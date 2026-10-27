@@ -1,0 +1,125 @@
+{
+  "conclusion": "",
+  "databaseId": 40596753377,
+  "headBranch": "ci/rjt-dictation-polish-native-01a17bef",
+  "headSha": "797da6c8be0f50f9c02a5eeed2e70e52adf4b82e",
+  "jobs": [
+    {
+      "completedAt": "0001-01-01T00:00:00Z",
+      "conclusion": "",
+      "databaseId": 122514489802,
+      "name": "native",
+      "startedAt": "2026-10-27T22:52:17Z",
+      "status": "in_progress",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T22:52:19Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T22:52:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:52:24Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T22:52:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:52:38Z",
+          "conclusion": "success",
+          "name": "Select Xcode and the static dependency toolchain",
+          "number": 3,
+          "startedAt": "2026-10-27T22:52:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:53:19Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 4,
+          "startedAt": "2026-10-27T22:52:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:53:20Z",
+          "conclusion": "success",
+          "name": "Check exact selection and observation classifiers",
+          "number": 5,
+          "startedAt": "2026-10-27T22:53:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:54:42Z",
+          "conclusion": "success",
+          "name": "Bind candidate source, native oracles and canonical packages",
+          "number": 6,
+          "startedAt": "2026-10-27T22:53:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:54:44Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper",
+          "number": 7,
+          "startedAt": "2026-10-27T22:54:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T22:54:44Z",
+          "conclusion": "skipped",
+          "name": "Run actions/cache/save@v4",
+          "number": 8,
+          "startedAt": "2026-10-27T22:54:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Execute four real Whisper file operations and native TextEdit delivery",
+          "number": 9,
+          "startedAt": "2026-10-27T22:54:44Z",
+          "status": "in_progress"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Recheck frozen source, signed app and native observations",
+          "number": 10,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Upload compact native acceptance observations",
+          "number": 11,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Upload build logs and exact native configuration",
+          "number": 12,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Post Run actions/checkout@v4",
+          "number": 24,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40596753377/job/122514489802"
+    }
+  ],
+  "status": "in_progress",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40596753377"
+}

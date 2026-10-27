@@ -1,0 +1,27 @@
+{
+  "classification": "source-only-oracle-updates",
+  "committed_source_checked": "c5859b1f59997633fbd59d92565eb70c173c8392",
+  "dictionary": {
+    "new_oracle_currently_committed": false,
+    "new_oracle_sha256": "3e76e3c168c50c73b028ba564746981cb0a82e5f0371d3a60174cde76b41cd33",
+    "old_oracle_compiler_failure_evidence_owned_by_root": true,
+    "old_oracle_sha256": "bd935877aca19d689f0c6ca0a99d4cfda2def35548c1040f66217d58fe36579f",
+    "only_changes": "@MainActor helper isolation plus materialized remove result before #require; two test bodies unchanged",
+    "test_body_sha256": {
+      "aFreshContextReadsChangesSavedByAnotherContext": "f5f43e87de67c28c7f933bf3555f3f659807c3d6c53f2edcda25f9e1dc2abcec",
+      "applyingAnotherStoreNeverReusesThePreviousStoresRules": "fe4f26f37ea360c485c59b7e4eaa082286bbccdc4140907739de7b4338a28741"
+    }
+  },
+  "finalizer": {
+    "new_committed_oracle_sha256": "5a51d639ac380bb3b0a4dcc2d7f8a9e97a1a6c94b96809df3f2fe68248fc0a43",
+    "old_oracle_sha256": "e1fcf3544f12aeb2c1ec461e5f26bb4c74d5a274e4c22878b91dcd801a3f98c4",
+    "only_changes": "Three obsolete cache-invalidation calls removed outside the selected test bodies",
+    "test_body_sha256": {
+      "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": "d03da25eebd7ce1ba1b4174c95bae012a72a605615465bad14642c7f487e247a",
+      "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": "cc4557417fba847515b82ba65293882310eec56fa99e532cf1880e547d50571f"
+    }
+  },
+  "native_regression_acceptance": false,
+  "normal_driver_self_tests_passed": true,
+  "scope": "Pins prepared for the coherent root commit; no test assertion weakened, no AI configuration forced, no native rerun before actual Local CLI diagnostics."
+}

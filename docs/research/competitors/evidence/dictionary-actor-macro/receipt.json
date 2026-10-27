@@ -1,0 +1,35 @@
+{
+  "classification": "extracted-helper-actor-compiler-shape-only",
+  "actual_helper_source": "VoiceInkTests/DictionaryContextFreshnessTests.swift",
+  "results": [
+    {
+      "lane": "old",
+      "swift_mode": "5",
+      "exit": 1,
+      "source_sha256": "7cca402a1d46298f63671f894284f753314e8c4a36d284c67c6b602c4c2507e2",
+      "diagnostics": "macro expansion #require:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context [#ActorIsolatedCall]\n`- /var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-dictionary-actor-shape-qzpvex9b/old.swift:15:98: note: expanded code originates here\n 6 | func save() throws {}\n 7 | func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] { [] } }\n 8 | @MainActor enum DictionaryService { static func removeWordReplacement(_ row: WordReplacement, context: ModelContext) -> String? { nil } }\n   |                                                 `- note: calls to static method 'removeWordReplacement(_:context:)' from outside of its actor context are implicitly asynchronous\n 9 | struct Probe {\n10 | private static func deleteOwnedSetupEntry(in context: ModelContext) throws {\n   |                     `- note: add '@MainActor' to make static method 'deleteOwnedSetupEntry(in:)' part of global actor 'MainActor'\n11 |             // A real successful removal establishes the same initial app-cache boundary in old/new hosts.\n12 |             let entry = WordReplacement(originalText: \"owned setup entry\", replacementText: \"temporary\")\n13 |             context.insert(entry)\n14 |             try context.save()\n15 |             try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)\n   |                 `- note: in expansion of macro 'require' here\n   +--- macro expansion #require ---------------------------------------\n   |1 | Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()\n   |  |                                                  `- error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context [#ActorIsolatedCall]\n   +--------------------------------------------------------------------\n16 |             try #require(context.fetch(FetchDescriptor<WordReplacement>()).isEmpty)\n17 |         }\n\n[#ActorIsolatedCall]: <https://docs.swift.org/compiler/documentation/diagnostics/actor-isolated-call>\n"
+    },
+    {
+      "lane": "old",
+      "swift_mode": "6",
+      "exit": 1,
+      "source_sha256": "7cca402a1d46298f63671f894284f753314e8c4a36d284c67c6b602c4c2507e2",
+      "diagnostics": "macro expansion #require:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context [#ActorIsolatedCall]\n`- /var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-dictionary-actor-shape-qzpvex9b/old.swift:15:98: note: expanded code originates here\n 6 | func save() throws {}\n 7 | func fetch<T>(_ descriptor: FetchDescriptor<T>) throws -> [T] { [] } }\n 8 | @MainActor enum DictionaryService { static func removeWordReplacement(_ row: WordReplacement, context: ModelContext) -> String? { nil } }\n   |                                                 `- note: calls to static method 'removeWordReplacement(_:context:)' from outside of its actor context are implicitly asynchronous\n 9 | struct Probe {\n10 | private static func deleteOwnedSetupEntry(in context: ModelContext) throws {\n   |                     `- note: add '@MainActor' to make static method 'deleteOwnedSetupEntry(in:)' part of global actor 'MainActor'\n11 |             // A real successful removal establishes the same initial app-cache boundary in old/new hosts.\n12 |             let entry = WordReplacement(originalText: \"owned setup entry\", replacementText: \"temporary\")\n13 |             context.insert(entry)\n14 |             try context.save()\n15 |             try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)\n   |                 `- note: in expansion of macro 'require' here\n   +--- macro expansion #require ---------------------------------------\n   |1 | Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode(\"DictionaryService.removeWordReplacement(entry, context: context)\"),\"==\",.__fromSyntaxNode(\"nil\")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()\n   |  |                                                  `- error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context [#ActorIsolatedCall]\n   +--------------------------------------------------------------------\n16 |             try #require(context.fetch(FetchDescriptor<WordReplacement>()).isEmpty)\n17 |         }\n\n[#ActorIsolatedCall]: <https://docs.swift.org/compiler/documentation/diagnostics/actor-isolated-call>\n"
+    },
+    {
+      "lane": "candidate",
+      "swift_mode": "5",
+      "exit": 0,
+      "source_sha256": "71cc1baed62576b9387c14641a4260052425746f703ddc48eef2081744d847d0",
+      "diagnostics": ""
+    },
+    {
+      "lane": "candidate",
+      "swift_mode": "6",
+      "exit": 0,
+      "source_sha256": "71cc1baed62576b9387c14641a4260052425746f703ddc48eef2081744d847d0",
+      "diagnostics": ""
+    }
+  ],
+  "scope": "Actual helper bodies with inert ModelContext, model and DictionaryService return-type shapes. Actual Testing macro compiler in Swift 5/6 modes. No app build, persistence or runtime proof."
+}

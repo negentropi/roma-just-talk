@@ -1,0 +1,6 @@
+{
+  "candidate_source_restored": true,
+  "engine_sha256": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c",
+  "restoration_method": "Write only the captured Engine bytes in the newly created detached checkout; no git restore/reset.",
+  "task_owned_checkout": "/Users/runner/work/_temp/recording-finalizer-baseline"
+}

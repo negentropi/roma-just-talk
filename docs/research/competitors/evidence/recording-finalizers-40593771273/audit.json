@@ -1,0 +1,178 @@
+{
+  "classification": "invalid-fixture-configuration-before-ownership-boundary",
+  "clean_shared_package_pins": 41,
+  "data_fetch": {
+    "failed_log_fetched_once": true,
+    "native_artifact_downloaded": false,
+    "native_artifact_id": 12776576150,
+    "native_compressed_bytes": 145747927,
+    "observations_artifact_id": 12775838725,
+    "observations_compressed_bytes": 682021,
+    "observations_fetched_once": true
+  },
+  "helper_sha256": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5",
+  "lanes": {
+    "baseline": {
+      "actual_api_key_validity": null,
+      "actual_local_cli_configuration_value": null,
+      "actual_selected_provider_raw_value": null,
+      "actual_test_results": {
+        "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        },
+        "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        }
+      },
+      "code_signature_unchanged_after_test": true,
+      "combined_configuration_condition": false,
+      "configuration_values_not_disambiguated_by_combined_assertion": true,
+      "exact_two_test_selection_verified": true,
+      "exit_code": 65,
+      "intended_ownership_issue_count": 0,
+      "library_validation_disabled": true,
+      "ownership_test_body_reached": false,
+      "prepared_isolated_configuration": {
+        "command_line_arguments": [
+          "-selectedAIProvider",
+          "Local CLI",
+          "-CurrentTranscriptionModel",
+          "whisper-large-v3-turbo",
+          "-PrewarmModelOnWake",
+          "NO",
+          "-hasCompletedOnboarding",
+          "YES",
+          "-isAIEnhancementEnabled",
+          "NO",
+          "-IsAudioCleanupEnabled",
+          "NO",
+          "-IsTranscriptionCleanupEnabled",
+          "NO",
+          "-enableAnnouncements",
+          "NO"
+        ],
+        "credential_contract": "LOCAL_BUILD routes app KeychainService to the fresh lane UserDefaults; no saved Keychain credential queries. This is source/configuration assurance, not SecItem tracing.",
+        "isolated_sha256": "87b81e6f4785ba0995b53948d8bc6ebc2edb35b4954b4c787645f138a308f117",
+        "isolated_user_home": "/Users/runner/work/_temp/recording-finalizer-proof/baseline/isolated-user",
+        "original_sha256": "ca00f9e071eb06750b35b4153d6ef4a0196e01bab7881cbbf07bc058e30fccd3",
+        "seed_preferences": {
+          "CurrentTranscriptionModel": "whisper-large-v3-turbo",
+          "IsAudioCleanupEnabled": false,
+          "IsTranscriptionCleanupEnabled": false,
+          "PrewarmModelOnWake": false,
+          "enableAnnouncements": false,
+          "hasCompletedOnboarding": true,
+          "isAIEnhancementEnabled": false,
+          "selectedAIProvider": "Local CLI"
+        }
+      },
+      "raw_signature_flags": "0x2(adhoc)",
+      "secondary_classifier_false_positive": {
+        "benign_actual_log_example": "2026-10-27 22:29:48.006796+0000 roma just talk[23590:74149] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 \"connection to service named com.apple.linkd.autoShortcut\" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}",
+        "pattern": "\\berror:",
+        "reason": "Background AppShortcuts linkd connection errors were labeled fatal by the broad matcher; tests still started and completed."
+      },
+      "setup_issue_count": 2,
+      "setup_issue_site": "DictationPolishPipelineTests.swift:586",
+      "strict_deep_signature_verified": true
+    },
+    "candidate": {
+      "actual_api_key_validity": null,
+      "actual_local_cli_configuration_value": null,
+      "actual_selected_provider_raw_value": null,
+      "actual_test_results": {
+        "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        },
+        "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        }
+      },
+      "code_signature_unchanged_after_test": true,
+      "combined_configuration_condition": false,
+      "configuration_values_not_disambiguated_by_combined_assertion": true,
+      "exact_two_test_selection_verified": true,
+      "exit_code": 65,
+      "intended_ownership_issue_count": 0,
+      "library_validation_disabled": true,
+      "ownership_test_body_reached": false,
+      "prepared_isolated_configuration": {
+        "command_line_arguments": [
+          "-selectedAIProvider",
+          "Local CLI",
+          "-CurrentTranscriptionModel",
+          "whisper-large-v3-turbo",
+          "-PrewarmModelOnWake",
+          "NO",
+          "-hasCompletedOnboarding",
+          "YES",
+          "-isAIEnhancementEnabled",
+          "NO",
+          "-IsAudioCleanupEnabled",
+          "NO",
+          "-IsTranscriptionCleanupEnabled",
+          "NO",
+          "-enableAnnouncements",
+          "NO"
+        ],
+        "credential_contract": "LOCAL_BUILD routes app KeychainService to the fresh lane UserDefaults; no saved Keychain credential queries. This is source/configuration assurance, not SecItem tracing.",
+        "isolated_sha256": "18714fad0bc060050ba3c1e84047ec7999aa1043c17d2d6904ddd87b700c580f",
+        "isolated_user_home": "/Users/runner/work/_temp/recording-finalizer-proof/candidate/isolated-user",
+        "original_sha256": "a10261493486ee83bd67662ad1f7ee6f8e9168d3f02c01802a3e89502deee6ed",
+        "seed_preferences": {
+          "CurrentTranscriptionModel": "whisper-large-v3-turbo",
+          "IsAudioCleanupEnabled": false,
+          "IsTranscriptionCleanupEnabled": false,
+          "PrewarmModelOnWake": false,
+          "enableAnnouncements": false,
+          "hasCompletedOnboarding": true,
+          "isAIEnhancementEnabled": false,
+          "selectedAIProvider": "Local CLI"
+        }
+      },
+      "raw_signature_flags": "0x2(adhoc)",
+      "secondary_classifier_false_positive": {
+        "benign_actual_log_example": "2026-10-27 22:39:25.545555+0000 roma just talk[43938:131027] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 \"connection to service named com.apple.linkd.autoShortcut\" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}",
+        "pattern": "\\berror:",
+        "reason": "Background AppShortcuts linkd connection errors were labeled fatal by the broad matcher; tests still started and completed."
+      },
+      "setup_issue_count": 2,
+      "setup_issue_site": "DictationPolishPipelineTests.swift:586",
+      "strict_deep_signature_verified": true
+    }
+  },
+  "limitations": [
+    "Both selected methods began once per lane, then threw at common fixture setup before the Engine ownership scenario.",
+    "The combined failed guard does not identify selected provider versus configuration validity.",
+    "No context-generation UUID or original/new recording ownership values were observed.",
+    "Local CLI startup configuration is prepared in xctestrun; actual provider/config values need diagnostic observations."
+  ],
+  "matched_red_green": false,
+  "only_production_difference": [
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
+  ],
+  "run_id": 40593771273,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40593771273",
+  "source_ref": "ci/rjt-recording-finalizer-01a17bef",
+  "source_sha": "e7b49af2239447246af6a8144e870ace37f4b161",
+  "static_whisper_bytes_matched": true,
+  "task_owned_source_restored": true,
+  "verified_source_pins": {
+    "baseline_engine_sha256": "4f9723565f85e6ae9ea7b7ae1ebb6b539626f95533d0fb44cc4cd8120c545a0f",
+    "candidate_engine_sha256": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c",
+    "fixture_sha256": "69b305908f75d26af44697cc6a0023f75725ffe780bacc2c094c0a06d91d2233",
+    "oracle_sha256": "e1fcf3544f12aeb2c1ec461e5f26bb4c74d5a274e4c22878b91dcd801a3f98c4"
+  }
+}

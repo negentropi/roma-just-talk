@@ -1,0 +1,85 @@
+{
+  "classification": "offline-classifier-correction-actual-log-recheck",
+  "driver_sha256": "c8c1bca50de33b386fd15c4bc82690e5b27d3f0c00e6c879ee3a758088d9f3c4",
+  "native_rerun": false,
+  "nonfatal_linkd_OSLog_no_longer_classified_as_fatal": true,
+  "normal_selftest_current_HEAD_pin_status": "Expected failure until root coordinates repinning after unrelated committed cache-call cleanup; runtime pin unchanged.",
+  "oracle_fixture_sha256": "e1fcf3544f12aeb2c1ec461e5f26bb4c74d5a274e4c22878b91dcd801a3f98c4",
+  "oracle_fixture_source": "e7b49af2239447246af6a8144e870ace37f4b161",
+  "rechecked_results": {
+    "baseline": {
+      "classification": "invalid-or-failed",
+      "errors": [
+        "Only the four source-bound context ownership assertions may fail"
+      ],
+      "exit_code": 65,
+      "failure_lines": [],
+      "issues": [
+        "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:586:13: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)",
+        "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:586:13: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)"
+      ],
+      "lane": "baseline",
+      "summaries": [
+        [
+          "2",
+          "2",
+          "failed"
+        ]
+      ],
+      "tests": {
+        "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        },
+        "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        }
+      },
+      "valid": false
+    },
+    "candidate": {
+      "classification": "invalid-or-failed",
+      "errors": [
+        "heldCancellationCannotClearContextCapturedByANewerAcceptedRun did not finish once with the expected result",
+        "resetCleanupCannotClearContextCapturedByANewerAcceptedRun did not finish once with the expected result",
+        "The exact two-test summary and expected process exit are required",
+        "Only the four source-bound context ownership assertions may fail"
+      ],
+      "exit_code": 65,
+      "failure_lines": [],
+      "issues": [
+        "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:586:13: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)",
+        "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:586:13: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)"
+      ],
+      "lane": "candidate",
+      "summaries": [
+        [
+          "2",
+          "2",
+          "failed"
+        ]
+      ],
+      "tests": {
+        "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        },
+        "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        }
+      },
+      "valid": false
+    }
+  },
+  "same_actual_native_logs_still_invalid_for_setup_failure": true
+}

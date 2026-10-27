@@ -41,12 +41,13 @@ extension VoiceInkTests {
             #expect(DictionaryService.applyWordReplacements(to: "Roma", using: reader) == "Second value")
         }
 
-        private static func deleteOwnedSetupEntry(in context: ModelContext) throws {
+        @MainActor private static func deleteOwnedSetupEntry(in context: ModelContext) throws {
             // A real successful removal establishes the same initial app-cache boundary in old/new hosts.
             let entry = WordReplacement(originalText: "owned setup entry", replacementText: "temporary")
             context.insert(entry)
             try context.save()
-            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)
+            let removalAlert = DictionaryService.removeWordReplacement(entry, context: context)
+            try #require(removalAlert == nil)
             try #require(context.fetch(FetchDescriptor<WordReplacement>()).isEmpty)
         }
     }

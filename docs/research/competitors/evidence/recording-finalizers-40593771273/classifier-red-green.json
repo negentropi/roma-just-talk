@@ -1,0 +1,27 @@
+{
+  "actual_OSLog_fixture_run": 40593771273,
+  "candidate_driver_sha256": "c8c1bca50de33b386fd15c4bc82690e5b27d3f0c00e6c879ee3a758088d9f3c4",
+  "classification": "offline-matched-classifier-regression",
+  "known_bad_driver_source_sha": "e7b49af2239447246af6a8144e870ace37f4b161",
+  "same_log_boundary_results": [
+    {
+      "control_without_OSLog_old_valid": true,
+      "lane": "candidate",
+      "old_errors": [
+        "Crash, launch, compiler or session errors cannot count as regression evidence"
+      ],
+      "same_log_with_actual_OSLog_candidate_valid": true,
+      "same_log_with_actual_OSLog_known_bad_valid": false
+    },
+    {
+      "control_without_OSLog_old_valid": true,
+      "lane": "baseline",
+      "old_errors": [
+        "Crash, launch, compiler or session errors cannot count as regression evidence"
+      ],
+      "same_log_with_actual_OSLog_candidate_valid": true,
+      "same_log_with_actual_OSLog_known_bad_valid": false
+    }
+  ],
+  "scope": "Actual old/new classifier functions with otherwise-valid synthetic test summaries plus one actual nonfatal OSLog line; no native product red/green claimed."
+}

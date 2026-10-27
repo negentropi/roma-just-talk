@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "candidate native result is invalid: heldCancellationCannotClearContextCapturedByANewerAcceptedRun did not finish once with the expected result; resetCleanupCannotClearContextCapturedByANewerAcceptedRun did not finish once with the expected result; The exact two-test summary and expected process exit are required; Only the four source-bound context ownership assertions may fail; Crash, launch, compiler or session errors cannot count as regression evidence",
+  "phase": "candidate"
+}

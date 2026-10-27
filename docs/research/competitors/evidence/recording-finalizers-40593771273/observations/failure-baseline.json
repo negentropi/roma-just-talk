@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "baseline native result is invalid: Only the four source-bound context ownership assertions may fail; Crash, launch, compiler or session errors cannot count as regression evidence",
+  "phase": "baseline"
+}

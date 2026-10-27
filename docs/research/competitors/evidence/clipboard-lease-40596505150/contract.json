@@ -1,0 +1,24 @@
+{
+  "acceptance": "known-bad reproduction only",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "cases": [
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+    "singleWritingPasteHonorsDefaultRestorationDeadline",
+    "newerClipboardCopySurvivesWritingRestorationDeadline"
+  ],
+  "failure_sites": {
+    "18": "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "31": "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "45": "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload"
+  },
+  "known_bad_paster_sha256": "c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0",
+  "lane": "baseline",
+  "oracle_sha256": "3bba815e11a289c96061f16db9967123272bd6916b29439e066f123435ac9d6a",
+  "paster_sha256": "c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0",
+  "scope": "clipboard restoration only; controlled menu/document access",
+  "source_sha": "7ef7b78b1d3453fed952c3a73a1fe7abd5a8362c",
+  "test_host_verifier_sha256": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5",
+  "test_host_verifier_tests_sha256": "3b74b785210bd5452f8f11247897c44f340d9b26fa1aa5efb52cfad8e7826855"
+}

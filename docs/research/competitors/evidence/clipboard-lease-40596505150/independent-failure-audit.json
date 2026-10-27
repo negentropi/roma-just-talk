@@ -1,0 +1,40 @@
+{
+  "classification": "invalid-pretest-testing-macro-actor-isolation",
+  "runID": 40596505150,
+  "sourceSHA": "7ef7b78b1d3453fed952c3a73a1fe7abd5a8362c",
+  "actualNativeTestsExecuted": 0,
+  "knownBadClipboardReproduced": false,
+  "actualCompilerDiagnostic": {
+    "path": "VoiceInkTests/DictionaryContextFreshnessTests.swift",
+    "line": 49,
+    "column": 17,
+    "message": "call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+    "macro": "#require",
+    "repeatedDiagnosticCount": 13
+  },
+  "commonOracleSHA256": "3bba815e11a289c96061f16db9967123272bd6916b29439e066f123435ac9d6a",
+  "actualPasterSHA256": "c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0",
+  "failedLogFetchedOnce": true,
+  "artifacts": [
+    {
+      "id": 12776603256,
+      "bytes": 80880,
+      "sha256": "bdb73efb0222e6ea6f1b5bea51210ec5967379ab5511f2086e2c4bd23019017d",
+      "members": 20,
+      "CRCValid": true,
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40596505150/evidence.zip"
+    },
+    {
+      "id": 12776972949,
+      "bytes": 230043,
+      "sha256": "a20f44f4edeffa780e7017ee351113a176dfe5c0557f9d0868ee6a87a01cf192",
+      "members": 5,
+      "CRCValid": true,
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40596505150/app-artifact.zip"
+    }
+  ],
+  "limits": [
+    "The complete app unit bundle did not compile; no native selection, paste, live process or clipboard behavior acceptance.",
+    "The source-bound revised clipboard fixture has not run; unchanged production CursorPaster remains unmodified."
+  ]
+}

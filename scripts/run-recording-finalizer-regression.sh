@@ -37,7 +37,7 @@ lock_path = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package
 lock_sha = "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
 candidate_engine_sha = "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c"
 baseline_engine_sha = "4f9723565f85e6ae9ea7b7ae1ebb6b539626f95533d0fb44cc4cd8120c545a0f"
-oracle_sha = "e1fcf3544f12aeb2c1ec461e5f26bb4c74d5a274e4c22878b91dcd801a3f98c4"
+oracle_sha = "5a51d639ac380bb3b0a4dcc2d7f8a9e97a1a6c94b96809df3f2fe68248fc0a43"
 baseline = output.parent / "recording-finalizer-baseline"
 package_checkouts = repo / ".local-build/SourcePackages"
 bundle_id = "com.negentropi.RomaJustTalk"
@@ -156,7 +156,10 @@ def classify(text, code, lane, sites):
     expected_lines = sorted(sites) if lane == "baseline" else []
     if len(issues) != len(expected_lines) or sorted(observed) != expected_lines:
         errors.append("Only the four source-bound context ownership assertions may fail")
-    if re.search(r"\b(?:crashed|crash report|unexpected exit|Testing cancelled|Test session ended prematurely|failed to launch|fatal error:|error:)", text, re.I):
+    fatal = re.search(r"\b(?:crashed|crash report|unexpected exit|Testing cancelled|Test session ended prematurely|failed to launch|fatal error:)", text, re.I)
+    diagnostics = re.search(r"^\s*(?:(?:xcodebuild|swiftc|clang|ld)(?:\[[^\]\n]+\])?:\s*)?(?:fatal\s+)?error:", text, re.M | re.I)
+    source_errors = re.search(r"^\s*[^\n]+\.(?:swift|c|cc|cpp|cxx|m|mm|h|hpp):\d+(?::\d+)?:\s*(?:fatal\s+)?error:", text, re.M | re.I)
+    if fatal or diagnostics or source_errors:
         errors.append("Crash, launch, compiler or session errors cannot count as regression evidence")
     return {"valid": not errors, "classification": ("intended-context-clear-failures" if lane == "baseline" else "passed") if not errors else "invalid-or-failed",
         "lane": lane, "exit_code": code, "tests": observations, "summaries": [list(value) for value in summaries],
@@ -391,6 +394,9 @@ def self_test():
     good, bad = log("candidate"), log("baseline")
     require(classify(good, 0, "candidate", sites)["valid"], "Valid candidate rejected")
     require(classify(bad, 65, "baseline", sites)["valid"], "Valid known-bad assertions rejected")
+    benign_oslog = '2026-10-27 22:39:25.545555+0000 roma just talk[43938:131027] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}\n'
+    require(classify(good + benign_oslog, 0, "candidate", sites)["valid"], "A nonfatal background OSLog invalidated a passing native case")
+    require(classify(bad + benign_oslog, 65, "baseline", sites)["valid"], "A nonfatal background OSLog invalidated the intended source-bound failures")
     issue = next(line for line in bad.splitlines() if "recorded an issue" in line)
     invalid = [(good, 65, "candidate"), (bad, 0, "baseline"), (good, 0, "baseline"),
         (good.replace("Test " + cases[0] + "() started.\n", ""), 0, "candidate"),
@@ -403,8 +409,15 @@ def self_test():
         (bad.replace("Expectation failed:", "Caught error:"), 65, "baseline"),
         (bad.replace(issue, issue.replace(cases[0], "unrelated")), 65, "baseline"),
         (bad + "Test host crashed\n", 65, "baseline"), (bad + "error: compile failed\n", 65, "baseline"),
+        (bad + "xcodebuild: error: Native launch failed\n", 65, "baseline"),
+        (bad + "/fixture/Source.swift:12:4: error: compile failed\n", 65, "baseline"),
+        (bad + "clang: error: link failed\n", 65, "baseline"),
         (bad.replace("2 tests", "3 tests"), 65, "baseline"), (bad.replace("2 suites", "0 suites"), 65, "baseline")]
     require(all(not classify(text, code, lane, sites)["valid"] for text, code, lane in invalid), "Invalid native result accepted")
+    setup_failure = "".join("Test " + name + "() started.\nTest " + name + "() failed after 0.1 seconds.\nTest " + name
+        + "() recorded an issue at DictationPolishPipelineTests.swift:586:13: Expectation failed: ai.selectedProvider == .localCLI && ai.isAPIKeyValid\n" for name in cases)
+    setup_failure += "Test run with 2 tests in 2 suites failed after 0.1 seconds.\n" + benign_oslog
+    require(not classify(setup_failure, 65, "baseline", sites)["valid"], "The actual pre-ownership setup failure counted as known-bad evidence")
     committed_engine = git(repo, "show", "HEAD:" + engine_path)
     require(digest(committed_engine) == candidate_engine_sha, "Pinned committed candidate Engine changed")
     with tempfile.TemporaryDirectory(prefix="rjt-finalizer-fixture-") as temporary:
@@ -415,7 +428,7 @@ def self_test():
         subprocess.run(["git", "apply", "--check", str(repo / fixture_path)], cwd=checkout, check=True)
         subprocess.run(["git", "apply", str(repo / fixture_path)], cwd=checkout, check=True)
         require(digest(engine.read_bytes()) == baseline_engine_sha, "Guard fixture does not reproduce the pinned known-bad Engine")
-    print(json.dumps({"classification": "offline-classifier-passed", "valid_cases": 2, "invalid_cases": len(invalid), "source_bound_assertions": len(sites),
+    print(json.dumps({"classification": "offline-classifier-passed", "valid_cases": 4, "invalid_cases": len(invalid) + 1, "source_bound_assertions": len(sites),
         "scope": "Classifier/source fixture only; no native build or test execution"}))
 
 

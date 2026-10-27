@@ -35,7 +35,7 @@ lock_path = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package
 lock_sha = "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
 baseline_sha = "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
 baseline_service_sha = "e630a6de3d0851a1222447ee7a03e1167481ac6d2f102909514555e070365966"
-oracle_sha = "bd935877aca19d689f0c6ca0a99d4cfda2def35548c1040f66217d58fe36579f"
+oracle_sha = "3e76e3c168c50c73b028ba564746981cb0a82e5f0371d3a60174cde76b41cd33"
 baseline = output.parent / "dictionary-context-baseline"
 package_checkouts = repo / ".local-build/SourcePackages"
 bundle_id = "com.negentropi.RomaJustTalk"
@@ -172,7 +172,10 @@ def classify(text, code, lane, sites):
     expected_lines = sorted(sites) if lane == "baseline" else []
     if len(issues) != len(expected_lines) or sorted(observed) != expected_lines:
         errors.append("Only the two source-bound final dictionary assertions may fail")
-    if re.search(r"\b(?:crashed|crash report|unexpected exit|Testing cancelled|Test session ended prematurely|failed to launch|fatal error:|error:)", text, re.I):
+    fatal = re.search(r"\b(?:crashed|crash report|unexpected exit|Testing cancelled|Test session ended prematurely|failed to launch|fatal error:)", text, re.I)
+    diagnostics = re.search(r"^\s*(?:(?:xcodebuild|swiftc|clang|ld)(?:\[[^\]\n]+\])?:\s*)?(?:fatal\s+)?error:", text, re.M | re.I)
+    source_errors = re.search(r"^\s*[^\n]+\.(?:swift|c|cc|cpp|cxx|m|mm|h|hpp):\d+(?::\d+)?:\s*(?:fatal\s+)?error:", text, re.M | re.I)
+    if fatal or diagnostics or source_errors:
         errors.append("Crash, launch, compiler or session errors cannot count as regression evidence")
     return {"valid": not errors, "classification": ("intended-stale-dictionary-failures" if lane == "baseline" else "passed") if not errors else "invalid-or-failed",
         "lane": lane, "exit_code": code, "tests": observations, "summaries": [list(value) for value in summaries],
@@ -405,6 +408,9 @@ def self_test():
     good, bad = log("candidate"), log("baseline")
     require(classify(good, 0, "candidate", sites)["valid"], "Valid candidate rejected")
     require(classify(bad, 65, "baseline", sites)["valid"], "Valid known-bad assertions rejected")
+    benign_oslog = '2026-10-27 22:39:25.545555+0000 roma just talk[43938:131027] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}\n'
+    require(classify(good + benign_oslog, 0, "candidate", sites)["valid"], "A nonfatal background OSLog invalidated a passing native case")
+    require(classify(bad + benign_oslog, 65, "baseline", sites)["valid"], "A nonfatal background OSLog invalidated intended source-bound dictionary failures")
     issue = next(line for line in bad.splitlines() if "recorded an issue" in line)
     invalid = [(good, 65, "candidate"), (bad, 0, "baseline"), (good, 0, "baseline"),
         (good.replace("Test " + next(iter(cases)) + "() started.\n", ""), 0, "candidate"),
@@ -417,13 +423,16 @@ def self_test():
         (bad.replace("Expectation failed:", "Caught error:"), 65, "baseline"),
         (bad.replace(issue, issue.replace(next(iter(cases)), "unrelated")), 65, "baseline"),
         (bad + "Test host crashed\n", 65, "baseline"), (bad + "error: compile failed\n", 65, "baseline"),
+        (bad + "xcodebuild: error: Native launch failed\n", 65, "baseline"),
+        (bad + "/fixture/Source.swift:12:4: error: compile failed\n", 65, "baseline"),
+        (bad + "clang: error: link failed\n", 65, "baseline"),
         (bad.replace("2 tests", "3 tests"), 65, "baseline"), (bad.replace("2 suites", "0 suites"), 65, "baseline")]
     require(all(not classify(text, code, lane, sites)["valid"] for text, code, lane in invalid), "Invalid native result accepted")
     require(digest(git(repo, "show", baseline_sha + ":" + service_path)) == baseline_service_sha, "Pinned historical dictionary changed")
     require(digest(git(repo, "show", baseline_sha + ":" + lock_path)) == lock_sha, "Historical canonical lock changed")
     invalid_values = bad.replace("First store", "Second store")
     require(not classify(invalid_values, 65, "baseline", sites)["valid"], "Baseline without observed wrong-store value accepted")
-    print(json.dumps({"classification": "offline-classifier-passed", "valid_cases": 2, "invalid_cases": len(invalid) + 1, "source_bound_assertions": len(sites),
+    print(json.dumps({"classification": "offline-classifier-passed", "valid_cases": 4, "invalid_cases": len(invalid) + 1, "source_bound_assertions": len(sites),
         "scope": "Classifier/source fixture only; no native build or test execution"}))
 
 

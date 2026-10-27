@@ -1,0 +1,16 @@
+{
+  "classification": "canceled-known-invalid-test-compile-source",
+  "runID": 40596753377,
+  "sourceSHA": "797da6c8be0f50f9c02a5eeed2e70e52adf4b82e",
+  "fixtureSource": "VoiceInkTests/DictionaryContextFreshnessTests.swift",
+  "fixtureSHA256": "bd935877aca19d689f0c6ca0a99d4cfda2def35548c1040f66217d58fe36579f",
+  "reason": "Root canceled after another actual native build found the same exact-source MainActor test-helper macro error; correction already prepared. Avoid duplicate known-invalid native builds.",
+  "diagnosticProviderFactsProduced": false,
+  "featureAcceptance": false,
+  "actualNativeExecutionCensus": "Not inspected; no successful native feature result claimed.",
+  "artifactDownloads": 0,
+  "failedLogDownloads": 0,
+  "limits": [
+    "Cancellation metadata and exact fixture identity only. No app compile/runtime or provider-state proof."
+  ]
+}

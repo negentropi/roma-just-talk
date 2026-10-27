@@ -1,0 +1,43 @@
+regression	Require exact known-bad context ownership failures	﻿2026-10-27T22:20:21.5156100Z ##[group]Run bash scripts/run-recording-finalizer-regression.sh baseline
+regression	Require exact known-bad context ownership failures	2026-10-27T22:20:21.5156620Z ^[[36;1mbash scripts/run-recording-finalizer-regression.sh baseline^[[0m
+regression	Require exact known-bad context ownership failures	2026-10-27T22:20:21.5207960Z shell: /bin/bash -e {0}
+regression	Require exact known-bad context ownership failures	2026-10-27T22:20:21.5208290Z ##[endgroup]
+regression	Require exact known-bad context ownership failures	2026-10-27T22:20:25.5426270Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/build-settings.json
+regression	Require exact known-bad context ownership failures	2026-10-27T22:21:02.3909400Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/build.log
+regression	Require exact known-bad context ownership failures	2026-10-27T22:28:58.4852160Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/static-app.log
+regression	Require exact known-bad context ownership failures	2026-10-27T22:29:07.3850030Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/signing.log
+regression	Require exact known-bad context ownership failures	2026-10-27T22:29:12.5358030Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/discovery/enumeration.log
+regression	Require exact known-bad context ownership failures	2026-10-27T22:29:32.1657110Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/selection/enumeration.log
+regression	Require exact known-bad context ownership failures	2026-10-27T22:29:39.6715250Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/tests.log
+regression	Require exact known-bad context ownership failures	2026-10-27T22:30:13.7534740Z Traceback (most recent call last):
+regression	Require exact known-bad context ownership failures	2026-10-27T22:30:13.7540750Z   File "<stdin>", line 452, in <module>
+regression	Require exact known-bad context ownership failures	2026-10-27T22:30:13.7945340Z   File "<stdin>", line 350, in execute_lane
+regression	Require exact known-bad context ownership failures	2026-10-27T22:30:13.7947010Z   File "<stdin>", line 41, in require
+regression	Require exact known-bad context ownership failures	2026-10-27T22:30:13.7949310Z RuntimeError: baseline native result is invalid: Only the four source-bound context ownership assertions may fail; Crash, launch, compiler or session errors cannot count as regression evidence
+regression	Require exact known-bad context ownership failures	2026-10-27T22:30:13.8404010Z ##[error]Process completed with exit code 1.
+regression	Require both candidate native regressions to pass	﻿2026-10-27T22:30:13.8811900Z ##[group]Run bash scripts/run-recording-finalizer-regression.sh candidate
+regression	Require both candidate native regressions to pass	2026-10-27T22:30:13.8814160Z ^[[36;1mbash scripts/run-recording-finalizer-regression.sh candidate^[[0m
+regression	Require both candidate native regressions to pass	2026-10-27T22:30:14.1465700Z shell: /bin/bash -e {0}
+regression	Require both candidate native regressions to pass	2026-10-27T22:30:14.1466130Z ##[endgroup]
+regression	Require both candidate native regressions to pass	2026-10-27T22:30:18.7528920Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/build-settings.json
+regression	Require both candidate native regressions to pass	2026-10-27T22:30:50.9149200Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/build.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:38:54.3668400Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/static-app.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:38:56.6193230Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/signing.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:38:59.6822510Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/discovery/enumeration.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:09.0464010Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/selection/enumeration.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:14.8548440Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/tests.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:50.2666970Z Traceback (most recent call last):
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:50.2672350Z   File "<stdin>", line 452, in <module>
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:50.2673020Z   File "<stdin>", line 350, in execute_lane
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:50.2673790Z   File "<stdin>", line 41, in require
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:50.2675910Z RuntimeError: candidate native result is invalid: heldCancellationCannotClearContextCapturedByANewerAcceptedRun did not finish once with the expected result; resetCleanupCannotClearContextCapturedByANewerAcceptedRun did not finish once with the expected result; The exact two-test summary and expected process exit are required; Only the four source-bound context ownership assertions may fail; Crash, launch, compiler or session errors cannot count as regression evidence
+regression	Require both candidate native regressions to pass	2026-10-27T22:39:50.3010280Z ##[error]Process completed with exit code 1.
+regression	Require the matched native red and green result	﻿2026-10-27T22:39:50.3254450Z ##[group]Run bash scripts/run-recording-finalizer-regression.sh verify
+regression	Require the matched native red and green result	2026-10-27T22:39:50.3255490Z ^[[36;1mbash scripts/run-recording-finalizer-regression.sh verify^[[0m
+regression	Require the matched native red and green result	2026-10-27T22:39:50.4855880Z shell: /bin/bash -e {0}
+regression	Require the matched native red and green result	2026-10-27T22:39:50.4857100Z ##[endgroup]
+regression	Require the matched native red and green result	2026-10-27T22:39:52.5295790Z Traceback (most recent call last):
+regression	Require the matched native red and green result	2026-10-27T22:39:52.5297080Z   File "<stdin>", line 466, in <module>
+regression	Require the matched native red and green result	2026-10-27T22:39:52.5297560Z   File "<stdin>", line 41, in require
+regression	Require the matched native red and green result	2026-10-27T22:39:52.5298170Z RuntimeError: Immutable native verdict no longer validates
+regression	Require the matched native red and green result	2026-10-27T22:39:52.5396470Z ##[error]Process completed with exit code 1.

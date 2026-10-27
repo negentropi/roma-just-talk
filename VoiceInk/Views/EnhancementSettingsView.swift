@@ -5,39 +5,32 @@ import VoiceInkCore
 struct EnhancementSettingsView: View {
     @EnvironmentObject private var enhancementService: AIEnhancementService
     private let presentation = VoiceInkEnhancementSettingsPresentation.macOS
-    @State private var isEditingPrompt = false
-    @State private var isShowingSettings = false
-    @State private var selectedPromptForEdit: VoiceInkCustomPrompt?
-    @State private var panelID = UUID()
+    /// The one owner of which sheet is up. Each case carries what its content needs, so the
+    /// sheet renders from the presented item rather than from separate flags.
+    @State private var activeSheet: ActiveSheet?
 
-    private let panelWidth: CGFloat = 400
+    private let sheetWidth: CGFloat = 400
 
-    private enum PanelType {
-        case promptEditor
+    private enum ActiveSheet: Identifiable {
         case settings
-    }
+        case addPrompt
+        case editPrompt(VoiceInkCustomPrompt)
 
-    private var activePanel: PanelType? {
-        if isShowingSettings { return .settings }
-        if isEditingPrompt || selectedPromptForEdit != nil { return .promptEditor }
-        return nil
-    }
-
-    private var isPanelOpen: Bool {
-        activePanel != nil
-    }
-
-    private func openPromptPanel() {
-        isShowingSettings = false
-        panelID = UUID()
-    }
-
-    private func closePanel() {
-        withAnimation(.smooth(duration: 0.3)) {
-            isEditingPrompt = false
-            selectedPromptForEdit = nil
-            isShowingSettings = false
+        var id: String {
+            switch self {
+            case .settings: "settings"
+            case .addPrompt: "prompt.add"
+            case .editPrompt(let prompt): "prompt.edit.\(prompt.id.uuidString)"
+            }
         }
+    }
+
+    private var isShowingSettings: Bool {
+        activeSheet?.id == ActiveSheet.settings.id
+    }
+
+    private func closeSheet() {
+        activeSheet = nil
     }
 
     var body: some View {
@@ -58,11 +51,7 @@ struct EnhancementSettingsView: View {
                     Text(presentation.generalSectionTitle)
                     Spacer()
                     Button {
-                        withAnimation(.smooth(duration: 0.3)) {
-                            isEditingPrompt = false
-                            selectedPromptForEdit = nil
-                            isShowingSettings.toggle()
-                        }
+                        activeSheet = .settings
                     } label: {
                         Image(systemName: presentation.settingsButtonSystemImageName)
                             .font(.system(size: 16, weight: .medium))
@@ -70,6 +59,8 @@ struct EnhancementSettingsView: View {
                     }
                     .buttonStyle(.plain)
                     .help(presentation.settingsButtonHelp)
+                    .accessibilityLabel(presentation.settingsButtonHelp)
+                    .accessibilityIdentifier("enhancement.settings.open")
                 }
             }
 
@@ -84,10 +75,7 @@ struct EnhancementSettingsView: View {
                         enhancementService.setActivePrompt(prompt)
                     },
                     onEditPrompt: { prompt in
-                        openPromptPanel()
-                        withAnimation(.smooth(duration: 0.3)) {
-                            selectedPromptForEdit = prompt
-                        }
+                        activeSheet = .editPrompt(prompt)
                     },
                     onDeletePrompt: { prompt in
                         enhancementService.deletePrompt(prompt)
@@ -99,10 +87,7 @@ struct EnhancementSettingsView: View {
                     Text(presentation.promptsSectionTitle)
                     Spacer()
                     Button {
-                        openPromptPanel()
-                        withAnimation(.smooth(duration: 0.3)) {
-                            isEditingPrompt = true
-                        }
+                        activeSheet = .addPrompt
                     } label: {
                         Image(systemName: VoiceInkCustomPromptPresentation.addPromptSystemImageName)
                             .font(.system(size: 18))
@@ -111,6 +96,8 @@ struct EnhancementSettingsView: View {
                     }
                     .buttonStyle(.plain)
                     .help(VoiceInkCustomPromptPresentation.addPromptHelpText)
+                    .accessibilityLabel(VoiceInkCustomPromptPresentation.addPromptHelpText)
+                    .accessibilityIdentifier("enhancement.prompts.add")
                 }
             }
             .opacity(enhancementService.isEnhancementEnabled ? 1.0 : 0.8)
@@ -118,32 +105,14 @@ struct EnhancementSettingsView: View {
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
         .background(Color(NSColor.controlBackgroundColor))
-        .slidingPanel(isPresented: .init(
-            get: { isPanelOpen },
-            set: { newValue in
-                if !newValue { closePanel() }
-            }
-        ), width: panelWidth) {
-            Group {
-                switch activePanel {
-                case .settings:
-                    EnhancementSettingsPanel(onDismiss: closePanel)
-                case .promptEditor:
-                    Group {
-                        if let prompt = selectedPromptForEdit {
-                            PromptEditorView(mode: .edit(prompt)) {
-                                closePanel()
-                            }
-                        } else if isEditingPrompt {
-                            PromptEditorView(mode: .add) {
-                                closePanel()
-                            }
-                        }
-                    }
-                    .id(panelID)
-                case nil:
-                    EmptyView()
-                }
+        .settingsSheet(item: $activeSheet, width: sheetWidth) { sheet in
+            switch sheet {
+            case .settings:
+                EnhancementSettingsPanel(onDismiss: closeSheet)
+            case .addPrompt:
+                PromptEditorView(mode: .add, onDismiss: closeSheet)
+            case .editPrompt(let prompt):
+                PromptEditorView(mode: .edit(prompt), onDismiss: closeSheet)
             }
         }
         .frame(minWidth: 500, minHeight: 400)

@@ -1,6 +1,6 @@
 # Choose dictation cleanup
 
-In **models**, open the settings gear and choose **Custom** or **None** under **Dictation Cleanup**.
+In **models**, open the settings gear and choose **Custom** or **None** under **Dictation Cleanup**. Settings opens in a Mac sheet; use its close button or Escape to return.
 
 Custom keeps the existing formatting, filler words, dictionary, snippets and AI enhancement settings. It is the default for existing installations.
 

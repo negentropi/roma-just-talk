@@ -26,6 +26,8 @@ struct DictionarySettingsPanel: View {
                 }
                 .buttonStyle(.plain)
                 .help(dictionaryPresentation.closeButtonHelp ?? "")
+                .accessibilityLabel(dictionaryPresentation.closeButtonHelp ?? "Close")
+                .accessibilityIdentifier("dictionary.settings.close")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -40,6 +42,7 @@ struct DictionarySettingsPanel: View {
                     LabeledContent(dictionaryPresentation.quickAddShortcutTitle ?? "") {
                         ShortcutRecorder(action: .quickAddToDictionary)
                             .controlSize(.small)
+                            .accessibilityIdentifier("dictionary.settings.shortcut")
                     }
                 } header: {
                     Text(dictionaryPresentation.shortcutsSectionTitle ?? "")

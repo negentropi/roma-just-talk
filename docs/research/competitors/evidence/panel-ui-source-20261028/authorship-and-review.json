@@ -1,0 +1,73 @@
+{
+  "classification": "source-authorship-and-review-only",
+  "invocations": [
+    {
+      "invocation": "rjt-panel-opus-01a17bef",
+      "model": "claude-opus-5-5",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 1.7000071999999997
+      },
+      "changed_paths": [
+        "VoiceInk/Views/Components/SlidingPanel.swift"
+      ],
+      "raw_jsonl_sha256": "387208a5255cee5ea9a0caac44b951ec12a8f79543249775b9fdfc7d126b09fb"
+    },
+    {
+      "invocation": "rjt-panel-followup-opus-01a17bef",
+      "model": "claude-opus-5-5",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 0.8402239999999999
+      },
+      "changed_paths": [
+        "VoiceInk/Views/AI Models/ModelManagementView.swift",
+        "VoiceInk/Views/Components/EnhancementSettingsPanel.swift",
+        "VoiceInk/Views/Components/SlidingPanel.swift",
+        "VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift",
+        "VoiceInk/Views/Dictionary/DictionarySettingsView.swift",
+        "VoiceInk/Views/EnhancementSettingsView.swift",
+        "VoiceInk/Views/PromptEditorView.swift"
+      ],
+      "raw_jsonl_sha256": "894efe73a94ef2f95f29abab3ab11f7a669aa9e21e417d0eb20eb2d766ef8bf6"
+    },
+    {
+      "invocation": "rjt-panel-powermode-opus-01a17bef",
+      "model": "claude-opus-5-5",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "total_cost_usd": 0.4986752000000001
+      },
+      "changed_paths": [
+        "VoiceInk/PowerMode/PowerModeConfigView.swift",
+        "VoiceInk/PowerMode/PowerModeView.swift"
+      ],
+      "raw_jsonl_sha256": "90cd09f25902bde57ee0a22d4ba924124b894c2f56253c34ccc4e8de0de4679b"
+    }
+  ],
+  "candidate_ui_sources": {
+    "VoiceInk/PowerMode/PowerModeConfigView.swift": "bad52f6016e0d584c2a179438c580bef68338c04bb7d30faa71ff05f748ff8f6",
+    "VoiceInk/PowerMode/PowerModeView.swift": "dac49e3e22f735967d0b72c7b3b812ab5065572149993c6dc6a7bb3507b81d7d",
+    "VoiceInk/Views/AI Models/ModelManagementView.swift": "abbc1d210a5e9be757880bbfea27ca247ba12b8d5ea52d74e11a68dc4e336f6d",
+    "VoiceInk/Views/Components/EnhancementSettingsPanel.swift": "abc66b8207e6aa77ce6229e249b628cae40bf448b022ab52a6793f5f688f5bbc",
+    "VoiceInk/Views/Components/SlidingPanel.swift": "e2172bf91ff6c98755406726c11796793f10edbb907671cfb093675e3e665862",
+    "VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift": "5af1db51055ef82f8d59661c2fbb072ce046e52d53b635bd67dde51ad9d0eb70",
+    "VoiceInk/Views/Dictionary/DictionarySettingsView.swift": "7b056a1fb751df4147852f20814987768b50cffe1c4483271194bcbc554d05af",
+    "VoiceInk/Views/EnhancementSettingsView.swift": "b800ed2203c5586773be4f52ba3a0e31fdbb2738e7eda647acfa1a42e5c0d334",
+    "VoiceInk/Views/PromptEditorView.swift": "45f18dfb8165a6abb69019ee0bd2f6cf6ce42926f4dad7198ea089d094dfc2e0"
+  },
+  "source_review": {
+    "reviewer_model": "gpt-6.1-sol",
+    "verdict": "No remaining source-proven blocker; ready for remote compile",
+    "resolved_finding": "Initial census missed two PowerMode calls; actual Opus migrated both. Whole VoiceInk search finds zero old API calls.",
+    "api_availability": "Sol checked installed SDK: single-value onGeometryChange supports macOS13+."
+  },
+  "limits": [
+    "No candidate compile or runtime established by this receipt.",
+    "Old non-hittable controls are observed. Disabled-container labels do not establish their cause.",
+    "Native UI run must verify controls, modality, persistence and shared callers."
+  ]
+}

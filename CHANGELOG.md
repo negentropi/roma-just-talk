@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Open settings, prompt editors and Power Mode configuration in native Mac sheets, with keyboard dismissal and one presentation owner per screen.
+
 - Add a global None dictation cleanup option that preserves the transcription model’s text and bypasses AI enhancement, snippets, replacements, capitalization and added spaces. Keep existing behavior and saved settings under Custom.
 - Let cancellation reach queued dictation paste tasks before they write text or post paste commands.
 - Add separate recording shortcuts for translation, selected-text editing, and drafting, with saved translation targets independent of the transcription language. Keep results in History when the original field changes, and refuse unsafe replacements.

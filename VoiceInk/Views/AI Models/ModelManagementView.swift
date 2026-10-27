@@ -54,7 +54,7 @@ struct ModelManagementView: View {
         }
         .frame(minWidth: 600, minHeight: minimumHeight)
         .background(Color(NSColor.controlBackgroundColor))
-        .slidingPanel(isPresented: $isShowingSettings, width: settingsPanelWidth) {
+        .settingsSheet(isPresented: $isShowingSettings, width: settingsPanelWidth) {
             settingsPanelContent
         }
         .alert(isPresented: $isShowingDeleteAlert) {

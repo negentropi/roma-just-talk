@@ -33,7 +33,7 @@ struct DictionarySettingsView: View {
         }
         .frame(minWidth: 600, minHeight: 500)
         .background(Color(NSColor.controlBackgroundColor))
-        .slidingPanel(isPresented: $isShowingSettings, width: 400) {
+        .settingsSheet(isPresented: $isShowingSettings, width: 400) {
             DictionarySettingsPanel {
                 withAnimation(.smooth(duration: 0.3)) {
                     isShowingSettings = false
@@ -80,6 +80,8 @@ struct DictionarySettingsView: View {
                 }
                 .buttonStyle(.plain)
                 .help(dictionaryPresentation.settingsButtonHelp ?? "")
+                .accessibilityLabel(dictionaryPresentation.settingsButtonHelp ?? "Dictionary Settings")
+                .accessibilityIdentifier("dictionary.settings.open")
             }
 
             HStack(alignment: .top, spacing: 16) {

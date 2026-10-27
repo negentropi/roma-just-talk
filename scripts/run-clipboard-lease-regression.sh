@@ -271,7 +271,8 @@ def isolated_configuration():
     environment = target.setdefault('EnvironmentVariables', {})
     environment.update({'CFFIXED_USER_HOME': str(isolated_home), 'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted', 'RUNNER_TEMP': os.environ['RUNNER_TEMP'],
         'RJT_CLIPBOARD_LEASE_CHECKS': '1', 'RJT_CLIPBOARD_LEASE_EVIDENCE': str(output / 'observations')})
-    target['CommandLineArguments'] = [item for key, value in seed.items() for item in ['-' + key, 'YES' if value is True else 'NO' if value is False else value]]
+    target['CommandLineArguments'] = [item for key, value in seed.items() if key != 'selectedAIProvider'
+        for item in ['-' + key, 'YES' if value is True else 'NO' if value is False else value]]
     target['ParallelizationEnabled'] = False
     def expand(node):
         if isinstance(node, str):
@@ -285,6 +286,8 @@ def isolated_configuration():
     path.write_bytes(plistlib.dumps(expand(value)))
     write_json(output / 'configuration.json', {'original_sha256': digest(original), 'isolated_sha256': digest(path.read_bytes()),
         'isolated_user_home': str(isolated_home), 'seed_preferences': seed,
+        'argument_domain_seed_keys': sorted(key for key in seed if key != 'selectedAIProvider'),
+        'provider_preference_source': 'Isolated plist only; XCTest may split the spaced provider label in argv.',
         'credential_contract': 'Actual LOCAL_BUILD routes KeychainService to fresh lane UserDefaults; no saved Keychain query. Source/configuration assurance, not SecItem tracing.',
         'scope': 'Actual NSPasteboard with existing controlled menu/document seam; no external editor/AX authorization. Normal startup pre-roll receives one exact signed-host microphone grant.'})
 

@@ -147,7 +147,7 @@ Model the Domain drove the immutable operation enum and distinct success/fallbac
 
 ## Execution review after the Ollama identity unit
 
-At `1f36a746`, Ollama capture now uses one immutable runtime endpoint/model pair. [Actual matched SDK proof](evidence/ollama-identity-40545355522/native-audit.json) passed; do not reimplement that prerequisite. Preserve Custom’s existing accepted-start snippet snapshot while retaining its other legacy live reads. Keep new optional recognition metadata on Mac `Transcription` and defaulted Core draft values, not `VoiceInkMutableTranscriptionRecord` (Mac does not conform; changing the protocol would unnecessarily widen iOS). Hosted store checks require a disposable Mac user/VM in addition to unique fixture URLs, because app-host startup opens its normal stores before the test. New Clarity metadata must use captured messages directly; shared last-request fields can change during suspension. No Light/Clarity implementation is claimed here.
+At `1f36a746`, Ollama capture now uses one immutable runtime endpoint/model pair. [Actual matched SDK proof](evidence/ollama-identity-40545355522/native-audit.json) passed; do not reimplement that prerequisite. Preserve Custom’s existing accepted-start snippet snapshot while retaining its other legacy live reads. Keep new optional recognition metadata on Mac `Transcription` and defaulted Core draft values, not `VoiceInkMutableTranscriptionRecord` (Mac does not conform; changing the protocol would unnecessarily widen iOS). Hosted store checks require a disposable Mac user/VM in addition to unique fixture URLs, because app-host startup opens its normal stores before the test. New Clarity metadata must use captured messages directly; shared last-request fields can change during suspension. No Light/Clarity app integration is claimed here.
 
 ## Independent Core preparation
 
@@ -156,3 +156,5 @@ At `1f36a746`, Ollama capture now uses one immutable runtime endpoint/model pair
 The Light rule preserves initial spaces/tabs and requires spaces/tabs after the comma. It leaves paragraph boundaries, non-ASCII separators and punctuation-only remainders unchanged. Its whole-utterance protection also covers bare Unicode domains and numeric dotted addresses; this intentionally favors preserving text.
 
 Foundation owns JSON lexical syntax and duplicate-member handling. The decoder validates the resulting semantic object: exactly the decoded key `text`, a string value, and nonblank output for nonblank input. It preserves that string verbatim. This is not a custom strict JSON lexer, a duplicate-key rejection guarantee, or evidence that a model obeys the cleanup instructions.
+
+The dedicated Core workflow runs the complete check executable with the existing Core lock forced, without app, Whisper, UI or provider setup. It records source/toolchain/pins and verifies source and lock bytes afterward. This keeps policy compilation independent of the pending native app gates.

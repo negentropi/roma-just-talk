@@ -12,7 +12,7 @@ struct WritingActionProviderSnapshot {
     let executionPlan: VoiceInkAIEnhancementRequestExecutionPlan
     let timeoutSeconds: TimeInterval
     let retryOnTimeout: Bool
-    fileprivate let ollama: OllamaService?
+    fileprivate let ollama: OllamaService.RequestConfiguration?
     fileprivate let localCLI: LocalCLIService?
 }
 
@@ -149,14 +149,16 @@ class AIEnhancementService: ObservableObject {
     func writingActionProviderSnapshot() throws -> WritingActionProviderSnapshot {
         guard isConfigured else { throw VoiceInkAIEnhancementError.notConfigured }
         let provider = aiService.selectedProvider
-        let modelName = aiService.currentModel
+        // Metadata and wire requests share the runtime picker model; the generic model cache can be stale.
+        let ollama = provider == .ollama ? OllamaService.RequestConfiguration.fromPreferences() : nil
+        let modelName = ollama?.modelName ?? aiService.currentModel
         return WritingActionProviderSnapshot(
             modelName: modelName,
             apiKey: aiService.apiKey,
             executionPlan: .planning(provider: provider, modelName: modelName),
             timeoutSeconds: VoiceInkAIEnhancementRequestPreference.timeoutSeconds(),
             retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout(),
-            ollama: provider == .ollama ? OllamaService() : nil,
+            ollama: ollama,
             localCLI: provider == .localCLI ? LocalCLIService() : nil
         )
     }
@@ -236,7 +238,12 @@ class AIEnhancementService: ObservableObject {
                 do {
                     let result: String
                     if let ollama = providerSnapshot?.ollama {
-                        result = try await ollama.enhance(formattedText, withSystemPrompt: systemMessage, timeout: timeoutSeconds)
+                        result = try await OllamaService.enhance(
+                            formattedText,
+                            withSystemPrompt: systemMessage,
+                            configuration: ollama,
+                            timeout: timeoutSeconds
+                        )
                     } else {
                         result = try await aiService.enhanceWithOllama(text: formattedText, systemPrompt: systemMessage, timeout: timeoutSeconds)
                     }

@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Keep the Ollama model named in Writing Action History consistent with the model sent in its captured request, including choices made in Ollama settings.
+
 - Open settings, prompt editors and Power Mode configuration in native Mac sheets, with keyboard dismissal and one presentation owner per screen.
 
 - Add a global None dictation cleanup option that preserves the transcription model’s text and bypasses AI enhancement, snippets, replacements, capitalization and added spaces. Keep existing behavior and saved settings under Custom.

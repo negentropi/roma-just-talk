@@ -1,6 +1,6 @@
 # Next Mac unit: dictation cleanup profiles
 
-Design only. Implementation starts after the Writing Actions and snippets unit passes its gates. Target: existing Swift Mac app.
+Historical four-profile proposal. The accepted [global Custom/None contract](raw-profile-plan.md) and [global Light/Clarity plan](clarity-run-plan-design.md) supersede its after-Power-Mode capture and per-mode scope below. Capture is before permission work; per-mode profile/style/provider overrides remain deferred. Target: existing Swift Mac app.
 
 ## Contract
 

@@ -1,0 +1,5 @@
+{
+  "mode": "verify",
+  "error": "Retained lane verdict is invalid: candidate",
+  "classification": "invalid-or-failed"
+}

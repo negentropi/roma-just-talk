@@ -1,0 +1,44 @@
+{
+  "run_id": 40521498970,
+  "head_sha": "8fc18c519a126018174929849f479fdcaa1aaa45",
+  "artifact_id": 12745410679,
+  "artifact_bytes": 372995271,
+  "artifact_sha256": "da6406b0f93008bb0e8df874665081b5c334b99f65d64d758d3a6229bf529225",
+  "source_sha_matches": true,
+  "same_app_binary_across_unit_live_ui": true,
+  "signature_requirements_equal": true,
+  "same_run_native_checkpoint_matches_full_artifact": true,
+  "classification": "failed-new-profile-ui-scroll",
+  "core_checks": 1699,
+  "counts": {
+    "unit": {
+      "total": 187,
+      "passed": 178,
+      "failed": 0,
+      "skipped": 9,
+      "executed_non_skipped": 178
+    },
+    "live": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "executed_non_skipped": 6
+    },
+    "ui": {
+      "total": 4,
+      "passed": 3,
+      "failed": 1,
+      "skipped": 0,
+      "executed_non_skipped": 4
+    }
+  },
+  "failure": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:398: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : Unable to find hit point for ScrollView, {{587.0, 89.0}, {400.0, 621.0}}",
+  "source": {
+    "path": "VoiceInkUITests/WritingFeaturesUITests.swift",
+    "line": 398,
+    "source_line": "            scroller.scroll(byDeltaX: 0, deltaY: towardTop ? 180 : -180)"
+  },
+  "release": "skipped-after-ui-failure",
+  "scope": "Actual new profile selection/persistence not reached. Existing three settings workflows passed."
+}

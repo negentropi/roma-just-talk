@@ -1,0 +1,181 @@
+{
+  "run_id": 40528585813,
+  "head_sha": "0fb265667a95ae8494e5132af4e5fd0f1625651c",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40528585813",
+  "baseline_checkpoint": {
+    "artifact_id": 12745023861,
+    "bytes": 28192,
+    "sha256": "eea72d70b792e90922814811ad1a2d64dd044a8fcfbd446843d8630d7d5f8a37",
+    "digest_and_crc_verified": true
+  },
+  "classification": "product-comparison-observed-driver-invalid",
+  "candidate": "four selected tests passed with zero issues",
+  "actual_import": "skipped after verifier failure",
+  "retained_files": [
+    {
+      "path": "baseline/host-requirement.txt",
+      "sha256": "e3aaac0a59279ec29a2e348c720da2fb731e7d586fc8447412c0482fffaabde5",
+      "bytes": 51
+    },
+    {
+      "path": "baseline/identity-after.json",
+      "sha256": "5f237dcea0bc89d6590ba41ff6e095472c9876222f939bbc97e7938ee104a9b0",
+      "bytes": 452
+    },
+    {
+      "path": "baseline/identity-before.json",
+      "sha256": "5f237dcea0bc89d6590ba41ff6e095472c9876222f939bbc97e7938ee104a9b0",
+      "bytes": 452
+    },
+    {
+      "path": "baseline/result.json",
+      "sha256": "0d3cfcba6340fbbf33794b48aa3bd384a9223437c4cc04ed36518211c6a39f87",
+      "bytes": 3581
+    },
+    {
+      "path": "baseline/selection/receipt.json",
+      "sha256": "48fa04167bec62d3e9dcb33bc1e5d804a3d8a283d96521bc8c5a2339af59d42a",
+      "bytes": 18293
+    },
+    {
+      "path": "baseline/selection/selected-tests.json",
+      "sha256": "be5c19584b63d112597ba91be270b42adf70a74d67c43cac546e67af493c2dc5",
+      "bytes": 25553
+    },
+    {
+      "path": "baseline/tcc.json",
+      "sha256": "6601ccbd2bd8ddabcc991a81596870706d2d3312f5cb744e7a509deb905f3093",
+      "bytes": 440
+    },
+    {
+      "path": "baseline/test-exit.txt",
+      "sha256": "979b894f2d91bf199766571d58024f020d1a44a417da5f48e1fa1cdf554a14f5",
+      "bytes": 3
+    },
+    {
+      "path": "baseline/tests.log",
+      "sha256": "a53589baab5240996679dca6835ed1214ca1cd77b90a8aef21b103779a2bba43",
+      "bytes": 20105
+    },
+    {
+      "path": "baseline-production-after.json",
+      "sha256": "be7f026bb78dc2de6f461afedc61abb0fabb2217f15f07065346873aa3561335",
+      "bytes": 77469
+    },
+    {
+      "path": "baseline-production.json",
+      "sha256": "be7f026bb78dc2de6f461afedc61abb0fabb2217f15f07065346873aa3561335",
+      "bytes": 77469
+    },
+    {
+      "path": "candidate/host-requirement.txt",
+      "sha256": "416824cc7bc49f276984518f3c624d3258f99285929e0cd4f0f6144eade414d1",
+      "bytes": 51
+    },
+    {
+      "path": "candidate/identity-after.json",
+      "sha256": "7028bc920a0f65e95687e1ea0664b590f0ca5faf8ecc31abd557507607295fae",
+      "bytes": 453
+    },
+    {
+      "path": "candidate/identity-before.json",
+      "sha256": "7028bc920a0f65e95687e1ea0664b590f0ca5faf8ecc31abd557507607295fae",
+      "bytes": 453
+    },
+    {
+      "path": "candidate/result.json",
+      "sha256": "2e6d5a8fb7d6122d9b283bfb369cbfaec47582e2f9e221fb0d40fcc3c0ae372b",
+      "bytes": 715
+    },
+    {
+      "path": "candidate/selection/receipt.json",
+      "sha256": "e986a8574d8cdfa712e481e6940c9a28ea5ee1df097a9c398889687d69d4ca16",
+      "bytes": 18487
+    },
+    {
+      "path": "candidate/selection/selected-tests.json",
+      "sha256": "4e75846a474747f8cfce05c352ae7fb75cd7b2d1817aea153568307b06cd8978",
+      "bytes": 25829
+    },
+    {
+      "path": "candidate/tcc.json",
+      "sha256": "ebcedc28e43b8dc6f7e8e3d8e141de7712e61289e7f7b197c709dd47e96c71b2",
+      "bytes": 440
+    },
+    {
+      "path": "candidate/test-exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "candidate/tests.log",
+      "sha256": "5ff5c07688bee941cef9e8ff0a2c337fe78b57728de3eb8191102b1886c29d97",
+      "bytes": 15526
+    },
+    {
+      "path": "candidate-production-after.json",
+      "sha256": "09c6ba40a03dd49c27df8cd379105550e63198ee3743fd354c09465c6a115df8",
+      "bytes": 77985
+    },
+    {
+      "path": "candidate-production.json",
+      "sha256": "09c6ba40a03dd49c27df8cd379105550e63198ee3743fd354c09465c6a115df8",
+      "bytes": 77985
+    },
+    {
+      "path": "contract.json",
+      "sha256": "ecff0c313efb37bc056844a2d5734e44e4256dc64f0a8be06b48920d07d00c08",
+      "bytes": 5638
+    },
+    {
+      "path": "failure-verify.json",
+      "sha256": "622045f7a3f10d105e942f584d2551d06c6841c1982f2d2b014fe3ac3f38adc9",
+      "bytes": 122
+    },
+    {
+      "path": "packages/baseline-strict-resolve.json",
+      "sha256": "4584fd12a5a6c90619ed5b3fa824d7c3b27e06fe3f44201e1685542527bf3296",
+      "bytes": 57
+    },
+    {
+      "path": "packages/candidate-strict-resolve.json",
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e",
+      "bytes": 48
+    },
+    {
+      "path": "packages/canonical-graph-contract.json",
+      "sha256": "4510988966c4438c74d1a06349a56385db25e74597b674819d227329733e263b",
+      "bytes": 833
+    }
+  ],
+  "limits": [
+    "Overall run failed in final verifier; do not call it a green gate.",
+    "Old/candidate raw results were independently reclassified with exact original assertions; only JSON tuple/list persistence caused the final verifier rejection.",
+    "Actual ASR import was skipped; the fixed-driver rerun must execute it.",
+    "Controlled recognition/AI and target interception; no native editor, microphone or physical input proof."
+  ],
+  "conclusion": "failure",
+  "final_observations": {
+    "artifact_id": 12746712204,
+    "bytes": 161954,
+    "sha256": "fe7156a7315ffc3c9914aeecf3ea21d5c337337641186efcd6e5821b80738c4b",
+    "digest_and_crc_verified": true
+  },
+  "full_artifact": {
+    "artifact_id": 12745309474,
+    "bytes": 93936589,
+    "sha256": "43c86e53cddb8692c7f085952d1486d7097403662d559f4b56a95187c622ae7d",
+    "retention": "GitHub Actions only; not downloaded"
+  },
+  "source_verification": {
+    "baseline_files": 603,
+    "candidate_files": 607,
+    "source_roots": "Exact production plus test roots in contract.json",
+    "before_after_equal": true,
+    "every_manifest_entry_matches_pinned_git_blob": true,
+    "all_oracle_and_helper_hashes_match_git": true,
+    "both_locks_strict_resolve_unchanged": true,
+    "both_app_test_binaries_and_signature_unchanged": true,
+    "both_fresh_TCC_rows_bind_exact_cdhash": true
+  }
+}

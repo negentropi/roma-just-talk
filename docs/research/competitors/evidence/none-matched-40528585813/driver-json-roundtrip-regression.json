@@ -1,0 +1,21 @@
+{
+  "scope": "CI verifier JSON persistence, not product behavior",
+  "actual_baseline_run": 40528585813,
+  "known_bad_driver_sha": "0fb265667a95ae8494e5132af4e5fd0f1625651c",
+  "actual_log_sha256": "a53589baab5240996679dca6835ed1214ca1cd77b90a8aef21b103779a2bba43",
+  "actual_receipt_sha256": "0d3cfcba6340fbbf33794b48aa3bd384a9223437c4cc04ed36518211c6a39f87",
+  "lanes": {
+    "known-bad": {
+      "script_sha256": "60b3f715088f0eb0ddc0d46c7cf583860643c2fbe3464e5959726deb2c9bbdea",
+      "intended_actual_baseline_valid": true,
+      "equals_persisted_actual_verdict": false,
+      "roundtrip_equal": false
+    },
+    "candidate": {
+      "script_sha256": "154b93628330b9fc31855924514f8fc0f1c56b4c87c50761d4545a4dd48370f3",
+      "intended_actual_baseline_valid": true,
+      "equals_persisted_actual_verdict": true,
+      "roundtrip_equal": true
+    }
+  }
+}

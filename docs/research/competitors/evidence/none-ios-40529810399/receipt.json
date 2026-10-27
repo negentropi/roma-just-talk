@@ -1,0 +1,263 @@
+{
+  "run_id": 40529810399,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40529810399",
+  "head_sha": "29e73cc7ab8dd5d682937ac522d1859fa87dda2d",
+  "run_conclusion": "failure",
+  "classification": "unverified-dependency-resolution",
+  "failed_boundary": "Resolve the direct iOS project and validate package metadata",
+  "failure": "iOS resolution added an unreviewed pin; inspect the retained graph before compiling",
+  "artifact": {
+    "id": 12745353753,
+    "bytes": 38895,
+    "sha256": "8128799c2ce9579b6ce3336303b312cc78d5e500a58272d827646c2302cfa00c",
+    "size_digest_crc_verified": true
+  },
+  "direct_project_scheme_discovered": true,
+  "original_pin_count": 2,
+  "original_pins_preserved": true,
+  "resolved_pin_count": 25,
+  "differences_from_reviewed_pin_sources": [
+    {
+      "identity": "swift-asn1",
+      "resolved": {
+        "identity": "swift-asn1",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-asn1.git",
+        "state": {
+          "revision": "3b6410f7dee09eb33cdd26260c5fd47fda19b0e2",
+          "version": "1.7.3"
+        }
+      },
+      "reviewed": {
+        "identity": "swift-asn1",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-asn1.git",
+        "state": {
+          "revision": "d9a5b37470adc940d22c3bcd5ca6953a516b727f",
+          "version": "1.7.2"
+        }
+      },
+      "revision_or_version_changed": true
+    },
+    {
+      "identity": "swift-async-algorithms",
+      "resolved": {
+        "identity": "swift-async-algorithms",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-async-algorithms.git",
+        "state": {
+          "revision": "13713a4ffdee8abd929f92568ee9462a46ae26e0",
+          "version": "1.1.7"
+        }
+      },
+      "reviewed": {
+        "identity": "swift-async-algorithms",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-async-algorithms.git",
+        "state": {
+          "revision": "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+          "version": "1.1.5"
+        }
+      },
+      "revision_or_version_changed": true
+    },
+    {
+      "identity": "swift-atomics",
+      "resolved": {
+        "identity": "swift-atomics",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "revision": "0442cb5a3f98ab802acb777929fdb446bda11a34",
+          "version": "1.3.1"
+        }
+      },
+      "reviewed": {
+        "identity": "swift-atomics",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "revision": "b601256eab081c0f92f059e12818ac1d4f178ff7",
+          "version": "1.3.0"
+        }
+      },
+      "revision_or_version_changed": true
+    },
+    {
+      "identity": "swift-collections",
+      "resolved": {
+        "identity": "swift-collections",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-collections.git",
+        "state": {
+          "revision": "f96b909e1a9e469620bc5037c1e24e00153f376f",
+          "version": "1.7.5"
+        }
+      },
+      "reviewed": {
+        "identity": "swift-collections",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-collections.git",
+        "state": {
+          "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+          "version": "1.6.0"
+        }
+      },
+      "revision_or_version_changed": true
+    },
+    {
+      "identity": "swift-crypto",
+      "resolved": {
+        "identity": "swift-crypto",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-crypto.git",
+        "state": {
+          "revision": "c2cbadd7263439d8015189668f96ff5b5be565ce",
+          "version": "5.0.3"
+        }
+      },
+      "reviewed": {
+        "identity": "swift-crypto",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-crypto.git",
+        "state": {
+          "revision": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+          "version": "4.5.2"
+        }
+      },
+      "revision_or_version_changed": true
+    },
+    {
+      "identity": "swift-numerics",
+      "resolved": {
+        "identity": "swift-numerics",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-numerics.git",
+        "state": {
+          "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+          "version": "1.1.1"
+        }
+      },
+      "reviewed": {
+        "identity": "swift-numerics",
+        "kind": "remoteSourceControl",
+        "location": "https://github.com/apple/swift-numerics",
+        "state": {
+          "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+          "version": "1.1.1"
+        }
+      },
+      "revision_or_version_changed": false
+    }
+  ],
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Bind source and dependency locks",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Select Xcode and Metal toolchain",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/cache/restore@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify existing iOS configuration contracts",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Prepare and verify static Whisper dependencies",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/cache/save@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Resolve the direct iOS project and validate package metadata",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "name": "Compile the iOS Simulator app and shared Core",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Verify the built app and unchanged sources",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Upload compile evidence",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Upload the verified Simulator app",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "retained_files": [
+    {
+      "path": "package-locks-before.json",
+      "bytes": 35331,
+      "sha256": "8ea9a2aea7c5b48a95cbfafabb7a5fcfcb474eaef206760ead9936985dc4d290"
+    },
+    {
+      "path": "package-resolution.log",
+      "bytes": 7511,
+      "sha256": "47ed928f166f5ce58b521b7cbd46f60a72137877990cca38737a1c88f3738598"
+    },
+    {
+      "path": "project-list.json",
+      "bytes": 438,
+      "sha256": "57f262dec0ccdf3ba9d8f672cef75ed5e10787cd67424db6b8655a7b30755329"
+    },
+    {
+      "path": "resolved-ios.Package.resolved",
+      "bytes": 6993,
+      "sha256": "d5f68cde98cda303d9dbc7c1530029d3693e602b56b9db019a945099a175c961"
+    },
+    {
+      "path": "source-sha.txt",
+      "bytes": 41,
+      "sha256": "aadea974f6d11ba11e1595175ab7ff4b536507d758d90a9ec869721893b40fb4"
+    }
+  ],
+  "limits": [
+    "No iOS compile, signing or app archive was attempted. This failure is package setup, not an observed product compile failure.",
+    "No runtime, Simulator launch, microphone, keyboard, human-speaker or device proof.",
+    "Only pre-resolution source manifest was captured; post-resolution source integrity did not run after this fail-closed guard.",
+    "No dependency pins or product sources edited by this reviewer."
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "errors": [],
+  "exit_code": 0,
+  "failure_lines": [],
+  "issues": [],
+  "lane": "candidate",
+  "summary": [
+    [
+      "4",
+      "passed"
+    ]
+  ],
+  "tests": {
+    "canceledQueuedDictationPasteDoesNotWriteTheTarget": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "dictationCustomRetainsItsExistingCleanupPath": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "dictationNoneDoesNotActivatePromptTriggersOrAI": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": true
+}

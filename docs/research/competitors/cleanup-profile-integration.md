@@ -1,6 +1,6 @@
 # Cleanup profile integration
 
-Design preparation for the existing Swift Mac app. Source inspected at `ebc92f1e60fdabbb9e26b2817f414d154865a9d5`. This document explains the implementation boundaries behind the [reviewed profile proposal](cleanup-profile-design.md). No profile implementation or runtime verification is claimed.
+Historical design preparation for the existing Swift Mac app, inspected at `ebc92f1e60fdabbb9e26b2817f414d154865a9d5`. The [global Custom/None contract](raw-profile-plan.md) and [global Light/Clarity plan](clarity-run-plan-design.md) supersede the snapshot timing, per-mode scope and provider-instance assumptions below. Use their accepted-start capture and immutable provider values for implementation. This document retains the original source findings; it claims no runtime verification.
 
 ## Why the operation needs a captured plan
 

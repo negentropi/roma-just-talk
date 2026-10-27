@@ -1,0 +1,54 @@
+{
+  "predecessor": {
+    "retainedRepresentative": "predecessor-build/identity.json",
+    "archivedReceipts": {
+      "predecessor-build/identity.json": {
+        "bytes": 176133,
+        "sha256": "a92ba9193eb5b057cf35cb923c0c93cd8f7c1da628f2b1cd5166908b10f62c47"
+      },
+      "seed/identity-before.json": {
+        "bytes": 176133,
+        "sha256": "a92ba9193eb5b057cf35cb923c0c93cd8f7c1da628f2b1cd5166908b10f62c47"
+      },
+      "seed/identity-after.json": {
+        "bytes": 176133,
+        "sha256": "a92ba9193eb5b057cf35cb923c0c93cd8f7c1da628f2b1cd5166908b10f62c47"
+      },
+      "old-reopen/identity-before.json": {
+        "bytes": 176133,
+        "sha256": "a92ba9193eb5b057cf35cb923c0c93cd8f7c1da628f2b1cd5166908b10f62c47"
+      },
+      "old-reopen/identity-after.json": {
+        "bytes": 176133,
+        "sha256": "a92ba9193eb5b057cf35cb923c0c93cd8f7c1da628f2b1cd5166908b10f62c47"
+      }
+    },
+    "allFiveByteIdentical": true
+  },
+  "candidate": {
+    "retainedRepresentative": "candidate-build/identity.json",
+    "archivedReceipts": {
+      "candidate-build/identity.json": {
+        "bytes": 176129,
+        "sha256": "5162fadba3d7db45b6b4b9595bd581060342d006e77def153becef9a440d946c"
+      },
+      "correction-write/identity-before.json": {
+        "bytes": 176129,
+        "sha256": "5162fadba3d7db45b6b4b9595bd581060342d006e77def153becef9a440d946c"
+      },
+      "correction-write/identity-after.json": {
+        "bytes": 176129,
+        "sha256": "5162fadba3d7db45b6b4b9595bd581060342d006e77def153becef9a440d946c"
+      },
+      "correction-reopen/identity-before.json": {
+        "bytes": 176129,
+        "sha256": "5162fadba3d7db45b6b4b9595bd581060342d006e77def153becef9a440d946c"
+      },
+      "correction-reopen/identity-after.json": {
+        "bytes": 176129,
+        "sha256": "5162fadba3d7db45b6b4b9595bd581060342d006e77def153becef9a440d946c"
+      }
+    },
+    "allFiveByteIdentical": true
+  }
+}

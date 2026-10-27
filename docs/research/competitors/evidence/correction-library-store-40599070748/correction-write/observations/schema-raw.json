@@ -1,0 +1,978 @@
+{
+  "encodingVersion" : {
+    "major" : 1,
+    "minor" : 0,
+    "patch" : 0
+  },
+  "entities" : [
+    {
+      "attributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "transcriptionId",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiEnhancementModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "enhancementDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "audioDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Sd"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "speedFactor",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "timestamp",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "id",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "wordCount",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Si"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "source",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "powerModeName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        }
+      ],
+      "name" : "SessionMetric",
+      "relationships" : [
+
+      ],
+      "storedAttributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "audioDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Sd"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "wordCount",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Si"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "transcriptionId",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "timestamp",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "speedFactor",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "id",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "powerModeName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "source",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "enhancementDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiEnhancementModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        }
+      ],
+      "storedRelationships" : [
+
+      ],
+      "subentities" : [
+
+      ]
+    },
+    {
+      "attributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "text",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "recognitionText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionStatus",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "processingFailureReason",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiEnhancementModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "promptName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "duration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Sd"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiRequestUserMessage",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "enhancedText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "id",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiRequestSystemMessage",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "enhancementDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "dictationProfileRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "clarityStyleRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "powerModeName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "powerModeEmoji",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "audioFileURL",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "timestamp",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        }
+      ],
+      "name" : "Transcription",
+      "relationships" : [
+
+      ],
+      "storedAttributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "dictationProfileRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "powerModeName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "duration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Sd"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "recognitionText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionStatus",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "clarityStyleRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "promptName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "powerModeEmoji",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiRequestSystemMessage",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "processingFailureReason",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiEnhancementModelName",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "enhancementDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "aiRequestUserMessage",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "enhancedText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "transcriptionDuration",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SdSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "timestamp",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "id",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "audioFileURL",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "text",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        }
+      ],
+      "storedRelationships" : [
+
+      ],
+      "subentities" : [
+
+      ]
+    },
+    {
+      "attributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "word",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "dateAdded",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        }
+      ],
+      "name" : "VocabularyWord",
+      "relationships" : [
+
+      ],
+      "storedAttributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "dateAdded",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "word",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        }
+      ],
+      "storedRelationships" : [
+
+      ],
+      "subentities" : [
+
+      ]
+    },
+    {
+      "attributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "literalReplacementText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "sourceVariantRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "isEnabled",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Sb"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "matchingKindRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "dateAdded",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "literalOriginalText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "replacementText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "sourceTranscriptionID",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDVSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "originalText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "id",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "approvalOriginRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        }
+      ],
+      "name" : "WordReplacement",
+      "relationships" : [
+
+      ],
+      "storedAttributes" : [
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "replacementText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "sourceVariantRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "literalReplacementText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "isEnabled",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "Sb"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "approvalOriginRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "id",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "matchingKindRawValue",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "originalText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SS"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : false,
+          "name" : "dateAdded",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4DateV"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "sourceTranscriptionID",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "10Foundation4UUIDVSg"
+        },
+        {
+          "hashModifier" : null,
+          "isOptional" : true,
+          "name" : "literalOriginalText",
+          "options" : [
+
+          ],
+          "originalName" : "",
+          "valueTypeName" : "SSSg"
+        }
+      ],
+      "storedRelationships" : [
+
+      ],
+      "subentities" : [
+
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 1,
+    "minor" : 0,
+    "patch" : 0
+  }
+}

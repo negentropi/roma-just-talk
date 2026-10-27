@@ -1,0 +1,294 @@
+{
+  "_type" : {
+    "_name" : "ActionTestPlanRunSummaries"
+  },
+  "summaries" : {
+    "_type" : {
+      "_name" : "Array"
+    },
+    "_values" : [
+      {
+        "_type" : {
+          "_name" : "ActionTestPlanRunSummary",
+          "_supertype" : {
+            "_name" : "ActionAbstractTestSummary"
+          }
+        },
+        "name" : {
+          "_type" : {
+            "_name" : "String"
+          },
+          "_value" : "Test Scheme Action"
+        },
+        "testableSummaries" : {
+          "_type" : {
+            "_name" : "Array"
+          },
+          "_values" : [
+            {
+              "_type" : {
+                "_name" : "ActionTestableSummary",
+                "_supertype" : {
+                  "_name" : "ActionAbstractTestSummary"
+                }
+              },
+              "diagnosticsDirectoryName" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : ""
+              },
+              "identifierURL" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : "test:\/\/com.apple.xcode\/VoiceInk\/VoiceInkTests"
+              },
+              "name" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : "VoiceInkTests"
+              },
+              "projectRelativePath" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : "VoiceInk.xcodeproj"
+              },
+              "targetName" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : "VoiceInkTests"
+              },
+              "testKind" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : "app hosted"
+              },
+              "testLanguage" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : ""
+              },
+              "testRegion" : {
+                "_type" : {
+                  "_name" : "String"
+                },
+                "_value" : ""
+              },
+              "tests" : {
+                "_type" : {
+                  "_name" : "Array"
+                },
+                "_values" : [
+                  {
+                    "_type" : {
+                      "_name" : "ActionTestSummaryGroup",
+                      "_supertype" : {
+                        "_name" : "ActionTestSummaryIdentifiableObject",
+                        "_supertype" : {
+                          "_name" : "ActionAbstractTestSummary"
+                        }
+                      }
+                    },
+                    "identifier" : {
+                      "_type" : {
+                        "_name" : "String"
+                      },
+                      "_value" : "Selected tests"
+                    },
+                    "identifierURL" : {
+                      "_type" : {
+                        "_name" : "String"
+                      },
+                      "_value" : "test:\/\/com.apple.xcode\/VoiceInk\/VoiceInkTests\/Selected%20tests"
+                    },
+                    "name" : {
+                      "_type" : {
+                        "_name" : "String"
+                      },
+                      "_value" : "Selected tests"
+                    },
+                    "subtests" : {
+                      "_type" : {
+                        "_name" : "Array"
+                      },
+                      "_values" : [
+                        {
+                          "_type" : {
+                            "_name" : "ActionTestSummaryGroup",
+                            "_supertype" : {
+                              "_name" : "ActionTestSummaryIdentifiableObject",
+                              "_supertype" : {
+                                "_name" : "ActionAbstractTestSummary"
+                              }
+                            }
+                          },
+                          "identifier" : {
+                            "_type" : {
+                              "_name" : "String"
+                            },
+                            "_value" : "VoiceInkTests.xctest"
+                          },
+                          "identifierURL" : {
+                            "_type" : {
+                              "_name" : "String"
+                            },
+                            "_value" : "test:\/\/com.apple.xcode\/VoiceInk\/VoiceInkTests\/VoiceInkTests.xctest"
+                          },
+                          "name" : {
+                            "_type" : {
+                              "_name" : "String"
+                            },
+                            "_value" : "VoiceInkTests.xctest"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "_type" : {
+                      "_name" : "ActionTestSummaryGroup",
+                      "_supertype" : {
+                        "_name" : "ActionTestSummaryIdentifiableObject",
+                        "_supertype" : {
+                          "_name" : "ActionAbstractTestSummary"
+                        }
+                      }
+                    },
+                    "duration" : {
+                      "_type" : {
+                        "_name" : "Double"
+                      },
+                      "_value" : "1.2582499980926514"
+                    },
+                    "identifier" : {
+                      "_type" : {
+                        "_name" : "String"
+                      },
+                      "_value" : "VoiceInkTests"
+                    },
+                    "identifierURL" : {
+                      "_type" : {
+                        "_name" : "String"
+                      },
+                      "_value" : "test:\/\/com.apple.xcode\/VoiceInk\/VoiceInkTests\/VoiceInkTests"
+                    },
+                    "name" : {
+                      "_type" : {
+                        "_name" : "String"
+                      },
+                      "_value" : "VoiceInkTests"
+                    },
+                    "subtests" : {
+                      "_type" : {
+                        "_name" : "Array"
+                      },
+                      "_values" : [
+                        {
+                          "_type" : {
+                            "_name" : "ActionTestMetadata",
+                            "_supertype" : {
+                              "_name" : "ActionTestSummaryIdentifiableObject",
+                              "_supertype" : {
+                                "_name" : "ActionAbstractTestSummary"
+                              }
+                            }
+                          },
+                          "activitySummariesCount" : {
+                            "_type" : {
+                              "_name" : "Int"
+                            },
+                            "_value" : "27"
+                          },
+                          "duration" : {
+                            "_type" : {
+                              "_name" : "Double"
+                            },
+                            "_value" : "1.2582499980926514"
+                          },
+                          "identifier" : {
+                            "_type" : {
+                              "_name" : "String"
+                            },
+                            "_value" : "VoiceInkTests\/liveCorrectionLibraryPersistentStoreUpgrade()"
+                          },
+                          "identifierURL" : {
+                            "_type" : {
+                              "_name" : "String"
+                            },
+                            "_value" : "test:\/\/com.apple.xcode\/VoiceInk\/VoiceInkTests\/VoiceInkTests\/liveCorrectionLibraryPersistentStoreUpgrade()"
+                          },
+                          "name" : {
+                            "_type" : {
+                              "_name" : "String"
+                            },
+                            "_value" : "liveCorrectionLibraryPersistentStoreUpgrade()"
+                          },
+                          "summaryRef" : {
+                            "_type" : {
+                              "_name" : "Reference"
+                            },
+                            "id" : {
+                              "_type" : {
+                                "_name" : "String"
+                              },
+                              "_value" : "0~vSqpWdyTiGqEz3RlHi3Xys0Ko64PsERFDxD-3sflztf-pwHU_ITZXHeUh3vGpZ9qJzSmHa8dTD0bB_1dOI7hGA=="
+                            },
+                            "targetType" : {
+                              "_type" : {
+                                "_name" : "TypeDefinition"
+                              },
+                              "name" : {
+                                "_type" : {
+                                  "_name" : "String"
+                                },
+                                "_value" : "ActionTestSummary"
+                              },
+                              "supertype" : {
+                                "_type" : {
+                                  "_name" : "TypeDefinition"
+                                },
+                                "name" : {
+                                  "_type" : {
+                                    "_name" : "String"
+                                  },
+                                  "_value" : "ActionTestSummaryIdentifiableObject"
+                                },
+                                "supertype" : {
+                                  "_type" : {
+                                    "_name" : "TypeDefinition"
+                                  },
+                                  "name" : {
+                                    "_type" : {
+                                      "_name" : "String"
+                                    },
+                                    "_value" : "ActionAbstractTestSummary"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "testStatus" : {
+                            "_type" : {
+                              "_name" : "String"
+                            },
+                            "_value" : "Success"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

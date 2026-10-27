@@ -1,0 +1,212 @@
+{
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "canonical_package_pins": 41,
+  "common_oracle_sha256": {
+    "candidate": "16a2e9ead1fbcc7f0f2cac8e1e3015b2819a2a0fb3af364856c5f9d4b5e41fe8",
+    "predecessor": "cdd61d3e67b96371944d2d59bb41b3313e38fc6116bfda41cf04321352d4acc5"
+  },
+  "declarations": {
+    "LocalBuild.xcconfig": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844",
+    "Makefile": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+    "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+    "VoiceInkQwen/Package.swift": "058f93419dd0da3a92dfd135af2c8a6b664192f53ec883168c279b7564b21d4e",
+    "iOS/VoiceInk-ios.xcodeproj/project.pbxproj": "1de9826aef36e173e54a8d62b0422fde6a4657011f86b8012dc62ff8807b9676"
+  },
+  "fixed_record_ids": [
+    "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+    "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+    "CCCCCCCC-CCCC-4CCC-8CCC-CCCCCCCCCCCC"
+  ],
+  "helpers": {
+    ".github/workflows/voiceink-correction-library-store-check.yml": "ff90b8a1f7eec70a61c5b6d5e84fa6a1b47a072f45ae53c50473bbd83ad46658",
+    "scripts/run-correction-library-store-check.sh": "df5beeb54c485c76c70c1b4bcb6073331cdff0194763da1972a42ff69ba8f664"
+  },
+  "neutral_runtime": {
+    "commit": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+    "functions": {
+      "attribute_map": "bddc35ccca7cf3dac0b1af103b9b224f244ba16f9a67320850058eb6dee55ebf",
+      "classify": "188a374d2cdedaa40bdedcde32b9d259a9ca90ec851190b63dd120813357592f",
+      "entity_map": "980bf471cc59146365f787648b7672bf0c76440b7937b402b2f0b3f1ade581ae",
+      "native_result": "51277d80448bf55186670c311c5596c114f8ac270166f8be99f74c4807ee97fa",
+      "same_json": "93d57380ecd42ce3d931b2fb8a9134bb1bd47e2b2c51b8dc1226d9e6721347aa"
+    },
+    "path": "scripts/run-dictation-metadata-store-check.sh",
+    "sha256": "d3514de2d76b7163b3424bff4bd95580885cddc49ae5fcec5a999a063ca247a0"
+  },
+  "new_field_types": {
+    "approvalOriginRawValue": "SSSg",
+    "literalOriginalText": "SSSg",
+    "literalReplacementText": "SSSg",
+    "matchingKindRawValue": "SSSg",
+    "sourceTranscriptionID": "10Foundation4UUIDVSg",
+    "sourceVariantRawValue": "SSSg"
+  },
+  "oracle_sha256": "7541a90f9ed61e2f1fd8e19179859943bc131146f30a5fbded2e0af74e377a0a",
+  "phases": [
+    {
+      "lane": "predecessor",
+      "name": "seed",
+      "source_path": "VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift",
+      "test_id": "VoiceInkTests/VoiceInkTests/liveCorrectionLibraryPersistentStoreUpgrade()",
+      "test_name": "liveCorrectionLibraryPersistentStoreUpgrade"
+    },
+    {
+      "lane": "predecessor",
+      "name": "old-reopen",
+      "source_path": "VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift",
+      "test_id": "VoiceInkTests/VoiceInkTests/liveCorrectionLibraryPersistentStoreUpgrade()",
+      "test_name": "liveCorrectionLibraryPersistentStoreUpgrade"
+    },
+    {
+      "lane": "candidate",
+      "name": "correction-write",
+      "source_path": "VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift",
+      "test_id": "VoiceInkTests/VoiceInkTests/liveCorrectionLibraryPersistentStoreUpgrade()",
+      "test_name": "liveCorrectionLibraryPersistentStoreUpgrade"
+    },
+    {
+      "lane": "candidate",
+      "name": "correction-reopen",
+      "source_path": "VoiceInkTests/CorrectionLibraryStoreUpgradeLiveTests.swift",
+      "test_id": "VoiceInkTests/VoiceInkTests/liveCorrectionLibraryPersistentStoreUpgrade()",
+      "test_name": "liveCorrectionLibraryPersistentStoreUpgrade"
+    }
+  ],
+  "scope": "Actual ebf predecessor seed/reopen, candidate six-optional-field WordReplacement upgrade and backend approval scalar save, then fresh candidate reopen of the same clone. No human approval, UI, CloudKit sync, backward store-open or real user-store proof.",
+  "shared_runtime": {
+    "commit": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+    "functions": {
+      "alive": "4a861b81c62a5e65c5256a5bed954265ce516f2258b9e0fa37434ee0fc6882c0",
+      "clone_seed": "ee35bd14f7edd1eb4abf33039e3c546fba48cc9bac6731156b7ede0d21b10c55",
+      "declarations": "b1921e1101b52f4e264afb7d9862bddf838470543e7725f079ca8911920de5dd",
+      "dependencies": "c56f7eb6b4d57a3eb8f8cece28b7c379a9e40b3cdb3b727728a3e908d39f2d79",
+      "dependency_state": "790f3bc89e4f2c5e97c2356227bcb952d5c7789a0a93aa65e31569c5e45c283b",
+      "digest": "b46c442db8153d4caa4e3d7ebb3560f6dc261f2c614ac20722d41b32fb1785fd",
+      "git": "57a06b16fa36246447ebeae107e5d6fc3b2b35373c2feded231ce9a3271cad5f",
+      "gitlink_source": "0e8deb1ea7a9f067e864ea02ad19b66dee0347fb3d5f54918967c908e91ea81e",
+      "identity": "535f7cbf1c13cbbb891474e10e0ba1864b051ae9c66d319d6d4e1f427a70caa6",
+      "inventory": "946a830c5c7a227ccf698e56b5e9d635c8aaf90a1166f5bfb1cd65a064e7d4cd",
+      "live_executable": "d8cf3f52c4a6e84e2f50fe379c5842e97240ea6a9c5e59074df1346e604c25d4",
+      "load": "d18bac24523ffca919d1015d81d37ed1b7a9da69a2472d18710cf0f5d9b54f7c",
+      "manifest": "c65bc9f26f518b12e6f43629e7fe5e71bfc29648cf7b8f8708dbcd42248a0fdf",
+      "metadata_rows": "70c5801bfdb965db032a8140e8d2b5ad2a7e9806a38adbf28ddf07ade2dc8427",
+      "normalized_identity": "5240c21d5fe5626ba023fb7bf28e13c89ad648bddf2fc907470f3b4067894f73",
+      "package_state": "fcf3913714c7224054adaf7c5eaf00beed728c60f8a30b90b6fbff962ea5860c",
+      "provision": "02b057aa591cf7b5de34fb52e9ddc752e116dcd0b12d12166de44988bbf4983c",
+      "require": "07aea090f1e0ffe029e693d88420d601dd716fbf051fb282a0b180d358f98992",
+      "run": "efbfd54859b96e6837ff0d1e10829330c1f1aaf7c1c135f15ac684bae91cc16c",
+      "run_host": "e27353c99824e6e0593f56f8b66b59d999d4aa792377564c9a05a93c43bd311f",
+      "seed_defaults": "c19d105783be084dbc45447bb486dc20a2deb1cf4b9e18dbf7b421153c6dd733",
+      "seed_unchanged": "d619c58446e60a6b421ece76ba2d1ca00ec2959b084905a62e58be6d61c3e9a4",
+      "store_tree": "98b9a863bb0ac7064393c944d7db8aa604cdec519e6d7573406880b6dc2f05af",
+      "tracked_sources": "3756df551a805c3ec2e41b6a363594164db2ff3b562328fedfe9037cbbc694c0",
+      "tree": "d56080ea56223cc08971b071888dc03a3d3bb150f717780553783c7407bee093",
+      "verify_dependencies": "371e76f6b399eb97de54369c7a42c3705b80393b2f91cb42ef973f46c277a5df",
+      "wait_closed": "a066d04da143a0ed0506da7998effe86a2ce01e3bae05147082e8d1dda76b5fe",
+      "whisper_source": "6c4d1e131576b1c23169a29b78ae6d6de980e20b6f9739b554d7ad1d437aabee",
+      "write": "9e173e026a5fdbd4666771eadde058182721d0b65bf2cc21efd9e0ded9fd56b7"
+    },
+    "path": "scripts/run-dictation-store-seed-check.sh",
+    "sha256": "5847555fe80cf6fb3740e562b919882cb9f0541c3bf497d6f16997c98fd42fc5"
+  },
+  "source_bridge": {
+    "HEAD": {
+      "factory_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+      "global_schema_constructor_sha256": "1f672413d034380d9cdba490d9f1b4ddaa9f9693d2655d4e0530896ab1b384a8",
+      "models": {
+        "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+        "VoiceInk/Models/Transcription.swift": "7a33f68bd7235304e195fab40518679e6481a077fe61ea851187b284e481039c",
+        "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+        "VoiceInk/Models/WordReplacement.swift": "034a015173fe1484f20c6fdb13b9bf423686150954fbe7abed8e9cc47e9c7d3d"
+      },
+      "module": "VoiceInk",
+      "word_replacement_stored_declarations": [
+        [
+          "id",
+          "UUID = UUID()"
+        ],
+        [
+          "originalText",
+          "String = \"\""
+        ],
+        [
+          "replacementText",
+          "String = \"\""
+        ],
+        [
+          "dateAdded",
+          "Date = Date()"
+        ],
+        [
+          "isEnabled",
+          "Bool = true"
+        ],
+        [
+          "matchingKindRawValue",
+          "String?"
+        ],
+        [
+          "approvalOriginRawValue",
+          "String?"
+        ],
+        [
+          "sourceTranscriptionID",
+          "UUID?"
+        ],
+        [
+          "sourceVariantRawValue",
+          "String?"
+        ],
+        [
+          "literalOriginalText",
+          "String?"
+        ],
+        [
+          "literalReplacementText",
+          "String?"
+        ]
+      ]
+    },
+    "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab": {
+      "factory_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+      "global_schema_constructor_sha256": "1f672413d034380d9cdba490d9f1b4ddaa9f9693d2655d4e0530896ab1b384a8",
+      "models": {
+        "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+        "VoiceInk/Models/Transcription.swift": "7a33f68bd7235304e195fab40518679e6481a077fe61ea851187b284e481039c",
+        "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+        "VoiceInk/Models/WordReplacement.swift": "602004b8f8fd7da3eea1bc3e74e5a2d03d91c56f96decb303658f68e34256d44"
+      },
+      "module": "VoiceInk",
+      "word_replacement_stored_declarations": [
+        [
+          "id",
+          "UUID = UUID()"
+        ],
+        [
+          "originalText",
+          "String = \"\""
+        ],
+        [
+          "replacementText",
+          "String = \"\""
+        ],
+        [
+          "dateAdded",
+          "Date = Date()"
+        ],
+        [
+          "isEnabled",
+          "Bool = true"
+        ]
+      ]
+    }
+  },
+  "source_history_id": "DDDDDDDD-DDDD-4DDD-8DDD-DDDDDDDDDDDD",
+  "source_sha": {
+    "candidate": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+    "predecessor": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+  },
+  "version": 1
+}

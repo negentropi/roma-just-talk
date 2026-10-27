@@ -1,0 +1,45 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 12778734241,
+      "node_id": "MDg6QXJ0aWZhY3QxMjc3ODczNDI0MQ==",
+      "name": "roma.correction-library-store-check",
+      "size_in_bytes": 165374633,
+      "url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12778734241",
+      "archive_download_url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12778734241/zip",
+      "expired": false,
+      "digest": "sha256:7233b95f4871a0e7289638788aa8b898abcd0951f11ae882d807ccc24cb12029",
+      "created_at": "2026-10-27T23:30:30Z",
+      "updated_at": "2026-10-27T23:30:30Z",
+      "expires_at": "2027-01-25T23:00:53Z",
+      "workflow_run": {
+        "id": 40599070748,
+        "repository_id": 1253985786,
+        "head_repository_id": 1253985786,
+        "head_branch": "ci/rjt-correction-library-store-check-01a17bef",
+        "head_sha": "641dcc6de3341acdffe41fe62f45e074bec749ef"
+      }
+    },
+    {
+      "id": 12778142546,
+      "node_id": "MDg6QXJ0aWZhY3QxMjc3ODE0MjU0Ng==",
+      "name": "roma.correction-library-predecessor-seed",
+      "size_in_bytes": 82472840,
+      "url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12778142546",
+      "archive_download_url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12778142546/zip",
+      "expired": false,
+      "digest": "sha256:107cb83665745150f1c05985f602f885c6a152a25c9d2fb7429a4171badf0d7b",
+      "created_at": "2026-10-27T23:17:23Z",
+      "updated_at": "2026-10-27T23:17:23Z",
+      "expires_at": "2027-01-25T23:00:53Z",
+      "workflow_run": {
+        "id": 40599070748,
+        "repository_id": 1253985786,
+        "head_repository_id": 1253985786,
+        "head_branch": "ci/rjt-correction-library-store-check-01a17bef",
+        "head_sha": "641dcc6de3341acdffe41fe62f45e074bec749ef"
+      }
+    }
+  ]
+}

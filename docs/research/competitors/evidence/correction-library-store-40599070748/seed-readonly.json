@@ -1,0 +1,16 @@
+{
+  "closedOriginalReadOnly": true,
+  "entries": {
+    ".": "0o500",
+    "default.store": "0o400",
+    "default.store-shm": "0o400",
+    "default.store-wal": "0o400",
+    "dictionary.store": "0o400",
+    "dictionary.store-shm": "0o400",
+    "dictionary.store-wal": "0o400",
+    "stats.store": "0o400",
+    "stats.store-shm": "0o400",
+    "stats.store-wal": "0o400"
+  },
+  "path": "/Users/runner/work/_temp/correction-library-store-proof/stores/seed"
+}

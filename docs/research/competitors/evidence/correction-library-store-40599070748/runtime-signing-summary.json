@@ -1,0 +1,105 @@
+{
+  "classification": "actual-both-builds-runtime-signing-audited",
+  "lanes": {
+    "predecessor": {
+      "flags": [
+        "0x10002"
+      ],
+      "mainBinarySHA256": "c8fc21d6bddc28d32191ac19127b1046a71e83a5533fd1e234953c3b7b97ac80",
+      "entitlementsTrue": [
+        "com.apple.security.automation.apple-events",
+        "com.apple.security.cs.disable-library-validation",
+        "com.apple.security.device.audio-input",
+        "com.apple.security.files.user-selected.read-only",
+        "com.apple.security.get-task-allow",
+        "com.apple.security.network.client",
+        "com.apple.security.network.server",
+        "com.apple.security.screen-capture"
+      ],
+      "actualCodesignRuntimeCommandCount": 13,
+      "actualExports": {
+        "ENABLE_PREVIEWS": [
+          "NO"
+        ],
+        "ENABLE_XOJIT_PREVIEWS": [
+          "NO"
+        ],
+        "ENABLE_HARDENED_RUNTIME": [
+          "YES"
+        ]
+      },
+      "nativeGuardLogs": {
+        "adhoc-app.log": {
+          "sha256": "1b1783716fd69d4cd955c90d550f29be8e46680594c6e74f3ec457b67eb83795",
+          "bytes": 6664,
+          "lastLines": [
+            "/Users/runner/work/_temp/correction-library-store-derived-predecessor/Build/Products/Debug/roma just talk.app: valid on disk",
+            "/Users/runner/work/_temp/correction-library-store-derived-predecessor/Build/Products/Debug/roma just talk.app: satisfies its Designated Requirement",
+            "Verified ad-hoc Library Validation contract: @rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+            "@rpath/Sparkle.framework/Versions/B/Sparkle",
+            "@rpath/libswiftCompatibilitySpan.dylib"
+          ]
+        },
+        "static-app.log": {
+          "sha256": "322ca6c93a7abe3dd3f63320c690dba83aeeb224f5ec0100604e3345515eb32e",
+          "bytes": 56,
+          "lastLines": [
+            "Verified statically linked Whisper app: 18 Mach-O files"
+          ]
+        }
+      }
+    },
+    "candidate": {
+      "flags": [
+        "0x10002"
+      ],
+      "mainBinarySHA256": "77d0b8a37af965edfa23609160f8a2bfebe5f096b8eb78597fc2b1ff746022bb",
+      "entitlementsTrue": [
+        "com.apple.security.automation.apple-events",
+        "com.apple.security.cs.disable-library-validation",
+        "com.apple.security.device.audio-input",
+        "com.apple.security.files.user-selected.read-only",
+        "com.apple.security.get-task-allow",
+        "com.apple.security.network.client",
+        "com.apple.security.network.server",
+        "com.apple.security.screen-capture"
+      ],
+      "actualCodesignRuntimeCommandCount": 13,
+      "actualExports": {
+        "ENABLE_PREVIEWS": [
+          "NO"
+        ],
+        "ENABLE_XOJIT_PREVIEWS": [
+          "NO"
+        ],
+        "ENABLE_HARDENED_RUNTIME": [
+          "YES"
+        ]
+      },
+      "nativeGuardLogs": {
+        "adhoc-app.log": {
+          "sha256": "fe14c8ced347a84bfb5def9e142c7a8273fbfc587cfe7ae822509c20b7d0a8db",
+          "bytes": 6592,
+          "lastLines": [
+            "/Users/runner/work/_temp/correction-library-store-derived-candidate/Build/Products/Debug/roma just talk.app: valid on disk",
+            "/Users/runner/work/_temp/correction-library-store-derived-candidate/Build/Products/Debug/roma just talk.app: satisfies its Designated Requirement",
+            "Verified ad-hoc Library Validation contract: @rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+            "@rpath/Sparkle.framework/Versions/B/Sparkle",
+            "@rpath/libswiftCompatibilitySpan.dylib"
+          ]
+        },
+        "static-app.log": {
+          "sha256": "322ca6c93a7abe3dd3f63320c690dba83aeeb224f5ec0100604e3345515eb32e",
+          "bytes": 56,
+          "lastLines": [
+            "Verified statically linked Whisper app: 18 Mach-O files"
+          ]
+        }
+      }
+    }
+  },
+  "limits": [
+    "Remote Mach-O parser reads embedded flags and entitlements; retained runner signing guards supply actual macOS cryptographic signature validation.",
+    "Both actual archived products are ad-hoc signed local test builds, not Developer ID release artifacts."
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "conclusion": "success",
+  "databaseId": 40599070748,
+  "headBranch": "ci/rjt-correction-library-store-check-01a17bef",
+  "headSha": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T23:30:48Z",
+      "conclusion": "success",
+      "databaseId": 122522357368,
+      "name": "correction-library-store",
+      "startedAt": "2026-10-27T23:01:02Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T23:01:05Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T23:01:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:01:12Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T23:01:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:01:25Z",
+          "conclusion": "success",
+          "name": "Select Xcode 26 and Metal toolchain",
+          "number": 3,
+          "startedAt": "2026-10-27T23:01:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:01:25Z",
+          "conclusion": "success",
+          "name": "Check schema delta and exact hosted-test classifiers",
+          "number": 4,
+          "startedAt": "2026-10-27T23:01:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:01:31Z",
+          "conclusion": "success",
+          "name": "Pin real products and seed disposable startup defaults",
+          "number": 5,
+          "startedAt": "2026-10-27T23:01:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:02:07Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 6,
+          "startedAt": "2026-10-27T23:01:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:03:42Z",
+          "conclusion": "success",
+          "name": "Build and freeze one shared static Whisper dependency",
+          "number": 7,
+          "startedAt": "2026-10-27T23:02:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:03:42Z",
+          "conclusion": "skipped",
+          "name": "Run actions/cache/save@v4",
+          "number": 8,
+          "startedAt": "2026-10-27T23:03:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:17:16Z",
+          "conclusion": "success",
+          "name": "Seed and reopen in separate actual predecessor hosts",
+          "number": 9,
+          "startedAt": "2026-10-27T23:03:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:17:23Z",
+          "conclusion": "success",
+          "name": "Preserve predecessor checkpoint before current app build",
+          "number": 10,
+          "startedAt": "2026-10-27T23:17:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:29:58Z",
+          "conclusion": "success",
+          "name": "Upgrade, save correction records, and reopen the same closed clone",
+          "number": 11,
+          "startedAt": "2026-10-27T23:17:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:30:21Z",
+          "conclusion": "success",
+          "name": "Require exact schema delta, stored values, and host identities",
+          "number": 12,
+          "startedAt": "2026-10-27T23:29:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:30:31Z",
+          "conclusion": "success",
+          "name": "Retain complete native results and closed fixture receipts",
+          "number": 13,
+          "startedAt": "2026-10-27T23:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:30:32Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 26,
+          "startedAt": "2026-10-27T23:30:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:30:35Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "startedAt": "2026-10-27T23:30:32Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40599070748/job/122522357368"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40599070748"
+}

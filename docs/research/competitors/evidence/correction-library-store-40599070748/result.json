@@ -1,0 +1,62 @@
+{
+  "canonical_fields_per_record": 9,
+  "canonical_record_count": 3,
+  "classification": "actual-correction-library-store-upgrade-passed",
+  "deleted_source_history_scalar_provenance_preserved": true,
+  "distinct_host_pids": [
+    28578,
+    32006,
+    55624,
+    59224
+  ],
+  "historical_six_new_fields_nil": true,
+  "legacy_39_values_and_identifiers_equal": true,
+  "limits": [
+    "Six local optional WordReplacement scalar attributes and explicit programmatic backend approval fixture only.",
+    "Empty legacy raw pair checked at predecessor matching boundary; no CloudKit sync or backward store-open proof.",
+    "No actual human approval, UI, real user store, provider call or microphone inactivity proof.",
+    "Actual app initialization opened fresh normal Application Support and attempted recorder pre-roll on the disposable runner."
+  ],
+  "literal_legacy_raw_pair_empty": true,
+  "new_record_count": 4,
+  "new_values_and_identifiers_equal_after_reopen": true,
+  "original_seed_immutable": true,
+  "phases": [
+    "seed",
+    "old-reopen",
+    "correction-write",
+    "correction-reopen"
+  ],
+  "schema_hashes": {
+    "correction-reopen": {
+      "canonical_schema_sha256": "75950ca01e3cb269bdd5c74f13acf5a69887ec377d7a6d6e838e4c498bc533b7",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "671ccf747e7ea939db47e7a624cd65efbb7efa1e71bc1c0013f3964528846128",
+      "transcription_metadata_sha256": "4514c9203581c771c7d96cbaec0b41234df35f164aed801420bfd91ace4d6ee8"
+    },
+    "correction-write": {
+      "canonical_schema_sha256": "75950ca01e3cb269bdd5c74f13acf5a69887ec377d7a6d6e838e4c498bc533b7",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "03840973660ea30759f7a3785859b816be86a0fdf2f1520a4e2843cc6d4c8d46",
+      "transcription_metadata_sha256": "4514c9203581c771c7d96cbaec0b41234df35f164aed801420bfd91ace4d6ee8"
+    },
+    "old-reopen": {
+      "canonical_schema_sha256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "516132ecd03f46f640cce22d88614c69839b2047a6eb8bd1c35ffe77ec7a289c",
+      "transcription_metadata_sha256": "4514c9203581c771c7d96cbaec0b41234df35f164aed801420bfd91ace4d6ee8"
+    },
+    "seed": {
+      "canonical_schema_sha256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "317724c296c8f9c2813ed76b93168e1ab7c18adbf1e79eda78fe47fc4b8fe2f9",
+      "transcription_metadata_sha256": "4514c9203581c771c7d96cbaec0b41234df35f164aed801420bfd91ace4d6ee8"
+    }
+  },
+  "source_sha": {
+    "candidate": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+    "predecessor": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+  },
+  "stored_fields_per_new_record": 11,
+  "unknown_kind_remains_disabled_and_rejected": true
+}

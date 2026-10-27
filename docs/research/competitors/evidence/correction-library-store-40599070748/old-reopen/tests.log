@@ -1,0 +1,166 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/runner/work/_temp/correction-library-store-predecessor/VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination platform=macOS -parallel-testing-enabled NO -derivedDataPath /Users/runner/work/_temp/correction-library-store-derived-predecessor -xcconfig /Users/runner/work/_temp/correction-library-store-predecessor/LocalBuild.xcconfig -clonedSourcePackagesDirPath /Users/runner/work/_temp/correction-library-store-packages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM= ENABLE_PREVIEWS=NO ENABLE_XOJIT_PREVIEWS=NO ENABLE_HARDENED_RUNTIME=YES CODE_SIGN_ENTITLEMENTS=/Users/runner/work/_temp/correction-library-store-predecessor/VoiceInk/VoiceInk.local.entitlements "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD" "-only-testing:VoiceInkTests/VoiceInkTests/liveCorrectionLibraryPersistentStoreUpgrade()" -resultBundlePath /Users/runner/work/_temp/correction-library-store-proof/old-reopen/Test.xcresult
+
+Build settings from command line:
+    CODE_SIGN_ENTITLEMENTS = /Users/runner/work/_temp/correction-library-store-predecessor/VoiceInk/VoiceInk.local.entitlements
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    CODE_SIGNING_REQUIRED = NO
+    DEVELOPMENT_TEAM = 
+    ENABLE_HARDENED_RUNTIME = YES
+    ENABLE_PREVIEWS = NO
+    ENABLE_XOJIT_PREVIEWS = NO
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Build settings from configuration file '/Users/runner/work/_temp/correction-library-store-predecessor/LocalBuild.xcconfig':
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGN_STYLE = Manual
+    DEVELOPMENT_TEAM = 
+    PROVISIONING_PROFILE_SPECIFIER = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  VoiceInkQwen: /Users/runner/work/_temp/correction-library-store-predecessor/VoiceInkQwen @ local
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  VoiceInkCore: /Users/runner/work/_temp/correction-library-store-predecessor/VoiceInkCore @ local
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+  VoiceInkNVIDIA: /Users/runner/work/_temp/correction-library-store-predecessor/VoiceInkNVIDIA @ local
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+
+Writing result bundle at path:
+	/Users/runner/work/_temp/correction-library-store-proof/old-reopen/Test.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:56ddf431d034cc5e8a7a38b0893aecb007f92eb6, name:My Mac }
+{ platform:macOS, arch:x86_64, id:56ddf431d034cc5e8a7a38b0893aecb007f92eb6, name:My Mac }
+2026-10-27 23:16:53.731178+0000 roma just talk[32006:99349] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0xc90e20760> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-27 23:16:53.893257+0000 roma just talk[32006:99349] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:16:53.893866+0000 roma just talk[32006:99473] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.893912+0000 roma just talk[32006:99473] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.894181+0000 roma just talk[32006:99349] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-27 23:16:53.894249+0000 roma just talk[32006:99349] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-27 23:16:53.895005+0000 roma just talk[32006:99349] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-27 23:16:53.895021+0000 roma just talk[32006:99349] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-27 23:16:53.896619+0000 roma just talk[32006:99474] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.896649+0000 roma just talk[32006:99474] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.897203+0000 roma just talk[32006:99473] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.904197+0000 roma just talk[32006:99545] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-27 23:16:53.904265+0000 roma just talk[32006:99473] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.897592+0000 roma just talk[32006:99544] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.908740+0000 roma just talk[32006:99544] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.897917+0000 roma just talk[32006:99546] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.908789+0000 roma just talk[32006:99546] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.898668+0000 roma just talk[32006:99548] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.909359+0000 roma just talk[32006:99548] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.899004+0000 roma just talk[32006:99547] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.910682+0000 roma just talk[32006:99547] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.899437+0000 roma just talk[32006:99550] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.910815+0000 roma just talk[32006:99550] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.901427+0000 roma just talk[32006:99549] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.916223+0000 roma just talk[32006:99549] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.904667+0000 roma just talk[32006:99552] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoSh2026-10-27 23:16:53.906388+0000 roma just talk[32006:99553] [Connection] Will NOT re-try to establish the connection
+ortcut}
+2026-10-27 23:16:53.923372+0000 roma just talk[32006:99552] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.923502+0000 roma just talk[32006:99473] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:53.923548+0000 roma just talk[32006:99473] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:16:55.143800+0000 roma just talk[32006:99349] [ContentView] ContentView appeared
+2026-10-27 23:16:55.181603+0000 roma just talk[32006:99349] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:16:55.182510+0000 roma just talk[32006:99349] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-27 23:16:55.182587+0000 roma just talk[32006:99349] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-27 23:16:55.403684+0000 roma just talk[32006:99349] [RecorderUIManager] Resetting recording state on launch
+2026-10-27 23:16:55.404268+0000 roma just talk[32006:99349] [Recorder] stopRecording called
+2026-10-27 23:16:55.404655+0000 roma just talk[32006:99349] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 23:16:55.404679+0000 roma just talk[32006:99349] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-27 23:16:55.432695+0000 roma just talk[32006:99349] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-27 23:16:55.433096+0000 roma just talk[32006:99349] [WindowManager] configureWindow: registering main window
+2026-10-27 23:16:55.543344+0000 roma just talk[32006:99349] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-27 23:16:55.552952+0000 roma just talk[32006:99349] [ShortcutMonitor] installEventTap: installed
+2026-10-27 23:16:55.615179+0000 roma just talk[32006:99349] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 23:16:55.615843+0000 roma just talk[32006:99552] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 23:16:55.615878+0000 roma just talk[32006:99552] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-27 23:16:55.616238+0000 roma just talk[32006:99552] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-27 23:16:55.616250+0000 roma just talk[32006:99552] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-27 23:16:55.616355+0000 roma just talk[32006:99552] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-27 23:16:55.632611+0000 roma just talk[32006:99552] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-27 23:16:55.632640+0000 roma just talk[32006:99552] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-27 23:16:55.698739+0000 roma just talk[32006:99552] [carc] Reporter disconnected. { function=sendMessage, reporterID=137464723275777 }
+2026-10-27 23:16:55.711833+0000 roma just talk[32006:99552] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-27 23:16:55.711879+0000 roma just talk[32006:99552] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-27 23:16:55.711890+0000 roma just talk[32006:99552] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-27 23:16:55.727236+0000 roma just talk[32006:99349] [Recorder] startPreRollBuffering: active on deviceID=87
+Test Suite 'Selected tests' started at 2026-10-27 23:16:55.925.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-27 23:16:55.926.
+Test Suite 'VoiceInkTests.xctest' passed at 2026-10-27 23:16:55.926.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-27 23:16:55.926.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VoiceInkTests started.
+◇ Test liveCorrectionLibraryPersistentStoreUpgrade() started.
+⎙ Attached 'observation.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+RJT correction store started phase=old-reopen hostPID=32006 sourceSHA=ebf629b4cf109f7a36109ccac7b20ac70f9f48ab
+⎙ Attached 'snapshots.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'expected-snapshots.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'schema-raw.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'schema-canonical.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'runtimeidentity.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'historical-transcription-metadata.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'expected-historical-transcription-metadata.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'old-reader-safety.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+⎙ Attached 'observation.json' to liveCorrectionLibraryPersistentStoreUpgrade().
+✔ Test liveCorrectionLibraryPersistentStoreUpgrade() passed after 0.297 seconds.
+✔ Suite VoiceInkTests passed after 0.298 seconds.
+✔ Test run with 1 test in 1 suite passed after 0.298 seconds.
+2026-10-27 23:16:56.841 xcodebuild[31605:98229] [MT] IDETestOperationsObserverDebug: 4.870 elapsed -- Testing started completed.
+2026-10-27 23:16:56.841 xcodebuild[31605:98229] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-27 23:16:56.841 xcodebuild[31605:98229] [MT] IDETestOperationsObserverDebug: 4.870 sec, +4.870 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/correction-library-store-proof/old-reopen/Test.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

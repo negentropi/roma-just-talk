@@ -1,0 +1,85 @@
+{
+  "classification": "actual-six-field-correction-library-store-upgrade-audited",
+  "runID": 40599070748,
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40599070748",
+  "testedHead": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+  "predecessorSHA": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "artifact": {
+    "artifactID": 12778734241,
+    "bytes": 165374633,
+    "sha256": "7233b95f4871a0e7289638788aa8b898abcd0951f11ae882d807ccc24cb12029",
+    "entries": 544,
+    "crcBadMember": null
+  },
+  "artifactFetches": 1,
+  "failedLogFetches": 0,
+  "predecessorArtifactDownloaded": false,
+  "actualHostPIDs": [
+    28578,
+    32006,
+    55624,
+    59224
+  ],
+  "schemaFieldsBefore": 39,
+  "newOptionalWordReplacementAttributes": {
+    "approvalOriginRawValue": "SSSg",
+    "literalOriginalText": "SSSg",
+    "literalReplacementText": "SSSg",
+    "matchingKindRawValue": "SSSg",
+    "sourceTranscriptionID": "10Foundation4UUIDVSg",
+    "sourceVariantRawValue": "SSSg"
+  },
+  "wordReplacementStoredFieldsAfter": 11,
+  "newPhysicalRecordCount": 4,
+  "physicalFieldsPerNewRecord": 11,
+  "newCanonicalRecordCount": 3,
+  "canonicalFieldsPerNewRecord": 9,
+  "legacy39FixtureValuesAndPersistentIdentifiersPreserved": true,
+  "newCorrectionValuesAndIdentifiersPreservedAfterFreshSameCloneReopen": true,
+  "closedOriginalSeedAndWriteCheckpointCopiesAudited": true,
+  "generatedPreviewIdentity": {
+    "id": "239E8D12-132C-41F5-8312-665F33CBADE0",
+    "dateAdded": 1793143686.384841,
+    "hostPID": 55624,
+    "sourceTranscriptionID": "DDDDDDDD-DDDD-4DDD-8DDD-DDDDDDDDDDDD",
+    "sourceVariant": "recognition",
+    "createdInPhase": "correction-write",
+    "generatedByServicePreview": true
+  },
+  "generatedPreviewDateInsideObservedWriteHostWindow": true,
+  "literalLegacyRawPairsEmpty": true,
+  "historicalSixNewWordFieldsNil": true,
+  "unknownKindDisabledAndRejected": true,
+  "deletedSourceHistoryScalarProvenancePreserved": true,
+  "canonicalPackagePins": 41,
+  "trackedProductSourceEntries": {
+    "predecessor": 634,
+    "candidate": 644
+  },
+  "runtimeFlags": {
+    "predecessor": [
+      "0x10002"
+    ],
+    "candidate": [
+      "0x10002"
+    ]
+  },
+  "remoteFullArtifactPath": "/data/rjt-writing-check-01a17bef/40599070748/roma.correction-library-store-check.zip",
+  "independentAuditReceiptsSHA256": {
+    "independent-correction-records-audit.json": "c03bba1714771788a6715dec4550ca10c504d723374915fa56a9c23d37923bcf",
+    "independent-correction-closure-source-audit.json": "753254bd29a4baaff2776ee1d197e01f50378d878778242a0adca8203ad79a81",
+    "runtime-signing-summary.json": "6b3b91caa5a4db8f2464f1d2890961f8433d49aedffa5e78e7a797fe5b5450b9"
+  },
+  "remoteAuditorSHA256": {
+    "audit_correction_records.py": "060f7379c7591920cbc79857c2832bf3acd4bc69eeb7e66bab4c13ae1e5728d2",
+    "audit_correction_closure.py": "f0b802c7b7fc3e6c5e21974484d6356baf778a3e0bb0db057ccad5f96c761cf3",
+    "inspect_signatures.py": "6cb1f96b0d779d6c394f7a7c23db28156cddfe54cf3d4f14691762f8f71c252b"
+  },
+  "limits": [
+    "Actual local SwiftData fixture upgrade and explicit programmatic backend approval only. No human approval or UI proof.",
+    "Empty legacy raw pairs checked with actual predecessor matching engine; no CloudKit sync or backward store-open proof.",
+    "No real user-store, provider call, release signing, or microphone inactivity proof.",
+    "Actual disposable app startup opened normal Application Support and attempted recorder pre-roll.",
+    "Proof is exact tested commit641dcc6 and archived oracle7541a90f; later working-tree edits excluded."
+  ]
+}

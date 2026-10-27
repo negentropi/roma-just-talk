@@ -1,0 +1,13 @@
+{
+  "lane": "candidate",
+  "targets": {
+    "VoiceInk": {
+      "active_conditions": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD CORRECTION_LIBRARY_CANDIDATE LOCAL_BUILD",
+      "candidate_condition": true
+    },
+    "VoiceInkTests": {
+      "active_conditions": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD CORRECTION_LIBRARY_CANDIDATE LOCAL_BUILD",
+      "candidate_condition": true
+    }
+  }
+}

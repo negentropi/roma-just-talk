@@ -1,0 +1,3718 @@
+{
+  "app_path": "/Users/runner/work/_temp/correction-library-store-derived-predecessor/Build/Products/Debug/roma just talk.app",
+  "app_tree": {
+    "Contents": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/MediaRemoteAdapter": {
+      "kind": "symlink",
+      "target": "Versions/Current/MediaRemoteAdapter"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter": {
+      "bytes": 552800,
+      "kind": "file",
+      "sha256": "02c6fb774b76e74bd7a731e51ed3f7074b0f9d3ec213943ed81586120f96d3fc"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 1316,
+      "kind": "file",
+      "sha256": "f742fc95a4b05a85287a451a299aa6075e6e95d7c47546803448153fb8721e95"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2442,
+      "kind": "file",
+      "sha256": "fa726762d5c3d9adb6e0d5e1012fe96787d10ee1898e2337b7b179c5de77adb3"
+    },
+    "Contents/Frameworks/MediaRemoteAdapter.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/Sparkle.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Autoupdate": {
+      "kind": "symlink",
+      "target": "Versions/Current/Autoupdate"
+    },
+    "Contents/Frameworks/Sparkle.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/Sparkle.framework/Sparkle": {
+      "kind": "symlink",
+      "target": "Versions/Current/Sparkle"
+    },
+    "Contents/Frameworks/Sparkle.framework/Updater.app": {
+      "kind": "symlink",
+      "target": "Versions/Current/Updater.app"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate": {
+      "bytes": 709584,
+      "kind": "file",
+      "sha256": "a8146503744b189717a16dd331e507109179b6dfeb01237c8ba6ee0ca7db6b26"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/Base.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/Base.lproj/Sparkle.strings": {
+      "bytes": 6249,
+      "kind": "file",
+      "sha256": "bf93bdde8ad020f2ba210ecfa0e84b5365d0342355a3ca39d88fec0acb1e4a40"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/Info.plist": {
+      "bytes": 1341,
+      "kind": "file",
+      "sha256": "0379f9165e800b09a465df94459fcdc8dcf997ddbbce70f6692716763ec522c4"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ReleaseNotesColorStyle.css": {
+      "bytes": 231,
+      "kind": "file",
+      "sha256": "76bd6999758fd8e51d17e6b482db434f9b4768c02b037af6bd2e3a000ce8cbc1"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/SUStatus.nib": {
+      "bytes": 13016,
+      "kind": "file",
+      "sha256": "bba15dd37a26af87476214b68b06d6455118ce507fd77863f4947d654a6045af"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/SUUpdateAlert.nib": {
+      "bytes": 18490,
+      "kind": "file",
+      "sha256": "3987a333da7c2728ef2cb9656e5eeaf0832884873cabf78353fcb9099c5d8fbe"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/SUUpdatePermissionPrompt.nib": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/SUUpdatePermissionPrompt.nib/keyedobjects-101300.nib": {
+      "bytes": 25424,
+      "kind": "file",
+      "sha256": "e08d0688455021c52837ae7fdfaf80b0df0a0ced318aa0cb3f9ff370769924db"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/SUUpdatePermissionPrompt.nib/keyedobjects-110000.nib": {
+      "bytes": 25401,
+      "kind": "file",
+      "sha256": "64b752f1632c719d2994746c71672d0b603076c0268256effb5edce6b6fcbe23"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ar.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ar.lproj/Sparkle.strings": {
+      "bytes": 3554,
+      "kind": "file",
+      "sha256": "441182787471a3998908044515fe13e92230edaa7e2730638e72a49610f56cba"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ca.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ca.lproj/Sparkle.strings": {
+      "bytes": 3501,
+      "kind": "file",
+      "sha256": "7ed0d5ca300649a7f13304015008f2dede98ad743a625c17d5a5fedacc1a3b1a"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/cs.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/cs.lproj/Sparkle.strings": {
+      "bytes": 10774,
+      "kind": "file",
+      "sha256": "99e66decf9bc46cf5622eead4e65b3b502e3775a4e8e0f03ef1b41683ea8d518"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/da.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/da.lproj/Sparkle.strings": {
+      "bytes": 4882,
+      "kind": "file",
+      "sha256": "8d0ff69b79460185f941372655433bad3934f49e63bef0b4171bd66da71e55f0"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/de.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/de.lproj/Sparkle.strings": {
+      "bytes": 11559,
+      "kind": "file",
+      "sha256": "311035a15227fb12e85eba2a46f3f6198d98ac5590d1d38c43c4ff7430d06599"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/el.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/el.lproj/Sparkle.strings": {
+      "bytes": 5934,
+      "kind": "file",
+      "sha256": "638981a4f095d8b1dabb6230d452e470359711b81803bc5df8c21e1211fd3757"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/es.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/es.lproj/Sparkle.strings": {
+      "bytes": 7040,
+      "kind": "file",
+      "sha256": "30cf2b18d30796961d88da28929d08c62ce45904553d004702877dc7449bf0df"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/fa.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/fa.lproj/Sparkle.strings": {
+      "bytes": 5716,
+      "kind": "file",
+      "sha256": "ed9dda9e271f7a97b8a7f327e71a1b6d06e5e061b367e7da3d153e47dc319263"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/fi.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/fi.lproj/Sparkle.strings": {
+      "bytes": 3252,
+      "kind": "file",
+      "sha256": "c14af9bac3fce436222a4ea277a7a6c0f9b42b2d84aceea75e758ce7538acae2"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/fr.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/fr.lproj/Sparkle.strings": {
+      "bytes": 7855,
+      "kind": "file",
+      "sha256": "3d554dcd167b085e25a75248533f21f389593aeace912ab9952c825ffe141ce1"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/he.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/he.lproj/Sparkle.strings": {
+      "bytes": 9657,
+      "kind": "file",
+      "sha256": "1d795bd7329d04b7ce84b6bdc845f917369e858b2b292f117b89a6666a185723"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/hr.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/hr.lproj/Sparkle.strings": {
+      "bytes": 6367,
+      "kind": "file",
+      "sha256": "920041380a08b3ba50d44e8a83f59de551139845a72748d58f2387c65920b33a"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/hu.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/hu.lproj/Sparkle.strings": {
+      "bytes": 4449,
+      "kind": "file",
+      "sha256": "cc2a16e4d487c6fab357b4f7d0fbbf7ec882371b2130413ffcb1b69cd540d2cf"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/is.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/is.lproj/Sparkle.strings": {
+      "bytes": 3954,
+      "kind": "file",
+      "sha256": "403feba503410e9455cd0eaafe592a2576eedb24130ccf2cdb13dda4b101f87e"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/it.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/it.lproj/Sparkle.strings": {
+      "bytes": 10956,
+      "kind": "file",
+      "sha256": "56a7445c1b68d76849ac59b98aa5c20c9002d5e07e9f0a2720486160f85b7366"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ja.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ja.lproj/Sparkle.strings": {
+      "bytes": 8697,
+      "kind": "file",
+      "sha256": "e404910028af70579cfa208bb4fadd9e3592505fc89af208f4071f2309553fb2"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ko.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ko.lproj/Sparkle.strings": {
+      "bytes": 7797,
+      "kind": "file",
+      "sha256": "a6269eb3f5a07d0c4f5d7467d5065372085aef7484c518a9d784ffd6c8f5aae4"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/nb.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/nb.lproj/Sparkle.strings": {
+      "bytes": 5539,
+      "kind": "file",
+      "sha256": "ef6f0dcae90c440b47ece09909e9cdf35f3383f34e72a614c8c5c0752ecbffe0"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/nl.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/nl.lproj/Sparkle.strings": {
+      "bytes": 9574,
+      "kind": "file",
+      "sha256": "ca9adf34fb93fe3f394ccc92114bf6a6b1f8a128bb5f362cb9f3247d7c26c77d"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/nn.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/nn.lproj/Sparkle.strings": {
+      "bytes": 5671,
+      "kind": "file",
+      "sha256": "1db8c6853a550aa25382da2d55431a1c1d308d6a37676c4f8593cc1633f8a5ae"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/pl.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/pl.lproj/Sparkle.strings": {
+      "bytes": 5453,
+      "kind": "file",
+      "sha256": "5c54b3f8e1eb3026e142e710e2167f2f839b73ab5ad7f18719230f33ae682aa9"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/pt-BR.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/pt-BR.lproj/Sparkle.strings": {
+      "bytes": 9976,
+      "kind": "file",
+      "sha256": "0292cadc2acfc34875c1e0b54e2d50de3833cd5e20c8660c8effe2b859aac84c"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/pt-PT.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/pt-PT.lproj/Sparkle.strings": {
+      "bytes": 5984,
+      "kind": "file",
+      "sha256": "fc958532d26a8e1e74622d3f558fc26a12800e8c49fb614afd0e1883acce4700"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ro.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ro.lproj/Sparkle.strings": {
+      "bytes": 6115,
+      "kind": "file",
+      "sha256": "b2bf064222c38a3672b01fe09406f799718cb0fc4e715121662639d6fdfea6ed"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ru.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/ru.lproj/Sparkle.strings": {
+      "bytes": 5784,
+      "kind": "file",
+      "sha256": "7193af28eb2a09b9fe7119cf6065a2150c6590971b22f98c56f356cd90851923"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/sk.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/sk.lproj/Sparkle.strings": {
+      "bytes": 5675,
+      "kind": "file",
+      "sha256": "e158daaa4f3f91b57cee05ab896f2c1bc467317932cc53bb7c01e7daee9e5238"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/sl.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/sl.lproj/Sparkle.strings": {
+      "bytes": 5646,
+      "kind": "file",
+      "sha256": "c62770c604a6c8c89e283357c8b322d8ce6a85f4d85c09002048331f65f8d980"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/sv.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/sv.lproj/Sparkle.strings": {
+      "bytes": 5160,
+      "kind": "file",
+      "sha256": "4a21ad5bcf8d836d265710c2e4a0a64f07c9551f1c49694d6734a931d23efd39"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/th.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/th.lproj/Sparkle.strings": {
+      "bytes": 5339,
+      "kind": "file",
+      "sha256": "4b6c8dc2ab69a0425de3aa9dc386c6539348e3983e47aa10f94c17e345a157a5"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/tr.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/tr.lproj/Sparkle.strings": {
+      "bytes": 6183,
+      "kind": "file",
+      "sha256": "b040d3f02d341eba047c15dfcafb60406d0847096a94466ecab512dcfb16abb5"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/uk.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/uk.lproj/Sparkle.strings": {
+      "bytes": 5842,
+      "kind": "file",
+      "sha256": "ff44d58635b3e8409d54b42b72c876a43e17fa98f6ea96b32583b9e88c747ab6"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/vi.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/vi.lproj/Sparkle.strings": {
+      "bytes": 12418,
+      "kind": "file",
+      "sha256": "2b3b4acbadf534cd0e812b97e589f80a4e1655b07c8907e98cc31df458ffd8b7"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/zh_CN.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/zh_CN.lproj/Sparkle.strings": {
+      "bytes": 7475,
+      "kind": "file",
+      "sha256": "e7f543b92977e9abc907241c411d8db0f59c4fee480859b3e88e4b495e0976c8"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/zh_HK.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/zh_HK.lproj/Sparkle.strings": {
+      "bytes": 6469,
+      "kind": "file",
+      "sha256": "3fc210132f33d89af3d25d27c7ea19426cf6d304be50254538456e0ec4fb7858"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/zh_TW.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Resources/zh_TW.lproj/Sparkle.strings": {
+      "bytes": 7625,
+      "kind": "file",
+      "sha256": "76321e1dd844c9b6568cb4af7c63bb57d9d1b700109aeedd7e5721d78727b12d"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle": {
+      "bytes": 977616,
+      "kind": "file",
+      "sha256": "c928f1725dd91a7218dbe971ecc7fddc238a782092c8bec56701f099ba58ee49"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/Info.plist": {
+      "bytes": 2400,
+      "kind": "file",
+      "sha256": "db7465df8fe32fb5f67b7e08f9e0b744896357e9206f56b206f5582fda2a4f17"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater": {
+      "bytes": 290560,
+      "kind": "file",
+      "sha256": "310933f1f233d61fcbd8234d799250bea1cadc7824b60bfd4d36ef5d0bceb736"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/PkgInfo": {
+      "bytes": 8,
+      "kind": "file",
+      "sha256": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/Resources/SUStatus.nib": {
+      "bytes": 13016,
+      "kind": "file",
+      "sha256": "bba15dd37a26af87476214b68b06d6455118ce507fd77863f4947d654a6045af"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2446,
+      "kind": "file",
+      "sha256": "25328c7eccf8a37f15b84aaa7ee766c3ac7dc091baaac7318d4de6221407e60e"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/Info.plist": {
+      "bytes": 1717,
+      "kind": "file",
+      "sha256": "476e0aef9d5572df1c3cc084a5ab28342d3cb04311ae6246cc92e45bfde8ba53"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader": {
+      "bytes": 172240,
+      "kind": "file",
+      "sha256": "8caaba0d77fc58b903d59640e5fde9841925f095283cb456b2c26b5714d09433"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2200,
+      "kind": "file",
+      "sha256": "6686de10a28a2fe11b36cbb86dcbacc827cfc4ea116b4dabf1845e5aee629e9b"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/Info.plist": {
+      "bytes": 1605,
+      "kind": "file",
+      "sha256": "6a27c3d0628cd832e3f04d210e68ce1d7d9e98f8cd234e92499c2d9f211e8a89"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer": {
+      "bytes": 223472,
+      "kind": "file",
+      "sha256": "f5bd39c2e771bcd099613b7df9cea648b7b6be3247756122cf33e96cc575aacd"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2200,
+      "kind": "file",
+      "sha256": "6686de10a28a2fe11b36cbb86dcbacc827cfc4ea116b4dabf1845e5aee629e9b"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/B/_CodeSignature/CodeResources": {
+      "bytes": 17887,
+      "kind": "file",
+      "sha256": "0deaba74dec491d03f557340a4bcd2517fc53b2e120fe2cbeab446475916b1fe"
+    },
+    "Contents/Frameworks/Sparkle.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "B"
+    },
+    "Contents/Frameworks/Sparkle.framework/XPCServices": {
+      "kind": "symlink",
+      "target": "Versions/Current/XPCServices"
+    },
+    "Contents/Frameworks/Testing.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Testing.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/Testing.framework/Testing": {
+      "kind": "symlink",
+      "target": "Versions/Current/Testing"
+    },
+    "Contents/Frameworks/Testing.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 856,
+      "kind": "file",
+      "sha256": "a062000564f555174107956dffa0b30fe803c23aaedd1e09407a5e754115b2d8"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/A/Resources/version.plist": {
+      "bytes": 457,
+      "kind": "file",
+      "sha256": "997180b81a6cbecd421ff3262e25a33c65a58cf2043dec6587c43e4d0298c474"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/A/Testing": {
+      "bytes": 10743376,
+      "kind": "file",
+      "sha256": "05f16e44ee78ff53c3e4f993d509055bfdc6457110f9e4668c6457099aeed600"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2674,
+      "kind": "file",
+      "sha256": "b853e5ded7880ff9f4d5bf10727a70699b22bbba9d16bd310e1210a282eeb811"
+    },
+    "Contents/Frameworks/Testing.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 900,
+      "kind": "file",
+      "sha256": "3949cd10883bff50f2fde0096f3fc32d01e1629f3705b300c3269be500d7b7f7"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/A/Resources/version.plist": {
+      "bytes": 460,
+      "kind": "file",
+      "sha256": "3e1ad3373051b13a0a6592623c267d9532cef007d9e9509787f4dd6a02ed4161"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport": {
+      "bytes": 2398512,
+      "kind": "file",
+      "sha256": "3ca83d2bae4055addb24a71e7bce3d3393ac50ff7038548381d8bdb9e37d181f"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2674,
+      "kind": "file",
+      "sha256": "07e8119ffe13e6766c4794f45a7d7057d980417a64b0aac5e6fac22e1cb1665d"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/XCTAutomationSupport.framework/XCTAutomationSupport": {
+      "kind": "symlink",
+      "target": "Versions/Current/XCTAutomationSupport"
+    },
+    "Contents/Frameworks/XCTest.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTest.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 822,
+      "kind": "file",
+      "sha256": "9f9fb3458e2104f7dddb7385bd94b6d9e1b8f1e7429f0d1ee5ce8e1588f933f1"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/A/Resources/version.plist": {
+      "bytes": 460,
+      "kind": "file",
+      "sha256": "3e1ad3373051b13a0a6592623c267d9532cef007d9e9509787f4dd6a02ed4161"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/A/XCTest": {
+      "bytes": 322992,
+      "kind": "file",
+      "sha256": "70768f372dfefb44ce7f4b690d08b2d3ecb40015d19db7f045de52f23e184ee0"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2674,
+      "kind": "file",
+      "sha256": "999c892e4dbd06285427a35b7ec23879738451aae9ebdb2a593911ae16f2cfce"
+    },
+    "Contents/Frameworks/XCTest.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/XCTest.framework/XCTest": {
+      "kind": "symlink",
+      "target": "Versions/Current/XCTest"
+    },
+    "Contents/Frameworks/XCTestCore.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 830,
+      "kind": "file",
+      "sha256": "d7f98b0a471277236419fd3c18223633e40b0d5294b57816d078c43ea2f3df10"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/A/Resources/version.plist": {
+      "bytes": 460,
+      "kind": "file",
+      "sha256": "3e1ad3373051b13a0a6592623c267d9532cef007d9e9509787f4dd6a02ed4161"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/A/XCTestCore": {
+      "bytes": 6753696,
+      "kind": "file",
+      "sha256": "40e0e93d393f838db5a30d239cd64d0da3573b68028c621bc4f3c04ff2697dca"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2674,
+      "kind": "file",
+      "sha256": "6efe1ee4fa9ad5feb20f2eebf442a8a6b61fc8328c1b5f8c408dca6be84c567c"
+    },
+    "Contents/Frameworks/XCTestCore.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/XCTestCore.framework/XCTestCore": {
+      "kind": "symlink",
+      "target": "Versions/Current/XCTestCore"
+    },
+    "Contents/Frameworks/XCTestSupport.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 836,
+      "kind": "file",
+      "sha256": "682565fbe027bc2815af7c563f82a48e82294c24355b023ffee60eca732737e9"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/A/Resources/version.plist": {
+      "bytes": 460,
+      "kind": "file",
+      "sha256": "3e1ad3373051b13a0a6592623c267d9532cef007d9e9509787f4dd6a02ed4161"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/A/XCTestSupport": {
+      "bytes": 317984,
+      "kind": "file",
+      "sha256": "c1ca0ece58becefdc3c0c8ecd0b68e893ae172fb822cc05b578d1f5a5411ae10"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2674,
+      "kind": "file",
+      "sha256": "95a8cefd22253881ab46e31a307284f11507ed6a00456af7ced23654ef079dde"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/XCTestSupport.framework/XCTestSupport": {
+      "kind": "symlink",
+      "target": "Versions/Current/XCTestSupport"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 838,
+      "kind": "file",
+      "sha256": "6593c4245d567c23aaeac9cd5808110c3869bdcce7118e73b2cd252086e1281c"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/A/Resources/version.plist": {
+      "bytes": 460,
+      "kind": "file",
+      "sha256": "3e1ad3373051b13a0a6592623c267d9532cef007d9e9509787f4dd6a02ed4161"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation": {
+      "bytes": 7113248,
+      "kind": "file",
+      "sha256": "d77645511f9c11aaa83f407e3390c7e7f87709be5ef0b0af41efa7261505c385"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2674,
+      "kind": "file",
+      "sha256": "78dbd8ab7d83c492de8bc78b534b6fd62aa4ddc9f411926e527fda5a1e9a8a85"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/XCUIAutomation.framework/XCUIAutomation": {
+      "kind": "symlink",
+      "target": "Versions/Current/XCUIAutomation"
+    },
+    "Contents/Frameworks/XCUnit.framework": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUnit.framework/Resources": {
+      "kind": "symlink",
+      "target": "Versions/Current/Resources"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/A": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/A/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/A/Resources/Info.plist": {
+      "bytes": 822,
+      "kind": "file",
+      "sha256": "3f651867f053a4a6dead1ddf52e3810a92a4db784028a1842c083686cabed5c5"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/A/Resources/version.plist": {
+      "bytes": 460,
+      "kind": "file",
+      "sha256": "3e1ad3373051b13a0a6592623c267d9532cef007d9e9509787f4dd6a02ed4161"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/A/XCUnit": {
+      "bytes": 165984,
+      "kind": "file",
+      "sha256": "1313863891db4bdbe4c41eab4637d8f5ce81a3165e8cfdf7c94583ecb7a62f6f"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/A/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/A/_CodeSignature/CodeResources": {
+      "bytes": 2674,
+      "kind": "file",
+      "sha256": "c8d7eb7df4c9e0d875cd7f7f1e3403501b02bfa046e3ab36dfcc207136958d6b"
+    },
+    "Contents/Frameworks/XCUnit.framework/Versions/Current": {
+      "kind": "symlink",
+      "target": "A"
+    },
+    "Contents/Frameworks/XCUnit.framework/XCUnit": {
+      "kind": "symlink",
+      "target": "Versions/Current/XCUnit"
+    },
+    "Contents/Frameworks/libXCTestBundleInject.dylib": {
+      "bytes": 221168,
+      "kind": "file",
+      "sha256": "1c178ea8863dab613576683a05dfe92621ab35100299f24128d16a754967a938"
+    },
+    "Contents/Frameworks/libXCTestSwiftSupport.dylib": {
+      "bytes": 3826224,
+      "kind": "file",
+      "sha256": "9ef967802121f0bc3d69b3aff6b99f6e7b9d0020489664deb6c0bc9b74a8228b"
+    },
+    "Contents/Frameworks/libswiftCompatibilitySpan.dylib": {
+      "bytes": 187856,
+      "kind": "file",
+      "sha256": "0ab6d0b0f7c61ca9cd2eadea1ca356baae20e28e99588e8d1692146d4cddd539"
+    },
+    "Contents/Info.plist": {
+      "bytes": 3289,
+      "kind": "file",
+      "sha256": "75ffa1c1abd832e8e567a4d2f8eadb163d236d38a7489bdc462e33826314de3f"
+    },
+    "Contents/MacOS": {
+      "kind": "directory"
+    },
+    "Contents/MacOS/roma just talk": {
+      "bytes": 230044080,
+      "kind": "file",
+      "sha256": "c8fc21d6bddc28d32191ac19127b1046a71e83a5533fd1e234953c3b7b97ac80"
+    },
+    "Contents/PkgInfo": {
+      "bytes": 8,
+      "kind": "file",
+      "sha256": "82502191c9484b04d685374f9879a0066069c49b8acae7a04b01d38d07e8eca0"
+    },
+    "Contents/PlugIns": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Info.plist": {
+      "bytes": 1299,
+      "kind": "file",
+      "sha256": "cc314b4249d929abf9e99c18633aa403d484f6dca33833a1003743a810d8f1b1"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests": {
+      "bytes": 12678608,
+      "kind": "file",
+      "sha256": "5e0804036cc922e771d7dc3c638e444de434c9b48ac1fd2df4f6afef93499066"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Info.plist": {
+      "bytes": 1168,
+      "kind": "file",
+      "sha256": "2a72a5b5909b3f73d5f6fadb4fa4e55bc597f9818187fa95c6062b62027b39ab"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Resources/run.pl": {
+      "bytes": 5034,
+      "kind": "file",
+      "sha256": "3547c53c265801c04ad64b43a7f178eeb589dd33e81a410f7e8e8d02de41063c"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 225,
+      "kind": "file",
+      "sha256": "3a5e9e39849bd643d47b7031e8967d962fa04fa51848c37ab9f65835c1675300"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2434,
+      "kind": "file",
+      "sha256": "40c75a0b7bc3c5071e97b3028015eb6a65c77eac81e90c2e302c21f11c45f5b7"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Info.plist": {
+      "bytes": 1150,
+      "kind": "file",
+      "sha256": "6d003ff3c26bbc369f38c2166b83ab240e03c1410d4269bbbba8228977fe3802"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ar.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ar.lproj/Localizable.strings": {
+      "bytes": 1226,
+      "kind": "file",
+      "sha256": "4b1766f32e241aa602667596728e4fb87244fda72d692132aa44b08b49d0ab94"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/de.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/de.lproj/Localizable.strings": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "94956859ba5dfcdffc6624a60222c94a75cc560e7dd6a4b14d1c407bf1389248"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/en.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/en.lproj/Localizable.strings": {
+      "bytes": 1018,
+      "kind": "file",
+      "sha256": "948120a49d10739bdf578c39d29c45043f053941b40754e0ebbfbfff8e957aa9"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/es.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/es.lproj/Localizable.strings": {
+      "bytes": 1093,
+      "kind": "file",
+      "sha256": "9629d921f8750948729016a24e2a5eaba251136887bcf2e5a4aeceff33ed7a61"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/fr.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/fr.lproj/Localizable.strings": {
+      "bytes": 1128,
+      "kind": "file",
+      "sha256": "5e4cb71d888a1570f921f5d33f3ba04ed4203f22a18f5764f52a996038bcc893"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ja.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ja.lproj/Localizable.strings": {
+      "bytes": 1135,
+      "kind": "file",
+      "sha256": "31f66b4b8d3a3fce8c0acb667539bc1b89db5746bf30d0a423cc4cab75020f4f"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ko.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ko.lproj/Localizable.strings": {
+      "bytes": 1084,
+      "kind": "file",
+      "sha256": "e864455c3e04b5802dca05bc4a55727054d778d7753034aca5f55caffdd93e03"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/pt.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/pt.lproj/Localizable.strings": {
+      "bytes": 1088,
+      "kind": "file",
+      "sha256": "d2831251813860907cb726831287db3c393ce62aacdcee0594eb2247cb1cd12e"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ru.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ru.lproj/Localizable.strings": {
+      "bytes": 1373,
+      "kind": "file",
+      "sha256": "25fff4505d9b1df28c3bb9fea8a8464b074b88e6aaf18f4ad6767a9c47fce8bf"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hans.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hans.lproj/Localizable.strings": {
+      "bytes": 1014,
+      "kind": "file",
+      "sha256": "c4e19874caae1b73865587b93b6e0d796e8632b410d2795256838b55efd82bb9"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hant.lproj": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hant.lproj/Localizable.strings": {
+      "bytes": 1011,
+      "kind": "file",
+      "sha256": "355866c986bad2d83747444daeb7684dc1498e5c8a0643b151517da34c6c3ab7"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 216,
+      "kind": "file",
+      "sha256": "b1742b6c90e03e9a019ebec911b47dda6165f6ab1c4a742c71315ab69bba565e"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 6317,
+      "kind": "file",
+      "sha256": "b38615a4b2f182944483a8a93d6f343043cdb668ed92e719c841e0b97e5abf1a"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Info.plist": {
+      "bytes": 1148,
+      "kind": "file",
+      "sha256": "ce64289bd691a7d158cd539085ad85139f1d3b098d0fd9a7d82f6fbb46294fd8"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+      "bytes": 373,
+      "kind": "file",
+      "sha256": "a07418e5fe128e224cd37964bc21c503b7aa2f575e7b4927468478ad873214fe"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 215,
+      "kind": "file",
+      "sha256": "8031eafb020dd214363f7f5de2c1869c4192e9b715a6e6195019373b73e70103"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2464,
+      "kind": "file",
+      "sha256": "b1ffd3943be9429b125873704d3262452ccbd7b6bf8cbee78fd3ef215f46ba51"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Info.plist": {
+      "bytes": 1150,
+      "kind": "file",
+      "sha256": "e9d10959e9e300cbc37e2106338b5cd5278ccb6c5d385e0382881694444eccbc"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-2-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-nio-transport-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-protobuf-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/riva-common-LICENSE.txt": {
+      "bytes": 1096,
+      "kind": "file",
+      "sha256": "9c0bb53336319c13d061a2246eea4f3f216bad31cdeb1fc9ff0fd8d8308dd543"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/riva-protocol-NOTICE.txt": {
+      "bytes": 234,
+      "kind": "file",
+      "sha256": "bd5de772f32d1e6e51c8527429574e1dacc6f410d8dd3222eca32dc1f438dfe7"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-algorithms-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-asn1-LICENSE.txt": {
+      "bytes": 11359,
+      "kind": "file",
+      "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-asn1-NOTICE.txt": {
+      "bytes": 1450,
+      "kind": "file",
+      "sha256": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-async-algorithms-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-atomics-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-certificates-LICENSE.txt": {
+      "bytes": 11359,
+      "kind": "file",
+      "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-certificates-NOTICE.txt": {
+      "bytes": 2589,
+      "kind": "file",
+      "sha256": "57d7797703d906b63c2be50d891cf70bdec307ae6f77a881638c33343f3dd195"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-collections-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-crypto-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-crypto-NOTICE.txt": {
+      "bytes": 1563,
+      "kind": "file",
+      "sha256": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-structured-headers-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-types-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-types-NOTICE.txt": {
+      "bytes": 1341,
+      "kind": "file",
+      "sha256": "eb79190094094bb6ce2b177a7ba7708f50bf873b9a2c5e6e1936a5f391b5ec0f"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-log-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-log-NOTICE.txt": {
+      "bytes": 1324,
+      "kind": "file",
+      "sha256": "879b241d49b407215a0ad8e1c6a71c358d7b29591b090cf379d37a5f50cff918"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-NOTICE.txt": {
+      "bytes": 3266,
+      "kind": "file",
+      "sha256": "d25ed2452b3476c342082d11e4e8bf5459174d2836124f842b499850bcebc50e"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-extras-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-extras-NOTICE.txt": {
+      "bytes": 1841,
+      "kind": "file",
+      "sha256": "722817c4c450c062f1f6e7b9df36733c0f6983aaad3e5e4aa5d76fe23d90010a"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-http2-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-http2-NOTICE.txt": {
+      "bytes": 2285,
+      "kind": "file",
+      "sha256": "56b85f4571b653e82649d82a696afe841a417206a21a25afac751bcb11c2ea87"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-ssl-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-ssl-NOTICE.txt": {
+      "bytes": 1984,
+      "kind": "file",
+      "sha256": "03e8ca5c65a3df21fe1ab48eef91bca7d370db56c290d8ef16eaaa09ba322abe"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-transport-services-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-numerics-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-protobuf-LICENSE.txt": {
+      "bytes": 11757,
+      "kind": "file",
+      "sha256": "186c5f0192a754714a7e542233ddaaad28745626e0ad32e358d3f5af00afb84a"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-service-lifecycle-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-service-lifecycle-NOTICE.txt": {
+      "bytes": 1412,
+      "kind": "file",
+      "sha256": "e0583b716a12a866a2a1d7456c26a17d18e1ec70f0ecaf2c62ed77180d1db043"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-system-LICENSE.txt": {
+      "bytes": 11750,
+      "kind": "file",
+      "sha256": "2245a990b635558be210fb3eb4f8a6f7a49aebc0fefbf5859146a65ddc7ddcf3"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 216,
+      "kind": "file",
+      "sha256": "53a91a565d8046622b31ac5e1b6374c2de764c7233af27447ddba675bfebe066"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 12290,
+      "kind": "file",
+      "sha256": "c21c06d0b98410919db96632ce91daec85daf16e0f3c49c18b8217979f5dc586"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Info.plist": {
+      "bytes": 1142,
+      "kind": "file",
+      "sha256": "9d2f05cbc895c227bc1a8d010aa34750f4a98e818e324427a3cf0e5b86de2b99"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/Apache-2.0-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/HuggingFace-LICENSE.txt": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-Audio-LICENSE.txt": {
+      "bytes": 1070,
+      "kind": "file",
+      "sha256": "fd330bb5d9adf9e65bfe4d8f6f90c808a4196ef5c98aad018a3344256fcb2374"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-LM-LICENSE.txt": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "7b1d86acac816ce8192209d7e01141c129b4d48d474c15cc5fb4af62f497c323"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-Swift-LICENSE.txt": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/NOTICE.txt": {
+      "bytes": 1967,
+      "kind": "file",
+      "sha256": "3f509582b725ba809faf5e048dd62b9c50b8119ffe701d26207b5dfb90606714"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/README.txt": {
+      "bytes": 4409,
+      "kind": "file",
+      "sha256": "2cd210229908d8979ecf65e4b9840c22258e2ab648e87e7f4425412cbdc5d5df"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/LICENSE": {
+      "bytes": 13115,
+      "kind": "file",
+      "sha256": "827c8d8fc207c2392794eef9e00fe246f9f61fdcc132556c275be3dd8c3cd97f"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party/fiat": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party/fiat/LICENSE": {
+      "bytes": 638,
+      "kind": "file",
+      "sha256": "9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/eventsource": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/eventsource/LICENSE.md": {
+      "bytes": 1062,
+      "kind": "file",
+      "sha256": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-audio-swift": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-audio-swift/LICENSE": {
+      "bytes": 1070,
+      "kind": "file",
+      "sha256": "fd330bb5d9adf9e65bfe4d8f6f90c808a4196ef5c98aad018a3344256fcb2374"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-c-vendored": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-c-vendored/LICENSE": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift-lm": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift-lm/LICENSE": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "7b1d86acac816ce8192209d7e01141c129b4d48d474c15cc5fb4af62f497c323"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/LICENSE": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/fmt": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/fmt/LICENSE": {
+      "bytes": 1431,
+      "kind": "file",
+      "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/json": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/json/LICENSE.MIT": {
+      "bytes": 1076,
+      "kind": "file",
+      "sha256": "86b998c792894ccb911a1cb7994f7a9652894e7a094c0b5e45be2f553f45cf14"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/metal-cpp": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/metal-cpp/LICENSE.txt": {
+      "bytes": 11344,
+      "kind": "file",
+      "sha256": "f4e92c7fe2aa066e294c0da9d08683dc9fb741ee6e6debbfad99a0c96e07c1f2"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored/LICENSE": {
+      "bytes": 1066,
+      "kind": "file",
+      "sha256": "ccfab7ccb2ea306f71531c8ca77bb55507606cd90768b1e32b8b52ab5b48cf01"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored/pocketfft-LICENSE.txt": {
+      "bytes": 1760,
+      "kind": "file",
+      "sha256": "46810eb31419fe6f675d585633b08b871175ef50bfe6d54e808bc7d98277d565"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/qwen3-asr-policy": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/qwen3-asr-policy/LICENSE": {
+      "bytes": 11343,
+      "kind": "file",
+      "sha256": "a44a6081c73ad75f0255bb2bb5cab74ef1829565a895a24e53a4f11290ab7655"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/sources.json": {
+      "bytes": 10792,
+      "kind": "file",
+      "sha256": "61cc7c0c920023787550e1b8735159afd70ec71bf2037ac01cb0126dcf3a3be9"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1/LICENSE.txt": {
+      "bytes": 11359,
+      "kind": "file",
+      "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1/NOTICE.txt": {
+      "bytes": 1450,
+      "kind": "file",
+      "sha256": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-collections": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-collections/LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto/LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto/NOTICE.txt": {
+      "bytes": 1563,
+      "kind": "file",
+      "sha256": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-huggingface": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-huggingface/LICENSE": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-jinja": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-jinja/LICENSE": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-numerics": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-numerics/LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-syntax": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-syntax/LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-transformers": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-transformers/LICENSE": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/yyjson": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/yyjson/LICENSE": {
+      "bytes": 1084,
+      "kind": "file",
+      "sha256": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/snapshot.json": {
+      "bytes": 1812,
+      "kind": "file",
+      "sha256": "18fcca33d2551bcae632ee0119acb5b9d38ea97e9c1eefe14468a1272c7bb664"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/tokenizer.json": {
+      "bytes": 4760339,
+      "kind": "file",
+      "sha256": "a1b84857f2052751736e1ca96e208da455db7de53bea3b6e52c34600d59ec192"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 212,
+      "kind": "file",
+      "sha256": "24f96a820a69a29c7fc03f4a08252401d9fae72ce0b677e52127e30405c380f9"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 12036,
+      "kind": "file",
+      "sha256": "a2e9a9ad91ffd7ae09ee914cbab5e494c589ca10dee7fa74e731709924fefa02"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Info.plist": {
+      "bytes": 1120,
+      "kind": "file",
+      "sha256": "3bc61b3dc58e4aa7a935f478f6149bcd9c394a83c022fae7b76b15447bfe66d0"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib": {
+      "bytes": 3817916,
+      "kind": "file",
+      "sha256": "24d4cfcd3ca8b15ead691e46219f35adabbea64c9f8de4eae9bf293fd8d5eb7b"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 201,
+      "kind": "file",
+      "sha256": "906126a6a414089e0d0377b3c133aef64873d2c54cea46564d5638d8ab0c8b8f"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2454,
+      "kind": "file",
+      "sha256": "e76e2e0aed1d537a3695ffdc43c3fc626a77749114b5cff997fec088edcbaf38"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/Info.plist": {
+      "bytes": 1131,
+      "kind": "file",
+      "sha256": "112b791609f634574043bfa4baf55df42b3cb26dcaccfca54ec1c2169e35f849"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+      "bytes": 398,
+      "kind": "file",
+      "sha256": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 206,
+      "kind": "file",
+      "sha256": "832b30345158848e72f5c5738ccbf84536da0e6bc12c0daed66c6c5b9e63eee2"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2464,
+      "kind": "file",
+      "sha256": "ef18096dbff5ed48c3659bec9bdd13f4cbb99b9a32bbef344b28350174a90610"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Info.plist": {
+      "bytes": 1129,
+      "kind": "file",
+      "sha256": "2ac77252ebe66332cbb7a1adb29780f8d765216806e18fdaf238e77f46c9f115"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+      "bytes": 599,
+      "kind": "file",
+      "sha256": "982f20d820bc4460acc9d4116c3e6c8ec837f717dc82edbb7308f7400515c909"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 205,
+      "kind": "file",
+      "sha256": "2cfb2b9310052f9a61eb120522074a7a70e366b48635c202c3c9cd95d37a26a7"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2464,
+      "kind": "file",
+      "sha256": "67ba4e51c5c6ab53b6d4b05fb6ecd54f032f365a31a915150b4564e31a072a6f"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/Info.plist": {
+      "bytes": 1136,
+      "kind": "file",
+      "sha256": "7a83abc8ee353d593d405ba5499dccbb95f7ffe51dfe659af0367ba44b5961c7"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/gpt2_tokenizer_config.json": {
+      "bytes": 234,
+      "kind": "file",
+      "sha256": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/t5_tokenizer_config.json": {
+      "bytes": 20746,
+      "kind": "file",
+      "sha256": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 209,
+      "kind": "file",
+      "sha256": "7f4bccaf26363c2859bb1d340127568f073a9d17576d9d5cb6bb9f2da6d2c63b"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2728,
+      "kind": "file",
+      "sha256": "ae3880b32a4b58e4636e028cf141099134804da084866b30e86115f17fe99df7"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/PlugIns/VoiceInkTests.xctest/Contents/_CodeSignature/CodeResources": {
+      "bytes": 52445,
+      "kind": "file",
+      "sha256": "09a85febc6fc84ba1d7fa17948d754f5a86f6aeb65f87fa4d43c670054ff164b"
+    },
+    "Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/AppIcon.icns": {
+      "bytes": 119544,
+      "kind": "file",
+      "sha256": "fdf0b13e0000172c7287b1f3a85f85f09dd497ee9d89e6199b0b9c5d69723001"
+    },
+    "Contents/Resources/Assets.car": {
+      "bytes": 2667784,
+      "kind": "file",
+      "sha256": "018343398a6869fb1b1794803d2028feb0b090335d5da2aa2f8df78750c0ae88"
+    },
+    "Contents/Resources/Info.plist": {
+      "bytes": 1890,
+      "kind": "file",
+      "sha256": "11b2a01024c6cef1780278fdede8d0d6479ef04ef8f5eb70f94880b804ce22c5"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Info.plist": {
+      "bytes": 1168,
+      "kind": "file",
+      "sha256": "2a72a5b5909b3f73d5f6fadb4fa4e55bc597f9818187fa95c6062b62027b39ab"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Resources/run.pl": {
+      "bytes": 5034,
+      "kind": "file",
+      "sha256": "3547c53c265801c04ad64b43a7f178eeb589dd33e81a410f7e8e8d02de41063c"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 225,
+      "kind": "file",
+      "sha256": "3a5e9e39849bd643d47b7031e8967d962fa04fa51848c37ab9f65835c1675300"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2434,
+      "kind": "file",
+      "sha256": "40c75a0b7bc3c5071e97b3028015eb6a65c77eac81e90c2e302c21f11c45f5b7"
+    },
+    "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/Metadata.appintents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/Metadata.appintents/extract.actionsdata": {
+      "bytes": 3607,
+      "kind": "file",
+      "sha256": "4fbe98f8f513d16b7ca1cd0487bb729915bcc148f2f54304be4f4142948ec204"
+    },
+    "Contents/Resources/Metadata.appintents/version.json": {
+      "bytes": 52,
+      "kind": "file",
+      "sha256": "3fbb1d7e80265e2010710177b0fc9598db06fa016bcf112736407ca76ceddb21"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Info.plist": {
+      "bytes": 1150,
+      "kind": "file",
+      "sha256": "6d003ff3c26bbc369f38c2166b83ab240e03c1410d4269bbbba8228977fe3802"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ar.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ar.lproj/Localizable.strings": {
+      "bytes": 1226,
+      "kind": "file",
+      "sha256": "4b1766f32e241aa602667596728e4fb87244fda72d692132aa44b08b49d0ab94"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/de.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/de.lproj/Localizable.strings": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "94956859ba5dfcdffc6624a60222c94a75cc560e7dd6a4b14d1c407bf1389248"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/en.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/en.lproj/Localizable.strings": {
+      "bytes": 1018,
+      "kind": "file",
+      "sha256": "948120a49d10739bdf578c39d29c45043f053941b40754e0ebbfbfff8e957aa9"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/es.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/es.lproj/Localizable.strings": {
+      "bytes": 1093,
+      "kind": "file",
+      "sha256": "9629d921f8750948729016a24e2a5eaba251136887bcf2e5a4aeceff33ed7a61"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/fr.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/fr.lproj/Localizable.strings": {
+      "bytes": 1128,
+      "kind": "file",
+      "sha256": "5e4cb71d888a1570f921f5d33f3ba04ed4203f22a18f5764f52a996038bcc893"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ja.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ja.lproj/Localizable.strings": {
+      "bytes": 1135,
+      "kind": "file",
+      "sha256": "31f66b4b8d3a3fce8c0acb667539bc1b89db5746bf30d0a423cc4cab75020f4f"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ko.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ko.lproj/Localizable.strings": {
+      "bytes": 1084,
+      "kind": "file",
+      "sha256": "e864455c3e04b5802dca05bc4a55727054d778d7753034aca5f55caffdd93e03"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/pt.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/pt.lproj/Localizable.strings": {
+      "bytes": 1088,
+      "kind": "file",
+      "sha256": "d2831251813860907cb726831287db3c393ce62aacdcee0594eb2247cb1cd12e"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ru.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ru.lproj/Localizable.strings": {
+      "bytes": 1373,
+      "kind": "file",
+      "sha256": "25fff4505d9b1df28c3bb9fea8a8464b074b88e6aaf18f4ad6767a9c47fce8bf"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hans.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hans.lproj/Localizable.strings": {
+      "bytes": 1014,
+      "kind": "file",
+      "sha256": "c4e19874caae1b73865587b93b6e0d796e8632b410d2795256838b55efd82bb9"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hant.lproj": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hant.lproj/Localizable.strings": {
+      "bytes": 1011,
+      "kind": "file",
+      "sha256": "355866c986bad2d83747444daeb7684dc1498e5c8a0643b151517da34c6c3ab7"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 216,
+      "kind": "file",
+      "sha256": "b1742b6c90e03e9a019ebec911b47dda6165f6ab1c4a742c71315ab69bba565e"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 6317,
+      "kind": "file",
+      "sha256": "b38615a4b2f182944483a8a93d6f343043cdb668ed92e719c841e0b97e5abf1a"
+    },
+    "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Info.plist": {
+      "bytes": 1148,
+      "kind": "file",
+      "sha256": "ce64289bd691a7d158cd539085ad85139f1d3b098d0fd9a7d82f6fbb46294fd8"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+      "bytes": 373,
+      "kind": "file",
+      "sha256": "a07418e5fe128e224cd37964bc21c503b7aa2f575e7b4927468478ad873214fe"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 215,
+      "kind": "file",
+      "sha256": "8031eafb020dd214363f7f5de2c1869c4192e9b715a6e6195019373b73e70103"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2464,
+      "kind": "file",
+      "sha256": "b1ffd3943be9429b125873704d3262452ccbd7b6bf8cbee78fd3ef215f46ba51"
+    },
+    "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Info.plist": {
+      "bytes": 1150,
+      "kind": "file",
+      "sha256": "e9d10959e9e300cbc37e2106338b5cd5278ccb6c5d385e0382881694444eccbc"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-2-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-nio-transport-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-protobuf-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/riva-common-LICENSE.txt": {
+      "bytes": 1096,
+      "kind": "file",
+      "sha256": "9c0bb53336319c13d061a2246eea4f3f216bad31cdeb1fc9ff0fd8d8308dd543"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/riva-protocol-NOTICE.txt": {
+      "bytes": 234,
+      "kind": "file",
+      "sha256": "bd5de772f32d1e6e51c8527429574e1dacc6f410d8dd3222eca32dc1f438dfe7"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-algorithms-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-asn1-LICENSE.txt": {
+      "bytes": 11359,
+      "kind": "file",
+      "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-asn1-NOTICE.txt": {
+      "bytes": 1450,
+      "kind": "file",
+      "sha256": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-async-algorithms-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-atomics-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-certificates-LICENSE.txt": {
+      "bytes": 11359,
+      "kind": "file",
+      "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-certificates-NOTICE.txt": {
+      "bytes": 2589,
+      "kind": "file",
+      "sha256": "57d7797703d906b63c2be50d891cf70bdec307ae6f77a881638c33343f3dd195"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-collections-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-crypto-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-crypto-NOTICE.txt": {
+      "bytes": 1563,
+      "kind": "file",
+      "sha256": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-structured-headers-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-types-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-types-NOTICE.txt": {
+      "bytes": 1341,
+      "kind": "file",
+      "sha256": "eb79190094094bb6ce2b177a7ba7708f50bf873b9a2c5e6e1936a5f391b5ec0f"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-log-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-log-NOTICE.txt": {
+      "bytes": 1324,
+      "kind": "file",
+      "sha256": "879b241d49b407215a0ad8e1c6a71c358d7b29591b090cf379d37a5f50cff918"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-NOTICE.txt": {
+      "bytes": 3266,
+      "kind": "file",
+      "sha256": "d25ed2452b3476c342082d11e4e8bf5459174d2836124f842b499850bcebc50e"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-extras-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-extras-NOTICE.txt": {
+      "bytes": 1841,
+      "kind": "file",
+      "sha256": "722817c4c450c062f1f6e7b9df36733c0f6983aaad3e5e4aa5d76fe23d90010a"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-http2-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-http2-NOTICE.txt": {
+      "bytes": 2285,
+      "kind": "file",
+      "sha256": "56b85f4571b653e82649d82a696afe841a417206a21a25afac751bcb11c2ea87"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-ssl-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-ssl-NOTICE.txt": {
+      "bytes": 1984,
+      "kind": "file",
+      "sha256": "03e8ca5c65a3df21fe1ab48eef91bca7d370db56c290d8ef16eaaa09ba322abe"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-transport-services-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-numerics-LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-protobuf-LICENSE.txt": {
+      "bytes": 11757,
+      "kind": "file",
+      "sha256": "186c5f0192a754714a7e542233ddaaad28745626e0ad32e358d3f5af00afb84a"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-service-lifecycle-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-service-lifecycle-NOTICE.txt": {
+      "bytes": 1412,
+      "kind": "file",
+      "sha256": "e0583b716a12a866a2a1d7456c26a17d18e1ec70f0ecaf2c62ed77180d1db043"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-system-LICENSE.txt": {
+      "bytes": 11750,
+      "kind": "file",
+      "sha256": "2245a990b635558be210fb3eb4f8a6f7a49aebc0fefbf5859146a65ddc7ddcf3"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 216,
+      "kind": "file",
+      "sha256": "53a91a565d8046622b31ac5e1b6374c2de764c7233af27447ddba675bfebe066"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 12290,
+      "kind": "file",
+      "sha256": "c21c06d0b98410919db96632ce91daec85daf16e0f3c49c18b8217979f5dc586"
+    },
+    "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Info.plist": {
+      "bytes": 1142,
+      "kind": "file",
+      "sha256": "9d2f05cbc895c227bc1a8d010aa34750f4a98e818e324427a3cf0e5b86de2b99"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/Apache-2.0-LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/HuggingFace-LICENSE.txt": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-Audio-LICENSE.txt": {
+      "bytes": 1070,
+      "kind": "file",
+      "sha256": "fd330bb5d9adf9e65bfe4d8f6f90c808a4196ef5c98aad018a3344256fcb2374"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-LM-LICENSE.txt": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "7b1d86acac816ce8192209d7e01141c129b4d48d474c15cc5fb4af62f497c323"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-Swift-LICENSE.txt": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/NOTICE.txt": {
+      "bytes": 1967,
+      "kind": "file",
+      "sha256": "3f509582b725ba809faf5e048dd62b9c50b8119ffe701d26207b5dfb90606714"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/README.txt": {
+      "bytes": 4409,
+      "kind": "file",
+      "sha256": "2cd210229908d8979ecf65e4b9840c22258e2ab648e87e7f4425412cbdc5d5df"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/LICENSE": {
+      "bytes": 13115,
+      "kind": "file",
+      "sha256": "827c8d8fc207c2392794eef9e00fe246f9f61fdcc132556c275be3dd8c3cd97f"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party/fiat": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party/fiat/LICENSE": {
+      "bytes": 638,
+      "kind": "file",
+      "sha256": "9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/eventsource": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/eventsource/LICENSE.md": {
+      "bytes": 1062,
+      "kind": "file",
+      "sha256": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-audio-swift": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-audio-swift/LICENSE": {
+      "bytes": 1070,
+      "kind": "file",
+      "sha256": "fd330bb5d9adf9e65bfe4d8f6f90c808a4196ef5c98aad018a3344256fcb2374"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-c-vendored": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-c-vendored/LICENSE": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift-lm": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift-lm/LICENSE": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "7b1d86acac816ce8192209d7e01141c129b4d48d474c15cc5fb4af62f497c323"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/LICENSE": {
+      "bytes": 1067,
+      "kind": "file",
+      "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/fmt": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/fmt/LICENSE": {
+      "bytes": 1431,
+      "kind": "file",
+      "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/json": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/json/LICENSE.MIT": {
+      "bytes": 1076,
+      "kind": "file",
+      "sha256": "86b998c792894ccb911a1cb7994f7a9652894e7a094c0b5e45be2f553f45cf14"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/metal-cpp": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/metal-cpp/LICENSE.txt": {
+      "bytes": 11344,
+      "kind": "file",
+      "sha256": "f4e92c7fe2aa066e294c0da9d08683dc9fb741ee6e6debbfad99a0c96e07c1f2"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored/LICENSE": {
+      "bytes": 1066,
+      "kind": "file",
+      "sha256": "ccfab7ccb2ea306f71531c8ca77bb55507606cd90768b1e32b8b52ab5b48cf01"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored/pocketfft-LICENSE.txt": {
+      "bytes": 1760,
+      "kind": "file",
+      "sha256": "46810eb31419fe6f675d585633b08b871175ef50bfe6d54e808bc7d98277d565"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/qwen3-asr-policy": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/qwen3-asr-policy/LICENSE": {
+      "bytes": 11343,
+      "kind": "file",
+      "sha256": "a44a6081c73ad75f0255bb2bb5cab74ef1829565a895a24e53a4f11290ab7655"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/sources.json": {
+      "bytes": 10792,
+      "kind": "file",
+      "sha256": "61cc7c0c920023787550e1b8735159afd70ec71bf2037ac01cb0126dcf3a3be9"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1/LICENSE.txt": {
+      "bytes": 11359,
+      "kind": "file",
+      "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1/NOTICE.txt": {
+      "bytes": 1450,
+      "kind": "file",
+      "sha256": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-collections": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-collections/LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto/LICENSE.txt": {
+      "bytes": 11358,
+      "kind": "file",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto/NOTICE.txt": {
+      "bytes": 1563,
+      "kind": "file",
+      "sha256": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-huggingface": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-huggingface/LICENSE": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-jinja": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-jinja/LICENSE": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-numerics": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-numerics/LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-syntax": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-syntax/LICENSE.txt": {
+      "bytes": 11751,
+      "kind": "file",
+      "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-transformers": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-transformers/LICENSE": {
+      "bytes": 11347,
+      "kind": "file",
+      "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/yyjson": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/yyjson/LICENSE": {
+      "bytes": 1084,
+      "kind": "file",
+      "sha256": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/snapshot.json": {
+      "bytes": 1812,
+      "kind": "file",
+      "sha256": "18fcca33d2551bcae632ee0119acb5b9d38ea97e9c1eefe14468a1272c7bb664"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/tokenizer.json": {
+      "bytes": 4760339,
+      "kind": "file",
+      "sha256": "a1b84857f2052751736e1ca96e208da455db7de53bea3b6e52c34600d59ec192"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 212,
+      "kind": "file",
+      "sha256": "24f96a820a69a29c7fc03f4a08252401d9fae72ce0b677e52127e30405c380f9"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 12036,
+      "kind": "file",
+      "sha256": "a2e9a9ad91ffd7ae09ee914cbab5e494c589ca10dee7fa74e731709924fefa02"
+    },
+    "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/arcURL.scpt": {
+      "bytes": 131,
+      "kind": "file",
+      "sha256": "0138efb6eb563441807eac9facf6dc132271844e7649c1c93562e88aeadde3c4"
+    },
+    "Contents/Resources/braveURL.scpt": {
+      "bytes": 110,
+      "kind": "file",
+      "sha256": "c15cd3a11e584ebe54c64344393e6a338e58dcf5382d47485b24bdb49764a236"
+    },
+    "Contents/Resources/chromeURL.scpt": {
+      "bytes": 110,
+      "kind": "file",
+      "sha256": "ee7cd7b7265eea95addbc5572a5a46881d17116754bfd2abe7f7c5be8591e97e"
+    },
+    "Contents/Resources/edgeURL.scpt": {
+      "bytes": 111,
+      "kind": "file",
+      "sha256": "c7850ed24d7e61d68aa3b8c249961e16f522a4de1b9d35806343be5551c2a97a"
+    },
+    "Contents/Resources/firefoxURL.scpt": {
+      "bytes": 557,
+      "kind": "file",
+      "sha256": "b10c63737243840a1352687911d0d79174b6e07b7315068f0b85b2a1eb31d295"
+    },
+    "Contents/Resources/ggml-silero-v5.1.2.bin": {
+      "bytes": 885098,
+      "kind": "file",
+      "sha256": "29940d98d42b91fbd05ce489f3ecf7c72f0a42f027e4875919a28fb4c04ea2cf"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Info.plist": {
+      "bytes": 1120,
+      "kind": "file",
+      "sha256": "3bc61b3dc58e4aa7a935f478f6149bcd9c394a83c022fae7b76b15447bfe66d0"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib": {
+      "bytes": 3817916,
+      "kind": "file",
+      "sha256": "24d4cfcd3ca8b15ead691e46219f35adabbea64c9f8de4eae9bf293fd8d5eb7b"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 201,
+      "kind": "file",
+      "sha256": "906126a6a414089e0d0377b3c133aef64873d2c54cea46564d5638d8ab0c8b8f"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2454,
+      "kind": "file",
+      "sha256": "e76e2e0aed1d537a3695ffdc43c3fc626a77749114b5cff997fec088edcbaf38"
+    },
+    "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/operaURL.scpt": {
+      "bytes": 102,
+      "kind": "file",
+      "sha256": "bb55d108e65ac6ae99c7650819d9352a33b17bea5e15c77eb2466c735951c986"
+    },
+    "Contents/Resources/orionURL.scpt": {
+      "bytes": 133,
+      "kind": "file",
+      "sha256": "7370f29bc1655992cf790ca0848a493d579c296b6e3bf932377f30d62024fdd0"
+    },
+    "Contents/Resources/safariURL.scpt": {
+      "bytes": 135,
+      "kind": "file",
+      "sha256": "dcb74ae68c8405c56b6b64598154809beb68c47cbe3d164bb7f75bad36d51404"
+    },
+    "Contents/Resources/sound1.wav": {
+      "bytes": 192078,
+      "kind": "file",
+      "sha256": "c539301ca1be6d28587a3e7aac21290eab4acbb71603fb7fd4c2a164b6cb332a"
+    },
+    "Contents/Resources/sound2.wav": {
+      "bytes": 192078,
+      "kind": "file",
+      "sha256": "9c5c518d7291d819c243cae650957b155f951dc75ba24af0870281afd04f45a9"
+    },
+    "Contents/Resources/sound3.wav": {
+      "bytes": 192078,
+      "kind": "file",
+      "sha256": "62bd89a65958ae80091c667eca565a58687ea75767dff74f644392d85ee19ac6"
+    },
+    "Contents/Resources/sound4.wav": {
+      "bytes": 192078,
+      "kind": "file",
+      "sha256": "03007083a134941a501a46f1f8b0f393a1550318a0a7cd0332524ddfdecad2bb"
+    },
+    "Contents/Resources/sound5.mp3": {
+      "bytes": 14740,
+      "kind": "file",
+      "sha256": "d74b50dbe7e1f1d7096023220f34ff4c7d1867b53b1a2e66d237de8e4190b6d8"
+    },
+    "Contents/Resources/sound6.mp3": {
+      "bytes": 14333,
+      "kind": "file",
+      "sha256": "64c620bcdfb27839bdaaf3697cbef1007f204c5c2efbdde63e62795cc448a2c4"
+    },
+    "Contents/Resources/sound7.wav": {
+      "bytes": 177468,
+      "kind": "file",
+      "sha256": "52aa791be2047f20bb62f8c49b5789a7de53d047e26b96640a89787de98d62a9"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/Info.plist": {
+      "bytes": 1131,
+      "kind": "file",
+      "sha256": "112b791609f634574043bfa4baf55df42b3cb26dcaccfca54ec1c2169e35f849"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+      "bytes": 398,
+      "kind": "file",
+      "sha256": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 206,
+      "kind": "file",
+      "sha256": "832b30345158848e72f5c5738ccbf84536da0e6bc12c0daed66c6c5b9e63eee2"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2464,
+      "kind": "file",
+      "sha256": "ef18096dbff5ed48c3659bec9bdd13f4cbb99b9a32bbef344b28350174a90610"
+    },
+    "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Info.plist": {
+      "bytes": 1129,
+      "kind": "file",
+      "sha256": "2ac77252ebe66332cbb7a1adb29780f8d765216806e18fdaf238e77f46c9f115"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+      "bytes": 599,
+      "kind": "file",
+      "sha256": "982f20d820bc4460acc9d4116c3e6c8ec837f717dc82edbb7308f7400515c909"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 205,
+      "kind": "file",
+      "sha256": "2cfb2b9310052f9a61eb120522074a7a70e366b48635c202c3c9cd95d37a26a7"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2464,
+      "kind": "file",
+      "sha256": "67ba4e51c5c6ab53b6d4b05fb6ecd54f032f365a31a915150b4564e31a072a6f"
+    },
+    "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/Info.plist": {
+      "bytes": 1136,
+      "kind": "file",
+      "sha256": "7a83abc8ee353d593d405ba5499dccbb95f7ffe51dfe659af0367ba44b5961c7"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/gpt2_tokenizer_config.json": {
+      "bytes": 234,
+      "kind": "file",
+      "sha256": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/t5_tokenizer_config.json": {
+      "bytes": 20746,
+      "kind": "file",
+      "sha256": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeDirectory": {
+      "bytes": 209,
+      "kind": "file",
+      "sha256": "7f4bccaf26363c2859bb1d340127568f073a9d17576d9d5cb6bb9f2da6d2c63b"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeRequirements": {
+      "bytes": 12,
+      "kind": "file",
+      "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2728,
+      "kind": "file",
+      "sha256": "ae3880b32a4b58e4636e028cf141099134804da084866b30e86115f17fe99df7"
+    },
+    "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeSignature": {
+      "bytes": 0,
+      "kind": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "Contents/Resources/vivaldiURL.scpt": {
+      "bytes": 104,
+      "kind": "file",
+      "sha256": "dce573fb0deff214c7ae863cf0ab2dd38d643a5fc9f04165c833928c44173acc"
+    },
+    "Contents/Resources/yandexURL.scpt": {
+      "bytes": 163,
+      "kind": "file",
+      "sha256": "cc8e326989cf697f11d3a1772f9c052e695af2e5514d5a8bebca71ddbab8188d"
+    },
+    "Contents/Resources/zenURL.scpt": {
+      "bytes": 569,
+      "kind": "file",
+      "sha256": "23172c051260529f24e6a6ee5db29a12eb797c4089d733b9a72e632f1953991e"
+    },
+    "Contents/_CodeSignature": {
+      "kind": "directory"
+    },
+    "Contents/_CodeSignature/CodeResources": {
+      "bytes": 62291,
+      "kind": "file",
+      "sha256": "71f909006f44eefd624858dafd50207af87bc510141ff700bad3ba019dfcc19e"
+    }
+  },
+  "designated_requirement": "cdhash H\"26fc857f096ae2a4955178a1ac2f249d448ce6c9\"",
+  "executable_path": "/Users/runner/work/_temp/correction-library-store-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "test_bundles": {
+    "roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest": {
+      "Contents": {
+        "kind": "directory"
+      },
+      "Contents/Info.plist": {
+        "bytes": 1299,
+        "kind": "file",
+        "sha256": "cc314b4249d929abf9e99c18633aa403d484f6dca33833a1003743a810d8f1b1"
+      },
+      "Contents/MacOS": {
+        "kind": "directory"
+      },
+      "Contents/MacOS/VoiceInkTests": {
+        "bytes": 12678608,
+        "kind": "file",
+        "sha256": "5e0804036cc922e771d7dc3c638e444de434c9b48ac1fd2df4f6afef93499066"
+      },
+      "Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Info.plist": {
+        "bytes": 1168,
+        "kind": "file",
+        "sha256": "2a72a5b5909b3f73d5f6fadb4fa4e55bc597f9818187fa95c6062b62027b39ab"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/Resources/run.pl": {
+        "bytes": 5034,
+        "kind": "file",
+        "sha256": "3547c53c265801c04ad64b43a7f178eeb589dd33e81a410f7e8e8d02de41063c"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 225,
+        "kind": "file",
+        "sha256": "3a5e9e39849bd643d47b7031e8967d962fa04fa51848c37ab9f65835c1675300"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 2434,
+        "kind": "file",
+        "sha256": "40c75a0b7bc3c5071e97b3028015eb6a65c77eac81e90c2e302c21f11c45f5b7"
+      },
+      "Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Info.plist": {
+        "bytes": 1150,
+        "kind": "file",
+        "sha256": "6d003ff3c26bbc369f38c2166b83ab240e03c1410d4269bbbba8228977fe3802"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ar.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ar.lproj/Localizable.strings": {
+        "bytes": 1226,
+        "kind": "file",
+        "sha256": "4b1766f32e241aa602667596728e4fb87244fda72d692132aa44b08b49d0ab94"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/de.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/de.lproj/Localizable.strings": {
+        "bytes": 1067,
+        "kind": "file",
+        "sha256": "94956859ba5dfcdffc6624a60222c94a75cc560e7dd6a4b14d1c407bf1389248"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/en.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/en.lproj/Localizable.strings": {
+        "bytes": 1018,
+        "kind": "file",
+        "sha256": "948120a49d10739bdf578c39d29c45043f053941b40754e0ebbfbfff8e957aa9"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/es.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/es.lproj/Localizable.strings": {
+        "bytes": 1093,
+        "kind": "file",
+        "sha256": "9629d921f8750948729016a24e2a5eaba251136887bcf2e5a4aeceff33ed7a61"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/fr.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/fr.lproj/Localizable.strings": {
+        "bytes": 1128,
+        "kind": "file",
+        "sha256": "5e4cb71d888a1570f921f5d33f3ba04ed4203f22a18f5764f52a996038bcc893"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ja.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ja.lproj/Localizable.strings": {
+        "bytes": 1135,
+        "kind": "file",
+        "sha256": "31f66b4b8d3a3fce8c0acb667539bc1b89db5746bf30d0a423cc4cab75020f4f"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ko.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ko.lproj/Localizable.strings": {
+        "bytes": 1084,
+        "kind": "file",
+        "sha256": "e864455c3e04b5802dca05bc4a55727054d778d7753034aca5f55caffdd93e03"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/pt.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/pt.lproj/Localizable.strings": {
+        "bytes": 1088,
+        "kind": "file",
+        "sha256": "d2831251813860907cb726831287db3c393ce62aacdcee0594eb2247cb1cd12e"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ru.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/ru.lproj/Localizable.strings": {
+        "bytes": 1373,
+        "kind": "file",
+        "sha256": "25fff4505d9b1df28c3bb9fea8a8464b074b88e6aaf18f4ad6767a9c47fce8bf"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hans.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hans.lproj/Localizable.strings": {
+        "bytes": 1014,
+        "kind": "file",
+        "sha256": "c4e19874caae1b73865587b93b6e0d796e8632b410d2795256838b55efd82bb9"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hant.lproj": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/Resources/zh-Hant.lproj/Localizable.strings": {
+        "bytes": 1011,
+        "kind": "file",
+        "sha256": "355866c986bad2d83747444daeb7684dc1498e5c8a0643b151517da34c6c3ab7"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 216,
+        "kind": "file",
+        "sha256": "b1742b6c90e03e9a019ebec911b47dda6165f6ab1c4a742c71315ab69bba565e"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 6317,
+        "kind": "file",
+        "sha256": "b38615a4b2f182944483a8a93d6f343043cdb668ed92e719c841e0b97e5abf1a"
+      },
+      "Contents/Resources/PermissionFlow_PermissionFlow.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Info.plist": {
+        "bytes": 1148,
+        "kind": "file",
+        "sha256": "ce64289bd691a7d158cd539085ad85139f1d3b098d0fd9a7d82f6fbb46294fd8"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+        "bytes": 373,
+        "kind": "file",
+        "sha256": "a07418e5fe128e224cd37964bc21c503b7aa2f575e7b4927468478ad873214fe"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 215,
+        "kind": "file",
+        "sha256": "8031eafb020dd214363f7f5de2c1869c4192e9b715a6e6195019373b73e70103"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 2464,
+        "kind": "file",
+        "sha256": "b1ffd3943be9429b125873704d3262452ccbd7b6bf8cbee78fd3ef215f46ba51"
+      },
+      "Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Info.plist": {
+        "bytes": 1150,
+        "kind": "file",
+        "sha256": "e9d10959e9e300cbc37e2106338b5cd5278ccb6c5d385e0382881694444eccbc"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-2-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-nio-transport-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/grpc-swift-protobuf-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/riva-common-LICENSE.txt": {
+        "bytes": 1096,
+        "kind": "file",
+        "sha256": "9c0bb53336319c13d061a2246eea4f3f216bad31cdeb1fc9ff0fd8d8308dd543"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/riva-protocol-NOTICE.txt": {
+        "bytes": 234,
+        "kind": "file",
+        "sha256": "bd5de772f32d1e6e51c8527429574e1dacc6f410d8dd3222eca32dc1f438dfe7"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-algorithms-LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-asn1-LICENSE.txt": {
+        "bytes": 11359,
+        "kind": "file",
+        "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-asn1-NOTICE.txt": {
+        "bytes": 1450,
+        "kind": "file",
+        "sha256": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-async-algorithms-LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-atomics-LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-certificates-LICENSE.txt": {
+        "bytes": 11359,
+        "kind": "file",
+        "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-certificates-NOTICE.txt": {
+        "bytes": 2589,
+        "kind": "file",
+        "sha256": "57d7797703d906b63c2be50d891cf70bdec307ae6f77a881638c33343f3dd195"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-collections-LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-crypto-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-crypto-NOTICE.txt": {
+        "bytes": 1563,
+        "kind": "file",
+        "sha256": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-structured-headers-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-types-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-http-types-NOTICE.txt": {
+        "bytes": 1341,
+        "kind": "file",
+        "sha256": "eb79190094094bb6ce2b177a7ba7708f50bf873b9a2c5e6e1936a5f391b5ec0f"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-log-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-log-NOTICE.txt": {
+        "bytes": 1324,
+        "kind": "file",
+        "sha256": "879b241d49b407215a0ad8e1c6a71c358d7b29591b090cf379d37a5f50cff918"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-NOTICE.txt": {
+        "bytes": 3266,
+        "kind": "file",
+        "sha256": "d25ed2452b3476c342082d11e4e8bf5459174d2836124f842b499850bcebc50e"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-extras-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-extras-NOTICE.txt": {
+        "bytes": 1841,
+        "kind": "file",
+        "sha256": "722817c4c450c062f1f6e7b9df36733c0f6983aaad3e5e4aa5d76fe23d90010a"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-http2-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-http2-NOTICE.txt": {
+        "bytes": 2285,
+        "kind": "file",
+        "sha256": "56b85f4571b653e82649d82a696afe841a417206a21a25afac751bcb11c2ea87"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-ssl-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-ssl-NOTICE.txt": {
+        "bytes": 1984,
+        "kind": "file",
+        "sha256": "03e8ca5c65a3df21fe1ab48eef91bca7d370db56c290d8ef16eaaa09ba322abe"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-nio-transport-services-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-numerics-LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-protobuf-LICENSE.txt": {
+        "bytes": 11757,
+        "kind": "file",
+        "sha256": "186c5f0192a754714a7e542233ddaaad28745626e0ad32e358d3f5af00afb84a"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-service-lifecycle-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-service-lifecycle-NOTICE.txt": {
+        "bytes": 1412,
+        "kind": "file",
+        "sha256": "e0583b716a12a866a2a1d7456c26a17d18e1ec70f0ecaf2c62ed77180d1db043"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices/swift-system-LICENSE.txt": {
+        "bytes": 11750,
+        "kind": "file",
+        "sha256": "2245a990b635558be210fb3eb4f8a6f7a49aebc0fefbf5859146a65ddc7ddcf3"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 216,
+        "kind": "file",
+        "sha256": "53a91a565d8046622b31ac5e1b6374c2de764c7233af27447ddba675bfebe066"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 12290,
+        "kind": "file",
+        "sha256": "c21c06d0b98410919db96632ce91daec85daf16e0f3c49c18b8217979f5dc586"
+      },
+      "Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Info.plist": {
+        "bytes": 1142,
+        "kind": "file",
+        "sha256": "9d2f05cbc895c227bc1a8d010aa34750f4a98e818e324427a3cf0e5b86de2b99"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/Apache-2.0-LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/HuggingFace-LICENSE.txt": {
+        "bytes": 11347,
+        "kind": "file",
+        "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-Audio-LICENSE.txt": {
+        "bytes": 1070,
+        "kind": "file",
+        "sha256": "fd330bb5d9adf9e65bfe4d8f6f90c808a4196ef5c98aad018a3344256fcb2374"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-LM-LICENSE.txt": {
+        "bytes": 1067,
+        "kind": "file",
+        "sha256": "7b1d86acac816ce8192209d7e01141c129b4d48d474c15cc5fb4af62f497c323"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/MLX-Swift-LICENSE.txt": {
+        "bytes": 1067,
+        "kind": "file",
+        "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/NOTICE.txt": {
+        "bytes": 1967,
+        "kind": "file",
+        "sha256": "3f509582b725ba809faf5e048dd62b9c50b8119ffe701d26207b5dfb90606714"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/README.txt": {
+        "bytes": 4409,
+        "kind": "file",
+        "sha256": "2cd210229908d8979ecf65e4b9840c22258e2ab648e87e7f4425412cbdc5d5df"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/LICENSE": {
+        "bytes": 13115,
+        "kind": "file",
+        "sha256": "827c8d8fc207c2392794eef9e00fe246f9f61fdcc132556c275be3dd8c3cd97f"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party/fiat": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/boringssl-vendored/third_party/fiat/LICENSE": {
+        "bytes": 638,
+        "kind": "file",
+        "sha256": "9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/eventsource": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/eventsource/LICENSE.md": {
+        "bytes": 1062,
+        "kind": "file",
+        "sha256": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-audio-swift": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-audio-swift/LICENSE": {
+        "bytes": 1070,
+        "kind": "file",
+        "sha256": "fd330bb5d9adf9e65bfe4d8f6f90c808a4196ef5c98aad018a3344256fcb2374"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-c-vendored": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-c-vendored/LICENSE": {
+        "bytes": 1067,
+        "kind": "file",
+        "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift-lm": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift-lm/LICENSE": {
+        "bytes": 1067,
+        "kind": "file",
+        "sha256": "7b1d86acac816ce8192209d7e01141c129b4d48d474c15cc5fb4af62f497c323"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/LICENSE": {
+        "bytes": 1067,
+        "kind": "file",
+        "sha256": "44326a4ea062241ae6fc26ee2ec90bdc81af7eb7b9d3966181b733fa69d42057"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/fmt": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/fmt/LICENSE": {
+        "bytes": 1431,
+        "kind": "file",
+        "sha256": "07580f2a3b35709ce703d523f447b242f6dfec7582a8c0df102c7fa2849375f8"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/json": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/json/LICENSE.MIT": {
+        "bytes": 1076,
+        "kind": "file",
+        "sha256": "86b998c792894ccb911a1cb7994f7a9652894e7a094c0b5e45be2f553f45cf14"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/metal-cpp": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-swift/Source/Cmlx/metal-cpp/LICENSE.txt": {
+        "bytes": 11344,
+        "kind": "file",
+        "sha256": "f4e92c7fe2aa066e294c0da9d08683dc9fb741ee6e6debbfad99a0c96e07c1f2"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored/LICENSE": {
+        "bytes": 1066,
+        "kind": "file",
+        "sha256": "ccfab7ccb2ea306f71531c8ca77bb55507606cd90768b1e32b8b52ab5b48cf01"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/mlx-vendored/pocketfft-LICENSE.txt": {
+        "bytes": 1760,
+        "kind": "file",
+        "sha256": "46810eb31419fe6f675d585633b08b871175ef50bfe6d54e808bc7d98277d565"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/qwen3-asr-policy": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/qwen3-asr-policy/LICENSE": {
+        "bytes": 11343,
+        "kind": "file",
+        "sha256": "a44a6081c73ad75f0255bb2bb5cab74ef1829565a895a24e53a4f11290ab7655"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/sources.json": {
+        "bytes": 10792,
+        "kind": "file",
+        "sha256": "61cc7c0c920023787550e1b8735159afd70ec71bf2037ac01cb0126dcf3a3be9"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1/LICENSE.txt": {
+        "bytes": 11359,
+        "kind": "file",
+        "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-asn1/NOTICE.txt": {
+        "bytes": 1450,
+        "kind": "file",
+        "sha256": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-collections": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-collections/LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto/LICENSE.txt": {
+        "bytes": 11358,
+        "kind": "file",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-crypto/NOTICE.txt": {
+        "bytes": 1563,
+        "kind": "file",
+        "sha256": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-huggingface": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-huggingface/LICENSE": {
+        "bytes": 11347,
+        "kind": "file",
+        "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-jinja": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-jinja/LICENSE": {
+        "bytes": 11347,
+        "kind": "file",
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-numerics": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-numerics/LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-syntax": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-syntax/LICENSE.txt": {
+        "bytes": 11751,
+        "kind": "file",
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-transformers": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/swift-transformers/LICENSE": {
+        "bytes": 11347,
+        "kind": "file",
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/yyjson": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/ThirdParty/yyjson/LICENSE": {
+        "bytes": 1084,
+        "kind": "file",
+        "sha256": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/snapshot.json": {
+        "bytes": 1812,
+        "kind": "file",
+        "sha256": "18fcca33d2551bcae632ee0119acb5b9d38ea97e9c1eefe14468a1272c7bb664"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources/tokenizer.json": {
+        "bytes": 4760339,
+        "kind": "file",
+        "sha256": "a1b84857f2052751736e1ca96e208da455db7de53bea3b6e52c34600d59ec192"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 212,
+        "kind": "file",
+        "sha256": "24f96a820a69a29c7fc03f4a08252401d9fae72ce0b677e52127e30405c380f9"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 12036,
+        "kind": "file",
+        "sha256": "a2e9a9ad91ffd7ae09ee914cbab5e494c589ca10dee7fa74e731709924fefa02"
+      },
+      "Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Info.plist": {
+        "bytes": 1120,
+        "kind": "file",
+        "sha256": "3bc61b3dc58e4aa7a935f478f6149bcd9c394a83c022fae7b76b15447bfe66d0"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib": {
+        "bytes": 3817916,
+        "kind": "file",
+        "sha256": "24d4cfcd3ca8b15ead691e46219f35adabbea64c9f8de4eae9bf293fd8d5eb7b"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 201,
+        "kind": "file",
+        "sha256": "906126a6a414089e0d0377b3c133aef64873d2c54cea46564d5638d8ab0c8b8f"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 2454,
+        "kind": "file",
+        "sha256": "e76e2e0aed1d537a3695ffdc43c3fc626a77749114b5cff997fec088edcbaf38"
+      },
+      "Contents/Resources/mlx-swift_Cmlx.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/Info.plist": {
+        "bytes": 1131,
+        "kind": "file",
+        "sha256": "112b791609f634574043bfa4baf55df42b3cb26dcaccfca54ec1c2169e35f849"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+        "bytes": 398,
+        "kind": "file",
+        "sha256": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 206,
+        "kind": "file",
+        "sha256": "832b30345158848e72f5c5738ccbf84536da0e6bc12c0daed66c6c5b9e63eee2"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 2464,
+        "kind": "file",
+        "sha256": "ef18096dbff5ed48c3659bec9bdd13f4cbb99b9a32bbef344b28350174a90610"
+      },
+      "Contents/Resources/swift-crypto_Crypto.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Info.plist": {
+        "bytes": 1129,
+        "kind": "file",
+        "sha256": "2ac77252ebe66332cbb7a1adb29780f8d765216806e18fdaf238e77f46c9f115"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/Resources/PrivacyInfo.xcprivacy": {
+        "bytes": 599,
+        "kind": "file",
+        "sha256": "982f20d820bc4460acc9d4116c3e6c8ec837f717dc82edbb7308f7400515c909"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 205,
+        "kind": "file",
+        "sha256": "2cfb2b9310052f9a61eb120522074a7a70e366b48635c202c3c9cd95d37a26a7"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 2464,
+        "kind": "file",
+        "sha256": "67ba4e51c5c6ab53b6d4b05fb6ecd54f032f365a31a915150b4564e31a072a6f"
+      },
+      "Contents/Resources/swift-nio_NIOPosix.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/Info.plist": {
+        "bytes": 1136,
+        "kind": "file",
+        "sha256": "7a83abc8ee353d593d405ba5499dccbb95f7ffe51dfe659af0367ba44b5961c7"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/gpt2_tokenizer_config.json": {
+        "bytes": 234,
+        "kind": "file",
+        "sha256": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/Resources/t5_tokenizer_config.json": {
+        "bytes": 20746,
+        "kind": "file",
+        "sha256": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeDirectory": {
+        "bytes": 209,
+        "kind": "file",
+        "sha256": "7f4bccaf26363c2859bb1d340127568f073a9d17576d9d5cb6bb9f2da6d2c63b"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeRequirements": {
+        "bytes": 12,
+        "kind": "file",
+        "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeResources": {
+        "bytes": 2728,
+        "kind": "file",
+        "sha256": "ae3880b32a4b58e4636e028cf141099134804da084866b30e86115f17fe99df7"
+      },
+      "Contents/Resources/swift-transformers_Hub.bundle/Contents/_CodeSignature/CodeSignature": {
+        "bytes": 0,
+        "kind": "file",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "Contents/_CodeSignature": {
+        "kind": "directory"
+      },
+      "Contents/_CodeSignature/CodeResources": {
+        "bytes": 52445,
+        "kind": "file",
+        "sha256": "09a85febc6fc84ba1d7fa17948d754f5a86f6aeb65f87fa4d43c670054ff164b"
+      }
+    }
+  }
+}

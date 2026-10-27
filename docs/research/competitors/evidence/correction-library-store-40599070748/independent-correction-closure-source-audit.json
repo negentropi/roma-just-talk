@@ -1,0 +1,34 @@
+{
+  "canonical_package_pins": 41,
+  "checks": [
+    "Exact candidate/predecessor Git source manifests, common/correction oracles and historical helper function hashes",
+    "Canonical lock SHA256 and all41 actual checkout pins; recursive source/Gitlink/symlink inventories and static Whisper framework entry shapes",
+    "Frozen app/test byte trees match archived binaries; exact module compiler macro flags and build-setting receipts",
+    "Four distinct live/closed host receipts, handshake, exact selected native results, strict test logs and frozen binary identities",
+    "Every archived closed seed/old-reopen/write-checkpoint/reopened clone file SHA256; seed/write copy receipt equality and same candidate fixture path"
+  ],
+  "classification": "independent-correction-closure-source-audit-passed",
+  "distinct_host_pids": [
+    28578,
+    32006,
+    55624,
+    59224
+  ],
+  "limits": [
+    "Linux archive audit cannot re-run macOS process liveness, TCC, code-sign verification or the app.",
+    "ZIP upload mode bits do not prove live read-only permissions. Native read-only receipts and source-bound guards are checked.",
+    "Package source byte inventories are retained runtime receipts. Canonical lock identities/revisions and inventory shape are independently checked."
+  ],
+  "phases": [
+    "seed",
+    "old-reopen",
+    "correction-write",
+    "correction-reopen"
+  ],
+  "script_sha256": "f0b802c7b7fc3e6c5e21974484d6356baf778a3e0bb0db057ccad5f96c761cf3",
+  "source_reference_sha256": "916c52aa067451529d3374dd9fc95ecaba0cc3780fb024f4a852a4070ee1a67d",
+  "source_sha": {
+    "candidate": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+    "predecessor": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab"
+  }
+}

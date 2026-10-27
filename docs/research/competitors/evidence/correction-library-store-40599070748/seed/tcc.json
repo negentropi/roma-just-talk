@@ -1,0 +1,14 @@
+[
+  {
+    "auth_value": 2,
+    "client": "com.negentropi.RomaJustTalk",
+    "requirement": "FADE0C000000002800000001000000080000001426FC857F096AE2A4955178A1AC2F249D448CE6C9",
+    "service": "kTCCServiceAccessibility"
+  },
+  {
+    "auth_value": 2,
+    "client": "com.negentropi.RomaJustTalk",
+    "requirement": "FADE0C000000002800000001000000080000001426FC857F096AE2A4955178A1AC2F249D448CE6C9",
+    "service": "kTCCServiceMicrophone"
+  }
+]

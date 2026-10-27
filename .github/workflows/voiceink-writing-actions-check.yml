@@ -69,23 +69,10 @@ jobs:
           set -o pipefail
           swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee "$RUNNER_TEMP/writing-core-checks.log"
 
-      - name: Release build and packaging contracts
+      - name: Prepare and verify static Whisper dependencies
         run: |
           set -o pipefail
-          bash scripts/tests/verify-adhoc-library-validation.test.sh
-          make local CONFIGURATION=Release 2>&1 | tee "$RUNNER_TEMP/writing-release-build.log"
-          app="$HOME/Applications/roma just talk.app"
-          test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
-          codesign --verify --deep --strict "$app"
-          bash scripts/verify-static-whisper-app.sh "$app"
-          bash scripts/verify-adhoc-library-validation.sh "$app"
-          bash scripts/verify-macos-release-instrumentation.sh "$app"
-          mkdir -p .local-build/writing-check-evidence
-          cp "$RUNNER_TEMP/writing-core-checks.log" .local-build/writing-check-evidence/core-checks.log
-          cp "$RUNNER_TEMP/writing-release-build.log" .local-build/writing-check-evidence/release-build.log
-          git rev-parse HEAD > .local-build/writing-check-evidence/source-sha.txt
-          ditto -c -k --keepParent "$app" "$RUNNER_TEMP/roma.just.talk.app.zip"
-          shasum -a 256 "$RUNNER_TEMP/roma.just.talk.app.zip" > .local-build/writing-check-evidence/app-sha256.txt
+          make setup 2>&1 | tee "$RUNNER_TEMP/writing-dependency-setup.log"
 
       - name: Preserve verified dependencies for test retries
         if: steps.deps-cache.outputs.cache-hit != 'true'
@@ -108,16 +95,45 @@ jobs:
       - name: Snippet and translation settings UI
         run: bash scripts/run-writing-feature-regression.sh ui
 
+      - name: Preserve test evidence before the Release build
+        if: always()
+        run: |
+          snapshot="$RUNNER_TEMP/writing-proof-snapshot"
+          mkdir -p "$snapshot"
+          if [[ -d .local-build/onboarding-test-evidence ]]; then
+            ditto .local-build/onboarding-test-evidence "$snapshot/onboarding-test-evidence"
+          fi
+          git rev-parse HEAD > "$snapshot/source-sha.txt"
+
+      - name: Release build and packaging contracts
+        run: |
+          set -o pipefail
+          bash scripts/tests/verify-adhoc-library-validation.test.sh
+          make local CONFIGURATION=Release 2>&1 | tee "$RUNNER_TEMP/writing-release-build.log"
+          app="$HOME/Applications/roma just talk.app"
+          test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
+          codesign --verify --deep --strict "$app"
+          bash scripts/verify-static-whisper-app.sh "$app"
+          bash scripts/verify-adhoc-library-validation.sh "$app"
+          bash scripts/verify-macos-release-instrumentation.sh "$app"
+          mkdir -p .local-build/writing-check-evidence
+          cp "$RUNNER_TEMP/writing-core-checks.log" .local-build/writing-check-evidence/core-checks.log
+          cp "$RUNNER_TEMP/writing-release-build.log" .local-build/writing-check-evidence/release-build.log
+          git rev-parse HEAD > .local-build/writing-check-evidence/source-sha.txt
+          ditto -c -k --keepParent "$app" "$RUNNER_TEMP/roma.just.talk.app.zip"
+          shasum -a 256 "$RUNNER_TEMP/roma.just.talk.app.zip" > .local-build/writing-check-evidence/app-sha256.txt
+
       - name: Upload verification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: roma.writing-actions-evidence
           path: |
-            .local-build/onboarding-test-evidence/**
+            ${{ runner.temp }}/writing-proof-snapshot/**
             .local-build/writing-check-evidence/**
             ${{ runner.temp }}/writing-feature-regression/**
             ${{ runner.temp }}/writing-core-checks.log
+            ${{ runner.temp }}/writing-dependency-setup.log
             ${{ runner.temp }}/writing-release-build.log
           if-no-files-found: error
           include-hidden-files: true
@@ -128,8 +144,8 @@ jobs:
         with:
           name: roma.writing-actions-screenshots
           path: |
-            .local-build/onboarding-test-evidence/writing-ui/screenshots/**
-            .local-build/onboarding-test-evidence/writing-ui/screenshot-export.*
+            ${{ runner.temp }}/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/**
+            ${{ runner.temp }}/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshot-export.*
           if-no-files-found: warn
 
       - name: Upload verified release app

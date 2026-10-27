@@ -56,3 +56,13 @@ Recheck the executable/signature and nonsecret auth status at execution time. Pr
 The [Core receipt](evidence/core-40562076345/receipt.json) binds all 1,707 passing checks to `aaaa286a794ac6f60773ef5149a30f214c586f23`. It proves the pure policy and JSON boundary, including exact decoded code units. It does not prove model behavior or app integration.
 
 These 27 calls would establish actual outputs for nine synthetic utterances through the tested Clarity route, model identity where observable, and configuration. They would not establish general writing quality, broad instruction-injection resistance, ASR accuracy, microphone behavior, recording or import integration, storage durability, cancellation, editor delivery, physical input, or UI quality. Test those boundaries separately. A JSON sample does not prove that a model obeys instructions; a semantic pass does not replace the transport and native integration gates.
+
+## First actual run and authentication correction
+
+[Remote build 40577497741](https://github.com/negentropi/roma-just-talk/actions/runs/40577497741), exact `18552122`, compiled the actual service and signed the unique probe. The [independent build audit](evidence/clarity-semantic-build-40577497741/summary.md) verifies source, 26 canonical checkouts, signed bundle and zero CI model calls. The signed artifact then passed fresh verification on the quiet local Mac.
+
+The [first 27 actual service attempts](evidence/clarity-semantic-40577497741/summary.md) all failed authentication: exit 1, no decoded model result, and the same OAuth-expired message. Every first attempt and raw stream remains retained. A complete observation receipt is not semantic success; no grading was performed.
+
+The earlier auth preflight and the print route used different settings flags. At the same CLI version, `--setting-sources ''` reports no authentication; `--setting-sources user` reports the existing first-party API-key configuration. The empty setting source also failed the separate UI invocation before any edit or cost. Authentication status alone does not prove a subsequent print request succeeds.
+
+The corrected runner uses one shared set of isolation flags for version, help, sanitized auth status and print. It retains user settings for existing authentication while `--bare`, disabled hooks/tools/MCP, a fresh input-only working directory and no session persistence keep generation context isolated. Auth status is projected to three approved fields and exit code, without retaining its raw response. The strict packaged-runner identity check is preserved, so this requires a new remote artifact rather than editing the prior signed package. A new authenticated 27-result run and independent grading remain acceptance work.

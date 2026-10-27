@@ -1,0 +1,10 @@
+{
+  "root": "/tmp/rjt-clarity-semantic-execution-40577497741-dk0t3nwr",
+  "artifact": "/tmp/rjt-clarity-semantic-execution-40577497741-dk0t3nwr/artifact",
+  "evidence": "/tmp/rjt-clarity-semantic-execution-40577497741-dk0t3nwr/observations",
+  "archiveSHA256": "5446e2311edaf0e7335a30eae11da0e1f865c81039cad5e488fc4f0179d94178",
+  "bundleIdentifier": "com.negentropi.RomaJustTalk.ClaritySemanticProbe.57ee39383bb545c9a23f0ded439faa8a",
+  "binarySHA256": "40b1d1471502112e86a4b6ce0daaaadfde7e23b30e6b84a9aa17494609ed809c",
+  "sourceSHA": "18552122392a0d161969074b1ff2361d1a9a5517",
+  "runnerSHA256": "c7f723921dbae2fe9cf664d673806b1455db71510bf6dd08157373a984f03815"
+}

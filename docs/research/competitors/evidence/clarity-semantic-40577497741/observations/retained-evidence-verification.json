@@ -1,0 +1,5 @@
+{
+  "failures": [],
+  "scope": "Retained stream and text bytes only. No prompt reconstruction, JSON decoding or semantic grading.",
+  "valid": true
+}

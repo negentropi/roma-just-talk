@@ -1,0 +1,26 @@
+{
+  "CLIInternalRetries": "unavailable",
+  "MacFreshSignatureVerified": true,
+  "actualCLIExecs": 27,
+  "appRetryOnTimeout": false,
+  "authPreflight": {
+    "apiProvider": "firstParty",
+    "authMethod": "api_key",
+    "loggedIn": true
+  },
+  "authenticatedModelOutputEstablished": false,
+  "binaryAndCLIUnchanged": true,
+  "completedServiceCalls": 27,
+  "decodedResults": 0,
+  "defaultModelOverridden": false,
+  "distinctAppError": "customError(\"Local CLI command failed with exit code 1.\")",
+  "distinctRawError": "Failed to authenticate: OAuth session expired and could not be refreshed",
+  "manualRetries": 0,
+  "persistentProbePreferencesUnchanged": true,
+  "preflightDoesNotProveIsolatedPrintAuthentication": true,
+  "retainedEvidenceValid": true,
+  "scope": "First 27 actual Clarity service attempts and authentication failures. No successful model response, semantic grading, app pipeline/UI, microphone or delivery proof.",
+  "semanticGrading": "not-performed",
+  "serviceErrors": 27,
+  "sourceBuildRun": 40577497741
+}

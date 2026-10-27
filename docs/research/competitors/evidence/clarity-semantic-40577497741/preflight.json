@@ -1,0 +1,15 @@
+{
+  "signatureVerified": true,
+  "bundleIdentifier": "com.negentropi.RomaJustTalk.ClaritySemanticProbe.57ee39383bb545c9a23f0ded439faa8a",
+  "cliRequestedPath": "/opt/homebrew/bin/claude",
+  "cliResolvedPath": "/opt/homebrew/Caskroom/claude-code@latest/2.1.310/claude",
+  "cliSHA256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+  "cliVersion": "2.1.310 (Claude Code)",
+  "authStatus": {
+    "loggedIn": true,
+    "authMethod": "api_key",
+    "apiProvider": "firstParty"
+  },
+  "authStatusExitCode": 0,
+  "semanticCallsExecuted": 0
+}

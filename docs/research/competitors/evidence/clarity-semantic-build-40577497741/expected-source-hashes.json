@@ -1,0 +1,756 @@
+{
+  "canonicalPins": {
+    "axswift": {
+      "identity": "axswift",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/tisfeng/AXSwift.git",
+      "state": {
+        "revision": "2efa201fa18184de98674165592fd1ecb0c00a6d",
+        "version": "0.3.6"
+      }
+    },
+    "eventsource": {
+      "identity": "eventsource",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/mattt/EventSource.git",
+      "state": {
+        "revision": "86b5096ac59ab46e66bd1f6377c604bc1dab0bc2",
+        "version": "1.5.1"
+      }
+    },
+    "fluidaudio": {
+      "identity": "fluidaudio",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/negentropi/FluidAudio.git",
+      "state": {
+        "revision": "56c9c2167efa4363690243709dda4a84f29e5f49"
+      }
+    },
+    "grpc-swift-2": {
+      "identity": "grpc-swift-2",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/grpc/grpc-swift-2.git",
+      "state": {
+        "revision": "ac33066eb6edb1a21a6ca172ea8184a9b06f3cc7",
+        "version": "2.4.3"
+      }
+    },
+    "grpc-swift-nio-transport": {
+      "identity": "grpc-swift-nio-transport",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/negentropi/grpc-swift-nio-transport.git",
+      "state": {
+        "revision": "65adb0bc4721a6c4695e1956af9552970c06a59f"
+      }
+    },
+    "grpc-swift-protobuf": {
+      "identity": "grpc-swift-protobuf",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/grpc/grpc-swift-protobuf.git",
+      "state": {
+        "revision": "176c5a434fd76f6f479848d1a8f7d44967534168",
+        "version": "2.4.1"
+      }
+    },
+    "keysender": {
+      "identity": "keysender",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/jordanbaird/KeySender",
+      "state": {
+        "revision": "99584bf1a03ab600cc44be89a2dcd98b2dbeb9de",
+        "version": "0.0.5"
+      }
+    },
+    "launchatlogin-modern": {
+      "identity": "launchatlogin-modern",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/sindresorhus/LaunchAtLogin-Modern",
+      "state": {
+        "branch": "main",
+        "revision": "a04ec1c363be3627734f6dad757d82f5d4fa8fcc"
+      }
+    },
+    "llmkit": {
+      "identity": "llmkit",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/Beingpax/LLMkit.git",
+      "state": {
+        "branch": "main",
+        "revision": "adc2239e2a3c586fd442a8ec1d96dec8e9ae8917"
+      }
+    },
+    "mediaremote-adapter": {
+      "identity": "mediaremote-adapter",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/Beingpax/mediaremote-adapter",
+      "state": {
+        "branch": "master",
+        "revision": "b97fa53f0654c8e33519e8a601b0bead3abd310a"
+      }
+    },
+    "mlx-audio-swift": {
+      "identity": "mlx-audio-swift",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/negentropi/mlx-audio-swift.git",
+      "state": {
+        "revision": "ec81d1d8b6e82be73751a515dafe695d2588da1f"
+      }
+    },
+    "mlx-swift": {
+      "identity": "mlx-swift",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/ml-explore/mlx-swift.git",
+      "state": {
+        "revision": "dc43e62d7055353c7f99fa071a4e71d29dfddc44",
+        "version": "0.31.4"
+      }
+    },
+    "mlx-swift-lm": {
+      "identity": "mlx-swift-lm",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/ml-explore/mlx-swift-lm.git",
+      "state": {
+        "revision": "bd4b7434e6bdb588c7ef55706ff8904cb7fd4c57",
+        "version": "3.31.4"
+      }
+    },
+    "permissionflow": {
+      "identity": "permissionflow",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/jaywcjlove/PermissionFlow",
+      "state": {
+        "revision": "164d39937c2edef736f0ac6a5b144013162a6654",
+        "version": "2.4.0"
+      }
+    },
+    "selectedtextkit": {
+      "identity": "selectedtextkit",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/tisfeng/SelectedTextKit",
+      "state": {
+        "revision": "ecbf46d8be541b54296a0836b7ae2f60c0416b72",
+        "version": "2.6.2"
+      }
+    },
+    "sparkle": {
+      "identity": "sparkle",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/sparkle-project/Sparkle",
+      "state": {
+        "revision": "066e75a8b3e99962685d6a90cdd5293ebffd9261",
+        "version": "2.9.1"
+      }
+    },
+    "swift-algorithms": {
+      "identity": "swift-algorithms",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-algorithms.git",
+      "state": {
+        "revision": "87e50f483c54e6efd60e885f7f5aa946cee68023",
+        "version": "1.2.1"
+      }
+    },
+    "swift-asn1": {
+      "identity": "swift-asn1",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-asn1.git",
+      "state": {
+        "revision": "d9a5b37470adc940d22c3bcd5ca6953a516b727f",
+        "version": "1.7.2"
+      }
+    },
+    "swift-async-algorithms": {
+      "identity": "swift-async-algorithms",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-async-algorithms.git",
+      "state": {
+        "revision": "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+        "version": "1.1.5"
+      }
+    },
+    "swift-atomics": {
+      "identity": "swift-atomics",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-atomics.git",
+      "state": {
+        "revision": "b601256eab081c0f92f059e12818ac1d4f178ff7",
+        "version": "1.3.0"
+      }
+    },
+    "swift-certificates": {
+      "identity": "swift-certificates",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-certificates.git",
+      "state": {
+        "revision": "84f03fafeca28c19f5fc4b528df3d22ce8896bd7",
+        "version": "1.21.1"
+      }
+    },
+    "swift-collections": {
+      "identity": "swift-collections",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-collections.git",
+      "state": {
+        "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+        "version": "1.6.0"
+      }
+    },
+    "swift-crypto": {
+      "identity": "swift-crypto",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-crypto.git",
+      "state": {
+        "revision": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+        "version": "4.5.2"
+      }
+    },
+    "swift-http-structured-headers": {
+      "identity": "swift-http-structured-headers",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-http-structured-headers.git",
+      "state": {
+        "revision": "933538faa42c432d385f02e07df0ace7c5ecfc47",
+        "version": "1.7.0"
+      }
+    },
+    "swift-http-types": {
+      "identity": "swift-http-types",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-http-types.git",
+      "state": {
+        "revision": "bff4b6903cdc99dda49649dd52f46c11cfd3ed50",
+        "version": "1.8.0"
+      }
+    },
+    "swift-huggingface": {
+      "identity": "swift-huggingface",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/huggingface/swift-huggingface.git",
+      "state": {
+        "revision": "9ebe9cb568ff9ebe2f1bcd3ae7d925fbb45ec8d2",
+        "version": "0.10.0"
+      }
+    },
+    "swift-jinja": {
+      "identity": "swift-jinja",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/huggingface/swift-jinja.git",
+      "state": {
+        "revision": "12ea4955e380dae6b0cd98299effe48c7fe584fc",
+        "version": "2.5.0"
+      }
+    },
+    "swift-log": {
+      "identity": "swift-log",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-log.git",
+      "state": {
+        "revision": "c9c6bb9d275ec0d95c3ad16391f3f045dc623104",
+        "version": "1.16.2"
+      }
+    },
+    "swift-nio": {
+      "identity": "swift-nio",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio.git",
+      "state": {
+        "revision": "6db9d9abd92ad7399b8a564cafbb87d3507245fa",
+        "version": "2.104.0"
+      }
+    },
+    "swift-nio-extras": {
+      "identity": "swift-nio-extras",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-extras.git",
+      "state": {
+        "revision": "8e1249b29f92574e05e0d91637f239e378a9a95b",
+        "version": "1.35.2"
+      }
+    },
+    "swift-nio-http2": {
+      "identity": "swift-nio-http2",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-http2.git",
+      "state": {
+        "revision": "0f3e54e29c944c2e835ad52159da7d9e1c94ac69",
+        "version": "1.46.0"
+      }
+    },
+    "swift-nio-ssl": {
+      "identity": "swift-nio-ssl",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-ssl.git",
+      "state": {
+        "revision": "322f3c2a4a21df31c84ca416bf65ee5e9059e440",
+        "version": "2.37.5"
+      }
+    },
+    "swift-nio-transport-services": {
+      "identity": "swift-nio-transport-services",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-transport-services.git",
+      "state": {
+        "revision": "67787bb645a5e67d2edcdfbe48a216cc549222d5",
+        "version": "1.28.0"
+      }
+    },
+    "swift-numerics": {
+      "identity": "swift-numerics",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-numerics",
+      "state": {
+        "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+        "version": "1.1.1"
+      }
+    },
+    "swift-protobuf": {
+      "identity": "swift-protobuf",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-protobuf.git",
+      "state": {
+        "revision": "55d7a1cc5666b85c13464aea1c4b4a90feccb4c8",
+        "version": "1.38.1"
+      }
+    },
+    "swift-service-lifecycle": {
+      "identity": "swift-service-lifecycle",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/swift-server/swift-service-lifecycle.git",
+      "state": {
+        "revision": "a18ee16b8039866fd919bdb4e8e906882d4ecc75",
+        "version": "2.13.0"
+      }
+    },
+    "swift-syntax": {
+      "identity": "swift-syntax",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/swiftlang/swift-syntax.git",
+      "state": {
+        "revision": "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
+        "version": "603.0.2"
+      }
+    },
+    "swift-system": {
+      "identity": "swift-system",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-system.git",
+      "state": {
+        "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+        "version": "1.8.1"
+      }
+    },
+    "swift-transformers": {
+      "identity": "swift-transformers",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/huggingface/swift-transformers.git",
+      "state": {
+        "revision": "c21fdcde390313a6d98d8e33a346f2c3486c3ab0",
+        "version": "1.3.4"
+      }
+    },
+    "yyjson": {
+      "identity": "yyjson",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/ibireme/yyjson.git",
+      "state": {
+        "revision": "8b4a38dc994a110abaec8a400615567bd996105f",
+        "version": "0.12.0"
+      }
+    },
+    "zip": {
+      "identity": "zip",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/marmelroy/Zip",
+      "state": {
+        "revision": "67fa55813b9e7b3b9acee9c0ae501def28746d76",
+        "version": "2.1.2"
+      }
+    }
+  },
+  "inputCaseIDs": [
+    "C01",
+    "C02",
+    "C03",
+    "C04",
+    "C05",
+    "C06",
+    "C07",
+    "C08",
+    "C09"
+  ],
+  "nvidiaPins": {
+    "grpc-swift-2": {
+      "identity": "grpc-swift-2",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/grpc/grpc-swift-2.git",
+      "state": {
+        "revision": "ac33066eb6edb1a21a6ca172ea8184a9b06f3cc7",
+        "version": "2.4.3"
+      }
+    },
+    "grpc-swift-nio-transport": {
+      "identity": "grpc-swift-nio-transport",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/negentropi/grpc-swift-nio-transport.git",
+      "state": {
+        "revision": "65adb0bc4721a6c4695e1956af9552970c06a59f"
+      }
+    },
+    "grpc-swift-protobuf": {
+      "identity": "grpc-swift-protobuf",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/grpc/grpc-swift-protobuf.git",
+      "state": {
+        "revision": "176c5a434fd76f6f479848d1a8f7d44967534168",
+        "version": "2.4.1"
+      }
+    },
+    "swift-algorithms": {
+      "identity": "swift-algorithms",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-algorithms.git",
+      "state": {
+        "revision": "87e50f483c54e6efd60e885f7f5aa946cee68023",
+        "version": "1.2.1"
+      }
+    },
+    "swift-asn1": {
+      "identity": "swift-asn1",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-asn1.git",
+      "state": {
+        "revision": "d9a5b37470adc940d22c3bcd5ca6953a516b727f",
+        "version": "1.7.2"
+      }
+    },
+    "swift-async-algorithms": {
+      "identity": "swift-async-algorithms",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-async-algorithms.git",
+      "state": {
+        "revision": "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+        "version": "1.1.5"
+      }
+    },
+    "swift-atomics": {
+      "identity": "swift-atomics",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-atomics.git",
+      "state": {
+        "revision": "0442cb5a3f98ab802acb777929fdb446bda11a34",
+        "version": "1.3.1"
+      }
+    },
+    "swift-certificates": {
+      "identity": "swift-certificates",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-certificates.git",
+      "state": {
+        "revision": "c8aece90ea05f9866bd392a5bf13b5cae56c0e03",
+        "version": "1.20.0"
+      }
+    },
+    "swift-collections": {
+      "identity": "swift-collections",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-collections.git",
+      "state": {
+        "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+        "version": "1.6.0"
+      }
+    },
+    "swift-crypto": {
+      "identity": "swift-crypto",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-crypto.git",
+      "state": {
+        "revision": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+        "version": "4.5.2"
+      }
+    },
+    "swift-http-structured-headers": {
+      "identity": "swift-http-structured-headers",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-http-structured-headers.git",
+      "state": {
+        "revision": "933538faa42c432d385f02e07df0ace7c5ecfc47",
+        "version": "1.7.0"
+      }
+    },
+    "swift-http-types": {
+      "identity": "swift-http-types",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-http-types.git",
+      "state": {
+        "revision": "bff4b6903cdc99dda49649dd52f46c11cfd3ed50",
+        "version": "1.8.0"
+      }
+    },
+    "swift-log": {
+      "identity": "swift-log",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-log.git",
+      "state": {
+        "revision": "3ffafb9722d5d918c614feb496c8789a3b59d222",
+        "version": "1.15.0"
+      }
+    },
+    "swift-nio": {
+      "identity": "swift-nio",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio.git",
+      "state": {
+        "revision": "a931f2c1de8dd49381ce3bf2e279d033f68d8865",
+        "version": "2.102.0"
+      }
+    },
+    "swift-nio-extras": {
+      "identity": "swift-nio-extras",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-extras.git",
+      "state": {
+        "revision": "41449336c8ecfadac6b4b5be75f9c3c306e61ced",
+        "version": "1.35.1"
+      }
+    },
+    "swift-nio-http2": {
+      "identity": "swift-nio-http2",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-http2.git",
+      "state": {
+        "revision": "0f3e54e29c944c2e835ad52159da7d9e1c94ac69",
+        "version": "1.46.0"
+      }
+    },
+    "swift-nio-ssl": {
+      "identity": "swift-nio-ssl",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-ssl.git",
+      "state": {
+        "revision": "03827c1a9fdb2b6b00a4e93ede8861520263af8c",
+        "version": "2.37.4"
+      }
+    },
+    "swift-nio-transport-services": {
+      "identity": "swift-nio-transport-services",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-nio-transport-services.git",
+      "state": {
+        "revision": "67787bb645a5e67d2edcdfbe48a216cc549222d5",
+        "version": "1.28.0"
+      }
+    },
+    "swift-numerics": {
+      "identity": "swift-numerics",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-numerics.git",
+      "state": {
+        "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+        "version": "1.1.1"
+      }
+    },
+    "swift-protobuf": {
+      "identity": "swift-protobuf",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-protobuf.git",
+      "state": {
+        "revision": "55d7a1cc5666b85c13464aea1c4b4a90feccb4c8",
+        "version": "1.38.1"
+      }
+    },
+    "swift-service-lifecycle": {
+      "identity": "swift-service-lifecycle",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/swift-server/swift-service-lifecycle.git",
+      "state": {
+        "revision": "7f9326b0326ff86e3646295ea6e891f68c471c5e",
+        "version": "2.12.0"
+      }
+    },
+    "swift-system": {
+      "identity": "swift-system",
+      "kind": "remoteSourceControl",
+      "location": "https://github.com/apple/swift-system.git",
+      "state": {
+        "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+        "version": "1.8.1"
+      }
+    }
+  },
+  "sourceInputs": {
+    ".github/workflows/voiceink-clarity-semantic-probe.yml": "3126d91775df2236483764d4478cb0d8dee78d1f64ed867b83e1307f4e555a95",
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+    "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+    "VoiceInk/Notifications/AppNotifications.swift": "984cc249530395f8c0dfbe585a411a522fbd397c9ecebb2b597cb3eb60ef7195",
+    "VoiceInk/Services/AIEnhancement/AIEnhancementService.swift": "986b0c1fae4a939faec9eed4c46a8c6065f6ed5489a922ed337d88994a06bb98",
+    "VoiceInk/Services/AIEnhancement/AIService.swift": "5c830045c735eff231bed4d83ddbe859a1c74c8676bb99d491835ff884682a70",
+    "VoiceInk/Services/AIEnhancement/LocalCLIService.swift": "2e4ca951ed5ecc9d85439485f3bfa33332d85520aedbdcf12be8173c0c53369a",
+    "VoiceInk/Services/APIKeyManager.swift": "8f35daaea29a73acac5f14a69a600b21ceb934552ccb925f39e0af125cc3df2c",
+    "VoiceInk/Services/CustomVocabularyService.swift": "00ffd303fa30988a32106433cf7339657beb80fdc111fed199ffa4164711ff57",
+    "VoiceInk/Services/KeychainService.swift": "78ede0cfc66704712ec972a002c6369fc19aa4620a3d1eb4aad4d845b61b5301",
+    "VoiceInk/Services/OllamaService.swift": "9f1108d8949551f13ce66757e1629e97cad0f6bab23aa6ca8615d6b43e084fd5",
+    "VoiceInk/Services/ScreenCaptureService.swift": "f0657cd1e034318dbd479d23a455edf26f58f6d22d43a512008f24d755e53eb3",
+    "VoiceInk/Services/SelectedTextService.swift": "0b1f9e9a4e9c0f3577c1f5ffeb4b3e156874d9a751f3c1651a61e4765118c7ca",
+    "VoiceInkCore/Package.resolved": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2",
+    "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+    "VoiceInkCore/README.md": "369a227b1283beb66c1e67b805f58326ed1ca79e56d9af72dbbe01e3bd14b55c",
+    "VoiceInkCore/Sources/VoiceInkAudioProof/main.swift": "38dd31c585073778495e035ca01b91e80476c683ad16b1f0adf4572596d824dc",
+    "VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift": "af6c873337daeb0d777d8a6e68e16d4fbf152194b552c5023be1c0cd2cc5f7c5",
+    "VoiceInkCore/Sources/VoiceInkCore/AppIdentity.swift": "95db1baae72f849b920431a6740db8814b4605c9cf68bc0c4bb01dc72ade3b77",
+    "VoiceInkCore/Sources/VoiceInkCore/AudioPlaybackTimeline.swift": "f7bae80a96bd26c7960ebfb836b1a99b92df2c5c7c24bc292ae58e754b830bf2",
+    "VoiceInkCore/Sources/VoiceInkCore/AudioPreRoll.swift": "17bff5e56043b33ee9bb9f898b6fe3688ff66d0b25e842ee95927f5df4ff9f12",
+    "VoiceInkCore/Sources/VoiceInkCore/AudioRoutingPolicy.swift": "d66a56757b31a3b1b12d7ed7cb8b6d99289e6bfae2e7deedb3c5b09206983086",
+    "VoiceInkCore/Sources/VoiceInkCore/AudioTranscriptionService.swift": "3a605a425b1a04e4cde23a5bf5b300c1ef7bc3f1d6b328954f30dacfc1b8b50b",
+    "VoiceInkCore/Sources/VoiceInkCore/CustomCloudModelPolicy.swift": "b0a3773968a0463dded5828218baf6742fb505cd66debc9a0765c71856f2ea23",
+    "VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift": "0507819c83d97f8a0e8400af44b1d246b35c2e15e1b3a0712168ddaf99c6598c",
+    "VoiceInkCore/Sources/VoiceInkCore/DashboardMetrics.swift": "22c9858c9d81cea71784ef25a38ad3e6040ee05e60c29496599aa5c28797db5c",
+    "VoiceInkCore/Sources/VoiceInkCore/DictationPolish.swift": "d9bcd4848c64432bfb6c7a92ded6255cb37b77ad43c8fe582bf5f4c2820c88a2",
+    "VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift": "074492e3521bbbf44eedc36478eb881176843a086aeb813b015c0972cd53324a",
+    "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift": "5ed4974691a8ceeb85c63a4b2f8c8a1357ad223469d3705ce4baca677f2a270d",
+    "VoiceInkCore/Sources/VoiceInkCore/HistoryCleanupPolicy.swift": "2c12c8574dcdd5be4a70df99285756ec7b585c29680a086896af4eaa1a78200e",
+    "VoiceInkCore/Sources/VoiceInkCore/IOSDiagnostics.swift": "9858d0c59732f9ab4e27b400b12592f94e798fdbd3edf3596e48305540855d62",
+    "VoiceInkCore/Sources/VoiceInkCore/IOSEnhancementBehavior.swift": "538787481551317f1864ce9dc916d398e5f0293e250f04eb56a300905257abe6",
+    "VoiceInkCore/Sources/VoiceInkCore/IOSHelpSupportPresentation.swift": "ce3c7e9c3a8cf40de04ea14cba3189846d972e330a9c03cede9a0234b82b9c6c",
+    "VoiceInkCore/Sources/VoiceInkCore/IOSKeyboardDeliveryPolicy.swift": "55052c9aca59aedcc244c77cc25c9fef7d9cbf0581face1b4d8f33176701a3e6",
+    "VoiceInkCore/Sources/VoiceInkCore/IOSMicrophonePermissionPresentation.swift": "f4fad6f123674fbadf9f681e96e54c81ed57c0a246279b6c97d6883eb8aa3803",
+    "VoiceInkCore/Sources/VoiceInkCore/IOSRecordingFeedback.swift": "4fc9bbe4fadd7458316dae071d0ca4789a6551043cea37f6132809500eb21b55",
+    "VoiceInkCore/Sources/VoiceInkCore/IOSSettingsBackup.swift": "7e62fe65bbf469bbb34b7b0515cdbcf16d12e72472d59bc91992dbecf0cd1bd6",
+    "VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift": "e580eb6c15e50810e779bdd1b3b54710aacbd3e47554f95a75f12ac2c7b59360",
+    "VoiceInkCore/Sources/VoiceInkCore/LatencyTrace.swift": "cdf3bd8f62e2e2cad3755ded95d71c2211fd23aff799bc2639343f3a60a54dd8",
+    "VoiceInkCore/Sources/VoiceInkCore/LicensePolicy.swift": "c5d96bdf4ff130887b268a694fda0d62a2fd1f04809730c1f7bc7b26c0a3d6ab",
+    "VoiceInkCore/Sources/VoiceInkCore/LocalOnboardingModelChoice.swift": "1a00d96e42f5016e4ccd6b19d2645b10f435ee1c490a64861019abcf538a5213",
+    "VoiceInkCore/Sources/VoiceInkCore/LocalWhisperTranscriptionFlow.swift": "79df92fd7806ec28e8ed13657180a3a5cdedbaeacf5148add4a8f7164aa6f435",
+    "VoiceInkCore/Sources/VoiceInkCore/Mode.swift": "d85ee9073b1d2f68c7e8bb79c89dd1f3e75bad91fc7b0899283ff18c215ca413",
+    "VoiceInkCore/Sources/VoiceInkCore/OnboardingPresentation.swift": "e015c5c847b0dd6d0096059df3f733a7232e78dfe384cace89f0e02edb7fa549",
+    "VoiceInkCore/Sources/VoiceInkCore/PCM16AudioSamples.swift": "5cf08dc7dcf81d27272f7bbac22a0d2e463cc6b6bdfc8f9a32e3ef3dd3fa85dd",
+    "VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift": "3d02e02f5df424aaadf88e61c868140fd533baa1a7f5ec82df495189da6ff06f",
+    "VoiceInkCore/Sources/VoiceInkCore/ProviderAPIKeyState.swift": "3951701ecbd5c232af3eb71959c618b10edc2a2d963df613380ef2f84178fd68",
+    "VoiceInkCore/Sources/VoiceInkCore/ProviderCatalog.swift": "e82a0af0eb733e6c7cdf17ffe6338cdd53e6003477f1ee86acbc31092a936a28",
+    "VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift": "ec39fb9e3694d1265b11651a58b82be5f95eb0b4a0b2160f36aad9d68637adbb",
+    "VoiceInkCore/Sources/VoiceInkCore/RemoteTransport.swift": "8c0ea3656fdf8299240d6d572376df5bc4e28c40fda59363c3503ec3b83393e1",
+    "VoiceInkCore/Sources/VoiceInkCore/SpokenSnippets.swift": "e7766130e2731c5b80631daa951ec70451e22c8a3f617e9229aaf62686e50239",
+    "VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift": "ead5a0df90449b0f7fbd9cc6573c490a219abb2ce09e4fe13015ec0f19106cde",
+    "VoiceInkCore/Sources/VoiceInkCore/StreamingStartupResolutionPolicy.swift": "bda99c26ee7f44dd9e0e630658f21437431406317c3c5a1de31e1fd4beb7a23c",
+    "VoiceInkCore/Sources/VoiceInkCore/SubscriptionPlanPolicy.swift": "98da8ccdc58bc903f93dad9af9e422b5945c4e468a3c10a82383816ae8be80eb",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptPresentation.swift": "3c1e27107de924f339036ff7df0a9d22848aba10e3b664fd3cfbac54adbdc299",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift": "08830aaad6f9ea2d24e4d2ba1ce1aee9801586698c07d202a641cfdfcc9b1c75",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionModelCatalog.swift": "634ad5aa6b34d17869c53841c87274d3ff72e2b9e26b6a98067f19e7d470d6c6",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift": "af172491a2c5e51f98102d51f80b5951e8d76d04c20a0249f2fa709eff8c628d",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift": "dec5bc9740e21d3f5ff9ac6153653ef24fcf60ae30c7b05455aa3fd586731b50",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionStreamingPreference.swift": "8322cb23fde16e06663fac3aab32cbd4d431594dbcb51e9885d1d6d0c99dd8dc",
+    "VoiceInkCore/Sources/VoiceInkCore/UpdateExperience.swift": "e874619b235bba6b59807a3a5e148e05c1f1a614e9b8e7b01143090bb25c7b39",
+    "VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift": "2f88d8365ad6d50b1667c2d1e5efcaa01560894e0ccd8b8b7b32de4409c8f205",
+    "VoiceInkCore/Sources/VoiceInkCore/WhisperModelFiles.swift": "9972fd2695b5ea07af85d70639ab33740b58937885a0c514d44558965a044ea3",
+    "VoiceInkCore/Sources/VoiceInkCore/WordReplacementLibrary.swift": "5eb84b0bf7818dee5e1c6fca95c24b64639432d19280dfb568738a8238a2c64c",
+    "VoiceInkCore/Sources/VoiceInkCore/WritingActions.swift": "05e8799fc8643228e77f41f22e0e652efb326bce32ea7c9e87730cd2cfbc0eef",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/AIProviderCatalogTests.swift": "5f7407b213d14d5343ceb377229857974acd70d6dd656a958fce05b1b47085d3",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/AppIdentityTests.swift": "191751b35cf72bcabad5550ad0c2047a69b0b923348f1016a3abfad97b96ae1e",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/AudioPlaybackTimelineTests.swift": "704c0f9048be5636ba9932c11b79f6214dab204267c7f3b447703c9f62f7dd9e",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/AudioPreRollTests.swift": "1364ded0f8d3bc7af0404a7005256ae08cf5dba97e507cfe661ce8f5af665c92",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/AudioRoutingPolicyTests.swift": "81ca77ac2370503f98d73d0ca24b2873c5611cb760da1bbfe225e30d42ea1ec0",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/ClarityStylePreferenceTests.swift": "dedef560f1b302ffaa151055aa81cab1078c959902ae7bb82b893ddbd37829f9",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/CustomCloudModelPolicyTests.swift": "26c0dc2289f90b646cf0060fb5a41c5c8e7eb941c35e2fdd49f0b82a328554d8",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/CustomPromptTests.swift": "c8726c3a19ea55e980eb2f0c916878dacf3a369e1d3888eebfd7cd6c2ad22097",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/DashboardMetricsTests.swift": "d4a52537af6ab32b4463257ce75ab16b8da31b7c519f6165437b1714d1f858d8",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/DictationDraftMetadataTests.swift": "3e6c8a33860ffac0140c68fa48fcd8978a1a08e618fe866a417785baf4c2bf23",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/DictationPolishTests.swift": "a6ecaab7ce90877101ed01096bd176dc4c85e04c83ce79df127f5f5a49d7d8ef",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/DictationProfileTests.swift": "a4e02f45d5fd92cbdea36d9bdcaec0473ffe86809486945fe08e491fd7386e17",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/DictionaryPolicyTests.swift": "83f8eb5ba16e272c95666231cf193d8375d1dfb5d37b856849318e4823b5f701",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/IOSMicrophonePermissionPresentationTests.swift": "4bfa300bfc90ac1bb56ff861cf2125c9b00f0ab011614df9a9033c7c0a9b9d63",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/IOSOnboardingProgressStoreTests.swift": "2cc0b7e73e9afed47b0371cfb3e0ce641fe9f2524e54680ec6b92cb2edf1bfcb",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/IOSOnboardingTutorialStateTests.swift": "a1827f6ffffe86d661bee2d09f58a3b99501ddb48a4d6cc59157b847627d1796",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/ImportedLocalWhisperRuntimeTests.swift": "9801d3a2481e8be3c07f7039c77ae534c76118869617c8f01fd78cbff00d30ed",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/LanguageCatalogTests.swift": "7178649e262d332f5edd92ffed59a5f2b0c4c06709aab915a2407a3e7ad8c080",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/LatencyTraceTests.swift": "0927b7c2df9fcd19c246de5887b76e5fdae4abf6caecdc1583289137680bdc25",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/LicensePolicyTests.swift": "878cd1121b4607da6a38b7a10150da20fc06ee49df14bd9b72ecc2dd2c7d04b7",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift": "b9a13370e94d9bea8bacbe5886e5d186a200e1107e5626755aac76c703acccfa",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/LocalOnboardingModelChoiceTests.swift": "0adac450b01afe7ba2445528cfce2b015782e30f7189d06e7abd4e9898513095",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/LocalWhisperTranscriptionFlowTests.swift": "e9806525f63dd4e20a049bc9dd9c182382a7a59fbbd5b2eecbc69aedb62f5099",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/MacOSSettingsPresentationTests.swift": "1aceb90b83a1e0a5c885888957aff45dcedba680b340191228b36dcd32b51fa9",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/MainActorRuntimePolicyTests.swift": "7203c0d3617e9c570667a3afe9fc03ccca690dae063a96042486c202ed94a278",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/ModeRuntimeConfigurationTests.swift": "c8934b635e816fee9a480447f6bc1348ed3813db560fb67b47dfece7de4f0201",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/NVIDIACloudModelTests.swift": "bb09892f2a81580d82b8c1f4995d5878485a60af1f22d4ba866c025fe0ea6707",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/OnboardingPresentationTests.swift": "eb9f5db27a63ab96ed8d149ebb1decc77034c22e6a2cf39f684e44db96eff668",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/PCM16AudioSamplesTests.swift": "b0c50eac14bb069ef3ca8f649c70d19209e47fa34c824f6e961b925675f0c324",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/PastePreferencesTests.swift": "30d87f2cb7c30ab95f967ce68bb6642a6fc2c96974604d2817a60fb11d2d4a83",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/PowerModePolicyTests.swift": "d80c83c53f9e7f5eeb022debb91c997507d7e5af6264e52873b5f33685237789",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/ProviderAccessRequirementTests.swift": "b415eb4e12b3fd482cc79b3377ee6fd137f96f2176e1cfb379211fc169c86df4",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/RecordingFeedbackPreferenceTests.swift": "5f1c1ac64c08ad095ae1eb1562d473d40981fbce2c09de1aa4a4475908b827d6",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/RecordingStatePolicyTests.swift": "38e9c90b3e22eb3fde81055228576948a215b132607ced1578b662bf453aabba",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/RemoteProviderRequestTests.swift": "72726567f5b3bbd0509d164364f341f90fe4b0aed45cb3e898023502db6d9472",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/RemoteTransportTests.swift": "4fef21aa35d297585c4cd381ba8b9b16970d71b776293d4facda5084d0eb2400",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/SpokenSnippetsTests.swift": "6248c9e30210f71c10567c4b4125475a1ea3b2c0eec0f599ae7b50997d1719ae",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/StoredAudioFileTests.swift": "0e17626f4e259044f0127d525fc8b98e90d2f6ddf1a68fc7142c8387e93ae0d4",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/SubscriptionPlanPolicyTests.swift": "78c4b87161d68364cd52f040a09c12bdaf69f2d5208e9c9e579a3b798004948d",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/TestSupport.swift": "1ebc21ddd5dfe4899b789754950705d8e6c18d1403ef73809d6251f19cbda6d0",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptPresentationTests.swift": "4e22cc50dae45e7bfb371a35285f26db5ba4e977069a968685b9fc7a55b37cd1",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionCleanupPreferencesTests.swift": "7673ae6a0c7c3565b38af4073f3598428f40fd804e66b574f1db79efd4fe9a0a",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionModelCatalogTests.swift": "c361adc7bd57fa8f48031b134ab1bdfd636a02343c0f4279d779769d8cc4aaa8",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRecordTests.swift": "e325c6aa5898dca3669ca0bf6ebd6b15f0be12a928f468a3cc39465d61444b6a",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionRunProcessorTests.swift": "c08db14539daea5390800042082b79d828fc9ba096a4a2bb05fcccba000181a6",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/TranscriptionStreamingPreferenceTests.swift": "d86f3ffd609056d6f7474d53127b7acdca73e148bbf0d4edce1949d996df2ab5",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/UpdateExperienceTests.swift": "2605c42baad61f2532f15c59c260dbd88b6725e2907b57ae8668ad18ffa5d826",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift": "c070457b4967cecd3f105640dc5ffc05195aee3aa7ce883a16ecf66a352d4907",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift": "5c00e59408c1f3dc0ca2c5a63a65d4bf9be3185f83728c14eb623bb870511577",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift": "56e37ed6d0c08d276ba320cfc43a23d4ece17c2b595b68e0cc28f428689bd2f5",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/WhisperModelFilesTests.swift": "12cbda8cdf60c56009d28ce5f16169bcba611c37ccc7aa3c40a3ce3957528f4d",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/WordReplacementLibraryTests.swift": "e6a949b65bcb0d4686046ec32acf35c9b9ff0b731a04d6e02c0460edbc1cf201",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/WritingActionsTests.swift": "cd7a2397708df0aa4501ddaf93783f2d3f0fa621fcb31c3a25602112566b0cc7",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/WritingFeatureBackupTests.swift": "ee9e157c399e6485e7bf9f73bf5066f619a62467ce0eedd76f819ea935e6d435",
+    "VoiceInkNVIDIA/.gitignore": "acc718146d21aae829cba1761475e05de39d73209d83af2ab8487a74843cead0",
+    "VoiceInkNVIDIA/Package.resolved": "3a6af795e40cc28c19650da7cdaaf41c127bb2924e37deda63e246f2242bb639",
+    "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+    "VoiceInkNVIDIA/Protos/LICENSE": "9c0bb53336319c13d061a2246eea4f3f216bad31cdeb1fc9ff0fd8d8308dd543",
+    "VoiceInkNVIDIA/Protos/riva/proto/riva_asr.proto": "e9b9443de9fd02c96935bf9fe32a7d459e5ca89c6f7731735de23d6e83dfd41e",
+    "VoiceInkNVIDIA/Protos/riva/proto/riva_audio.proto": "7ab2939dfe9f5ed121eba1c6b86cad0cd561fa483acfc653762a8b8af0b2a123",
+    "VoiceInkNVIDIA/Protos/riva/proto/riva_common.proto": "07d668e74d7c2c4e01fa5fee5323b9f6aff2f57f86f4f00d51656b9cb2a3a377",
+    "VoiceInkNVIDIA/README.md": "83d8a8c23d7ecfe67077407a897b0a60544dc31d0a3091adec6607c79977a921",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Generated/riva/proto/riva_asr.grpc.swift": "59cdfaff15666640da3fc930753b47e217c5ec3ce7c76b2e01908b0825203edf",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Generated/riva/proto/riva_asr.pb.swift": "646fae8453b113be090dcd2de759bf411b90b76ecbb2e524bcf2f69ad4f355bc",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Generated/riva/proto/riva_audio.pb.swift": "35838a7f61724203efe98fb94020ad96dcbd4c2eea839493f5c00214ef4b4647",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Generated/riva/proto/riva_common.pb.swift": "f179ab3da74584da05228f7860f01e5244ac5c84e7b6e2bda3e742d0e0508167",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/NVIDIAParakeet.swift": "446e2c306620e23a486ef148d7480fc57bc499a0047949abd7d58a5ce817b63a",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/NVIDIAParakeetClient.swift": "f626ce7c372a16efebca5bdb6223980f6147fa3d28a46554a4f6641b1d40869e",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/grpc-swift-2-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/grpc-swift-nio-transport-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/grpc-swift-protobuf-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/riva-common-LICENSE.txt": "9c0bb53336319c13d061a2246eea4f3f216bad31cdeb1fc9ff0fd8d8308dd543",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/riva-protocol-NOTICE.txt": "bd5de772f32d1e6e51c8527429574e1dacc6f410d8dd3222eca32dc1f438dfe7",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-algorithms-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-asn1-LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-asn1-NOTICE.txt": "11dd3b3b783e6ec26098dd38ebc962986ea109b85447e28e62867b83bd0f8c5b",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-async-algorithms-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-atomics-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-certificates-LICENSE.txt": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-certificates-NOTICE.txt": "57d7797703d906b63c2be50d891cf70bdec307ae6f77a881638c33343f3dd195",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-collections-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-crypto-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-crypto-NOTICE.txt": "b3ddc2ae068e76b3beb71be03c0400f90090f9469aa491bf7b1ac42320af37b8",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-http-structured-headers-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-http-types-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-http-types-NOTICE.txt": "eb79190094094bb6ce2b177a7ba7708f50bf873b9a2c5e6e1936a5f391b5ec0f",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-log-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-log-NOTICE.txt": "879b241d49b407215a0ad8e1c6a71c358d7b29591b090cf379d37a5f50cff918",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-NOTICE.txt": "d25ed2452b3476c342082d11e4e8bf5459174d2836124f842b499850bcebc50e",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-extras-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-extras-NOTICE.txt": "722817c4c450c062f1f6e7b9df36733c0f6983aaad3e5e4aa5d76fe23d90010a",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-http2-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-http2-NOTICE.txt": "56b85f4571b653e82649d82a696afe841a417206a21a25afac751bcb11c2ea87",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-ssl-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-ssl-NOTICE.txt": "03e8ca5c65a3df21fe1ab48eef91bca7d370db56c290d8ef16eaaa09ba322abe",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-nio-transport-services-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-numerics-LICENSE.txt": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-protobuf-LICENSE.txt": "186c5f0192a754714a7e542233ddaaad28745626e0ad32e358d3f5af00afb84a",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-service-lifecycle-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-service-lifecycle-NOTICE.txt": "e0583b716a12a866a2a1d7456c26a17d18e1ec70f0ecaf2c62ed77180d1db043",
+    "VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices/swift-system-LICENSE.txt": "2245a990b635558be210fb3eb4f8a6f7a49aebc0fefbf5859146a65ddc7ddcf3",
+    "VoiceInkNVIDIA/Tests/VoiceInkNVIDIATests/NVIDIAParakeetTests.swift": "daffe381819f94078fb0b1a1efd2ec1b27e4453968301ce28ce8cdcd90a1c322",
+    "VoiceInkTests/WritingActionProviderTests.swift": "556f37d74d40eeb1ed8fce8b2e2183e022a5a16222952c1d469a04b1580bda4c",
+    "docs/research/competitors/fixtures/clarity-inputs.json": "edc37d6fdf36559699fb3a552b77f0887d708b92d417ff5beeb62cfb39ba17ae",
+    "docs/research/competitors/fixtures/clarity-private-rubric.json": "3602f93b6518598dc18c83b165fa557f4f28862b5d692f7c7e387ce03a149ba1",
+    "scripts/run-clarity-semantic-probe.sh": "c7f723921dbae2fe9cf664d673806b1455db71510bf6dd08157373a984f03815",
+    "scripts/run-writing-local-cli-service-probe.sh": "3449f2e845dc2b5c792d75be1ecab42f753141d949c3605681ea453006819714"
+  },
+  "sourceSHA": "18552122392a0d161969074b1ff2361d1a9a5517"
+}

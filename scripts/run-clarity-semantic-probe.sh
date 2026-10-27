@@ -297,6 +297,46 @@ def validate_inputs(raw):
     require(all(set(value) == {'id', 'transcript'} and isinstance(value['transcript'], str) for value in values), 'Inputs must contain only IDs and transcripts')
     return values
 
+def cli_actions(cli, requested_model):
+    isolation_arguments = ['--bare', '--no-session-persistence', '--tools', '', '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}', '--setting-sources', 'user', '--settings', '{"disableAllHooks":true}']
+    actions = {name: [str(cli), *isolation_arguments, *arguments] for name, arguments in {
+        'version': ['--version'],
+        'help': ['--help'],
+        'authStatus': ['auth', 'status', '--json'],
+        'print': ['--print', '--output-format', 'text', '--max-budget-usd', '0.50']
+    }.items()}
+    if requested_model:
+        actions['print'] += ['--model', requested_model]
+    return isolation_arguments, actions
+
+def project_auth_status(raw, exit_code):
+    projection = {'loggedIn': None, 'authMethod': 'unavailable', 'apiProvider': 'unavailable', 'exitCode': exit_code}
+    try:
+        payload = json.loads(raw)
+    except (TypeError, ValueError, UnicodeDecodeError):
+        return projection, False
+    if not isinstance(payload, dict):
+        return projection, False
+    if type(payload.get('loggedIn')) is bool:
+        projection['loggedIn'] = payload['loggedIn']
+    if payload.get('authMethod') in ['api_key', 'none']:
+        projection['authMethod'] = payload['authMethod']
+    if payload.get('apiProvider') == 'firstParty':
+        projection['apiProvider'] = 'firstParty'
+    accepted = exit_code == 0 and projection['loggedIn'] is True and projection['authMethod'] == 'api_key' and projection['apiProvider'] == 'firstParty'
+    return projection, accepted
+
+def auth_preflight(command, cwd, receipt):
+    try:
+        result = subprocess.run(command, capture_output=True, cwd=cwd, timeout=20)
+    except (OSError, subprocess.TimeoutExpired):
+        write(receipt, project_auth_status(None, None)[0])
+        raise RuntimeError('CLI authentication preflight failed.') from None
+    projection, accepted = project_auth_status(result.stdout, result.returncode)
+    write(receipt, projection)
+    require(accepted, 'CLI authentication preflight failed.')
+    return projection
+
 def classify(value, code, contract):
     rows = value.get('observations', [])
     valid = code == 0 and value.get('completedCallCount') == 27 and [row.get('id') for row in rows] == EXPECTED and 'fatalError' not in value
@@ -317,6 +357,19 @@ def classify(value, code, contract):
     return {'validObservationSet': bool(valid), 'classification': 'completed-observations-awaiting-independent-grading' if valid else 'invalid-or-incomplete-observations', 'semanticVerdict': 'pending-independent-grading', 'completedCallCount': len(rows), 'decodedResultCount': sum(row.get('serviceOutcome') == 'decoded-result' for row in rows), 'serviceErrorCount': sum(row.get('serviceOutcome') == 'error' for row in rows)}
 
 def self_test():
+    isolation_arguments, actions = cli_actions('/synthetic/claude', 'reviewed-model')
+    require(isolation_arguments[isolation_arguments.index('--setting-sources') + 1] == 'user', 'Reviewed user setting source changed')
+    for arguments in actions.values():
+        require(arguments[1:1 + len(isolation_arguments)] == isolation_arguments, 'CLI action isolation arguments differ')
+    require(actions['authStatus'][1 + len(isolation_arguments):] == ['auth', 'status', '--json'], 'Auth status must not become a print or model request')
+    require('--model' not in actions['authStatus'] and '--print' not in actions['authStatus'] and '--output-format' not in actions['authStatus'] and '--max-budget-usd' not in actions['authStatus'], 'Auth status received print-only options')
+    secret = 'SYNTHETIC-DO-NOT-RETAIN'
+    raw = json.dumps({'loggedIn': True, 'authMethod': 'api_key', 'apiProvider': 'firstParty', 'apiKey': secret, 'accountId': secret, 'email': secret})
+    projection, accepted = project_auth_status(raw, 0)
+    require(accepted and set(projection) == {'loggedIn', 'authMethod', 'apiProvider', 'exitCode'} and secret not in json.dumps(projection), 'Auth status projection retained unrelated fields')
+    for raw, code in [(secret, 0), ('[]', 0), ('{}', 0), (json.dumps({'loggedIn': False, 'authMethod': 'none'}), 1), (json.dumps({'loggedIn': True, 'authMethod': secret, 'apiProvider': secret}), 0)]:
+        projection, accepted = project_auth_status(raw, code)
+        require(not accepted and secret not in json.dumps(projection), 'Auth status failure leaked content or was accepted')
     contract = {'sourceSHA': 'source', 'bundleIdentifier': 'bundle'}
     census = {name: 'synthetic-hash' for name in ['input.json', 'system-message.txt', 'user-message.txt']}
     row = {'sourceSHA': 'source', 'appModelLabel': 'local-cli', 'timeoutSeconds': 120, 'cliTimeoutSeconds': 120, 'generationInputsUnchanged': True, 'generationCensusBefore': census, 'generationCensusAfter': census, 'semanticVerdict': 'pending-independent-grading', 'providerSnapshotCaptureCount': 1, 'appRetryOnTimeout': False, 'persistentProbePreferencesUnchanged': True, 'observedExecutorLaunchCount': 1, 'serviceOutcome': 'error', 'serviceError': 'invalidResponse', 'launches': [{'stdinUTF8Exact': True, 'stdinCaptureComplete': True, 'stdoutCaptureComplete': True, 'stderrCaptureComplete': True}]}
@@ -548,16 +601,16 @@ def run(artifact, executable, out, requested_model):
     preflight = out / 'preflight'
     preflight.mkdir()
     logged(['codesign', '--verify', '--deep', '--strict', app], out / 'signature-before.log', timeout=60)
-    logged([cli, '--bare', '--version'], out / 'cli-version.txt', cwd=preflight, timeout=20)
-    logged([cli, '--bare', '--help'], out / 'cli-help.txt', cwd=preflight, timeout=20)
+    isolation_arguments, actions = cli_actions(cli, requested_model)
+    logged(actions['version'], out / 'cli-version.txt', cwd=preflight, timeout=20)
+    logged(actions['help'], out / 'cli-help.txt', cwd=preflight, timeout=20)
     help_text = (out / 'cli-help.txt').read_text()
     flags = ['--bare', '--print', '--no-session-persistence', '--tools', '--strict-mcp-config', '--mcp-config', '--setting-sources', '--settings', '--output-format', '--max-budget-usd']
     if requested_model:
         flags.append('--model')
     require(all(flag in help_text for flag in flags), 'Current CLI no longer exposes every required isolation/budget flag')
-    cli_arguments = ['--bare', '--print', '--no-session-persistence', '--tools', '', '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}', '--setting-sources', '', '--settings', '{"disableAllHooks":true}', '--output-format', 'text', '--max-budget-usd', '0.50']
-    if requested_model:
-        cli_arguments += ['--model', requested_model]
+    auth_preflight(actions['authStatus'], preflight, out / 'cli-auth-status.json')
+    cli_arguments = actions['print'][1:]
     (out / 'attempts').mkdir()
     wrapper = out / 'capture-command.sh'
     wrapper.write_text(capture_wrapper(cli, cli_arguments, out / 'attempts'))
@@ -569,10 +622,12 @@ def run(artifact, executable, out, requested_model):
         'bundleIdentifier': contract['bundleIdentifier'], 'binarySHA256': receipt['binarySHA256'],
         'buildReceiptSHA256': digest((artifact / 'build-receipt.json').read_bytes()),
         'cliPath': str(cli), 'cliSHA256': digest(cli.read_bytes()), 'cliVersion': (out / 'cli-version.txt').read_text().strip(),
+        'cliIsolationArguments': isolation_arguments,
         'cliArguments': cli_arguments, 'commandTemplate': command, 'requestedModel': requested_model or 'default-not-overridden',
+        'authStatusReceiptSHA256': digest((out / 'cli-auth-status.json').read_bytes()),
         'servedModel': 'unavailable-text-mode', 'endpoint': 'unavailable-local-cli',
         'timeoutSeconds': 120, 'appRetryOnTimeout': False, 'maxBudgetUSDPerCall': '0.50', 'scheduledCalls': 27,
-        'isolatedSettings': {'bare': True, 'tools': [], 'mcpServers': {}, 'settingSources': [], 'disableAllHooks': True, 'sessionPersistence': False},
+        'isolatedSettings': {'bare': True, 'tools': [], 'mcpServers': {}, 'settingSources': ['user'], 'disableAllHooks': True, 'sessionPersistence': False},
         'generationContext': 'One transcript/style through production VoiceInkClarityRequest only; no rubric, repository, history or earlier outputs supplied',
         'generationRoot': str(generation),
         'semanticVerdict': 'pending-independent-grading', 'scope': SCOPE}

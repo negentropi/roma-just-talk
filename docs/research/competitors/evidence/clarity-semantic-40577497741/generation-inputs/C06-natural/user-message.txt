@@ -1,0 +1,1 @@
+{"style":"natural","transcript":"Mina, amanhã o build RJT-482 vai para staging, not production. まだ確定ではありません。"}

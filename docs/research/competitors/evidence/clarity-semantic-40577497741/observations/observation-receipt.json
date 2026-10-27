@@ -1,0 +1,13 @@
+{
+  "binaryAndCLIUnchanged": true,
+  "classification": "completed-observations-awaiting-independent-grading",
+  "completedCallCount": 27,
+  "decodedResultCount": 0,
+  "probeExitCode": 0,
+  "retainedEvidenceValid": true,
+  "scope": "Twenty-seven synthetic inputs through actual AIEnhancementService.performClarity and LocalCLIService. No app lifecycle, ASR, microphone, storage, UI, editor delivery or general model-quality proof. Semantic grading remains independent.",
+  "semanticVerdict": "pending-independent-grading",
+  "serviceErrorCount": 27,
+  "sourceSHA": "18552122392a0d161969074b1ff2361d1a9a5517",
+  "validObservationSet": true
+}

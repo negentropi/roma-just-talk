@@ -1,0 +1,20 @@
+{
+  "conclusion": "success",
+  "headBranch": "ci/rjt-clarity-semantic-probe-01a17bef",
+  "headSHA": "18552122392a0d161969074b1ff2361d1a9a5517",
+  "jobCompletedUTC": "2026-10-27T20:30:02Z",
+  "jobID": 122447735846,
+  "jobStartedUTC": "2026-10-27T20:22:47Z",
+  "requiredSteps": {
+    "buildEvidenceUpload": "success",
+    "classifier": "success",
+    "finiteSyntheticCapture": "success",
+    "nativeBuildAndSign": "success",
+    "prepare": "success",
+    "signedProbeUpload": "success"
+  },
+  "runID": 40577497741,
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40577497741",
+  "source": "Observed gh run view exact run and gh API artifacts after completion. No success-run log fetch.",
+  "status": "completed"
+}

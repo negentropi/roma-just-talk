@@ -1,0 +1,104 @@
+warning: 'package': dependency 'axswift' is not used by any target
+warning: 'package': dependency 'grpc-swift-2' is not used by any target
+warning: 'package': dependency 'grpc-swift-nio-transport' is not used by any target
+warning: 'package': dependency 'keysender' is not used by any target
+warning: 'package': dependency 'swift-algorithms' is not used by any target
+warning: 'package': dependency 'swift-asn1' is not used by any target
+warning: 'package': dependency 'swift-atomics' is not used by any target
+warning: 'package': dependency 'swift-certificates' is not used by any target
+warning: 'package': dependency 'swift-crypto' is not used by any target
+warning: 'package': dependency 'swift-http-structured-headers' is not used by any target
+warning: 'package': dependency 'swift-nio' is not used by any target
+warning: 'package': dependency 'swift-nio-extras' is not used by any target
+warning: 'package': dependency 'swift-nio-http2' is not used by any target
+warning: 'package': dependency 'swift-nio-transport-services' is not used by any target
+warning: 'package': dependency 'swift-numerics' is not used by any target
+warning: 'package': dependency 'swift-service-lifecycle' is not used by any target
+warning: 'package': dependency 'swift-system' is not used by any target
+Building for production...
+[0/53] Compiling CNIOLinux liburing_shims.c
+[1/53] Write swift-version-7974D3F7F03D5E95.txt
+[2/53] Copying PrivacyInfo.xcprivacy
+[3/53] Write sources
+[5/53] Compiling CNIOLLHTTP c_nio_http.c
+[7/55] Compiling _NIOBase64 Base64.swift
+[7/55] Compiling CNIOLLHTTP c_nio_llhttp.c
+[8/55] Write sources
+[9/55] Copying ThirdPartyNotices
+[10/55] Write sources
+[11/55] Copying PrivacyInfo.xcprivacy
+[13/55] Write sources
+[15/56] Compiling _AtomicsShims.c
+[16/56] Write sources
+[32/57] Compiling _NIODataStructures Heap.swift
+[33/58] Compiling LLMkit HTTPClient.swift
+[33/58] Write sources
+[37/59] Compiling InternalCollectionsUtilities Debugging.swift
+[37/59] Write sources
+[41/59] Compiling CNIOWindows shim.c
+[43/60] Compiling KeySender KeyEvent.swift
+[43/60] Compiling CNIOWindows WSAStartup.c
+[44/60] Compiling CNIOWASI CNIOWASI.c
+[46/60] Compiling ContainersPreview OutputSpan+Extras.swift
+[46/60] Compiling CNIOOpenBSD shim.c
+[47/60] Compiling CNIOPosix event_loop_id.c
+[48/61] Compiling CNIOLinux shim.c
+[49/61] Compiling CNIOLLHTTP c_nio_api.c
+[50/61] Compiling CNIOFreeBSD shim.c
+[51/61] Compiling CNIODarwin shim.c
+[52/61] Compiling c-nioatomics.c
+[53/61] Compiling c-atomics.c
+[54/61] Compiling CGRPCNIOTransportZlib empty.c
+[56/62] Compiling DequeModule Deque+Codable.swift
+[56/62] Write sources
+[59/63] Compiling NIOConcurrencyHelpers NIOAtomic.swift
+[60/64] Compiling Atomics OptionalRawRepresentable.swift
+[61/65] Compiling AXSwift AXSwift.swift
+[62/65] Compiling GRPCCore CallOptions.swift
+[63/67] Compiling SelectedTextKit AXSwift+Attribute.swift
+[64/67] Compiling SwiftProtobuf AnyMessageStorage.swift
+[65/68] Compiling GRPCProtobuf Coding.swift
+[66/68] Compiling NIOCore AddressedEnvelope.swift
+[67/71] Compiling NIOFoundationEssentialsCompat ByteBuffer-foundation.swift
+[68/71] Compiling NIOEmbedded AsyncTestingChannel.swift
+[69/71] Compiling NIOPosix BSDSocketAPICommon.swift
+[70/72] Compiling NIO Exports.swift
+[71/75] Compiling NIOFoundationCompat Exports.swift
+[72/75] Compiling NIOTLS ApplicationProtocolNegotiationHandler.swift
+[73/76] Compiling NIOTransportServices AcceptHandler.swift
+[74/76] Compiling NIOHTTP1 ByteCollectionUtils.swift
+[75/78] Compiling NIOExtras DebugInboundEventsHandler.swift
+[76/78] Compiling NIOHPACK DynamicHeaderTable.swift
+[77/79] Compiling NIOHTTP2 ConnectionStateMachine.swift
+[78/80] Compiling GRPCNIOTransportCore Backoff.swift
+[79/81] Compiling GRPCNIOTransportHTTP2TransportServices Config+TLS.swift
+[80/82] Compiling VoiceInkNVIDIA riva_asr.grpc.swift
+[81/83] Compiling VoiceInkCore AIProviderCatalog.swift
+[82/84] Compiling WritingLocalCLIProbe AIEnhancementService.swift
+/Users/runner/work/_temp/clarity-semantic-probe/generator/writing-local-cli-service-probe/package/Sources/WritingLocalCLIProbe/AIEnhancementService.swift:517:16: warning: value 'capturedText' was defined but never used; consider replacing with boolean test [#no-usage]
+515 |         }
+516 | 
+517 |         if let capturedText = await screenCaptureService.captureAndExtractText() {
+    |                `- warning: value 'capturedText' was defined but never used; consider replacing with boolean test [#no-usage]
+518 |             await MainActor.run {
+519 |                 self.objectWillChange.send()
+
+/Users/runner/work/_temp/clarity-semantic-probe/generator/writing-local-cli-service-probe/package/Sources/WritingLocalCLIProbe/AIService.swift:265:28: warning: capture of 'self' with non-Sendable type 'AIService' in a '@Sendable' closure [#SendableClosureCaptures]
+  3 | import VoiceInkCore
+  4 | 
+  5 | class AIService: ObservableObject {
+    |       `- note: class 'AIService' does not conform to the 'Sendable' protocol
+  6 |     @Published var apiKey: String = ""
+  7 |     @Published var isAPIKeyValid: Bool = false
+    :
+263 |             await self.ollamaService.checkConnection()
+264 |             DispatchQueue.main.async {
+265 |                 completion(self.ollamaService.isConnected)
+    |                            `- warning: capture of 'self' with non-Sendable type 'AIService' in a '@Sendable' closure [#SendableClosureCaptures]
+266 |             }
+267 |         }
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+[82/84] Write Objects.LinkFileList
+[83/84] Linking WritingLocalCLIProbe
+Build of product 'WritingLocalCLIProbe' complete! (297.66s)

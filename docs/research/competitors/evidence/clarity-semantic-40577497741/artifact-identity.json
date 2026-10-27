@@ -1,0 +1,16 @@
+{
+  "appModelLabel": "local-cli",
+  "archiveSHA256": "5446e2311edaf0e7335a30eae11da0e1f865c81039cad5e488fc4f0179d94178",
+  "binarySHA256": "40b1d1471502112e86a4b6ce0daaaadfde7e23b30e6b84a9aa17494609ed809c",
+  "buildReceiptSHA256": "91c9d0d2baca297374cab9ecf38aad8b2fefe2cec190120c5f629759a7e67535",
+  "bundleIdentifier": "com.negentropi.RomaJustTalk.ClaritySemanticProbe.57ee39383bb545c9a23f0ded439faa8a",
+  "inputSHA256": "edc37d6fdf36559699fb3a552b77f0887d708b92d417ff5beeb62cfb39ba17ae",
+  "requestConstructorSourceSHA256": "d9bcd4848c64432bfb6c7a92ded6255cb37b77ad43c8fe582bf5f4c2820c88a2",
+  "requestedModel": "default-not-overridden",
+  "rubricBytesCopied": false,
+  "rubricSHA256": "3602f93b6518598dc18c83b165fa557f4f28862b5d692f7c7e387ce03a149ba1",
+  "servedModel": "unavailable-text-mode",
+  "serviceSourceSHA256": "986b0c1fae4a939faec9eed4c46a8c6065f6ed5489a922ed337d88994a06bb98",
+  "sourceContractSHA256": "643a769d13b4fb6e53d5bdc0f31372d985eb2819d617590c344874e5ab5c6a31",
+  "sourceSHA": "18552122392a0d161969074b1ff2361d1a9a5517"
+}

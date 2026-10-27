@@ -1,0 +1,16 @@
+{
+  "CIWholeProbeBundleSignatureVerification": true,
+  "appLifecycle": false,
+  "editorDelivery": false,
+  "independentLinuxBundleByteVerification": true,
+  "independentReview": "PASS from service_probe_review after SSH reading existing artifacts. No duplicate downloads or execution.",
+  "localMacSignatureReverification": false,
+  "lockSelection": "NVIDIA22 supplies identities; exact26 states come from the canonical app41 lock. Seven NVIDIA inner-lock states differ and remain explicitly recorded in audit.json.",
+  "microphone": false,
+  "nativeRemoteBuild": true,
+  "nextOwner": "Root performs fresh Mac signature/artifact/CLI checks before any separately authorized semantic execution and grading.",
+  "profilesOrPipelineActivation": false,
+  "providerAuthenticationExecution": false,
+  "semanticCallsExecuted": 0,
+  "semanticGrading": "not-started"
+}

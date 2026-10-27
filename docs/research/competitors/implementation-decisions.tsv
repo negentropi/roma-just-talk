@@ -1,0 +1,21 @@
+ts	phase	decision	why	evidence	result
+2026-10-27T06:36:58Z	target	Implement in the existing Mac app	Felix selected this target; the Rust rewrite has different gaps	docs/research/competitors/implementation-plan.md	VERIFIED
+2026-10-27T06:36:58Z	design	Capture an immutable action and AX destination for each recording	Avoid changing the shared prompt or replacing text in a different field	VoiceInk/Services/WritingActionSession.swift	NOT VERIFIED
+2026-10-27T06:36:58Z	baseline	Include the existing synthetic-key fix from the running Mac build	New features must preserve the current Special shortcut behavior	27984ec9	VERIFIED
+2026-10-27T06:47:14Z	verification	Run the 17 snippet behavior tests against compiled production snippet code	Check the first library unit before connecting the app UI	ec7bc1bc	VERIFIED
+2026-10-27T06:47:15Z	design	Choose the existing pipeline with an immutable action session	Independent designs found a separate processor would duplicate cancellation and history ownership	/tmp/rjt-writing-design-synthesis.md	VERIFIED
+2026-10-27T07:06:59Z	verification	Save the isolated snippet test receipt	The earlier code-commit pointer did not itself contain test stdout	/tmp/rjt-snippet-check-01a17bef/receipt.txt	VERIFIED
+2026-10-27T07:06:59Z	review	Apply Claude UI fixes from GPT-6.1 Sol review	Prevent stale-window loss and show imported multiline content before replacement	827845a1	VERIFIED
+2026-10-27T07:06:59Z	ci	Dispatch full Mac gate for exact candidate	Build and app tests must run away from the user laptop	https://github.com/negentropi/roma-just-talk/actions/runs/40464283678	NOT VERIFIED
+2026-10-27T07:06:59Z	ci	Cancel only the auto-triggered iOS run from our CI transport push	It held the shared workflow concurrency lock; target is Mac and shared core remains in the Mac gate	https://github.com/negentropi/roma-just-talk/actions/runs/40464283745	VERIFIED
+2026-10-27T07:16:24Z	ci	Start hosted Mac verification without the unavailable Namespace profile	The hosted route provides an actual Mac, Xcode, unit, live editor and UI gates	https://github.com/negentropi/roma-just-talk/actions/runs/40465969195	NOT VERIFIED
+2026-10-27T07:41:46Z	build	Build the release Mac app and verify its package contracts on the hosted Mac	Source review alone cannot establish compiler or packaging correctness	https://github.com/negentropi/roma-just-talk/actions/runs/40465969195	VERIFIED
+2026-10-27T07:58:41Z	test	Reject the first full Mac test result	Two invalid UTF-16 selections were accepted and all snippet pipeline cases crashed in the test store	https://github.com/negentropi/roma-just-talk/actions/runs/40465969195	NOT VERIFIED
+2026-10-27T07:58:41Z	fix	Validate surrogate boundaries directly	Foundation range conversion accepted malformed UTF-16 endpoints on the tested SDK	/tmp/rjt-writing-utf16.4znO4r/candidate.txt	VERIFIED
+2026-10-27T07:58:41Z	test	Isolate the pipeline fixture container without changing assertions	The unmatched control crashed at the same save boundary as snippet cases	57f0cb85	NOT VERIFIED
+2026-10-27T08:21:26Z	fix	Use a writing-feature change event for snippet and target edits	The general settings observer replaces the original Power Mode snapshot with active values	VoiceInk/PowerMode/PowerModeSessionManager.swift:60	NOT VERIFIED
+2026-10-27T08:28:04Z	ci	Correct the cache restore action output contract	The combined action does not expose the primary key and no saved cache entry was observed	46a092b5	NOT VERIFIED
+2026-10-27T08:42:02Z	ci	Reject second app-test verdict before execution	Swift Testing macro expansion failed while compiling the provider validator; core and Release checks passed	https://github.com/negentropi/roma-just-talk/actions/runs/40470346259	INCONCLUSIVE
+2026-10-27T08:42:02Z	fix	Evaluate provider verdicts before expectation expansion	Preserve all six semantic validator expectations without the rethrows macro error	e774c745	NOT VERIFIED
+2026-10-27T08:42:02Z	ci	Run tests before packaging and snapshot their evidence	Release make local replaces derived data; failed tests must remain inspectable	7459b97b	NOT VERIFIED
+2026-10-27T08:42:02Z	ci	Start the exact corrected candidate on the same disposable CI ref	Full native execution remains necessary after source and isolated checks	https://github.com/negentropi/roma-just-talk/actions/runs/40475185945	NOT VERIFIED

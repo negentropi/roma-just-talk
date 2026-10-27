@@ -11,6 +11,15 @@ Checked 2026-10-27. Research input: [Wispr Flow](wispr-flow.md), [Willow](willow
 - **Present:** source and user-facing wiring found for the named basic capability. **Partial:** primitives or a narrower workflow exist. **Absent:** no implementation found in reviewed owners. **Unresolved:** documentation/platform/effect is insufficiently specified. None of these statuses is fresh runtime proof.
 - Vendor IDs below point to source URLs and detailed behavior in the three audits. Competitor marketing speed, accuracy, language totals and compliance claims are not RJT acceptance criteria.
 
+## Implementation progress
+
+The table below retains the audited baseline states. New Mac work is tracked in the [implementation plan](implementation-plan.md), with user instructions in [Writing Actions and spoken snippets](../../writing-actions-and-snippets.md).
+
+- A23: `ec7bc1bc` and `827845a1` add a first-class plain-text snippet library, literal multiline delivery, enable controls, and reviewed CSV import and export. Rich-text snippets remain open.
+- A24–A26: `827845a1` adds distinct recording actions for selected-text editing, translation, and drafting, with independent ordered translation targets and captured destination checks. Read-only answers, contextual replies, web actions, transform review, and undo remain open.
+- Settings backup and reset include the new library, targets, and shortcuts while retaining older backup decoding.
+- Hosted run [40465969195](https://github.com/negentropi/roma-just-talk/actions/runs/40465969195) passed shared-core checks and built the release Mac app, then exposed a UTF-16 selection bug and pipeline test-store crashes. Run [40470346259](https://github.com/negentropi/roma-just-talk/actions/runs/40470346259) passed core and Release gates but failed test compilation before executing the corrected tests. Run [40475185945](https://github.com/negentropi/roma-just-talk/actions/runs/40475185945) tests candidate `7459b97b`. App tests, live editor proof, matched regression, and UI interactions remain open. No real-provider semantic result is claimed.
+
 ## Source owners
 
 Pinned source links make the two targets unambiguous. Rust paths are relative to `rjt/`; Swift paths are repository-relative.

@@ -1,16 +1,16 @@
 {
-  "conclusion": "",
+  "conclusion": "cancelled",
   "databaseId": 40567821918,
   "headBranch": "ci/rjt-dictation-store-seed-check-01a17bef",
   "headSha": "caf053ea37aefa1f99e29420354d42c0169c6c39",
   "jobs": [
     {
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
+      "completedAt": "2026-10-27T19:23:27Z",
+      "conclusion": "cancelled",
       "databaseId": 122413702281,
       "name": "store-control",
       "startedAt": "2026-10-27T19:17:56Z",
-      "status": "in_progress",
+      "status": "completed",
       "steps": [
         {
           "completedAt": "2026-10-27T19:17:58Z",
@@ -77,58 +77,66 @@
           "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T19:23:09Z",
+          "conclusion": "cancelled",
           "name": "Seed and reopen in separate actual predecessor hosts",
           "number": 9,
           "startedAt": "2026-10-27T19:21:17Z",
-          "status": "in_progress"
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T19:23:09Z",
+          "conclusion": "skipped",
           "name": "Preserve predecessor checkpoint before current app build",
           "number": 10,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T19:23:09Z",
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T19:23:09Z",
+          "conclusion": "skipped",
           "name": "Read a new closed-seed clone in the unchanged-schema current host",
           "number": 11,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T19:23:09Z",
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T19:23:09Z",
+          "conclusion": "skipped",
           "name": "Require exact runtime identity and all old values across hosts",
           "number": 12,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T19:23:09Z",
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T19:23:13Z",
+          "conclusion": "success",
           "name": "Retain complete native results and closed fixture receipts",
           "number": 13,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T19:23:09Z",
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T19:23:14Z",
+          "conclusion": "success",
           "name": "Post Run actions/checkout@v4",
           "number": 26,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T19:23:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:23:20Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "startedAt": "2026-10-27T19:23:14Z",
+          "status": "completed"
         }
       ],
       "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40567821918/job/122413702281"
     }
   ],
-  "status": "in_progress",
-  "updatedAt": "2026-10-27T19:22:04Z",
+  "status": "completed",
+  "updatedAt": "2026-10-27T19:23:27Z",
   "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40567821918"
 }

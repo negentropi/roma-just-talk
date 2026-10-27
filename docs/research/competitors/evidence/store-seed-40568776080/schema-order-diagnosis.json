@@ -1,0 +1,197 @@
+{
+  "changedArrayKeyOnly": "storedAttributes",
+  "classification": "captured-schema-order-only-diagnosis",
+  "defaultsRemoved": false,
+  "entityArrays": {
+    "old-reopen": [
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "SessionMetric",
+        "storedAttributeCount": 12,
+        "storedAttributeNamesInActualOrder": [
+          "transcriptionDuration",
+          "audioDuration",
+          "powerModeName",
+          "transcriptionModelName",
+          "id",
+          "wordCount",
+          "source",
+          "timestamp",
+          "aiEnhancementModelName",
+          "enhancementDuration",
+          "transcriptionId",
+          "speedFactor"
+        ]
+      },
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "WordReplacement",
+        "storedAttributeCount": 5,
+        "storedAttributeNamesInActualOrder": [
+          "id",
+          "originalText",
+          "dateAdded",
+          "isEnabled",
+          "replacementText"
+        ]
+      },
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "VocabularyWord",
+        "storedAttributeCount": 2,
+        "storedAttributeNamesInActualOrder": [
+          "dateAdded",
+          "word"
+        ]
+      },
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "Transcription",
+        "storedAttributeCount": 16,
+        "storedAttributeNamesInActualOrder": [
+          "enhancementDuration",
+          "powerModeName",
+          "aiRequestSystemMessage",
+          "transcriptionDuration",
+          "duration",
+          "transcriptionStatus",
+          "id",
+          "aiRequestUserMessage",
+          "transcriptionModelName",
+          "text",
+          "audioFileURL",
+          "promptName",
+          "enhancedText",
+          "timestamp",
+          "powerModeEmoji",
+          "aiEnhancementModelName"
+        ]
+      }
+    ],
+    "seed": [
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "SessionMetric",
+        "storedAttributeCount": 12,
+        "storedAttributeNamesInActualOrder": [
+          "audioDuration",
+          "timestamp",
+          "transcriptionId",
+          "id",
+          "source",
+          "transcriptionModelName",
+          "transcriptionDuration",
+          "enhancementDuration",
+          "aiEnhancementModelName",
+          "speedFactor",
+          "wordCount",
+          "powerModeName"
+        ]
+      },
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "WordReplacement",
+        "storedAttributeCount": 5,
+        "storedAttributeNamesInActualOrder": [
+          "dateAdded",
+          "id",
+          "originalText",
+          "replacementText",
+          "isEnabled"
+        ]
+      },
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "VocabularyWord",
+        "storedAttributeCount": 2,
+        "storedAttributeNamesInActualOrder": [
+          "word",
+          "dateAdded"
+        ]
+      },
+      {
+        "keys": [
+          "attributes",
+          "name",
+          "relationships",
+          "storedAttributes",
+          "storedRelationships",
+          "subentities"
+        ],
+        "name": "Transcription",
+        "storedAttributeCount": 16,
+        "storedAttributeNamesInActualOrder": [
+          "transcriptionDuration",
+          "aiEnhancementModelName",
+          "powerModeName",
+          "transcriptionModelName",
+          "enhancedText",
+          "promptName",
+          "duration",
+          "aiRequestSystemMessage",
+          "powerModeEmoji",
+          "aiRequestUserMessage",
+          "id",
+          "transcriptionStatus",
+          "timestamp",
+          "audioFileURL",
+          "enhancementDuration",
+          "text"
+        ]
+      }
+    ]
+  },
+  "fullCanonicalObjectsEqualAfterOnlySortingStoredAttributes": true,
+  "limits": "Diagnostic experiment on captured data only. Original run remains failed; no current app or migration proof.",
+  "otherArraysReordered": false,
+  "scalarsReplaced": false
+}

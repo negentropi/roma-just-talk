@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "mode": "predecessor",
+  "error": "Normalized actual runtime schema changed"
+}

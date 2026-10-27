@@ -1,0 +1,59 @@
+{
+  "actualExports": {
+    "ENABLE_DEBUG_DYLIB": [
+      "    export ENABLE_DEBUG_DYLIB\\=NO"
+    ],
+    "ENABLE_HARDENED_RUNTIME": [
+      "    export ENABLE_HARDENED_RUNTIME\\=YES"
+    ],
+    "ENABLE_PREVIEWS": [
+      "    export ENABLE_PREVIEWS\\=NO"
+    ],
+    "ENABLE_XOJIT_PREVIEWS": [
+      "    export ENABLE_XOJIT_PREVIEWS\\=NO"
+    ]
+  },
+  "actualGuardLog": "--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUnit.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTAutomationSupport.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTAutomationSupport.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUnit.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUIAutomation.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUIAutomation.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestSupport.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestSupport.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTest.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTest.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libswiftCompatibilitySpan.dylib\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libswiftCompatibilitySpan.dylib\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestCore.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestCore.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestBundleInject.dylib\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestBundleInject.dylib\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestSwiftSupport.dylib\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestSwiftSupport.dylib\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/MediaRemoteAdapter.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/MediaRemoteAdapter.framework/Versions/Current/.\n--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Testing.framework/Versions/Current/.\n--validated:/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Testing.framework/Versions/Current/.\n/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app: valid on disk\n/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app: satisfies its Designated Requirement\nVerified ad-hoc Library Validation contract: @rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter\n@rpath/Sparkle.framework/Versions/B/Sparkle\n@rpath/libswiftCompatibilitySpan.dylib\n",
+  "actualHostPIDs": [
+    25870,
+    29330
+  ],
+  "classification": "actual-hardened-runtime-and-host-launch-confirmed",
+  "limits": "Signing and two old-app test launches only. Overall run failed on schema storedAttributes order; current app not built.",
+  "mainCodeDirectories": [
+    {
+      "adhoc": true,
+      "bytes": 444828,
+      "flags": "0x10002",
+      "hardenedRuntime": true,
+      "identifier": "com.negentropi.RomaJustTalk",
+      "slot": 0,
+      "version": "0x20500"
+    }
+  ],
+  "mainEntitlements": [
+    {
+      "com.apple.security.app-sandbox": false,
+      "com.apple.security.automation.apple-events": true,
+      "com.apple.security.cs.disable-library-validation": true,
+      "com.apple.security.device.audio-input": true,
+      "com.apple.security.files.user-selected.read-only": true,
+      "com.apple.security.get-task-allow": true,
+      "com.apple.security.network.client": true,
+      "com.apple.security.network.server": true,
+      "com.apple.security.screen-capture": true,
+      "com.apple.security.temporary-exception.files.absolute-path.read-only": [
+        "/"
+      ],
+      "com.apple.security.temporary-exception.mach-lookup.global-name": [
+        "com.apple.testmanagerd",
+        "com.apple.dt.testmanagerd.runner",
+        "com.apple.coresymbolicationd"
+      ]
+    }
+  ],
+  "mainSHA256": [
+    "b404d521a1d63cb697547deac92ad6720da801314fc7d42bab94be196ec7a9e1"
+  ],
+  "runtimeDisableNotes": []
+}

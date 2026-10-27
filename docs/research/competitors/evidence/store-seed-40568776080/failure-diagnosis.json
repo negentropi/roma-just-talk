@@ -1,0 +1,19 @@
+{
+  "artifactID": 12764288502,
+  "cause": "Canonicalization omitted the actual serialized storedAttributes key. All72 original leaf differences are order permutations. Sorting only that key in a separate diagnostic makes full canonical objects equal without removing any values. Original failed run is unchanged.",
+  "classification": "old-seed-and-reopen-tests-pass-original-cross-host-schema-check-fails",
+  "exactSourceSHA": "cc88b5b1e79a158e5665d81b7d179a42ebe12935",
+  "proven": [
+    "Actual predecessor build and hardened runtime signature contract.",
+    "Separate seedPID25870 and reopenPID29330 live/exited before whole-store copy/hash.",
+    "35storedfields in2rows permodel retain exact bytes/nil values across old-process reopen.",
+    "Exact saved identifiers, actual module/entity/store groups, entire closed seed copy and preserved original immutable bytes."
+  ],
+  "remoteArchive": "/data/rjt-writing-check-01a17bef/40568776080/roma.dictation-store-seed-control.zip",
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40568776080",
+  "startupLimit": "Actual hosted startup logs show pre-roll buffering active on Apple Virtual Sound Device. This run does not prove microphone inactivity.",
+  "unproven": [
+    "Current app build/read.",
+    "Future metadata fields or migration."
+  ]
+}

@@ -230,7 +230,7 @@ private final class DictationStoreSeedFixture {
             "schemaEntities": container.schema.entities.map(\.name).sorted(), "persistentIdentifiers": persistentIdentifiers,
             "configurations": configReceipt, "schemaRawSHA256": DictationStoreSeedInputs.sha256(rawSchema),
             "schemaCanonicalSHA256": DictationStoreSeedInputs.sha256(canonicalBytes),
-            "schemaNormalization": "Sort object keys and arrays keyed entities, subentities, attributes, relationships, properties, storedProperties, inheritedProperties, or options by canonical JSON bytes. Preserve every value and all other array order, including compound indices and uniqueness constraints. No defaults or runtime metadata are removed."
+            "schemaNormalization": "Sort object keys and arrays keyed entities, subentities, attributes, storedAttributes, relationships, properties, storedProperties, inheritedProperties, or options by canonical JSON bytes. Preserve every value and all other array order, including compound indices and uniqueness constraints. No defaults or runtime metadata are removed."
         ], named: "runtimeidentity.json")
     }
 
@@ -384,7 +384,7 @@ private final class DictationStoreSeedFixture {
         }
         if let array = value as? [Any] {
             let normalized = try array.map { try canonicalSchema($0) }
-            let unorderedKeys: Set<String> = ["entities", "subentities", "attributes", "relationships", "properties",
+            let unorderedKeys: Set<String> = ["entities", "subentities", "attributes", "storedAttributes", "relationships", "properties",
                                               "storedProperties", "inheritedProperties", "options"]
             guard let key, unorderedKeys.contains(key) else { return normalized }
             let paired = try normalized.map { item in

@@ -1,0 +1,15 @@
+{
+  "console_uid": 501,
+  "home": "/Users/runner",
+  "limits": "Normal app Application Support will be opened by actual app initialization. No user-store isolation claim; this is a fresh disposable Actions user.",
+  "normal_support_before_any_host": {
+    "entries": [],
+    "exists": false,
+    "path": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk"
+  },
+  "run_attempt": "1",
+  "run_id": "40568776080",
+  "runner_name": "GitHub Actions 1000001319",
+  "uid": 501,
+  "username": "runner"
+}

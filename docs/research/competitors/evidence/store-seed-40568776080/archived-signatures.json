@@ -1,0 +1,491 @@
+{
+  "actualCodesignCommands": [
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/libXCTestSwiftSupport.dylib",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/libXCTestBundleInject.dylib",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCUnit.framework",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCUIAutomation.framework",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTestSupport.framework",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTestCore.framework",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTest.framework",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTAutomationSupport.framework",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/Testing.framework",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/Sparkle.framework/Versions/B",
+    "/usr/bin/codesign --force --sign - -o runtime --timestamp\\=none --preserve-metadata\\=identifier,entitlements,flags --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/MediaRemoteAdapter.framework/Versions/A",
+    "/usr/bin/codesign --force --sign - -o runtime --entitlements /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkTests.build/VoiceInkTests.xctest.xcent --timestamp\\=none --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest",
+    "/usr/bin/codesign --force --sign - -o runtime --entitlements /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/roma\\ just\\ talk.app.xcent --timestamp\\=none --generate-entitlement-der /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma\\ just\\ talk.app"
+  ],
+  "binaryArchives": {
+    "actual-host.app.zip": {
+      "bytes": 73749770,
+      "sha256": "f29e2ea30d415ed7624149a936851e3ce7da19a6df2060dafcf8f8b178902df8"
+    },
+    "actual-tests-0.xctest.zip": {
+      "bytes": 4543227,
+      "sha256": "0f529a73a4566b6b6a385e6826dd27db2b131c3d0c5bb85f7d2b2f116df9c499"
+    }
+  },
+  "classification": "archived-mach-o-signature-inspection",
+  "limits": [
+    "Parser inspection does not independently validate Apple code-signature cryptographic seals or TCC/runtime behavior.",
+    "Original runner codesign deep/strict verification passed in identity(); later Hardened Runtime contract rejected the built app before fixture launch."
+  ],
+  "method": "Remote Linux parser reads Mach-O LC_CODE_SIGNATURE, CodeDirectory flags and embedded XML entitlements directly from retained archived app/test bytes. No re-signing, app launch or macOS codesign execution.",
+  "signatures": {
+    "actual-host.app.zip:roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater": [
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 1188,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "org.sparkle-project.Sparkle.Updater",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777223,
+        "entitlements": {},
+        "sha256": "f362e4f41cada309d49004f6ae812fea86dbb81b9f41b08583aaaa57b4ffe187",
+        "signatureSlots": [
+          {
+            "bytes": 1188,
+            "magic": "0xfade0c02",
+            "sha256": "4eaac8c28cfa1038dca9bddb5473cb98ce439b04f2f263ae2a20b28450c324ba",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 189,
+            "magic": "0xfade7171",
+            "sha256": "eda0e349a903d27ba3b4d17ddb7364e137bc8292a2457384a8dfa9a663f78802",
+            "slot": 5
+          },
+          {
+            "bytes": 15,
+            "magic": "0xfade7172",
+            "sha256": "1306d4645bb1cd4a611d6da77f4d4bc5fabe70765c7769ef05bcb8d8279aec8d",
+            "slot": 7
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 123552,
+        "sliceOffset": 16384
+      },
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 612,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "org.sparkle-project.Sparkle.Updater",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777228,
+        "entitlements": {},
+        "sha256": "8b681b218dd3d5204c977f96ebad4e60e98e6d7ba4659f6272af005e85e51d2b",
+        "signatureSlots": [
+          {
+            "bytes": 612,
+            "magic": "0xfade0c02",
+            "sha256": "771137f8abed7707f463e9e52367e86199078a0f987651f4c4a5fb78fdd7b17e",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 189,
+            "magic": "0xfade7171",
+            "sha256": "eda0e349a903d27ba3b4d17ddb7364e137bc8292a2457384a8dfa9a663f78802",
+            "slot": 5
+          },
+          {
+            "bytes": 15,
+            "magic": "0xfade7172",
+            "sha256": "1306d4645bb1cd4a611d6da77f4d4bc5fabe70765c7769ef05bcb8d8279aec8d",
+            "slot": 7
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 143104,
+        "sliceOffset": 147456
+      }
+    ],
+    "actual-host.app.zip:roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader": [
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 710,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "org.sparkle-project.DownloaderService",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777223,
+        "entitlements": {},
+        "sha256": "f61f59bb0828d2ef912e694b2ae778a52a59c8c8cb9a9de403ac7cb9f1f0e836",
+        "signatureSlots": [
+          {
+            "bytes": 710,
+            "magic": "0xfade0c02",
+            "sha256": "b3d14bd0bc0150ed0f984e607520d86e119c584c0858cb823bc86b8443c12b73",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 189,
+            "magic": "0xfade7171",
+            "sha256": "eda0e349a903d27ba3b4d17ddb7364e137bc8292a2457384a8dfa9a663f78802",
+            "slot": 5
+          },
+          {
+            "bytes": 15,
+            "magic": "0xfade7172",
+            "sha256": "1306d4645bb1cd4a611d6da77f4d4bc5fabe70765c7769ef05bcb8d8279aec8d",
+            "slot": 7
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 62048,
+        "sliceOffset": 16384
+      },
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 518,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "org.sparkle-project.DownloaderService",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777228,
+        "entitlements": {},
+        "sha256": "97d04a9dae222ff7896df8b876085a9b8b8d530aa8072f46e4377acaf1e93c4d",
+        "signatureSlots": [
+          {
+            "bytes": 518,
+            "magic": "0xfade0c02",
+            "sha256": "0409ce461953ccccf6406510c0759d52889465e7f63ef9b584b314b1daa823c3",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 189,
+            "magic": "0xfade7171",
+            "sha256": "eda0e349a903d27ba3b4d17ddb7364e137bc8292a2457384a8dfa9a663f78802",
+            "slot": 5
+          },
+          {
+            "bytes": 15,
+            "magic": "0xfade7172",
+            "sha256": "1306d4645bb1cd4a611d6da77f4d4bc5fabe70765c7769ef05bcb8d8279aec8d",
+            "slot": 7
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 90320,
+        "sliceOffset": 81920
+      }
+    ],
+    "actual-host.app.zip:roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer": [
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 870,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "org.sparkle-project.InstallerLauncher",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777223,
+        "entitlements": {},
+        "sha256": "4c8796593b81c1cd65231a254a9d6afbdc480a029d3b2325a4ccec0eff5cc5bd",
+        "signatureSlots": [
+          {
+            "bytes": 870,
+            "magic": "0xfade0c02",
+            "sha256": "4056922c5dc087d9e45c8142b48dac80b6be886b0cf19e0201960f376b961a23",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 189,
+            "magic": "0xfade7171",
+            "sha256": "eda0e349a903d27ba3b4d17ddb7364e137bc8292a2457384a8dfa9a663f78802",
+            "slot": 5
+          },
+          {
+            "bytes": 15,
+            "magic": "0xfade7172",
+            "sha256": "1306d4645bb1cd4a611d6da77f4d4bc5fabe70765c7769ef05bcb8d8279aec8d",
+            "slot": 7
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 84640,
+        "sliceOffset": 16384
+      },
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 550,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "org.sparkle-project.InstallerLauncher",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777228,
+        "entitlements": {},
+        "sha256": "3a2fc219f2ef121a95e97ffd04e89919e7934eae4bcc4436a2af18e640f31fb5",
+        "signatureSlots": [
+          {
+            "bytes": 550,
+            "magic": "0xfade0c02",
+            "sha256": "054d861efe2921b07185aac6616459914f845d8c40695673348db84df09231e0",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 189,
+            "magic": "0xfade7171",
+            "sha256": "eda0e349a903d27ba3b4d17ddb7364e137bc8292a2457384a8dfa9a663f78802",
+            "slot": 5
+          },
+          {
+            "bytes": 15,
+            "magic": "0xfade7172",
+            "sha256": "1306d4645bb1cd4a611d6da77f4d4bc5fabe70765c7769ef05bcb8d8279aec8d",
+            "slot": 7
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 108784,
+        "sliceOffset": 114688
+      }
+    ],
+    "actual-host.app.zip:roma just talk.app/Contents/MacOS/roma just talk": [
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 444828,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "com.negentropi.RomaJustTalk",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777228,
+        "entitlements": {
+          "com.apple.security.app-sandbox": false,
+          "com.apple.security.automation.apple-events": true,
+          "com.apple.security.cs.disable-library-validation": true,
+          "com.apple.security.device.audio-input": true,
+          "com.apple.security.files.user-selected.read-only": true,
+          "com.apple.security.get-task-allow": true,
+          "com.apple.security.network.client": true,
+          "com.apple.security.network.server": true,
+          "com.apple.security.screen-capture": true,
+          "com.apple.security.temporary-exception.files.absolute-path.read-only": [
+            "/"
+          ],
+          "com.apple.security.temporary-exception.mach-lookup.global-name": [
+            "com.apple.testmanagerd",
+            "com.apple.dt.testmanagerd.runner",
+            "com.apple.coresymbolicationd"
+          ]
+        },
+        "sha256": "b404d521a1d63cb697547deac92ad6720da801314fc7d42bab94be196ec7a9e1",
+        "signatureSlots": [
+          {
+            "bytes": 444828,
+            "magic": "0xfade0c02",
+            "sha256": "c6c098619b555de643dd8224d35a343df54e786c02aa3f3196245a5708ffd95f",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 1089,
+            "magic": "0xfade7171",
+            "sha256": "e67df026ba8b864d2ab69eea58c774a8d3450098ca1823dcbc90617fd4a8c566",
+            "slot": 5
+          },
+          {
+            "bytes": 653,
+            "magic": "0xfade7172",
+            "sha256": "544e11973ee3eed55c49ba038a8d51f2c8f1b44649ba4113a2335371296f6204",
+            "slot": 7
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 228025056,
+        "sliceOffset": 0
+      }
+    ],
+    "actual-host.app.zip:roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests": [
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 15361,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "com.negentropi.RomaJustTalkTests",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777228,
+        "entitlements": null,
+        "sha256": "91d3ae61bb21a4d51902c7f29fe047779abc06f650a38783284782fd2f3d3361",
+        "signatureSlots": [
+          {
+            "bytes": 15361,
+            "magic": "0xfade0c02",
+            "sha256": "24bb08189c643bb0f12aade2ec8c28d899d2827dbef1e89f1e10aaed4af5dfd4",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 7778496,
+        "sliceOffset": 0
+      }
+    ],
+    "actual-tests-0.xctest.zip:VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests": [
+      {
+        "codeDirectories": [
+          {
+            "adhoc": true,
+            "bytes": 15361,
+            "flags": "0x10002",
+            "hardenedRuntime": true,
+            "identifier": "com.negentropi.RomaJustTalkTests",
+            "slot": 0,
+            "version": "0x20500"
+          }
+        ],
+        "cpuType": 16777228,
+        "entitlements": null,
+        "sha256": "91d3ae61bb21a4d51902c7f29fe047779abc06f650a38783284782fd2f3d3361",
+        "signatureSlots": [
+          {
+            "bytes": 15361,
+            "magic": "0xfade0c02",
+            "sha256": "24bb08189c643bb0f12aade2ec8c28d899d2827dbef1e89f1e10aaed4af5dfd4",
+            "slot": 0
+          },
+          {
+            "bytes": 12,
+            "magic": "0xfade0c01",
+            "sha256": "987920904eab650e75788c054aa0b0524e6a80bfc71aa32df8d237a61743f986",
+            "slot": 2
+          },
+          {
+            "bytes": 8,
+            "magic": "0xfade0b01",
+            "sha256": "e6c83bc98a10348492c7d4d2378a54572ef29e1a5692ccd02b5e29f4b762d6a0",
+            "slot": 65536
+          }
+        ],
+        "sliceBytes": 7778496,
+        "sliceOffset": 0
+      }
+    ]
+  }
+}

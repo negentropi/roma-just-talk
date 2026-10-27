@@ -36,7 +36,7 @@ tag_sha = "846d05df04d5821a7b5dc8588304cb58e3bd8368"
 lock_path = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
 lock_sha = "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
 oracle_path = "VoiceInkTests/DictationStoreSeedLiveTests.swift"
-helper_paths = ["scripts/run-dictation-store-seed-check.sh", "scripts/tests/dictation-store-source-inventory.test.py", ".github/workflows/voiceink-dictation-store-seed-check.yml"]
+helper_paths = ["scripts/run-dictation-store-seed-check.sh", "scripts/tests/dictation-store-source-inventory.test.py", "scripts/tests/dictation-store-schema-canonicalization.test.py", ".github/workflows/voiceink-dictation-store-seed-check.yml"]
 product_roots = ["VoiceInk", "VoiceInkCore", "VoiceInkNVIDIA", "VoiceInkQwen", "VoiceInk.xcodeproj", "VoiceInkTests", "VoiceInkUITests", "iOS", "Makefile", "LocalBuild.xcconfig"]
 model_names = ["Transcription", "VocabularyWord", "WordReplacement", "SessionMetric"]
 model_paths = ["VoiceInk/Models/" + name + ".swift" for name in model_names]
@@ -674,6 +674,8 @@ def verify():
 
 def self_test():
     subprocess.run(["python3", str(repo / "scripts/tests/dictation-store-source-inventory.test.py")], check=True)
+    if sys.platform == "darwin":
+        subprocess.run(["python3", str(repo / "scripts/tests/dictation-store-schema-canonicalization.test.py")], check=True)
     good = "Test " + test_name + "() started.\nTest " + test_name + "() passed after 0.1 seconds.\nTest run with 1 test in 1 suite passed\n"
     require(classify(good, 0)["valid"], "Valid exact selected test rejected")
     invalid = [good.replace("started.", "not started."), good.replace("passed after", "skipped after"), good.replace("1 test in", "0 tests in"), good + "Test other() started.\n", good + "Test " + test_name + "() recorded an issue: setup failed\n", good.replace("1 suite passed", "1 suite failed"), good + good]

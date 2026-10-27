@@ -1,0 +1,13 @@
+{
+  "classification": "clean",
+  "reviewer": "/root/store_oracle_review",
+  "findings": [],
+  "verified": [
+    "Only storedAttributes added to known unordered keys; no scalar/default/count change.",
+    "Actual old/candidate Swift functions compared under the same Foundation harness.",
+    "Four pinned native files and old canonical outputs bind the known-bad failure.",
+    "All 35 unique attributes agree in both real schemas.",
+    "Seven metadata/count mutations and six meaningful/unknown array order reversals remain detectable."
+  ],
+  "scope": "Read-only source and captured-fixture review. No native app or migration execution repeated."
+}

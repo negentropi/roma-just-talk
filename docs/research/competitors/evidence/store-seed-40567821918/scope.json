@@ -1,0 +1,10 @@
+{
+  "actualStoreSeedProof": false,
+  "artifactOrLogFetched": false,
+  "classification": "cancelled-before-store-proof",
+  "currentReadProof": false,
+  "oldReopenProof": false,
+  "reason": "Root canceled after the already retained predecessor build note and settings exposed the preview-style Hardened Runtime override. A new run disables both preview modes; no result is transferred between runs.",
+  "runID": 40567821918,
+  "sourceSHA": "caf053ea37aefa1f99e29420354d42c0169c6c39"
+}

@@ -1,0 +1,22 @@
+store-control	Seed and reopen in separate actual predecessor hosts	﻿2026-10-27T19:26:53.2365250Z ##[group]Run bash scripts/run-dictation-store-seed-check.sh predecessor
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:26:53.2366280Z ^[[36;1mbash scripts/run-dictation-store-seed-check.sh predecessor^[[0m
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:26:53.4106390Z shell: /bin/bash -e {0}
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:26:53.4106760Z ##[endgroup]
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:26:59.2392900Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/build.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:35:37.3096130Z Running ditto; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/archive-host.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:35:48.7162490Z Running ditto; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/archive-tests-0.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:35:49.7559550Z Running bash; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/static-app.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:35:57.6889650Z Running bash; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/adhoc-app.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:36:14.5436960Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/seed/selection/enumeration.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:37:05.7021390Z Running lsof; log /Users/runner/work/_temp/dictation-store-seed-proof/seed/closed-fixture-open-files.txt
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:37:09.3007100Z Running xcrun; log /Users/runner/work/_temp/dictation-store-seed-proof/seed/export-attachments.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:37:24.5914970Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/old-reopen/selection/enumeration.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:29.0214940Z Running lsof; log /Users/runner/work/_temp/dictation-store-seed-proof/old-reopen/closed-fixture-open-files.txt
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:31.2445690Z Running xcrun; log /Users/runner/work/_temp/dictation-store-seed-proof/old-reopen/export-attachments.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:41.2525010Z Traceback (most recent call last):
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:41.2527180Z   File "<stdin>", line 692, in <module>
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:41.2528980Z   File "<stdin>", line 629, in old_control
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:41.2529990Z   File "<stdin>", line 536, in compare_runtime
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:41.2531120Z   File "<stdin>", line 40, in require
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:41.2531610Z RuntimeError: Normalized actual runtime schema changed
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:38:41.2922440Z ##[error]Process completed with exit code 1.

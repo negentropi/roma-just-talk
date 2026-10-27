@@ -1,0 +1,17 @@
+{
+  "entries": [
+    "Recordings",
+    "WhisperModels",
+    "default.store",
+    "default.store-shm",
+    "default.store-wal",
+    "dictionary.store",
+    "dictionary.store-shm",
+    "dictionary.store-wal",
+    "stats.store",
+    "stats.store-shm",
+    "stats.store-wal"
+  ],
+  "exists": true,
+  "path": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk"
+}

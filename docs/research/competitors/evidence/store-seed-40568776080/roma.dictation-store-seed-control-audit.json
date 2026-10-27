@@ -1,0 +1,335 @@
+{
+  "archive": "roma.dictation-store-seed-control.zip",
+  "archiveBytes": 79340953,
+  "archiveSHA256": "d2b5ee72550b1cf4eb4f5236f45a33f9ead0181c322a74bf34dfb6961aaecf84",
+  "builds": {
+    "predecessor": {
+      "appTreeEntries": 669,
+      "archives": {
+        "actual-host.app.zip": {
+          "bytes": 73749770,
+          "sha256": "f29e2ea30d415ed7624149a936851e3ce7da19a6df2060dafcf8f8b178902df8"
+        },
+        "actual-tests-0.xctest.zip": {
+          "bytes": 4543227,
+          "sha256": "0f529a73a4566b6b6a385e6826dd27db2b131c3d0c5bb85f7d2b2f116df9c499"
+        }
+      },
+      "designatedRequirement": "cdhash H\"c6c098619b555de643dd8224d35a343df54e786c\"",
+      "executablePath": "/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "testBundleCount": 1
+    }
+  },
+  "classification": "old-records-and-closed-copies-audited-original-schema-check-failed",
+  "currentAppBuilt": false,
+  "distinctHostPIDs": [
+    25870,
+    29330
+  ],
+  "entryCount": 228,
+  "frameworkEntryCount": 121,
+  "limitations": [
+    "Original run failed its schema comparison. Only old-app records, identifiers and closed-copy evidence independently audited; current app never built.",
+    "Fresh normal Application Support opened by actual app initialization.",
+    "App startup attempts recorder pre-roll; microphone inactivity not established."
+  ],
+  "originalRunFailure": {
+    "classification": "invalid-or-failed",
+    "error": "Normalized actual runtime schema changed",
+    "mode": "predecessor"
+  },
+  "packageInventories": {
+    "axswift": {
+      "entryCount": 25,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "eventsource": {
+      "entryCount": 19,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "fluidaudio": {
+      "entryCount": 524,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "grpc-swift-2": {
+      "entryCount": 441,
+      "gitlinks": {},
+      "symlinkCount": 8
+    },
+    "grpc-swift-nio-transport": {
+      "entryCount": 220,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "grpc-swift-protobuf": {
+      "entryCount": 107,
+      "gitlinks": {},
+      "symlinkCount": 2
+    },
+    "keysender": {
+      "entryCount": 9,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "launchatlogin-modern": {
+      "entryCount": 9,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "llmkit": {
+      "entryCount": 32,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "mediaremote-adapter": {
+      "entryCount": 13,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "mlx-audio-swift": {
+      "entryCount": 434,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "mlx-swift": {
+      "entryCount": 741,
+      "gitlinks": {
+        "Source/Cmlx/mlx": {
+          "git_object": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+          "revision": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+          "state": "initialized",
+          "trackedSourceCount": 883
+        },
+        "Source/Cmlx/mlx-c": {
+          "git_object": "0726ca922fc902c4c61ef9c27d94132be418e945",
+          "revision": "0726ca922fc902c4c61ef9c27d94132be418e945",
+          "state": "initialized",
+          "trackedSourceCount": 126
+        }
+      },
+      "symlinkCount": 0
+    },
+    "mlx-swift-lm": {
+      "entryCount": 273,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "permissionflow": {
+      "entryCount": 57,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "selectedtextkit": {
+      "entryCount": 42,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "sparkle": {
+      "entryCount": 600,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-algorithms": {
+      "entryCount": 119,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-asn1": {
+      "entryCount": 212,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-async-algorithms": {
+      "entryCount": 208,
+      "gitlinks": {},
+      "symlinkCount": 2
+    },
+    "swift-atomics": {
+      "entryCount": 144,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-certificates": {
+      "entryCount": 365,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-collections": {
+      "entryCount": 842,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-crypto": {
+      "entryCount": 1044,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-http-structured-headers": {
+      "entryCount": 69,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-http-types": {
+      "entryCount": 603,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-huggingface": {
+      "entryCount": 101,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-jinja": {
+      "entryCount": 37,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-log": {
+      "entryCount": 144,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio": {
+      "entryCount": 767,
+      "gitlinks": {},
+      "symlinkCount": 2
+    },
+    "swift-nio-extras": {
+      "entryCount": 180,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio-http2": {
+      "entryCount": 614,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio-ssl": {
+      "entryCount": 769,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio-transport-services": {
+      "entryCount": 61,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-numerics": {
+      "entryCount": 70,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-protobuf": {
+      "entryCount": 2511,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-service-lifecycle": {
+      "entryCount": 51,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-syntax": {
+      "entryCount": 872,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-system": {
+      "entryCount": 99,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-transformers": {
+      "entryCount": 95,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "yyjson": {
+      "entryCount": 903,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "zip": {
+      "entryCount": 71,
+      "gitlinks": {},
+      "symlinkCount": 0
+    }
+  },
+  "packagePinCount": 41,
+  "phases": {
+    "old-reopen": {
+      "canonicalSchemaSHA256": "8b108a2dcfc9faeb103874daea745a3cb3943292d95a9a16ced0b66188ef867e",
+      "fixturePath": "/Users/runner/work/_temp/dictation-store-seed-proof/stores/old-reopen",
+      "hostPID": 29330,
+      "nativeResult": {
+        "test_action_id": "0~n7cIdxc1SmK7Fg2_V18fUUA2Gjg-OdUr7TsI1ZqhORBRiRVzlH6xGmE0ld_cL0ysVxQC2hNsyzqCNe0M8lSr0A==",
+        "tests": [
+          {
+            "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+            "status": "Success"
+          }
+        ],
+        "valid": true
+      },
+      "normalSupportPath": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk",
+      "rawSchemaSHA256": "cdf96457dc57faf8edbee73cd92cb70b9546d7ec087f3ba20c87142cedbd2232",
+      "snapshotSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "sourceSHA": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+      "storeBytes": 344064,
+      "storeFileCount": 9
+    },
+    "seed": {
+      "canonicalSchemaSHA256": "412aceafcd347b193af83af7f7d133fb903fdcfde2fd01f5f15debb19c9677be",
+      "fixturePath": "/Users/runner/work/_temp/dictation-store-seed-proof/stores/seed",
+      "hostPID": 25870,
+      "nativeResult": {
+        "test_action_id": "0~LbQ2xEUG3mqjjTe8JBaR9cmwARPku5UFT-bfdxlRcQPGipKAXqx33J_2J8WJtr24xa9AGvCkIVsH26XWcobQwA==",
+        "tests": [
+          {
+            "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+            "status": "Success"
+          }
+        ],
+        "valid": true
+      },
+      "normalSupportPath": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk",
+      "rawSchemaSHA256": "9022a2a23935b340ef0862c4161d801184b901047572fbdfacf3a3941fd02d3e",
+      "snapshotSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "sourceSHA": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+      "storeBytes": 344064,
+      "storeFileCount": 9
+    }
+  },
+  "schemaComparisonPassed": false,
+  "snapshotRowsPerModel": 2,
+  "snapshotStoredFieldCount": 35,
+  "sourceBridgeEqual": true,
+  "sourceInventories": {
+    "candidate": {
+      "entryCount": 618,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "predecessor": {
+      "entryCount": 610,
+      "gitlinks": {},
+      "symlinkCount": 0
+    }
+  },
+  "sourceOracleSHA256": "ad146f0800c148acd6d25e3500f6c7a4f8d3c1e7da887fe9b46642afc99bb5e7",
+  "sourceSHA": {
+    "candidate": "cc88b5b1e79a158e5665d81b7d179a42ebe12935",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  },
+  "whisperInventory": {
+    "entryCount": 2057,
+    "gitlinks": {},
+    "symlinkCount": 0
+  },
+  "whisperSourceRevision": "21ba6d269a02c14309355cb96822db6058d4cf48",
+  "whisperTrackedSourceFileCount": 2057,
+  "zipCRCValid": true
+}

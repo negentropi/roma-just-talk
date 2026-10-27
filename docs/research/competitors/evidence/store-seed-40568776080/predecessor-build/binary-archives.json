@@ -1,0 +1,10 @@
+{
+  "actual-host.app.zip": {
+    "bytes": 73749770,
+    "sha256": "f29e2ea30d415ed7624149a936851e3ce7da19a6df2060dafcf8f8b178902df8"
+  },
+  "actual-tests-0.xctest.zip": {
+    "bytes": 4543227,
+    "sha256": "0f529a73a4566b6b6a385e6826dd27db2b131c3d0c5bb85f7d2b2f116df9c499"
+  }
+}

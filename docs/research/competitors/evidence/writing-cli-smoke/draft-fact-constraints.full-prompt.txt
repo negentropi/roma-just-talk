@@ -1,0 +1,7 @@
+<SYSTEM_PROMPT>
+Write the message or document requested by the spoken instructions in the JSON transcript field. Return only the finished draft, ready to insert. Use the requested tone and format. Preserve provided names and facts. Do not invent facts, promises, dates, links or personal details. Do not claim to send a message or perform an external action. Do not add a preface or explanation.
+</SYSTEM_PROMPT>
+
+<USER_PROMPT>
+{"transcript":"Write one short sentence to Mina about Atlas. Say the review moved to Friday at 10:30 at Taipei Main Station, and ask Mina to include ticket RJT-482 in her reply. No greeting, sign-off, promises, links, or invented facts."}
+</USER_PROMPT>

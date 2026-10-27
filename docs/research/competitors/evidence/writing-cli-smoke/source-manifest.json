@@ -1,0 +1,146 @@
+{
+  "prepared_utc": "2026-10-27T08:52:53.521168+00:00",
+  "source_sha": "d5a90a27744ba50b0bb074a36723bb1f59f5c987",
+  "source_files": {
+    "VoiceInkCore/Sources/VoiceInkCore/WritingActions.swift": "2ccaf980d75e123d8326c39125707911a4b0e41980ba98d80362a96a41ecd12b",
+    "VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift": "e580eb6c15e50810e779bdd1b3b54710aacbd3e47554f95a75f12ac2c7b59360",
+    "VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift": "af6c873337daeb0d777d8a6e68e16d4fbf152194b552c5023be1c0cd2cc5f7c5",
+    "VoiceInkTests/WritingActionProviderTests.swift": "4d9a642646296520730da117bd6d646d825a045e46579aa7eeb47610bf111907"
+  },
+  "driver_sha256": "7a3dc41bb817bea0da312c558293436ef85fcd50d699df10fcdc6e9d1838ef33",
+  "construction": "Unchanged WritingActions.swift prefix through VoiceInkWritingActionRequest; unchanged VoiceInkLanguageOption and LanguageCatalog all/sortedOptions/autoDetect fields; unchanged LocalCLI fullPrompt; unchanged existing fixture/check definitions.",
+  "boundary": "Prompt construction and existing authenticated CLI semantic smoke only. No app service, Groq transport, recording, editor delivery, or physical shortcut proof.",
+  "model_selection": "No model override. Existing authenticated CLI default used; reported models recorded per case. Local configuration is not retained.",
+  "validation_driver_sha256": "a0fb8bb364fea337b3ca80a38f0e7035cb1471fa73347734878d0f0c888840cd",
+  "cli_command": "claude --bare --print --tools '' --disable-slash-commands --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --setting-sources user --no-session-persistence --max-budget-usd 0.50 --output-format json < fixture.full-prompt.txt",
+  "requests": {
+    "japanese-to-english": {
+      "request_sha256": "3d71842dab557a2b5935537df7ee7c0c6d7a97b7c2df5b8d7bd5fe00dcad812b",
+      "full_prompt_sha256": "f370082ffb2677b8738d192603e5a3410e99c991d795498f0e6390638cf8b3da",
+      "cli_result_sha256": "57da6fc62f08e77e899f5ecc6712c82937cad2add0f2f95d0d5067395b6d30ee",
+      "cli_reported_models": [
+        "claude-opus-5-5"
+      ],
+      "cli_status": "success",
+      "cli_is_error": false,
+      "tool_use_allowed": false,
+      "permission_denials": [],
+      "passed_bounded_semantic_checks": true,
+      "semantic_check_count": 9,
+      "validation_sha256": "df38486de126b367f10a17545cc640350df1eed68fc10755ae3bf34ab634e70d"
+    },
+    "english-to-traditional-chinese": {
+      "request_sha256": "3c8f6a346f758418dace57dc7635b7c5d65884ba4feb53575a196f7f111fd240",
+      "full_prompt_sha256": "71cedff711eb30d8025c3a0c3d7b2bfbde0faf4dd2ccda130f2e2dafa8a416e7",
+      "cli_result_sha256": "eb97df66888ba0501a8af9b44588084898ba3cf1e5fe785809ef87d8f6213a72",
+      "cli_reported_models": [
+        "claude-opus-5-5"
+      ],
+      "cli_status": "success",
+      "cli_is_error": false,
+      "tool_use_allowed": false,
+      "permission_denials": [],
+      "passed_bounded_semantic_checks": true,
+      "semantic_check_count": 14,
+      "validation_sha256": "d888afb1f75b045e99b09782e9854c0db606d80c514b2d1585747aed04d4028b"
+    },
+    "concise-selection": {
+      "request_sha256": "96e8ec89bfd416939b494fbf460a5fd3a19d2208f43f0f4a57ce98a0bf2748b9",
+      "full_prompt_sha256": "84b3ede19ecb8a6157d7d302c215d9ac379ccb9f43f8e86e4cb3ac83f24ab40b",
+      "cli_result_sha256": "ac90a2306d7e8589ccc9ace2a91ea8c3a8d407e49b6f460c563f77d950ef9ce9",
+      "cli_reported_models": [
+        "claude-opus-5-5"
+      ],
+      "cli_status": "success",
+      "cli_is_error": false,
+      "tool_use_allowed": false,
+      "permission_denials": [],
+      "passed_bounded_semantic_checks": true,
+      "semantic_check_count": 19,
+      "validation_sha256": "5ea797836b4233a569102408dc63ab634f6e7087e318c31c4e88ddb536537c7d"
+    }
+  },
+  "completed_utc": "2026-10-27T08:55:11.577401+00:00",
+  "result": "PASS: three baseline and two supplemental synthetic prompt-plus-ClaudeCLI semantic cases",
+  "unproven": [
+    "AIEnhancementService and LocalCLIService execution",
+    "Groq provider transport",
+    "recording and ASR",
+    "native editor delivery",
+    "physical shortcut behavior",
+    "General translation, rewriting, drafting or adversarial robustness beyond the five retained fixtures"
+  ],
+  "source_hashes_match_recorded_commit": {
+    "VoiceInkCore/Sources/VoiceInkCore/WritingActions.swift": true,
+    "VoiceInkCore/Sources/VoiceInkCore/LanguageCatalog.swift": true,
+    "VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift": true,
+    "VoiceInkTests/WritingActionProviderTests.swift": true
+  },
+  "retention": {
+    "original_source_manifest_sha256": "3f6273e91f67e740b7ea4d1d14a94e6069c8d22e4d641d7593bb00a800cdb58d",
+    "raw_cli_results": "Not retained. Selected synthetic-output and reported-model fields are in *.cli-receipt.json.",
+    "excluded": "No credentials, local configuration files, session identifiers, raw timing, cost, or usage metadata.",
+    "reproduction": "verify.py rebuilds the source-bound pure prompt driver and validator without network calls. CLI outputs are retained observations, not regenerated responses."
+  },
+  "retained_files": {
+    "additional-cases.json": "742ebd6dac6017b71d4615afabdb7a312056cfeb5f5d5c6bacfd38d6f7edbfdf",
+    "concise-selection.cli-receipt.json": "073a96016c08f2fd980f3722a1a9e9b211a7a8c38ec389d85c75111a4472682f",
+    "concise-selection.full-prompt.txt": "84b3ede19ecb8a6157d7d302c215d9ac379ccb9f43f8e86e4cb3ac83f24ab40b",
+    "concise-selection.request.json": "96e8ec89bfd416939b494fbf460a5fd3a19d2208f43f0f4a57ce98a0bf2748b9",
+    "concise-selection.validation.json": "5ea797836b4233a569102408dc63ab634f6e7087e318c31c4e88ddb536537c7d",
+    "draft-fact-constraints.cli-receipt.json": "6552634955387b58c01d6998eb2ac80257a69c0e6522bd5e10c16f375c30ca23",
+    "draft-fact-constraints.full-prompt.txt": "1082b3fb3421be8667272f322d59ef42a2606f34bfbeced0d69988fe784ca496",
+    "draft-fact-constraints.request.json": "0d9ba686a232478613cc8d746651a8343f9e2ed4c54392da3aa16ddfaea51669",
+    "draft-fact-constraints.validation.json": "1b6904d54cb4195c33a57669ff7f13eb6985eb4c7e07372339ae83bace10afe0",
+    "english-to-traditional-chinese.cli-receipt.json": "02cd3775137222820f57254cfff06ab0cfe2b0e506606c6275973e4c5f0ca1cc",
+    "english-to-traditional-chinese.full-prompt.txt": "71cedff711eb30d8025c3a0c3d7b2bfbde0faf4dd2ccda130f2e2dafa8a416e7",
+    "english-to-traditional-chinese.request.json": "3c8f6a346f758418dace57dc7635b7c5d65884ba4feb53575a196f7f111fd240",
+    "english-to-traditional-chinese.validation.json": "d888afb1f75b045e99b09782e9854c0db606d80c514b2d1585747aed04d4028b",
+    "japanese-to-english.cli-receipt.json": "c79aef2aef4d333c9d4961e366441102626495292e8e11b7ead3cc92fdb944d5",
+    "japanese-to-english.full-prompt.txt": "f370082ffb2677b8738d192603e5a3410e99c991d795498f0e6390638cf8b3da",
+    "japanese-to-english.request.json": "3d71842dab557a2b5935537df7ee7c0c6d7a97b7c2df5b8d7bd5fe00dcad812b",
+    "japanese-to-english.validation.json": "df38486de126b367f10a17545cc640350df1eed68fc10755ae3bf34ab634e70d",
+    "summary.md": "ed851a4a7bc8afa122f2feddae600d2746a75fad4c95e6d38fe442b3c2ca7870",
+    "supplemental-driver.swift": "0bcff5ee75c0ae530ee982d28810945fa3bb210d8f354369daf8076b548717fe",
+    "supplemental_checks.py": "c6dfad1b64ec85f97f2c0cff81919fc35152a413d01532a0b1c556b11416b432",
+    "translation-instruction-content.cli-receipt.json": "9223b6d674894185d81cc7189784606b377e9fbc1e1befcf13d70141f1705b5c",
+    "translation-instruction-content.full-prompt.txt": "1e34c6b169b5fb53b9295d275c3b2d2a680158f25932fcb3fc9078323f3922d2",
+    "translation-instruction-content.request.json": "adacab7a3156e42b703ef6f5c5a882e6f4f61b53c092e6915e3baac41a53e087",
+    "translation-instruction-content.validation.json": "201304e0a98d3b819649df7ca5213d1ad61c426aeae6efd64981a22f087e5e5a",
+    "verify.py": "e26e9649def239c1630932bb19159290e2c08ebfe3ecd4c587248c7cad81f3db"
+  },
+  "supplemental_requests": {
+    "draft-fact-constraints": {
+      "cli_result_sha256": "28dbd4f5db0cd291cd8c02d077dc4006dbeb493165eb0b8b8fd5dc7768ed0545",
+      "cli_reported_models": [
+        "claude-opus-5-5"
+      ],
+      "cli_status": "success",
+      "cli_is_error": false,
+      "tool_use_allowed": false,
+      "permission_denials": [],
+      "passed_bounded_semantic_checks": true,
+      "semantic_check_count": 19,
+      "request_sha256": "0d9ba686a232478613cc8d746651a8343f9e2ed4c54392da3aa16ddfaea51669",
+      "full_prompt_sha256": "1082b3fb3421be8667272f322d59ef42a2606f34bfbeced0d69988fe784ca496",
+      "validation_sha256": "1b6904d54cb4195c33a57669ff7f13eb6985eb4c7e07372339ae83bace10afe0"
+    },
+    "translation-instruction-content": {
+      "cli_result_sha256": "d9650040a39cad4eeada1d5b7ab31fff8507d8c28c1c10b7bead914c432283d4",
+      "cli_reported_models": [
+        "claude-opus-5-5"
+      ],
+      "cli_status": "success",
+      "cli_is_error": false,
+      "tool_use_allowed": false,
+      "permission_denials": [],
+      "passed_bounded_semantic_checks": true,
+      "semantic_check_count": 17,
+      "request_sha256": "adacab7a3156e42b703ef6f5c5a882e6f4f61b53c092e6915e3baac41a53e087",
+      "full_prompt_sha256": "1e34c6b169b5fb53b9295d275c3b2d2a680158f25932fcb3fc9078323f3922d2",
+      "validation_sha256": "201304e0a98d3b819649df7ca5213d1ad61c426aeae6efd64981a22f087e5e5a"
+    }
+  },
+  "supplemental_driver_sha256": "4ac1c1ab8a9e87a9e017a67e5f89b82eb1f3b403d14a9f047ea18182c7c04151",
+  "supplemental_completed_utc": "2026-10-27T09:03:49.874385+00:00"
+}

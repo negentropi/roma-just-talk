@@ -1,0 +1,126 @@
+{
+  "checks" : [
+    {
+      "passed" : true,
+      "requirement" : "Returns nonempty output"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves Atlas exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves Mina exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves Friday exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves 10:30 exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves Taipei Main Station exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves RJT-482 exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: review"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: moved or rescheduled or now scheduled or now on"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: reply or replies or respond or responding or response"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits hello"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits dear Mina"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits thank you"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits patience"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits here is"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits here's"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Uses English rather than untranslated Japanese or Chinese"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Uses at most 35 words"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Uses at most 1 sentence"
+    }
+  ],
+  "fixture" : {
+    "alternativeFacts" : [
+      [
+        "review"
+      ],
+      [
+        "moved",
+        "rescheduled",
+        "now scheduled",
+        "now on"
+      ],
+      [
+        "reply",
+        "replies",
+        "respond",
+        "responding",
+        "response"
+      ]
+    ],
+    "exactTerms" : [
+      "Atlas",
+      "Mina",
+      "Friday",
+      "10:30",
+      "Taipei Main Station",
+      "RJT-482"
+    ],
+    "expectedLanguage" : "english",
+    "forbiddenPhrases" : [
+      "hello",
+      "dear Mina",
+      "thank you",
+      "patience",
+      "here is",
+      "here's"
+    ],
+    "id" : "concise-selection",
+    "kind" : "rewriteSelection",
+    "maximumSentences" : 1,
+    "maximumWords" : 35,
+    "selectedText" : "Hello Mina. This is a fairly long update about our Atlas project. I am writing to let you know that we moved the review to Friday at 10:30 at Taipei Main Station. Please use ticket RJT-482 when you reply. Thank you for your patience and understanding.",
+    "targetLanguage" : "",
+    "transcript" : "Rewrite this as one concise sentence. Preserve who the update is for, what changed, the time and place, and the reply instructions. Do not add a greeting or sign-off."
+  },
+  "output" : "Mina, the Atlas project review has moved to Friday at 10:30 at Taipei Main Station; please use ticket RJT-482 when you reply.",
+  "passed" : true
+}

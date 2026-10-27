@@ -1,0 +1,12 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "num_turns": 1,
+  "result": "Mina, the Atlas review has moved to Friday at 10:30 at Taipei Main Station, so please include ticket RJT-482 in your reply.",
+  "reported_models": [
+    "claude-opus-5-5"
+  ],
+  "original_cli_result_sha256": "28dbd4f5db0cd291cd8c02d077dc4006dbeb493165eb0b8b8fd5dc7768ed0545",
+  "retention_note": "Selected observed fields only. Session identifiers, timing, usage, cost, and other ambient CLI metadata are intentionally not retained."
+}

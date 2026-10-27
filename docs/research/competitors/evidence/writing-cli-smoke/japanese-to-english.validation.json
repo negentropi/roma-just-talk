@@ -1,0 +1,85 @@
+{
+  "checks" : [
+    {
+      "passed" : true,
+      "requirement" : "Returns nonempty output"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves RJT-482 exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: Taipei Main Station or Taipei Station or Taipei Railway Station"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: south exit or southern exit or south entrance or southern entrance"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: tomorrow"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: 3 p.m. or 3 pm or 3pm or 3:00 p.m. or 3:00 pm or 3:00pm or 15:00 or three in the afternoon or 3 in the afternoon or three p.m."
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits here is the translation"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits here's the translation"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Uses English rather than untranslated Japanese or Chinese"
+    }
+  ],
+  "fixture" : {
+    "alternativeFacts" : [
+      [
+        "Taipei Main Station",
+        "Taipei Station",
+        "Taipei Railway Station"
+      ],
+      [
+        "south exit",
+        "southern exit",
+        "south entrance",
+        "southern entrance"
+      ],
+      [
+        "tomorrow"
+      ],
+      [
+        "3 p.m.",
+        "3 pm",
+        "3pm",
+        "3:00 p.m.",
+        "3:00 pm",
+        "3:00pm",
+        "15:00",
+        "three in the afternoon",
+        "3 in the afternoon",
+        "three p.m."
+      ]
+    ],
+    "exactTerms" : [
+      "RJT-482"
+    ],
+    "expectedLanguage" : "english",
+    "forbiddenPhrases" : [
+      "here is the translation",
+      "here's the translation"
+    ],
+    "id" : "japanese-to-english",
+    "kind" : "translate",
+    "selectedText" : "",
+    "targetLanguage" : "en",
+    "transcript" : "明日の午後3時に台北駅の南口で会いましょう。確認コードは RJT-482 です。"
+  },
+  "output" : "Let's meet at the south exit of Taipei Station at 3 p.m. tomorrow. The confirmation code is RJT-482.",
+  "passed" : true
+}

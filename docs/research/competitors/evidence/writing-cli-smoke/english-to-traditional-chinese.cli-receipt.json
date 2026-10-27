@@ -1,0 +1,12 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "num_turns": 1,
+  "result": "明天下午3點在台北車站南出口跟我碰面。確認碼是 RJT-482。",
+  "reported_models": [
+    "claude-opus-5-5"
+  ],
+  "original_cli_result_sha256": "eb97df66888ba0501a8af9b44588084898ba3cf1e5fe785809ef87d8f6213a72",
+  "retention_note": "Selected observed fields only. Session identifiers, timing, usage, cost, and ambient CLI metadata are not retained."
+}

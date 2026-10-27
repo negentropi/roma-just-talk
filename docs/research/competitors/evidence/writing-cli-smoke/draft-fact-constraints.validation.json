@@ -1,0 +1,89 @@
+{
+  "fixture": {
+    "id": "draft-fact-constraints",
+    "kind": "draft",
+    "transcript": "Write one short sentence to Mina about Atlas. Say the review moved to Friday at 10:30 at Taipei Main Station, and ask Mina to include ticket RJT-482 in her reply. No greeting, sign-off, promises, links, or invented facts.",
+    "selectedText": "",
+    "targetLanguage": ""
+  },
+  "output": "Mina, the Atlas review has moved to Friday at 10:30 at Taipei Main Station, so please include ticket RJT-482 in your reply.",
+  "checks": [
+    {
+      "requirement": "Nonempty output",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves confirmation or reply token RJT-482",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves Taipei station location",
+      "passed": true
+    },
+    {
+      "requirement": "Does not add a service preface",
+      "passed": true
+    },
+    {
+      "requirement": "Does not claim an external action",
+      "passed": true
+    },
+    {
+      "requirement": "Does not invent a link",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves mina",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves atlas",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves review",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves friday",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves 10:30",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves reply",
+      "passed": true
+    },
+    {
+      "requirement": "Preserves review rescheduling",
+      "passed": true
+    },
+    {
+      "requirement": "Asks for the ticket in the reply",
+      "passed": true
+    },
+    {
+      "requirement": "Does not negate the ticket request",
+      "passed": true
+    },
+    {
+      "requirement": "One concise sentence",
+      "passed": true
+    },
+    {
+      "requirement": "No greeting or sign-off",
+      "passed": true
+    },
+    {
+      "requirement": "No added promise",
+      "passed": true
+    },
+    {
+      "requirement": "No added numeric facts",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

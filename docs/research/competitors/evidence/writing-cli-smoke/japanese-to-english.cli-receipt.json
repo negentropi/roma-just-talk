@@ -1,0 +1,12 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "num_turns": 1,
+  "result": "Let's meet at the south exit of Taipei Station at 3 p.m. tomorrow. The confirmation code is RJT-482.",
+  "reported_models": [
+    "claude-opus-5-5"
+  ],
+  "original_cli_result_sha256": "57da6fc62f08e77e899f5ecc6712c82937cad2add0f2f95d0d5067395b6d30ee",
+  "retention_note": "Selected observed fields only. Session identifiers, timing, usage, cost, and ambient CLI metadata are not retained."
+}

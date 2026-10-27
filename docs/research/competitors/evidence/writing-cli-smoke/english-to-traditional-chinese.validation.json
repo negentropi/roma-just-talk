@@ -1,0 +1,113 @@
+{
+  "checks" : [
+    {
+      "passed" : true,
+      "requirement" : "Returns nonempty output"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves RJT-482 exactly"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: 台北車站 or 臺北車站 or 台北火車站 or 臺北火車站"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: 南口 or 南出口 or 南側出口 or 南邊出口"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: 明天 or 明日"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: 下午3 or 下午 3 or 下午三 or 午後3 or 午後 3 or 15:00"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Preserves fact: 確認 or 代碼 or 代號 or 編號"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits 车站"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits 确认"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits 代码"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits 见面"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits 请"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Omits 会面"
+    },
+    {
+      "passed" : true,
+      "requirement" : "Contains Chinese text"
+    }
+  ],
+  "fixture" : {
+    "alternativeFacts" : [
+      [
+        "台北車站",
+        "臺北車站",
+        "台北火車站",
+        "臺北火車站"
+      ],
+      [
+        "南口",
+        "南出口",
+        "南側出口",
+        "南邊出口"
+      ],
+      [
+        "明天",
+        "明日"
+      ],
+      [
+        "下午3",
+        "下午 3",
+        "下午三",
+        "午後3",
+        "午後 3",
+        "15:00"
+      ],
+      [
+        "確認",
+        "代碼",
+        "代號",
+        "編號"
+      ]
+    ],
+    "exactTerms" : [
+      "RJT-482"
+    ],
+    "expectedLanguage" : "traditionalChinese",
+    "forbiddenPhrases" : [
+      "车站",
+      "确认",
+      "代码",
+      "见面",
+      "请",
+      "会面"
+    ],
+    "id" : "english-to-traditional-chinese",
+    "kind" : "translate",
+    "selectedText" : "",
+    "targetLanguage" : "zh-Hant",
+    "transcript" : "Meet me at the south exit of Taipei Main Station tomorrow at 3 p.m. The confirmation code is RJT-482."
+  },
+  "output" : "明天下午3點在台北車站南出口跟我碰面。確認碼是 RJT-482。",
+  "passed" : true
+}

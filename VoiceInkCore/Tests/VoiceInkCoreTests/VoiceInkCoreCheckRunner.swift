@@ -10,6 +10,23 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testExpansionReportsMatchesEvenWhenSavedContentEqualsTrigger", run: { SpokenSnippetsTests().testExpansionReportsMatchesEvenWhenSavedContentEqualsTrigger() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testEntireSnippetRecognizesOnlyCompleteEnabledTriggerAndRecognitionPunctuation", run: { SpokenSnippetsTests().testEntireSnippetRecognizesOnlyCompleteEnabledTriggerAndRecognitionPunctuation() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testBareTriggerPreservesExactMultilineContentWithoutRecognitionPunctuation", run: { SpokenSnippetsTests().testBareTriggerPreservesExactMultilineContentWithoutRecognitionPunctuation() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testInlineExpansionUsesLongestMatchWithoutExpandingSavedContentAgain", run: { SpokenSnippetsTests().testInlineExpansionUsesLongestMatchWithoutExpandingSavedContentAgain() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testLatinAndUnicodeWordBoundariesPreventSubstringExpansion", run: { SpokenSnippetsTests().testLatinAndUnicodeWordBoundariesPreventSubstringExpansion() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testCJKAndThaiTriggersExpandInsideUnspacedWriting", run: { SpokenSnippetsTests().testCJKAndThaiTriggersExpandInsideUnspacedWriting() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testDisabledSnippetsDoNotExpandOrChangeUnmatchedText", run: { SpokenSnippetsTests().testDisabledSnippetsDoNotExpandOrChangeUnmatchedText() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testValidationRejectsBlankOversizedAndCanonicalDuplicateTriggers", run: { SpokenSnippetsTests().testValidationRejectsBlankOversizedAndCanonicalDuplicateTriggers() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testPersistenceKeepsIDsAndExactContentAcrossReload", run: { try SpokenSnippetsTests().testPersistenceKeepsIDsAndExactContentAcrossReload() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testInvalidSaveLeavesExistingPreferencesUntouched", run: { try SpokenSnippetsTests().testInvalidSaveLeavesExistingPreferencesUntouched() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testMalformedSavedDataIsIgnoredWithoutErasingIt", run: { SpokenSnippetsTests().testMalformedSavedDataIsIgnoredWithoutErasingIt() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testCSVExportImportRoundTripsCommasQuotesNewlinesAndEnabledState", run: { try SpokenSnippetsTests().testCSVExportImportRoundTripsCommasQuotesNewlinesAndEnabledState() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testCSVTwoColumnImportDefaultsEnabledAndSupportsBOMAndCRLF", run: { SpokenSnippetsTests().testCSVTwoColumnImportDefaultsEnabledAndSupportsBOMAndCRLF() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testMalformedCSVAndInvalidRowsCannotBeMergedPartially", run: { SpokenSnippetsTests().testMalformedCSVAndInvalidRowsCannotBeMergedPartially() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testCSVPreviewMakesExistingAndIncomingDuplicatesExplicit", run: { SpokenSnippetsTests().testCSVPreviewMakesExistingAndIncomingDuplicatesExplicit() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testConflictPolicyKeepsReplacesOrRejectsWithoutChangingUnrelatedEntries", run: { try SpokenSnippetsTests().testConflictPolicyKeepsReplacesOrRejectsWithoutChangingUnrelatedEntries() }),
+            VoiceInkCoreCheck(name: "SpokenSnippetsTests.testImportRejectsMoreThanOneThousandEntries", run: { SpokenSnippetsTests().testImportRejectsMoreThanOneThousandEntries() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testProviderRepairNeverSilentlyRoutesAudioIntoOrOutOfNVIDIA", run: { NVIDIACloudModelTests().testProviderRepairNeverSilentlyRoutesAudioIntoOrOutOfNVIDIA() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testCloudEntryPointRejectsMissingKeyAndMalformedAudioBeforeNetwork", run: { await NVIDIACloudModelTests().testCloudEntryPointRejectsMissingKeyAndMalformedAudioBeforeNetwork() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testNVIDIAIsOptionalCloudAndRequiresBothKeyAndSupportedOS", run: { NVIDIACloudModelTests().testNVIDIAIsOptionalCloudAndRequiresBothKeyAndSupportedOS() }),

@@ -1,0 +1,106 @@
+{
+  "axswift": {
+    "revision": "2efa201fa18184de98674165592fd1ecb0c00a6d",
+    "trackedClean": true
+  },
+  "grpc-swift-2": {
+    "revision": "ac33066eb6edb1a21a6ca172ea8184a9b06f3cc7",
+    "trackedClean": true
+  },
+  "grpc-swift-nio-transport": {
+    "revision": "65adb0bc4721a6c4695e1956af9552970c06a59f",
+    "trackedClean": true
+  },
+  "grpc-swift-protobuf": {
+    "revision": "176c5a434fd76f6f479848d1a8f7d44967534168",
+    "trackedClean": true
+  },
+  "keysender": {
+    "revision": "99584bf1a03ab600cc44be89a2dcd98b2dbeb9de",
+    "trackedClean": true
+  },
+  "llmkit": {
+    "revision": "adc2239e2a3c586fd442a8ec1d96dec8e9ae8917",
+    "trackedClean": true
+  },
+  "selectedtextkit": {
+    "revision": "ecbf46d8be541b54296a0836b7ae2f60c0416b72",
+    "trackedClean": true
+  },
+  "swift-algorithms": {
+    "revision": "87e50f483c54e6efd60e885f7f5aa946cee68023",
+    "trackedClean": true
+  },
+  "swift-asn1": {
+    "revision": "d9a5b37470adc940d22c3bcd5ca6953a516b727f",
+    "trackedClean": true
+  },
+  "swift-async-algorithms": {
+    "revision": "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+    "trackedClean": true
+  },
+  "swift-atomics": {
+    "revision": "b601256eab081c0f92f059e12818ac1d4f178ff7",
+    "trackedClean": true
+  },
+  "swift-certificates": {
+    "revision": "84f03fafeca28c19f5fc4b528df3d22ce8896bd7",
+    "trackedClean": true
+  },
+  "swift-collections": {
+    "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+    "trackedClean": true
+  },
+  "swift-crypto": {
+    "revision": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+    "trackedClean": true
+  },
+  "swift-http-structured-headers": {
+    "revision": "933538faa42c432d385f02e07df0ace7c5ecfc47",
+    "trackedClean": true
+  },
+  "swift-http-types": {
+    "revision": "bff4b6903cdc99dda49649dd52f46c11cfd3ed50",
+    "trackedClean": true
+  },
+  "swift-log": {
+    "revision": "c9c6bb9d275ec0d95c3ad16391f3f045dc623104",
+    "trackedClean": true
+  },
+  "swift-nio": {
+    "revision": "6db9d9abd92ad7399b8a564cafbb87d3507245fa",
+    "trackedClean": true
+  },
+  "swift-nio-extras": {
+    "revision": "8e1249b29f92574e05e0d91637f239e378a9a95b",
+    "trackedClean": true
+  },
+  "swift-nio-http2": {
+    "revision": "0f3e54e29c944c2e835ad52159da7d9e1c94ac69",
+    "trackedClean": true
+  },
+  "swift-nio-ssl": {
+    "revision": "322f3c2a4a21df31c84ca416bf65ee5e9059e440",
+    "trackedClean": true
+  },
+  "swift-nio-transport-services": {
+    "revision": "67787bb645a5e67d2edcdfbe48a216cc549222d5",
+    "trackedClean": true
+  },
+  "swift-numerics": {
+    "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+    "trackedClean": true
+  },
+  "swift-protobuf": {
+    "revision": "55d7a1cc5666b85c13464aea1c4b4a90feccb4c8",
+    "trackedClean": true
+  },
+  "swift-service-lifecycle": {
+    "revision": "a18ee16b8039866fd919bdb4e8e906882d4ecc75",
+    "trackedClean": true
+  },
+  "swift-system": {
+    "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+    "trackedClean": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "root": "/tmp/rjt-clarity-semantic-execution-40582234931-9kd7p1ao",
+  "artifact": "/tmp/rjt-clarity-semantic-execution-40582234931-9kd7p1ao/artifact",
+  "evidence": "/tmp/rjt-clarity-semantic-execution-40582234931-9kd7p1ao/observations",
+  "archiveSHA256": "87472be08888ba46543a5569d79f6a229834f3ddeffe89b1919b7d2f0625c596",
+  "bundleIdentifier": "com.negentropi.RomaJustTalk.ClaritySemanticProbe.341894c4db574132bf4c258c6c597b91",
+  "binarySHA256": "48229ec4f6f2134fafc71dc454fc6f4a5d553c18cc22212bd7ca3317485e0feb",
+  "sourceSHA": "74f5289167b121f390cbb9da4e7e23bf614e2f3b",
+  "runnerSHA256": "384e49b2ab75c50ae8521e10e24248f55bf263779b0d8de1d6288d6e29cf82f5",
+  "freshMacSignatureVerified": true
+}

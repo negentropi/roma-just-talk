@@ -1,0 +1,29 @@
+{
+  "appModelLabel": "local-cli",
+  "archiveSHA256": "87472be08888ba46543a5569d79f6a229834f3ddeffe89b1919b7d2f0625c596",
+  "authStatusReceiptSHA256": "9ff78572d13652b54f639851bde38c22ba1dc74dadab12d1534a6154481c6e88",
+  "binarySHA256": "48229ec4f6f2134fafc71dc454fc6f4a5d553c18cc22212bd7ca3317485e0feb",
+  "buildReceiptSHA256": "508e10da9c40434780939f6a0c01c6e450c6fa9bacd3cedc6695035c55cdb069",
+  "bundleIdentifier": "com.negentropi.RomaJustTalk.ClaritySemanticProbe.341894c4db574132bf4c258c6c597b91",
+  "cliSHA256": "ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd",
+  "cliVersion": "2.1.310 (Claude Code)",
+  "inputSHA256": "edc37d6fdf36559699fb3a552b77f0887d708b92d417ff5beeb62cfb39ba17ae",
+  "isolatedSettings": {
+    "bare": true,
+    "disableAllHooks": true,
+    "mcpServers": {},
+    "sessionPersistence": false,
+    "settingSources": [
+      "user"
+    ],
+    "tools": []
+  },
+  "requestConstructorSourceSHA256": "d9bcd4848c64432bfb6c7a92ded6255cb37b77ad43c8fe582bf5f4c2820c88a2",
+  "requestedModel": "default-not-overridden",
+  "rubricBytesCopied": false,
+  "rubricSHA256": "3602f93b6518598dc18c83b165fa557f4f28862b5d692f7c7e387ce03a149ba1",
+  "servedModel": "unavailable-text-mode",
+  "serviceSourceSHA256": "986b0c1fae4a939faec9eed4c46a8c6065f6ed5489a922ed337d88994a06bb98",
+  "sourceContractSHA256": "6cde78e3ec32a9d09bd468a29c4132a8906ec5526347694b16fcbe1e0b11d6a9",
+  "sourceSHA": "74f5289167b121f390cbb9da4e7e23bf614e2f3b"
+}

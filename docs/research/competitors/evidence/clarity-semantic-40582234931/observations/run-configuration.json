@@ -1,0 +1,7 @@
+{
+  "commandTemplate": "exec /bin/bash '/tmp/rjt-clarity-semantic-execution-40582234931-9kd7p1ao/observations/capture-command.sh'",
+  "evidencePath": "/tmp/rjt-clarity-semantic-execution-40582234931-9kd7p1ao/observations",
+  "generationPath": "/tmp/RJT-Clarity-Generation-d_6b_6v5",
+  "inputsPath": "/tmp/rjt-clarity-semantic-execution-40582234931-9kd7p1ao/artifact/clarity-inputs.json",
+  "manifestSHA256": "10d8f5724a48b4378e9e98599aba5ca3381439b45c1d4c8f013977888835a77a"
+}

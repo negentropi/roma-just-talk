@@ -1,0 +1,25 @@
+{
+  "artifacts": [
+    {
+      "githubAndObservedZIP_SHA256": "0d35b106c2a2418c9a085285deaa704d7485cd9c4c62a698095d0cc67bf2cb0e",
+      "id": 12769164491,
+      "name": "roma.clarity-semantic-build-evidence",
+      "zipByteCount": 60129
+    },
+    {
+      "githubAndObservedZIP_SHA256": "1bb45ee3c629e1f5dc1b0cfa9bd414768dfed5bac73fa8e673e04673cc403aac",
+      "id": 12768994779,
+      "name": "roma.clarity-semantic-service-probe",
+      "zipByteCount": 7672952
+    }
+  ],
+  "auditProgramSHA256": "c27a2cc9228008eb461edbb24406bcf98a8ac73e4f99baacdde2a75473c63d0b",
+  "auditedUTC": "2026-10-27T21:04:01.251357+00:00",
+  "githubDownloadsPerArtifact": 1,
+  "host": "decentleftover-pf",
+  "independentExpectedInputsSHA256": "2877ca5c46c41c709761ddcbe84848f8aee4f07799e46d43aeacec8a355ef3de",
+  "localSignedArchive": "/tmp/rjt-clarity-semantic-probe-40582234931/signed-probe.tar.gz",
+  "remoteRoot": "/data/codex/rjt/clarity-semantic-build-40582234931",
+  "signedTarByteCount": 7780060,
+  "signedTarSHA256": "87472be08888ba46543a5569d79f6a229834f3ddeffe89b1919b7d2f0625c596"
+}

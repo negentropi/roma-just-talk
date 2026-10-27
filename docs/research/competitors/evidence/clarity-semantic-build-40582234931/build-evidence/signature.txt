@@ -1,0 +1,23 @@
+Executable=/Users/runner/work/_temp/clarity-semantic-probe/ClaritySemanticProbe.app/Contents/MacOS/ClaritySemanticProbe
+Identifier=com.negentropi.RomaJustTalk.ClaritySemanticProbe.341894c4db574132bf4c258c6c597b91
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=61322 flags=0x2(adhoc) hashes=1908+3 location=embedded
+VersionPlatform=1
+VersionMin=917504
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=35a509361b2b385f3c09b55419015a12285646b7
+CandidateCDHashFull sha256=35a509361b2b385f3c09b55419015a12285646b763877cd113d6cd76b47b2b77
+Hash choices=sha256
+CMSDigest=35a509361b2b385f3c09b55419015a12285646b763877cd113d6cd76b47b2b77
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=10125312
+Executable Segment flags=0x1
+Page size=16384
+CDHash=35a509361b2b385f3c09b55419015a12285646b7
+Signature=adhoc
+Info.plist entries=7
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=36
+Internal requirements count=0 size=12

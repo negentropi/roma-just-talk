@@ -1,0 +1,16 @@
+{
+  "CIWholeProbeBundleSignatureVerification": true,
+  "appLifecycle": false,
+  "editorDelivery": false,
+  "independentLinuxBundleByteVerification": true,
+  "lockSelection": "NVIDIA22 supplies identities; exact26 states come from canonical app41. Both source lockfiles remain frozen.",
+  "microphone": false,
+  "nativeRemoteBuild": true,
+  "profilesOrPipelineActivation": false,
+  "providerAuthenticationExecutedInCI": false,
+  "reviewedRunnerSHA256": "384e49b2ab75c50ae8521e10e24248f55bf263779b0d8de1d6288d6e29cf82f5",
+  "semanticCallsExecutedInCI": 0,
+  "semanticGrading": "not-performed",
+  "strictPackagedRunnerIdentityRetained": true,
+  "userAuthSourceSharedByAllCLIActions": true
+}

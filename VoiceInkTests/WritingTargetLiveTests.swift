@@ -95,6 +95,27 @@ extension VoiceInkTests {
         #endif
     }
 
+    @Test(.enabled(if: LiveWritingEditor.isEnabled))
+    @MainActor func liveWritingStartupContextRespectsOwnerAfterCancellation() async throws {
+        let environment = ProcessInfo.processInfo.environment
+        try #require((environment["TEST_RUNNER_GITHUB_ACTIONS"] ?? environment["GITHUB_ACTIONS"]) == "true")
+        try #require((environment["TEST_RUNNER_RUNNER_ENVIRONMENT"] ?? environment["RUNNER_ENVIRONMENT"]) == "github-hosted")
+        #if LOCAL_BUILD
+        let fixture = try LiveWritingStartupContextFixture()
+        defer { fixture.restore() }
+        do {
+            try await fixture.runCase(cancelWriting: true)
+            try await fixture.runCase(cancelWriting: false)
+            try fixture.saveEvidence(noSetupFailure: true)
+        } catch {
+            try? fixture.saveEvidence(noSetupFailure: false, error: String(describing: error))
+            throw error
+        }
+        #else
+        throw LiveWritingPipelineFailure.localBuildRequired
+        #endif
+    }
+
     @MainActor private func expectLiveTargetChanged(_ target: WritingTarget) async {
         do {
             try await target.replace(with: "MUST NOT BE INSERTED")
@@ -326,6 +347,225 @@ private final class LiveWritingFixedTranscriptSession: TranscriptionSession {
         return text
     }
     func cancel() { Issue.record("The fixed transcript session unexpectedly canceled.") }
+}
+
+@MainActor
+private final class LiveWritingStartupContextFixture {
+    private let environmentFixture: LiveWritingPipelineFixture
+    private let directory: URL
+    private let savedConfigurations: [PowerModeConfig]
+    private let savedActiveConfiguration: PowerModeConfig?
+    private let savedDefaults: [String: Any]
+    private var cases: [String: [String: Any]] = [:]
+    private static let extraPreferenceKeys = [
+        "activeConfigurationId", "powerModePersistConfig",
+        VoiceInkAudioInputPreference.lastUsedMicrophoneDeviceIDKey,
+        VoiceInkRecordingFeedbackPreference.systemMuteModeKey,
+        VoiceInkRecordingFeedbackPreference.legacyIsSystemMuteEnabledKey,
+        VoiceInkRecordingFeedbackPreference.isPauseMediaEnabledKey
+    ]
+
+    init() throws {
+        let defaults = UserDefaults.standard
+        try #require(defaults.object(forKey: "powerModeActiveSession.v1") == nil)
+        let domain = try #require(Bundle.main.bundleIdentifier)
+        let persisted = defaults.persistentDomain(forName: domain) ?? [:]
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent("RJT-Startup-Context-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: path, withIntermediateDirectories: true)
+        directory = path
+        environmentFixture = try LiveWritingPipelineFixture()
+        savedConfigurations = PowerModeManager.shared.configurations
+        savedActiveConfiguration = PowerModeManager.shared.activeConfiguration
+        savedDefaults = Dictionary(uniqueKeysWithValues: Self.extraPreferenceKeys.compactMap { key in
+            persisted[key].map { (key, $0) }
+        })
+        PowerModeManager.shared.configurations = []
+        PowerModeManager.shared.activeConfiguration = nil
+        defaults.set(false, forKey: "powerModePersistConfig")
+        VoiceInkRecordingFeedbackPreference.saveSystemMuteMode(.never)
+        defaults.set(false, forKey: VoiceInkRecordingFeedbackPreference.isPauseMediaEnabledKey)
+        VoiceInkAIEnhancementContextPreference.saveUseClipboardContext(true)
+        VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(true)
+        VoiceInkLocalCLIPreference.saveCommandTemplate("/usr/bin/false")
+    }
+
+    func runCase(cancelWriting: Bool) async throws {
+        let label = cancelWriting ? "canceled-writing" : "active-ordinary"
+        let gate = LiveWritingStartupLoadGate()
+        let whisper = LiveWritingGatedWhisperManager(modelsDirectory: directory, gate: gate)
+        let model = ImportedWhisperModel(fileBaseName: "RJT-Context-\(UUID().uuidString)")
+        whisper.availableModels = [.init(name: model.name, url: directory.appendingPathComponent(model.name + ".bin"))]
+        let fluid = FluidAudioModelManager()
+        let models = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: fluid)
+        models.currentTranscriptionModel = model
+        let enhancement = LiveWritingContextSpy(aiService: AIService(), modelContext: environmentFixture.container.mainContext)
+        let engine = VoiceInkEngine(
+            modelContext: environmentFixture.container.mainContext,
+            whisperModelManager: whisper, transcriptionModelManager: models,
+            qwenRuntimeResult: .failure(LiveWritingPipelineFailure.unusedRecognizerRuntime),
+            enhancementService: enhancement
+        )
+        engine.recordPermissionRequestForTesting = { true }
+        enhancement.isOwnerRecording = { [weak engine] in engine?.recordingState == .recording }
+        let editor = cancelWriting ? try await LiveWritingEditor.open(.textEdit) : nil
+        defer { editor?.close() }
+        let writing: WritingActionSession?
+        if let editor {
+            try await editor.selectOriginalPassage()
+            writing = try WritingActionSession(kind: .rewriteSelection, provider: enhancement.writingActionProviderSnapshot())
+        } else {
+            writing = nil
+        }
+        let starting = Task { await engine.toggleRecord(writingSession: writing) }
+        var startupTask: Task<Void, Never>?
+        var audioURL: URL?
+        do {
+            let gateEntered = await gate.waitUntilEntered()
+            try #require(gateEntered, "The actual recording startup did not reach the Whisper load override.")
+            await starting.value
+            try #require(engine.recordingState == .recording)
+            try #require(whisper.loadCalls == 1)
+            let task = try #require(engine.recordingStartupTask)
+            startupTask = task
+            audioURL = try #require(engine.recordedFile)
+            let audioExists = audioURL.map { FileManager.default.fileExists(atPath: $0.path) } == true
+            try #require(audioExists, "The actual recorder did not create its owned audio file.")
+            if cancelWriting { await engine.cancelRecording() }
+            let detachedAfterCancellation = cancelWriting && engine.recordingStartupTask == nil
+            gate.release()
+            await task.value
+            let wasRecordingAtCompletion = engine.recordingState == .recording
+            if !cancelWriting { await engine.cancelRecording() }
+            let ownerEnded = engine.recordingState == .idle && engine.writingActionKind == nil
+            #expect(ownerEnded)
+            if cancelWriting {
+                #expect(enhancement.clipboardReads == 0, "Canceled writing startup must not capture clipboard context")
+                #expect(enhancement.screenReads == 0, "Canceled writing startup must not capture screen context")
+            } else {
+                #expect(wasRecordingAtCompletion)
+                #expect(enhancement.clipboardReads == 1, "Active ordinary startup must capture clipboard context")
+                #expect(enhancement.screenReads == 1, "Active ordinary startup must capture screen context")
+                let onlyActiveOwnerReads = enhancement.captureStates.allSatisfy { $0 }
+                #expect(onlyActiveOwnerReads)
+            }
+            cases[label] = [
+                "gateEntered": gateEntered, "taskCompleted": true, "ownerEnded": ownerEnded,
+                "recordingCanceled": ownerEnded, "clipboardReads": enhancement.clipboardReads,
+                "screenReads": enhancement.screenReads, "modelLoadCalls": whisper.loadCalls,
+                "actualAudioFileCreated": audioExists,
+                "taskDetachedOnCancellation": detachedAfterCancellation,
+                "wasRecordingAtTaskCompletion": wasRecordingAtCompletion,
+                "captureStatesWereRecording": enhancement.captureStates
+            ]
+        } catch {
+            let taskToDrain = startupTask ?? engine.recordingStartupTask
+            let fileToRemove = audioURL ?? engine.recordedFile
+            gate.release()
+            await engine.cancelRecording()
+            await starting.value
+            await taskToDrain?.value
+            if let fileToRemove, FileManager.default.fileExists(atPath: fileToRemove.path) {
+                do { try FileManager.default.removeItem(at: fileToRemove) }
+                catch { Issue.record("Could not remove owned failed startup audio: \(error)") }
+            }
+            throw error
+        }
+        if let audioURL, FileManager.default.fileExists(atPath: audioURL.path) {
+            try FileManager.default.removeItem(at: audioURL)
+        }
+    }
+
+    func saveEvidence(noSetupFailure: Bool, error: String? = nil) throws {
+        let environment = ProcessInfo.processInfo.environment
+        let path = try #require(environment["RJT_LIVE_WRITING_TARGET_EVIDENCE"] ?? environment["TEST_RUNNER_RJT_LIVE_WRITING_TARGET_EVIDENCE"])
+        let output = URL(fileURLWithPath: path, isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        let receipt: [String: Any] = [
+            "checkpoint": "startup-context-ownership", "test": "liveWritingStartupContextRespectsOwnerAfterCancellation",
+            "version": 1, "cases": cases, "noSetupFailure": noSetupFailure,
+            "error": error as Any? ?? NSNull(), "bundleIdentifier": Bundle.main.bundleIdentifier as Any? ?? NSNull(),
+            "executablePath": Bundle.main.executableURL?.path as Any? ?? NSNull(),
+            "processIdentifier": ProcessInfo.processInfo.processIdentifier,
+            "scope": "Actual engine and recorder with gated Whisper loader and context-call spies; no model weights, transcription or OS context reads"
+        ]
+        try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("startup-context-ownership.json"))
+    }
+
+    func restore() {
+        PowerModeManager.shared.configurations = savedConfigurations
+        PowerModeManager.shared.activeConfiguration = savedActiveConfiguration
+        for key in Self.extraPreferenceKeys {
+            if let value = savedDefaults[key] { UserDefaults.standard.set(value, forKey: key) }
+            else { UserDefaults.standard.removeObject(forKey: key) }
+        }
+        environmentFixture.restore()
+        NotificationManager.shared.dismissNotification()
+        do { try FileManager.default.removeItem(at: directory) }
+        catch { Issue.record("Could not remove owned startup context fixture: \(error)") }
+    }
+}
+
+@MainActor
+private final class LiveWritingContextSpy: AIEnhancementService {
+    private(set) var clipboardReads = 0
+    private(set) var screenReads = 0
+    private(set) var captureStates: [Bool] = []
+    var isOwnerRecording: (() -> Bool)?
+    override func captureClipboardContext() {
+        clipboardReads += 1
+        captureStates.append(isOwnerRecording?() == true)
+    }
+    override func captureScreenContext() async {
+        screenReads += 1
+        captureStates.append(isOwnerRecording?() == true)
+    }
+}
+
+@MainActor
+private final class LiveWritingGatedWhisperManager: WhisperModelManager {
+    private let gate: LiveWritingStartupLoadGate
+    private(set) var loadCalls = 0
+    init(modelsDirectory: URL, gate: LiveWritingStartupLoadGate) {
+        self.gate = gate
+        super.init(modelsDirectory: modelsDirectory)
+    }
+    override func loadModel(_ model: VoiceInkWhisperLocalModelFile) async throws {
+        loadCalls += 1
+        await gate.enter()
+    }
+}
+
+@MainActor
+private final class LiveWritingStartupLoadGate {
+    private var load: CheckedContinuation<Void, Never>?
+    private var observer: CheckedContinuation<Bool, Never>?
+    private var entered = false
+    private var released = false
+    func enter() async {
+        entered = true
+        observer?.resume(returning: true)
+        observer = nil
+        guard !released else { return }
+        await withCheckedContinuation { load = $0 }
+    }
+    func waitUntilEntered() async -> Bool {
+        if entered { return true }
+        let timeout = Task {
+            try? await Task.sleep(for: .seconds(20))
+            guard !Task.isCancelled else { return }
+            observer?.resume(returning: false)
+            observer = nil
+        }
+        let result = await withCheckedContinuation { observer = $0 }
+        timeout.cancel()
+        return result
+    }
+    func release() {
+        released = true
+        load?.resume()
+        load = nil
+    }
 }
 
 private enum LiveWritingFailure: Error, CustomStringConvertible {

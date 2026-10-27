@@ -14,6 +14,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     var partialTranscript: String = ""
     var currentSession: TranscriptionSession?
     private var activeRecordingStartID: UUID?
+    private(set) var recordingStartupTask: Task<Void, Never>?
     private var activePipelineTranscriptionID: UUID?
     private var canceledPipelineTranscriptionIDs = Set<UUID>()
     private var stopRequestedDuringStart = false
@@ -92,6 +93,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
         return enhancementService
     }
 
+    private func invalidateRecordingStartup() {
+        recordingStartupTask?.cancel()
+        recordingStartupTask = nil
+        activeRecordingStartID = nil
+    }
+
     // MARK: - Toggle Record
 
     func toggleWritingAction(_ kind: VoiceInkWritingActionKind) async {
@@ -164,6 +171,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             stopRequestedDuringStart = false
             partialTranscript = ""
             let startID = UUID()
+            invalidateRecordingStartup()
             activeRecordingStartID = startID
             recordingState = .starting
 
@@ -284,7 +292,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                         self.recordedFile = nil
                                     }
                                     self.recordingState = .idle
-                                    self.activeRecordingStartID = nil
+                                    self.invalidateRecordingStartup()
                                     self.stopRequestedDuringStart = false
                                 }
                                 latencyTrace.finish(
@@ -356,8 +364,17 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 return
                             }
 
-                            Task { @MainActor [weak self] in
+                            let capturesDictationContext = writingSession == nil
+                            recordingStartupTask = Task { @MainActor [weak self] in
                                 guard let self else { return }
+                                defer {
+                                    if self.activeRecordingStartID == startID {
+                                        self.recordingStartupTask = nil
+                                    }
+                                }
+                                guard self.activeRecordingStartID == startID,
+                                      !self.shouldCancelRecording,
+                                      !Task.isCancelled else { return }
 
                                 if let model = self.transcriptionModelManager.currentTranscriptionModel {
                                     await model.transcriptionRuntimeResourcePlan.applyRecordingStartupRuntimeState(
@@ -388,7 +405,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                     )
                                 }
 
-                                if self.activeWritingSession == nil, let enhancementService = self.enhancementService {
+                                guard self.activeRecordingStartID == startID,
+                                      !self.shouldCancelRecording,
+                                      !Task.isCancelled else { return }
+                                if capturesDictationContext, let enhancementService = self.enhancementService {
                                     enhancementService.captureClipboardContext()
                                     await enhancementService.captureScreenContext()
                                 }
@@ -411,7 +431,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recordingState = .idle
                             self.activeWritingSession = nil
                             self.recordedFile = nil
-                            self.activeRecordingStartID = nil
+                            self.invalidateRecordingStartup()
                             self.stopRequestedDuringStart = false
                             self.currentSession?.cancel()
                             self.currentSession = nil
@@ -430,7 +450,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             )
                         }
             } else {
-                activeRecordingStartID = nil
+                invalidateRecordingStartup()
                 activeWritingSession = nil
                 activeSpokenSnippets = []
                 recordingState = .idle
@@ -601,7 +621,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             details: "hasSession=\(currentSession != nil) hasFile=\(recordedFile != nil)",
             token: traceToken
         )
-        activeRecordingStartID = nil
+        invalidateRecordingStartup()
         stopRequestedDuringStart = false
         partialTranscript = ""
         recordingState = .transcribing
@@ -793,7 +813,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTrace.currentToken()
         cancelCurrentSession()
-        activeRecordingStartID = nil
+        invalidateRecordingStartup()
         activePipelineTranscriptionID = nil
         canceledPipelineTranscriptionIDs.removeAll()
         shouldCancelRecording = false
@@ -811,6 +831,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     private func requestRecordingCancellation() {
         shouldCancelRecording = true
+        invalidateRecordingStartup()
         activeWritingSession = nil
 
         if recordingState.isPostRecordingProcessing,
@@ -826,7 +847,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     ) async {
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
-        activeRecordingStartID = nil
+        invalidateRecordingStartup()
         activeWritingSession = nil
         stopRequestedDuringStart = false
         await recorder.stopRecording(latencyTraceToken: traceToken)
@@ -941,7 +962,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     func cleanupResources() async {
         logger.notice("cleanupResources: releasing model resources")
-        activeRecordingStartID = nil
+        invalidateRecordingStartup()
         stopRequestedDuringStart = false
         await whisperModelManager.cleanupResources()
         await serviceRegistry.cleanup()

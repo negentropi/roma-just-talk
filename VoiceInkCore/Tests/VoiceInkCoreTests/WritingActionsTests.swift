@@ -96,7 +96,10 @@ final class WritingActionsTests: XCTestCase {
             request: request,
             shouldCancel: { false },
             perform: { _ in self.result("One\nTwo\n") },
-            deliver: { delivered.append($0) }
+            deliver: {
+                await Task.yield()
+                delivered.append($0)
+            }
         )
         XCTAssertEqual(delivered, ["One\nTwo\n"])
         do {
@@ -109,6 +112,25 @@ final class WritingActionsTests: XCTestCase {
             XCTFail("An empty model output must not erase a selection")
         } catch {
             XCTAssertEqual(error as? VoiceInkWritingActionError, .emptyOutput)
+            XCTAssertEqual(delivered, ["One\nTwo\n"])
+        }
+
+        var attemptedDelivery = false
+        do {
+            _ = try await VoiceInkWritingActionExecution.run(
+                request: request,
+                shouldCancel: { false },
+                perform: { _ in self.result("Generated replacement") },
+                deliver: { _ in
+                    await Task.yield()
+                    attemptedDelivery = true
+                    throw WritingActionDeliveryFailure.unavailable
+                }
+            )
+            XCTFail("An asynchronous delivery failure must reach the caller")
+        } catch {
+            XCTAssertTrue(error is WritingActionDeliveryFailure)
+            XCTAssertTrue(attemptedDelivery)
             XCTAssertEqual(delivered, ["One\nTwo\n"])
         }
     }
@@ -124,3 +146,5 @@ final class WritingActionsTests: XCTestCase {
         )
     }
 }
+
+private enum WritingActionDeliveryFailure: Error { case unavailable }

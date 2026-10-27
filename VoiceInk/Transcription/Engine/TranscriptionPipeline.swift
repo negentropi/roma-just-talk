@@ -197,7 +197,9 @@ class TranscriptionPipeline {
                             transcription.aiRequestUserMessage = result.requestUserMessage
                             return result
                         },
-                        deliver: { text in try writingSession.target.replace(with: text) }
+                        deliver: { text in
+                            try await writingSession.target.replace(with: text, shouldCancel: shouldCancel)
+                        }
                     )
                     transcription.transcriptionState = .completed
                 } catch {

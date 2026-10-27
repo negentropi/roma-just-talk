@@ -14,7 +14,7 @@ extension VoiceInkTests {
         let target = try WritingTarget.capture(requiresSelection: true)
         #expect(target.selectedText.utf16.elementsEqual(LiveWritingEditor.passage.utf16))
         let replacement = "Rewritten 台灣\nSecond line"
-        try target.replace(with: replacement)
+        try await target.replace(with: replacement)
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
         try await editor.waitForValue(expected)
         #expect(editor.value?.utf16.elementsEqual(expected.utf16) == true)
@@ -28,7 +28,7 @@ extension VoiceInkTests {
         try await editor.selectOriginalPassage()
         let rangeTarget = try WritingTarget.capture(requiresSelection: true)
         try await editor.select(NSRange(location: 0, length: 3))
-        expectLiveTargetChanged(rangeTarget)
+        await expectLiveTargetChanged(rangeTarget)
         #expect(editor.value == LiveWritingEditor.original)
         editor.record("textedit-range-drift", expected: LiveWritingEditor.original)
 
@@ -37,7 +37,7 @@ extension VoiceInkTests {
         try editor.replaceSelection("User's edit")
         let userEdited = LiveWritingEditor.prefix + "User's edit" + LiveWritingEditor.suffix
         try await editor.waitForValue(userEdited)
-        expectLiveTargetChanged(textTarget)
+        await expectLiveTargetChanged(textTarget)
         #expect(editor.value == userEdited)
         editor.record("textedit-text-drift", expected: userEdited)
 
@@ -49,7 +49,7 @@ extension VoiceInkTests {
         let other = try await LiveWritingEditor.open(.textEdit)
         defer { other.close() }
         try await other.selectOriginalPassage()
-        expectLiveTargetChanged(focusTarget)
+        await expectLiveTargetChanged(focusTarget)
         #expect(editor.value == LiveWritingEditor.original)
         #expect(other.value == LiveWritingEditor.original)
         editor.record("textedit-focus-drift", expected: LiveWritingEditor.original)
@@ -65,7 +65,7 @@ extension VoiceInkTests {
         #expect(target.selectedText.utf16.elementsEqual(LiveWritingEditor.passage.utf16))
         let replacement = "Translated 日本語\nNext paragraph"
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
-        do { try target.replace(with: replacement) }
+        do { try await target.replace(with: replacement) }
         catch {
             editor.recordOperationFailure("safari-replacement-failure", expected: expected)
             throw error
@@ -75,9 +75,9 @@ extension VoiceInkTests {
         editor.record("safari-replacement", expected: expected)
     }
 
-    @MainActor private func expectLiveTargetChanged(_ target: WritingTarget) {
+    @MainActor private func expectLiveTargetChanged(_ target: WritingTarget) async {
         do {
-            try target.replace(with: "MUST NOT BE INSERTED")
+            try await target.replace(with: "MUST NOT BE INSERTED")
             Issue.record("A stale live editor accepted a writing replacement.")
         } catch {
             #expect(error as? WritingTarget.Failure == .targetChanged)

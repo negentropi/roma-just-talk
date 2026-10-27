@@ -136,97 +136,110 @@ struct WritingTargetTests {
         #expect(!WritingTarget.targetMatches(capturedPID: 42, currentPID: nil, isSameElement: true))
     }
 
-    @Test @MainActor func selectedTextSetterReplacesOnlyTheCapturedRange() throws {
+    @Test @MainActor func selectedTextSetterReplacesOnlyTheCapturedRange() async throws {
         let access = FakeWritingAccess(value: "前chosen後", range: NSRange(location: 1, length: 6))
         let target = try access.makeTarget()
 
-        try target.replace(with: "😀 replacement")
+        try await target.replace(with: "😀 replacement")
 
         #expect(access.value == "前😀 replacement後")
         #expect(access.range == NSRange(location: 15, length: 0))
         #expect(access.selectedWrites == 1)
     }
 
-    @Test @MainActor func unsupportedSelectedTextSetterLeavesTheDocumentAndSelectionIntact() throws {
-        let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
-        access.selectedBehavior = .unsupported
-        let target = try access.makeTarget()
-
-        #expect(throws: WritingTarget.Failure.replacementFailed) { try target.replace(with: "😀") }
-
-        #expect(access.value == "prefix old suffix")
-        #expect(access.range == NSRange(location: 7, length: 3))
-        #expect(access.selectedWrites == 1)
-    }
-
-    @Test @MainActor func changedFocusPreventsAnyEditorMutation() throws {
+    @Test @MainActor func cancellationBeforeNativeReplacementLeavesTheSelectionIntact() async throws {
         let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         let target = try access.makeTarget()
-        access.validationFailure = .targetChanged
 
-        #expect(throws: WritingTarget.Failure.targetChanged) { try target.replace(with: "new") }
+        await #expect(throws: CancellationError.self) {
+            try await target.replace(with: "new", shouldCancel: { true })
+        }
 
         #expect(access.value == "prefix old suffix")
         #expect(access.range == NSRange(location: 7, length: 3))
         #expect(access.selectedWrites == 0)
     }
 
-    @Test @MainActor func editsOrSelectionMovementDuringGenerationRemainUntouched() throws {
+    @Test @MainActor func unsupportedSelectedTextSetterLeavesTheDocumentAndSelectionIntact() async throws {
+        let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
+        access.selectedBehavior = .unsupported
+        let target = try access.makeTarget()
+
+        await #expect(throws: WritingTarget.Failure.replacementFailed) { try await target.replace(with: "😀") }
+
+        #expect(access.value == "prefix old suffix")
+        #expect(access.range == NSRange(location: 7, length: 3))
+        #expect(access.selectedWrites == 1)
+    }
+
+    @Test @MainActor func changedFocusPreventsAnyEditorMutation() async throws {
+        let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
+        let target = try access.makeTarget()
+        access.validationFailure = .targetChanged
+
+        await #expect(throws: WritingTarget.Failure.targetChanged) { try await target.replace(with: "new") }
+
+        #expect(access.value == "prefix old suffix")
+        #expect(access.range == NSRange(location: 7, length: 3))
+        #expect(access.selectedWrites == 0)
+    }
+
+    @Test @MainActor func editsOrSelectionMovementDuringGenerationRemainUntouched() async throws {
         let textDrift = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         let textTarget = try textDrift.makeTarget()
         textDrift.value = "prefix old suffix typed"
-        #expect(throws: WritingTarget.Failure.targetChanged) { try textTarget.replace(with: "new") }
+        await #expect(throws: WritingTarget.Failure.targetChanged) { try await textTarget.replace(with: "new") }
         #expect(textDrift.value == "prefix old suffix typed")
         #expect(textDrift.selectedWrites == 0)
 
         let rangeDrift = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         let rangeTarget = try rangeDrift.makeTarget()
         rangeDrift.range = NSRange(location: 0, length: 6)
-        #expect(throws: WritingTarget.Failure.targetChanged) { try rangeTarget.replace(with: "new") }
+        await #expect(throws: WritingTarget.Failure.targetChanged) { try await rangeTarget.replace(with: "new") }
         #expect(rangeDrift.value == "prefix old suffix")
         #expect(rangeDrift.range == NSRange(location: 0, length: 6))
         #expect(rangeDrift.selectedWrites == 0)
     }
 
-    @Test @MainActor func successfulButIneffectiveSetterDoesNotAttemptAnotherMutation() throws {
+    @Test @MainActor func successfulButIneffectiveSetterDoesNotAttemptAnotherMutation() async throws {
         let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         access.selectedBehavior = .unchanged(.success)
         let target = try access.makeTarget()
 
-        #expect(throws: WritingTarget.Failure.replacementUnconfirmed) { try target.replace(with: "new") }
+        await #expect(throws: WritingTarget.Failure.replacementUnconfirmed) { try await target.replace(with: "new") }
 
         #expect(access.value == "prefix old suffix")
         #expect(access.selectedWrites == 1)
     }
 
-    @Test @MainActor func errorAfterPartialMutationDoesNotOverwriteTheChangedDocument() throws {
+    @Test @MainActor func errorAfterPartialMutationDoesNotOverwriteTheChangedDocument() async throws {
         let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         access.selectedBehavior = .overwrite("prefix partial suffix", .cannotComplete)
         let target = try access.makeTarget()
 
-        #expect(throws: WritingTarget.Failure.replacementUnconfirmed) { try target.replace(with: "new") }
+        await #expect(throws: WritingTarget.Failure.replacementUnconfirmed) { try await target.replace(with: "new") }
 
         #expect(access.value == "prefix partial suffix")
         #expect(access.selectedWrites == 1)
     }
 
-    @Test @MainActor func errorAfterConfirmedReplacementDoesNotRepeatTheReplacement() throws {
+    @Test @MainActor func errorAfterConfirmedReplacementDoesNotRepeatTheReplacement() async throws {
         let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         access.selectedBehavior = .replace(.cannotComplete)
         let target = try access.makeTarget()
 
-        try target.replace(with: "new")
+        try await target.replace(with: "new")
 
         #expect(access.value == "prefix new suffix")
         #expect(access.selectedWrites == 1)
     }
 
-    @Test @MainActor func rejectedSelectedTextWriteIsNotRetriedThroughAnotherMutation() throws {
+    @Test @MainActor func rejectedSelectedTextWriteIsNotRetriedThroughAnotherMutation() async throws {
         let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         access.selectedBehavior = .unchanged(.cannotComplete)
         let target = try access.makeTarget()
 
-        #expect(throws: WritingTarget.Failure.replacementFailed) { try target.replace(with: "new") }
+        await #expect(throws: WritingTarget.Failure.replacementFailed) { try await target.replace(with: "new") }
 
         #expect(access.value == "prefix old suffix")
         #expect(access.range == NSRange(location: 7, length: 3))

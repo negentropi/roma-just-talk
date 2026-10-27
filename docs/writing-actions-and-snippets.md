@@ -25,7 +25,11 @@ Translate treats your speech as content to translate. Draft treats it as an inst
 3. Say an instruction such as "Make this shorter" or "Rewrite this in Spanish."
 4. Press the same shortcut to finish.
 
-Keep the original app, field, text, and selection unchanged while processing runs. The app checks them before replacement. It refuses protected fields, read-only selections, and editors that do not expose safe selected-text replacement through Accessibility. It does not replace the whole document as a fallback.
+Keep the original app, field, text, and selection unchanged while processing runs. The app checks them before replacement. It refuses protected fields, read-only selections, and editors that do not expose the information needed to validate a replacement. It does not replace the whole document as a fallback.
+
+Native editors use selected-text Accessibility writes. Browser fields use the captured app's Paste command. The browser route checks the original field, text, selection, cancellation, and clipboard ownership immediately before its single attempt. If a target change or newer clipboard copy is detected, delivery stops.
+
+Browser delivery temporarily uses the clipboard; clipboard contents are not included in the AI request. After confirmed replacement, restoration follows your existing clipboard setting and preserves newer copies. If delivery cannot be confirmed, generated text remains on the clipboard and in History so a delayed paste cannot consume restored, unrelated content. Check the field before trying again.
 
 If generation fails or the destination changes, the instruction is not inserted. Open **History** to recover the recording, transcript, and any generated result. Canceling prevents delivery. Explicit writing actions do not use snippets, ordinary cleanup prompts, screen or clipboard context, or automatic Send.
 

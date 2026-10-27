@@ -154,15 +154,15 @@ public enum VoiceInkWritingActionExecution {
         request: VoiceInkWritingActionRequest,
         shouldCancel: () -> Bool,
         perform: (VoiceInkWritingActionRequest) async throws -> VoiceInkAIEnhancementResult,
-        deliver: (String) throws -> Void
+        deliver: (String) async throws -> Void
     ) async throws -> VoiceInkAIEnhancementResult {
-        guard !shouldCancel() else { throw CancellationError() }
+        guard !Task.isCancelled, !shouldCancel() else { throw CancellationError() }
         let result = try await perform(request)
-        guard !shouldCancel() else { throw CancellationError() }
+        guard !Task.isCancelled, !shouldCancel() else { throw CancellationError() }
         guard !result.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw VoiceInkWritingActionError.emptyOutput
         }
-        try deliver(result.text)
+        try await deliver(result.text)
         return result
     }
 }

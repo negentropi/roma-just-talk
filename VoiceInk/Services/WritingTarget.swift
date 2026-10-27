@@ -12,6 +12,7 @@ final class WritingTarget {
         case protectedField
         case missingSelection
         case targetChanged
+        case clipboardChanged
         case replacementFailed
         case replacementUnconfirmed
 
@@ -27,6 +28,8 @@ final class WritingTarget {
                 return "Select the text you want to edit before starting."
             case .targetChanged:
                 return "The original text or selection changed. Your result is still available to copy."
+            case .clipboardChanged:
+                return "Your clipboard changed before the replacement. Your result is still available to copy."
             case .replacementFailed:
                 return "This app could not replace the text. Your result is still available to copy."
             case .replacementUnconfirmed:
@@ -86,14 +89,21 @@ final class WritingTarget {
         func replaceSelection(_ text: String) -> AXError?
     }
 
+    enum DeliveryRoute {
+        case selectedTextAttribute
+        case systemPaste(CursorTextContextReader.FocusedPasteTarget)
+    }
+
     let selectedText: String
     private let snapshot: TextSnapshot
     private let access: any Access
+    private let route: DeliveryRoute
 
-    init(snapshot: TextSnapshot, access: any Access) {
+    init(snapshot: TextSnapshot, access: any Access, route: DeliveryRoute = .selectedTextAttribute) {
         self.snapshot = snapshot
         self.access = access
         selectedText = snapshot.selectedText
+        self.route = route
     }
 
     static func capture(requiresSelection: Bool) throws -> WritingTarget {
@@ -109,7 +119,8 @@ final class WritingTarget {
               pid == frontmostPID else {
             throw Failure.unsupportedEditor
         }
-        let access = AXAccess(processIdentifier: pid, element: element)
+        let usesSystemPaste = CursorTextContextReader.usesSystemPaste(for: element)
+        let access = AXAccess(processIdentifier: pid, element: element, usesSystemPaste: usesSystemPaste)
         try access.validate()
         guard let snapshot = access.readSnapshot() else {
             throw Failure.unsupportedEditor
@@ -117,19 +128,65 @@ final class WritingTarget {
         if requiresSelection && snapshot.range.length == 0 {
             throw Failure.missingSelection
         }
-        return WritingTarget(snapshot: snapshot, access: access)
+        let route: DeliveryRoute = usesSystemPaste
+            ? .systemPaste(CursorTextContextReader.FocusedPasteTarget(
+                focusedElement: element,
+                processIdentifier: pid,
+                text: snapshot.value,
+                selectedRange: CFRange(location: snapshot.range.location, length: snapshot.range.length)
+            )) : .selectedTextAttribute
+        return WritingTarget(snapshot: snapshot, access: access, route: route)
     }
 
-    func replace(with text: String) throws {
+    func replace(with text: String, shouldCancel: () -> Bool = { false }) async throws {
+        guard !Task.isCancelled, !shouldCancel() else { throw CancellationError() }
         try validateCurrentTarget()
         let expected = snapshot.replacement(text)
 
+        if case .systemPaste(let target) = route {
+            do {
+                let result = try await CursorPaster.pasteWritingReplacement(
+                    text,
+                    expectedValue: expected,
+                    access: MenuPasteAccess(owner: self, target: target),
+                    shouldCancel: shouldCancel
+                )
+                switch result {
+                case .confirmed: return
+                case .notAttempted: throw Failure.replacementFailed
+                case .attemptedUnconfirmed: throw Failure.replacementUnconfirmed
+                }
+            } catch CursorPaster.WritingPasteError.clipboardChanged {
+                throw Failure.clipboardChanged
+            } catch CursorPaster.WritingPasteError.clipboardWriteFailed {
+                throw Failure.replacementFailed
+            }
+        }
+
+        guard !Task.isCancelled, !shouldCancel() else { throw CancellationError() }
         guard let result = access.replaceSelection(text) else {
             throw Failure.replacementFailed
         }
         if observeValue(expected) { return }
         throw result == .success || !matchesCurrentSnapshot()
             ? Failure.replacementUnconfirmed : Failure.replacementFailed
+    }
+
+    private struct MenuPasteAccess: CursorPaster.WritingPasteAccess {
+        let owner: WritingTarget
+        let target: CursorTextContextReader.FocusedPasteTarget
+
+        func validateTarget() throws { try owner.validateCurrentTarget() }
+        func readValue() -> String? {
+            do { try owner.access.validate() } catch { return nil }
+            return owner.access.readValue()
+        }
+        func pressMenu(authorize: () throws -> Void, willAttempt: () -> Void) async throws
+            -> CursorTextContextReader.CapturedMenuAttempt {
+            try await CursorTextContextReader.pressCapturedCommandVMenuItem(
+                target: target, authorize: authorize, willAttempt: willAttempt
+            )
+        }
     }
 
     nonisolated static func targetMatches(
@@ -164,10 +221,12 @@ final class WritingTarget {
     private final class AXAccess: Access {
         let processIdentifier: pid_t
         let element: AXUIElement
+        let usesSystemPaste: Bool
 
-        init(processIdentifier: pid_t, element: AXUIElement) {
+        init(processIdentifier: pid_t, element: AXUIElement, usesSystemPaste: Bool) {
             self.processIdentifier = processIdentifier
             self.element = element
+            self.usesSystemPaste = usesSystemPaste
         }
 
         func validate() throws {
@@ -183,11 +242,16 @@ final class WritingTarget {
             ) else {
                 throw Failure.targetChanged
             }
-            guard WritingTarget.isEditable(element) else { throw Failure.unsupportedEditor }
+            guard WritingTarget.isEditable(element, usesSystemPaste: usesSystemPaste) else {
+                throw Failure.unsupportedEditor
+            }
         }
 
         func readSnapshot() -> TextSnapshot? { WritingTarget.readSnapshot(from: element) }
-        func readValue() -> String? { WritingTarget.string(kAXValueAttribute as CFString, from: element) }
+        func readValue() -> String? {
+            guard AXIsProcessTrusted(), !WritingTarget.isProtected(element) else { return nil }
+            return WritingTarget.string(kAXValueAttribute as CFString, from: element)
+        }
 
         func replaceSelection(_ text: String) -> AXError? {
             guard WritingTarget.isSettable(kAXSelectedTextAttribute as CFString, on: element) else { return nil }
@@ -210,12 +274,16 @@ final class WritingTarget {
         return snapshot
     }
 
-    private static func isEditable(_ element: AXUIElement) -> Bool {
+    private static func isEditable(_ element: AXUIElement, usesSystemPaste: Bool) -> Bool {
         guard let role = string(kAXRoleAttribute as CFString, from: element),
               [kAXTextFieldRole as String, kAXTextAreaRole as String, kAXComboBoxRole as String].contains(role),
               boolean(kAXEnabledAttribute as CFString, from: element) != false,
               boolean("AXEditable" as CFString, from: element) != false else {
             return false
+        }
+        if usesSystemPaste {
+            return boolean("AXEditable" as CFString, from: element) == true
+                || isSettable(kAXValueAttribute as CFString, on: element)
         }
         return isSettable(kAXSelectedTextAttribute as CFString, on: element)
     }

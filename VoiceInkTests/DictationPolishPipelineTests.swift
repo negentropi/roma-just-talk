@@ -364,7 +364,7 @@ extension VoiceInkTests {
                 #expect(canceled.transcriptionModelName == "Owned recording original")
                 await fixture.engineTask { await engine.toggleRecord() }.value
                 let completed = try #require(fixture.records().first { $0.audioFileURL == newURL.absoluteString })
-                #expect(completed.transcriptionState == .completed && completed.dictationProfile == .none)
+                #expect(completed.transcriptionState == .completed && completed.dictationProfile == VoiceInkDictationProfile.none)
                 #expect(completed.transcriptionModelName == newerModel.displayName)
                 #expect(completed.recognitionText == "  New recording. 🧪 ")
                 #expect(fixture.delivered == ["  New recording. 🧪 "])

@@ -196,6 +196,10 @@ private final class LiveWritingEditor {
                 return false
             }
         } catch {
+            recordSetupFailure(
+                kind: kind, token: token, resource: resource, application: application,
+                appElement: appElement, previousWindows: priorWindows
+            )
             Issue.record("Could not claim the live editor; preserved fixture \(directory.path).")
             if let previous, !previous.isTerminated { previous.activate() }
             throw error
@@ -322,11 +326,8 @@ private final class LiveWritingEditor {
     }
 
     func record(_ name: String, expected: String) {
-        let environment = ProcessInfo.processInfo.environment
-        guard let path = environment["RJT_LIVE_WRITING_TARGET_EVIDENCE"]
-            ?? environment["TEST_RUNNER_RJT_LIVE_WRITING_TARGET_EVIDENCE"] else { return }
+        guard let output = Self.evidenceDirectory else { return }
         do {
-            let output = URL(fileURLWithPath: path, isDirectory: true)
             try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
             let receipt: [String: Any] = [
                 "checkpoint": name, "token": token, "bundleIdentifier": kind.bundleIdentifier,
@@ -336,6 +337,209 @@ private final class LiveWritingEditor {
             try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
                 .write(to: output.appendingPathComponent("\(token)-\(name).json"))
         } catch { Issue.record("Could not write live writing evidence: \(error)") }
+    }
+
+    private static var evidenceDirectory: URL? {
+        let environment = ProcessInfo.processInfo.environment
+        return (environment["RJT_LIVE_WRITING_TARGET_EVIDENCE"]
+            ?? environment["TEST_RUNNER_RJT_LIVE_WRITING_TARGET_EVIDENCE"])
+            .map { URL(fileURLWithPath: $0, isDirectory: true) }
+    }
+
+    private static func recordSetupFailure(
+        kind: Kind, token: String, resource: URL, application: NSRunningApplication,
+        appElement: AXUIElement, previousWindows: [AXUIElement]
+    ) {
+        guard let output = evidenceDirectory else { return }
+        _ = AXUIElementSetMessagingTimeout(appElement, 0.2)
+        let currentWindows = windows(in: appElement)
+        let focused = element(kAXFocusedUIElementAttribute, from: appElement)
+        let deadline = Date().addingTimeInterval(5)
+        let focusedMetadata = focused.map { diagnosticNode($0, token: token, resource: resource, deadline: deadline) } ?? [:]
+        let focusedWindow = focused.flatMap { element(kAXWindowAttribute, from: $0) }
+        var ownedWindows: [AXUIElement] = []
+        var summaries: [[String: Any]] = []
+        for window in currentWindows ?? [] {
+            guard Date() < deadline else { break }
+            let tree = diagnosticTree(window, deadline: min(deadline, Date().addingTimeInterval(2)))
+            let owned = tree.nodes.contains { node in
+                guard Date() < deadline else { return false }
+                return [kAXTitleAttribute, kAXDescriptionAttribute, kAXDocumentAttribute].contains {
+                    string($0, from: node)?.contains(token) == true
+                }
+            }
+            if owned { ownedWindows.append(window) }
+            var summary: [String: Any] = [
+                "owned": owned,
+                "existedBeforeLaunch": previousWindows.contains { CFEqual($0, window) },
+                "title": scopedString(kAXTitleAttribute, from: window, token: token),
+                "document": scopedURL(kAXDocumentAttribute, from: window, resource: resource),
+                "visitedNodes": tree.nodes.count, "traversalTruncated": tree.truncated,
+                "childrenAXErrors": tree.errors, "roleCounts": tree.roles
+            ]
+            if owned {
+                var nodes: [[String: Any]] = []
+                for (index, node) in tree.nodes.enumerated() {
+                    guard Date() < deadline else { break }
+                    var metadata = diagnosticNode(node, token: token, resource: resource, deadline: deadline)
+                    metadata["index"] = index
+                    metadata["focused"] = focused.map { CFEqual($0, node) } ?? false
+                    nodes.append(metadata)
+                }
+                summary["nodes"] = nodes
+                summary["metadataTruncated"] = nodes.count != tree.nodes.count
+            }
+            summaries.append(summary)
+        }
+        let focusedOwned = focusedWindow.map { candidate in
+            ownedWindows.contains { CFEqual($0, candidate) }
+        } ?? false
+        let screenshotWindow = ownedWindows.first { window in
+            !previousWindows.contains { CFEqual($0, window) }
+        }
+        let screenshot: String
+        if ownedWindows.count == 1, let screenshotWindow, Date() < deadline {
+            screenshot = captureOwnedWindow(
+                screenshotWindow, application: application, token: token, resource: resource, output: output
+            )
+        } else {
+            screenshot = "not captured; no unique new token-owned window within AX deadline"
+        }
+        let receipt: [String: Any] = [
+            "checkpoint": "setup-failure", "token": token, "bundleIdentifier": kind.bundleIdentifier,
+            "processIdentifier": application.processIdentifier, "resource": resource.absoluteString,
+            "windowsReadable": currentWindows != nil, "windows": summaries,
+            "windowsTruncated": summaries.count != currentWindows?.count,
+            "focusedElementInOwnedWindow": focusedOwned,
+            "focusedElement": focusedMetadata,
+            "screenshot": screenshot, "date": ISO8601DateFormatter().string(from: Date())
+        ]
+        do {
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+                .write(to: output.appendingPathComponent("\(token)-setup-failure.json"))
+        } catch { Issue.record("Could not write live editor setup diagnostics: \(error)") }
+    }
+
+    private static func diagnosticNode(_ node: AXUIElement, token: String, resource: URL, deadline: Date) -> [String: Any] {
+        _ = AXUIElementSetMessagingTimeout(node, 0.1)
+        func read(_ name: String) -> CFTypeRef? {
+            Date() < deadline ? attribute(name, from: node) : nil
+        }
+        let title = read(kAXTitleAttribute) as? String
+        let description = read(kAXDescriptionAttribute) as? String
+        var metadata: [String: Any] = [
+            "role": read(kAXRoleAttribute) as? String ?? "<unavailable>",
+            "subrole": read(kAXSubroleAttribute) as? String ?? "<unavailable>",
+            "title": title.flatMap { $0.contains(token) ? $0 : nil } ?? "<unrelated text redacted>",
+            "description": description.flatMap { $0.contains(token) ? $0 : nil } ?? "<unrelated text redacted>",
+            "url": Date() < deadline ? scopedURL(kAXURLAttribute, from: node, resource: resource) : "<AX deadline reached>"
+        ]
+        guard Date() < deadline,
+              title?.contains(token) == true || description?.contains(token) == true else { return metadata }
+        let value = read(kAXValueAttribute) as? String
+        var settable = DarwinBoolean(false)
+        guard Date() < deadline else { return metadata }
+        let writableResult = AXUIElementIsAttributeSettable(node, kAXSelectedTextAttribute as CFString, &settable)
+        metadata["fixtureValue"] = value ?? "<unavailable>"
+        metadata["expectedValue"] = original
+        metadata["valueUTF16Count"] = value?.utf16.count ?? -1
+        metadata["expectedUTF16Count"] = original.utf16.count
+        metadata["prefixUTF16Count"] = prefix.utf16.count
+        metadata["passageUTF16Count"] = passage.utf16.count
+        metadata["suffixUTF16Count"] = suffix.utf16.count
+        metadata["exactUTF16Equal"] = value?.utf16.elementsEqual(original.utf16) ?? false
+        metadata["canonicalEqual"] = value == original
+        metadata["selectedRangeReadable"] = Date() < deadline && range(from: node) != nil
+        metadata["selectedTextWritable"] = writableResult == .success && settable.boolValue
+        metadata["selectedTextWritableAXError"] = writableResult.rawValue
+        return metadata
+    }
+
+    private static func diagnosticTree(
+        _ root: AXUIElement, deadline: Date
+    ) -> (nodes: [AXUIElement], truncated: Bool, errors: [String: Int], roles: [String: Int]) {
+        var queue = [root]
+        var index = 0
+        var errors: [String: Int] = [:]
+        var roles: [String: Int] = [:]
+        while index < queue.count, queue.count < 512, Date() < deadline {
+            let candidate = queue[index]
+            index += 1
+            _ = AXUIElementSetMessagingTimeout(candidate, 0.1)
+            roles[string(kAXRoleAttribute, from: candidate) ?? "<unavailable>", default: 0] += 1
+            guard Date() < deadline else { break }
+            var rawChildren: CFTypeRef?
+            let result = AXUIElementCopyAttributeValue(candidate, kAXChildrenAttribute as CFString, &rawChildren)
+            if result != .success { errors[String(result.rawValue), default: 0] += 1 }
+            for child in rawChildren as? [AXUIElement] ?? []
+                where !queue.contains(where: { CFEqual($0, child) }) {
+                if queue.count == 512 { break }
+                queue.append(child)
+            }
+        }
+        return (Array(queue.prefix(index)), index < queue.count, errors, roles)
+    }
+
+    private static func scopedString(_ name: String, from node: AXUIElement, token: String) -> String {
+        guard let value = string(name, from: node) else { return "<unavailable>" }
+        return value.contains(token) ? value : "<unrelated text redacted>"
+    }
+
+    private static func scopedURL(_ name: String, from node: AXUIElement, resource: URL) -> String {
+        let raw = attribute(name, from: node)
+        let url = (raw as? URL) ?? (raw as? String).flatMap(URL.init(string:))
+        guard let url else { return "<unavailable>" }
+        return url.isFileURL && url.standardizedFileURL == resource.standardizedFileURL
+            ? url.absoluteString : "<unrelated URL redacted>"
+    }
+
+    private static func captureOwnedWindow(
+        _ window: AXUIElement, application: NSRunningApplication, token: String, resource: URL, output: URL
+    ) -> String {
+        guard CGPreflightScreenCaptureAccess() else { return "not captured; Screen Recording unavailable" }
+        guard string(kAXTitleAttribute, from: window)?.contains(token) == true
+                || scopedURL(kAXDocumentAttribute, from: window, resource: resource) == resource.absoluteString else {
+            return "not captured; active document ownership unproven"
+        }
+        guard
+              let position = attribute(kAXPositionAttribute, from: window),
+              let size = attribute(kAXSizeAttribute, from: window),
+              CFGetTypeID(position) == AXValueGetTypeID(), CFGetTypeID(size) == AXValueGetTypeID() else {
+            return "not captured; owned window bounds unavailable"
+        }
+        var origin = CGPoint.zero
+        var dimensions = CGSize.zero
+        guard AXValueGetValue(position as! AXValue, .cgPoint, &origin),
+              AXValueGetValue(size as! AXValue, .cgSize, &dimensions),
+              let inventory = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
+                as? [[String: Any]] else { return "not captured; window inventory unavailable" }
+        let matches = inventory.filter {
+            guard ($0[kCGWindowOwnerPID as String] as? NSNumber)?.int32Value == application.processIdentifier,
+                  let rawBounds = $0[kCGWindowBounds as String] as? [String: Any],
+                  let bounds = CGRect(dictionaryRepresentation: rawBounds as CFDictionary) else { return false }
+            return abs(bounds.minX - origin.x) < 1 && abs(bounds.minY - origin.y) < 1
+                && abs(bounds.width - dimensions.width) < 1 && abs(bounds.height - dimensions.height) < 1
+        }
+        guard matches.count == 1, let number = matches[0][kCGWindowNumber as String] as? NSNumber else {
+            return "not captured; no unique owned window number"
+        }
+        let image = output.appendingPathComponent("\(token)-setup-failure.png")
+        do {
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+            process.arguments = ["-x", "-o", "-l", number.stringValue, "-t", "png", image.path]
+            process.standardOutput = FileHandle.nullDevice
+            process.standardError = FileHandle.nullDevice
+            try process.run()
+            guard poll(seconds: 2, { !process.isRunning }) else {
+                process.terminate()
+                return "capture timed out"
+            }
+            return process.terminationStatus == 0 && FileManager.default.fileExists(atPath: image.path)
+                ? image.lastPathComponent : "capture failed (\(process.terminationStatus))"
+        } catch { return "capture failed (\(error))" }
     }
 
     private static func wait(_ failure: String, until predicate: () -> Bool) async throws {

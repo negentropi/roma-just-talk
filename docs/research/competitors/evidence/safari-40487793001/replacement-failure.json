@@ -1,0 +1,679 @@
+{
+  "actualPollingDurationMilliseconds" : 2051.7863333333394,
+  "automaticWriteRetry" : false,
+  "diagnosticAXReadTimeoutSource" : "LiveWritingEditor.value and selectedRange",
+  "expectedAppearedAfterError" : false,
+  "expectedUTF16Count" : 58,
+  "expectedValue" : "Before 👩🏽‍💻 Translated 日本語\nNext paragraph after 🧑‍🚀.\n",
+  "finalContentState" : "original",
+  "maximumSamples" : 41,
+  "originalValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+  "phase" : "replacement",
+  "pollingStartBudgetMilliseconds" : 2000,
+  "productionError" : "replacementUnconfirmed",
+  "samples" : [
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 0.67400000000361615,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 0.0009583333309137743,
+      "valueReadMilliseconds" : 0.1690833333327646
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 55.305250000003525,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 54.940166666668233,
+      "valueReadMilliseconds" : 55.135166666673285
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 106.57512500000621,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 106.16500000000428,
+      "valueReadMilliseconds" : 106.39258333333146
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 159.57149999999842,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 158.98850000000664,
+      "valueReadMilliseconds" : 159.18458333332808
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 213.54658333333987,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 213.18787500000269,
+      "valueReadMilliseconds" : 213.32999999999913
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 266.22812499999782,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 265.96374999999739,
+      "valueReadMilliseconds" : 266.09550000000581
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 320.01187500000583,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 319.68349999999646,
+      "valueReadMilliseconds" : 319.83987499999955
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 373.58187499999929,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 373.30154166666318,
+      "valueReadMilliseconds" : 373.43216666666024
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 424.02570833333186,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 423.70508333333134,
+      "valueReadMilliseconds" : 423.84304166667164
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 477.73183333333691,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 477.47354166666867,
+      "valueReadMilliseconds" : 477.59145833333605
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 531.54899999999827,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 531.19700000000591,
+      "valueReadMilliseconds" : 531.37974999999926
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 585.59841666667012,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 585.13837499999966,
+      "valueReadMilliseconds" : 585.34537500000283
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 637.39891666666892,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 637.09995833333721,
+      "valueReadMilliseconds" : 637.23849999999516
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 688.97729166667432,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 688.59620833333679,
+      "valueReadMilliseconds" : 688.75995833333548
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 739.70537499999978,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 739.43574999999839,
+      "valueReadMilliseconds" : 739.57887500000652
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 790.6104583333331,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 790.29070833333037,
+      "valueReadMilliseconds" : 790.42995833333407
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 841.90375000000017,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 841.4297500000032,
+      "valueReadMilliseconds" : 841.58370833333151
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 895.8062500000068,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 895.42887500000745,
+      "valueReadMilliseconds" : 895.58325000000139
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 949.34741666666866,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 949.0076666666738,
+      "valueReadMilliseconds" : 949.13937500000145
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1003.4563333333324,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1002.8007500000058,
+      "valueReadMilliseconds" : 1003.0470833333283
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1055.7785000000024,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1054.983000000007,
+      "valueReadMilliseconds" : 1055.288708333336
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1109.5760416666708,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1109.2552500000038,
+      "valueReadMilliseconds" : 1109.4082083333346
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1162.6113749999972,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1162.3024166666623,
+      "valueReadMilliseconds" : 1162.4472499999997
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1213.5639583333386,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1213.2664583333367,
+      "valueReadMilliseconds" : 1213.4115416666732
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1265.1142916666629,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1264.8541249999994,
+      "valueReadMilliseconds" : 1264.9912916666608
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1318.8839166666639,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1318.5736249999991,
+      "valueReadMilliseconds" : 1318.708000000001
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1372.3085000000026,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1372.0514583333311,
+      "valueReadMilliseconds" : 1372.1671250000043
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1424.3344166666675,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1424.0035833333309,
+      "valueReadMilliseconds" : 1424.1407083333399
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1475.1316250000032,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1474.8212083333385,
+      "valueReadMilliseconds" : 1474.9775416666607
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1526.3888749999951,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1525.7433333333381,
+      "valueReadMilliseconds" : 1526.0647083333367
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1580.2862500000003,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1579.8971250000022,
+      "valueReadMilliseconds" : 1580.1007916666663
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1631.0615000000012,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1630.6757083333282,
+      "valueReadMilliseconds" : 1630.8598749999987
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1683.7447500000026,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1683.3761249999952,
+      "valueReadMilliseconds" : 1683.5360000000037
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1735.1982083333296,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1734.7988333333292,
+      "valueReadMilliseconds" : 1734.987458333336
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1788.3414583333347,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1787.7915416666638,
+      "valueReadMilliseconds" : 1787.9965833333385
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1840.1712499999974,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1839.7997083333307,
+      "valueReadMilliseconds" : 1839.9866249999945
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1894.1912083333391,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1893.8085000000058,
+      "valueReadMilliseconds" : 1894.0186250000011
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1947.9872916666636,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1947.6577083333382,
+      "valueReadMilliseconds" : 1947.8150000000055
+    },
+    {
+      "canonicalExpectedEqual" : false,
+      "contentState" : "original",
+      "elapsedMilliseconds" : 1999.1491666666689,
+      "exactExpectedUTF16" : false,
+      "exactOriginalUTF16" : true,
+      "firstDifferentExpectedUTF16Offset" : 15,
+      "observedUTF16Count" : 38,
+      "observedValue" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+      "selectedRange" : {
+        "length" : 9,
+        "location" : 15
+      },
+      "selectedText" : "target é",
+      "startedMilliseconds" : 1998.6434166666668,
+      "valueReadMilliseconds" : 1998.8358749999975
+    }
+  ]
+}

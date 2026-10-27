@@ -1,0 +1,279 @@
+{
+  "run_id": 40479529231,
+  "head_sha": "2c5058fe3f0c605bc38af812c994bad5b0737239",
+  "artifact_zip": "/data/rjt-writing-check-01a17bef/40479529231/evidence.zip",
+  "artifact_bytes": 209303850,
+  "source_sha_receipt": {
+    "zip_member": "_temp/writing-proof-snapshot/source-sha.txt",
+    "bytes": 41,
+    "sha256": "fa6248659779ebeeb42c8840e099e48aea80905cbdbfc01c60c10d8dc967f1cb"
+  },
+  "source_sha_matches": true,
+  "extraction": "Read existing ZIP; decoded Zstandard xcresult Data blocks with existing Python3.14 compression.zstd; parsed exact serialized string fields. No native execution or xcresulttool performed during extraction.",
+  "unit": {
+    "counts": {
+      "total": 156,
+      "passed": 150,
+      "failed": 0,
+      "skipped": 6,
+      "executed_non_skipped": 150
+    },
+    "aggregate_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~UJdnyfPssUZU2d56fz84yIQ7Xtf0P2QXbch70TZqkz5NmUJkM7eeRIbAlzIuCeCUPcRoy_81RWB7YB1jdKPrSw==",
+    "decoded_sha256": "dd55416d322c9534cec93aeab3bdcffc19ffd6f51c764c95a8c7b2da43d31eb5",
+    "selected_results": {
+      "WritingTargetTests/selectionCannotSplitAnEmojiSurrogatePair()": [
+        "Success"
+      ],
+      "VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()": [
+        "Success"
+      ],
+      "VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()": [
+        "Success"
+      ],
+      "VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()": [
+        "Success"
+      ],
+      "WritingActionEngineTests/permissionWaitReservesOneRecordingStart()": [
+        "Success"
+      ],
+      "WritingActionEngineTests/oldStartupFailureDoesNotClearANewerRecordingStart()": [
+        "Success"
+      ]
+    },
+    "skipped": [
+      "VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+      "VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+      "VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+      "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+      "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+      "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()"
+    ],
+    "count_note": "156 result records include parameterized invocations and 6 gated skips; 150 non-skipped case records passed. Do not call 156 executed."
+  },
+  "live": {
+    "counts": {
+      "total": 3,
+      "passed": 2,
+      "failed": 1,
+      "skipped": 0,
+      "executed_non_skipped": 3
+    },
+    "aggregate_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~rc3ADcIFHI1L4ekd6QhhuKqIIihLM79ewmBKj4lSfAyVw5Vu35emFeeh86WV9JTbjhd4gA49-dNhdArJEfdhjg==",
+    "decoded_sha256": "ba9511937ad785f1783df636095cb511542c84e4f24ef0654b61208cb04d4e0c",
+    "results": [
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+        "status": "Success"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+        "status": "Success"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+        "status": "Failure"
+      }
+    ],
+    "selection_receipt": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/selection/selection-receipt.json",
+      "bytes": 15202,
+      "sha256": "86ce6c34664403bccd89919bfe5e2a4859d2857d9f392cafe6f39bbfd8163b29",
+      "valid": true,
+      "requested_identifiers": [
+        "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+        "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+        "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()"
+      ],
+      "enabled_identifiers": [
+        "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+        "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+        "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()"
+      ]
+    },
+    "observations": [
+      {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-7872D86A-BAB8-427D-B1BD-79D9DDB423F4-textedit-replacement.json",
+        "bytes": 407,
+        "sha256": "515e70228c2b9f6ac6739a5e450cb25c3a632f0b6589ef7a8a27b2c7debec3e1",
+        "checkpoint": "textedit-replacement",
+        "expected_equals_observed_utf8": true
+      },
+      {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-D90EA944-730F-4D7F-8F91-DEA05FE12C08-textedit-focus-drift.json",
+        "bytes": 369,
+        "sha256": "b7a0e94f0b096275aca33e35e718f3e3dd4feced98096d1335d436da6e43c1d8",
+        "checkpoint": "textedit-focus-drift",
+        "expected_equals_observed_utf8": true
+      },
+      {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-D90EA944-730F-4D7F-8F91-DEA05FE12C08-textedit-range-drift.json",
+        "bytes": 369,
+        "sha256": "5eb46036a6952d1086032af6c3c941b2a76383fecfcf127fa73138d8b5e619d6",
+        "checkpoint": "textedit-range-drift",
+        "expected_equals_observed_utf8": true
+      },
+      {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/RJT-Writing-Live-D90EA944-730F-4D7F-8F91-DEA05FE12C08-textedit-text-drift.json",
+        "bytes": 370,
+        "sha256": "e2951ab7afca1186166786ee4b8092539e28a7372db0423e5d73c4a836defb2a",
+        "checkpoint": "textedit-text-drift",
+        "expected_equals_observed_utf8": true
+      }
+    ],
+    "failure_classification": "Safari fixture claim failed before WritingTarget.capture and replacement. Two TextEdit tests executed production capture/replacement or drift-refusal successfully; Safari compatibility remains unproven.",
+    "test_log": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/tests.log",
+      "bytes": 15422,
+      "sha256": "94a02f75d292e9e4e9a62926779e91e93c867c02861064e09ef583b2be511226"
+    }
+  },
+  "matched_regression": {
+    "failure_receipt": {
+      "zip_member": "_temp/writing-feature-regression/failure.json",
+      "bytes": 74,
+      "sha256": "2d72a235cf1b7a9751f3df29e85f929f582015f41575eeafff572a35899b6aea",
+      "content": {
+        "classification": "invalid",
+        "boundary": "baseline-checkout",
+        "exit_code": 1
+      }
+    },
+    "classification": "Invalid setup: Package.resolved byte comparison failed before baseline build or tests. No matched regression execution claim."
+  },
+  "ui": {
+    "counts": {
+      "total": 3,
+      "passed": 0,
+      "failed": 3,
+      "skipped": 0,
+      "executed_non_skipped": 3
+    },
+    "aggregate_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~bUZYMxiU7OR2XFjJCRUShZ83ZyuYcdUd6nHH_f2aHVhx5wk5nKsVmWYeWyxg85Ur-04S1QO3umP_iS1r5kSe0A==",
+    "decoded_sha256": "a367338bc693fdbc3d16180df964a276d67fab65cb0ac55efd220b3789d64d31",
+    "results": [
+      {
+        "identifier": "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+        "status": "Failure"
+      },
+      {
+        "identifier": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+        "status": "Failure"
+      },
+      {
+        "identifier": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+        "status": "Failure"
+      }
+    ],
+    "driver_receipt": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/result.json",
+      "bytes": 479,
+      "sha256": "cceed5fb4c283548a09f2093966f76897763af7387c4fbcdd64208b5aed91dd6",
+      "content": {
+        "classification": "invalid-or-failed",
+        "exit_code": 65,
+        "tests": {
+          "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+            "starts": 1,
+            "results": [
+              "failed"
+            ]
+          },
+          "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+            "starts": 1,
+            "results": [
+              "failed"
+            ]
+          },
+          "testTranslationTargetsReorderSelectAndPersist": {
+            "starts": 1,
+            "results": [
+              "failed"
+            ]
+          }
+        }
+      }
+    },
+    "failure_classification": "All 3 XCTest methods failed the launchApp foreground assertion at WritingFeaturesUITests.swift:180; continueAfterFailure=false prevented feature control interactions.",
+    "test_log": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/tests.log",
+      "bytes": 10640,
+      "sha256": "69a226fe1e6a0001c82ec7bace759223faa58ac5a95c9937d9eeb150cdfbe10a"
+    },
+    "screenshot_export_receipt": {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshot-export.json",
+      "bytes": 133,
+      "sha256": "4a50df8c5c94dac94d392bbad581b63129909faf7bc4da43d5241ab0d612c795",
+      "content": {
+        "source_sha": "2c5058fe3f0c605bc38af812c994bad5b0737239",
+        "export_exit_code": 0,
+        "visual_proof": "missing",
+        "images": []
+      }
+    }
+  },
+  "identities": [
+    {
+      "before": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-before.txt",
+        "bytes": 363,
+        "sha256": "e6724becf8e8011f8eed526ac693b988559edfc97429bf95f25c8bcab10fb013"
+      },
+      "after": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-after.txt",
+        "bytes": 363,
+        "sha256": "e6724becf8e8011f8eed526ac693b988559edfc97429bf95f25c8bcab10fb013"
+      },
+      "unchanged": true,
+      "app_binary_sha256": "b743a85eee5e1248baf72918e1c3c5bf01488b84935414d541087506de5995b6"
+    },
+    {
+      "before": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/identity-before.txt",
+        "bytes": 198,
+        "sha256": "8beb26e4afa893280671eb7aaa336f170dd9697bcd5080a89bf2ec3c356d7c28"
+      },
+      "after": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/identity-after.txt",
+        "bytes": 198,
+        "sha256": "8beb26e4afa893280671eb7aaa336f170dd9697bcd5080a89bf2ec3c356d7c28"
+      },
+      "unchanged": true,
+      "app_binary_sha256": "b743a85eee5e1248baf72918e1c3c5bf01488b84935414d541087506de5995b6"
+    },
+    {
+      "before": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/identity-before.txt",
+        "bytes": 198,
+        "sha256": "8beb26e4afa893280671eb7aaa336f170dd9697bcd5080a89bf2ec3c356d7c28"
+      },
+      "after": {
+        "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/identity-after.txt",
+        "bytes": 198,
+        "sha256": "8beb26e4afa893280671eb7aaa336f170dd9697bcd5080a89bf2ec3c356d7c28"
+      },
+      "unchanged": true,
+      "app_binary_sha256": "b743a85eee5e1248baf72918e1c3c5bf01488b84935414d541087506de5995b6"
+    }
+  ],
+  "same_app_binary_across_unit_live_ui": true,
+  "signature_requirements": [
+    {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "ca30765ce27f991c090a39500ea4d191e303cc0431fc450104e142645dbd8006",
+      "requirement": "cdhash H\"938aacb42b0e49ec7734e8d2af4d6692793b70eb\""
+    },
+    {
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "ca30765ce27f991c090a39500ea4d191e303cc0431fc450104e142645dbd8006",
+      "requirement": "cdhash H\"938aacb42b0e49ec7734e8d2af4d6692793b70eb\""
+    }
+  ],
+  "limits": [
+    "Gated unit skips are not executed provider or native proof.",
+    "Live TextEdit successes do not establish Safari behavior or rich-text compatibility.",
+    "Failed UI launch assertions do not establish feature interaction or visual correctness.",
+    "Invalid matched setup does not establish known-bad red/candidate green."
+  ]
+}

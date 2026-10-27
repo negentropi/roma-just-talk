@@ -1,0 +1,17 @@
+{
+  "source_sha": "479fa1768e554433467b1355e4c8ded962b01627",
+  "production_source": {
+    "path": "VoiceInk/Services/WritingTarget.swift",
+    "sha256": "a8f8dbe6816b7d204570ca8f40817b8fa1c9e9e6e013fa04cb7bafd726d4ed92"
+  },
+  "fixture_source": {
+    "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+    "sha256": "7e0ff22ef6aa83404b40119797a5f1bc2f02796f50ca03492d69a846ec446036"
+  },
+  "extracted_helper_sha256": "cfae356cd080dbb774fa4bb33f7d508e85e03de5d9f7521f70c1327c6b04aeb8",
+  "generated_probe_sha256": "bdf5e8cbf2bd067a501f68b38007c28df0b468266d1cd08907dd576257333617",
+  "driver_sha256": "8a675389f20295e5ef61598b85daf8b7a87da5746555ad0db87dc794024dac26",
+  "extraction": "The byte-identical suffix beginning private enum LiveWritingFailure; production WritingTarget is copied unchanged",
+  "testing_adapter": "Issue.record collects helper diagnostics as failures; no Testing module, AX mock, helper predicate or target behavior substitution",
+  "boundary": "Native production-class and live-fixture diagnosis only; full application gates remain required"
+}

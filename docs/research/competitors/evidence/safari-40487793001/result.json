@@ -1,0 +1,19 @@
+{
+  "accessibilityTrusted" : true,
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk.WritingTargetProbe",
+  "checks" : {
+    "captured-selection-exact" : true,
+    "drift-left-original-untouched" : true,
+    "selected-range-drift-refused" : true
+  },
+  "classification" : "invalid-or-failed",
+  "error" : "replacementUnconfirmed",
+  "executablePath" : "\/Users\/runner\/work\/_temp\/writing-target-probe\/WritingTargetProbe.app\/Contents\/MacOS\/WritingTargetProbe",
+  "fixtureIssues" : [
+
+  ],
+  "phase" : "replacement",
+  "processIdentifier" : 1406,
+  "scope" : "Production WritingTarget plus the extracted live Safari helper; not full app E2E",
+  "screenCaptureGranted" : true
+}

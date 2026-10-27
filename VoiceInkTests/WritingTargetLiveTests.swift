@@ -167,6 +167,161 @@ extension VoiceInkTests {
     }
 }
 
+extension VoiceInkTests {
+    @Test(.enabled(if: DictationPolishLiveInputs.isEnabled), .timeLimit(.minutes(5)))
+    @MainActor func liveDictationPolishPipelineDeliversLiteralTextToTextEdit() async throws {
+        let environment = try DictationPolishLiveEnvironment(testName: "liveDictationPolishPipelineDeliversLiteralTextToTextEdit")
+        let fixture = try LiveDictationPolishPipelineFixture(environment: environment)
+        var receipt = environment.hostReceipt
+        receipt["sourcePath"] = #filePath
+        do {
+            var scenarios: [[String: Any]] = []
+            for scenario in ["light", "clarity-success", "clarity-fallback"] {
+                scenarios.append(try await fixture.run(scenario))
+            }
+            try fixture.close()
+            try environment.close()
+            receipt["scenarios"] = scenarios
+            receipt["ownedCleanupCompleted"] = true
+            receipt["classification"] = "passed"
+            receipt["scope"] = "Actual ordinary pipeline, native TextEdit insertion and actual Local CLI child; fixed synthetic recognition and JSON output."
+            receipt["limitations"] = "No microphone, ASR or model semantics in this editor case; no physical keyboard, crash/relaunch durability or arbitrary editor claim."
+            try environment.write(receipt)
+        } catch {
+            try? fixture.close()
+            try? environment.close()
+            receipt["classification"] = "failed"
+            receipt["failure"] = String(describing: error)
+            try? environment.write(receipt)
+            throw error
+        }
+    }
+}
+
+@MainActor
+private final class LiveDictationPolishPipelineFixture {
+    private let environment: DictationPolishLiveEnvironment
+    private let provider = LiveWritingUnusedRecognizerProvider()
+    private let initialClipboardGeneration: Int
+    private var closed = false
+
+    init(environment: DictationPolishLiveEnvironment) throws {
+        self.environment = environment
+        initialClipboardGeneration = NSPasteboard.general.changeCount
+        CursorPaster.configureAccessibilityTextInserterForTesting()
+        CursorPaster.configurePasteCommandPosterForTesting()
+        environment.context.insert(WordReplacement(originalText: "Roma", replacementText: DictationPolishLiveEnvironment.replacement))
+        try environment.context.save()
+        DictionaryService.invalidateWordReplacementCache()
+    }
+
+    func run(_ scenario: String) async throws -> [String: Any] {
+        let profile: VoiceInkDictationProfile = scenario == "light" ? .light : .clarity
+        let fails = scenario == "clarity-fallback"
+        profile.save()
+        VoiceInkClarityStyle.natural.save()
+        let command = try environment.installCommand(label: scenario, fails: fails)
+        let plan = DictationPostprocessingPlan.capture(profile: profile, using: environment.context,
+            enhancementService: environment.enhancement)
+        // A later live command/style/library change must not retarget this captured plan.
+        environment.ai.updateLocalCLICommandTemplate("/usr/bin/false")
+        VoiceInkClarityStyle.formal.save()
+        let rule = try #require(try environment.context.fetch(FetchDescriptor<WordReplacement>()).first)
+        rule.replacementText = "MUST NOT USE LATER RULE"
+        try environment.context.save()
+        DictionaryService.invalidateWordReplacementCache()
+        defer {
+            rule.replacementText = DictationPolishLiveEnvironment.replacement
+            do { try environment.context.save() } catch { Issue.record("Could not restore owned native rule: \(error)") }
+            DictionaryService.invalidateWordReplacementCache()
+        }
+        let raw = "Um, Roma confirms this.\r\n"
+        let prepared = profile == .light
+            ? DictationPolishLiveEnvironment.replacement + " confirms this.\r\n"
+            : "Um, " + DictationPolishLiveEnvironment.replacement + " confirms this.\r\n"
+        let output = fails ? raw : (profile == .light ? prepared : DictationPolishLiveEnvironment.enhanced)
+        let registry = TranscriptionServiceRegistry(modelProvider: provider, modelsDirectory: environment.directory,
+            modelContext: environment.context, qwenRuntimeResult: .failure(LiveWritingPipelineFailure.unusedRecognizerRuntime))
+        var warnings: [String] = []
+        let pipeline = TranscriptionPipeline(modelContext: environment.context, serviceRegistry: registry,
+            enhancementService: environment.enhancement, reportProcessingFailure: { warnings.append($0) })
+        let editor = try await LiveWritingEditor.open(.textEdit)
+        defer { editor.close() }
+        try await editor.selectOriginalPassage()
+        let session = LiveWritingFixedTranscriptSession(text: raw)
+        let audio = command.appendingPathComponent("synthetic-recognition.wav")
+        let record = Transcription(text: "", duration: 1, audioFileURL: audio.absoluteString)
+        environment.context.insert(record)
+        var dismissals = 0
+        await pipeline.run(transcription: record, audioURL: audio,
+            model: TranscriptionModelRegistry.defaultMacOSFluidAudioModel,
+            session: session, spokenSnippets: [], dictationPlan: plan, latencyTraceToken: nil,
+            onStateChange: { _ in }, shouldCancel: { false },
+            onCancel: { Issue.record("Native polish pipeline unexpectedly canceled.") },
+            onDismiss: { dismissals += 1 })
+        let expectedDocument = LiveWritingEditor.prefix + output + LiveWritingEditor.suffix
+        try await editor.waitForValue(expectedDocument)
+        let observedDocument = try #require(editor.value)
+        let expectedSelection = NSRange(location: LiveWritingEditor.prefix.utf16.count + output.utf16.count, length: 0)
+        let actualSelection = try #require(editor.selectedRange)
+        try #require(DictationPolishLiveInputs.exact(observedDocument, expectedDocument))
+        try #require(actualSelection == expectedSelection)
+        try #require(session.transcribeCalls == 1 && dismissals == 1)
+        let fresh = ModelContext(environment.container)
+        let recordID = record.id
+        let saved = try #require(try fresh.fetch(FetchDescriptor<Transcription>(predicate: #Predicate { $0.id == recordID })).first)
+        try #require(saved.id == record.id && saved.transcriptionState == .completed && saved.dictationProfile == profile)
+        try #require(DictationPolishLiveInputs.exact(try #require(saved.recognitionText), raw))
+        try #require(DictationPolishLiveInputs.exact(saved.text, fails ? raw : prepared))
+        try #require(saved.clarityStyle == (profile == .clarity ? .natural : nil))
+        try #require(warnings.count == (fails ? 1 : 0))
+        if fails {
+            try #require(saved.enhancedText == nil && saved.processingFailureReason?.isEmpty == false)
+            try #require(warnings[0].contains("The original was inserted."))
+        } else {
+            try #require(saved.processingFailureReason == nil)
+            if profile == .clarity {
+                try #require(DictationPolishLiveInputs.exact(try #require(saved.enhancedText), output))
+                try #require(saved.aiEnhancementModelName == "local-cli")
+            } else { try #require(saved.enhancedText == nil) }
+        }
+        // This TextEdit observation requires direct AX insertion; payload equality cannot own a later copy.
+        try #require(NSPasteboard.general.changeCount == initialClipboardGeneration,
+                     "The native AX delivery changed the clipboard; no restoration is authorized.")
+        var result: [String: Any] = [
+            "scenario": scenario, "profile": profile.rawValue, "recordID": saved.id.uuidString,
+            "expectedDocument": expectedDocument, "observedDocument": observedDocument,
+            "expectedSelection": ["location": expectedSelection.location, "length": expectedSelection.length],
+            "observedSelection": ["location": actualSelection.location, "length": actualSelection.length],
+            "utf8Equal": true, "utf16Equal": true, "selectionEqual": true,
+            "warningCount": warnings.count, "warnings": warnings, "recognitionText": saved.recognitionText as Any? ?? NSNull(),
+            "text": saved.text, "enhancedText": saved.enhancedText as Any? ?? NSNull(),
+            "processingFailureReason": saved.processingFailureReason as Any? ?? NSNull(),
+            "syntheticRecognitionCalls": session.transcribeCalls, "dismissals": dismissals
+        ]
+        if profile == .clarity {
+            result.merge(try environment.verifyCommand(command, prepared: prepared, expectedStyle: .natural)) { _, new in new }
+            if !fails {
+                let request = try VoiceInkClarityRequest(transcript: prepared, style: .natural)
+                try #require(saved.aiRequestSystemMessage == request.systemMessage && saved.aiRequestUserMessage == request.userMessage)
+            }
+        } else {
+            try #require(!FileManager.default.fileExists(atPath: command.appendingPathComponent("pid.txt").path))
+            result["actualCLIRequestCount"] = 0
+            result["requestFrozen"] = true
+        }
+        editor.record("polish-" + scenario, expected: expectedDocument)
+        return result
+    }
+
+    func close() throws {
+        guard !closed else { return }
+        closed = true
+        try #require(NSPasteboard.general.changeCount == initialClipboardGeneration,
+                     "Clipboard changed; the native fixture preserves the newer generation.")
+    }
+}
+
 private enum LiveWritingPipelineFailure: Error {
     case localBuildRequired, unusedRecognizerRuntime
 }

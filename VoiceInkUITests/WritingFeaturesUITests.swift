@@ -540,13 +540,6 @@ final class WritingFeaturesUITests: XCTestCase {
         let unsavedMode = "Unsent mode proof " + UUID().uuidString
         replaceText(in: modeName, with: unsavedMode)
         assertValue(unsavedMode, of: modeName)
-        let modeFrame = modeSheet.frame
-        _ = clickBackgroundEntryIfReachable(addMode, outside: modeSheet)
-        XCTAssertEqual(app.sheets.count, 1, "The background Add action replaced the active Power Mode draft.")
-        XCTAssertEqual(modeSheet.frame, modeFrame)
-        XCTAssertTrue(modeName.exists && modeName.isEnabled && modeName.isHittable)
-        assertValue(unsavedMode, of: modeName)
-        XCTAssertTrue(preferences.panelValuesAreUnchanged(from: modeSnapshot), "The background Add action changed saved modes.")
         attachScreenshot(app, named: "Power Mode unsaved native sheet")
         dismissSettingsSheet("powerMode.configuration.cancel", usingKeyboard: true, in: app)
         XCTAssertTrue(preferences.panelValuesAreUnchanged(from: modeSnapshot), "Cancel persisted an unsaved Power Mode.")

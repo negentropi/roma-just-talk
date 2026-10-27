@@ -1,0 +1,11 @@
+{
+  "artifactOrLogFetched": false,
+  "canceledByRoot": true,
+  "classification": "canceled-before-metadata-runtime-proof",
+  "conclusion": "cancelled",
+  "metadataUpgradeProof": false,
+  "reason": "Known candidate actor-isolation compiler defect was fixed in the next exact-head retry.",
+  "runID": 40581853947,
+  "sourceSHA": "66e635fd8f1a2491b0ecb21cd5d6c02f996a458c",
+  "status": "completed"
+}

@@ -1,0 +1,46 @@
+{
+  "artifactBytes": 158850082,
+  "artifactID": 12772293325,
+  "artifactSHA256": "624eb01d152baa457e0451eda75482703148bce11610b1fb6b4ed9d73a64e311",
+  "auditorCorrection": "Initial audit expected empty-string root mode key. Actual pathlib root relative key is dot; corrected only that auditor expectation before the passing audit. No production/run receipt changed.",
+  "bothActualSigningGuardsPassed": true,
+  "candidateReopenedSameClone": true,
+  "canonicalPackagePins": 41,
+  "classification": "actual-four-field-metadata-store-upgrade-audited",
+  "exactNewValuesAndIdentifiersSurvivedFreshReopen": true,
+  "historicalNewMetadataNil": true,
+  "hostPIDs": [
+    52880,
+    56159,
+    78888,
+    81319
+  ],
+  "legacyRowsPerModel": 2,
+  "legacyStoredFields": 35,
+  "limits": [
+    "Local four-optional-String migration and explicit draft-adapter scalar persistence only.",
+    "No UI/profile activation, provider calls, CloudKit sync or real user-store upgrade tested.",
+    "Fresh normal app Application Support opened and pre-roll path ran; no microphone inactivity claim."
+  ],
+  "newFieldsPerRecord": 20,
+  "newRecordCount": 3,
+  "originalSeedAndClosedWriteCheckpointImmutable": true,
+  "remoteArtifact": "/data/rjt-writing-check-01a17bef/40581983321/roma.dictation-metadata-store-check.zip",
+  "runID": 40581983321,
+  "schemaDelta": {
+    "newFieldType": "String?",
+    "newFields": [
+      "clarityStyleRawValue",
+      "dictationProfileRawValue",
+      "processingFailureReason",
+      "recognitionText"
+    ],
+    "newTranscriptionStoredAttributeCount": 20,
+    "oldStoredAttributeCount": 35,
+    "otherMetadataAndMeaningfulOrderPreserved": true
+  },
+  "sourceSHA": {
+    "candidate": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  }
+}

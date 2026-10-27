@@ -1,0 +1,52 @@
+{
+  "classification": "actual-dictation-metadata-store-upgrade-passed",
+  "distinct_host_pids": [
+    52880,
+    56159,
+    78888,
+    81319
+  ],
+  "fields_per_new_record": 20,
+  "historical_new_metadata_nil": true,
+  "legacy_values_and_identifiers_equal": true,
+  "limits": [
+    "Four local optional String attributes and explicit draft-adapter scalar persistence only.",
+    "No profile activation, provider call, CloudKit sync, real user store, microphone inactivity or UI proof.",
+    "Actual app initialization opened fresh normal Application Support and attempted recorder pre-roll on the disposable runner."
+  ],
+  "new_record_count": 3,
+  "new_values_and_identifiers_equal_after_reopen": true,
+  "original_seed_immutable": true,
+  "phases": [
+    "seed",
+    "old-reopen",
+    "metadata-write",
+    "metadata-reopen"
+  ],
+  "schema_hashes": {
+    "metadata-reopen": {
+      "canonical_schema_sha256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "f188b7e62a09590a4c59dc30da24e985029aba8931eac1223106ce335821f4bc"
+    },
+    "metadata-write": {
+      "canonical_schema_sha256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "8c2e01962f02e6e93cff4c9b1521629a75bc596533bc5e567082bfc3b89d069a"
+    },
+    "old-reopen": {
+      "canonical_schema_sha256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "91bf1c89dadc19bb379822486813144f8e5f829bb15a25723a4ad1861d9de32c"
+    },
+    "seed": {
+      "canonical_schema_sha256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "legacy_snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "raw_schema_sha256": "c08f750d1c4c70f3e6f25e8f41d04bc002f7b85658cd0459d90cb11cba1ba860"
+    }
+  },
+  "source_sha": {
+    "candidate": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  }
+}

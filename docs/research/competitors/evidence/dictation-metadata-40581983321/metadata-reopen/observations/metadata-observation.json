@@ -1,0 +1,14 @@
+{
+  "additionalRecordCount" : 3,
+  "canceledDraftMetadataCleared" : false,
+  "exactNewFieldValues" : true,
+  "explicitSavePerformed" : false,
+  "historicalMetadataNil" : true,
+  "historicalRowCount" : 2,
+  "hostPID" : 81319,
+  "phase" : "metadata-reopen",
+  "readNilBeforeWrite" : false,
+  "scope" : "Scalar and draft-adapter persistence fixture; values do not activate dictation profiles.",
+  "unknownRawValuesPreservedWithoutRelabeling" : true,
+  "version" : 1
+}

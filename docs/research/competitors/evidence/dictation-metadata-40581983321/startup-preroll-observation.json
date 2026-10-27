@@ -1,0 +1,18 @@
+{
+  "classification": "startup-log-observation",
+  "limit": "Actual app startup used its pre-roll path. This does not prove microphone inactivity or recognition behavior.",
+  "phases": {
+    "metadata-reopen": [
+      "2026-10-27 21:29:34.247685+0000 roma just talk[81319:217710] [Recorder] startPreRollBuffering: active on deviceID=81"
+    ],
+    "metadata-write": [
+      "2026-10-27 21:28:32.110951+0000 roma just talk[78888:209459] [Recorder] startPreRollBuffering: active on deviceID=81"
+    ],
+    "old-reopen": [
+      "2026-10-27 21:18:29.862414+0000 roma just talk[56159:148826] [Recorder] startPreRollBuffering: active on deviceID=81"
+    ],
+    "seed": [
+      "2026-10-27 21:17:09.840087+0000 roma just talk[52880:138635] [Recorder] startPreRollBuffering: active on deviceID=81"
+    ]
+  }
+}

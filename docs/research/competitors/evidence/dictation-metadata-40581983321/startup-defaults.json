@@ -1,0 +1,68 @@
+{
+  "host_initialization_limit": "Actual app initialization unconditionally attempts recorder.startPreRollBuffering(). No recording command or audio fixture is supplied; this check does not establish microphone inactivity.",
+  "model_selection": "Existing cloud-model descriptor prevents local model loading or download; no recognition is requested.",
+  "recording_arguments": [],
+  "scope": "Only exact injected preference keys queried on the disposable user. App initialization still opens normal Application Support stores.",
+  "values": {
+    "CurrentTranscriptionModel": {
+      "type": "string",
+      "value": "whisper-large-v3-turbo"
+    },
+    "DidApplyLaunchAtLoginDefault": {
+      "type": "boolean",
+      "value": "1"
+    },
+    "IsAudioCleanupEnabled": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "IsTranscriptionCleanupEnabled": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "PrewarmModelOnWake": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "SUAutomaticallyUpdate": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "SUEnableAutomaticChecks": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "SUHasLaunchedBefore": {
+      "type": "boolean",
+      "value": "1"
+    },
+    "automaticUpdatesEnabled": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "enableAnnouncements": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "hasCompletedOnboarding": {
+      "type": "boolean",
+      "value": "1"
+    },
+    "isAIEnhancementEnabled": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "isMiddleClickToggleEnabled": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "powerModeUIFlag": {
+      "type": "boolean",
+      "value": "0"
+    },
+    "selectedAIProvider": {
+      "type": "string",
+      "value": "Local CLI"
+    }
+  }
+}

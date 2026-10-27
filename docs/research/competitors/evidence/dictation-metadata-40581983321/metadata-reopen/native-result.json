@@ -1,0 +1,10 @@
+{
+  "test_action_id": "0~8xdtFyFka64R11AlwVMU2siHkjfAuuhD_-AOEghqpHpp7zg5HrSDD5wzONrT_tpipeA-OChCCYejjz_z2KpDSw==",
+  "tests": [
+    {
+      "identifier": "VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+      "status": "Success"
+    }
+  ],
+  "valid": true
+}

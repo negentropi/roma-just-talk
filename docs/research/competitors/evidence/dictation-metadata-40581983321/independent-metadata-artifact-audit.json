@@ -1,0 +1,402 @@
+{
+  "archive": "/data/rjt-writing-check-01a17bef/40581983321/roma.dictation-metadata-store-check.zip",
+  "archiveBytes": 158850082,
+  "archiveSHA256": "624eb01d152baa457e0451eda75482703148bce11610b1fb6b4ed9d73a64e311",
+  "builds": {
+    "candidate": {
+      "appTreeEntries": 669,
+      "archives": {
+        "actual-host.app.zip": {
+          "bytes": 74571707,
+          "sha256": "e5e7e0ce95567a2f4befe5dbefa30f1e2c3368fd546aa447451d7e1ff67149fc"
+        },
+        "actual-tests-0.xctest.zip": {
+          "bytes": 5151186,
+          "sha256": "e563bfb8e2197847fb16f83309ee80317acff25b2d850e1c01048ebd94fb46ea"
+        }
+      },
+      "designatedRequirement": "cdhash H\"7c823d948d3588c252355aa2b63b5f6e1931aa34\"",
+      "executablePath": "/Users/runner/work/_temp/dictation-metadata-store-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "nativeSignatureGuardPassed": true,
+      "testBundleCount": 1
+    },
+    "predecessor": {
+      "appTreeEntries": 669,
+      "archives": {
+        "actual-host.app.zip": {
+          "bytes": 73764131,
+          "sha256": "dcbb6fafabf8fd74dd7129fcb23dc2bc6da5e97219021e14feb173b2397353d4"
+        },
+        "actual-tests-0.xctest.zip": {
+          "bytes": 4547843,
+          "sha256": "4dc76af658e830abfa3bb3cdcaace524d41b2e35c432d578a5f31600f554e179"
+        }
+      },
+      "designatedRequirement": "cdhash H\"d5c991464ef6f62ac4e016fcbf6832d6f93fb865\"",
+      "executablePath": "/Users/runner/work/_temp/dictation-metadata-store-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "nativeSignatureGuardPassed": true,
+      "testBundleCount": 1
+    }
+  },
+  "classification": "independent-metadata-artifact-audit-passed",
+  "distinctHostPIDs": [
+    52880,
+    56159,
+    78888,
+    81319
+  ],
+  "entryCount": 474,
+  "frameworkEntryCount": 121,
+  "legacyFields": 35,
+  "legacyRowsPerModel": 2,
+  "limits": [
+    "Only four local nullable String attributes and explicit draft-adapter scalar persistence. No profile activation, real user-store, CloudKit, provider or UI proof.",
+    "Actual app startup opened fresh normal Application Support and attempted recorder pre-roll. No microphone inactivity claim.",
+    "Both-lane raw Mach-O flags/entitlements are audited separately; retained native guards supply deep/strict macOS signature verification."
+  ],
+  "metadataOracleSHA256": "d6c22e6adccc8f8defe6355d53f5f9a186d6827a6c9a92ba2dd12a19da10a1c0",
+  "newFieldsPerRecord": 20,
+  "newRecordCount": 3,
+  "newValuesAndIdentifiersPersistAfterFreshReopen": true,
+  "oldMetadataNil": true,
+  "oracleSHA256": "cdd61d3e67b96371944d2d59bb41b3313e38fc6116bfda41cf04321352d4acc5",
+  "packageInventories": {
+    "axswift": {
+      "entries": 25,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "eventsource": {
+      "entries": 19,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "fluidaudio": {
+      "entries": 524,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "grpc-swift-2": {
+      "entries": 441,
+      "gitlinks": {},
+      "symlinks": 8
+    },
+    "grpc-swift-nio-transport": {
+      "entries": 220,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "grpc-swift-protobuf": {
+      "entries": 107,
+      "gitlinks": {},
+      "symlinks": 2
+    },
+    "keysender": {
+      "entries": 9,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "launchatlogin-modern": {
+      "entries": 9,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "llmkit": {
+      "entries": 32,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "mediaremote-adapter": {
+      "entries": 13,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "mlx-audio-swift": {
+      "entries": 434,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "mlx-swift": {
+      "entries": 741,
+      "gitlinks": {
+        "Source/Cmlx/mlx": {
+          "nested": {
+            "entries": 883,
+            "gitlinks": {},
+            "symlinks": 0
+          },
+          "object": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+          "state": "initialized"
+        },
+        "Source/Cmlx/mlx-c": {
+          "nested": {
+            "entries": 126,
+            "gitlinks": {},
+            "symlinks": 0
+          },
+          "object": "0726ca922fc902c4c61ef9c27d94132be418e945",
+          "state": "initialized"
+        }
+      },
+      "symlinks": 0
+    },
+    "mlx-swift-lm": {
+      "entries": 273,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "permissionflow": {
+      "entries": 57,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "selectedtextkit": {
+      "entries": 42,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "sparkle": {
+      "entries": 600,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-algorithms": {
+      "entries": 119,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-asn1": {
+      "entries": 212,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-async-algorithms": {
+      "entries": 208,
+      "gitlinks": {},
+      "symlinks": 2
+    },
+    "swift-atomics": {
+      "entries": 144,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-certificates": {
+      "entries": 365,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-collections": {
+      "entries": 842,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-crypto": {
+      "entries": 1044,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-http-structured-headers": {
+      "entries": 69,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-http-types": {
+      "entries": 603,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-huggingface": {
+      "entries": 101,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-jinja": {
+      "entries": 37,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-log": {
+      "entries": 144,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-nio": {
+      "entries": 767,
+      "gitlinks": {},
+      "symlinks": 2
+    },
+    "swift-nio-extras": {
+      "entries": 180,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-nio-http2": {
+      "entries": 614,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-nio-ssl": {
+      "entries": 769,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-nio-transport-services": {
+      "entries": 61,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-numerics": {
+      "entries": 70,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-protobuf": {
+      "entries": 2511,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-service-lifecycle": {
+      "entries": 51,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-syntax": {
+      "entries": 872,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-system": {
+      "entries": 99,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "swift-transformers": {
+      "entries": 95,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "yyjson": {
+      "entries": 903,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "zip": {
+      "entries": 71,
+      "gitlinks": {},
+      "symlinks": 0
+    }
+  },
+  "packagePinCount": 41,
+  "phases": {
+    "metadata-reopen": {
+      "canonicalSchemaSHA256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "fixturePath": "/Users/runner/work/_temp/dictation-metadata-store-proof/stores/metadata",
+      "hostExitUnix": 1793136578.544224,
+      "hostLiveUnix": 1793136574.614802,
+      "hostPID": 81319,
+      "legacySnapshotsSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "nativeTest": {
+        "identifier": "VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+        "status": "Success"
+      },
+      "rawSchemaSHA256": "f188b7e62a09590a4c59dc30da24e985029aba8931eac1223106ce335821f4bc",
+      "sourceSHA": "3ada8372711c0d9a484087ea3e3300e4fac0afba"
+    },
+    "metadata-write": {
+      "canonicalSchemaSHA256": "a384d4178a9c0f5cef58c00ffa01b9c3d1559719e4c49d9d9640bdbcec320f31",
+      "fixturePath": "/Users/runner/work/_temp/dictation-metadata-store-proof/stores/metadata",
+      "hostExitUnix": 1793136516.655531,
+      "hostLiveUnix": 1793136512.160416,
+      "hostPID": 78888,
+      "legacySnapshotsSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "nativeTest": {
+        "identifier": "VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+        "status": "Success"
+      },
+      "rawSchemaSHA256": "8c2e01962f02e6e93cff4c9b1521629a75bc596533bc5e567082bfc3b89d069a",
+      "sourceSHA": "3ada8372711c0d9a484087ea3e3300e4fac0afba"
+    },
+    "old-reopen": {
+      "canonicalSchemaSHA256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "fixturePath": "/Users/runner/work/_temp/dictation-metadata-store-proof/stores/old-reopen",
+      "hostExitUnix": 1793135913.149753,
+      "hostLiveUnix": 1793135909.907855,
+      "hostPID": 56159,
+      "legacySnapshotsSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "nativeTest": {
+        "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+        "status": "Success"
+      },
+      "rawSchemaSHA256": "91bf1c89dadc19bb379822486813144f8e5f829bb15a25723a4ad1861d9de32c",
+      "sourceSHA": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+    },
+    "seed": {
+      "canonicalSchemaSHA256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "fixturePath": "/Users/runner/work/_temp/dictation-metadata-store-proof/stores/seed",
+      "hostExitUnix": 1793135833.3677921,
+      "hostLiveUnix": 1793135829.905243,
+      "hostPID": 52880,
+      "legacySnapshotsSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "nativeTest": {
+        "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+        "status": "Success"
+      },
+      "rawSchemaSHA256": "c08f750d1c4c70f3e6f25e8f41d04bc002f7b85658cd0459d90cb11cba1ba860",
+      "sourceSHA": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+    }
+  },
+  "runID": 40581983321,
+  "schemaDelta": {
+    "newFieldType": "String?",
+    "newFields": [
+      "clarityStyleRawValue",
+      "dictationProfileRawValue",
+      "processingFailureReason",
+      "recognitionText"
+    ],
+    "newTranscriptionStoredAttributeCount": 20,
+    "oldStoredAttributeCount": 35,
+    "otherMetadataAndMeaningfulOrderPreserved": true
+  },
+  "sourceInventories": {
+    "candidate": {
+      "entries": 628,
+      "gitlinks": {},
+      "symlinks": 0
+    },
+    "predecessor": {
+      "entries": 610,
+      "gitlinks": {},
+      "symlinks": 0
+    }
+  },
+  "sourceSHA": {
+    "candidate": "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  },
+  "whisperInventory": {
+    "entries": 2057,
+    "gitlinks": {},
+    "symlinks": 0
+  },
+  "whisperSourceRevision": "21ba6d269a02c14309355cb96822db6058d4cf48",
+  "wholeClosedStores": {
+    "candidateReopen": {
+      "bytes": 356352,
+      "files": 9
+    },
+    "closedWriteCheckpoint": {
+      "bytes": 356352,
+      "files": 9
+    },
+    "oldReopen": {
+      "bytes": 344064,
+      "files": 9
+    },
+    "originalSeed": {
+      "bytes": 344064,
+      "files": 9
+    }
+  },
+  "zipCRCValid": true
+}

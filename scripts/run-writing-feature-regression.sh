@@ -258,14 +258,17 @@ case "$mode" in
       liveWritingTargetTextEditPreservesUnicodeOutsideSelection
       liveWritingTargetTextEditRefusesRangeTextAndFocusDrift
       liveWritingTargetSafariTextareaReplacesOnlySelection
+      liveWritingActionPipelineUsesLocalCLIAndRetainsFailure
     )
     test_arguments "$repo_root" "$debug_dir"
     select_tests "${live_names[@]}"
     RJT_LIVE_WRITING_TARGET_CHECKS=1 TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS=1 \
+      TEST_RUNNER_GITHUB_ACTIONS=true TEST_RUNNER_RUNNER_ENVIRONMENT="$RUNNER_ENVIRONMENT" \
       preflight_selected_tests "$out/selection"
     shasum -a 256 "$debug_app/Contents/MacOS/roma just talk" > "$out/identity-before.txt"
     test_exit=0
     RJT_LIVE_WRITING_TARGET_CHECKS=1 TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS=1 \
+      TEST_RUNNER_GITHUB_ACTIONS=true TEST_RUNNER_RUNNER_ENVIRONMENT="$RUNNER_ENVIRONMENT" \
       RJT_LIVE_WRITING_TARGET_EVIDENCE="$out" TEST_RUNNER_RJT_LIVE_WRITING_TARGET_EVIDENCE="$out" \
       xcodebuild test-without-building "${arguments[@]}" "${selectors[@]}" \
         -resultBundlePath "$out/Live.xcresult" > "$out/tests.log" 2>&1 || test_exit=$?

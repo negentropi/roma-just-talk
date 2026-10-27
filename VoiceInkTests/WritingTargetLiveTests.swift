@@ -1,7 +1,9 @@
 import AppKit
 import Carbon.HIToolbox
 import Foundation
+import SwiftData
 import Testing
+import VoiceInkCore
 @testable import VoiceInk
 
 extension VoiceInkTests {
@@ -75,6 +77,24 @@ extension VoiceInkTests {
         editor.record("safari-replacement", expected: expected)
     }
 
+    @Test(.enabled(if: LiveWritingEditor.isEnabled))
+    @MainActor func liveWritingActionPipelineUsesLocalCLIAndRetainsFailure() async throws {
+        let environment = ProcessInfo.processInfo.environment
+        try #require((environment["TEST_RUNNER_GITHUB_ACTIONS"] ?? environment["GITHUB_ACTIONS"]) == "true")
+        try #require((environment["TEST_RUNNER_RUNNER_ENVIRONMENT"] ?? environment["RUNNER_ENVIRONMENT"]) == "github-hosted")
+        #if LOCAL_BUILD
+        let fixture = try LiveWritingPipelineFixture()
+        defer { fixture.restore() }
+        try await fixture.runCase(succeeds: true)
+        try await fixture.runCase(succeeds: false)
+        let verificationContext = ModelContext(fixture.container)
+        let savedCount = try verificationContext.fetchCount(FetchDescriptor<Transcription>())
+        #expect(savedCount == 2)
+        #else
+        throw LiveWritingPipelineFailure.localBuildRequired
+        #endif
+    }
+
     @MainActor private func expectLiveTargetChanged(_ target: WritingTarget) async {
         do {
             try await target.replace(with: "MUST NOT BE INSERTED")
@@ -83,6 +103,229 @@ extension VoiceInkTests {
             #expect(error as? WritingTarget.Failure == .targetChanged)
         }
     }
+}
+
+private enum LiveWritingPipelineFailure: Error {
+    case localBuildRequired, unusedRecognizerRuntime
+}
+
+@MainActor
+private final class LiveWritingPipelineFixture {
+    let container: ModelContainer
+    private let context: ModelContext
+    private let directory: URL
+    private let evidenceDirectory: URL
+    private let provider = LiveWritingUnusedRecognizerProvider()
+    private let savedDefaults: [String: Any]
+    private let savedSoundEnabled: Bool
+    private static let preferenceKeys = [
+        VoiceInkUserDefaultsKey.selectedAIProvider,
+        VoiceInkUserDefaultsKey.isAIEnhancementEnabled,
+        VoiceInkUserDefaultsKey.useClipboardContext,
+        VoiceInkUserDefaultsKey.useScreenCaptureContext,
+        VoiceInkUserDefaultsKey.customPrompts,
+        VoiceInkUserDefaultsKey.selectedPromptId,
+        VoiceInkUserDefaultsKey.enhancementRetryOnTimeout,
+        VoiceInkLocalCLIPreference.commandTemplateKey,
+        VoiceInkLocalCLIPreference.timeoutSecondsKey,
+        VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey
+    ]
+
+    init() throws {
+        let defaults = UserDefaults.standard
+        let domain = try #require(Bundle.main.bundleIdentifier)
+        let persisted = defaults.persistentDomain(forName: domain) ?? [:]
+        let environment = ProcessInfo.processInfo.environment
+        let evidencePath = try #require(environment["RJT_LIVE_WRITING_TARGET_EVIDENCE"] ?? environment["TEST_RUNNER_RJT_LIVE_WRITING_TARGET_EVIDENCE"])
+        evidenceDirectory = URL(fileURLWithPath: evidencePath, isDirectory: true)
+        let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
+        container = try ModelContainer(for: schema, configurations: [ModelConfiguration(
+            "LiveWritingPipeline-\(UUID().uuidString)", schema: schema,
+            isStoredInMemoryOnly: true, groupContainer: .none, cloudKitDatabase: .none
+        )])
+        context = container.mainContext
+        context.autosaveEnabled = false
+        directory = FileManager.default.temporaryDirectory.appendingPathComponent("RJT-Writing-Pipeline-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        savedDefaults = Dictionary(uniqueKeysWithValues: Self.preferenceKeys.compactMap { key in
+            persisted[key].map { (key, $0) }
+        })
+        savedSoundEnabled = SoundManager.shared.isEnabled
+        VoiceInkAIEnhancementProviderPreference.saveSelectedProvider(.localCLI)
+        VoiceInkAIEnhancementPreference.saveIsEnabled(false)
+        VoiceInkAIEnhancementContextPreference.saveUseClipboardContext(false)
+        VoiceInkAIEnhancementContextPreference.saveUseScreenCaptureContext(false)
+        defaults.set(false, forKey: VoiceInkUserDefaultsKey.enhancementRetryOnTimeout)
+        VoiceInkLocalCLIPreference.saveTimeoutSeconds(5)
+        SoundManager.shared.isEnabled = false
+    }
+
+    func runCase(succeeds: Bool) async throws {
+        let label = succeeds ? "success" : "failure"
+        let receipts = directory.appendingPathComponent(label, isDirectory: true)
+        try FileManager.default.createDirectory(at: receipts, withIntermediateDirectories: true)
+        let output = "Pipeline 台灣\nSecond line"
+        let instruction = succeeds ? "Rewrite the selection as two concise lines." : "Rewrite this selection and retain my instruction if processing fails."
+        let script = receipts.appendingPathComponent("synthetic-command.sh")
+        let response = receipts.appendingPathComponent("synthetic-output.txt")
+        try output.write(to: response, atomically: true, encoding: .utf8)
+        let scriptBody = """
+        umask 077
+        /bin/cat > \(Self.shellQuote(receipts.appendingPathComponent("stdin.txt").path))
+        printf '%s' "$VOICEINK_SYSTEM_PROMPT" > \(Self.shellQuote(receipts.appendingPathComponent("system.txt").path))
+        printf '%s' "$VOICEINK_USER_PROMPT" > \(Self.shellQuote(receipts.appendingPathComponent("user.txt").path))
+        printf '%s' "$VOICEINK_FULL_PROMPT" > \(Self.shellQuote(receipts.appendingPathComponent("full.txt").path))
+        printf '%s' "$$" > \(Self.shellQuote(receipts.appendingPathComponent("pid.txt").path))
+        \(succeeds ? "/bin/cat " + Self.shellQuote(response.path) : "printf '%s' 'Synthetic CLI failure 23' >&2; exit 23")
+        """
+        try scriptBody.write(to: script, atomically: true, encoding: .utf8)
+        let command = "/bin/sh " + Self.shellQuote(script.path)
+        VoiceInkLocalCLIPreference.saveCommandTemplate(command)
+        let aiService = AIService()
+        let enhancement = AIEnhancementService(aiService: aiService, modelContext: context)
+        try #require(aiService.selectedProvider == .localCLI)
+        try #require(enhancement.isConfigured)
+        try #require(!enhancement.isEnhancementEnabled)
+        let registry = TranscriptionServiceRegistry(
+            modelProvider: provider, modelsDirectory: directory, modelContext: context,
+            qwenRuntimeResult: .failure(LiveWritingPipelineFailure.unusedRecognizerRuntime)
+        )
+        let pipeline = TranscriptionPipeline(modelContext: context, serviceRegistry: registry, enhancementService: enhancement)
+        let editor = try await LiveWritingEditor.open(.safari)
+        defer {
+            NotificationManager.shared.dismissNotification()
+            editor.close()
+        }
+        try await editor.selectOriginalPassage()
+        let writing = try WritingActionSession(kind: .rewriteSelection, provider: enhancement.writingActionProviderSnapshot())
+        let request = try writing.request(transcript: instruction)
+        let poison = "printf '%s' 'MUST NOT USE CHANGED CLI PREFERENCES'"
+        aiService.updateLocalCLICommandTemplate(poison)
+        try #require(aiService.localCLICommandTemplate == poison)
+        let audio = receipts.appendingPathComponent("synthetic-recognizer-input.wav")
+        let record = Transcription(text: "", duration: 1, audioFileURL: audio.absoluteString)
+        context.insert(record)
+        let recognizer = LiveWritingFixedTranscriptSession(text: instruction)
+        var dismissals = 0
+        var states: [VoiceInkRecordingState] = []
+        await pipeline.run(
+            transcription: record, audioURL: audio,
+            model: TranscriptionModelRegistry.defaultMacOSFluidAudioModel,
+            session: recognizer, writingSession: writing, spokenSnippets: [], latencyTraceToken: nil,
+            onStateChange: { states.append($0) }, shouldCancel: { false },
+            onCancel: { Issue.record("The fixed writing pipeline fixture unexpectedly canceled.") },
+            onDismiss: { dismissals += 1 }
+        )
+        let expectedDocument = succeeds ? LiveWritingEditor.prefix + output + LiveWritingEditor.suffix : LiveWritingEditor.original
+        do { try await editor.waitForValue(expectedDocument) }
+        catch {
+            editor.recordOperationFailure("pipeline-\(label)-delivery-failure", expected: expectedDocument)
+            throw error
+        }
+        let exactDocument = editor.value?.utf16.elementsEqual(expectedDocument.utf16) == true
+        #expect(exactDocument)
+        #expect(recognizer.transcribeCalls == 1)
+        #expect(dismissals == 1)
+        #expect(states == [.enhancing])
+        #expect(!enhancement.isEnhancementEnabled)
+        let recordID = record.id
+        let verificationContext = ModelContext(container)
+        let fetched = try verificationContext.fetch(FetchDescriptor<Transcription>(
+            predicate: #Predicate { $0.id == recordID }
+        ))
+        let saved = try #require(fetched.first)
+        #expect(saved !== record)
+        #expect(saved.text == instruction)
+        #expect(saved.transcriptionState == (succeeds ? .completed : .failed))
+        #expect(saved.transcriptionModelName == TranscriptionModelRegistry.defaultMacOSFluidAudioModel.displayName)
+        #expect(saved.promptName == "Edit selected text")
+        #expect(saved.transcriptionDuration != nil)
+        #expect(saved.duration == 1)
+        #expect(saved.audioFileURL == audio.absoluteString)
+        if succeeds {
+            let exactEnhancedText = saved.enhancedText?.utf16.elementsEqual(output.utf16) == true
+            #expect(exactEnhancedText)
+            #expect(saved.aiEnhancementModelName == "local-cli")
+            #expect(saved.enhancementDuration != nil)
+            #expect(saved.aiRequestSystemMessage == request.systemMessage)
+            #expect(saved.aiRequestUserMessage == request.userMessage)
+        } else {
+            #expect(saved.enhancedText == nil)
+            #expect(saved.aiEnhancementModelName == nil)
+            #expect(saved.enhancementDuration == nil)
+        }
+        let system = try String(contentsOf: receipts.appendingPathComponent("system.txt"), encoding: .utf8)
+        let user = try String(contentsOf: receipts.appendingPathComponent("user.txt"), encoding: .utf8)
+        let full = try String(contentsOf: receipts.appendingPathComponent("full.txt"), encoding: .utf8)
+        let stdin = try String(contentsOf: receipts.appendingPathComponent("stdin.txt"), encoding: .utf8)
+        let childPIDText = try String(contentsOf: receipts.appendingPathComponent("pid.txt"), encoding: .utf8)
+        let childPID = try #require(Int32(childPIDText))
+        #expect(system == request.systemMessage)
+        #expect(user == request.userMessage)
+        #expect(full == stdin)
+        let containsInstructionAndSelection = full.contains(instruction) && full.contains(LiveWritingEditor.passage)
+        #expect(containsInstructionAndSelection)
+        #expect(childPID > 0 && childPID != ProcessInfo.processInfo.processIdentifier)
+        editor.record("pipeline-\(label)-delivery", expected: expectedDocument)
+        try saveEvidence(label, record: saved, childPID: childPID, system: system, user: user, full: full, document: editor.value)
+    }
+
+    private func saveEvidence(
+        _ label: String, record: Transcription, childPID: pid_t,
+        system: String, user: String, full: String, document: String?
+    ) throws {
+        let output = evidenceDirectory
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+        let receipt: [String: Any] = [
+            "checkpoint": "writing-pipeline-\(label)", "recordID": record.id.uuidString,
+            "scope": "Real pipeline, LocalCLIService child process and Safari delivery; fixed synthetic recognizer text and CLI output",
+            "historyProof": "Fresh ModelContext reads saved finalization from retained in-memory store; no crash or relaunch durability claim",
+            "audioProof": "Fixed transcript session bypasses microphone and audio decoding; audio URL is a synthetic fixture reference",
+            "ordinaryEnhancementEnabled": false, "preferencesChangedAfterCapture": true,
+            "childPID": childPID, "systemPrompt": system, "userPrompt": user, "stdin": full,
+            "rawInstruction": record.text, "enhancedText": record.enhancedText as Any? ?? NSNull(),
+            "status": record.transcriptionStatus as Any? ?? NSNull(), "promptName": record.promptName as Any? ?? NSNull(),
+            "enhancementModel": record.aiEnhancementModelName as Any? ?? NSNull(),
+            "observedDocument": document as Any? ?? NSNull()
+        ]
+        try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent("\(directory.lastPathComponent)-\(label).json"))
+    }
+
+    func restore() {
+        SoundManager.shared.isEnabled = savedSoundEnabled
+        for key in Self.preferenceKeys {
+            if let value = savedDefaults[key] { UserDefaults.standard.set(value, forKey: key) }
+            else { UserDefaults.standard.removeObject(forKey: key) }
+        }
+        do { try FileManager.default.removeItem(at: directory) }
+        catch { Issue.record("Could not remove owned writing pipeline fixture: \(error)") }
+    }
+
+    private static func shellQuote(_ text: String) -> String {
+        "'" + text.replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
+}
+
+@MainActor
+private final class LiveWritingUnusedRecognizerProvider: WhisperModelProvider {
+    let isModelLoaded = false
+    let whisperContext: WhisperContext? = nil
+    let loadedWhisperModel: VoiceInkWhisperLocalModelFile? = nil
+    let availableModels: [VoiceInkWhisperLocalModelFile] = []
+}
+
+@MainActor
+private final class LiveWritingFixedTranscriptSession: TranscriptionSession {
+    let text: String
+    private(set) var transcribeCalls = 0
+    init(text: String) { self.text = text }
+    func prepare(model: any TranscriptionModel, latencyTraceToken: VoiceInkLatencyTrace.Token?) async throws -> ((Data) -> Void)? { nil }
+    func transcribe(audioURL: URL) async throws -> String {
+        transcribeCalls += 1
+        return text
+    }
+    func cancel() { Issue.record("The fixed transcript session unexpectedly canceled.") }
 }
 
 private enum LiveWritingFailure: Error, CustomStringConvertible {

@@ -1,0 +1,34 @@
+{
+  "baseline_method": "testDictationProfilePreservesCustomSettingsAndPersists",
+  "baseline_original_oracle_sha256": "e8db82c39e47ee38b1c693ce915a5f252978d6250efe5f6a224a3ffd71053b1a",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "build_inputs_sha256": {
+    "LocalBuild.xcconfig": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844",
+    "Makefile": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9",
+    "scripts/verify-static-whisper-xcframework.sh": "325bb8ec708dab070d6639a5efdc40f462ddc2f052c1c38c94737ca744277327"
+  },
+  "bundle_identifier": "com.negentropi.RomaJustTalk",
+  "candidate_sha": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "changed_production_paths": [
+    "VoiceInk/PowerMode/PowerModeConfigView.swift",
+    "VoiceInk/PowerMode/PowerModeView.swift",
+    "VoiceInk/Services/AIEnhancement/AIEnhancementService.swift",
+    "VoiceInk/Services/OllamaService.swift",
+    "VoiceInk/Views/AI Models/ModelManagementView.swift",
+    "VoiceInk/Views/Components/EnhancementSettingsPanel.swift",
+    "VoiceInk/Views/Components/SlidingPanel.swift",
+    "VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift",
+    "VoiceInk/Views/Dictionary/DictionarySettingsView.swift",
+    "VoiceInk/Views/EnhancementSettingsView.swift",
+    "VoiceInk/Views/PromptEditorView.swift",
+    "VoiceInkCore/Sources/VoiceInkCore/DictationPolish.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/DictationPolishTests.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift"
+  ],
+  "driver_sha": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+  "driver_sha256": "c992dc02b715849b362d13c13851180deb86760064f3d738e01883521e75ace8",
+  "intended_assertion_line": 353,
+  "intended_assertion_message": "Opening model settings disabled the panel or blocked a visible panel control.",
+  "oracle_sha256": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69"
+}

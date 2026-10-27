@@ -1,0 +1,44 @@
+{
+  "reviewer": "GPT-6.1 Sol",
+  "run_id": 40562078437,
+  "candidate_sha": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+  "verdict": "no-blocking-visual-defect-observed",
+  "blocking_findings": [],
+  "method": "Viewed all ten original PNGs through view_image. Read retained candidate XCTest log, result, raw background-pointer actors, source bindings, receipt and corresponding test source. No product changes or test execution.",
+  "images_viewed": [
+    "custom-dictation-cleanup-settings.png",
+    "none-dictation-cleanup-selected.png",
+    "none-preserves-inactive-custom-formatting.png",
+    "none-dictation-cleanup-persisted-after-relaunch.png",
+    "custom-formatting-restored-without-changing-saved-values.png",
+    "dictionary-settings-native-sheet.png",
+    "enhancement-settings-native-sheet.png",
+    "prompt-editor-unsaved-native-sheet.png",
+    "power-mode-unsaved-native-sheet.png",
+    "power-mode-reorder-native-sheet.png"
+  ],
+  "visual_observations": {
+    "model_settings": "None is visibly selected after relaunch. Inactive Custom formatting retains displayed values with disabled styling and explicit explanatory notes. Restored Custom controls show enabled styling and original displayed values. Header and close button remain visible above scrolling content.",
+    "dictionary": "Shortcut row, Record button, header and close button readable within the sheet. Sparse content leaves blank space; no overlap or obstructed required control observed.",
+    "enhancement": "Context, timeout and shortcut sections fit the captured sheet. Labels and controls readable, header and close button unobstructed.",
+    "prompt_editor": "Focused name accepts a long unique draft; visible suffix reflects horizontal text-field scrolling. Instructions occupy scrolling content. Cancel and disabled Save Changes remain visible in the fixed footer.",
+    "power_mode_draft": "Add Power Mode header and close button visible. Focused name shows the long draft suffix. General and trigger fields readable; lower transcription content scrolls behind the fixed footer. Cancel and Save Changes remain visible without overlap.",
+    "power_mode_reorder": "Empty list sheet has readable Reorder Power Modes header and visible close button. The screenshot establishes empty presentation only, not populated ordering.",
+    "shared_presentation": "Captured sheets stay within the parent window at the tested size, with consistent native dimming. No blocked header/footer control or unintended horizontal clipping observed. Partial rows at scrolling viewport edges are expected scroll clipping."
+  },
+  "retained_runtime_evidence": {
+    "candidate_result": "Four cases each started once and passed; exit 0. candidate-tests.log ends with four tests and zero failures.",
+    "power_mode_draft": "candidate-tests.log lines 1560-1614 show Add click, native sheet and name lookup, unique draft typing/readback, Escape at line 1605, then sheet disappearance checks. Passing source-bound test includes unchanged saved-mode assertion after Escape.",
+    "power_mode_reorder": "candidate-tests.log lines 1615-1649 show Reorder open, native sheet and close-button lookup, close click at line 1640 and sheet disappearance checks. Passing source-bound test includes unchanged saved-mode assertion.",
+    "model_background_pointer": "candidate-after-background-pointer-1.json records an actual ordinary pointer attempt, one native sheet and all three foreground controls enabled and hittable afterward. Background AX traits remain diagnostic.",
+    "baseline": "comparison-result.json records the intended foreground-marker failure at line 353 with Custom and None not hittable. Same oracle bytes are bound in the retained comparison contract."
+  },
+  "limits": [
+    "Debug native UI evidence at the captured window size only; no Release, physical speech/dictation or VoiceOver proof.",
+    "Empty Power Mode reorder presentation, Close and no-persistence only; no populated-list reorder operation tested.",
+    "No Power Mode saved-shortcut mutation/retention or existing configuration Edit proof in this smoke.",
+    "Screenshots do not establish arbitrary small-window behavior, keyboard tab order or accessibility activation blocking.",
+    "Selected original archive members were reviewed; whole-archive hash verification is not claimed.",
+    "The separate full macOS gate was not reviewed here."
+  ]
+}

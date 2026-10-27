@@ -1,0 +1,6 @@
+{
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "candidate_sha": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+  "oracle_sha256": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69",
+  "valid": true
+}

@@ -1,0 +1,33 @@
+{
+  "run_id": 40562078437,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40562078437",
+  "head_sha": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "oracle_sha256": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69",
+  "baseline_expected_red_line": 353,
+  "candidate_cases": 4,
+  "candidate_passed": 4,
+  "candidate_failed_or_skipped": 0,
+  "all_source_identity_tcc_process_checks_valid": true,
+  "native_sheet_smokes": [
+    "Model settings",
+    "Dictionary settings",
+    "Enhancement settings",
+    "Prompt unsaved editor",
+    "Power Mode unsaved draft",
+    "Power Mode reorder"
+  ],
+  "artifact": {
+    "id": 12763118271,
+    "name": "roma.writing-ui-diagnostic-evidence",
+    "bytes": 213877577,
+    "api_digest_sha256": "260fca44c1b905eed971fe7ebff871eada5acb6c688cff2b55daf2ec91c51428",
+    "whole_archive_downloaded": false,
+    "whole_archive_hash_verified": false,
+    "selected_ranges_bytes": 3978803,
+    "selected_member_crc_verified_by_zipfile": true,
+    "selected_original_screenshot_count": 10,
+    "remote_selected_path": "/data/rjt-writing-check-01a17bef/40562078437/quick/"
+  },
+  "acceptance_scope": "Matched Debug UI only; no Release, physical dictation/speech, or VoiceOver claim."
+}

@@ -1,0 +1,11 @@
+{
+  "baseline_intended_red": true,
+  "candidate_cases": 4,
+  "candidate_passed": 4,
+  "candidate_failed_or_skipped": 0,
+  "source_identity_tcc_process_verified": true,
+  "model_background_pointer_attempted": true,
+  "shared_panel_screenshots": 5,
+  "power_mode_cancel_and_reorder_completed": true,
+  "accepted_scope": "Debug native UI only"
+}

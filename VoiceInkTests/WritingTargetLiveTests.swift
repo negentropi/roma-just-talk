@@ -64,8 +64,12 @@ extension VoiceInkTests {
         let target = try WritingTarget.capture(requiresSelection: true)
         #expect(target.selectedText.utf16.elementsEqual(LiveWritingEditor.passage.utf16))
         let replacement = "Translated 日本語\nNext paragraph"
-        try target.replace(with: replacement)
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
+        do { try target.replace(with: replacement) }
+        catch {
+            editor.recordOperationFailure("safari-replacement-failure", expected: expected)
+            throw error
+        }
         try await editor.waitForValue(expected)
         #expect(editor.value?.utf16.elementsEqual(expected.utf16) == true)
         editor.record("safari-replacement", expected: expected)
@@ -136,7 +140,14 @@ private final class LiveWritingEditor {
         self.previousWindows = previousWindows
     }
 
-    var value: String? { Self.string(kAXValueAttribute, from: editor) }
+    var value: String? {
+        _ = AXUIElementSetMessagingTimeout(editor, 0.1)
+        return Self.string(kAXValueAttribute, from: editor)
+    }
+    var selectedRange: NSRange? {
+        _ = AXUIElementSetMessagingTimeout(editor, 0.1)
+        return Self.range(from: editor).map { NSRange(location: $0.location, length: $0.length) }
+    }
 
     static func open(_ kind: Kind) async throws -> LiveWritingEditor {
         guard AXIsProcessTrusted() else {
@@ -339,6 +350,59 @@ private final class LiveWritingEditor {
         } catch { Issue.record("Could not write live writing evidence: \(error)") }
     }
 
+    func recordOperationFailure(_ name: String, expected: String) {
+        guard let output = Self.evidenceDirectory else { return }
+        for element in [appElement, window, editor] { _ = AXUIElementSetMessagingTimeout(element, 0.1) }
+        let windows = Self.windows(in: appElement)
+        let windowPresent = windows?.contains { CFEqual($0, window) } == true
+        let editorWindow = Self.element(kAXWindowAttribute, from: editor)
+        let hasFixtureLabel = [kAXTitleAttribute, kAXDescriptionAttribute].contains {
+            Self.string($0, from: editor)?.contains(token) == true
+        }
+        let owned = windowPresent && editorWindow.map { CFEqual($0, window) } == true && hasFixtureLabel
+        let observedAt = ProcessInfo.processInfo.systemUptime
+        let observedDate = ISO8601DateFormatter().string(from: Date())
+        let observed = owned ? value : nil
+        let range = owned ? selectedRange : nil
+        let selected = owned ? Self.string(kAXSelectedTextAttribute, from: editor) : nil
+        let system = AXUIElementCreateSystemWide()
+        _ = AXUIElementSetMessagingTimeout(system, 0.1)
+        let focused = Self.element(kAXFocusedUIElementAttribute, from: system)
+        let frontmostIsExpected = NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier
+        let title = Self.scopedString(kAXTitleAttribute, from: window, token: token)
+        let document = Self.scopedURL(kAXDocumentAttribute, from: window, resource: resource)
+        let screenshot: String
+        if owned, !previousWindows.contains(where: { CFEqual($0, window) }) {
+            screenshot = Self.captureOwnedWindow(
+                window, application: application, token: token, resource: resource, output: output, name: name
+            )
+        } else {
+            screenshot = "not captured; no new owned fixture window"
+        }
+        let receipt: [String: Any] = [
+            "checkpoint": name, "token": token, "bundleIdentifier": kind.bundleIdentifier,
+            "processIdentifier": application.processIdentifier, "ownedEditor": owned,
+            "windowStillPresent": windowPresent,
+            "expected": expected, "observed": observed as Any? ?? NSNull(),
+            "observedUTF16Count": observed?.utf16.count ?? -1, "expectedUTF16Count": expected.utf16.count,
+            "exactUTF16Equal": observed?.utf16.elementsEqual(expected.utf16) == true,
+            "canonicalEqual": observed == expected,
+            "originalStillPresent": observed?.utf16.elementsEqual(Self.original.utf16) == true,
+            "prefixPreserved": observed?.utf16.starts(with: Self.prefix.utf16) == true,
+            "suffixPreserved": observed.map { Array($0.utf16.suffix(Self.suffix.utf16.count)) == Array(Self.suffix.utf16) } == true,
+            "selectedText": selected as Any? ?? NSNull(),
+            "selectionLocationUTF16": range?.location ?? -1, "selectionLengthUTF16": range?.length ?? -1,
+            "focusedEditor": focused.map { CFEqual($0, editor) } == true,
+            "frontmostIsExpectedApplication": frontmostIsExpected, "title": title, "document": document,
+            "screenshot": screenshot, "systemUptime": observedAt, "date": observedDate
+        ]
+        do {
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+                .write(to: output.appendingPathComponent("\(token)-\(name).json"))
+        } catch { Issue.record("Could not write live editor failure observation: \(error)") }
+    }
+
     private static var evidenceDirectory: URL? {
         let environment = ProcessInfo.processInfo.environment
         return (environment["RJT_LIVE_WRITING_TARGET_EVIDENCE"]
@@ -495,7 +559,8 @@ private final class LiveWritingEditor {
     }
 
     private static func captureOwnedWindow(
-        _ window: AXUIElement, application: NSRunningApplication, token: String, resource: URL, output: URL
+        _ window: AXUIElement, application: NSRunningApplication, token: String, resource: URL, output: URL,
+        name: String = "setup-failure"
     ) -> String {
         guard CGPreflightScreenCaptureAccess() else { return "not captured; Screen Recording unavailable" }
         guard string(kAXTitleAttribute, from: window)?.contains(token) == true
@@ -524,7 +589,7 @@ private final class LiveWritingEditor {
         guard matches.count == 1, let number = matches[0][kCGWindowNumber as String] as? NSNumber else {
             return "not captured; no unique owned window number"
         }
-        let image = output.appendingPathComponent("\(token)-setup-failure.png")
+        let image = output.appendingPathComponent("\(token)-\(name).png")
         do {
             try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
             let process = Process()

@@ -1,0 +1,58 @@
+{
+  "run_id": 40575108782,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40575108782",
+  "source_head": "46d5e2839cf50dfdcde4bdca79da8188e3b95299",
+  "classification": "invalid-pretest-signature-verification-fixture",
+  "seven_test_execution_proven": false,
+  "test_execution_started": false,
+  "completed_tests": 0,
+  "compiled_actual_sources": {
+    "app_library_file_count": 11,
+    "test_file_sha256": "85580bed6dda374494026bfd44fccd898dbc04b2cf1e8167e68f0742de03a054",
+    "service_sha256": "986b0c1fae4a939faec9eed4c46a8c6065f6ed5489a922ed337d88994a06bb98",
+    "namespace": "VoiceInk",
+    "tests_registered_in_source": [
+      "clarityPreservesLiteralProviderJSONAndCodeUnits",
+      "claritySameOutputRetainsCapturedRequestMetadata",
+      "clarityRejectsMalformedAndBlankProviderResponses",
+      "claritySnapshotKeepsCapturedCLICommandAndProvider",
+      "claritySnapshotKeepsCapturedCLITimeout",
+      "writingActionsRetainLegacyFilteringAndEmptyPolicies",
+      "clarityCancellationDoesNotReturnLateOutput"
+    ],
+    "build_seconds": 96.68,
+    "standard_swift_testing_runner_linked": true
+  },
+  "pins": {
+    "canonical_subset_count": 26,
+    "before_after_build_exact_match": true,
+    "resolved_lock_sha256": "025c5b056d5db92e2b3fee004e3e8c2bf7960931dcd0cfa173b901375ec851fb"
+  },
+  "failure": {
+    "recorded_driver_phase": "build",
+    "actual_boundary": "Before any test execution, strict codesign verification of the inner xctest MachO",
+    "diagnostic": "/Users/runner/work/_temp/clarity-service-check/package/.build/arm64-apple-macosx/debug/ClarityServiceCheckPackageTests.xctest/Contents/MacOS/ClarityServiceCheckPackageTests: code has no resources but signature indicates they must be present",
+    "exit_code": 1
+  },
+  "proposed_fixture_correction": {
+    "verify_target": "ClarityServiceCheckPackageTests.xctest bundle",
+    "flags": [
+      "--verify",
+      "--deep",
+      "--strict"
+    ],
+    "display_target": "same complete bundle",
+    "preserved": "actual inner MachO hash, complete bundle/resources manifests, descriptor equality and all seven strict test checks",
+    "resigning_or_resource_check_bypass": false,
+    "native_retry_required": true
+  },
+  "scope": "Compile/link and exact canonical pins proven. No actual test execution, binary before/after identity proof, Clarity service runtime acceptance, app/UI, provider credentials or AI-quality proof.",
+  "artifact": {
+    "id": 12767393606,
+    "name": "roma.clarity-service-evidence",
+    "size_in_bytes": 77067,
+    "digest": "sha256:579d1d32ce97b87278cbb98490682e2f87f7867b3e87726537f45b8d9c06b3c6",
+    "download_count": 1,
+    "zip_size_hash_integrity_verified": true
+  }
+}

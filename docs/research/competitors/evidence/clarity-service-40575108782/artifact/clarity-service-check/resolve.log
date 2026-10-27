@@ -1,0 +1,184 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+Fetching https://github.com/negentropi/grpc-swift-nio-transport.git
+[1/4323] Fetching grpc-swift-nio-transport
+Fetched https://github.com/negentropi/grpc-swift-nio-transport.git from cache (1.19s)
+Fetching https://github.com/Beingpax/LLMkit.git
+[1/431] Fetching llmkit
+Fetched https://github.com/Beingpax/LLMkit.git from cache (0.74s)
+Fetching https://github.com/tisfeng/SelectedTextKit
+Fetching https://github.com/apple/swift-atomics.git
+[1/1893] Fetching swift-atomics
+[1894/3178] Fetching swift-atomics, selectedtextkit
+Fetched https://github.com/tisfeng/SelectedTextKit from cache (1.60s)
+Fetched https://github.com/apple/swift-atomics.git from cache (1.60s)
+Fetching https://github.com/apple/swift-certificates.git
+Fetching https://github.com/apple/swift-nio.git
+[1/7607] Fetching swift-certificates
+Fetched https://github.com/apple/swift-certificates.git from cache (0.99s)
+Fetching https://github.com/apple/swift-asn1.git
+[1/86691] Fetching swift-nio
+[1735/88742] Fetching swift-nio, swift-asn1
+Fetched https://github.com/apple/swift-asn1.git from cache (0.85s)
+[34677/86691] Fetching swift-nio
+Fetching https://github.com/apple/swift-nio-http2.git
+[75423/99010] Fetching swift-nio, swift-nio-http2
+Fetched https://github.com/apple/swift-nio-http2.git from cache (1.80s)
+Fetching https://github.com/jordanbaird/KeySender
+[1/253] Fetching keysender
+Fetched https://github.com/jordanbaird/KeySender from cache (0.82s)
+Fetching https://github.com/apple/swift-http-structured-headers.git
+Fetched https://github.com/apple/swift-nio.git from cache (4.89s)
+Fetching https://github.com/grpc/grpc-swift-2.git
+[1/1284] Fetching swift-http-structured-headers
+Fetched https://github.com/apple/swift-http-structured-headers.git from cache (0.73s)
+Fetching https://github.com/apple/swift-nio-transport-services.git
+[1/31249] Fetching grpc-swift-2
+[5626/34116] Fetching grpc-swift-2, swift-nio-transport-services
+Fetched https://github.com/apple/swift-nio-transport-services.git from cache (0.89s)
+[29062/31249] Fetching grpc-swift-2
+Fetching https://github.com/apple/swift-algorithms.git
+Fetched https://github.com/grpc/grpc-swift-2.git from cache (1.53s)
+Fetching https://github.com/tisfeng/AXSwift.git
+[1/6159] Fetching swift-algorithms
+[1233/6607] Fetching swift-algorithms, axswift
+Fetched https://github.com/tisfeng/AXSwift.git from cache (0.77s)
+Fetching https://github.com/apple/swift-protobuf.git
+Fetched https://github.com/apple/swift-algorithms.git from cache (1.10s)
+Fetching https://github.com/apple/swift-system.git
+[1/7381] Fetching swift-system
+Fetched https://github.com/apple/swift-system.git from cache (1.21s)
+Fetching https://github.com/apple/swift-numerics
+[1/55675] Fetching swift-protobuf
+[558/62441] Fetching swift-protobuf, swift-numerics
+Fetched https://github.com/apple/swift-numerics from cache (1.17s)
+[13362/55675] Fetching swift-protobuf
+Fetching https://github.com/apple/swift-crypto.git
+[55676/74534] Fetching swift-protobuf, swift-crypto
+Fetched https://github.com/apple/swift-crypto.git from cache (2.06s)
+Fetching https://github.com/grpc/grpc-swift-protobuf.git
+[1/2661] Fetching grpc-swift-protobuf
+Fetched https://github.com/grpc/grpc-swift-protobuf.git from cache (0.84s)
+Fetching https://github.com/apple/swift-nio-extras.git
+Fetched https://github.com/apple/swift-protobuf.git from cache (5.80s)
+Fetching https://github.com/apple/swift-log.git
+[1/6710] Fetching swift-nio-extras
+Fetched https://github.com/apple/swift-nio-extras.git from cache (1.03s)
+Fetching https://github.com/apple/swift-collections.git
+[1/8381] Fetching swift-log
+Fetched https://github.com/apple/swift-log.git from cache (1.08s)
+Fetching https://github.com/apple/swift-async-algorithms.git
+[1/29362] Fetching swift-collections
+[5287/36187] Fetching swift-collections, swift-async-algorithms
+Fetched https://github.com/apple/swift-async-algorithms.git from cache (0.96s)
+Fetching https://github.com/swift-server/swift-service-lifecycle.git
+[6167/29362] Fetching swift-collections
+[17307/32248] Fetching swift-collections, swift-service-lifecycle
+Fetched https://github.com/swift-server/swift-service-lifecycle.git from cache (0.86s)
+Fetching https://github.com/apple/swift-nio-ssl.git
+[19967/29362] Fetching swift-collections
+Fetched https://github.com/apple/swift-collections.git from cache (2.93s)
+Fetching https://github.com/apple/swift-http-types.git
+[1/16894] Fetching swift-nio-ssl
+[16895/18855] Fetching swift-nio-ssl, swift-http-types
+Fetched https://github.com/apple/swift-http-types.git from cache (0.82s)
+Fetched https://github.com/apple/swift-nio-ssl.git from cache (1.50s)
+Computing version for https://github.com/apple/swift-asn1.git
+Computed https://github.com/apple/swift-asn1.git at 1.7.2 (23.29s)
+Computing version for https://github.com/apple/swift-certificates.git
+Computed https://github.com/apple/swift-certificates.git at 1.21.1 (0.42s)
+Computing version for https://github.com/apple/swift-nio-extras.git
+Computed https://github.com/apple/swift-nio-extras.git at 1.35.2 (0.46s)
+Computing version for https://github.com/apple/swift-nio-ssl.git
+Computed https://github.com/apple/swift-nio-ssl.git at 2.37.5 (0.32s)
+Computing version for https://github.com/apple/swift-nio-transport-services.git
+Computed https://github.com/apple/swift-nio-transport-services.git at 1.28.0 (0.28s)
+Computing version for https://github.com/apple/swift-nio-http2.git
+Computed https://github.com/apple/swift-nio-http2.git at 1.46.0 (0.28s)
+Computing version for https://github.com/apple/swift-nio.git
+Computed https://github.com/apple/swift-nio.git at 2.104.0 (0.38s)
+Computing version for https://github.com/grpc/grpc-swift-2.git
+Computed https://github.com/grpc/grpc-swift-2.git at 2.4.3 (0.31s)
+Computing version for https://github.com/grpc/grpc-swift-protobuf.git
+Computed https://github.com/grpc/grpc-swift-protobuf.git at 2.4.1 (0.34s)
+Computing version for https://github.com/apple/swift-protobuf.git
+Computed https://github.com/apple/swift-protobuf.git at 1.38.1 (0.34s)
+Computing version for https://github.com/apple/swift-system.git
+Computed https://github.com/apple/swift-system.git at 1.8.1 (0.30s)
+Computing version for https://github.com/swift-server/swift-service-lifecycle.git
+Computed https://github.com/swift-server/swift-service-lifecycle.git at 2.13.0 (0.26s)
+Computing version for https://github.com/apple/swift-numerics
+Computed https://github.com/apple/swift-numerics at 1.1.1 (0.26s)
+Computing version for https://github.com/apple/swift-log.git
+Computed https://github.com/apple/swift-log.git at 1.16.2 (0.27s)
+Computing version for https://github.com/apple/swift-http-types.git
+Computed https://github.com/apple/swift-http-types.git at 1.8.0 (0.28s)
+Computing version for https://github.com/apple/swift-http-structured-headers.git
+Computed https://github.com/apple/swift-http-structured-headers.git at 1.7.0 (0.26s)
+Computing version for https://github.com/apple/swift-crypto.git
+Computed https://github.com/apple/swift-crypto.git at 4.5.2 (0.41s)
+Computing version for https://github.com/apple/swift-collections.git
+Computed https://github.com/apple/swift-collections.git at 1.6.0 (0.35s)
+Computing version for https://github.com/apple/swift-atomics.git
+Computed https://github.com/apple/swift-atomics.git at 1.3.0 (0.26s)
+Computing version for https://github.com/apple/swift-async-algorithms.git
+Computed https://github.com/apple/swift-async-algorithms.git at 1.1.5 (0.30s)
+Computing version for https://github.com/apple/swift-algorithms.git
+Computed https://github.com/apple/swift-algorithms.git at 1.2.1 (1.92s)
+Computing version for https://github.com/tisfeng/SelectedTextKit
+Computed https://github.com/tisfeng/SelectedTextKit at 2.6.2 (0.26s)
+Computing version for https://github.com/jordanbaird/KeySender
+Computed https://github.com/jordanbaird/KeySender at 0.0.5 (0.38s)
+Computing version for https://github.com/tisfeng/AXSwift.git
+Computed https://github.com/tisfeng/AXSwift.git at 0.3.6 (2.18s)
+Creating working copy for https://github.com/swift-server/swift-service-lifecycle.git
+Working copy of https://github.com/swift-server/swift-service-lifecycle.git resolved at 2.13.0
+Creating working copy for https://github.com/apple/swift-async-algorithms.git
+Working copy of https://github.com/apple/swift-async-algorithms.git resolved at 1.1.5
+Creating working copy for https://github.com/apple/swift-collections.git
+Working copy of https://github.com/apple/swift-collections.git resolved at 1.6.0
+Creating working copy for https://github.com/apple/swift-http-types.git
+Working copy of https://github.com/apple/swift-http-types.git resolved at 1.8.0
+Creating working copy for https://github.com/Beingpax/LLMkit.git
+Working copy of https://github.com/Beingpax/LLMkit.git resolved at main (adc2239)
+Creating working copy for https://github.com/apple/swift-nio-extras.git
+Working copy of https://github.com/apple/swift-nio-extras.git resolved at 1.35.2
+Creating working copy for https://github.com/grpc/grpc-swift-protobuf.git
+Working copy of https://github.com/grpc/grpc-swift-protobuf.git resolved at 2.4.1
+Creating working copy for https://github.com/apple/swift-nio-ssl.git
+Working copy of https://github.com/apple/swift-nio-ssl.git resolved at 2.37.5
+Creating working copy for https://github.com/apple/swift-system.git
+Working copy of https://github.com/apple/swift-system.git resolved at 1.8.1
+Creating working copy for https://github.com/apple/swift-asn1.git
+Working copy of https://github.com/apple/swift-asn1.git resolved at 1.7.2
+Creating working copy for https://github.com/jordanbaird/KeySender
+Working copy of https://github.com/jordanbaird/KeySender resolved at 0.0.5
+Creating working copy for https://github.com/apple/swift-algorithms.git
+Working copy of https://github.com/apple/swift-algorithms.git resolved at 1.2.1
+Creating working copy for https://github.com/apple/swift-log.git
+Working copy of https://github.com/apple/swift-log.git resolved at 1.16.2
+Creating working copy for https://github.com/apple/swift-numerics
+Working copy of https://github.com/apple/swift-numerics resolved at 1.1.1
+Creating working copy for https://github.com/apple/swift-crypto.git
+Working copy of https://github.com/apple/swift-crypto.git resolved at 4.5.2
+Creating working copy for https://github.com/grpc/grpc-swift-2.git
+Working copy of https://github.com/grpc/grpc-swift-2.git resolved at 2.4.3
+Creating working copy for https://github.com/apple/swift-protobuf.git
+Working copy of https://github.com/apple/swift-protobuf.git resolved at 1.38.1
+Creating working copy for https://github.com/apple/swift-certificates.git
+Working copy of https://github.com/apple/swift-certificates.git resolved at 1.21.1
+Creating working copy for https://github.com/apple/swift-http-structured-headers.git
+Working copy of https://github.com/apple/swift-http-structured-headers.git resolved at 1.7.0
+Creating working copy for https://github.com/tisfeng/SelectedTextKit
+Working copy of https://github.com/tisfeng/SelectedTextKit resolved at 2.6.2
+Creating working copy for https://github.com/negentropi/grpc-swift-nio-transport.git
+Working copy of https://github.com/negentropi/grpc-swift-nio-transport.git resolved at 65adb0bc4721a6c4695e1956af9552970c06a59f
+Creating working copy for https://github.com/apple/swift-nio-http2.git
+Working copy of https://github.com/apple/swift-nio-http2.git resolved at 1.46.0
+Creating working copy for https://github.com/tisfeng/AXSwift.git
+Working copy of https://github.com/tisfeng/AXSwift.git resolved at 0.3.6
+Creating working copy for https://github.com/apple/swift-atomics.git
+Working copy of https://github.com/apple/swift-atomics.git resolved at 1.3.0
+Creating working copy for https://github.com/apple/swift-nio-transport-services.git
+Working copy of https://github.com/apple/swift-nio-transport-services.git resolved at 1.28.0
+Creating working copy for https://github.com/apple/swift-nio.git
+Working copy of https://github.com/apple/swift-nio.git resolved at 2.104.0

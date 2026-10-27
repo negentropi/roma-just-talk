@@ -224,8 +224,8 @@ xcrun swift build "${args[@]}" --show-bin-path > "$out/bin-path.txt" 2>> "$out/b
 bin="$(cat "$out/bin-path.txt")"
 test_bundle="$bin/ClarityServiceCheckPackageTests.xctest"
 test_executable="$test_bundle/Contents/MacOS/ClarityServiceCheckPackageTests"
-codesign --verify --strict "$test_executable" > "$out/signature-verification-before.log" 2>&1
-codesign --display --verbose=4 "$test_executable" > "$out/signature-before.txt" 2>&1
+codesign --verify --deep --strict "$test_bundle" > "$out/signature-verification-before.log" 2>&1
+codesign --display --verbose=4 "$test_bundle" > "$out/signature-before.txt" 2>&1
 proof binary "$out" "$bin" before
 proof verify "$repo" "$out" before-tests
 phase=tests
@@ -233,8 +233,8 @@ test_exit=0
 xcrun swift test "${args[@]}" --skip-build --enable-swift-testing --disable-xctest --no-parallel --xunit-output "$out/tests.xml" > "$out/tests.log" 2>&1 || test_exit=$?
 printf '%s\n' "$test_exit" > "$out/test-exit-code.txt"
 phase=verify
-codesign --verify --strict "$test_executable" > "$out/signature-verification-after.log" 2>&1
-codesign --display --verbose=4 "$test_executable" > "$out/signature-after.txt" 2>&1
+codesign --verify --deep --strict "$test_bundle" > "$out/signature-verification-after.log" 2>&1
+codesign --display --verbose=4 "$test_bundle" > "$out/signature-after.txt" 2>&1
 cmp "$out/signature-before.txt" "$out/signature-after.txt"
 proof binary "$out" "$bin" after
 proof pins "$out" after

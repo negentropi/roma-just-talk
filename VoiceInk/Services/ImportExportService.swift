@@ -354,7 +354,7 @@ class ImportExportService {
                     )
                     writingFeatures.apply()
                     recordingShortcutManager.updateShortcutStatus()
-                    NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+                    NotificationCenter.default.post(name: .writingFeaturesDidChange, object: nil)
 
                     showImportSuccessAlert(
                         fileName: url.lastPathComponent,

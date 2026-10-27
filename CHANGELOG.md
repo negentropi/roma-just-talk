@@ -6,6 +6,7 @@
 - Add spoken snippets with exact multiline content, enable controls, and CSV import and export. Snippet-containing dictation stays literal so cleanup and AI cannot alter the saved text or its spoken trigger.
 - Keep a canceled recording start from clearing a newer recording after delayed permission or model preparation finishes.
 - Reject malformed text selections that split an emoji during writing actions.
+- Keep snippet and translation-target changes separate from Power Mode's saved settings.
 
 - Double-tap Shift in Special mode to dictate hands-free, then press the assigned shortcut to finish. Set the tap interval in milliseconds or turn the gesture off.
 

@@ -65,6 +65,7 @@ struct WritingActionsSettingsSection: View {
         }
         .onAppear(perform: reload)
         .onReceive(NotificationCenter.default.publisher(for: .AppSettingsDidChange)) { _ in reload() }
+        .onReceive(NotificationCenter.default.publisher(for: .writingFeaturesDidChange)) { _ in reload() }
     }
 
     @ViewBuilder
@@ -196,7 +197,7 @@ struct WritingActionsSettingsSection: View {
             try next.save()
             preferences = VoiceInkWritingActionPreferences.load()
             saveFailure = nil
-            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+            NotificationCenter.default.post(name: .writingFeaturesDidChange, object: nil)
         } catch {
             preferences = VoiceInkWritingActionPreferences.load()
             saveFailure = "Your change wasn't saved. \(error.localizedDescription)"

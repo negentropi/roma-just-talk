@@ -38,6 +38,7 @@ struct SpokenSnippetsView: View {
         .padding()
         .onAppear(perform: reload)
         .onReceive(NotificationCenter.default.publisher(for: .AppSettingsDidChange)) { _ in reload() }
+        .onReceive(NotificationCenter.default.publisher(for: .writingFeaturesDidChange)) { _ in reload() }
         .sheet(item: $editorTarget) { target in
             SpokenSnippetEditorSheet(target: target, library: snippets, onSave: save)
         }
@@ -182,7 +183,7 @@ struct SpokenSnippetsView: View {
         try change(&library)
         try VoiceInkSpokenSnippets.save(library)
         snippets = VoiceInkSpokenSnippets.load()
-        NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
+        NotificationCenter.default.post(name: .writingFeaturesDidChange, object: nil)
     }
 
     private func save(_ snippet: VoiceInkSpokenSnippet, replacing expected: VoiceInkSpokenSnippet?) throws {

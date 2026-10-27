@@ -1,0 +1,135 @@
+# RJT competitor parity ledger
+
+Checked 2026-10-27. Research input: [Wispr Flow](wispr-flow.md), [Willow](willow.md), [Typeless](typeless.md), 201 vendor capability rows before grouping. This ledger groups them into 52 product capabilities. Counts describe research coverage, not 52 equally sized implementation tasks.
+
+## Target and evidence boundaries
+
+- **Swift target S:** current chat checkout, `9e35e991b15c94e0089cc5f02f3b75522e78362b`. macOS VoiceInk-derived app plus separate Swift iOS app.
+- **Rust target R:** `ceefa8008eef93a90e357619d27b43ad4626c793`, inspected at `/Users/atalphalnmomhappyhouse/.t3/worktrees/VoiceInk/t3-9dabace7/rjt`. Shared Rust core and Slint hub; macOS, Windows and Android hosts.
+- Target choice is pending. Do not implement against one while describing the other as current RJT.
+- Rust's [foundation decision](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/docs/rjt-foundation.md) explicitly chooses Wispr-style dictation over Swift feature parity. Several enhancement modes, Power Modes and trigger words were deliberately dropped. Their existence in Swift is reference evidence, not an instruction to restore them.
+- **Present:** source and user-facing wiring found for the named basic capability. **Partial:** primitives or a narrower workflow exist. **Absent:** no implementation found in reviewed owners. **Unresolved:** documentation/platform/effect is insufficiently specified. None of these statuses is fresh runtime proof.
+- Vendor IDs below point to source URLs and detailed behavior in the three audits. Competitor marketing speed, accuracy, language totals and compliance claims are not RJT acceptance criteria.
+
+## Source owners
+
+Pinned source links make the two targets unambiguous. Rust paths are relative to `rjt/`; Swift paths are repository-relative.
+
+| Key | Owning source |
+| --- | --- |
+| R1 | [core settings](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/settings.rs), [engine](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/engine.rs) |
+| R2 | [auto edits](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/autoedit.rs), [styles](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/style.rs) |
+| R3 | [dictionary/snippets](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/dictionary.rs), [hub callbacks](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/hub/src/lib.rs) |
+| R4 | [history](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/history.rs), [hub UI](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/ui/hub.slint) |
+| R5 | [desktop insertion](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/app/src/insert.rs), [app detection](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/app/src/front.rs), [desktop host](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/app/src/main.rs) |
+| R6 | [Android insertion/overlay](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/android/app/src/main/kotlin/com/negentropi/rjt/KeyService.kt), [mobile host](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/mobile/src/lib.rs) |
+| R7 | [trigger](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/trigger.rs), [local models](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/core/src/local.rs), [README](https://github.com/negentropi/roma-just-talk/blob/ceefa8008eef93a90e357619d27b43ad4626c793/rjt/README.md) |
+| S1 | [enhancement service](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Services/AIEnhancement/AIEnhancementService.swift), [prompts](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInkCore/Sources/VoiceInkCore/CustomPrompt.swift) |
+| S2 | [cleanup controls](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInkCore/Sources/VoiceInkCore/TranscriptionCleanupPreferences.swift), [Power Modes](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift) |
+| S3 | [paste](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Paste/CursorPaster.swift), [cursor/target context](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Services/CursorTextContextReader.swift) |
+| S4 | [last transcript/retry](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Services/LastTranscriptionService.swift), [history detail](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Views/History/TranscriptionDetailView.swift), [retention service](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Services/TranscriptionAutoCleanupService.swift) |
+| S5 | [dictionary](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Services/DictionaryService.swift), [backup/import](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Services/ImportExportService.swift) |
+| S6 | [recording shortcuts](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Shortcuts/RecordingShortcutManager.swift), [audio inputs](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/VoiceInk/Services/AudioDeviceManager.swift), [iOS parity evidence](https://github.com/negentropi/roma-just-talk/blob/9e35e991b15c94e0089cc5f02f3b75522e78362b/docs/ios-feature-parity.md) |
+
+## App parity
+
+Acceptance epics E1–E14 follow the inventory. A present entry still needs scenario proof before claiming matched competitor behavior.
+
+| ID | Capability and vendor evidence | Swift S | Rust R | Gap / acceptance owner |
+| --- | --- | --- | --- | --- |
+| A01 | Global field dictation, WF01/W01/T01 | Present; S3/S6 | Present; R1/R5/R6 | E1 target correctness, not merely clipboard write |
+| A02 | Hold/toggle/hands-free/cancel, WF02–03/W02/W04/T02 | Present; multiple modes and double tap, S6 | Present basic modes/cancel; R7 | Partial exact gesture parity; E10 lifecycle matrix |
+| A03 | Multiple per-action keyboard/mouse bindings, WF33–34/W03/W05/T43–45 | Partial; primary/secondary plus middle click, S6 | Partial; single trigger key/mode, R1/R7 | E10 binding actions, conflicts, ordinary-input preservation |
+| A04 | Cleanup intensity/raw option, WF04/T03–08 | Partial; granular cleanup plus AI switch, S1/S2 | Partial; auto edits Boolean, R2 | E3 explicit None/Light/clarity behavior |
+| A05 | Fillers, repetition, backtracking, lists, spoken punctuation/line breaks/email layout, WF06–07/W07–13/T03–08 | Partial; cleanup/prompts, S1/S2 | Partial; prompt expresses most rules, R2 | E3 meaning and literal-command tests; prompt text alone insufficient |
+| A06 | Category style and concrete punctuation/casing, WF08–09/W28–29/T24 | Partial; configurable app modes, S2 | Present basic categories/3 tones, R2/R3 | E3 samples and punctuation behavior; broader presets partial |
+| A07 | Browser-aware category/per-app output format, WF08/WF11 | Present app/site mode primitives, S2 | Absent web detection; browser is Other, R2/R5 | E4 category/format overrides, not blanket Swift Power Mode restoration |
+| A08 | Cursor-aware spacing/case/selection boundaries, WF10/WF12 | Present primitives and paste integration, S3 | Partial; Android adds leading space; desktop none, R5/R6 | E1 sentence/mid-sentence/CJK/selected-range cases |
+| A09 | Auto language/mixed-language dictation, WF13/WF15/W14–15/T09 | Present model-dependent routing; unsupported locales vary | Partial; language string/auto sent to provider, R1 | E3 multilingual model-specific proof; no fixed language-total promise |
+| A10 | Regional/script variants and restricted favorites, WF14/W14/T10 | Partial; selected model language and prompts | Partial; free language field, R1/R3 | E3 explicit locale/script choices, persisted independently |
+| A11 | Local/offline dictation, W16 | Present local models | Present local Whisper, R7 | E3 network-denied result proof; online auto edits opt-in for local R |
+| A12 | Preferred microphone, fallback/ranking, level test, WF39/W06/T46 | Present picker/priority, S6 | Partial; system mic and level, no persisted picker found, R1/R5 | E10 disconnect/reconnect and device preference |
+| A13 | Sounds, mute/pause other audio, WF39/W21/T47–48 | Present controls | Partial; cues only, R1 | E10 mute/restore without disrupting Bluetooth output |
+| A14 | Clipboard preservation and original-target delivery, WF35–36/T01 | Present stronger target checks/fallbacks, S3 | Partial; text clipboard change guard, current-field paste, R5 | E1 focus change, image/empty/new clipboard and slow-paste proof |
+| A15 | Preserve/copy original versus cleaned text, WF05/WF38 | Present original/enhanced history views and last-copy variants, S4 | Partial; DB retains raw/text, hub copy uses final, R4 | E2 visible variant selection and copy/paste exact chosen value |
+| A16 | History search, filters, bulk management, WF05/T31–36 | Present search and bulk actions; no Ask intent filter | Partial; search/page/copy/play/delete, R3/R4 | E2 intent/status filters and bulk delete where applicable |
+| A17 | Retry failed/cancelled audio; copy/paste last, WF03/WF35/W19/T34 | Present history audio retry; last actions choose completed text, S4 | Absent failed-audio retry; successful text survives paste error, R1/R4 | E2 durable capture before request; see concrete failure below |
+| A18 | Retention including Never and separate audio/text policies, WF38/WF87/T37–38 | Present timed cleanup; Never semantics need proof, S4 | Absent retention setting/sweep, R1/R4 | E2 deletion and crash-leftover policy, accounting independent of content |
+| A19 | Original audio export and transcript export, WF38/T35 | Partial; playback and transcript export, audio handoff needs proof | Partial; local Opus playback, no export callback, R3/R4 | E2 exported bytes playable and correct; deletion covers copies owned by app |
+| A20 | Manual dictionary and deterministic corrections, WF16–17/W23/W25/T25/T29 | Present; S5 | Present; R3 | E5 boundaries, phrase precedence, Unicode and literal replacement |
+| A21 | Correction learning, provenance/review/off switch, WF16/W26/W30/T21–23/T26–27 | Absent learned correction loop | Absent; manual entries only, R3 | E5 attributable corrections only; review/delete/disable |
+| A22 | Dictionary CSV/bulk import, search/source/star/bulk actions, WF18–19/T28–30 | Partial; search/manage and backup, S5 | Partial; line parser plus add/remove; no file-import UI, R3 | E5 preview, invalid rows, duplicates, round trip, source filters |
+| A23 | Spoken snippets, multiline/rich snippets and bulk import, WF20–22/W24 | Partial; word replacements can expand text, no first-class snippet library | Present plain snippets; rich/bulk controls absent, R3 | E5 exact multiline data, overlapping phrases, safe plain-text fallback |
+| A24 | Dedicated selected-text voice rewrite, WF23–24/W33–35/T15–16 | Partial; selected context and Rewrite prompt, S1/S3 | Absent; auto edits explicitly refuse instructions, R2 | E6 distinct intent/selection transaction; no accidental dictation commands |
+| A25 | Dedicated translation, ordered target languages/shortcut, W34/T11–13 | Absent dedicated intent; arbitrary prompt possible, S1 | Absent, R1/R2 | E7 target separate from ASR language, exact selection/dictation delivery |
+| A26 | Draft from intent and contextual replies/facts, WF23/W31–32/W36/T20 | Partial; Assistant/custom prompts and optional context, S1 | Absent intentional drafting, R2 | E6 input context opt-in plus deliberate generation intent |
+| A27 | Ask about read-only text/general questions/web actions, WF24/T17–19 | Partial assistant prompt; no read-only answer transaction | Absent | E6 answer card distinct from replacement; E12 typed web destinations |
+| A28 | Reusable transforms, diff/retry/undo/post-dictation transform, WF25–29 | Partial reusable prompts; no transform review transaction, S1 | Absent | E6 preserve original, retry from original, undo latest validated edit |
+| A29 | Optional surrounding text/visible context and sensitive-field exclusion, WF85–87/W44/T42 | Partial; selected/clipboard/screen context; exclusion policy incomplete, S1/S3 | Absent text-context capture; no sensitive-field guard found, R5/R6 | E1/E6 bounded local context, disclosure, off switch and password refusal |
+| A30 | IDE visible symbols and voice file tagging, WF30–31/W18 | Partial generic screen context; no IDE/file-tag action | Absent | E12 supported IDE contract and autocomplete confirmation; plain fallback |
+| A31 | Terminal/remote desktop delivery, chunking, WF32/WF35–36 | Partial robust paste fallbacks, S3 | Partial generic clipboard paste, R5 | E1 long Unicode text, slow viewer and retained recovery |
+| A32 | Long sessions, limits/warnings, mic/error/restart recovery, WF37/WF40/W20/T39 | Partial; app error/retry infrastructure | Partial; errors surfaced but no durable failed session, R1 | E2/E10 define tested limit; no need to copy arbitrary vendor cap |
+| A33 | Movable/docked/hidden status UI, multi-monitor behavior, WF41–42/W22 | Partial notch/mini recorder preferences | Partial companion pill; docking/persistence not established | E10 multi-display/fullscreen/reduced-motion and hide recovery |
+| A34 | Stats, heatmap, app share, streaks, communication report, WF46–47/T52 | Partial dashboard metrics | Partial words/WPM/streak/saved time, R4 | E11 measure independently of retention; report claims need actual analysis |
+| A35 | Login/background/Dock/update/notification controls, WF43/WF45/W21/T49–51 | Present many controls; exact categories partial | Partial tray/background/theme; update/login preferences absent from reviewed settings | E10 persistent preferences, critical-error visibility, update while idle |
+| A36 | Keyboard/screen-reader access, localization/reduced motion, WF44/T50 | Partial; accessibility and locale coverage not audited | Partial; shared UI, no full accessibility audit | E11 real assistive-tech walkthrough and supported UI-language inventory |
+| A37 | Local Scratchpad, autosave/tabs/search/versions/recovery destination, WF77–80 | Absent first-class workspace; history is not a note editor | Absent | E8 local durable drafts/versions first; sync/images separated below |
+
+## Mobile and platform parity
+
+The Rust foundation requires slices on macOS, Windows and Android together. Adding shared core logic is not proof that each host exposes it. Swift iOS source presence is also not universal device proof; use its parity ledger's per-row limits.
+
+| ID | Capability and vendor evidence | Swift S | Rust R | Gap / acceptance owner |
+| --- | --- | --- | --- | --- |
+| M01 | iOS system voice keyboard, cross-app return, WF01/W38–40/T53/T56 | Present source, mixed runtime proof; S6 | Absent Rust iOS host | E9 keyboard exchange, permission/Full Access and background expiry |
+| M02 | iPhone Action Button/Shortcuts/Live Activities, WF48 | Partial App Intents and keyboard lifecycle, S6 | Absent Rust iOS host | E9 cold/warm invocation, stop/cancel, expiry and return exactly once |
+| M03 | Android overlay/snooze/sensitive fields/notification replies, WF49–51 | Absent Android app in S | Partial native overlay/volume/accessibility insertion, R6 | E9 password refusal, original target, snooze recovery and reply preservation |
+| M04 | Mobile selection edit/translation/typing/PiP, W37/T54–60 | Partial keyboard dictation; dedicated actions/PiP not established | Absent keyboard/PiP; Android overlay is different | E6/E7/E9 mobile-specific flows; separate typed keyboard project |
+| M05 | Platform coverage, T61 and vendor requirement notes | macOS/iOS source | macOS/Windows/Android source; iOS/Linux deferred | E9 build/runtime per OS; do not infer device support from compilation |
+
+## Hosted services and meeting epics
+
+These remain in scope of the research. Implementing them means storage, credentials, permissions and ongoing operations, not copying a setting. Product packaging and service policy need concrete decisions before those dependent builds.
+
+| ID | Capability and vendor evidence | Current S / R | Required work and acceptance owner |
+| --- | --- | --- | --- |
+| H01 | Opt-in cross-device settings/library/history sync, WF84/W27/T40–41 | Partial/unresolved S CloudKit hooks; no coherent sync contract. Absent R local JSON/SQLite. | E13 accounts, schema/conflicts, offline queue, opt-out/cloud deletion; explicit data-type matrix |
+| H02 | Shared team dictionary/snippets, personal precedence, WF52/W41 | Absent | E13 tenant/library roles, personal override, revoked access, shared-entry provenance |
+| H03 | Invitations, roles/departments, billing/usage/leaderboards, WF53/WF57/W42–43/T64 | Absent | E13 service/team management and usage integrity; actual invoices/roles, not mock dashboard |
+| H04 | SAML/SCIM/domain capture, managed updates/policy, WF54–56/W43/T65 | Absent | E13 identity lifecycle, policy locks, provisioning/deprovisioning and managed update safety |
+| H05 | Independent processing/storage/training/context controls, audits/BAA, WF87–88/W45–48/T42/T65 | Partial local/cloud/context settings; no equivalent hosted organization system | E13 exact data routes/retention and enforceable policy. Contracts/audits require real operational evidence |
+| H06 | Bot-free mic+system audio meeting capture/lifecycle/offline recovery, WF58–60/WF73 | Absent; audio file import is different | E14 dual-source capture, permissions, resumable chunks, crash recovery and disk bounds |
+| H07 | Calendar connections, reminders/call detection/join actions, WF61 | Absent | E14 Google/Outlook authorization, event scope, disconnect, join/record target and missed-event handling |
+| H08 | Meeting workspace/live transcript/speakers/notes/summary/Q&A/translation, WF62–70/WF74 | Absent | E14 separate note/transcript/summary, speaker corrections, preserved edited summaries, cited answers, language tests |
+| H09 | Meeting/Scratchpad export/share/import/sync/images/versions/retention, WF71–72/WF75–76/WF81 | Absent integrated workspace/service | E8/E13/E14 permissions, private notes excluded, offline/conflict tests, deletion across devices |
+| H10 | Authorized read-only remote MCP, WF82–83 | Absent | E13 service authorization; allowed resources only, revocation and tenant isolation, mutation refusal |
+
+## Concrete implementation contracts
+
+These are dependency-based work units, not an assertion that every one fits a single change. No competitor app runtime was exercised in this audit.
+
+| Epic | Dependency / owning modules | Required observable acceptance |
+| --- | --- | --- |
+| E1 Safe delivery/context | R platform adapters + engine target snapshot; S3 reference. Needed before E6 selection mutation. | Begin in A, switch to B while processing: B untouched, result recoverable. Replace intended range only. Preserve prefix/suffix, Unicode and newer clipboard writes; test empty/image clipboard, slow target and CJK spacing. Sensitive/password target sends no context and accepts no automatic mutation. |
+| E2 Durable history/recovery/retention | R history status schema, audio persistence, engine lifecycle, shared hub; S4 reference. | Disconnect before transcription returns, terminate/relaunch, retry retained audio without re-recording and get visible text. Keep success on paste failure. Compare/copy raw and final. Never/timed retention removes exact owned audio/text, including interrupted files; exported audio plays. |
+| E3 Formatting/language controls | Shared cleanup/style/locale settings, request construction and samples. | None preserves words; light removes fillers without changing meaning; clarity permits bounded rewrite. Answer-hidden fixtures cover ordinary/quoted “new line,” corrections, repeated names, lists, email, mixed languages, Traditional Chinese and mid-sentence punctuation. Real offline route succeeds with networking denied. |
+| E4 Web/context styles | Browser URL/domain adapter and shared category resolution; E1 context boundary. | Gmail web gets Email and Slack web gets Work; unmatched/private pages get defined fallback. Changes persist and affect next run only. No page-body capture merely to select style. |
+| E5 Library + learning | R3 schema/import UI; correction observation depends on E1 attribution. | Multiline snippet byte-for-byte insertion; longest matching phrase wins without recursive expansion. Import preview catches malformed/duplicate rows without losing prior data. Only a correction to a known delivered range learns spelling; unrelated typing never learns. Learned entries can be reviewed/deleted/disabled. |
+| E6 Intent editing/Ask/transforms | Explicit session intent + E1 target/read-only snapshot + result history + host UI. | Ordinary dictation never executes instructions. Editable selection rewrites in place; read-only selection gets answer card. Focus/range drift prevents replacement. Diff shows original/result; retry uses original; undo restores most recent owned edit. Generation failure retains user text and captured instruction. |
+| E7 Translate | Separate intent + ordered target locales + E6/E1 delivery. | Recognition locale unchanged when target changes. Dictation and selected text translate to chosen target; favorites reorder/persist. No target or failed provider leaves original intact. Verify code-switching, script variants and mobile target selection. |
+| E8 Local notes | Separate note/version store and draft editor; E2 recovery destination. | Autosave survives forced termination; restore first preserves current draft; search finds title/body. Failed/no-target dictation opens recoverable draft without losing content. Share excludes private material by explicit rule. |
+| E9 Platform flows | Thin OS adapters, shared core/hub; obey foundation's all-three delivery rule for R. | macOS/Windows/Android same change tested at target insertion boundary. iOS later needs real keyboard/background/PiP proof. Android protects password fields, unrelated apps and notification reply text; snooze can always be reversed. |
+| E10 Device/input/status controls | Trigger/mic/media/window/update adapters and persisted preferences. | Matched key down/up/release-order and keyboard/mouse matrix preserves normal input; device disconnect falls back visibly. Status remains usable over fullscreen/multiple displays. Login/update/settings survive restart; updates wait for recording and audio save. |
+| E11 Accessibility/insights | Semantic UI, localization, independent metrics store where retention disabled. | Keyboard-only and screen-reader user completes setup, dictation, retry, dictionary edit and settings. Reduced motion respected. Stats reconcile with fixed records and remain accurate under Never retention; communication reports show their actual input/limits. |
+| E12 Developer/web actions | E6 explicit action intent; per-app adapters and typed destination builders. | Supported editor filenames confirmed through actual autocomplete; unsupported app gets plain text. Queries URL-encoded; generated speech cannot select arbitrary shell commands or privileged actions. Long terminal input arrives intact. |
+| E13 Accounts/sync/team/privacy/MCP | Service and policy decisions, credentials, versioned sync records, server ownership. | Two devices offline-edit then reconcile without silent loss; opt-out deletes specified cloud data. Member removal revokes shared/MCP access. Cross-tenant reads fail. Managed privacy cannot be bypassed; logs/reports omit secrets. Certification wording matches examined scope. |
+| E14 Meetings | E2 durable capture + dual audio adapter, then E13 for sharing/calendar/MCP. | Mic and system speakers captured distinctly, resumed recording appends, crash/offline queue recovers. Summaries preserve manual edits on failed regeneration; citations resolve to actual transcript spans. Calendar disconnect revokes access; public share omits private notes. |
+
+## First useful end-to-end candidates
+
+1. **E2 recovery/retention:** strongest verified Rust gap. In `core/src/engine.rs:206`, `let Ok((raw, text, edit_model)) = polished else { return };` runs before history/audio save. A transcription failure therefore drops the captured audio. `history::Entry` has no status/error field; hub callbacks have no retry. Save a recoverable session before network processing, then expose same-audio retry and retention. Prove failed baseline and fixed candidate under the same disconnect/restart conditions.
+2. **E3 cleanup strength plus raw/result selection:** existing prompt/DB structures make this bounded. Requires real semantic fixtures and shared UI, not merely adding an enum or prompt lines.
+3. **E7 explicit translation:** a complete new user capability once E1 target behavior is guarded. Recognition language and translation target must stay separate. Do not hide it as an arbitrary enhancement prompt.
+4. **E6 selected-text editing:** broad competitor overlap, but depends on platform selection/target adapters. Begin with editable selection and safe refusal; read-only answers, drafting, transforms and web actions remain visible follow-on contracts.
+
+The user asked to add missing features. This ledger records implementation work still required; the research itself does not fulfill that implementation request. No code or runtime behavior changed by this audit.

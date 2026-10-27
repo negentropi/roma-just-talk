@@ -1,0 +1,544 @@
+{
+  "callbackElapsedSeconds" : 0.55206524999994144,
+  "configuredCallbackDelaySeconds" : 0.55000000000000004,
+  "helperExitCode" : 0,
+  "helperReport" : {
+    "actionElapsedSeconds" : 0.55906891666677438,
+    "actionError" : 0,
+    "actionErrorDescription" : "AXError(rawValue: 0)",
+    "actionMatchCount" : 1,
+    "actionTimeoutSeconds" : 2,
+    "actionTimeoutSetupError" : 0,
+    "activeAfter" : true,
+    "activeBefore" : true,
+    "activeBeforeAction" : true,
+    "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+    "calls" : [
+      {
+        "attribute" : "AXFocusedWindow",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "application"
+      },
+      {
+        "attribute" : "AXWindows",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "application"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0"
+      },
+      {
+        "errorCode" : 0,
+        "operation" : "copyAttributeNames",
+        "path" : "window\/0"
+      },
+      {
+        "attribute" : "AXRole",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0"
+      },
+      {
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "operation" : "copyActionNames",
+        "path" : "window\/0"
+      },
+      {
+        "attribute" : "AXChildren",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0"
+      },
+      {
+        "errorCode" : 0,
+        "operation" : "copyAttributeNames",
+        "path" : "window\/0\/0"
+      },
+      {
+        "attribute" : "AXRole",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/0"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/0"
+      },
+      {
+        "attribute" : "AXIdentifier",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/0"
+      },
+      {
+        "attribute" : "AXEnabled",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/0"
+      },
+      {
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "operation" : "copyActionNames",
+        "path" : "window\/0\/0"
+      },
+      {
+        "attribute" : "AXChildren",
+        "error" : "AXError(rawValue: -25212)",
+        "errorCode" : -25212,
+        "path" : "window\/0\/0"
+      },
+      {
+        "errorCode" : 0,
+        "operation" : "copyAttributeNames",
+        "path" : "window\/0\/1"
+      },
+      {
+        "attribute" : "AXRole",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/1"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: -25212)",
+        "errorCode" : -25212,
+        "path" : "window\/0\/1"
+      },
+      {
+        "attribute" : "AXEnabled",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/1"
+      },
+      {
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "operation" : "copyActionNames",
+        "path" : "window\/0\/1"
+      },
+      {
+        "attribute" : "AXChildren",
+        "error" : "AXError(rawValue: -25212)",
+        "errorCode" : -25212,
+        "path" : "window\/0\/1"
+      },
+      {
+        "errorCode" : 0,
+        "operation" : "copyAttributeNames",
+        "path" : "window\/0\/2"
+      },
+      {
+        "attribute" : "AXRole",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/2"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: -25212)",
+        "errorCode" : -25212,
+        "path" : "window\/0\/2"
+      },
+      {
+        "attribute" : "AXEnabled",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/2"
+      },
+      {
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "operation" : "copyActionNames",
+        "path" : "window\/0\/2"
+      },
+      {
+        "attribute" : "AXChildren",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/2"
+      },
+      {
+        "errorCode" : 0,
+        "operation" : "copyAttributeNames",
+        "path" : "window\/0\/2\/0"
+      },
+      {
+        "attribute" : "AXRole",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/2\/0"
+      },
+      {
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "operation" : "copyActionNames",
+        "path" : "window\/0\/2\/0"
+      },
+      {
+        "attribute" : "AXChildren",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/2\/0"
+      },
+      {
+        "errorCode" : 0,
+        "operation" : "copyAttributeNames",
+        "path" : "window\/0\/3"
+      },
+      {
+        "attribute" : "AXRole",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/3"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: -25212)",
+        "errorCode" : -25212,
+        "path" : "window\/0\/3"
+      },
+      {
+        "attribute" : "AXEnabled",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/3"
+      },
+      {
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "operation" : "copyActionNames",
+        "path" : "window\/0\/3"
+      },
+      {
+        "attribute" : "AXChildren",
+        "error" : "AXError(rawValue: -25212)",
+        "errorCode" : -25212,
+        "path" : "window\/0\/3"
+      },
+      {
+        "errorCode" : 0,
+        "operation" : "copyAttributeNames",
+        "path" : "window\/0\/4"
+      },
+      {
+        "attribute" : "AXRole",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/4"
+      },
+      {
+        "attribute" : "AXValue",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/4"
+      },
+      {
+        "attribute" : "AXEnabled",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/4"
+      },
+      {
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "operation" : "copyActionNames",
+        "path" : "window\/0\/4"
+      },
+      {
+        "attribute" : "AXChildren",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/0\/4"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "window\/1"
+      },
+      {
+        "attribute" : "AXWindows",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "beforePress\/application"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "beforePress\/window"
+      },
+      {
+        "attribute" : "AXTitle",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "beforePress\/window"
+      },
+      {
+        "attribute" : "AXEnabled",
+        "error" : "AXError(rawValue: 0)",
+        "errorCode" : 0,
+        "path" : "beforePress\/control"
+      }
+    ],
+    "deadlineExceeded" : false,
+    "enabledBeforeAction" : true,
+    "fixtureWindowCount" : 1,
+    "fixtureWindows" : [
+      {
+        "actions" : [
+          "AXRaise"
+        ],
+        "AXRole" : "AXWindow",
+        "AXTitle" : "Roma delayed native AX fixture 49900 90A8364D-8247-4328-9AF8-E0F92E50FF0A",
+        "children" : [
+          {
+            "actions" : [
+              "AXPress"
+            ],
+            "AXEnabled" : true,
+            "AXIdentifier" : "onboarding-delayed-native-action",
+            "AXRole" : "AXButton",
+            "AXTitle" : "Run one delayed native action",
+            "path" : "window\/0\/0",
+            "supportedAttributes" : [
+              "AXIdentifier",
+              "AXEnabled",
+              "AXFrame",
+              "AXParent",
+              "AXSize",
+              "AXFocused",
+              "AXRole",
+              "AXTopLevelUIElement",
+              "AXHelp",
+              "AXPosition",
+              "AXTitle",
+              "AXWindow",
+              "AXRoleDescription"
+            ],
+            "timeoutError" : 0
+          },
+          {
+            "actions" : [
+              "AXPress"
+            ],
+            "AXEnabled" : true,
+            "AXRole" : "AXButton",
+            "path" : "window\/0\/1",
+            "supportedAttributes" : [
+              "AXEnabled",
+              "AXFrame",
+              "AXParent",
+              "AXSize",
+              "AXFocused",
+              "AXRole",
+              "AXTopLevelUIElement",
+              "AXHelp",
+              "AXPosition",
+              "AXTitle",
+              "AXWindow",
+              "AXRoleDescription",
+              "AXSubrole",
+              "AXEdited"
+            ],
+            "timeoutError" : 0
+          },
+          {
+            "actions" : [
+              "AXPress",
+              "AXShowMenu"
+            ],
+            "AXEnabled" : false,
+            "AXRole" : "AXButton",
+            "children" : [
+              {
+                "actions" : [
+
+                ],
+                "AXRole" : "AXGroup",
+                "children" : [
+
+                ],
+                "childrenCount" : 0,
+                "path" : "window\/0\/2\/0",
+                "supportedAttributes" : [
+                  "AXRole",
+                  "AXHelp",
+                  "AXChildrenInNavigationOrder",
+                  "AXChildren",
+                  "AXWindow",
+                  "AXPosition",
+                  "AXRoleDescription",
+                  "AXSize",
+                  "AXFocused",
+                  "AXFrame",
+                  "AXParent",
+                  "AXTopLevelUIElement"
+                ],
+                "timeoutError" : 0
+              }
+            ],
+            "childrenCount" : 1,
+            "path" : "window\/0\/2",
+            "supportedAttributes" : [
+              "AXEnabled",
+              "AXFrame",
+              "AXParent",
+              "AXSize",
+              "AXFocused",
+              "AXChildren",
+              "AXRole",
+              "AXTopLevelUIElement",
+              "AXHelp",
+              "AXPosition",
+              "AXTitle",
+              "AXWindow",
+              "AXRoleDescription",
+              "AXSubrole"
+            ],
+            "timeoutError" : 0
+          },
+          {
+            "actions" : [
+              "AXPress"
+            ],
+            "AXEnabled" : false,
+            "AXRole" : "AXButton",
+            "path" : "window\/0\/3",
+            "supportedAttributes" : [
+              "AXEnabled",
+              "AXFrame",
+              "AXParent",
+              "AXSize",
+              "AXFocused",
+              "AXRole",
+              "AXTopLevelUIElement",
+              "AXHelp",
+              "AXPosition",
+              "AXTitle",
+              "AXWindow",
+              "AXRoleDescription",
+              "AXSubrole"
+            ],
+            "timeoutError" : 0
+          },
+          {
+            "actions" : [
+
+            ],
+            "AXEnabled" : true,
+            "AXRole" : "AXStaticText",
+            "AXValue" : "Roma delayed native AX fixture 49900 90A8364D-8247-4328-9AF8-E0F92E50FF0A",
+            "children" : [
+
+            ],
+            "childrenCount" : 0,
+            "path" : "window\/0\/4",
+            "supportedAttributes" : [
+              "AXFocused",
+              "AXFrame",
+              "AXChildrenInNavigationOrder",
+              "AXSelectedText",
+              "AXInsertionPointLineNumber",
+              "AXPosition",
+              "AXNumberOfCharacters",
+              "AXEnabled",
+              "AXPlaceholderValue",
+              "AXSelectedTextRange",
+              "AXHelp",
+              "AXChildren",
+              "AXRole",
+              "AXParent",
+              "AXTopLevelUIElement",
+              "AXVisibleCharacterRange",
+              "AXValue",
+              "AXSize",
+              "AXRoleDescription",
+              "AXWindow"
+            ],
+            "timeoutError" : 0
+          }
+        ],
+        "childrenCount" : 5,
+        "path" : "window\/0",
+        "supportedAttributes" : [
+          "AXFocused",
+          "AXFullScreen",
+          "AXTitle",
+          "AXChildrenInNavigationOrder",
+          "AXFrame",
+          "AXPosition",
+          "AXGrowArea",
+          "AXMinimizeButton",
+          "AXDocument",
+          "AXSections",
+          "AXCloseButton",
+          "AXMain",
+          "AXActivationPoint",
+          "AXFullScreenButton",
+          "AXProxy",
+          "AXDefaultButton",
+          "AXMinimized",
+          "AXChildren",
+          "AXRole",
+          "AXParent",
+          "AXTitleUIElement",
+          "AXCancelButton",
+          "AXModal",
+          "AXSubrole",
+          "AXZoomButton",
+          "AXRoleDescription",
+          "AXSize",
+          "AXToolbarButton"
+        ],
+        "timeoutError" : 0
+      }
+    ],
+    "focusedWindowTypeID" : 77,
+    "generatedAt" : "2026-10-27T17:35:45Z",
+    "helperPID" : 49983,
+    "hostPID" : 49900,
+    "matchedCount" : 1,
+    "matchedPaths" : [
+      "window\/0\/0"
+    ],
+    "matchValue" : "onboarding-delayed-native-action",
+    "missingCheckboxDescriptions" : [
+
+    ],
+    "mode" : "press-id",
+    "nodeCount" : 7,
+    "parentPID" : 49900,
+    "queryIncomplete" : false,
+    "sameWindowBeforeAction" : true,
+    "timeoutError" : 0,
+    "traversalBounded" : false,
+    "trusted" : true,
+    "windowCount" : 2,
+    "windowTitle" : "Roma delayed native AX fixture 49900 90A8364D-8247-4328-9AF8-E0F92E50FF0A",
+    "windowTitles" : [
+      "Roma delayed native AX fixture 49900 90A8364D-8247-4328-9AF8-E0F92E50FF0A",
+      "roma-just-talk Onboarding"
+    ]
+  },
+  "hostPID" : 49900,
+  "pressCount" : 1,
+  "targetIdentifier" : "onboarding-delayed-native-action",
+  "version" : 1,
+  "windowTitle" : "Roma delayed native AX fixture 49900 90A8364D-8247-4328-9AF8-E0F92E50FF0A"
+}

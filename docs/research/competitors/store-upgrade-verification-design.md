@@ -97,3 +97,11 @@ Provenance should retain a transcript UUID and explicit source variant without i
 A storage owner should handle actual model fields, old-store fixtures and restart verification. The dictionary owner should handle matching kind, legacy decoding, cache projection and backup import/export. Any shared Core rule change must include its iOS preference, editing and processing consumers. Claude Opus 5.5 owns user-facing History and Dictionary controls; GPT-6.1 Sol reviews that UI.
 
 Prove It Works drove the old-binary and process-restart requirement. Laziness Protocol drove reuse of actual app models and store grouping. This remains a design artifact, not migration proof.
+
+## Seed/control implementation preflight
+
+Use pinned `ebc92f1e60fdabbb9e26b2817f414d154865a9d5` as the actual predecessor product for a source-schema seed. Tag `846d05df04d5821a7b5dc8588304cb58e3bd8368` has the same four model files, schema constructor and factory, but its 24-pin lock is incomplete. The reviewed 41-pin bridge preserves those original pins. Its project differs from the tag only by Sparkle public-key settings; local manifests, test scheme and entitlements match. This does not equate the fresh build to the historical shipped binary or compiler.
+
+Run on a disposable hosted Mac user/VM; app startup opens its normal stores before the fixture. Use the factory’s explicit URL initializer with `cloudKitDatabase: .none`. That overload does not accept `groupContainer`; assert exact store URLs and nil group container from the resulting configurations. Guard macOS 15 runtime entity-name APIs. Preserve raw Codable schema JSON and separately normalize Set-backed collections for digest comparison; record intended schema order independently. Require exact host-PID exit before hashing or cloning whole store directories.
+
+Build the real app with one verified static Whisper framework in both lanes. Record its source revision and recursive framework hashes. `make setup` can otherwise clone or pull unpinned Whisper source; do not run a second unfrozen setup between predecessor and candidate. The seed/control prerequisite creates no recognition or correction fields. It first proves unchanged-schema old seed, old reopen and current reopen using the actual product module and separate host processes.

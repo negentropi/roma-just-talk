@@ -1,0 +1,222 @@
+{
+  "baseline/app-signature-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/app-signature-after.txt",
+    "bytes": 954,
+    "sha256": "f068b28b7f5d46d0a99003a8f7e06a6e5c859120e2ea6b98e2026491d356ca16"
+  },
+  "baseline/application-processes.json": {
+    "archive_member": "onboarding-ax-action-regression/baseline/application-processes.json",
+    "bytes": 426,
+    "sha256": "bbf2b10333e295eed146e5c014da8b4749c0d72667a3a6161d3028e33ec60f71"
+  },
+  "baseline/boundary.json": {
+    "archive_member": "onboarding-ax-action-regression/baseline/attachments/C92ACEBA-6649-4A4F-908C-A8EF3936EF3B.json",
+    "bytes": 14378,
+    "sha256": "5fedb925e74064173acf433add5a123820be386838ce1b5fa34bd198737ea8c3"
+  },
+  "baseline/classifier-exit.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/classifier-exit.txt",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "baseline/exit-code.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/exit-code.txt",
+    "bytes": 3,
+    "sha256": "979b894f2d91bf199766571d58024f020d1a44a417da5f48e1fa1cdf554a14f5"
+  },
+  "baseline/helper-identity-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/helper-identity-after.txt",
+    "bytes": 114,
+    "sha256": "e23b45d4630db65de3abdf759778466aa6f97571feb0e8fef6ddc33368d2a69f"
+  },
+  "baseline/helper-identity-before.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/helper-identity-before.txt",
+    "bytes": 114,
+    "sha256": "e23b45d4630db65de3abdf759778466aa6f97571feb0e8fef6ddc33368d2a69f"
+  },
+  "baseline/helper-signature-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/helper-signature-after.txt",
+    "bytes": 836,
+    "sha256": "d838a6481b05f78f9f5317e46fffe3691bc3a13933c7a2622ef1d44841dd9b4d"
+  },
+  "baseline/helper-signature-before.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/helper-signature-before.txt",
+    "bytes": 836,
+    "sha256": "d838a6481b05f78f9f5317e46fffe3691bc3a13933c7a2622ef1d44841dd9b4d"
+  },
+  "baseline/host-identity-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/host-identity-after.txt",
+    "bytes": 433,
+    "sha256": "5b09aa7b304c182c07102f5e94c8bf731e888c04998708249b73c62461638ff3"
+  },
+  "baseline/host-identity-before.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/host-identity-before.txt",
+    "bytes": 433,
+    "sha256": "5b09aa7b304c182c07102f5e94c8bf731e888c04998708249b73c62461638ff3"
+  },
+  "baseline/host-requirement.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/host-requirement.txt",
+    "bytes": 51,
+    "sha256": "a0b31122d9ad96b1eed7edc8e844800b79c6e5e36f6a7cd39bec46410e487564"
+  },
+  "baseline/microphone-tcc.json": {
+    "archive_member": "onboarding-ax-action-regression/baseline/microphone-tcc.json",
+    "bytes": 199,
+    "sha256": "b025d63c59dab5dfc63362af92c3e121df3dc2a55da7dcc55feaf4b4c2541925"
+  },
+  "baseline/result.json": {
+    "archive_member": "onboarding-ax-action-regression/baseline/result.json",
+    "bytes": 17429,
+    "sha256": "f41e55069d7e4b6ac5f8a2810f8c3ef2a8dbc22f4a8061ae0982816cc9ce96bc"
+  },
+  "baseline/system-tcc.json": {
+    "archive_member": "onboarding-ax-action-regression/baseline/system-tcc.json",
+    "bytes": 202,
+    "sha256": "0eb5870cc394641995deb7e0daf5b82263f46df4418165d3166881cd0242eb64"
+  },
+  "baseline/tcc-verification.json": {
+    "archive_member": "onboarding-ax-action-regression/baseline/tcc-verification.json",
+    "bytes": 122,
+    "sha256": "158ebffd4d1d3674f65b86589e47d6c79b095a41f015910a76ab4ea5a2e33dbd"
+  },
+  "baseline/test-signature-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/baseline/test-signature-after.txt",
+    "bytes": 988,
+    "sha256": "be3a46994bf42a865f1689fe14b0c48e73c0c9839b6eabf72ac612901aa03c0d"
+  },
+  "baseline/tests.log": {
+    "archive_member": "onboarding-ax-action-regression/baseline/tests.log",
+    "bytes": 33542,
+    "sha256": "6f4a9e14ab88ed566dffb2c6ef25b47cf8ce08b72b46d342f56bd50fe6d0dfb3"
+  },
+  "candidate/app-signature-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/app-signature-after.txt",
+    "bytes": 954,
+    "sha256": "f068b28b7f5d46d0a99003a8f7e06a6e5c859120e2ea6b98e2026491d356ca16"
+  },
+  "candidate/application-processes.json": {
+    "archive_member": "onboarding-ax-action-regression/candidate/application-processes.json",
+    "bytes": 426,
+    "sha256": "f87194c443ab2e7b5bbf110450f9e3ed80fe5ad006ec76112ee1e9cb763691e5"
+  },
+  "candidate/boundary.json": {
+    "archive_member": "onboarding-ax-action-regression/candidate/attachments/6EC69A94-576C-46BE-95FE-E0A6C2243B0B.json",
+    "bytes": 14484,
+    "sha256": "d8134feec9b0309621b626589b4361a3172b5866f9ca1a57f2833f58fe22874e"
+  },
+  "candidate/classifier-exit.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/classifier-exit.txt",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "candidate/exit-code.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/exit-code.txt",
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "candidate/helper-identity-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/helper-identity-after.txt",
+    "bytes": 114,
+    "sha256": "8208afabcaf11309e26d3d1a428f29b0c05039a2ea29424b472843ba32609ed6"
+  },
+  "candidate/helper-identity-before.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/helper-identity-before.txt",
+    "bytes": 114,
+    "sha256": "8208afabcaf11309e26d3d1a428f29b0c05039a2ea29424b472843ba32609ed6"
+  },
+  "candidate/helper-signature-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/helper-signature-after.txt",
+    "bytes": 836,
+    "sha256": "bcba55f00f4aed47da74214eb8de6b189184dcee042e5228c92cc644a481f384"
+  },
+  "candidate/helper-signature-before.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/helper-signature-before.txt",
+    "bytes": 836,
+    "sha256": "bcba55f00f4aed47da74214eb8de6b189184dcee042e5228c92cc644a481f384"
+  },
+  "candidate/host-identity-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/host-identity-after.txt",
+    "bytes": 433,
+    "sha256": "5b09aa7b304c182c07102f5e94c8bf731e888c04998708249b73c62461638ff3"
+  },
+  "candidate/host-identity-before.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/host-identity-before.txt",
+    "bytes": 433,
+    "sha256": "5b09aa7b304c182c07102f5e94c8bf731e888c04998708249b73c62461638ff3"
+  },
+  "candidate/host-requirement.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/host-requirement.txt",
+    "bytes": 51,
+    "sha256": "a0b31122d9ad96b1eed7edc8e844800b79c6e5e36f6a7cd39bec46410e487564"
+  },
+  "candidate/microphone-tcc.json": {
+    "archive_member": "onboarding-ax-action-regression/candidate/microphone-tcc.json",
+    "bytes": 199,
+    "sha256": "b025d63c59dab5dfc63362af92c3e121df3dc2a55da7dcc55feaf4b4c2541925"
+  },
+  "candidate/result.json": {
+    "archive_member": "onboarding-ax-action-regression/candidate/result.json",
+    "bytes": 17179,
+    "sha256": "70917fa2aac0f50b2a1b7ffb6c8a659f51dd248a5f53c26e514b6b7516651888"
+  },
+  "candidate/system-tcc.json": {
+    "archive_member": "onboarding-ax-action-regression/candidate/system-tcc.json",
+    "bytes": 202,
+    "sha256": "0eb5870cc394641995deb7e0daf5b82263f46df4418165d3166881cd0242eb64"
+  },
+  "candidate/tcc-verification.json": {
+    "archive_member": "onboarding-ax-action-regression/candidate/tcc-verification.json",
+    "bytes": 122,
+    "sha256": "158ebffd4d1d3674f65b86589e47d6c79b095a41f015910a76ab4ea5a2e33dbd"
+  },
+  "candidate/test-signature-after.txt": {
+    "archive_member": "onboarding-ax-action-regression/candidate/test-signature-after.txt",
+    "bytes": 988,
+    "sha256": "be3a46994bf42a865f1689fe14b0c48e73c0c9839b6eabf72ac612901aa03c0d"
+  },
+  "candidate/tests.log": {
+    "archive_member": "onboarding-ax-action-regression/candidate/tests.log",
+    "bytes": 67817,
+    "sha256": "1519a710fd8f8d38031c69a259756f436759c4eea9b9e3656f34aec5d50b2ca1"
+  },
+  "compiled-app-signature.txt": {
+    "archive_member": "onboarding-ax-action-regression/compiled-app-signature.txt",
+    "bytes": 954,
+    "sha256": "f068b28b7f5d46d0a99003a8f7e06a6e5c859120e2ea6b98e2026491d356ca16"
+  },
+  "compiled-identity.txt": {
+    "archive_member": "onboarding-ax-action-regression/compiled-identity.txt",
+    "bytes": 433,
+    "sha256": "5b09aa7b304c182c07102f5e94c8bf731e888c04998708249b73c62461638ff3"
+  },
+  "compiled-test-signature.txt": {
+    "archive_member": "onboarding-ax-action-regression/compiled-test-signature.txt",
+    "bytes": 988,
+    "sha256": "be3a46994bf42a865f1689fe14b0c48e73c0c9839b6eabf72ac612901aa03c0d"
+  },
+  "contract.json": {
+    "archive_member": "onboarding-ax-action-regression/contract.json",
+    "bytes": 858,
+    "sha256": "fcbc4590a91864af730ebc44b9215cf9e129f64cd6baed7d873f2eeb5c3c0826"
+  },
+  "environment.txt": {
+    "archive_member": "onboarding-ax-action-regression/environment.txt",
+    "bytes": 201,
+    "sha256": "40124b7b1afd765d0a26347b43bfcb326e4d1d368031efe301ac0761d6629948"
+  },
+  "helpers-identity.sha256": {
+    "archive_member": "onboarding-ax-action-regression/helpers-identity.sha256",
+    "bytes": 279,
+    "sha256": "760020d282202c95c4aaea929bb98dcfd1390d417f97584e029d4a1c364c643c"
+  },
+  "selected-tests.json": {
+    "archive_member": "onboarding-ax-action-regression/selected-tests.json",
+    "bytes": 25981,
+    "sha256": "d7b9628e212f68fcfb58c6520fe346616c4735bfbfb64ce9809cf5f901b324bf"
+  },
+  "selection-receipt.json": {
+    "archive_member": "onboarding-ax-action-regression/selection-receipt.json",
+    "bytes": 18340,
+    "sha256": "38df48bbc6dcb6988c5eb2cee258c78345d10e79778fc06c8b49daf07101b703"
+  }
+}

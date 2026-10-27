@@ -1,0 +1,12 @@
+{
+  "assertion_line": 140,
+  "candidate_helper_sha256": "1b087e88d6956163b04ee75371074bd7d29c6eb6e840231a3524d928e285b78a",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "expected_app_executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "method": "testExternalAccessibilityWaitsForOneDelayedNativeButtonAction",
+  "old_helper_commit": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "old_helper_sha256": "b1e0f3bdc693210177e700197d170ff4a803b3b5978109df51fc755ac371dd96",
+  "oracle_sha256": "828f0155ee7dca9b4a4adbcad56596e6f87585fa01d5341eca81cb9a2a27cf6b",
+  "scope": "One candidate app and test bundle; only external AX helper executable differs",
+  "source_sha": "737a8bb7aa4b1b07d20831b3ad4847692aed3054"
+}

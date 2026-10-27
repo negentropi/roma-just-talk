@@ -1,0 +1,88 @@
+{
+  "classification": "matched-red-green",
+  "lanes": {
+    "baseline": {
+      "action_elapsed_seconds": null,
+      "action_timeout_seconds": null,
+      "action_timeout_setup_error": null,
+      "actual_helper_trusted": true,
+      "callback_elapsed_seconds": 0.5512549583331747,
+      "exact_app_executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "fresh_tcc_csreq_matches_host": true,
+      "helper_binary_sha256": "3f18d7ff8f50e26a8c5f6ebe7a5ce48c8f60e859cfdd193133ad4ab5cb444920",
+      "helper_exit": 74,
+      "helper_pid": 48813,
+      "host_and_test_binaries_unchanged": true,
+      "host_pid": 48525,
+      "native_action_error": -25204,
+      "observed_result": "failed",
+      "one_test_executed": true,
+      "press_count": 1,
+      "signatures": {
+        "app": {
+          "CDHash": "02cb8affceb164e95e7fd25a569021194c46058b",
+          "Identifier": "com.negentropi.RomaJustTalk"
+        },
+        "helper": {
+          "CDHash": "c02a7f6e1c8e23b70f85ca035a1e1589ec772f76",
+          "Identifier": "com.negentropi.RomaJustTalk.AXProbe"
+        },
+        "test": {
+          "CDHash": "67e15e5616fb3db740f2719ac0bcba6401de91dd",
+          "Identifier": "com.negentropi.RomaJustTalkTests"
+        }
+      },
+      "sole_assertion_error": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift:140: error: -[VoiceInkTests.OnboardingRegionViewTests testExternalAccessibilityWaitsForOneDelayedNativeButtonAction] : XCTAssertEqual failed: (\"74\") is not equal to (\"0\") - The single delayed native action was not acknowledged within the helper action budget.",
+      "xcode_exit": 65
+    },
+    "candidate": {
+      "action_elapsed_seconds": 0.5590689166667744,
+      "action_timeout_seconds": 2,
+      "action_timeout_setup_error": 0,
+      "actual_helper_trusted": true,
+      "callback_elapsed_seconds": 0.5520652499999414,
+      "exact_app_executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "fresh_tcc_csreq_matches_host": true,
+      "helper_binary_sha256": "016339c714b998414e8e9b4382f89b6ed917905be2a16a812ad011358b7193c2",
+      "helper_exit": 0,
+      "helper_pid": 49983,
+      "host_and_test_binaries_unchanged": true,
+      "host_pid": 49900,
+      "native_action_error": 0,
+      "observed_result": "passed",
+      "one_test_executed": true,
+      "press_count": 1,
+      "signatures": {
+        "app": {
+          "CDHash": "02cb8affceb164e95e7fd25a569021194c46058b",
+          "Identifier": "com.negentropi.RomaJustTalk"
+        },
+        "helper": {
+          "CDHash": "e016e93aa8eb836dbdae858b8f845532df2b0fc6",
+          "Identifier": "com.negentropi.RomaJustTalk.AXProbe"
+        },
+        "test": {
+          "CDHash": "67e15e5616fb3db740f2719ac0bcba6401de91dd",
+          "Identifier": "com.negentropi.RomaJustTalkTests"
+        }
+      },
+      "sole_assertion_error": null,
+      "xcode_exit": 0
+    }
+  },
+  "scope": "One candidate app/test build; old and new external AX helper compared using one real delayed native NSButton action. Not full-suite or Release validation.",
+  "source_inventory": {
+    "after_sha256": "a0885417b93fc1e6aac33a31e5f53bea3d37cfcb77d251c507c13610e4815734",
+    "before_sha256": "a0885417b93fc1e6aac33a31e5f53bea3d37cfcb77d251c507c13610e4815734",
+    "count": 590,
+    "key_input_sha256": {
+      ".github/workflows/voiceink-onboarding-ax-action-check.yml": "d1abc507d723a9bb9cd8ae80445f746b00d1f0871ede91f7b04c242b9adafc07",
+      "Tools/OnboardingAccessibilityProbe.swift": "1b087e88d6956163b04ee75371074bd7d29c6eb6e840231a3524d928e285b78a",
+      "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+      "VoiceInkTests/OnboardingRegionViewTests.swift": "828f0155ee7dca9b4a4adbcad56596e6f87585fa01d5341eca81cb9a2a27cf6b",
+      "scripts/run-onboarding-ax-action-regression.sh": "2c2c46323914ad5cf56aa92d47ba16c56774ab899d3f6440ed654738494effcf"
+    },
+    "unchanged": true
+  },
+  "source_sha": "737a8bb7aa4b1b07d20831b3ad4847692aed3054"
+}

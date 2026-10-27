@@ -1,0 +1,11 @@
+{
+  "expected_executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "processes": [
+    {
+      "pid": 48525,
+      "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk"
+    }
+  ],
+  "observer_completed": true,
+  "sampling_errors": []
+}

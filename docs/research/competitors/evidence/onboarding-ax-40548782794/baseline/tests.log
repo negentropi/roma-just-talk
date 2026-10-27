@@ -1,0 +1,693 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination platform=macOS -parallel-testing-enabled NO -derivedDataPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build -xcconfig LocalBuild.xcconfig -clonedSourcePackagesDirPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS=/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD" "-only-testing:VoiceInkTests/OnboardingRegionViewTests/testExternalAccessibilityWaitsForOneDelayedNativeButtonAction" -resultBundlePath /Users/runner/work/_temp/onboarding-ax-action-regression/baseline/Test.xcresult
+
+Build settings from command line:
+    CODE_SIGN_ENTITLEMENTS = /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    CODE_SIGNING_REQUIRED = NO
+    DEVELOPMENT_TEAM = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Build settings from configuration file 'LocalBuild.xcconfig':
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGN_STYLE = Manual
+    DEVELOPMENT_TEAM = 
+    PROVISIONING_PROFILE_SPECIFIER = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  VoiceInkQwen: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkQwen @ local
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  VoiceInkNVIDIA: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkNVIDIA @ local
+  VoiceInkCore: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore @ local
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+
+Writing result bundle at path:
+	/Users/runner/work/_temp/onboarding-ax-action-regression/baseline/Test.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:02134f39b2c9b7504073bb1a860cab079d109588, name:My Mac }
+{ platform:macOS, arch:x86_64, id:02134f39b2c9b7504073bb1a860cab079d109588, name:My Mac }
+2026-10-27 17:35:02.693942+0000 roma just talk[48525:122040] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x908ec41e0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-27 17:35:02.818972+0000 roma just talk[48525:122040] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 17:35:02.820542+0000 roma just talk[48525:122040] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-27 17:35:02.820645+0000 roma just talk[48525:122040] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-27 17:35:02.822176+0000 roma just talk[48525:122040] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-27 17:35:02.822277+0000 roma just talk[48525:122040] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-27 17:35:02.828935+0000 roma just talk[48525:122372] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-27 17:35:02.829038+0000 roma just talk[48525:122280] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.830293+0000 roma just talk[48525:122280] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.829451+0000 roma just talk[48525:122360] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.830328+0000 roma just talk[48525:122360] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.830050+0000 roma just talk[48525:122372] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.833826+0000 roma just talk[48525:122372] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.830610+0000 roma just talk[48525:122371] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.831025+0000 roma just talk[48525:122280] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.834927+0000 roma just talk[48525:122371] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.834933+0000 roma just talk[48525:122280] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.831472+0000 roma just talk[48525:122373] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.832018+0000 roma just talk[48525:122375] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.835169+0000 roma just talk[48525:122375] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.832507+0000 roma just talk[48525:122376] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.832868+0000 roma just talk[48525:122374] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.835553+0000 roma just talk[48525:122376] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.835560+0000 roma just talk[48525:122374] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.833954+0000 roma just talk[48525:122360] [Connection] Will NOT re-try to establish the connection
+2026-10-27 17:35:02.833362+0000 roma just talk[48525:122378] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.836306+0000 roma just talk[48525:122378] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.835163+0000 roma just talk[48525:122373] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.836357+0000 roma just talk[48525:122380] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:02.839818+0000 roma just talk[48525:122380] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 17:35:03.584563+0000 roma just talk[48525:122040] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 17:35:03.585101+0000 roma just talk[48525:122040] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-27 17:35:03.585177+0000 roma just talk[48525:122040] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-27 17:35:03.646725+0000 roma just talk[48525:122040] [RecorderUIManager] Resetting recording state on launch
+2026-10-27 17:35:03.646914+0000 roma just talk[48525:122040] [Recorder] stopRecording called
+2026-10-27 17:35:03.647059+0000 roma just talk[48525:122040] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 17:35:03.647073+0000 roma just talk[48525:122040] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-27 17:35:03.647156+0000 roma just talk[48525:122040] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+Test Suite 'Selected tests' started at 2026-10-27 17:35:03.733.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-27 17:35:03.734.
+Test Suite 'OnboardingRegionViewTests' started at 2026-10-27 17:35:03.734.
+Test Case '-[VoiceInkTests.OnboardingRegionViewTests testExternalAccessibilityWaitsForOneDelayedNativeButtonAction]' started.
+2026-10-27 17:35:03.747172+0000 roma just talk[48525:122040] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 17:35:03.748093+0000 roma just talk[48525:122378] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 17:35:03.748122+0000 roma just talk[48525:122378] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 81
+2026-10-27 17:35:03.748423+0000 roma just talk[48525:122378] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice
+2026-10-27 17:35:03.748433+0000 roma just talk[48525:122378] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-27 17:35:03.748532+0000 roma just talk[48525:122378] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-27 17:35:03.767856+0000 roma just talk[48525:122378] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-27 17:35:03.767880+0000 roma just talk[48525:122378] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-27 17:35:03.770531+0000 roma just talk[48525:122378] [carc] Reporter disconnected. { function=sendMessage, reporterID=208413288038401 }
+2026-10-27 17:35:03.782475+0000 roma just talk[48525:122378] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-27 17:35:03.782507+0000 roma just talk[48525:122378] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-27 17:35:03.782516+0000 roma just talk[48525:122378] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-27 17:35:03.926690+0000 roma just talk[48525:122279] unable to find air64_v27 slice or a compatible one in binary archive 'file:///System/Library/PrivateFrameworks/RenderBox.framework/Resources/archive.metallib' 
+ available slices: applegpu_g15g, applegpu_g15s, applegpu_g15d, applegpu_g15d, applegpu_g15g, applegpu_g16s, applegpu_g13g, applegpu_g17p, applegpu_g17g, applegpu_g17s, applegpu_g14g, applegpu_g16g, applegpu_g15s, applegpu_g14s, applegpu_g16s, applegpu_g14d, applegpu_g13s, applegpu_g13d,
+2026-10-27 17:35:03.970809+0000 roma just talk[48525:122040] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-27 17:35:03.979819+0000 roma just talk[48525:122040] [ShortcutMonitor] installEventTap: installed
+2026-10-27 17:35:03.980793+0000 roma just talk[48525:122040] [Recorder] startPreRollBuffering: active on deviceID=81
+2026-10-27 17:35:04.226569+0000 roma just talk[48525:122374] [Common] Unable to obtain a task name port right for pid 156: (os/kern) failure (0x5)
+ROMA_DELAYED_NATIVE_AX_REPORT: {
+  "actionError" : -25204,
+  "actionErrorDescription" : "AXError(rawValue: -25204)",
+  "actionMatchCount" : 1,
+  "activeAfter" : true,
+  "activeBefore" : true,
+  "activeBeforeAction" : true,
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "calls" : [
+    {
+      "attribute" : "AXFocusedWindow",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "application"
+    },
+    {
+      "attribute" : "AXWindows",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "application"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0"
+    },
+    {
+      "attribute" : "AXIdentifier",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/1"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/1"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/3"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/3"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/4"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/4"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/4"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/4"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/4"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/4"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/1"
+    },
+    {
+      "attribute" : "AXWindows",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/application"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/window"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/window"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/control"
+    }
+  ],
+  "deadlineExceeded" : false,
+  "enabledBeforeAction" : true,
+  "fixtureWindowCount" : 1,
+  "fixtureWindows" : [
+    {
+      "actions" : [
+        "AXRaise"
+      ],
+      "AXRole" : "AXWindow",
+      "AXTitle" : "Roma delayed native AX fixture 48525 6EAC3E24-D52A-47E7-AD25-A419F9C57F6C",
+      "children" : [
+        {
+          "actions" : [
+            "AXPress"
+          ],
+          "AXEnabled" : true,
+          "AXIdentifier" : "onboarding-delayed-native-action",
+          "AXRole" : "AXButton",
+          "AXTitle" : "Run one delayed native action",
+          "path" : "window\/0\/0",
+          "supportedAttributes" : [
+            "AXIdentifier",
+            "AXEnabled",
+            "AXFrame",
+            "AXParent",
+            "AXSize",
+            "AXFocused",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXPosition",
+            "AXTitle",
+            "AXWindow",
+            "AXRoleDescription"
+          ],
+          "timeoutError" : 0
+        },
+        {
+          "actions" : [
+            "AXPress"
+          ],
+          "AXEnabled" : true,
+          "AXRole" : "AXButton",
+          "path" : "window\/0\/1",
+          "supportedAttributes" : [
+            "AXEnabled",
+            "AXFrame",
+            "AXParent",
+            "AXSize",
+            "AXFocused",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXPosition",
+            "AXTitle",
+            "AXWindow",
+            "AXRoleDescription",
+            "AXSubrole",
+            "AXEdited"
+          ],
+          "timeoutError" : 0
+        },
+        {
+          "actions" : [
+            "AXPress",
+            "AXShowMenu"
+          ],
+          "AXEnabled" : false,
+          "AXRole" : "AXButton",
+          "children" : [
+            {
+              "actions" : [
+
+              ],
+              "AXRole" : "AXGroup",
+              "children" : [
+
+              ],
+              "childrenCount" : 0,
+              "path" : "window\/0\/2\/0",
+              "supportedAttributes" : [
+                "AXRole",
+                "AXHelp",
+                "AXChildrenInNavigationOrder",
+                "AXChildren",
+                "AXWindow",
+                "AXPosition",
+                "AXRoleDescription",
+                "AXSize",
+                "AXFocused",
+                "AXFrame",
+                "AXParent",
+                "AXTopLevelUIElement"
+              ],
+              "timeoutError" : 0
+            }
+          ],
+          "childrenCount" : 1,
+          "path" : "window\/0\/2",
+          "supportedAttributes" : [
+            "AXEnabled",
+            "AXFrame",
+            "AXParent",
+            "AXSize",
+            "AXFocused",
+            "AXChildren",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXPosition",
+            "AXTitle",
+            "AXWindow",
+            "AXRoleDescription",
+            "AXSubrole"
+          ],
+          "timeoutError" : 0
+        },
+        {
+          "actions" : [
+            "AXPress"
+          ],
+          "AXEnabled" : false,
+          "AXRole" : "AXButton",
+          "path" : "window\/0\/3",
+          "supportedAttributes" : [
+            "AXEnabled",
+            "AXFrame",
+            "AXParent",
+            "AXSize",
+            "AXFocused",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXPosition",
+            "AXTitle",
+            "AXWindow",
+            "AXRoleDescription",
+            "AXSubrole"
+          ],
+          "timeoutError" : 0
+        },
+        {
+          "actions" : [
+
+          ],
+          "AXEnabled" : true,
+          "AXRole" : "AXStaticText",
+          "AXValue" : "Roma delayed native AX fixture 48525 6EAC3E24-D52A-47E7-AD25-A419F9C57F6C",
+          "children" : [
+
+          ],
+          "childrenCount" : 0,
+          "path" : "window\/0\/4",
+          "supportedAttributes" : [
+            "AXFocused",
+            "AXFrame",
+            "AXChildrenInNavigationOrder",
+            "AXSelectedText",
+            "AXInsertionPointLineNumber",
+            "AXPosition",
+            "AXNumberOfCharacters",
+            "AXEnabled",
+            "AXPlaceholderValue",
+            "AXSelectedTextRange",
+            "AXHelp",
+            "AXChildren",
+            "AXRole",
+            "AXParent",
+            "AXTopLevelUIElement",
+            "AXVisibleCharacterRange",
+            "AXValue",
+            "AXSize",
+            "AXRoleDescription",
+            "AXWindow"
+          ],
+          "timeoutError" : 0
+        }
+      ],
+      "childrenCount" : 5,
+      "path" : "window\/0",
+      "supportedAttributes" : [
+        "AXFocused",
+        "AXFullScreen",
+        "AXTitle",
+        "AXChildrenInNavigationOrder",
+        "AXFrame",
+        "AXPosition",
+        "AXGrowArea",
+        "AXMinimizeButton",
+        "AXDocument",
+        "AXSections",
+        "AXCloseButton",
+        "AXMain",
+        "AXActivationPoint",
+        "AXFullScreenButton",
+        "AXProxy",
+        "AXDefaultButton",
+        "AXMinimized",
+        "AXChildren",
+        "AXRole",
+        "AXParent",
+        "AXTitleUIElement",
+        "AXCancelButton",
+        "AXModal",
+        "AXSubrole",
+        "AXZoomButton",
+        "AXRoleDescription",
+        "AXSize",
+        "AXToolbarButton"
+      ],
+      "timeoutError" : 0
+    }
+  ],
+  "focusedWindowTypeID" : 77,
+  "generatedAt" : "2026-10-27T17:35:04Z",
+  "helperPID" : 48813,
+  "hostPID" : 48525,
+  "matchedCount" : 1,
+  "matchedPaths" : [
+    "window\/0\/0"
+  ],
+  "matchValue" : "onboarding-delayed-native-action",
+  "missingCheckboxDescriptions" : [
+
+  ],
+  "mode" : "press-id",
+  "nodeCount" : 7,
+  "parentPID" : 48525,
+  "queryIncomplete" : false,
+  "sameWindowBeforeAction" : true,
+  "timeoutError" : 0,
+  "traversalBounded" : false,
+  "trusted" : true,
+  "windowCount" : 2,
+  "windowTitle" : "Roma delayed native AX fixture 48525 6EAC3E24-D52A-47E7-AD25-A419F9C57F6C",
+  "windowTitles" : [
+    "Roma delayed native AX fixture 48525 6EAC3E24-D52A-47E7-AD25-A419F9C57F6C",
+    "roma-just-talk Onboarding"
+  ]
+}
+
+
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift:140: error: -[VoiceInkTests.OnboardingRegionViewTests testExternalAccessibilityWaitsForOneDelayedNativeButtonAction] : XCTAssertEqual failed: ("74") is not equal to ("0") - The single delayed native action was not acknowledged within the helper action budget.
+Test Case '-[VoiceInkTests.OnboardingRegionViewTests testExternalAccessibilityWaitsForOneDelayedNativeButtonAction]' failed (1.913 seconds).
+Test Suite 'OnboardingRegionViewTests' failed at 2026-10-27 17:35:05.648.
+	 Executed 1 test, with 1 failure (0 unexpected) in 1.913 (1.914) seconds
+Test Suite 'VoiceInkTests.xctest' failed at 2026-10-27 17:35:05.649.
+	 Executed 1 test, with 1 failure (0 unexpected) in 1.913 (1.914) seconds
+Test Suite 'Selected tests' failed at 2026-10-27 17:35:05.649.
+	 Executed 1 test, with 1 failure (0 unexpected) in 1.913 (1.917) seconds
+2026-10-27 17:35:05.651498+0000 roma just talk[48525:122040] [WindowSharing] Error occurred during -advanceToConfigPhaseIfNeeded: for NSThemeWidgetSharedWindowRemoteButton: Error Domain=NSCocoaErrorDomain Code=4099 "The connection to service with pid 48816 created from an endpoint was invalidated from this process." UserInfo={NSDebugDescription=The connection to service with pid 48816 created from an endpoint was invalidated from this process.}
+2026-10-27 17:35:05.648152+0000 roma just talk[48525:122373] [tcp] tcp_input [C1.1.1.1:3] flags=[R] seq=321030, ack=0, win=0 state=CLOSED rcv_nxt=321030, snd_una=1167725978
+2026-10-27 17:35:05.652659+0000 roma just talk[48525:122373] [tcp] tcp_input [C1.1.1.1:3] flags=[R] seq=321030, ack=0, win=0 state=CLOSED rcv_nxt=321030, snd_una=1167725978
+2026-10-27 17:35:05.674918+0000 roma just talk[48525:122040] [Sparkle] The app has an EdDSA public key, but there is no EdDSA signature in the appcast, so the appcast will be rejected.
+2026-10-27 17:35:05.678342+0000 roma just talk[48525:122040] [Sparkle] Error: The update feed is improperly signed and could not be validated. Please try again later or contact the app developer. (null) (URL (null))
+2026-10-27 17:35:05.678377+0000 roma just talk[48525:122040] [Sparkle] Error: The app has an EdDSA public key, but there is no EdDSA signature in the appcast, so the appcast will be rejected. (null) (URL (null))
+2026-10-27 17:35:10.205 xcodebuild[48080:119974] [MT] IDETestOperationsObserverDebug: 8.865 elapsed -- Testing started completed.
+2026-10-27 17:35:10.205 xcodebuild[48080:119974] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-27 17:35:10.205 xcodebuild[48080:119974] [MT] IDETestOperationsObserverDebug: 8.865 sec, +8.865 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/onboarding-ax-action-regression/baseline/Test.xcresult
+
+Failing tests:
+	OnboardingRegionViewTests.testExternalAccessibilityWaitsForOneDelayedNativeButtonAction()
+
+** TEST EXECUTE FAILED **
+
+Testing started

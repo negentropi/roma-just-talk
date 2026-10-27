@@ -366,6 +366,22 @@ public struct VoiceInkWordReplacementRule: Codable, Equatable, Sendable {
 }
 
 public enum VoiceInkWordReplacementEngine {
+    private static let nonSpacedScripts: [ClosedRange<UInt32>] = [
+        0x3040...0x309F,
+        0x30A0...0x30FF,
+        0x4E00...0x9FFF,
+        0xAC00...0xD7AF,
+        0x0E00...0x0E7F,
+    ]
+
+    private static let spacedWordCharacterClass: String = {
+        let nonSpacedRanges = nonSpacedScripts.map {
+            "\\x{\(String($0.lowerBound, radix: 16))}-\\x{\(String($0.upperBound, radix: 16))}"
+        }.joined()
+        // ICU needs the outer union to keep Thai decimal digits after range subtraction.
+        return #"[[[\p{L}\p{M}]-["# + nonSpacedRanges + #"]]\p{Nd}]"#
+    }()
+
     public static func apply(_ rules: [VoiceInkWordReplacementRule], to text: String) -> String {
         guard !rules.isEmpty else {
             return text
@@ -394,7 +410,7 @@ public enum VoiceInkWordReplacementEngine {
         for original in variants {
             if usesWordBoundaries(for: original) {
                 let escaped = NSRegularExpression.escapedPattern(for: original)
-                let pattern = "(?<![a-zA-Z0-9])\(escaped)(?![a-zA-Z0-9])"
+                let pattern = "(?<!\(spacedWordCharacterClass))\(escaped)(?!\(spacedWordCharacterClass))"
                 if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
                     let range = NSRange(modifiedText.startIndex..., in: modifiedText)
                     modifiedText = regex.stringByReplacingMatches(
@@ -415,14 +431,6 @@ public enum VoiceInkWordReplacementEngine {
     }
 
     private static func usesWordBoundaries(for text: String) -> Bool {
-        let nonSpacedScripts: [ClosedRange<UInt32>] = [
-            0x3040...0x309F,
-            0x30A0...0x30FF,
-            0x4E00...0x9FFF,
-            0xAC00...0xD7AF,
-            0x0E00...0x0E7F,
-        ]
-
         for scalar in text.unicodeScalars {
             for range in nonSpacedScripts where range.contains(scalar.value) {
                 return false

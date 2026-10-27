@@ -1,0 +1,35 @@
+{
+  "baseline": "c1a0f967b11794b45f68d07d0d02e6dfb3eac81b",
+  "source_path": "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift",
+  "known_bad_source_sha256": "aa4b2803207d87632d0d5d68f89bd137d1aa497b7fdc4ff3a146e3118aa841d1",
+  "candidate_source_sha256": "d482f2f5616f8e42d1bcd4574a2b8abdf346eb96c861bf8c7cf196608ab39880",
+  "test_source_sha256": "83f8eb5ba16e272c95666231cf193d8375d1dfb5d37b856849318e4823b5f701",
+  "focused_test_source_sha256": "1319ddd8d9171d144043f1254649d2b67db78a919c502461d97c0e227c043f74",
+  "test_support_sha256": "1ebc21ddd5dfe4899b789754950705d8e6c18d1403ef73809d6251f19cbda6d0",
+  "driver_sha256": "c3942b1b61f9b9a8757cfbf8937e27d780c3bfbd2b140f503c519af7a0992127",
+  "registered_methods": [
+    "testWordReplacementEngineApplyReturnsInputForNoRules",
+    "testWordReplacementEngineApplySortsRulesByLongerOriginalText",
+    "testWordReplacementEngineApplyUsesCaseInsensitiveWordBoundariesForSpacedText",
+    "testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength",
+    "testWordReplacementEngineApplyUsesSubstringReplacementForNonSpacedScripts"
+  ],
+  "scope": "Compiled exact production engine extraction and unchanged registered test bodies. No full package or native app execution.",
+  "contract": "Preserve existing non-spaced ranges, mixed-script matches and separators. Block other letters, combining marks and all decimal digits around spaced-script rules. No normalization or linguistic segmentation claim.",
+  "swift_version": "Apple Swift version 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4)\nTarget: arm64-apple-macosx26.0",
+  "lanes": {
+    "known-bad": {
+      "exit_code": 1,
+      "failures": 8,
+      "engine_sha256": "de1cd074349fe329480f6ea1b7445cc8b596e916795e9a349501f5cf48b5721f",
+      "log_sha256": "65efd2a1cc848cd405a68ee56d10f07348dc151278440b24ead2a7525c7d8a29"
+    },
+    "candidate": {
+      "exit_code": 0,
+      "failures": 0,
+      "engine_sha256": "d73b081f722c3eacda242868e01bdf991e47b41b36b4033e6a1b27aef152cecf",
+      "log_sha256": "18a6edc9a4d0b806a46494a77f0bffdbb785eaeae2d7da608b140735d7293a38"
+    }
+  },
+  "classification": "matched-red-green"
+}

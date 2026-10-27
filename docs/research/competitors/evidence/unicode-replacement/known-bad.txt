@@ -1,0 +1,9 @@
+FocusedTests.swift:62: expected éclear clear to equal éclair clear
+FocusedTests.swift:62: expected éclear clear to equal éclair clear
+FocusedTests.swift:62: expected RJTé éRJT RJT to equal Romaé éRoma RJT
+FocusedTests.swift:62: expected RJT́ éRJT RJT to equal Romá éRoma RJT
+FocusedTests.swift:62: expected RJTβ βRJT RJT to equal Romaβ βRoma RJT
+FocusedTests.swift:62: expected RJT٣ ٣RJT RJT to equal Roma٣ ٣Roma RJT
+FocusedTests.swift:62: expected RJT๑ ๑RJT RJT to equal Roma๑ ๑Roma RJT
+FocusedTests.swift:62: expected 𐐀RJT RJT𐐀 𝟘RJT RJT𝟘 RJT to equal 𐐀Roma Roma𐐀 𝟘Roma Roma𝟘 RJT
+focused_registered_methods=5 failures=8

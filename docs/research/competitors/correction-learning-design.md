@@ -33,7 +33,7 @@ The replacement engine passes replacement text to a regex-template API without e
 
 The unchanged extracted engine failed both literal cases. `a952ff67` now escapes replacement text, with the same production-engine fixture red on the old source and green on the candidate. [Retained receipt](evidence/literal-replacement/receipt.json). Existing comma alternatives and CJK controls passed. Shared core verification passed on `f901c372`; this fixes a prerequisite, not the approved-correction workflow.
 
-The current spaced-script boundary pattern is ASCII-only. Separate probes found `éclair` becoming `éclear` and `Romaé` becoming `RJTé`. Fix those boundaries while retaining deliberate CJK substring matching. Tests must separate these semantics rather than claim universal Unicode behavior.
+The ASCII-only boundary pattern also changed `éclair` to `éclear` and `Romaé` to `RJTé`. The [matched Unicode proof](evidence/unicode-replacement/receipt.json) now records eight failures on the old engine and none on the candidate using the same five registered test methods. The correction blocks adjacent letters, marks and decimal digits outside the existing unspaced script ranges. Those original ranges, mixed Latin/CJK/Thai/Korean matches, and punctuation/underscore separators remain intact. Full shared-core verification is pending; this is not a claim of universal linguistic segmentation.
 
 ## Acceptance
 

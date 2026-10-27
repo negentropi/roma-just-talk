@@ -8,9 +8,9 @@ final class WritingActionSession {
     let kind: VoiceInkWritingActionKind
     let targetLanguage: String
     let target: WritingTarget
-    let provider: WritingActionProviderSnapshot
+    let provider: AIEnhancementProviderSnapshot
 
-    init(kind: VoiceInkWritingActionKind, provider: WritingActionProviderSnapshot) throws {
+    init(kind: VoiceInkWritingActionKind, provider: AIEnhancementProviderSnapshot) throws {
         self.kind = kind
         self.provider = provider
         let preferences = VoiceInkWritingActionPreferences.load()

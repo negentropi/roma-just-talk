@@ -120,7 +120,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return
         }
         do {
-            let session = try WritingActionSession(kind: kind, provider: enhancementService.writingActionProviderSnapshot())
+            let session = try WritingActionSession(kind: kind, provider: enhancementService.providerSnapshot())
             recorderUIManager?.beginRecorderSession()
             SoundManager.shared.play(.start)
             await toggleRecord(writingSession: session)

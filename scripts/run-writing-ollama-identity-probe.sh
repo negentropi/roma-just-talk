@@ -183,7 +183,11 @@ private struct Receipt: Encodable {
             receipt.systemMessage = input.systemMessage
             receipt.userMessage = input.userMessage
             let beforeCapture = try persistent(bundle)
+            #if RJT_OLLAMA_LEGACY_SNAPSHOT_API
             let held = try service.writingActionProviderSnapshot()
+            #else
+            let held = try service.providerSnapshot()
+            #endif
             receipt.snapshotModel = held.modelName
             try checkpoint("held-capture", bundle: bundle, before: beforeCapture, receipt: &receipt)
             defaults(caseID: caseID, endpoint: endpointB, later: true)
@@ -198,7 +202,11 @@ private struct Receipt: Encodable {
             try require(modelWriteValid, "Menu model selection did not persist exactly the two known model keys")
             receipt.held = observation(try await service.performWritingAction(input, using: held), request: input)
             try checkpoint("held-execution", bundle: bundle, before: afterModel, receipt: &receipt)
+            #if RJT_OLLAMA_LEGACY_SNAPSHOT_API
             let fresh = try service.writingActionProviderSnapshot()
+            #else
+            let fresh = try service.providerSnapshot()
+            #endif
             receipt.freshSnapshotModel = fresh.modelName
             try checkpoint("fresh-capture", bundle: bundle, before: afterModel, receipt: &receipt)
             receipt.fresh = observation(try await service.performWritingAction(input, using: fresh), request: input)
@@ -294,7 +302,7 @@ let package = Package(name: "WritingOllamaProbe", platforms: [.macOS(.v14)],
         (src / 'Probe.swift').write_bytes(DRIVER)
         (package / 'Package.swift').write_text(manifest)
         write_json(package / 'Package.resolved', {'pins': retained, 'version': 2})
-        contract['versions'][version] = {'source_sha': revision, 'app_sources': app_hashes, 'dependency_sources': tree_hashes(dep), 'bundles': {case: 'com.negentropi.RomaJustTalk.WritingOllamaProbe.' + uuid.uuid4().hex for case in CASES}}
+        contract['versions'][version] = {'source_sha': revision, 'swift_defines': ['RJT_OLLAMA_LEGACY_SNAPSHOT_API'] if version == 'baseline' else [], 'app_sources': app_hashes, 'dependency_sources': tree_hashes(dep), 'bundles': {case: 'com.negentropi.RomaJustTalk.WritingOllamaProbe.' + uuid.uuid4().hex for case in CASES}}
     write_json(OUT / 'contract.json', contract)
     print('PREPARED exact baseline, candidate, unchanged oracle, 41 canonical pins, 26 service pins', flush=True)
 
@@ -303,6 +311,7 @@ def validate_sources(version, contract):
     root = OUT / version
     package = root / 'package'
     item = contract['versions'][version]
+    require(item['swift_defines'] == (['RJT_OLLAMA_LEGACY_SNAPSHOT_API'] if version == 'baseline' else []), 'Snapshot API compile lane changed')
     require(all(digest((package / 'Sources/WritingOllamaProbe' / Path(path).name).read_bytes()) == expected for path, expected in item['app_sources'].items()), 'App sources changed')
     require(tree_hashes(package / 'Dependencies') == item['dependency_sources'], 'Local dependency sources changed')
     require(digest((package / 'Sources/WritingOllamaProbe/Probe.swift').read_bytes()) == contract['driver_sha256'] == digest(DRIVER), 'Unchanged driver hash failed')
@@ -343,7 +352,8 @@ def build():
         write_json(root / 'dependencies-before-build.json', before)
         resolved = (package / 'Package.resolved').read_bytes()
         logged(['xcrun', 'swift', 'package', '--package-path', package, '--skip-update', 'show-dependencies', '--format', 'json'], root / 'package-graph.json', timeout=120)
-        logged(['xcrun', 'swift', 'build', '--package-path', package, '--force-resolved-versions', '--configuration', 'release', '--product', 'WritingOllamaProbe', '--jobs', '3'], root / 'build.log', timeout=1800)
+        compile_flags = [argument for define in contract['versions'][version]['swift_defines'] for argument in ['-Xswiftc', '-D' + define]]
+        logged(['xcrun', 'swift', 'build', '--package-path', package, '--force-resolved-versions', '--configuration', 'release', '--product', 'WritingOllamaProbe', '--jobs', '3'] + compile_flags, root / 'build.log', timeout=1800)
         require((package / 'Package.resolved').read_bytes() == resolved, 'Build rewrote lock file')
         validate_sources(version, contract)
         after = dependency_receipt(package, contract)

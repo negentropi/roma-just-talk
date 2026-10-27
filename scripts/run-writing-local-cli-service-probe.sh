@@ -138,7 +138,7 @@ private enum ProbeMain {
         let input = try request(.japaneseToEnglish)
         let expected = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: input.systemMessage, userPrompt: input.userMessage)
         var observations: [ProbeObservation] = []
-        let original = try service.writingActionProviderSnapshot()
+        let original = try service.providerSnapshot()
         try installCommand("/bin/cat >/dev/null; /usr/bin/printf 'RJT_EXPECTED_NONZERO' >&2; exit 23")
         let result = try await service.performWritingAction(input, using: original)
         let snapshotChecks = [
@@ -151,7 +151,7 @@ private enum ProbeMain {
         ]
         observations.append(.init(id: "captured-command-and-stdin", output: result.text, checks: snapshotChecks))
         try require(snapshotChecks.allSatisfy { $0.passed }, "Captured command or request transport changed")
-        let changed = try service.writingActionProviderSnapshot()
+        let changed = try service.providerSnapshot()
         var changedFailed = false
         do { _ = try await service.performWritingAction(input, using: changed) }
         catch {
@@ -164,7 +164,7 @@ private enum ProbeMain {
             .init(requirement: "New snapshot propagates the controlled nonzero error", passed: changedFailed)
         ]))
         try installCommand("/bin/cat >/dev/null; /usr/bin/printf '%s\\n%s' \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\"")
-        let environment = try await service.performWritingAction(input, using: service.writingActionProviderSnapshot())
+        let environment = try await service.performWritingAction(input, using: service.providerSnapshot())
         let expectedEnvironment = input.systemMessage + "\n" + input.userMessage
         let environmentEquality = ProbeTextEquality(
             canonicallyEquivalent: environment.text == expectedEnvironment,
@@ -176,7 +176,7 @@ private enum ProbeMain {
             .init(requirement: "Canonically equivalent system and user prompts reach command environment", passed: environmentEquality.canonicallyEquivalent)
         ], textEquality: environmentEquality))
         try installCommand("/bin/cat >/dev/null")
-        let empty = try service.writingActionProviderSnapshot()
+        let empty = try service.providerSnapshot()
         var emptyFailed = false
         do { _ = try await service.performWritingAction(input, using: empty) }
         catch { emptyFailed = error as? VoiceInkAIEnhancementError == .localCLIExecutionFailure(VoiceInkLocalCLIExecutionError.emptyOutput) }
@@ -239,7 +239,7 @@ private enum ProbeMain {
             } else {
                 for fixture in [WritingProviderFixture.japaneseToEnglish, .englishToTraditionalChinese, .conciseSelection] {
                     try installCommand(command)
-                    let captured = try service.writingActionProviderSnapshot()
+                    let captured = try service.providerSnapshot()
                     try installCommand("/bin/cat >/dev/null; exit 23")
                     let input = try request(fixture)
                     let result = try await service.performWritingAction(input, using: captured)

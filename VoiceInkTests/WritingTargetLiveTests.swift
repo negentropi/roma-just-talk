@@ -259,7 +259,7 @@ private final class LiveWritingPipelineFixture {
             editor.close()
         }
         try await editor.selectOriginalPassage()
-        let writing = try WritingActionSession(kind: .rewriteSelection, provider: enhancement.writingActionProviderSnapshot())
+        let writing = try WritingActionSession(kind: .rewriteSelection, provider: enhancement.providerSnapshot())
         let request = try writing.request(transcript: instruction)
         let poison = "printf '%s' 'MUST NOT USE CHANGED CLI PREFERENCES'"
         aiService.updateLocalCLICommandTemplate(poison)
@@ -480,7 +480,7 @@ private final class LiveWritingStartupContextFixture {
         let writing: WritingActionSession?
         if let editor {
             try await editor.selectOriginalPassage()
-            writing = try WritingActionSession(kind: .rewriteSelection, provider: enhancement.writingActionProviderSnapshot())
+            writing = try WritingActionSession(kind: .rewriteSelection, provider: enhancement.providerSnapshot())
         } else {
             writing = nil
         }

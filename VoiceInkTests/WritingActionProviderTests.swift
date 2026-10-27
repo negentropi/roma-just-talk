@@ -85,7 +85,7 @@ extension VoiceInkTests {
         let service = AIEnhancementService(aiService: aiService, modelContext: ModelContext(container))
         try #require(aiService.selectedProvider == .groq)
         try #require(!service.isEnhancementEnabled)
-        let provider = try service.writingActionProviderSnapshot()
+        let provider = try service.providerSnapshot()
         let request = try VoiceInkWritingActionRequest(
             kind: fixture.kind,
             transcript: fixture.transcript,

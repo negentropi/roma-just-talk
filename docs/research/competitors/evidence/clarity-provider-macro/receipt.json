@@ -1,0 +1,27 @@
+{
+  "scope": "Typecheck only. Four exact throws expressions, nested serialized suite, throwing Data expression, UTF8/UTF16 and require shapes from new Clarity tests; unmodified real Core error/result declarations. No service, fixture, Core module or app-host compile and no execution.",
+  "tests_sha256": "85580bed6dda374494026bfd44fccd898dbc04b2cf1e8167e68f0742de03a054",
+  "source_sha256": "768c48671ff099d740358f28873b8bd76f1061a322d2adfda6ec31f8527d73f9",
+  "throws_expressions": [
+    "item.1",
+    "VoiceInkAIEnhancementError.customError(\"Local CLI command timed out after 5 seconds.\")",
+    "VoiceInkAIEnhancementError.customError(\"Local CLI command returned empty output.\")",
+    "VoiceInkWritingActionError.emptyOutput"
+  ],
+  "checks": [
+    {
+      "swift_language_version": 5,
+      "exit_code": 0,
+      "warnings_as_errors": true,
+      "cross_import_overlays": false,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "swift_language_version": 6,
+      "exit_code": 0,
+      "warnings_as_errors": true,
+      "cross_import_overlays": false,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

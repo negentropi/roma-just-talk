@@ -30,6 +30,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Keep the disposable desktop awake
+        run: |
+          /usr/bin/caffeinate -d -i -u -t 7200 </dev/null >/dev/null 2>&1 &
+          echo "Temporary desktop assertion PID: $!"
+
       - name: Select Xcode and Metal toolchain
         shell: bash
         run: |
@@ -52,6 +57,7 @@ jobs:
           xcrun metal --version
 
       - uses: actions/cache@v4
+        id: deps-cache
         with:
           path: |
             ~/VoiceInk-Dependencies/whisper.cpp
@@ -80,6 +86,15 @@ jobs:
           git rev-parse HEAD > .local-build/writing-check-evidence/source-sha.txt
           ditto -c -k --keepParent "$app" "$RUNNER_TEMP/roma.just.talk.app.zip"
           shasum -a 256 "$RUNNER_TEMP/roma.just.talk.app.zip" > .local-build/writing-check-evidence/app-sha256.txt
+
+      - name: Preserve verified dependencies for test retries
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
       - name: Full Mac unit suite with fresh CI permissions
         run: bash scripts/run-macos-ci-unit-tests.sh

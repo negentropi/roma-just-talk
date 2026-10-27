@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "Native outcomes invalid: Setup, compiler, skip, crash or launch failure cannot count as evidence",
+  "phase": "verify"
+}

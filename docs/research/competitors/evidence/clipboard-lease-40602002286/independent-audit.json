@@ -1,0 +1,44 @@
+{
+  "classification": "actual-known-bad-clipboard-reproduced-with-calibrated-diagnostic-classifier",
+  "sourceSHA": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "runID": 40602002286,
+  "githubRunConclusion": "failure",
+  "actualPostconditionFailures": 3,
+  "actualPassingControls": 2,
+  "sameObservedHostPID": 17035,
+  "liveExactExecutableObserved": true,
+  "signatureVerified": true,
+  "signatureFlags": "0x2(adhoc)",
+  "frozenAppIdentity": "3a88eefc966a18e432249dc7bbd2b3054578451a135ac02b63ec211ec7acd5a9",
+  "sourceFilesVerifiedAgainstExactGitHead": 647,
+  "actualCanonicalPackageCheckouts": 41,
+  "oracleSHA256": "3bba815e11a289c96061f16db9967123272bd6916b29439e066f123435ac9d6a",
+  "pasterSHA256": "c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0",
+  "rawFailureClassifierError": "Successful Recorder no-op OSLog contains skipped and was treated as skipped test.",
+  "calibratedClassifierAcceptsImmutableRawLog": true,
+  "hostExitIndependentObservation": "Xcode session completed; extra ps closure step was not reached after benign-log classifier failure. No separate live-after-exit ps receipt retained.",
+  "artifactDownloadsOnce": [
+    {
+      "id": 12778344876,
+      "bytes": 147765,
+      "sha256": "9f6e42b943fcf38cda56cab08a1361105d3bab9df9fd105e642570df3c602048",
+      "members": 44,
+      "CRCValid": true,
+      "path": "/data/rjt-writing-check-01a17bef/40602002286/evidence.zip"
+    },
+    {
+      "id": 12778149936,
+      "bytes": 104792029,
+      "sha256": "69338e55fcb76891123b2f264a029509c3b3e11433cda2aa3d3cf8ce99af9bae",
+      "members": 1817,
+      "CRCValid": true,
+      "path": "/data/rjt-writing-check-01a17bef/40602002286/app-artifact.zip"
+    }
+  ],
+  "limits": [
+    "Actual NSPasteboard timers with controlled menu/document access; no native editor or Undo command.",
+    "GitHub workflow remains failed; corrected diagnostic classifier accepts unchanged raw results.",
+    "No separately observed post-exit process closure receipt.",
+    "Candidate lease not implemented or tested."
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "errors": [
+    "Setup, compiler, skip, crash or launch failure cannot count as evidence"
+  ],
+  "exit_code": 65,
+  "failure_lines": [
+    18,
+    31,
+    45
+  ],
+  "issues": [
+    "\u2718 Test nestedWritingPastesRestoreOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:18:13: Expectation failed: restored",
+    "\u2718 Test writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:31:13: Expectation failed: restored",
+    "\u2718 Test preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload() recorded an issue at ClipboardRestorationLeaseTests.swift:45:13: Expectation failed: restored"
+  ],
+  "lane": "baseline",
+  "started_tests": [
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+    "singleWritingPasteHonorsDefaultRestorationDeadline",
+    "newerClipboardCopySurvivesWritingRestorationDeadline"
+  ],
+  "summary": [
+    [
+      "5",
+      "1",
+      "failed"
+    ]
+  ],
+  "test_results": {
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard": [
+      "failed"
+    ],
+    "newerClipboardCopySurvivesWritingRestorationDeadline": [
+      "passed"
+    ],
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload": [
+      "failed"
+    ],
+    "singleWritingPasteHonorsDefaultRestorationDeadline": [
+      "passed"
+    ],
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard": [
+      "failed"
+    ]
+  },
+  "valid": false
+}

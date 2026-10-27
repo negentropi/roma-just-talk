@@ -1,0 +1,47 @@
+{
+  "valid": true,
+  "lane": "baseline",
+  "exit_code": 65,
+  "started_tests": [
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+    "singleWritingPasteHonorsDefaultRestorationDeadline",
+    "newerClipboardCopySurvivesWritingRestorationDeadline"
+  ],
+  "test_results": {
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard": [
+      "failed"
+    ],
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard": [
+      "failed"
+    ],
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload": [
+      "failed"
+    ],
+    "singleWritingPasteHonorsDefaultRestorationDeadline": [
+      "passed"
+    ],
+    "newerClipboardCopySurvivesWritingRestorationDeadline": [
+      "passed"
+    ]
+  },
+  "summary": [
+    [
+      "5",
+      "1",
+      "failed"
+    ]
+  ],
+  "issues": [
+    "\u2718 Test nestedWritingPastesRestoreOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:18:13: Expectation failed: restored",
+    "\u2718 Test writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard() recorded an issue at ClipboardRestorationLeaseTests.swift:31:13: Expectation failed: restored",
+    "\u2718 Test preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload() recorded an issue at ClipboardRestorationLeaseTests.swift:45:13: Expectation failed: restored"
+  ],
+  "failure_lines": [
+    18,
+    31,
+    45
+  ],
+  "errors": []
+}

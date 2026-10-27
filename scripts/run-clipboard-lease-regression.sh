@@ -165,7 +165,7 @@ def classify(text, code, expected_lane, sites):
     expected_lines = sorted(sites) if expected_lane == 'baseline' else []
     if len(issues) != len(expected_lines) or sorted(observed_lines) != expected_lines:
         errors.append('Only three exact clipboard postcondition assertions may fail')
-    if re.search(r'\b(?:crashed|crash report|unexpected exit|Testing cancelled|Test session ended prematurely|failed to launch|fatal error:|skipped)|^.+\.swift:\d+:\d+:\s*error:|^xcodebuild:\s*error:|^error:', text, re.I | re.M):
+    if re.search(r'\b(?:crashed|crash report|unexpected exit|Testing cancelled|Test session ended prematurely|failed to launch|fatal error:)|\bTest\s+\S+\(\)\s+skipped\b|\bTest Case .+ skipped\b|^.+\.swift:\d+:\d+:\s*error:|^xcodebuild:\s*error:|^error:', text, re.I | re.M):
         errors.append('Setup, compiler, skip, crash or launch failure cannot count as evidence')
     return {'valid': not errors, 'lane': expected_lane, 'exit_code': code, 'started_tests': starts,
         'test_results': results, 'summary': summary, 'issues': issues, 'failure_lines': observed_lines, 'errors': errors}
@@ -461,6 +461,8 @@ def self_test():
         'duplicate-rejected': not classify(bad + '\n◇ Test ' + cases[0] + '() started.', 65, 'baseline', sites)['valid'],
         'setup-failure-rejected': not classify(bad + '\nerror: unavailable clipboard', 65, 'baseline', sites)['valid'],
         'background-oslog-accepted': classify(bad + '\n2026-10-27 22:00:00.000 roma just talk[123:456] linkd.autoShortcut error: Error Domain=NSCocoaErrorDomain Code=4097', 65, 'baseline', sites)['valid'],
+        'recorder-no-op-oslog-accepted': classify(bad + '\n2026-10-27 23:34:04.825868+0000 roma just talk[17035:57206] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit', 65, 'baseline', sites)['valid'],
+        'additional-skipped-test-rejected': not classify(bad + '\n◇ Test UnselectedCase() skipped: disabled', 65, 'baseline', sites)['valid'],
         'structured-compiler-error-rejected': not classify(bad + '\n/source/Fixture.swift:12:3: error: cannot find type', 65, 'baseline', sites)['valid'],
         'structured-xcodebuild-error-rejected': not classify(bad + '\nxcodebuild: error: Invalid test configuration', 65, 'baseline', sites)['valid'],
         'skip-rejected': not classify(bad.replace('() passed after', '() skipped after', 1), 65, 'baseline', sites)['valid'],

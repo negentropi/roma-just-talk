@@ -1,0 +1,11 @@
+regression	Require three intended old failures or five candidate passes	﻿2026-10-27T23:34:36.1633550Z ##[group]Run bash scripts/run-clipboard-lease-regression.sh verify
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:36.1634540Z ^[[36;1mbash scripts/run-clipboard-lease-regression.sh verify^[[0m
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:36.2034040Z shell: /bin/bash -e {0}
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:36.2035010Z env:
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:36.2035910Z   RJT_CLIPBOARD_LEASE_LANE: baseline
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:36.2036850Z ##[endgroup]
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:40.8414100Z Traceback (most recent call last):
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:40.8415140Z   File "<stdin>", line 544, in <module>
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:40.8415470Z   File "<stdin>", line 51, in require
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:40.8416430Z RuntimeError: Native outcomes invalid: Setup, compiler, skip, crash or launch failure cannot count as evidence
+regression	Require three intended old failures or five candidate passes	2026-10-27T23:34:40.8593300Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,16 @@
+store-control	Build and freeze one shared static Whisper dependency	﻿2026-10-27T18:20:00.3324340Z ##[group]Run bash scripts/run-dictation-store-seed-check.sh dependencies
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:20:00.3324860Z ^[[36;1mbash scripts/run-dictation-store-seed-check.sh dependencies^[[0m
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:20:00.3571210Z shell: /bin/bash -e {0}
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:20:00.3571760Z ##[endgroup]
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:20:00.7368290Z Running make; log /Users/runner/work/_temp/dictation-store-seed-proof/dependencies-setup.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:29:25.2981050Z Running bash; log /Users/runner/work/_temp/dictation-store-seed-proof/dependencies-static-verification.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:29:27.7212010Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-strict-packages.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:14.4531210Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/candidate-strict-packages.log
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8417150Z Traceback (most recent call last):
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8418130Z   File "<stdin>", line 666, in <module>
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8418630Z   File "<stdin>", line 571, in dependencies
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8421330Z   File "<stdin>", line 190, in package_state
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8422040Z   File "<stdin>", line 73, in tracked_sources
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8422770Z   File "<stdin>", line 40, in require
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8423180Z RuntimeError: Unsupported tracked source Git mode 160000: Source/Cmlx/mlx
+store-control	Build and freeze one shared static Whisper dependency	2026-10-27T18:31:29.8755800Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "mode": "dependencies",
+  "error": "Unsupported tracked source Git mode 160000: Source/Cmlx/mlx"
+}

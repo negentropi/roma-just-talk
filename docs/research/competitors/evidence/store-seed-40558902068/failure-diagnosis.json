@@ -1,0 +1,30 @@
+{
+  "artifactID": 12761320398,
+  "diagnosis": "tracked_sources explicitly rejected Git mode160000. The pinned mlx-swift package contains two Git submodules. Actual initialized state and nested sources were not retained before this rejection.",
+  "exactSourceSHA": "3141871c7c29b886cbba1f8572a267e9fc9ffb89",
+  "nativeProof": "none; dependency freeze failed before either app build or actual store seed.",
+  "remoteArchive": "/data/rjt-writing-check-01a17bef/40558902068/roma.dictation-store-seed-control.zip",
+  "remoteHost": "decentleftover-pf",
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40558902068",
+  "upstreamPackage": {
+    "gitlinks": [
+      {
+        "mode": "160000",
+        "path": "Source/Cmlx/mlx",
+        "sha": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+        "type": "commit",
+        "url": "https://github.com/ml-explore/mlx"
+      },
+      {
+        "mode": "160000",
+        "path": "Source/Cmlx/mlx-c",
+        "sha": "0726ca922fc902c4c61ef9c27d94132be418e945",
+        "type": "commit",
+        "url": "https://github.com/ml-explore/mlx-c"
+      }
+    ],
+    "repository": "https://github.com/ml-explore/mlx-swift",
+    "revision": "dc43e62d7055353c7f99fa071a4e71d29dfddc44",
+    "version": "0.31.4"
+  }
+}

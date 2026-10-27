@@ -76,6 +76,23 @@ def git(checkout, *args):
     return subprocess.check_output(["git", "-C", str(checkout), *args])
 
 
+def gitlink_source(path, object_id):
+    if not os.path.lexists(path):
+        return {"kind": "gitlink", "state": "uninitialized"}
+    require(stat.S_ISDIR(path.lstat().st_mode), "Tracked gitlink changed filesystem kind: " + str(path))
+    metadata = path / ".git"
+    if not os.path.lexists(metadata):
+        require(not any(path.iterdir()), "Uninitialized gitlink contains unversioned source: " + str(path))
+        return {"kind": "gitlink", "state": "uninitialized"}
+    require(not metadata.is_symlink(), "Gitlink Git metadata must not be a symlink: " + str(path))
+    top_level = Path(os.fsdecode(git(path, "rev-parse", "--show-toplevel")).removesuffix("\n"))
+    require(top_level.resolve() == path.resolve(), "Gitlink must own its initialized checkout: " + str(path))
+    revision = git(path, "rev-parse", "HEAD").decode().strip()
+    require(revision == object_id, "Gitlink checkout revision differs from its pinned object: " + str(path))
+    require(not git(path, "status", "--porcelain", "--untracked-files=no", "--ignore-submodules=none"), "Gitlink checkout has tracked changes: " + str(path))
+    return {"kind": "gitlink", "state": "initialized", "revision": revision, "tracked_sources": tracked_sources(path)}
+
+
 def tracked_sources(checkout, *roots):
     result = {}
     entries = git(checkout, "ls-files", "--stage", "-z", "--", *roots).split(b"\0")
@@ -86,10 +103,16 @@ def tracked_sources(checkout, *roots):
         mode, object_id, stage = (value.decode("ascii") for value in metadata.split())
         relative = os.fsdecode(raw_path)
         require(stage == "0" and relative not in result, "Unmerged or duplicate tracked source entry: " + relative)
-        require(mode in {"100644", "100755", "120000"}, "Unsupported tracked source Git mode " + mode + ": " + relative)
+        require(mode in {"100644", "100755", "120000", "160000"}, "Unsupported tracked source Git mode " + mode + ": " + relative)
         path = checkout / relative
-        information = path.lstat()
         identity = {"git_mode": mode, "git_object": object_id}
+        if mode == "160000":
+            head_entry = git(checkout, "--literal-pathspecs", "ls-tree", "-z", "HEAD", "--", relative).split(b"\0")
+            expected = b"160000 commit " + object_id.encode("ascii") + b"\t" + raw_path
+            require(head_entry == [expected, b""], "Gitlink index differs from its pinned parent revision: " + relative)
+            result[relative] = dict(identity, **gitlink_source(path, object_id))
+            continue
+        information = path.lstat()
         if mode == "120000":
             require(stat.S_ISLNK(information.st_mode), "Tracked symlink changed filesystem kind: " + relative)
             result[relative] = dict(identity, kind="symlink", target=os.readlink(path))

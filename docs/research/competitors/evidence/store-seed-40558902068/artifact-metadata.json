@@ -1,0 +1,25 @@
+{
+  "artifacts": [
+    {
+      "archive_download_url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12761320398/zip",
+      "created_at": "2026-10-27T18:31:31Z",
+      "digest": "sha256:e48cf4bc6427a8fa87232aef6dac6693b2c6d41577a7a78a63f5deb71fafa0fd",
+      "expired": false,
+      "expires_at": "2027-01-25T18:19:31Z",
+      "id": 12761320398,
+      "name": "roma.dictation-store-seed-control",
+      "node_id": "MDg6QXJ0aWZhY3QxMjc2MTMyMDM5OA==",
+      "size_in_bytes": 272202,
+      "updated_at": "2026-10-27T18:31:31Z",
+      "url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12761320398",
+      "workflow_run": {
+        "head_branch": "ci/rjt-dictation-store-seed-check-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "3141871c7c29b886cbba1f8572a267e9fc9ffb89",
+        "id": 40558902068,
+        "repository_id": 1253985786
+      }
+    }
+  ],
+  "total_count": 1
+}

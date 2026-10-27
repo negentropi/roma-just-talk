@@ -1,0 +1,30 @@
+regression	Execute the selected old or candidate native lane	﻿2026-10-27T23:08:09.8058290Z ##[group]Run bash scripts/run-writing-delivery-commit-regression.sh run
+regression	Execute the selected old or candidate native lane	2026-10-27T23:08:09.8060750Z ^[[36;1mbash scripts/run-writing-delivery-commit-regression.sh run^[[0m
+regression	Execute the selected old or candidate native lane	2026-10-27T23:08:09.9407770Z shell: /bin/bash -e {0}
+regression	Execute the selected old or candidate native lane	2026-10-27T23:08:09.9408060Z env:
+regression	Execute the selected old or candidate native lane	2026-10-27T23:08:09.9408410Z   RJT_DELIVERY_COMMIT_LANE: baseline
+regression	Execute the selected old or candidate native lane	2026-10-27T23:08:09.9408770Z ##[endgroup]
+regression	Execute the selected old or candidate native lane	2026-10-27T23:08:14.4821060Z Running xcodebuild; log /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/build-settings.json
+regression	Execute the selected old or candidate native lane	2026-10-27T23:08:46.5644260Z Running xcodebuild; log /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/build.log
+regression	Execute the selected old or candidate native lane	2026-10-27T23:15:37.0993860Z Running bash; log /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/static-app.log
+regression	Execute the selected old or candidate native lane	2026-10-27T23:15:41.1193480Z Running bash; log /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/signing.log
+regression	Execute the selected old or candidate native lane	2026-10-27T23:15:45.7255930Z Running xcodebuild; log /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/discovery/enumeration.log
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:02.0896550Z Running xcodebuild; log /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/selection/enumeration.log
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:07.0770690Z Running xcodebuild; log /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/tests.log
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:37.4507830Z Traceback (most recent call last):
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:37.4509320Z   File "<stdin>", line 572, in <module>
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:37.4509770Z   File "<stdin>", line 417, in execute_lane
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:37.4527710Z   File "<stdin>", line 69, in require
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:37.4528610Z RuntimeError: baseline native result is invalid: Only the exact post-mutation metadata and first-caller-query failures with actual wrong values may fail; Exactly one actual read-only save diagnostic is required
+regression	Execute the selected old or candidate native lane	2026-10-27T23:16:37.4840910Z ##[error]Process completed with exit code 1.
+regression	Verify the immutable three-case lane result	﻿2026-10-27T23:16:37.5086330Z ##[group]Run bash scripts/run-writing-delivery-commit-regression.sh verify
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:37.5094770Z ^[[36;1mbash scripts/run-writing-delivery-commit-regression.sh verify^[[0m
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:37.6023820Z shell: /bin/bash -e {0}
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:37.6024070Z env:
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:37.6024260Z   RJT_DELIVERY_COMMIT_LANE: baseline
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:37.6024470Z ##[endgroup]
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:38.8409750Z Traceback (most recent call last):
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:38.8410280Z   File "<stdin>", line 581, in <module>
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:38.8410770Z   File "<stdin>", line 69, in require
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:38.8411270Z RuntimeError: Exact lane result no longer validates
+regression	Verify the immutable three-case lane result	2026-10-27T23:16:38.8460400Z ##[error]Process completed with exit code 1.

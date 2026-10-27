@@ -1,0 +1,182 @@
+[
+  {
+    "archive": "observations",
+    "path": "baseline/build-command.json",
+    "bytes": 1202,
+    "sha256": "53d101879a453bb66cec94c496fbbaee2944594e4d7bd492fdef4bebd52a9bfa"
+  },
+  {
+    "archive": "observations",
+    "path": "baseline/build-settings.json",
+    "bytes": 41194,
+    "sha256": "ed6cfc8a3d6472794012619490a9ebbbd99c63c125b8c3165365a749b86d793f"
+  },
+  {
+    "archive": "observations",
+    "path": "baseline/packages-before.json",
+    "bytes": 5585,
+    "sha256": "c7c816283c0572f2e933d49e15ef31c9c9b0b76972b837bdab698b4e88a3b6ab"
+  },
+  {
+    "archive": "observations",
+    "path": "baseline/source-preservation.json",
+    "bytes": 361,
+    "sha256": "62bfce14698fee300b18d8a570bd59a21532ed22a765afaa1b959e9274879646"
+  },
+  {
+    "archive": "observations",
+    "path": "baseline/static-whisper-before.json",
+    "bytes": 11104,
+    "sha256": "40dd4fb471e14d4ee5d52245b5484e08d9d40a29198396e9baa6c50e84dd3c78"
+  },
+  {
+    "archive": "observations",
+    "path": "baseline-source.json",
+    "bytes": 487740,
+    "sha256": "3f94c6f30ff06f2b6be549608d09c4c189f6f3ed2d018cbc6c4df2bcc9f9e18c"
+  },
+  {
+    "archive": "observations",
+    "path": "candidate/build-command.json",
+    "bytes": 1187,
+    "sha256": "27233c20395181eb5c86c5eb436284d8ad0460566878db45865a3c26107373a0"
+  },
+  {
+    "archive": "observations",
+    "path": "candidate/build-settings.json",
+    "bytes": 41217,
+    "sha256": "a8968bb115d834efd5ab0e2536bf8696df807d42d2f438e1c10c6eb0cde8aea2"
+  },
+  {
+    "archive": "observations",
+    "path": "candidate/packages-before.json",
+    "bytes": 5585,
+    "sha256": "c7c816283c0572f2e933d49e15ef31c9c9b0b76972b837bdab698b4e88a3b6ab"
+  },
+  {
+    "archive": "observations",
+    "path": "candidate/static-whisper-before.json",
+    "bytes": 11104,
+    "sha256": "40dd4fb471e14d4ee5d52245b5484e08d9d40a29198396e9baa6c50e84dd3c78"
+  },
+  {
+    "archive": "observations",
+    "path": "candidate-source.json",
+    "bytes": 535105,
+    "sha256": "c1ca275762456d0dc8d76990d3613a6c1fef0ef9a51f044570696f5336a25232"
+  },
+  {
+    "archive": "observations",
+    "path": "contract.json",
+    "bytes": 3631,
+    "sha256": "d252ab276eca089c364dabaa136f84e8800baddb649f68b9ead0f0f8d1daff3f"
+  },
+  {
+    "archive": "observations",
+    "path": "failure-baseline.json",
+    "bytes": 187,
+    "sha256": "3175a7192761aa67f05a462b4d732bc5b9860227dcff94ebd07355cd4d8f8b39"
+  },
+  {
+    "archive": "observations",
+    "path": "packages/candidate-strict-resolve.json",
+    "bytes": 48,
+    "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+  },
+  {
+    "archive": "observations",
+    "path": "packages/canonical-graph-contract.json",
+    "bytes": 838,
+    "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f"
+  },
+  {
+    "archive": "observations",
+    "path": "packages/canonical.Package.resolved",
+    "bytes": 11320,
+    "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  {
+    "archive": "observations",
+    "path": "source/DictionaryContextFreshnessTests.swift",
+    "bytes": 4473,
+    "sha256": "bd935877aca19d689f0c6ca0a99d4cfda2def35548c1040f66217d58fe36579f"
+  },
+  {
+    "archive": "observations",
+    "path": "source/baseline-dictionary.swift",
+    "bytes": 5719,
+    "sha256": "e630a6de3d0851a1222447ee7a03e1167481ac6d2f102909514555e070365966"
+  },
+  {
+    "archive": "observations",
+    "path": "source/candidate-dictionary.swift",
+    "bytes": 8137,
+    "sha256": "fdaf71ac81f25b65484c463db9b606ce85b254b3177c10900aa2df57d98a697e"
+  },
+  {
+    "archive": "observations",
+    "path": "source/run-dictionary-context-regression.sh",
+    "bytes": 35465,
+    "sha256": "5c708477b5748ff4d686be5393134f53fb6759d0b15d5ec3c003511e405d20b5"
+  },
+  {
+    "archive": "observations",
+    "path": "source/verify-adhoc-macos-test-host.sh",
+    "bytes": 3642,
+    "sha256": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5"
+  },
+  {
+    "archive": "observations",
+    "path": "source/verify-adhoc-macos-test-host.test.sh",
+    "bytes": 4826,
+    "sha256": "3b74b785210bd5452f8f11247897c44f340d9b26fa1aa5efb52cfad8e7826855"
+  },
+  {
+    "archive": "observations",
+    "path": "source/voiceink-dictionary-context-check.yml",
+    "bytes": 5955,
+    "sha256": "f6ddaf65e4330ccbc9000c910e29badc058d201d34fc53b2ac9acdedd55f5cad"
+  },
+  {
+    "archive": "native",
+    "path": "dictionary-context-proof/baseline/build-settings-errors.log",
+    "bytes": 255,
+    "sha256": "c1988193b73fd459209c239c512d628ecab48ff66999306289145af5a265fba3"
+  },
+  {
+    "archive": "native",
+    "path": "dictionary-context-proof/baseline/build.log",
+    "bytes": 4891061,
+    "sha256": "a11d162ffe7fb8c271d966551694988258f92fb0d61b855bca206db8f0fe4f84"
+  },
+  {
+    "archive": "native",
+    "path": "dictionary-context-proof/candidate/build-settings-errors.log",
+    "bytes": 255,
+    "sha256": "c1988193b73fd459209c239c512d628ecab48ff66999306289145af5a265fba3"
+  },
+  {
+    "archive": "native",
+    "path": "dictionary-context-proof/candidate/build.log",
+    "bytes": 4698932,
+    "sha256": "f921eef184ec2f15e33c614e6dd339918378b1cfde3c9679bf238138a0074f49"
+  },
+  {
+    "archive": "native",
+    "path": "dictionary-context-proof/package-contract.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "archive": "native",
+    "path": "dictionary-context-proof/packages/candidate-strict-resolve.log",
+    "bytes": 11679,
+    "sha256": "9097ebfcf60fcc720cd3fabd54853d92695fbf347c887a8848cf77f71f97be4c"
+  },
+  {
+    "archive": "native",
+    "path": "dictionary-context-dependencies.log",
+    "bytes": 39579,
+    "sha256": "cb53f05ac2344e40e0f598a7b95a7293d1e1f89ea1092082bc536fc67a82cdf7"
+  }
+]

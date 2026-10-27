@@ -1,0 +1,43 @@
+{
+  "classification": "invalid-or-failed",
+  "errors": [
+    "Only the exact post-mutation metadata and first-caller-query failures with actual wrong values may fail",
+    "Exactly one actual read-only save diagnostic is required"
+  ],
+  "exit_code": 65,
+  "failure_sites": [],
+  "issues": [
+    "\u2718 Test importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() recorded an issue at DictationPolishAudioFileTests.swift:519:13: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)",
+    "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:127:17: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)",
+    "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:127:17: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)"
+  ],
+  "lane": "baseline",
+  "summaries": [
+    [
+      "3",
+      "3",
+      "failed"
+    ]
+  ],
+  "tests": {
+    "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": false
+}

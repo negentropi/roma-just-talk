@@ -1,0 +1,7 @@
+{
+  "all_pinned_tracked_sources_unchanged": true,
+  "injected_only_common_oracle": true,
+  "scope": "Historical tracked bytes unchanged; only the identical new public-API oracle was added.",
+  "service_sha256": "e630a6de3d0851a1222447ee7a03e1167481ac6d2f102909514555e070365966",
+  "task_owned_checkout": "/Users/runner/work/_temp/dictionary-context-baseline"
+}

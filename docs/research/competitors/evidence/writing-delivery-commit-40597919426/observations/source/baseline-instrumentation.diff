@@ -1,0 +1,130 @@
+diff --git a/VoiceInk/Services/WritingActionSession.swift b/VoiceInk/Services/WritingActionSession.swift
+index 9f539f8d..ef4b9daf 100644
+--- a/VoiceInk/Services/WritingActionSession.swift
++++ b/VoiceInk/Services/WritingActionSession.swift
+@@ -10,6 +10,18 @@ final class WritingActionSession {
+     let target: WritingTarget
+     let provider: AIEnhancementProviderSnapshot
+ 
++    init(
++        kind: VoiceInkWritingActionKind,
++        targetLanguage: String,
++        target: WritingTarget,
++        provider: AIEnhancementProviderSnapshot
++    ) {
++        self.kind = kind
++        self.targetLanguage = targetLanguage
++        self.target = target
++        self.provider = provider
++    }
++
+     init(kind: VoiceInkWritingActionKind, provider: AIEnhancementProviderSnapshot) throws {
+         self.kind = kind
+         self.provider = provider
+diff --git a/VoiceInkTests/DictationPolishAudioFileTests.swift b/VoiceInkTests/DictationPolishAudioFileTests.swift
+index 8dd76eb3..a4611f59 100644
+--- a/VoiceInkTests/DictationPolishAudioFileTests.swift
++++ b/VoiceInkTests/DictationPolishAudioFileTests.swift
+@@ -23,7 +23,6 @@ extension VoiceInkTests {
+                 fixture.defaults.set("pt", forKey: VoiceInkUserDefaultsKey.selectedTranscriptionLanguage)
+                 rule.replacementText = "Later"
+                 try fixture.context.save()
+-                DictionaryService.invalidateWordReplacementCache()
+                 let laterSnippet = "Later\r\n<tag>e\u{301}</tag> 🧪 "
+                 try fixture.snippet("my signature", content: laterSnippet)
+                 gate.release()
+@@ -233,6 +232,70 @@ extension VoiceInkTests {
+             } catch { await fixture.close(); throw error }
+         }
+ 
++        @Test @MainActor func importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() async throws {
++            final class Completions: @unchecked Sendable {
++                private let lock = NSLock()
++                private var records: [Transcription] = []
++                func receive(_ notification: Notification) {
++                    guard let record = notification.object as? Transcription else { return }
++                    lock.withLock { records.append(record) }
++                }
++                func snapshot() -> [Transcription] { lock.withLock { records } }
++            }
++            let fixture = try PolishAudioFixture(readOnlyStore: true)
++            do {
++                fixture.profile(.none)
++                let bystander = try #require(fixture.context.fetch(FetchDescriptor<VocabularyWord>()).first)
++                let savedWord = bystander.word
++                bystander.word = "Unrelated unsaved import edit"
++                let input = try Data(contentsOf: fixture.audio)
++                let gate = fixture.gate()
++                let registry = fixture.registry([.init("Read-only imported e\u{301} 🧪", gate: gate)])
++                let manager = fixture.manager([registry])
++                manager.addToQueue(urls: [fixture.audio])
++                let item = try #require(manager.queue.first)
++                let engine = fixture.engine()
++                manager.startProcessing(modelContext: fixture.context, engine: engine)
++                try await gate.waitUntilEntered()
++                let copy = try #require(registry.inputs.first)
++                fixture.ownedCopies.insert(copy)
++                #expect(copy != fixture.audio)
++                #expect(copy.deletingLastPathComponent() == VoiceInkMacOSStorageDirectories.recordingsDirectory)
++                #expect(try Data(contentsOf: copy).isEmpty == false)
++                let completions = Completions()
++                let tokens = [Notification.Name.transcriptionCreated, .transcriptionCompleted].map { name in
++                    NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) {
++                        // Store references without inspecting model state before the controlled first query.
++                        completions.receive($0)
++                    }
++                }
++                defer { for token in tokens { NotificationCenter.default.removeObserver(token) } }
++                gate.release()
++                try await fixture.waitUntil { !manager.isProcessingQueue && registry.cleanupCalls == 1 }
++
++                // This must be the first caller-context read after the failed queue operation.
++                let firstVisibleRows = try fixture.records()
++                #expect(firstVisibleRows.isEmpty)
++                if case .failed(let message) = item.status {
++                    #expect(!message.isEmpty)
++                } else {
++                    Issue.record("The actual read-only import did not fail its completed-record save.")
++                }
++                #expect(item.transcription == nil && manager.lastCompletedItemId == nil)
++                #expect(completions.snapshot().filter { $0.audioFileURL == copy.absoluteString }.isEmpty)
++                #expect(!FileManager.default.fileExists(atPath: copy.path))
++                #expect(try Data(contentsOf: fixture.audio) == input)
++                #expect(bystander.word == "Unrelated unsaved import edit" && fixture.context.hasChanges)
++                let fresh = ModelContext(fixture.container)
++                fresh.autosaveEnabled = false
++                #expect(try fresh.fetch(FetchDescriptor<Transcription>()).isEmpty)
++                #expect(try fresh.fetch(FetchDescriptor<VocabularyWord>()).map(\.word) == [savedWord])
++                #expect(bystander.word == "Unrelated unsaved import edit" && fixture.context.hasChanges)
++                #expect(fixture.enhancement.requests.isEmpty && fixture.warnings.isEmpty)
++                await fixture.close()
++            } catch { await fixture.close(); throw error }
++        }
++
+         @Test @MainActor func importCapturesEachItemWhenItStartsAndPreservesItsRawMetadata() async throws {
+             let fixture = try PolishAudioFixture()
+             do {
+@@ -452,7 +515,6 @@ private final class PolishAudioFixture {
+         defaults.set(false, forKey: VoiceInkUserDefaultsKey.isAudioCleanupEnabled)
+         defaults.removeObject(forKey: VoiceInkSpokenSnippets.userDefaultsKey)
+         PowerModeManager.shared.activeConfiguration = nil
+-        DictionaryService.invalidateWordReplacementCache()
+         let ai = AIService()
+         try #require(ai.selectedProvider == .localCLI && ai.isAPIKeyValid && ai.apiKey.isEmpty)
+         enhancement = PolishAudioEnhancementSpy(aiService: ai, modelContext: context)
+@@ -486,7 +548,6 @@ private final class PolishAudioFixture {
+         let rule = WordReplacement(originalText: source, replacementText: replacement)
+         context.insert(rule)
+         try context.save()
+-        DictionaryService.invalidateWordReplacementCache()
+         return rule
+     }
+ 
+@@ -602,7 +663,6 @@ private final class PolishAudioFixture {
+                 catch { Issue.record("Could not remove owned processed audio: \(error)") }
+             }
+         }
+-        DictionaryService.invalidateWordReplacementCache()
+         PowerModeManager.shared.activeConfiguration = savedPowerMode
+         for key in Self.keys {
+             if let value = savedDefaults[key] { defaults.set(value, forKey: key) }

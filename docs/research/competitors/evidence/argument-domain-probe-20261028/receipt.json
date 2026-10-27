@@ -1,0 +1,21 @@
+{
+  "classification": "read-only-Foundation-command-argument-probe",
+  "argv": [
+    "swift",
+    "main.swift",
+    "-selectedAIProvider",
+    "Local CLI"
+  ],
+  "source_sha256": "279dd8d743c24f12bd2200b48b335de54a2f613c8d1bfccd5fec4575a6cf8d98",
+  "exit": 0,
+  "result": {
+    "argumentRawType": "NSTaggedPointerString",
+    "argumentRawValue": "Local CLI",
+    "argvValue": "Local CLI",
+    "selectedValue": "Local CLI"
+  },
+  "limits": [
+    "No persistent preferences written. Only the named public provider key read.",
+    "Not XCTest, xctestrun launch forwarding or actual AIService initialization."
+  ]
+}

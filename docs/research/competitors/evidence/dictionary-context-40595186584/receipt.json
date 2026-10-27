@@ -1,0 +1,63 @@
+{
+  "run_id": 40595186584,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40595186584",
+  "head_sha": "a5601328e66d6949b5de052b81112ffadaeb1d1c",
+  "conclusion": "cancelled",
+  "classification": "invalid-pretest-actor-isolation-compile-failure",
+  "baseline_reference_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "baseline": {
+    "build_failed": true,
+    "repeated_diagnostics": 11,
+    "unique_diagnostic": "call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context",
+    "actual_common_oracle_sha256": "bd935877aca19d689f0c6ca0a99d4cfda2def35548c1040f66217d58fe36579f",
+    "tracked_baseline_source_equals_git": true,
+    "only_common_oracle_added": true,
+    "native_tests_started": 0
+  },
+  "candidate": {
+    "build_cancelled": true,
+    "native_tests_started": 0
+  },
+  "artifacts": {
+    "observations": {
+      "id": 12776723954,
+      "bytes": 289146,
+      "sha256": "52e3de9f7084745b691cc5259589d7bafdd060679b23b4f4464f797af41b4faf",
+      "crc_members": 23,
+      "download_count": 1
+    },
+    "native": {
+      "id": 12777826345,
+      "bytes": 444712,
+      "sha256": "4f233e7cd5e2503f0b7039ff4f89b7e9a6f1e45e723fdf69fc988b78340102ee",
+      "crc_members": 7,
+      "download_count": 1
+    }
+  },
+  "failed_log_request": {
+    "fetch_count": 1,
+    "bytes": 0,
+    "note": "gh --log-failed returned an empty stream for this cancelled run; actual baseline compiler diagnostics were read from the small native evidence archive."
+  },
+  "raw_build_logs": {
+    "baseline": {
+      "bytes": 4891061,
+      "sha256": "a11d162ffe7fb8c271d966551694988258f92fb0d61b855bca206db8f0fe4f84"
+    },
+    "candidate": {
+      "bytes": 4698932,
+      "sha256": "f921eef184ec2f15e33c614e6dd339918378b1cfde3c9679bf238138a0074f49"
+    }
+  },
+  "fix_preparation": {
+    "head": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+    "common_oracle_sha256": "3e76e3c168c50c73b028ba564746981cb0a82e5f0371d3a60174cde76b41cd33",
+    "change": "Mark setup helper @MainActor and materialize removalAlert before #require; two actual test bodies unchanged. Native retry remains separate."
+  },
+  "limits": [
+    "Zero native tests; neither red bug reproduction nor green candidate proof",
+    "Compilation error belongs to the test setup helper, not DictionaryService runtime behavior",
+    "No CloudKit synchronization proof",
+    "No future Undo or read-only import test attributed to this head"
+  ]
+}

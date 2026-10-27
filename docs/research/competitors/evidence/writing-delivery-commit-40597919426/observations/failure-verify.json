@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "Exact lane result no longer validates",
+  "phase": "verify"
+}

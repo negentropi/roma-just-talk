@@ -1,0 +1,223 @@
+{
+  "baseline_reference_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "bridge_sha256": "1b6048e13f973dc7cc8aae5ab13ff90a586396c7e7bffdeadca9a162e4ae2bea",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "expected_baseline_assertions": {
+    "DictationPolishAudioFileTests.swift:278": {
+      "expression": "firstVisibleRows.isEmpty",
+      "file": "DictationPolishAudioFileTests.swift",
+      "line": 278,
+      "observed": "nonempty-first-query",
+      "test": "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow"
+    },
+    "WritingActionDeliveryCommitTests.swift:18": {
+      "expression": "record.transcriptionState == .completed",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 18,
+      "observed": "canceled-state",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:19": {
+      "expression": "record.text == fixture.instruction",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 19,
+      "observed": "The transcription was canceled.",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:20": {
+      "expression": "record.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) == true",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 20,
+      "observed": "nil",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:21": {
+      "expression": "record.aiEnhancementModelName == \"owned-writing-model\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 21,
+      "observed": "nil",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:22": {
+      "expression": "record.aiRequestSystemMessage == \"owned system request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 22,
+      "observed": "nil",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:23": {
+      "expression": "record.aiRequestUserMessage == \"owned user request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 23,
+      "observed": "nil",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:24": {
+      "expression": "fixture.cancellations == 0",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 24,
+      "observed": "one-cancellation",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:26": {
+      "expression": "saved.transcriptionState == .completed",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 26,
+      "observed": "canceled-state",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:27": {
+      "expression": "saved.text == fixture.instruction",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 27,
+      "observed": "The transcription was canceled.",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:28": {
+      "expression": "saved.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) == true",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 28,
+      "observed": "nil",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:29": {
+      "expression": "saved.aiRequestSystemMessage == \"owned system request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 29,
+      "observed": "nil",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:30": {
+      "expression": "saved.aiRequestUserMessage == \"owned user request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 30,
+      "observed": "nil",
+      "test": "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:41": {
+      "expression": "record.transcriptionState == .failed",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 41,
+      "observed": "canceled-state",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:42": {
+      "expression": "record.text == fixture.instruction",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 42,
+      "observed": "The transcription was canceled.",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:43": {
+      "expression": "record.enhancedText?.utf8.elementsEqual(fixture.enhancement.output.utf8) == true",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 43,
+      "observed": "nil",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:44": {
+      "expression": "record.aiEnhancementModelName == \"owned-writing-model\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 44,
+      "observed": "nil",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:45": {
+      "expression": "record.aiRequestSystemMessage == \"owned system request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 45,
+      "observed": "nil",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:46": {
+      "expression": "record.aiRequestUserMessage == \"owned user request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 46,
+      "observed": "nil",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:47": {
+      "expression": "fixture.cancellations == 0",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 47,
+      "observed": "one-cancellation",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:49": {
+      "expression": "saved.transcriptionState == .failed",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 49,
+      "observed": "canceled-state",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:50": {
+      "expression": "saved.text == fixture.instruction",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 50,
+      "observed": "The transcription was canceled.",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:51": {
+      "expression": "saved.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) == true",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 51,
+      "observed": "nil",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:52": {
+      "expression": "saved.aiRequestSystemMessage == \"owned system request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 52,
+      "observed": "nil",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    },
+    "WritingActionDeliveryCommitTests.swift:53": {
+      "expression": "saved.aiRequestUserMessage == \"owned user request\"",
+      "file": "WritingActionDeliveryCommitTests.swift",
+      "line": 53,
+      "observed": "nil",
+      "test": "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata"
+    }
+  },
+  "helper_sha256": {
+    ".github/workflows/voiceink-writing-delivery-commit-check.yml": "94f99638687cafd5b4ce1b91b3b351bbed73884dcb165a5a8ed671b9db69fe03",
+    "LocalBuild.xcconfig": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844",
+    "Makefile": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9",
+    "VoiceInk/Services/KeychainService.swift": "78ede0cfc66704712ec972a002c6369fc19aa4620a3d1eb4aad4d845b61b5301",
+    "scripts/run-writing-delivery-commit-regression.sh": "2f00232d42f1f887a2e41925561a3c3162acbc7f91e422ec6ddb1bc39ad65753",
+    "scripts/run-writing-feature-regression.sh": "b9f811ad39bfbd5071e374348b80c029877a658cf560866c4e2ae4829c528450",
+    "scripts/tests/verify-adhoc-macos-test-host.test.sh": "3b74b785210bd5452f8f11247897c44f340d9b26fa1aa5efb52cfad8e7826855",
+    "scripts/verify-adhoc-macos-test-host.sh": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5",
+    "scripts/verify-static-whisper-app.sh": "e40475d402148fbde4327619c94ad046de1fb4ff18a3f04228a35534d64e2ad8",
+    "scripts/verify-static-whisper-xcframework.sh": "325bb8ec708dab070d6639a5efdc40f462ddc2f052c1c38c94737ca744277327"
+  },
+  "instrumentation": {
+    "added_test": "VoiceInkTests/WritingActionDeliveryCommitTests.swift",
+    "production_bridge_only": "VoiceInk/Services/WritingActionSession.swift",
+    "replaced_tracked_test": "VoiceInkTests/DictationPolishAudioFileTests.swift"
+  },
+  "lane": "baseline",
+  "live_build_declarations": {
+    "LocalBuild.xcconfig": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844",
+    "Makefile": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+    "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+    "VoiceInkQwen/Package.swift": "058f93419dd0da3a92dfd135af2c8a6b664192f53ec883168c279b7564b21d4e",
+    "iOS/VoiceInk-ios.xcodeproj/project.pbxproj": "1de9826aef36e173e54a8d62b0422fde6a4657011f86b8012dc62ff8807b9676"
+  },
+  "oracle_sha256": {
+    "VoiceInkTests/DictationPolishAudioFileTests.swift": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9",
+    "VoiceInkTests/WritingActionDeliveryCommitTests.swift": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506"
+  },
+  "scope": "Actual app pipeline post-mutation metadata and importer first-caller-context fetch. Synthetic controlled fixtures; no physical input, Clipboard Undo, CloudKit or runtime review-UI proof.",
+  "session_bridged_sha256": "a04c539eb86d85ffb22f9a3fab46ceabbd69c297b8cfd63af8d3257a704b561e",
+  "session_original_sha256": "10fc37409284b6c5bc4d60986bfd7b030046c08654c639781061c5b7058c6596",
+  "source_sha": "c5859b1f59997633fbd59d92565eb70c173c8392",
+  "task_owned_baseline": "/Users/runner/work/_temp/writing-delivery-commit-baseline",
+  "tests": [
+    "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata",
+    "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata",
+    "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow"
+  ]
+}

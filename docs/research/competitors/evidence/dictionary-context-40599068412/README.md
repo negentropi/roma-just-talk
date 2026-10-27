@@ -1,0 +1,11 @@
+# Dictionary context comparison: old bugs reproduced; candidate did not compile
+
+[Actual run 40599068412](https://github.com/negentropi/roma-just-talk/actions/runs/40599068412), exact `641dcc6de3341acdffe41fe62f45e074bec749ef`, proves two old dictionary-cache failures. Candidate native execution remains unverified. [Receipt](receipt.json).
+
+Historical `ebf629b4cf109f7a36109ccac7b20ac70f9f48ab` retained all tracked source bytes; only the common public-API test file was added. Both cases started once and failed only their final source-bound assertions: applying a second independent store returned **First store**, and applying a fresh context after another context's saved edit returned **First value**. The actual expected values were Second store and Second value. All setup and positive controls passed; exactly two issues in the 0.080-second native run. The new main-actor setup helper compiled successfully.
+
+Candidate compilation failed with fourteen copies of one unrelated test-source error: `CorrectionLibraryStoreUpgradeLiveTests.swift:89:59` accessed the throwing `voiceInkRule` property without `try`. No candidate native test ran. The missing candidate exit receipt is a consequence of compilation failure. The next source materializes the throwing property with `try`; retry 40602009529 is separate.
+
+Independent audit verifies both full source inventories against their Git commits, identical canonical 41-pin checkout states and static Whisper inputs, actual old DictionaryService compilation, exact two-case selection, unchanged old app/test binary identity, strict Debug signatures, signed TCC grants and the retained isolated launch configuration bytes. This supports the old native boundary, not a green candidate.
+
+Both artifacts were downloaded once to remote `/data`: observations 466,203 bytes (44 CRC members), native evidence 102,744,662 bytes (1,851 CRC members). Complete SHA-256/member identities are retained. Raw build logs and xcresults stay remote; only receipts, source contracts, exact native test log, configuration and narrow compiler/build excerpts are copied here. Failed logs fetched once. No CloudKit synchronization, physical input, ASR, future Undo or read-only import proof.

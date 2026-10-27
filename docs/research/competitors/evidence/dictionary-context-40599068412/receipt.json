@@ -1,0 +1,75 @@
+{
+  "run_id": 40599068412,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40599068412",
+  "head_sha": "641dcc6de3341acdffe41fe62f45e074bec749ef",
+  "classification": "valid-native-baseline-red-candidate-pretest-compile-failure",
+  "baseline_reference_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "artifacts": {
+    "observations": {
+      "id": 12777619845,
+      "bytes": 466203,
+      "sha256": "a957eadc8dd790e5f0f9f2a5ca7decc52e49c9c7b1ba0365be460ab5a12705b3",
+      "crc_members": 44,
+      "download_count": 1
+    },
+    "native": {
+      "id": 12777669708,
+      "bytes": 102744662,
+      "sha256": "a45f5596389c50094fae6e977cba1599d1dbe250f8b7783ca954fbf52ceb20fc",
+      "crc_members": 1851,
+      "download_count": 1
+    }
+  },
+  "source_checks": {
+    "candidate_tracked_files_match_git": 3463,
+    "baseline_tracked_files_match_git": 2969,
+    "historical_runtime_unchanged": true,
+    "only_common_oracle_injected": "VoiceInkTests/DictionaryContextFreshnessTests.swift",
+    "common_oracle_sha256": "3e76e3c168c50c73b028ba564746981cb0a82e5f0371d3a60174cde76b41cd33",
+    "canonical_packages": 41,
+    "both_lanes_package_and_static_whisper_inputs_identical": true
+  },
+  "baseline": {
+    "native_tests_started": 2,
+    "native_tests_failed": 2,
+    "native_issues": [
+      "\u2718 Test applyingAnotherStoreNeverReusesThePreviousStoresRules() recorded an issue at DictionaryContextFreshnessTests.swift:20:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: second.context) \u2192 \"First store\") == \"Second store\"",
+      "\u2718 Test aFreshContextReadsChangesSavedByAnotherContext() recorded an issue at DictionaryContextFreshnessTests.swift:41:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: reader) \u2192 \"First value\") == \"Second value\""
+    ],
+    "classification": "intended-stale-dictionary-failures",
+    "source_bound_final_assertions_only": true,
+    "setup_and_other_positive_controls_passed": true,
+    "app_files_and_test_bundle_unchanged": true,
+    "strict_adhoc_debug_signature_verified": true,
+    "fresh_signed_TCC_matches_csreq": true,
+    "isolated_launch_configuration_hash_verified": true
+  },
+  "candidate": {
+    "native_tests_started": 0,
+    "test_build_failed": true,
+    "repeated_diagnostics": 14,
+    "unique_error": "CorrectionLibraryStoreUpgradeLiveTests.swift:89:59: property access can throw but is not marked with try",
+    "missing_exit_json_is_follow_on_failure": true
+  },
+  "failed_log_fetch_count": 1,
+  "raw_build_logs": {
+    "baseline": {
+      "bytes": 5218927,
+      "sha256": "67c48724a228213cde95f0eb7d20c171f7e90c306deed897bf3730221cb3040b"
+    },
+    "candidate": {
+      "bytes": 5155348,
+      "sha256": "6a6bba5a046082e8bf0f11b0fce8a3e58a2e65ed41f08c69f31e41e4c9f8d1ad"
+    }
+  },
+  "followup": {
+    "head": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+    "change": "Materialize try compatibility.voiceInkRule before constructing the rule array; actual retry separate."
+  },
+  "limits": [
+    "Old per-store/per-context cache bugs reproduced in a controlled native app host",
+    "Candidate compilation failed before native execution; no passing fix or full matched result",
+    "No CloudKit synchronization, physical input, ASR, future Undo or read-only import behavior proof",
+    "Raw build logs and xcresults retained only in original remote /data archives"
+  ]
+}

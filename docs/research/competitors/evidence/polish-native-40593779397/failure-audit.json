@@ -1,0 +1,60 @@
+{
+  "classification": "actual-five-case-setup-failure-no-feature-acceptance",
+  "runID": 40593779397,
+  "sourceSHA": "e7b49af2239447246af6a8144e870ace37f4b161",
+  "nativeTestsStartedOnce": [
+    "liveLightImportQueueUsesRealWhisperRecognition",
+    "liveClarityImportQueueUsesRealWhisperRecognition",
+    "liveLightRetranscriptionUsesRealWhisperRecognition",
+    "liveClarityRetranscriptionUsesRealWhisperRecognition",
+    "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+  ],
+  "nativeTestsFailedOnce": 5,
+  "actualWhisperInferences": 0,
+  "actualEditorScenarios": 0,
+  "actualCLIRequests": 0,
+  "failureBoundary": "Common fixture initializer provider/validity assertion before real work. Compound assertion does not identify which subcondition failed. No guessed product cause.",
+  "appBuildAndLaunchPassed": true,
+  "actualDebugSignature": {
+    "app_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "47a17cb08b2ab151d1013f065006652139dba5967fd7e6c385d9ace816883818",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "sourceCensus": 637,
+  "sourceBeforeAfterEqual": true,
+  "sourceCensusMatchesPinnedGit": true,
+  "signedAppAndTestBundleIdentityBeforeAfterEqual": true,
+  "actualCanonicalDependencyPinsBefore": 41,
+  "hostPID": 29451,
+  "hostClosurePassed": true,
+  "selectedTestCount": 5,
+  "actualTCCRows": 2,
+  "artifact": {
+    "id": 12775842378,
+    "bytes": 312364,
+    "sha256": "8ea80e97b99ac344702f27c97715ea0be3f314f1b132a2fecaefd574a9e2fd8b",
+    "zipMembers": 40,
+    "crcValid": true,
+    "downloads": 1,
+    "path": "/data/rjt-writing-check-01a17bef/40593779397/evidence.zip"
+  },
+  "largeEvidenceArtifactDownloaded": false,
+  "limits": [
+    "Five test bodies started; all failed fixture setup before inference, CLI, editor or per-method observations.",
+    "App startup attempted microphone pre-roll; no microphone inactivity claim.",
+    "Dependency and static-library post-checks ran before source-after was written; separate raw after-dependency inventories were not retained.",
+    "Failed fixture initializers did not restore their preferences/temp directories in this run; disposable fresh host only."
+  ]
+}

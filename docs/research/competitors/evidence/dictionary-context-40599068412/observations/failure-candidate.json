@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "Command failed with exit 65; inspect /Users/runner/work/_temp/dictionary-context-proof/candidate/build.log",
+  "phase": "candidate"
+}

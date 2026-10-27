@@ -1,0 +1,16 @@
+Executable=/Users/runner/work/_temp/dictionary-context-derived-baseline/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
+Identifier=com.negentropi.RomaJustTalk
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=449844 flags=0x2(adhoc) hashes=14047+7 location=embedded
+Hash type=sha256 size=32
+CandidateCDHash sha256=b4e5be0e4adfa4573313a314f17f730f27863b31
+CandidateCDHashFull sha256=b4e5be0e4adfa4573313a314f17f730f27863b314ed8577afcef19eca9c9920c
+Hash choices=sha256
+CMSDigest=b4e5be0e4adfa4573313a314f17f730f27863b314ed8577afcef19eca9c9920c
+CMSDigestType=2
+CDHash=b4e5be0e4adfa4573313a314f17f730f27863b31
+Signature=adhoc
+Info.plist entries=36
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=168
+Internal requirements count=0 size=12

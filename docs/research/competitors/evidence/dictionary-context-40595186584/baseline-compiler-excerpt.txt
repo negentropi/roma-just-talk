@@ -1,0 +1,22 @@
+SwiftCompile normal arm64 /Users/runner/work/_temp/dictionary-context-baseline/VoiceInkTests/DictationStoreSeedLiveTests.swift (in target 'VoiceInkTests' from project 'VoiceInk')
+    cd /Users/runner/work/_temp/dictionary-context-baseline
+    
+@__swiftmacro_13VoiceInkTests0042DictionaryContextFreshnessTestsswift_IyBInfMX48_16_33_7A7A27ED8CF6046CB661E5AAE672C3B3Ll7requirefMf_.swift:1:50: error: call to main actor-isolated static method 'removeWordReplacement(_:context:)' in a synchronous nonisolated context
+Testing.__checkBinaryOperation(DictionaryService.removeWordReplacement(entry, context: context),{ $0 == $1() },nil,expression: .__fromBinaryOperation(.__fromSyntaxNode("DictionaryService.removeWordReplacement(entry, context: context)"),"==",.__fromSyntaxNode("nil")),comments: [],isRequired: true,sourceLocation: Testing.SourceLocation.__here()).__required()
+                                                 ^
+/Users/runner/work/_temp/dictionary-context-baseline/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here
+            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/runner/work/_temp/dictionary-context-baseline/VoiceInkTests/DictionaryContextFreshnessTests.swift:49:17: note: in expansion of macro 'require' here
+            try #require(DictionaryService.removeWordReplacement(entry, context: context) == nil)
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+VoiceInk.DictionaryService.removeWordReplacement:2:33: note: calls to static method 'removeWordReplacement(_:context:)' from outside of its actor context are implicitly asynchronous
+@MainActor internal static func removeWordReplacement(_ replacement: VoiceInk.WordReplacement, context: ModelContext) -> VoiceInkCore.VoiceInkDictionaryAlertPresentation?}
+                                ^
+/Users/runner/work/_temp/dictionary-context-baseline/VoiceInkTests/DictionaryContextFreshnessTests.swift:44:29: note: add '@MainActor' to make static method 'deleteOwnedSetupEntry(in:)' part of global actor 'MainActor'
+        private static func deleteOwnedSetupEntry(in context: ModelContext) throws {
+                            ^
+        @MainActor 
+
+SwiftCompile normal arm64 /Users/runner/work/_temp/dictionary-context-baseline/VoiceInkTests/DictionaryContextFreshnessTests.swift (in target 'VoiceInkTests' from project 'VoiceInk')
+    cd /Users/runner/work/_temp/dictionary-context-baseline

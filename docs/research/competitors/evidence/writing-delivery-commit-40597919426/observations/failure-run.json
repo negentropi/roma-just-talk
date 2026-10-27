@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "baseline native result is invalid: Only the exact post-mutation metadata and first-caller-query failures with actual wrong values may fail; Exactly one actual read-only save diagnostic is required",
+  "phase": "run"
+}

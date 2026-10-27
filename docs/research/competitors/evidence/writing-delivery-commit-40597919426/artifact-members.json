@@ -1,0 +1,252 @@
+[
+  {
+    "path": "baseline/build-command.json",
+    "bytes": 1227,
+    "sha256": "171742275048e1f4472d012305b64f9fd9b7a91756a1776d303eb0d794a87d0b"
+  },
+  {
+    "path": "baseline/configuration.json",
+    "bytes": 1218,
+    "sha256": "21fe85c2c14da7ec6a0ac967331fa34c76310939d9e49d343b3e7c22dcb21c26"
+  },
+  {
+    "path": "baseline/discovery/enumeration.log",
+    "bytes": 11162,
+    "sha256": "63c3460881d3ae60ea2f5bbf5d6b3538ef7a91b7dc3c4fb5c39c97ca28e4ba08"
+  },
+  {
+    "path": "baseline/build-settings.json",
+    "bytes": 41534,
+    "sha256": "bf17e594492c749177895eaed18531d43b9d1ffa79a8a3304f87db0e267e5897"
+  },
+  {
+    "path": "baseline/discovery/selected-tests.json",
+    "bytes": 38505,
+    "sha256": "b5fd54f17b47cedf6c48118d05668ec04f77bf93390d5d87d3c00304ebaa4afe"
+  },
+  {
+    "path": "baseline/exit.json",
+    "bytes": 44,
+    "sha256": "69fef3b5ef7cd3e1773d281641365b46cc3d058163dbc51803deee9b35b8e1a8"
+  },
+  {
+    "path": "baseline/host-requirement.txt",
+    "bytes": 51,
+    "sha256": "773cce263dadc0c996dc03127b1a6cf6920d1c6aeb664d4d881d736e6d18d1a8"
+  },
+  {
+    "path": "baseline/identity-after.json",
+    "bytes": 71084,
+    "sha256": "b01ac229e08490644508fe05f22cf14149bed6f265fb8224f9304971a6891b92"
+  },
+  {
+    "path": "baseline/identity-before.json",
+    "bytes": 71084,
+    "sha256": "b01ac229e08490644508fe05f22cf14149bed6f265fb8224f9304971a6891b92"
+  },
+  {
+    "path": "baseline/packages-before.json",
+    "bytes": 5585,
+    "sha256": "c7c816283c0572f2e933d49e15ef31c9c9b0b76972b837bdab698b4e88a3b6ab"
+  },
+  {
+    "path": "baseline/result.json",
+    "bytes": 1696,
+    "sha256": "98bd18fdc44f5ef679c4bb9627ebb40967d2ca4de6c7166aa831a316af897762"
+  },
+  {
+    "path": "baseline/selection/enumeration.log",
+    "bytes": 9819,
+    "sha256": "5774aa16c3656a5f22f0dc54280cc3f4a1ab30835be0b1057d2045fb3d566e5f"
+  },
+  {
+    "path": "baseline/selection/receipt.json",
+    "bytes": 27957,
+    "sha256": "81bb62df2c213c4be4ba7130da18ec9b03cc2270ca16f9a5b44270acb81ed21e"
+  },
+  {
+    "path": "baseline/selection/selected-tests.json",
+    "bytes": 38503,
+    "sha256": "6d6ce4b984e5fd9709f23c212312337b3b4042d53ec9c958853e2604e317904c"
+  },
+  {
+    "path": "baseline/source-after.json",
+    "bytes": 533326,
+    "sha256": "607a3072c95d40ee4e8a40049c473e8271d2d78b8ea45853902eb58c9cbdf643"
+  },
+  {
+    "path": "baseline/source-preservation.json",
+    "bytes": 782,
+    "sha256": "35624c8cb280a8d52b6ebbae97ab26450fa1555048924a2e52524a539f6f70f3"
+  },
+  {
+    "path": "baseline/static-whisper-before.json",
+    "bytes": 11104,
+    "sha256": "d8c362430be2f367fc8eb5d634cee3ad0917eaf99cd97fb71818023d40b9eb89"
+  },
+  {
+    "path": "baseline/tcc.json",
+    "bytes": 440,
+    "sha256": "7176ba7aa8bbbe35ea5d43f88710f2b3f24a4cea5dbfe00e5ae429a2021b190a"
+  },
+  {
+    "path": "baseline/test-host-signature/entitlements.log",
+    "bytes": 235,
+    "sha256": "e6dcb6e2e2d0a01112d252157fcb0890e733ea568a68bf0a91d7b8e505956983"
+  },
+  {
+    "path": "baseline/test-host-signature/deep-verification.txt",
+    "bytes": 6326,
+    "sha256": "712b4f1231ec6240cd3e884c72f013da254e7d7a28ca1b75abbab0e3c328bf47"
+  },
+  {
+    "path": "baseline/test-host-signature/entitlements.plist",
+    "bytes": 1017,
+    "sha256": "99cb83381cba5abc770fb567deafb883cca077d42909457c808a289ac2f004ab"
+  },
+  {
+    "path": "baseline/test-host-signature/linked-libraries.txt",
+    "bytes": 8305,
+    "sha256": "a529ba2fa9a21ba448fa06e898170165334592f7b893ed1ca87a35dbedf6153a"
+  },
+  {
+    "path": "baseline/test-host-signature/result.json",
+    "bytes": 1019,
+    "sha256": "9fb05aa7939bcdc9476df1a767f2aecb16f9019c7bd8bd2363b68ab14ea675fc"
+  },
+  {
+    "path": "baseline/test-host-signature/signature.txt",
+    "bytes": 798,
+    "sha256": "f25e78048ab11836b0bf00ea8ce84c3d997ee3c9631f8aba908341fb2a08847d"
+  },
+  {
+    "path": "baseline/tests.log",
+    "bytes": 15458,
+    "sha256": "3bbd20982847d6b58e61e186c364bac97de62188d4fc9be533741585c68d487a"
+  },
+  {
+    "path": "baseline-original-source.json",
+    "bytes": 533326,
+    "sha256": "fb7efc84ded52d70fa92ee3a173b3ee2782137b517d829bdbe0fac9fe61c71ff"
+  },
+  {
+    "path": "baseline-source.json",
+    "bytes": 533326,
+    "sha256": "607a3072c95d40ee4e8a40049c473e8271d2d78b8ea45853902eb58c9cbdf643"
+  },
+  {
+    "path": "candidate-source.json",
+    "bytes": 552131,
+    "sha256": "cc1ccf4f79e3dc294155e9ebd40179ac91df4be61fb338e8a4dd27931f8139ff"
+  },
+  {
+    "path": "contract.json",
+    "bytes": 11493,
+    "sha256": "fdce61e8c82c5b51fd6dc9fb9a62b3c134e91e624bbba5cc49a1cec420c3f773"
+  },
+  {
+    "path": "failure-run.json",
+    "bytes": 273,
+    "sha256": "a20d744a16b6f5f76d5dc5a9ee702adae21cb83c03a50298993f04550adfca17"
+  },
+  {
+    "path": "failure-verify.json",
+    "bytes": 117,
+    "sha256": "7ff03bbcfbdbf9bbf18721892cc8f95efae462914642c039f2e24514888b3738"
+  },
+  {
+    "path": "packages/candidate-strict-resolve.json",
+    "bytes": 48,
+    "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+  },
+  {
+    "path": "packages/canonical-graph-contract.json",
+    "bytes": 838,
+    "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f"
+  },
+  {
+    "path": "packages/canonical.Package.resolved",
+    "bytes": 11320,
+    "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  {
+    "path": "source/LocalBuild.xcconfig",
+    "bytes": 641,
+    "sha256": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844"
+  },
+  {
+    "path": "source/Makefile",
+    "bytes": 17343,
+    "sha256": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9"
+  },
+  {
+    "path": "source/VoiceInk/Services/KeychainService.swift",
+    "bytes": 5063,
+    "sha256": "78ede0cfc66704712ec972a002c6369fc19aa4620a3d1eb4aad4d845b61b5301"
+  },
+  {
+    "path": "source/VoiceInkTests/DictationPolishAudioFileTests.swift",
+    "bytes": 41750,
+    "sha256": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9"
+  },
+  {
+    "path": "source/VoiceInkTests/WritingActionDeliveryCommitTests.swift",
+    "bytes": 14600,
+    "sha256": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506"
+  },
+  {
+    "path": "source/baseline-instrumentation.diff",
+    "bytes": 7288,
+    "sha256": "733742bed9188c329410bb673a1b919d3c3a3a78fb12bd843090f547b2c9169a"
+  },
+  {
+    "path": "source/baseline-original-audio-tests.swift",
+    "bytes": 37948,
+    "sha256": "daa1401f9a7a6ba797432b45d3a579211851448501b3687acc051e4fa0fd8951"
+  },
+  {
+    "path": "source/baseline-original-session.swift",
+    "bytes": 1463,
+    "sha256": "10fc37409284b6c5bc4d60986bfd7b030046c08654c639781061c5b7058c6596"
+  },
+  {
+    "path": "source/scripts/run-writing-delivery-commit-regression.sh",
+    "bytes": 45971,
+    "sha256": "2f00232d42f1f887a2e41925561a3c3162acbc7f91e422ec6ddb1bc39ad65753"
+  },
+  {
+    "path": "source/scripts/run-writing-feature-regression.sh",
+    "bytes": 52663,
+    "sha256": "b9f811ad39bfbd5071e374348b80c029877a658cf560866c4e2ae4829c528450"
+  },
+  {
+    "path": "source/scripts/tests/verify-adhoc-macos-test-host.test.sh",
+    "bytes": 4826,
+    "sha256": "3b74b785210bd5452f8f11247897c44f340d9b26fa1aa5efb52cfad8e7826855"
+  },
+  {
+    "path": "source/scripts/verify-adhoc-macos-test-host.sh",
+    "bytes": 3642,
+    "sha256": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5"
+  },
+  {
+    "path": "source/scripts/verify-static-whisper-xcframework.sh",
+    "bytes": 1853,
+    "sha256": "325bb8ec708dab070d6639a5efdc40f462ddc2f052c1c38c94737ca744277327"
+  },
+  {
+    "path": "source/scripts/verify-static-whisper-app.sh",
+    "bytes": 1926,
+    "sha256": "e40475d402148fbde4327619c94ad046de1fb4ff18a3f04228a35534d64e2ad8"
+  },
+  {
+    "path": "toolchain.json",
+    "bytes": 315,
+    "sha256": "3f7b908c06b90954c7460aabc462b0eb1ae056e13da3e542e7281c9d195fc7e4"
+  },
+  {
+    "path": "source/session-value-initializer.patch",
+    "bytes": 849,
+    "sha256": "1b6048e13f973dc7cc8aae5ab13ff90a586396c7e7bffdeadca9a162e4ae2bea"
+  }
+]

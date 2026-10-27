@@ -1,16 +1,16 @@
 {
-  "conclusion": "",
+  "conclusion": "cancelled",
   "databaseId": 40596753377,
   "headBranch": "ci/rjt-dictation-polish-native-01a17bef",
   "headSha": "797da6c8be0f50f9c02a5eeed2e70e52adf4b82e",
   "jobs": [
     {
-      "completedAt": "0001-01-01T00:00:00Z",
-      "conclusion": "",
+      "completedAt": "2026-10-27T23:00:11Z",
+      "conclusion": "cancelled",
       "databaseId": 122514489802,
       "name": "native",
       "startedAt": "2026-10-27T22:52:17Z",
-      "status": "in_progress",
+      "status": "completed",
       "steps": [
         {
           "completedAt": "2026-10-27T22:52:19Z",
@@ -77,49 +77,57 @@
           "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T23:00:00Z",
+          "conclusion": "cancelled",
           "name": "Execute four real Whisper file operations and native TextEdit delivery",
           "number": 9,
           "startedAt": "2026-10-27T22:54:44Z",
-          "status": "in_progress"
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T23:00:00Z",
+          "conclusion": "skipped",
           "name": "Recheck frozen source, signed app and native observations",
           "number": 10,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T23:00:00Z",
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T23:00:03Z",
+          "conclusion": "success",
           "name": "Upload compact native acceptance observations",
           "number": 11,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T23:00:00Z",
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T23:00:05Z",
+          "conclusion": "success",
           "name": "Upload build logs and exact native configuration",
           "number": 12,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T23:00:03Z",
+          "status": "completed"
         },
         {
-          "completedAt": "0001-01-01T00:00:00Z",
-          "conclusion": "",
+          "completedAt": "2026-10-27T23:00:05Z",
+          "conclusion": "success",
           "name": "Post Run actions/checkout@v4",
           "number": 24,
-          "startedAt": "0001-01-01T00:00:00Z",
-          "status": "pending"
+          "startedAt": "2026-10-27T23:00:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T23:00:08Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 25,
+          "startedAt": "2026-10-27T23:00:05Z",
+          "status": "completed"
         }
       ],
       "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40596753377/job/122514489802"
     }
   ],
-  "status": "in_progress",
+  "status": "completed",
   "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40596753377"
 }

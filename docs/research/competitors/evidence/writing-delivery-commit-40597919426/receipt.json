@@ -1,0 +1,63 @@
+{
+  "run_id": 40597919426,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40597919426",
+  "head_sha": "c5859b1f59997633fbd59d92565eb70c173c8392",
+  "classification": "invalid-pre-action-AIService-fixture-configuration",
+  "baseline_reference_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "artifact": {
+    "id": 12779241098,
+    "bytes": 636865,
+    "sha256": "6308b8fcec41fe9eb722f1c5073f15eef8756ace502d1ae33e859bdaa99ee3ec",
+    "crc_members": 50,
+    "download_count": 1
+  },
+  "native_artifact": {
+    "id": 12778462142,
+    "name": "roma.writing-delivery-commit-native-evidence",
+    "size_in_bytes": 94057265,
+    "digest": "sha256:840de3902dcf78b2795f4fd4bbb056e3804421a22e5a9adc43f66bdf59316fa6"
+  },
+  "native_artifact_downloaded": false,
+  "failed_log_fetch_count": 1,
+  "source_closure": {
+    "candidate_tracked_files_match_git": 3358,
+    "baseline_original_tracked_files_match_git": 3241,
+    "baseline_runtime_preserved_except_initializer_bridge": true,
+    "explicit_test_instrumentation": {
+      "added_test": "VoiceInkTests/WritingActionDeliveryCommitTests.swift",
+      "production_bridge_only": "VoiceInk/Services/WritingActionSession.swift",
+      "replaced_tracked_test": "VoiceInkTests/DictationPolishAudioFileTests.swift"
+    },
+    "baseline_after_source_matches_before": true,
+    "both_common_oracles_exact": {
+      "VoiceInkTests/DictationPolishAudioFileTests.swift": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9",
+      "VoiceInkTests/WritingActionDeliveryCommitTests.swift": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506"
+    }
+  },
+  "actual_results": {
+    "started": 3,
+    "failed": 3,
+    "skipped": 0,
+    "issues": [
+      "\u2718 Test importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() recorded an issue at DictationPolishAudioFileTests.swift:519:13: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:127:17: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:127:17: Expectation failed: (ai.selectedProvider == .localCLI && ai.isAPIKeyValid \u2192 false) && (ai.apiKey.isEmpty \u2192 <not evaluated>)"
+    ],
+    "allowed_post_mutation_issues": 0,
+    "exit_code": 65,
+    "app_and_test_identity_unchanged": true,
+    "strict_debug_host_signature_verified": true,
+    "exact_selection_verified": true
+  },
+  "findings": [
+    "Each fixture throws at its AIService initialization requirement before entering the tested operation. The compound expression reveals configuration failure but does not isolate the failing provider/validity operand.",
+    "No fake editor mutation, import execution or controlled read-only completed-record save was reached; no Cocoa 513 fixture diagnostic appeared.",
+    "The classifier correctly rejected the three setup failures rather than treating any failing test as old-bug proof."
+  ],
+  "limits": [
+    "This is an invalid setup run, not old post-delivery cancellation or pending-import-row reproduction",
+    "No physical editor, ASR, provider model or Undo gesture behavior tested",
+    "Native build/xcresult artifact remains GitHub metadata only; no 94 MB download",
+    "No fix chosen from the compound error alone; runtime configuration diagnostics required"
+  ]
+}

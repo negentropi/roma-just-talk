@@ -1,0 +1,31 @@
+{
+  "source_sha": "f870a0b04238f338b52855b081b49087cc8966fa",
+  "boundary": "Read-only interpretation of retained deterministic service output plus tiny real local Foundation Process controls; no provider/authentication or app build.",
+  "deterministic_receipt": "/tmp/rjt-local-cli-service-40496074931/evidence/deterministic/result.json",
+  "deterministic_receipt_sha256": "39b80690a700dd40c00a9414b728869cfeec7a4282ee35b5b621cce9a49423dc",
+  "source_fixture_utf8_preserved_in_stdin": true,
+  "environment_expected_utf16_count": 472,
+  "environment_observed_utf16_count": 475,
+  "environment_expected_utf8_count": 532,
+  "environment_observed_utf8_count": 541,
+  "environment_utf8_equal": false,
+  "environment_utf16_equal": false,
+  "environment_canonically_equal": true,
+  "expected_is_nfc": true,
+  "observed_is_nfd": true,
+  "expected_utf8_sha256": "4d00db8e8b04034ae46b716bbdf4a2d83bb2bee875a7442c3aef0bf32f99b77a",
+  "observed_utf8_sha256": "0ddaca11a00ba6dfe82617f2eda575aff43641222f4f13b0661f5e38fe05b10a",
+  "first_scalar_mismatch": {
+    "offset": 444,
+    "expected": "U+3067",
+    "observed": "U+3066"
+  },
+  "foundation_process_experiment": "/tmp/rjt-process-unicode-observation.json",
+  "foundation_process_experiment_sha256": "e1f8c8cc773593dfd46d10b45f4f919bc99cd0f3d4038892dfca93d08c3767cb",
+  "python_subprocess_os_control": {
+    "exit_code": 0,
+    "UTF8Equal": true
+  },
+  "interpretation": "The environment and arguments path observed through Foundation Process decomposes the sample to NFD before receipt JSON serialization; stdin Data.utf8 preserves encoding. The existing Swift String equality checks canonical equivalence.",
+  "recommendation": "Keep historical receipts unchanged. Describe the environment check as canonical-equivalent text and add code-unit observations. Use UTF8/UTF16 elementsEqual where future checks claim exactness. No transport refactor justified by this fixture alone."
+}

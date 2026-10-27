@@ -72,10 +72,17 @@ private struct ProbeCheck: Encodable {
     let passed: Bool
 }
 
+private struct ProbeTextEquality: Encodable {
+    let canonicallyEquivalent: Bool
+    let utf8Equal: Bool
+    let utf16Equal: Bool
+}
+
 private struct ProbeObservation: Encodable {
     let id: String
     let output: String?
     let checks: [ProbeCheck]
+    var textEquality: ProbeTextEquality? = nil
 }
 
 private struct ProbeReceipt: Encodable {
@@ -135,10 +142,10 @@ private enum ProbeMain {
         try installCommand("/bin/cat >/dev/null; /usr/bin/printf 'RJT_EXPECTED_NONZERO' >&2; exit 23")
         let result = try await service.performWritingAction(input, using: original)
         let snapshotChecks = [
-            ProbeCheck(requirement: "Original snapshot command receives exact stdin", passed: result.text == expected),
+            ProbeCheck(requirement: "Original snapshot command receives exact UTF-8 stdin", passed: result.text.utf8.elementsEqual(expected.utf8)),
             ProbeCheck(requirement: "Captured model is Local CLI", passed: result.modelName == "local-cli"),
-            ProbeCheck(requirement: "Exact system request is retained", passed: result.requestSystemMessage == input.systemMessage),
-            ProbeCheck(requirement: "Exact user request is retained", passed: result.requestUserMessage == input.userMessage),
+            ProbeCheck(requirement: "Exact UTF-8 system request is retained", passed: result.requestSystemMessage?.utf8.elementsEqual(input.systemMessage.utf8) == true),
+            ProbeCheck(requirement: "Exact UTF-8 user request is retained", passed: result.requestUserMessage?.utf8.elementsEqual(input.userMessage.utf8) == true),
             ProbeCheck(requirement: "Ordinary enhancement remains disabled", passed: !service.isEnhancementEnabled),
             ProbeCheck(requirement: "Provider remains Local CLI without a key", passed: ai.selectedProvider == .localCLI && ai.apiKey.isEmpty)
         ]
@@ -158,11 +165,16 @@ private enum ProbeMain {
         ]))
         try installCommand("/bin/cat >/dev/null; /usr/bin/printf '%s\\n%s' \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\"")
         let environment = try await service.performWritingAction(input, using: service.writingActionProviderSnapshot())
-        let environmentMatches = environment.text == input.systemMessage + "\n" + input.userMessage
-        try require(environmentMatches, "The real command did not receive the exact prompt environment")
+        let expectedEnvironment = input.systemMessage + "\n" + input.userMessage
+        let environmentEquality = ProbeTextEquality(
+            canonicallyEquivalent: environment.text == expectedEnvironment,
+            utf8Equal: environment.text.utf8.elementsEqual(expectedEnvironment.utf8),
+            utf16Equal: environment.text.utf16.elementsEqual(expectedEnvironment.utf16)
+        )
+        try require(environmentEquality.canonicallyEquivalent, "The real command did not receive canonically equivalent prompt environment text")
         observations.append(.init(id: "prompt-environment", output: environment.text, checks: [
-            .init(requirement: "Exact system and user prompts reach command environment", passed: environmentMatches)
-        ]))
+            .init(requirement: "Canonically equivalent system and user prompts reach command environment", passed: environmentEquality.canonicallyEquivalent)
+        ], textEquality: environmentEquality))
         try installCommand("/bin/cat >/dev/null")
         let empty = try service.writingActionProviderSnapshot()
         var emptyFailed = false
@@ -232,7 +244,7 @@ private enum ProbeMain {
                     let input = try request(fixture)
                     let result = try await service.performWritingAction(input, using: captured)
                     var checks = fixture.checks(result.text).map { ProbeCheck(requirement: $0.requirement, passed: $0.passed) }
-                    checks.append(.init(requirement: "Source-bound request metadata is retained", passed: result.requestSystemMessage == input.systemMessage && result.requestUserMessage == input.userMessage))
+                    checks.append(.init(requirement: "Exact UTF-8 source-bound request metadata is retained", passed: result.requestSystemMessage?.utf8.elementsEqual(input.systemMessage.utf8) == true && result.requestUserMessage?.utf8.elementsEqual(input.userMessage.utf8) == true))
                     checks.append(.init(requirement: "Ordinary enhancement remains disabled", passed: !service.isEnhancementEnabled))
                     observations.append(.init(id: fixture.id, output: result.text, checks: checks))
                     try require(checks.allSatisfy { $0.passed }, "A bounded semantic requirement failed for " + fixture.id)
@@ -410,6 +422,10 @@ if result.get("classification") != "passed" or result.get("mode") != "determinis
     raise SystemExit("The real service deterministic proof failed")
 if {row["id"] for row in result["observations"]} != required or len(result["observations"]) != 4 or any(not row["checks"] or any(check["passed"] is not True for check in row["checks"]) for row in result["observations"]):
     raise SystemExit("The real service proof did not execute every required case")
+environment = next(row for row in result["observations"] if row["id"] == "prompt-environment")
+equality = environment.get("textEquality", {})
+if equality.get("canonicallyEquivalent") is not True or any(type(equality.get(key)) is not bool for key in ["utf8Equal", "utf16Equal"]):
+    raise SystemExit("Environment transport must report canonical equivalence and both code-unit observations")
 with tarfile.open(root / "signed-probe.tar.gz", "w:gz") as archive:
     archive.add(root / "WritingLocalCLIProbe.app", arcname="WritingLocalCLIProbe.app")
     for name in ["source-contract.json", "identity-before.txt", "signature.txt", "resolved-pin-receipt.json", "sources-after-build.json"]:

@@ -1,0 +1,64 @@
+{
+  "run_id": 40475185945,
+  "head_sha": "7459b97b0469832a55b38df7b82753b82e430fdb",
+  "artifact_id": 12721313617,
+  "artifact_zip": "/data/rjt-writing-check-01a17bef/40475185945/evidence.zip",
+  "artifact_bytes": 97543394,
+  "extraction": "Read existing ZIP; decompressed xcresult Data Zstandard blocks with Python3.14 compression.zstd; parsed exact serialized string fields. No xcresulttool or native execution performed here.",
+  "source_aggregate": {
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~_GoHeS8N8_0kSlOo-JOjt-3o_lt976PMKY-uMd9aV7Q9X27JJpKvZrY6M5IiMONGloPklqiJ6Yx4aWDfIBy-Vg==",
+    "decoded_sha256": "9c5d75576fa3a67278d1d7b5dc68957c00c54148a0997de4772075209984863c"
+  },
+  "source_action_metrics": {
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~Qm-1Mk6o5HuIiWgJigiOdugOqwvvztyRGow_XyGD0J_CvX_mite1rj5YB-kTstiwZnF3tpz9G3e3bOq8t6NvTg==",
+    "decoded_sha256": "e6f56b3771127f64c348ba23d43fa13e13eb47947c952f18274ae694af701067",
+    "testsCount": 156,
+    "testsSkippedCount": 6
+  },
+  "source_console": {
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~dACuYTSQy4zusyh6Olmku0X8QoW7AwIxC526PpAYKMExkeqkeH7bNSgrdI467MMwKvDJTC8Kuwn8ARWxBQwlaQ==",
+    "decoded_sha256": "b030ce45e2c3eed657b50677d8689ecaabea44f532e5a43dd0d766e97dfaf227",
+    "swift_testing_summary": "Test run with 146 tests in 15 suites passed after 2.519 seconds.",
+    "xctest_summary": "Executed 8 tests, with 0 failures (0 unexpected)."
+  },
+  "xcresult_test_records": {
+    "total": 156,
+    "success": 150,
+    "failed": 0,
+    "skipped": 6,
+    "executed_non_skipped": 150
+  },
+  "count_boundary": "Xcode result records include parameterized case invocations. The Swift Testing console reports146 test functions including gated skips; XCTest separately reports8 executed tests. Do not call156 executed tests.",
+  "selected_results": {
+    "WritingTargetTests/selectionCannotSplitAnEmojiSurrogatePair()": [
+      "Success"
+    ],
+    "VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()": [
+      "Success"
+    ],
+    "VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()": [
+      "Success"
+    ],
+    "VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()": [
+      "Success"
+    ],
+    "WritingActionEngineTests/permissionWaitReservesOneRecordingStart()": [
+      "Success"
+    ],
+    "WritingActionEngineTests/oldStartupFailureDoesNotClearANewerRecordingStart()": [
+      "Success"
+    ]
+  },
+  "skipped": [
+    "VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+    "VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+    "VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+    "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+    "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+    "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()"
+  ],
+  "limits": [
+    "Six gated provider/native tests were skipped in the full unit suite; they are not runtime proof.",
+    "Subsequent live-only step selected zero tests due to bare method identifiers and does not establish native editor behavior."
+  ]
+}

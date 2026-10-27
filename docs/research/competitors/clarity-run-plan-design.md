@@ -157,7 +157,7 @@ At `1f36a746`, Ollama capture now uses one immutable runtime endpoint/model pair
 
 ## Independent Core preparation
 
-`DictationPolish.swift` now contains the conservative English hesitation rule, stable Natural/Casual/Formal values, fixed JSON request messages and response decoding. Eight registered check methods cover positive cleanup, multilingual and protected-content no-ops, exact code units, instruction-like transcript data and malformed/blank responses. This preparation has not yet passed a compiler/runtime gate. It adds no selectable profile, provider call, app preference or storage field.
+`DictationPolish.swift` now contains the conservative English hesitation rule, stable Natural/Casual/Formal values, fixed JSON request messages and response decoding. Eight registered check methods cover positive cleanup, multilingual and protected-content no-ops, exact code units, instruction-like transcript data and malformed/blank responses. [Core run 40562076345](https://github.com/negentropi/roma-just-talk/actions/runs/40562076345), exact `aaaa286a`, compiled and passed all 1,707 registered checks, including those eight exactly once. The [independent receipt](evidence/core-40562076345/receipt.json) verifies exact check names/order, source and lock bytes, and the actual toolchain. This adds no selectable profile, provider call, app preference or storage field; app integration and real model quality remain unverified.
 
 The Light rule preserves initial spaces/tabs and requires spaces/tabs after the comma. It leaves paragraph boundaries, non-ASCII separators and punctuation-only remainders unchanged. Its whole-utterance protection also covers bare Unicode domains and numeric dotted addresses; this intentionally favors preserving text.
 

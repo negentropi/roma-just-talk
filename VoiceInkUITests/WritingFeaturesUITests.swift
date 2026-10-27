@@ -284,11 +284,12 @@ final class WritingFeaturesUITests: XCTestCase {
 
     @MainActor private func targetIsSelected(_ code: String, in app: XCUIApplication) -> Bool {
         let row = identified("writingActions.target.\(code)", in: app)
-        return row.staticTexts["Current target"].exists
+        return app.buttons["writingActions.target.\(code).select"].isSelected
+            || row.staticTexts["Current target"].exists
     }
 
     @MainActor private func containsText(_ text: String, in element: XCUIElement) -> Bool {
-        element.descendants(matching: .any)
+        element.label.contains(text) || element.descendants(matching: .any)
             .allElementsBoundByIndex.contains {
                 $0.label.contains(text) || ($0.value as? String)?.contains(text) == true
             }

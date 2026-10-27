@@ -75,6 +75,36 @@ Path(output).write_text(json.dumps({"expectation": expectation, "exit_code": int
 PY
 }
 
+verify_permission_observations() {
+  python3 - "$@" <<'PY'
+import json
+import re
+import sys
+from pathlib import Path
+
+log_path, expectation, exit_code, output = sys.argv[1:]
+text = Path(log_path).read_text(errors="replace")
+name = "permissionWaitReservesOneRecordingStart"
+started = re.findall(r"Test " + name + r"\(\) started\.", text)
+finished = re.findall(r"Test " + name + r"\(\) (passed|failed) after ", text)
+summaries = re.findall(r"Test run with (\d+) tests? in \d+ suites? (passed|failed)", text)
+expected_result = "failed" if expectation == "known-bad" else "passed"
+valid = len(started) == 1 and finished == [expected_result] and summaries == [("1", expected_result)]
+diagnostics = {}
+if expectation == "known-bad":
+    diagnostics = {
+        "permission_wait_left_state_idle": bool(re.search(r"Expectation failed:[^\n]*recordingState[^\n]*\bidle\b[^\n]*\bstarting\b", text)),
+        "duplicate_permission_calls": bool(re.search(r"Expectation failed:[^\n]*gate\.calls[^\n]*→\s*2\)?\s*==\s*1", text)),
+    }
+    valid = valid and int(exit_code) == 65 and all(diagnostics.values())
+else:
+    valid = valid and int(exit_code) == 0
+Path(output).write_text(json.dumps({"expectation": expectation, "classification": "deferred-permission-callback" if valid else "invalid-or-failed", "exit_code": int(exit_code), "test": {name: finished}, "diagnostics": diagnostics}, indent=2) + "\n")
+if not valid:
+    raise SystemExit("Permission proof requires one executed test and the exact expected ownership assertions")
+PY
+}
+
 test -d "$debug_dir/onboarding-test-evidence/Debug.xcresult"
 codesign --verify --deep --strict "$debug_app"
 
@@ -120,10 +150,42 @@ case "$mode" in
     git worktree add --detach "$baseline" "$baseline_ref"
     test "$(git -C "$baseline" rev-parse HEAD)" = "$baseline_ref"
     oracle=VoiceInkTests/SpokenSnippetPipelineTests.swift
+    permission_oracle=VoiceInkTests/WritingActionEngineTests.swift
     test -f "$repo_root/$oracle"
     test ! -e "$baseline/$oracle"
     cp "$repo_root/$oracle" "$baseline/$oracle"
     cmp "$repo_root/$oracle" "$baseline/$oracle"
+    test -f "$repo_root/$permission_oracle"
+    test ! -e "$baseline/$permission_oracle"
+    cp "$repo_root/$permission_oracle" "$baseline/$permission_oracle"
+    cmp "$repo_root/$permission_oracle" "$baseline/$permission_oracle"
+    python3 - "$baseline" "$out" <<'PY'
+import difflib
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+baseline, output = map(Path, sys.argv[1:])
+relative = "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
+file = baseline / relative
+original = file.read_text()
+property_anchor = "    private var qwenStartupWarmup: Task<Void, Never>?\n"
+permission_anchor = "    private func requestRecordPermission(\n        latencyTraceToken: VoiceInkLatencyTrace.Token?\n    ) async -> Bool {\n"
+if original.count(property_anchor) != 1 or original.count(permission_anchor) != 1:
+    raise SystemExit("Known-bad permission boundary did not match the instrumentation contract")
+properties = "    var recordPermissionRequestForTesting: (() async -> Bool)?\n    var recordingStartupPreparationForTesting: (() async throws -> Void)?\n"
+hook = "        if let recordPermissionRequestForTesting { return await recordPermissionRequestForTesting() }\n"
+instrumented = original.replace(property_anchor, properties + property_anchor).replace(permission_anchor, permission_anchor + hook)
+patch = "".join(difflib.unified_diff(original.splitlines(keepends=True), instrumented.splitlines(keepends=True), fromfile="a/" + relative, tofile="b/" + relative))
+additions = [line[1:] for line in patch.splitlines() if line.startswith("+") and not line.startswith("+++")]
+if additions != properties.splitlines() + hook.splitlines():
+    raise SystemExit("Instrumentation changed more than the two optional hooks and existing permission boundary")
+file.write_text(instrumented)
+(output / "baseline-permission-instrumentation.patch").write_text(patch)
+digest = lambda value: hashlib.sha256(value.encode()).hexdigest()
+(output / "baseline-permission-instrumentation.json").write_text(json.dumps({"path": relative, "original_sha256": digest(original), "instrumented_sha256": digest(instrumented), "patch_sha256": digest(patch), "added_lines": additions, "scope": "optional hook at existing permission callback; no startup-preparation await or ownership fix"}, indent=2) + "\n")
+PY
     resolved=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
     cmp "$repo_root/$resolved" "$baseline/$resolved"
     {
@@ -132,12 +194,14 @@ case "$mode" in
       sw_vers
       uname -m
       shasum -a 256 "$repo_root/$oracle" "$baseline/$oracle" "$repo_root/$resolved" "$baseline/$resolved"
+      shasum -a 256 "$repo_root/$permission_oracle" "$baseline/$permission_oracle" "$out/baseline-permission-instrumentation.patch"
       shasum -a 256 "$repo_root/VoiceInk/Transcription/Engine/TranscriptionPipeline.swift" "$baseline/VoiceInk/Transcription/Engine/TranscriptionPipeline.swift"
     } > "$out/contract.txt"
     test_arguments "$baseline" "$baseline/.local-build"
     select_tests "${test_names[@]}"
+    build_selectors=("${selectors[@]}" '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart')
     phase=baseline-build
-    if ! xcodebuild build-for-testing "${arguments[@]}" "${selectors[@]}" \
+    if ! xcodebuild build-for-testing "${arguments[@]}" "${build_selectors[@]}" \
       -clonedSourcePackagesDirPath "$debug_dir/SourcePackages" \
       -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile > "$out/baseline-build.log" 2>&1; then
       tail -n 120 "$out/baseline-build.log" >&2
@@ -151,6 +215,15 @@ case "$mode" in
       tail -n 120 "$out/baseline-tests.log" >&2
       exit 1
     fi
+    phase=baseline-permission-test
+    baseline_permission_exit=0
+    xcodebuild test-without-building "${arguments[@]}" \
+      '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart' \
+      -resultBundlePath "$out/BaselinePermission.xcresult" > "$out/baseline-permission.log" 2>&1 || baseline_permission_exit=$?
+    if ! verify_permission_observations "$out/baseline-permission.log" known-bad "$baseline_permission_exit" "$out/baseline-permission-result.json"; then
+      tail -n 120 "$out/baseline-permission.log" >&2
+      exit 1
+    fi
     phase=candidate-tests
     test_arguments "$repo_root" "$debug_dir"
     candidate_exit=0
@@ -160,8 +233,18 @@ case "$mode" in
       tail -n 120 "$out/candidate-tests.log" >&2
       exit 1
     fi
+    phase=candidate-permission-test
+    candidate_permission_exit=0
+    xcodebuild test-without-building "${arguments[@]}" \
+      '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart' \
+      -resultBundlePath "$out/CandidatePermission.xcresult" > "$out/candidate-permission.log" 2>&1 || candidate_permission_exit=$?
+    if ! verify_permission_observations "$out/candidate-permission.log" fixed "$candidate_permission_exit" "$out/candidate-permission-result.json"; then
+      tail -n 120 "$out/candidate-permission.log" >&2
+      exit 1
+    fi
     cmp "$repo_root/$oracle" "$baseline/$oracle"
-    printf '{"classification":"matched-red-green","candidate":"%s","baseline":"%s"}\n' \
+    cmp "$repo_root/$permission_oracle" "$baseline/$permission_oracle"
+    printf '{"classification":"matched-red-green","scope":["literal-snippets","deferred-permission-callback"],"stale_startup_catch":"candidate-only coverage","candidate":"%s","baseline":"%s"}\n' \
       "$candidate_sha" "$baseline_ref" > "$out/result.json"
     ;;
   ui)
@@ -201,6 +284,21 @@ indirect_object_identifier_type,indirect_object_identifier,flags
     RJT_WRITING_UI_CHECKS=1 TEST_RUNNER_RJT_WRITING_UI_CHECKS=1 \
       xcodebuild test-without-building "${arguments[@]}" "$ui_selector" \
         -resultBundlePath "$out/UI.xcresult" > "$out/tests.log" 2>&1 || test_exit=$?
+    export_exit=0
+    xcrun xcresulttool export attachments --path "$out/UI.xcresult" \
+      --output-path "$out/screenshots" > "$out/screenshot-export.log" 2>&1 || export_exit=$?
+    python3 - "$out/screenshots" "$export_exit" "$candidate_sha" "$out/screenshot-export.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+directory, exit_code, source_sha, output = sys.argv[1:]
+images = [str(path.relative_to(directory)) for path in Path(directory).rglob("*") if path.suffix.lower() in {".png", ".jpg", ".jpeg"}]
+available = int(exit_code) == 0 and bool(images)
+Path(output).write_text(json.dumps({"source_sha": source_sha, "export_exit_code": int(exit_code), "visual_proof": "available" if available else "missing", "images": images}, indent=2) + "\n")
+if not available:
+    print("::warning::Writing settings screenshots were not exported; inspect screenshot-export.log and retained UI.xcresult.")
+PY
     shasum -a 256 "$debug_app/Contents/MacOS/roma just talk" > "$out/identity-after.txt"
     cmp "$out/identity-before.txt" "$out/identity-after.txt"
     codesign --verify --deep --strict "$debug_app"

@@ -107,6 +107,16 @@ jobs:
           if-no-files-found: error
           include-hidden-files: true
 
+      - name: Upload settings screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-actions-screenshots
+          path: |
+            .local-build/onboarding-test-evidence/writing-ui/screenshots/**
+            .local-build/onboarding-test-evidence/writing-ui/screenshot-export.*
+          if-no-files-found: warn
+
       - name: Upload verified release app
         if: success()
         uses: actions/upload-artifact@v4

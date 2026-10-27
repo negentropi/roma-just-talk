@@ -1,0 +1,11 @@
+# Native settings comparison: failed test premise
+
+Run [40543565335](https://github.com/negentropi/roma-just-talk/actions/runs/40543565335), candidate `830d45210816a36c2db70b09d1329a0ef8b7ddf6`, baseline `bdd608cf6111e8d7e88c12678f530318713acf67`. Same UI oracle bytes, SHA256 `4dc9dac031a37e09d8b70c8f7f8ed014cad1ea1fa3939dfea625e20be30df192`.
+
+Baseline: one selected test, one failure at the intended line 361 marker. Custom and None existed and were enabled but had no XCTest hitpoint. Candidate: four tests executed; three existing tests passed. The profile test failed at the same marker because its covered gear and Recommended filter still reported enabled/hittable. Candidate Custom, None and Close each reported enabled/hittable, and one native sheet existed. No profile mutation, persistence check or five shared-caller smoke scenarios ran.
+
+The failed premise was that covered native-modal background controls must report disabled or unhittable. These flags alone do not prove an action can activate them. No background action was attempted in this run. App/Window/Form report Disabled even when native child controls are reachable; those container flags likewise cannot establish inherited product disablement. The next oracle separates foreground reachability from an ordinary background pointer action and checks actual sheet/selection/preferences effects. VoiceOver and direct background AXPress remain unproven.
+
+`analyze-actors.py` reproduces the before/after census from original JSON attachments; run with `python3 analyze-actors.py`. Original native hierarchy attachments accompany the census. Both lane identities, fresh Accessibility/Microphone TCC row readbacks and observed executable paths verified successfully. `comparison-contract.json` records the canonical package lock and changed production files; `receipt.json` pins source and artifact hashes.
+
+Frames extracted without edits from original recordings: baseline at 40s, candidate at 35s. The original MP4s remain in the remotely retained, CRC-verified artifact; no original explicit PNG existed for this failed test. Candidate frame shows the readable centered native sheet and dimmed main window. These frames show appearance only.

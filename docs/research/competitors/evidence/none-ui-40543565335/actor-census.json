@@ -1,0 +1,222 @@
+{
+  "lanes": {
+    "baseline": {
+      "after": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": true,
+            "exists": true,
+            "hittable": false
+          },
+          "form": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": true,
+            "exists": true,
+            "hittable": false
+          },
+          "settings-close": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-open": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [
+          "custom",
+          "none"
+        ],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 1,
+        "phase": "after-opening",
+        "version": 1
+      },
+      "background_action_attempted": false,
+      "before": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 1,
+        "phase": "before-opening",
+        "version": 1
+      },
+      "foreground_boundary_failures": [
+        "custom",
+        "none"
+      ]
+    },
+    "candidate": {
+      "after": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "form": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-close": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [
+          "settings-open remained interactive behind the panel",
+          "background-filter remained interactive behind the panel"
+        ],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 1,
+        "opening": 1,
+        "phase": "after-opening",
+        "version": 1
+      },
+      "background_action_attempted": false,
+      "before": {
+        "actors": {
+          "application": {
+            "enabled": false,
+            "exists": true,
+            "hittable": false
+          },
+          "background-filter": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          },
+          "custom": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "form": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "main-window": {
+            "enabled": false,
+            "exists": true,
+            "hittable": true
+          },
+          "none": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-close": {
+            "enabled": null,
+            "exists": false,
+            "hittable": null
+          },
+          "settings-open": {
+            "enabled": true,
+            "exists": true,
+            "hittable": true
+          }
+        },
+        "boundaryFailures": [],
+        "mainWindowCount": 1,
+        "nativeSheetCount": 0,
+        "opening": 1,
+        "phase": "before-opening",
+        "version": 1
+      },
+      "foreground_boundary_failures": []
+    }
+  },
+  "run_id": 40543565335
+}

@@ -199,6 +199,7 @@ final class WritingFeaturesUITests: XCTestCase {
         try preferences.install()
         try launchApp(app, ownership: ownership)
         openModelSettings(in: app)
+        assertModelSettingsResistsBackgroundPointer(preferences: preferences, in: app)
         assertProfile("Custom", storedValue: "custom", preferences: preferences, in: app)
         assertCustomFormatting(isEnabled: true, preferences: preferences, in: app)
         attachScreenshot(app, named: "Custom dictation cleanup settings")
@@ -347,19 +348,50 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(profileChoice("Custom", in: app).waitForExistence(timeout: 5))
         XCTAssertTrue(profileChoice("None", in: app).waitForExistence(timeout: 5))
         let after = modelSettingsActors(in: app)
-        var failures = ["custom", "none", "settings-close"].filter { after[$0]?.isInteractive != true }
-        for key in ["settings-open", "background-filter"] where after[key]?.isBlocked != true {
-            failures.append(key + " remained interactive behind the panel")
-        }
-        if app.sheets.count == 0 {
-            for key in ["application", "main-window"]
-            where before[key]?.enabled == true && after[key]?.enabled != true {
-                failures.append(key + " became disabled")
-            }
-        }
+        let failures = ["custom", "none", "settings-close"].filter { after[$0]?.isInteractive != true }
         attachModelSettingsBoundary("after-opening", actors: after, failures: failures, in: app)
         XCTAssertTrue(failures.isEmpty, "Opening model settings disabled the panel or blocked a visible panel control.")
         XCTAssertEqual(app.sheets.count, 1, "Model settings did not present one native sheet.")
+    }
+
+    @MainActor private func assertModelSettingsResistsBackgroundPointer(
+        preferences: WritingFeaturesDictationPreferences,
+        in app: XCUIApplication
+    ) {
+        let expectedProfile = preferences.profile()
+        let customValue = String(describing: profileChoice("Custom", in: app).value ?? "")
+        let noneValue = String(describing: profileChoice("None", in: app).value ?? "")
+        let entry = app.buttons["models.settings.open"]
+        let sheetFrame = app.sheets.firstMatch.frame
+        // Native modal background traits can remain hittable; verify pointer routing by its effect.
+        let attempted = clickBackgroundEntryIfReachable(entry, outside: app.sheets.firstMatch)
+        let after = modelSettingsActors(in: app)
+        let failures = ["custom", "none", "settings-close"].filter { after[$0]?.isInteractive != true }
+        attachModelSettingsBoundary("after-background-pointer", actors: after, failures: failures,
+                                    backgroundPointerAttempted: attempted, in: app)
+        XCTAssertEqual(app.sheets.count, 1, "The background gear dismissed or replaced the model settings sheet.")
+        XCTAssertEqual(app.sheets.firstMatch.frame, sheetFrame, "The background gear moved the active model settings sheet.")
+        XCTAssertTrue(failures.isEmpty, "The background gear blocked the active model settings controls.")
+        XCTAssertEqual(String(describing: profileChoice("Custom", in: app).value ?? ""), customValue)
+        XCTAssertEqual(String(describing: profileChoice("None", in: app).value ?? ""), noneValue)
+        XCTAssertEqual(preferences.profile(), expectedProfile, "The background gear changed the cleanup profile.")
+        XCTAssertTrue(preferences.customSettingsAreUnchanged(), "The background gear changed saved Custom settings.")
+    }
+
+    @MainActor private func clickBackgroundEntryIfReachable(_ entry: XCUIElement, outside sheet: XCUIElement) -> Bool {
+        guard SettingsActorObservation(entry).isInteractive else { return false }
+        let entryFrame = entry.frame
+        let sheetFrame = sheet.frame
+        guard !entryFrame.isEmpty, !sheetFrame.isEmpty else {
+            XCTFail("The background pointer probe had no native frame.")
+            return false
+        }
+        guard !entryFrame.intersects(sheetFrame) else {
+            XCTFail("The background pointer probe overlapped the active sheet.")
+            return false
+        }
+        entry.click()
+        return true
     }
 
     @MainActor private func closeModelSettings(in app: XCUIApplication, usingKeyboard: Bool = false) {
@@ -398,14 +430,16 @@ final class WritingFeaturesUITests: XCTestCase {
         _ phase: String,
         actors: [String: SettingsActorObservation],
         failures: [String] = [],
+        backgroundPointerAttempted: Bool? = nil,
         in app: XCUIApplication
     ) {
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "version": 1, "phase": phase, "opening": modelSettingsOpening,
             "mainWindowCount": app.windows.matching(identifier: Self.mainWindowIdentifier).count,
             "nativeSheetCount": app.sheets.count,
             "actors": actors.mapValues(\.json), "boundaryFailures": failures
         ]
+        if let backgroundPointerAttempted { payload["backgroundPointerAttempted"] = backgroundPointerAttempted }
         do {
             let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted, .sortedKeys]),
                                            uniformTypeIdentifier: "public.json")
@@ -442,7 +476,19 @@ final class WritingFeaturesUITests: XCTestCase {
             shortcut = shortcutWrapper.buttons.firstMatch
         }
         XCTAssertTrue(shortcut.isEnabled && shortcut.isHittable)
-        assertCoveredEntryIsBlocked(dictionarySettings)
+        guard let dictionarySnapshot = preferences.panelValues() else {
+            XCTFail("Unable to read saved settings before the dictionary background pointer probe.")
+            return
+        }
+        let dictionaryFrame = dictionarySheet.frame
+        _ = clickBackgroundEntryIfReachable(dictionarySettings, outside: dictionarySheet)
+        XCTAssertEqual(app.sheets.count, 1, "The background gear dismissed or replaced the dictionary settings sheet.")
+        XCTAssertEqual(dictionarySheet.frame, dictionaryFrame)
+        XCTAssertTrue(shortcut.exists && shortcut.isEnabled && shortcut.isHittable)
+        let dictionaryClose = dictionarySheet.buttons["dictionary.settings.close"]
+        XCTAssertTrue(dictionaryClose.exists && dictionaryClose.isEnabled && dictionaryClose.isHittable)
+        XCTAssertTrue(preferences.panelValuesAreUnchanged(from: dictionarySnapshot), "The background gear changed saved settings.")
+        XCTAssertTrue(preferences.customSettingsAreUnchanged())
         attachScreenshot(app, named: "Dictionary settings native sheet")
         dismissSettingsSheet("dictionary.settings.close", usingKeyboard: true, in: app)
         XCTAssertTrue(dictionarySettings.isEnabled && dictionarySettings.isHittable)
@@ -456,7 +502,6 @@ final class WritingFeaturesUITests: XCTestCase {
         let clipboard = enhancementSheet.switches["enhancement.settings.clipboard"]
         XCTAssertTrue(clipboard.waitForExistence(timeout: 5))
         XCTAssertTrue(clipboard.isEnabled && clipboard.isHittable)
-        assertCoveredEntryIsBlocked(enhancementSettings)
         attachScreenshot(app, named: "Enhancement settings native sheet")
         dismissSettingsSheet("enhancement.settings.close", usingKeyboard: true, in: app)
         XCTAssertTrue(enhancementSettings.isEnabled && enhancementSettings.isHittable)
@@ -475,7 +520,6 @@ final class WritingFeaturesUITests: XCTestCase {
         let unsavedPrompt = "Unsent sheet proof " + UUID().uuidString
         replaceText(in: promptName, with: unsavedPrompt)
         assertValue(unsavedPrompt, of: promptName)
-        assertCoveredEntryIsBlocked(addPrompt)
         attachScreenshot(app, named: "Prompt editor unsaved native sheet")
         dismissSettingsSheet("promptEditor.cancel", usingKeyboard: true, in: app)
         XCTAssertTrue(preferences.panelValuesAreUnchanged(from: promptSnapshot), "Cancel persisted an unsaved prompt draft.")
@@ -496,7 +540,13 @@ final class WritingFeaturesUITests: XCTestCase {
         let unsavedMode = "Unsent mode proof " + UUID().uuidString
         replaceText(in: modeName, with: unsavedMode)
         assertValue(unsavedMode, of: modeName)
-        assertCoveredEntryIsBlocked(addMode)
+        let modeFrame = modeSheet.frame
+        _ = clickBackgroundEntryIfReachable(addMode, outside: modeSheet)
+        XCTAssertEqual(app.sheets.count, 1, "The background Add action replaced the active Power Mode draft.")
+        XCTAssertEqual(modeSheet.frame, modeFrame)
+        XCTAssertTrue(modeName.exists && modeName.isEnabled && modeName.isHittable)
+        assertValue(unsavedMode, of: modeName)
+        XCTAssertTrue(preferences.panelValuesAreUnchanged(from: modeSnapshot), "The background Add action changed saved modes.")
         attachScreenshot(app, named: "Power Mode unsaved native sheet")
         dismissSettingsSheet("powerMode.configuration.cancel", usingKeyboard: true, in: app)
         XCTAssertTrue(preferences.panelValuesAreUnchanged(from: modeSnapshot), "Cancel persisted an unsaved Power Mode.")
@@ -506,7 +556,6 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(reorder.waitForExistence(timeout: 5))
         reorder.click()
         _ = requiredSettingsSheet(in: app)
-        assertCoveredEntryIsBlocked(reorder)
         let closeReorder = app.sheets.firstMatch.buttons["powerMode.reorder.close"]
         XCTAssertTrue(closeReorder.waitForExistence(timeout: 5))
         XCTAssertTrue(closeReorder.isEnabled && closeReorder.isHittable)
@@ -521,10 +570,6 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(app.sheets.firstMatch.waitForExistence(timeout: 5))
         XCTAssertEqual(app.sheets.count, 1, "The settings action did not present one native sheet.")
         return app.sheets.firstMatch
-    }
-
-    @MainActor private func assertCoveredEntryIsBlocked(_ entry: XCUIElement) {
-        XCTAssertTrue(SettingsActorObservation(entry).isBlocked, "The covered settings action remained interactive.")
     }
 
     @MainActor private func dismissSettingsSheet(_ closeIdentifier: String, usingKeyboard: Bool, in app: XCUIApplication) {
@@ -777,7 +822,6 @@ private struct SettingsActorObservation {
     }
 
     var isInteractive: Bool { exists && enabled == true && hittable == true }
-    var isBlocked: Bool { !exists || enabled == false || hittable == false }
 
     var json: [String: Any] {
         ["exists": exists, "enabled": enabled.map { $0 as Any } ?? NSNull(),

@@ -1,0 +1,174 @@
+{
+  "run_id": 40543565335,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40543565335",
+  "candidate_sha": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "oracle_sha256": "4dc9dac031a37e09d8b70c8f7f8ed014cad1ea1fa3939dfea625e20be30df192",
+  "artifact": {
+    "id": 12754096246,
+    "name": "roma.writing-ui-diagnostic-evidence",
+    "bytes": 205056984,
+    "sha256": "b30da1d9dc65f7daa73ed96336056e2d021b7a3739359b6fa3dd6a11244a46fa",
+    "remote_path": "/data/rjt-writing-check-01a17bef/40543565335/ui-evidence.zip",
+    "all_member_crc_verified": true
+  },
+  "source_inputs_verified_against_git_object": [
+    {
+      "path": "VoiceInkUITests/WritingFeaturesUITests.swift",
+      "sha256": "4dc9dac031a37e09d8b70c8f7f8ed014cad1ea1fa3939dfea625e20be30df192"
+    },
+    {
+      "path": "scripts/run-writing-settings-ui-regression.sh",
+      "sha256": "a426dc477b94279d5e63d45eae4300b47dfcd3d8322a804f85f8b1891c3b686e"
+    },
+    {
+      "path": "scripts/run-writing-feature-regression.sh",
+      "sha256": "3bc7e4b5f554044ebf2c41251c2c15f020c1cacf924643904da76dd05a873ebd"
+    },
+    {
+      "path": ".github/workflows/voiceink-writing-ui-check.yml",
+      "sha256": "12515fc46db59e3b9e6487e6e8ec89d9a759beda85fd4e3acbb95703bd16255a"
+    },
+    {
+      "path": "VoiceInk.xcodeproj/project.pbxproj",
+      "sha256": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e"
+    },
+    {
+      "path": "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+    }
+  ],
+  "failed_ci_log": {
+    "path": "/tmp/rjt-none-ui-failed-40543565335.log",
+    "sha256": "c5e137e3a7ed5b614868fb475f8732a9b86110fd46d86e4b7da236af5521e2fb",
+    "bytes": 3135
+  },
+  "scope": "Debug UI comparison; no Release, dictation, VoiceOver, background AX action or profile persistence acceptance.",
+  "retained_files": [
+    {
+      "path": "comparison-result.json",
+      "sha256": "5c16cdb5b74f87f1fa390c921bbbc4a4675e76c97d6104a91bacfd1a0ee7a14a",
+      "bytes": 11575
+    },
+    {
+      "path": "comparison-contract.json",
+      "sha256": "6b7c8da1cee6e0ad4736ebab1f93234718390804f16017312fcf69d5ec9b1828",
+      "bytes": 1702
+    },
+    {
+      "path": "source-verification.json",
+      "sha256": "1e2fdc8ad298cba57a53bf3476b0b21c88be055bfcca053df345fb9c79cf7f05",
+      "bytes": 232
+    },
+    {
+      "path": "environment.txt",
+      "sha256": "40124b7b1afd765d0a26347b43bfcb326e4d1d368031efe301ac0761d6629948",
+      "bytes": 201
+    },
+    {
+      "path": "source-inputs.sha256",
+      "sha256": "1665f52c5b54f7eccf954bd25f0e55c4a834f958970d7ef54af2360197e5515a",
+      "bytes": 689
+    },
+    {
+      "path": "source-inputs-after.txt",
+      "sha256": "1056a7b3c7c1595408119e0ccdceb95781169fc449f49b353aee106747beade7",
+      "bytes": 317
+    },
+    {
+      "path": "source-sha.txt",
+      "sha256": "7c0c66fd97ca2660049fb3c6f2844e2f938071e153c3b634bdb24e41124e8545",
+      "bytes": 41
+    },
+    {
+      "path": "baseline-boundary-before-opening.json",
+      "sha256": "2fd48f8adae614f1f06b6d870a0875f019c6ce1e6a0be772823567a03684e79c",
+      "bytes": 966
+    },
+    {
+      "path": "baseline-boundary-after-opening.json",
+      "sha256": "d154bbfe802ab2421ae1d1c748180b2d1786a101a01d1da059b3145092afd3dd",
+      "bytes": 991
+    },
+    {
+      "path": "baseline-hierarchy-before-opening.txt",
+      "sha256": "4047a8f08ea48fa6305cb735ff08cd1e425f064a98f995073033193a0e67cf0a",
+      "bytes": 45532
+    },
+    {
+      "path": "baseline-hierarchy-after-opening.txt",
+      "sha256": "1a5a8d81573e5c4ff78ef9637777a94dfbcb8983f15f368c1fcd39ac153b0c07",
+      "bytes": 50520
+    },
+    {
+      "path": "baseline-identity-verification.json",
+      "sha256": "63afb4bf2e4b6ec1854c44f1ccc2dfd87b407f07f06eeabbdcefe68023f32bbb",
+      "bytes": 1653
+    },
+    {
+      "path": "baseline-tcc-verification.json",
+      "sha256": "73943e8d842af5f09f850853d41d5af6a1d7bd340238ec78c82afc7ab1187c0c",
+      "bytes": 334
+    },
+    {
+      "path": "baseline-process-verification.json",
+      "sha256": "469afe2b4a3492bfeafdcf5c7d985539c3e5acf94dff2e24d9eb73d92e9464b4",
+      "bytes": 526
+    },
+    {
+      "path": "baseline-result.json",
+      "sha256": "ff2d9ba10fa9495a664058e4cc2d6d18e2d4db4677d4c982ed1c1018a03d16aa",
+      "bytes": 3535
+    },
+    {
+      "path": "candidate-boundary-before-opening.json",
+      "sha256": "2fd48f8adae614f1f06b6d870a0875f019c6ce1e6a0be772823567a03684e79c",
+      "bytes": 966
+    },
+    {
+      "path": "candidate-boundary-after-opening.json",
+      "sha256": "d55d6a02e07a6565fe26857527d4c5f3285c7dc639524c49a8933528ebd84462",
+      "bytes": 1082
+    },
+    {
+      "path": "candidate-hierarchy-before-opening.txt",
+      "sha256": "9236707720fc8e11ec5a074cf4bca00edd4ff95e8575858644e8e67f3fee1dcd",
+      "bytes": 45804
+    },
+    {
+      "path": "candidate-hierarchy-after-opening.txt",
+      "sha256": "397295b6991254fc9ec2d2f4dcddf58e79b462ca483e7ebc33d9f25ed66680db",
+      "bytes": 50896
+    },
+    {
+      "path": "candidate-identity-verification.json",
+      "sha256": "b4ef2d53fd33f91535b2bc26104ed30101db420069f42a390653817a1e080d7f",
+      "bytes": 1590
+    },
+    {
+      "path": "candidate-tcc-verification.json",
+      "sha256": "a617d35259d9c7fd1aade7b71bbb9543ffbcded499351715932563bd2b9d85b6",
+      "bytes": 334
+    },
+    {
+      "path": "candidate-process-verification.json",
+      "sha256": "00b65dd91447c8baa541f826921dbe0f191988f06616c0d186c784de1bed09e5",
+      "bytes": 1459
+    },
+    {
+      "path": "candidate-result.json",
+      "sha256": "daa765bc0569e6fe8647425ba0f68e4c8c48616ea8e2f39d6ec14fd7f9151b8c",
+      "bytes": 613
+    },
+    {
+      "path": "candidate-settings-frame-35s.png",
+      "sha256": "64d8a69c957a17089bd605e4aa8e0db6f2ac8e6747f6f2e46a53d0c960bb0e45",
+      "bytes": 211879
+    },
+    {
+      "path": "baseline-settings-frame-40s.png",
+      "sha256": "f67a29e41cfd64fd2d102bc6bcff3d216d293749e7a31423ea4deaac9fcceef2",
+      "bytes": 223863
+    }
+  ]
+}

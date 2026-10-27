@@ -1,0 +1,22 @@
+BASELINE
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' started.
+/Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkUITests/WritingFeaturesUITests.swift:361: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' failed (62.701 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 62.701 (62.704) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 62.701 (62.705) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 62.701 (62.707) seconds
+
+CANDIDATE
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing]' started.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing]' passed (145.636 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' started.
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:361: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' failed (61.477 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' started.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' passed (159.789 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' started.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' passed (90.445 seconds).
+	 Executed 4 tests, with 1 failure (0 unexpected) in 457.347 (457.352) seconds
+	 Executed 4 tests, with 1 failure (0 unexpected) in 457.347 (457.354) seconds
+	 Executed 4 tests, with 1 failure (0 unexpected) in 457.347 (457.355) seconds
+

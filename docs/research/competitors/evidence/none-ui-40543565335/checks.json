@@ -1,0 +1,39 @@
+{
+  "scope": "Actual matched Debug UI run; failed candidate is not accepted",
+  "lanes": {
+    "baseline": {
+      "starts": [
+        "testDictationProfilePreservesCustomSettingsAndPersists"
+      ],
+      "finishes": {
+        "testDictationProfilePreservesCustomSettingsAndPersists": "failed"
+      },
+      "error_lines": [
+        "/Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkUITests/WritingFeaturesUITests.swift:361: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control."
+      ],
+      "identity_valid": true,
+      "tcc_valid": true,
+      "process_valid": true
+    },
+    "candidate": {
+      "starts": [
+        "testCSVImportPreviewsMultilineContentBeforeReplacing",
+        "testDictationProfilePreservesCustomSettingsAndPersists",
+        "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
+        "testTranslationTargetsReorderSelectAndPersist"
+      ],
+      "finishes": {
+        "testCSVImportPreviewsMultilineContentBeforeReplacing": "passed",
+        "testDictationProfilePreservesCustomSettingsAndPersists": "failed",
+        "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "passed",
+        "testTranslationTargetsReorderSelectAndPersist": "passed"
+      },
+      "error_lines": [
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:361: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control."
+      ],
+      "identity_valid": true,
+      "tcc_valid": true,
+      "process_valid": true
+    }
+  }
+}

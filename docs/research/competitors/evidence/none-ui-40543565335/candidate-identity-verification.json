@@ -1,0 +1,34 @@
+{
+  "binaries": [
+    {
+      "path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "sha256": "01326054dbb324262007f7b5270845013ac4cbace02f4e5d9d707e1cceace7bd"
+    },
+    {
+      "path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/MacOS/VoiceInkUITests-Runner",
+      "sha256": "0fee334029e7416cad8b5538cc75a39bff7aa79304fb77bb07d9cdab74bbeabf"
+    },
+    {
+      "path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests",
+      "sha256": "2f303dfbca9383895fc27e1a85c78b80b5f758aed9656038de9f50b42f6c8c20"
+    }
+  ],
+  "signatures": {
+    "app": {
+      "bundle_identifier": "com.negentropi.RomaJustTalk",
+      "cdhash": "ff01f8c4a460715f90a4ed3fb60509b50cd11780",
+      "signature_sha256": "1ea8ddd62db3309f02a0545f636700f6376f98e4ebe8da408283e9a9729a0862"
+    },
+    "runner": {
+      "bundle_identifier": "com.negentropi.RomaJustTalkUITests.xctrunner",
+      "cdhash": "58416b788f11861979fb1af9291546250249b7a7",
+      "signature_sha256": "14d87621c64a2b0f32f9879a36926d607cde6d1bfd4b7730084eadb0ee0f7bf9"
+    },
+    "test-bundle": {
+      "bundle_identifier": "com.negentropi.RomaJustTalkUITests",
+      "cdhash": "05e264fba212bec8d6b01f03fd292700bba03724",
+      "signature_sha256": "a77934b01f87f018796aa840bec152ac51410c27c49fa1187e2fb7ca3552a642"
+    }
+  },
+  "valid": true
+}

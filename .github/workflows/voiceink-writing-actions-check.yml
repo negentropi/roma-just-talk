@@ -95,10 +95,38 @@ jobs:
         if: ${{ !cancelled() && steps.units.outcome == 'success' }}
         run: bash scripts/run-writing-feature-regression.sh live
 
+      - name: Upload the native check checkpoint
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-live-checkpoint
+          path: |
+            .local-build/onboarding-test-evidence/writing-target-live/*.json
+            .local-build/onboarding-test-evidence/writing-target-live/tests.log
+            .local-build/onboarding-test-evidence/writing-target-live/identity-*.txt
+            .local-build/onboarding-test-evidence/writing-target-live/selection/*.json
+            .local-build/onboarding-test-evidence/writing-target-live/selection/enumeration.log
+          include-hidden-files: true
+          if-no-files-found: warn
+
       - name: Matched snippet regression
         id: regression
         if: ${{ !cancelled() && steps.units.outcome == 'success' }}
         run: bash scripts/run-writing-feature-regression.sh regression "$BASELINE_REF"
+
+      - name: Upload the matched regression checkpoint
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-regression-checkpoint
+          path: |
+            ${{ runner.temp }}/writing-feature-regression/*.json
+            ${{ runner.temp }}/writing-feature-regression/*-tests.log
+            ${{ runner.temp }}/writing-feature-regression/*-permission.log
+            ${{ runner.temp }}/writing-feature-regression/contract.txt
+            ${{ runner.temp }}/writing-feature-regression/*selection/*.json
+            ${{ runner.temp }}/writing-feature-regression/*selection/enumeration.log
+          if-no-files-found: warn
 
       - name: Snippet and translation settings UI
         id: ui

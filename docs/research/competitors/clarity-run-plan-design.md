@@ -1,6 +1,6 @@
 # Global Light and Clarity implementation plan
 
-Design only, 2026-10-28. Source read at `d6397ed975ba62d03289d681e53e3bb103eff5a0`. No implementation, builds, provider calls or runtime checks were performed for this document. The current global Custom/None unit must close its full gate before this unit starts.
+Integration design, 2026-10-28. Initial source read at `d6397ed975ba62d03289d681e53e3bb103eff5a0`. The current global Custom/None unit must close its full gate before app integration starts. Independent Core policy preparation can be compiled beforehand without exposing new profiles or changing ordinary dictation.
 
 Felix selected dictation polish next. This unit adds global Light, global Clarity, three Clarity styles, and actual recognition/failure metadata across recording, import and retranscription. Approved corrections and transform undo follow separately. Their storage preparation remains in [correction learning](correction-learning-design.md) and [store upgrade verification](store-upgrade-verification-design.md).
 
@@ -148,3 +148,11 @@ Model the Domain drove the immutable operation enum and distinct success/fallbac
 ## Execution review after the Ollama identity unit
 
 At `1f36a746`, Ollama capture now uses one immutable runtime endpoint/model pair. [Actual matched SDK proof](evidence/ollama-identity-40545355522/native-audit.json) passed; do not reimplement that prerequisite. Preserve Custom’s existing accepted-start snippet snapshot while retaining its other legacy live reads. Keep new optional recognition metadata on Mac `Transcription` and defaulted Core draft values, not `VoiceInkMutableTranscriptionRecord` (Mac does not conform; changing the protocol would unnecessarily widen iOS). Hosted store checks require a disposable Mac user/VM in addition to unique fixture URLs, because app-host startup opens its normal stores before the test. New Clarity metadata must use captured messages directly; shared last-request fields can change during suspension. No Light/Clarity implementation is claimed here.
+
+## Independent Core preparation
+
+`DictationPolish.swift` now contains the conservative English hesitation rule, stable Natural/Casual/Formal values, fixed JSON request messages and response decoding. Eight registered check methods cover positive cleanup, multilingual and protected-content no-ops, exact code units, instruction-like transcript data and malformed/blank responses. This preparation has not yet passed a compiler/runtime gate. It adds no selectable profile, provider call, app preference or storage field.
+
+The Light rule preserves initial spaces/tabs and requires spaces/tabs after the comma. It leaves paragraph boundaries, non-ASCII separators and punctuation-only remainders unchanged. Its whole-utterance protection also covers bare Unicode domains and numeric dotted addresses; this intentionally favors preserving text.
+
+Foundation owns JSON lexical syntax and duplicate-member handling. The decoder validates the resulting semantic object: exactly the decoded key `text`, a string value, and nonblank output for nonblank input. It preserves that string verbatim. This is not a custom strict JSON lexer, a duplicate-key rejection guarantee, or evidence that a model obeys the cleanup instructions.

@@ -185,6 +185,7 @@ private final class LiveWritingEditor {
         try content.write(to: resource, atomically: true, encoding: .utf8)
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
+        let openStarted = ProcessInfo.processInfo.systemUptime
         let application = try await NSWorkspace.shared.open(
             [resource], withApplicationAt: applicationURL, configuration: configuration
         )
@@ -211,6 +212,12 @@ private final class LiveWritingEditor {
                 kind: kind, token: token, resource: resource, application: application,
                 appElement: appElement, previousWindows: priorWindows
             )
+            if kind == .safari {
+                await recordSafariReadiness(
+                    token: token, resource: resource, application: application,
+                    previousWindows: priorWindows, openStarted: openStarted
+                )
+            }
             Issue.record("Could not claim the live editor; preserved fixture \(directory.path).")
             if let previous, !previous.isTerminated { previous.activate() }
             throw error
@@ -485,6 +492,192 @@ private final class LiveWritingEditor {
         } catch { Issue.record("Could not write live editor setup diagnostics: \(error)") }
     }
 
+    private static func recordSafariReadiness(
+        token: String, resource: URL, application: NSRunningApplication,
+        previousWindows: [AXUIElement], openStarted: TimeInterval
+    ) async {
+        guard let output = evidenceDirectory else { return }
+        let started = ProcessInfo.processInfo.systemUptime
+        let deadline = started + 20
+        let offsets: [TimeInterval] = [0, 0.5, 1, 2, 4, 7, 10, 14, 19]
+        var samples: [[String: Any]] = []
+        var firstOwnedField: TimeInterval?
+        for offset in offsets {
+            let delay = min(started + offset, deadline) - ProcessInfo.processInfo.systemUptime
+            if delay > 0 {
+                do { try await Task.sleep(for: .seconds(delay)) }
+                catch { break }
+            }
+            let sampledAt = ProcessInfo.processInfo.systemUptime
+            guard sampledAt < deadline else { break }
+            var sample = safariReadinessSample(
+                token: token, resource: resource, application: application,
+                previousWindows: previousWindows, deadline: min(deadline, sampledAt + 1)
+            )
+            let completedAt = ProcessInfo.processInfo.systemUptime
+            sample["surveyMilliseconds"] = (sampledAt - started) * 1_000
+            sample["sinceOpenMilliseconds"] = (sampledAt - openStarted) * 1_000
+            sample["sampleCompletedSinceOpenMilliseconds"] = (completedAt - openStarted) * 1_000
+            sample["sampleDurationMilliseconds"] = (completedAt - sampledAt) * 1_000
+            if firstOwnedField == nil, sample["ownedExactTextAreaObserved"] as? Bool == true {
+                firstOwnedField = completedAt - openStarted
+            }
+            samples.append(sample)
+            if application.isTerminated { break }
+        }
+        let receipt: [String: Any] = [
+            "checkpoint": "safari-readiness-after-setup-failure", "token": token,
+            "processIdentifier": application.processIdentifier,
+            "scope": "Read-only survey; original discovery failure remains a failure",
+            "budgetMilliseconds": 20_000, "sampleBudgetMilliseconds": 1_000,
+            "startedMillisecondsAfterOpen": (started - openStarted) * 1_000,
+            "durationMilliseconds": (ProcessInfo.processInfo.systemUptime - started) * 1_000,
+            "scheduledSamples": offsets.count, "skippedSamples": offsets.count - samples.count,
+            "firstOwnedExactTextAreaObservedMillisecondsAfterOpen": firstOwnedField.map { $0 * 1_000 } as Any? ?? NSNull(),
+            "interpretation": "A negative or truncated sample does not prove that an owned textarea is absent",
+            "activationPerformed": false, "accessibilityEnablementWritten": false,
+            "samples": samples
+        ]
+        do {
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+                .write(to: output.appendingPathComponent("\(token)-safari-readiness.json"))
+        } catch { Issue.record("Could not write Safari readiness evidence: \(error)") }
+    }
+
+    private static func safariReadinessSample(
+        token: String, resource: URL, application: NSRunningApplication,
+        previousWindows: [AXUIElement], deadline: TimeInterval
+    ) -> [String: Any] {
+        guard !application.isTerminated else {
+            return ["applicationTerminated": true, "ownedExactTextAreaObserved": false]
+        }
+        let app = AXUIElementCreateApplication(application.processIdentifier)
+        _ = AXUIElementSetMessagingTimeout(app, 0.1)
+        func read(_ name: String, from node: AXUIElement) -> CFTypeRef? {
+            let remaining = deadline - ProcessInfo.processInfo.systemUptime
+            guard remaining > 0 else { return nil }
+            _ = AXUIElementSetMessagingTimeout(node, Float(min(0.1, remaining)))
+            return attribute(name, from: node)
+        }
+        var rawWindows: CFTypeRef?
+        let windowsResult = AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &rawWindows)
+        let currentWindows = rawWindows as? [AXUIElement]
+        let focused = ProcessInfo.processInfo.systemUptime < deadline
+            ? element(kAXFocusedUIElementAttribute, from: app) : nil
+        if let focused { _ = AXUIElementSetMessagingTimeout(focused, 0.1) }
+        let focusedRole = focused.flatMap { read(kAXRoleAttribute, from: $0) as? String }
+        let focusedSubrole = focused.flatMap { read(kAXSubroleAttribute, from: $0) as? String }
+        var summaries: [[String: Any]] = []
+        var ownedExactFieldObserved = false
+        for window in currentWindows ?? [] {
+            guard ProcessInfo.processInfo.systemUptime < deadline else { break }
+            _ = AXUIElementSetMessagingTimeout(window, 0.1)
+            let title = read(kAXTitleAttribute, from: window) as? String
+            let document = safariURLContext(read(kAXDocumentAttribute, from: window), resource: resource)
+            let documentOwned = document["ownedFixture"] as? Bool == true
+            let titleOwned = title?.contains(token) == true
+            let remaining = max(0, deadline - ProcessInfo.processInfo.systemUptime)
+            let tree = diagnosticTree(window, deadline: Date(timeIntervalSinceNow: min(0.5, remaining)))
+            var owned = titleOwned || documentOwned
+            var exactOriginalField = false
+            var textFieldContainsToken = false
+            var textFieldContexts: [[String: Any]] = []
+            var textAreas: [AXUIElement] = []
+            var labels: Set<String> = []
+            var inspected = 0
+            for node in tree.nodes {
+                guard ProcessInfo.processInfo.systemUptime < deadline else { break }
+                inspected += 1
+                let role = read(kAXRoleAttribute, from: node) as? String
+                let nodeTitle = read(kAXTitleAttribute, from: node) as? String
+                let description = read(kAXDescriptionAttribute, from: node) as? String
+                let tokenLabel = nodeTitle?.contains(token) == true || description?.contains(token) == true
+                owned = owned || tokenLabel
+                for text in [nodeTitle, description].compactMap({ $0 }) {
+                    if let label = safariSetupLabel(text) { labels.insert(label) }
+                }
+                if role == kAXStaticTextRole as String,
+                   let text = read(kAXValueAttribute, from: node) as? String,
+                   let label = safariSetupLabel(text) { labels.insert(label) }
+                if role == kAXTextAreaRole as String {
+                    textAreas.append(node)
+                } else if role == kAXTextFieldRole as String {
+                    let rawValue = read(kAXValueAttribute, from: node)
+                    textFieldContainsToken = textFieldContainsToken || (rawValue as? String)?.contains(token) == true
+                    textFieldContexts.append(safariURLContext(rawValue, resource: resource))
+                }
+            }
+            var inspectedValues = 0
+            if owned {
+                for textArea in textAreas {
+                    guard ProcessInfo.processInfo.systemUptime < deadline else { break }
+                    inspectedValues += 1
+                    exactOriginalField = exactOriginalField
+                        || (read(kAXValueAttribute, from: textArea) as? String)?.utf16.elementsEqual(original.utf16) == true
+                }
+            }
+            ownedExactFieldObserved = ownedExactFieldObserved || (owned && exactOriginalField)
+            summaries.append([
+                "titleContainsToken": titleOwned, "documentIsOwnedFile": documentOwned,
+                "documentContext": document, "textFieldContexts": textFieldContexts,
+                "titleClassification": titleOwned ? "owned-local-fixture" : title.flatMap(safariSetupLabel) ?? "unrecognized-redacted",
+                "tokenWindowPresent": owned, "existedBeforeOpen": previousWindows.contains { CFEqual($0, window) },
+                "roleCounts": tree.roles, "childrenAXErrors": tree.errors,
+                "webAreaPresent": tree.roles["AXWebArea", default: 0] > 0,
+                "textAreaPresent": tree.roles[kAXTextAreaRole as String, default: 0] > 0,
+                "exactOriginalFieldPresent": exactOriginalField, "textFieldContainsToken": textFieldContainsToken,
+                "knownSetupLabelIdentifiers": labels.sorted(), "visitedNodes": tree.nodes.count,
+                "traversalTruncated": tree.truncated,
+                "metadataTruncated": inspected != tree.nodes.count || (owned && inspectedValues != textAreas.count)
+            ])
+        }
+        return [
+            "applicationFinishedLaunching": application.isFinishedLaunching,
+            "applicationTerminated": application.isTerminated,
+            "applicationFrontmost": NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier,
+            "windowsAXError": windowsResult.rawValue, "windowsReadable": currentWindows != nil,
+            "windows": summaries, "windowsTruncated": summaries.count != currentWindows?.count,
+            "focusedRole": focusedRole ?? "<unavailable>", "focusedSubrole": focusedSubrole ?? "<unavailable>",
+            "ownedExactTextAreaObserved": ownedExactFieldObserved
+        ]
+    }
+
+    private static func safariURLContext(_ raw: CFTypeRef?, resource: URL) -> [String: Any] {
+        guard let raw else { return ["state": "unavailable", "ownedFixture": false] }
+        if let text = raw as? String, text.isEmpty { return ["state": "empty", "ownedFixture": false] }
+        let url = (raw as? URL) ?? (raw as? String).flatMap(URL.init(string:))
+        guard let url, let scheme = url.scheme else { return ["state": "text-redacted", "ownedFixture": false] }
+        let owned = url.isFileURL && url.standardizedFileURL == resource.standardizedFileURL
+        let knownBlank = url.absoluteString == "about:blank"
+        return [
+            "state": owned ? "owned-local-fixture" : knownBlank ? "known-blank" : "unrelated-url-redacted",
+            "ownedFixture": owned, "hostEmpty": url.host?.isEmpty != false,
+            "scheme": ["file", "about", "safari", "favorites", "http", "https"].contains(scheme) ? scheme : "other"
+        ]
+    }
+
+    private static func safariSetupLabel(_ text: String) -> String? {
+        switch text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "safari": "safari-title"
+        case "start page": "start-page"
+        case "address and search", "search or enter website name": "address-search-control"
+        case "welcome to safari": "welcome-to-safari"
+        case "get started": "get-started-control"
+        case "start browsing": "start-browsing-control"
+        case "continue": "continue-control"
+        case "not now": "not-now-control"
+        case "make safari your default browser", "use safari as your default web browser",
+             "set safari as your default browser", "safari is not your default web browser": "default-browser-prompt"
+        case "use safari": "use-safari-control"
+        case "don't change": "dont-change-control"
+        case "cancel": "cancel-control"
+        case "open": "open-control"
+        case "done": "done-control"
+        default: nil
+        }
+    }
+
     private static func diagnosticNode(_ node: AXUIElement, token: String, resource: URL, deadline: Date) -> [String: Any] {
         _ = AXUIElementSetMessagingTimeout(node, 0.1)
         func read(_ name: String) -> CFTypeRef? {
@@ -530,7 +723,7 @@ private final class LiveWritingEditor {
         while index < queue.count, queue.count < 512, Date() < deadline {
             let candidate = queue[index]
             index += 1
-            _ = AXUIElementSetMessagingTimeout(candidate, 0.1)
+            _ = AXUIElementSetMessagingTimeout(candidate, Float(max(0.001, min(0.1, deadline.timeIntervalSinceNow))))
             roles[string(kAXRoleAttribute, from: candidate) ?? "<unavailable>", default: 0] += 1
             guard Date() < deadline else { break }
             var rawChildren: CFTypeRef?

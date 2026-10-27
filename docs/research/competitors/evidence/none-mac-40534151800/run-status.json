@@ -1,0 +1,163 @@
+{
+  "run_id": 40534151800,
+  "head_sha": "d6397ed975ba62d03289d681e53e3bb103eff5a0",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40534151800",
+  "status": "completed",
+  "conclusion": "cancelled",
+  "steps": {
+    "Set up job": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:45:35Z",
+      "completedAt": "2026-10-27T15:45:36Z"
+    },
+    "Run actions/checkout@v4": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:45:36Z",
+      "completedAt": "2026-10-27T15:45:42Z"
+    },
+    "Keep the disposable desktop awake": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:45:42Z",
+      "completedAt": "2026-10-27T15:45:42Z"
+    },
+    "Select Xcode and Metal toolchain": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:45:42Z",
+      "completedAt": "2026-10-27T15:45:55Z"
+    },
+    "Run actions/cache/restore@v4": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:45:55Z",
+      "completedAt": "2026-10-27T15:46:29Z"
+    },
+    "Verify the canonical package graph before compiling": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:46:29Z",
+      "completedAt": "2026-10-27T15:47:25Z"
+    },
+    "Shared core checks": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:47:25Z",
+      "completedAt": "2026-10-27T15:51:20Z"
+    },
+    "Prepare and verify static Whisper dependencies": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:51:20Z",
+      "completedAt": "2026-10-27T15:51:23Z"
+    },
+    "Preserve verified dependencies for test retries": {
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-27T15:51:23Z",
+      "completedAt": "2026-10-27T15:51:23Z"
+    },
+    "Full Mac unit suite with fresh CI permissions": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T15:51:23Z",
+      "completedAt": "2026-10-27T16:01:50Z"
+    },
+    "Live TextEdit and Safari selection transactions": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:01:50Z",
+      "completedAt": "2026-10-27T16:03:19Z"
+    },
+    "Upload the native check checkpoint": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:03:19Z",
+      "completedAt": "2026-10-27T16:03:21Z"
+    },
+    "Matched snippet regression": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:03:21Z",
+      "completedAt": "2026-10-27T16:12:39Z"
+    },
+    "Upload the matched regression checkpoint": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:12:39Z",
+      "completedAt": "2026-10-27T16:12:40Z"
+    },
+    "Writing, snippet and dictation settings UI": {
+      "status": "completed",
+      "conclusion": "cancelled",
+      "startedAt": "2026-10-27T16:12:40Z",
+      "completedAt": "2026-10-27T16:13:18Z"
+    },
+    "Preserve test evidence before the Release build": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:13:18Z",
+      "completedAt": "2026-10-27T16:13:21Z"
+    },
+    "Release build and packaging contracts": {
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-27T16:13:21Z",
+      "completedAt": "2026-10-27T16:13:21Z"
+    },
+    "Upload verification evidence": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:13:21Z",
+      "completedAt": "2026-10-27T16:13:37Z"
+    },
+    "Upload settings screenshots": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:13:37Z",
+      "completedAt": "2026-10-27T16:13:38Z"
+    },
+    "Upload verified release app": {
+      "status": "completed",
+      "conclusion": "skipped",
+      "startedAt": "2026-10-27T16:13:38Z",
+      "completedAt": "2026-10-27T16:13:38Z"
+    },
+    "Post Run actions/checkout@v4": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:13:38Z",
+      "completedAt": "2026-10-27T16:13:39Z"
+    },
+    "Complete job": {
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-27T16:13:39Z",
+      "completedAt": "2026-10-27T16:13:43Z"
+    }
+  },
+  "cancellation": {
+    "source": "Coordinator message in this task",
+    "reason": "Coordinator canceled the duplicate full run after separate UI-only evidence showed the app/window/form disabled by the shared sliding panel. A Claude-owned production fix and fresh full gate follow.",
+    "separate_ui_run_id": 40532580607,
+    "separate_ui_failure_independently_audited_here": false
+  },
+  "verified_scopes": {
+    "native_checkpoint": "checkpoint-receipt.json independently verifies six exact executions and receipts.",
+    "production_equivalence": "production-equivalence.json compares exact pinned product trees with prior8fc source.",
+    "core_units_and_matched": "GitHub steps succeeded. Full artifact/raw case aggregates were not downloaded or decoded for this canceled run."
+  },
+  "not_established": [
+    "Exact full-unit result-record or gated-skip count.",
+    "New profile UI selection, enabled controls or persistence.",
+    "Release or packaging success.",
+    "No overall full-gate success claim."
+  ],
+  "retention": {
+    "full_evidence_archive_downloaded": false,
+    "reason": "Coordinator requested minimal cancellation/source/native receipts; avoid redundant full ZIP download.",
+    "native_checkpoint_downloaded": true
+  }
+}

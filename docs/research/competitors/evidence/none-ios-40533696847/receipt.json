@@ -1,0 +1,234 @@
+{
+  "run_id": 40533696847,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40533696847",
+  "head_sha": "4ee166835ee1274458ae8eeb30d8d879430651f1",
+  "run_conclusion": "success",
+  "classification": "ios-simulator-compile-and-static-package-passed",
+  "artifact": {
+    "id": 12746809530,
+    "bytes": 248390,
+    "sha256": "85cb92a71f4bfa4bf7b0877730c3e2fd966cab605193c3bb554263400301d09f",
+    "size_digest_crc_verified": true
+  },
+  "simulator_app_artifact": {
+    "id": 12746969170,
+    "bytes": 78948333,
+    "sha256": "af48dd4599626d9eeca27255fa71d21bc26df58923e7b52c82fda7402c51b9d8",
+    "verification": "GitHub artifact metadata only; outer app archive not downloaded"
+  },
+  "source_checks": {
+    "same_product_sources_as_full_mac_head": "8fc18c519a126018174929849f479fdcaa1aaa45",
+    "git_diff_empty": true,
+    "artifact_bound_non_lock_sources": 583,
+    "all_artifact_source_hashes_checked": true,
+    "pinned_workflow_helper_matches_artifact": true,
+    "original_all_lock_hashes_match_git": true,
+    "only_generated_ios_resolution_metadata_changed": true,
+    "accepted_graph_unchanged_during_build": true
+  },
+  "dependencies": {
+    "seed_pins": 42,
+    "resolved_pins": 25,
+    "original_pins_preserved": 2,
+    "all_package_states_and_repositories_match_reviewed_sources": true,
+    "repository_equivalence": "Optional terminal .git suffix only",
+    "seed_origin_hash": "e73c4125af8b019ecb5e4d8b92ecd0bfbd454ea2065453b96594b17e436333de",
+    "generated_origin_hash": "df674b45b1217ad67a965b9f88c7f9bb4017ff6fab84e290029aad06888ca953",
+    "seed_sha256": "f2272461a6b8fb943c5e40051fecf8b37bf06816a0dd453ebc1bf2d6219431d2",
+    "resolved_sha256": "9ef0281253cc36305582b4e077be84fc659d9ad62abb2f112118e8f86d9f9a0f"
+  },
+  "build": {
+    "configuration": "Debug",
+    "destination": "generic/platform=iOS Simulator",
+    "architectures": [
+      "arm64",
+      "x86_64"
+    ],
+    "actual_core_profile_compile_entries": [
+      {
+        "line": 17811,
+        "text": "SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      },
+      {
+        "line": 17876,
+        "text": "SwiftCompile normal x86_64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      }
+    ],
+    "succeeded_markers": 1,
+    "raw_build_log_bytes": 4560241,
+    "raw_build_log_sha256": "d06e0374e361bdd1f11b4a13b8faf355a8e2152c6c99e29396a5c6d87589574b",
+    "signature": "Ad-hoc; deep strict verification command returned success in the successful verification step",
+    "static_whisper_macho_files": 7,
+    "root_cf_bundle_executable_sha256": "c90130e3572de604d7e1f7852d7541163b61636dbaf22eb69abc1c6237837be6",
+    "inner_simulator_archive_sha256_recorded_by_ci": "b46aba89b58fa0a531ef3b8dc7c8ba6856cdd14f6bbe05a1b59449e6662258ee"
+  },
+  "steps": [
+    {
+      "name": "Set up job",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "conclusion": "success"
+    },
+    {
+      "name": "Bind source and dependency locks",
+      "conclusion": "success"
+    },
+    {
+      "name": "Select Xcode and Metal toolchain",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/cache/restore@v4",
+      "conclusion": "success"
+    },
+    {
+      "name": "Resolve the direct iOS project and validate package metadata",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify existing iOS configuration contracts",
+      "conclusion": "success"
+    },
+    {
+      "name": "Prepare and verify static Whisper dependencies",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/cache/save@v4",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Compile the iOS Simulator app and shared Core",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify the built app and unchanged sources",
+      "conclusion": "success"
+    },
+    {
+      "name": "Upload compile evidence",
+      "conclusion": "success"
+    },
+    {
+      "name": "Upload the verified Simulator app",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "conclusion": "success"
+    }
+  ],
+  "retained_files": [
+    {
+      "path": "app-archive-sha256.txt",
+      "bytes": 133,
+      "sha256": "ddb4fd7e1c73121f63525a6ff8c5c197d1f1d820b8e7f5a04f830af4b91fb5fa"
+    },
+    {
+      "path": "build-excerpt.txt",
+      "bytes": 953,
+      "sha256": "e967438e0b867fb25b38355e7d95ae81cee54190d9350f12156298bf52e43381"
+    },
+    {
+      "path": "executable-sha256.txt",
+      "bytes": 177,
+      "sha256": "3d0c1f4728ea38c2575d5c77c2dacd537a65b96a03aa27edecd276dc3e2986e6"
+    },
+    {
+      "path": "package-locks-after.json",
+      "bytes": 651,
+      "sha256": "8a3a08f7ea307cacfa6d9dfdbfd2158ee48cbca474230781fa1d2c758f7f5dbc"
+    },
+    {
+      "path": "package-locks-before.json",
+      "bytes": 35331,
+      "sha256": "8ea9a2aea7c5b48a95cbfafabb7a5fcfcb474eaef206760ead9936985dc4d290"
+    },
+    {
+      "path": "package-resolution-receipt.json",
+      "bytes": 471,
+      "sha256": "b3f0759c882bc02bef53d052f1df5a7514dacad1143a0be987799c3effd8e125"
+    },
+    {
+      "path": "package-seed-receipt.json",
+      "bytes": 782,
+      "sha256": "9a7593cb8d9fb5e301c537031fef477ae92f2ba07ad2c73830df810fc755165f"
+    },
+    {
+      "path": "pin_contract.py",
+      "bytes": 1678,
+      "sha256": "940ccb49b99a2754ae38855c583503359fb111274efb32bfb26caf639e865f8d"
+    },
+    {
+      "path": "project-list.json",
+      "bytes": 438,
+      "sha256": "57f262dec0ccdf3ba9d8f672cef75ed5e10787cd67424db6b8655a7b30755329"
+    },
+    {
+      "path": "resolved-ios.Package.resolved",
+      "bytes": 6989,
+      "sha256": "9ef0281253cc36305582b4e077be84fc659d9ad62abb2f112118e8f86d9f9a0f"
+    },
+    {
+      "path": "scope.txt",
+      "bytes": 132,
+      "sha256": "c0e286aa3ce3e1e41ebd3bc1d4fa0d4d90061bcf88c38846666be7ebf23c001e"
+    },
+    {
+      "path": "seed-ios.Package.resolved",
+      "bytes": 11337,
+      "sha256": "f2272461a6b8fb943c5e40051fecf8b37bf06816a0dd453ebc1bf2d6219431d2"
+    },
+    {
+      "path": "signature-identity.txt",
+      "bytes": 936,
+      "sha256": "349a2c8d9c98a2e56fa8a6ae05bc61f465550d1fdc9dbea2baac50cae14b3cfa"
+    },
+    {
+      "path": "signature-verification.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "source-integrity.json",
+      "bytes": 278,
+      "sha256": "f9fc026eeb5bf65f0f993a38b6aff280ac9abe2076aa28b5c2dd19de7cbc4838"
+    },
+    {
+      "path": "source-manifest-before.json",
+      "bytes": 75009,
+      "sha256": "30dcc03c014a2c643563348fc6ea118b2ee8ff51728947d435560eca6578826c"
+    },
+    {
+      "path": "source-sha.txt",
+      "bytes": 41,
+      "sha256": "bd44189bb91d98e7bdc5d84fa0f9b618ea94fa5cdc923f04979106dfff98fccb"
+    },
+    {
+      "path": "static-whisper.log",
+      "bytes": 55,
+      "sha256": "1fa0d07e853ab4ca576cd5d1a22565fd28aeb3127735ad30550388cd084f05e5"
+    },
+    {
+      "path": "xcode-version.txt",
+      "bytes": 32,
+      "sha256": "18730ed2ae28a2c9cf0c2d5db549033a4f07089331391a7133b7b32187454fa9"
+    }
+  ],
+  "limits": [
+    "Compilation and static packaging proof only; no Simulator launch, iOS unit/UI runtime, microphone, keyboard or device proof.",
+    "Root CFBundleExecutable is the Debug loader stub. It is not an independent digest of the compiled debug dylib. CI records an inner whole-app archive hash and GitHub records its outer artifact metadata; app ZIP not downloaded for this audit.",
+    "No new dictation cleanup capability on iOS is claimed. This verifies the existing iOS app still compiles with the shared Core API changes.",
+    "Generated iOS resolution metadata exists only in the disposable runner; repository dependency locks and declarations were not edited."
+  ],
+  "independent_review": {
+    "verdict": "clean",
+    "scope": "Independent actual artifact rereview verified ZIP digest/CRC, all 583 source blobs against pinned Git, all five original locks, actual seed/resolved helper outputs, all retained hashes, strict compiler invocation and both architecture compile entries, exact fresh Actions status, and product-source equality."
+  }
+}

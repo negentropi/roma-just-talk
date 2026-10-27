@@ -1,0 +1,7 @@
+{
+  "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved": "262a8f2e86bbd370c1889bb82f8ea5041be5b8a77332d8b26d0dfa989ea553c2",
+  "VoiceInkCore/Package.resolved": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2",
+  "VoiceInkNVIDIA/Package.resolved": "3a6af795e40cc28c19650da7cdaaf41c127bb2924e37deda63e246f2242bb639",
+  "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "9ef0281253cc36305582b4e077be84fc659d9ad62abb2f112118e8f86d9f9a0f"
+}

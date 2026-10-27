@@ -1,0 +1,15 @@
+{
+  "target": "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+  "original_ios_sha256": "226525aa48bdb444d7b39fa298df914c3cc1bfae72d760234fa5b986eaaa0fba",
+  "reviewed_mac_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "original_pins": [
+    "keyboardkit",
+    "llmkit"
+  ],
+  "reviewed_pin_count": 41,
+  "seed_pin_count": 42,
+  "seed_sha256": "f2272461a6b8fb943c5e40051fecf8b37bf06816a0dd453ebc1bf2d6219431d2",
+  "shared_identity_conflicts_checked": true,
+  "repository_equivalence": "Only an optional terminal .git suffix is ignored; scheme, host and repository path stay exact",
+  "scope": "Runner-only generated iOS resolution metadata seeded from existing reviewed pins before any xcodebuild invocation"
+}

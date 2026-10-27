@@ -1,0 +1,24 @@
+{
+  "audio": {
+    "bytes": 165984,
+    "channels": 1,
+    "frames": 80944,
+    "path": "/Users/runner/work/_temp/none-profile-inputs/input.wav",
+    "phrase": "The quick brown fox confirms this local speech to text test for Roma just talk.",
+    "rate": 135,
+    "retained_path": "import/input.wav",
+    "sample_rate": 16000,
+    "sample_width": 2,
+    "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805",
+    "voice": "Samantha"
+  },
+  "model": {
+    "bytes": 147951465,
+    "path": "/Users/runner/work/_temp/none-profile-inputs/ggml-base.bin",
+    "sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+    "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+  },
+  "scope": "Synthetic speech WAV and hash-pinned local Whisper weights; no microphone or provider credentials",
+  "setup_reference": "scripts/run-ios-remote-stt-e2e.sh",
+  "setup_reference_sha256": "7811fae8aee7040f939aedac481e472b10106ff2a456ad39d36edcc0f0d39d01"
+}

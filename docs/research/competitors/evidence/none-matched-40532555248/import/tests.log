@@ -1,0 +1,2577 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination platform=macOS -parallel-testing-enabled NO -derivedDataPath /Users/runner/work/_temp/none-profile-derived-candidate -xcconfig /Users/runner/work/roma-just-talk/roma-just-talk/LocalBuild.xcconfig -clonedSourcePackagesDirPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS=/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD" "-only-testing:VoiceInkTests/VoiceInkTests/liveNoneProfileImportQueueUsesRealWhisperRecognition()" -resultBundlePath /Users/runner/work/_temp/none-profile-proof/import/Import.xcresult
+
+Build settings from command line:
+    CODE_SIGN_ENTITLEMENTS = /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    CODE_SIGNING_REQUIRED = NO
+    DEVELOPMENT_TEAM = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Build settings from configuration file '/Users/runner/work/roma-just-talk/roma-just-talk/LocalBuild.xcconfig':
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGN_STYLE = Manual
+    DEVELOPMENT_TEAM = 
+    PROVISIONING_PROFILE_SPECIFIER = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  VoiceInkQwen: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkQwen @ local
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  VoiceInkCore: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore @ local
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  VoiceInkNVIDIA: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkNVIDIA @ local
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+
+Writing result bundle at path:
+	/Users/runner/work/_temp/none-profile-proof/import/Import.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:fe92741f88f996893993b20a1f31759fdd581b6c, name:My Mac }
+{ platform:macOS, arch:x86_64, id:fe92741f88f996893993b20a1f31759fdd581b6c, name:My Mac }
+2026-10-27 15:56:16.653358+0000 roma just talk[41611:123689] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0xbd28a5b20> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-27 15:56:16.934732+0000 roma just talk[41611:123689] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 15:56:16.936696+0000 roma just talk[41611:123689] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-27 15:56:16.936927+0000 roma just talk[41611:123689] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-27 15:56:16.938257+0000 roma just talk[41611:123689] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-27 15:56:16.938287+0000 roma just talk[41611:123689] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-27 15:56:16.943032+0000 roma just talk[41611:123734] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.943083+0000 roma just talk[41611:123734] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.943682+0000 roma just talk[41611:123735] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.943760+0000 roma just talk[41611:123735] [Connection] Unable to re-re2026-10-27 15:56:16.948754+0000 roma just talk[41611:123763] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+gister with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.944289+0000 roma just talk[41611:123734] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.957741+0000 roma just talk[41611:123734] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.947136+0000 roma just talk[41611:123736] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.958660+0000 roma just talk[41611:123736] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.951641+0000 roma just talk[41611:123764] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.958690+0000 roma just talk[41611:123764] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.955583+0000 roma just talk[41611:123767] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.957492+0000 roma just talk[41611:123766] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.959214+0000 roma just talk[41611:123767] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.959021+0000 roma just talk[41611:123736] [Connection] Will NOT re-try to establish the connection
+2026-10-27 15:56:16.959271+0000 roma just talk[41611:123766] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.959568+0000 roma just talk[41611:123768] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:16.959584+0000 roma just talk[41611:123768] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 15:56:18.344607+0000 roma just talk[41611:123689] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 15:56:18.345258+0000 roma just talk[41611:123689] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-27 15:56:18.345425+0000 roma just talk[41611:123689] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-27 15:56:18.451667+0000 roma just talk[41611:123689] [RecorderUIManager] Resetting recording state on launch
+2026-10-27 15:56:18.452342+0000 roma just talk[41611:123689] [Recorder] stopRecording called
+2026-10-27 15:56:18.452525+0000 roma just talk[41611:123689] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 15:56:18.452536+0000 roma just talk[41611:123689] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-27 15:56:18.452616+0000 roma just talk[41611:123689] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-27 15:56:18.792276+0000 roma just talk[41611:123689] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-27 15:56:18.811511+0000 roma just talk[41611:123689] [ShortcutMonitor] installEventTap: installed
+2026-10-27 15:56:18.850901+0000 roma just talk[41611:123736] unable to find air64_v27 slice or a compatible one in binary archive 'file:///System/Library/PrivateFrameworks/RenderBox.framework/Resources/archive.metallib' 
+ available slices: applegpu_g15g, applegpu_g15s, applegpu_g15d, applegpu_g15d, applegpu_g15g, applegpu_g16s, applegpu_g13g, applegpu_g17p, applegpu_g17g, applegpu_g17s, applegpu_g14g, applegpu_g16g, applegpu_g15s, applegpu_g14s, applegpu_g16s, applegpu_g14d, applegpu_g13s, applegpu_g13d,
+Test Suite 'Selected tests' started at 2026-10-27 15:56:18.888.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-27 15:56:18.889.
+Test Suite 'VoiceInkTests.xctest' passed at 2026-10-27 15:56:18.889.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-27 15:56:18.889.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+2026-10-27 15:56:18.905708+0000 roma just talk[41611:123689] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 15:56:18.908455+0000 roma just talk[41611:123736] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 15:56:18.908579+0000 roma just talk[41611:123736] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-27 15:56:18.911099+0000 roma just talk[41611:123736] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-27 15:56:18.911145+0000 roma just talk[41611:123736] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-27 15:56:18.912166+0000 roma just talk[41611:123736] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VoiceInkTests started.
+◇ Test liveNoneProfileImportQueueUsesRealWhisperRecognition() started.
+2026-10-27 15:56:18.931687+0000 roma just talk[41611:123736] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-27 15:56:18.931717+0000 roma just talk[41611:123736] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-27 15:56:18.938685+0000 roma just talk[41611:123736] [carc] Reporter disconnected. { function=sendMessage, reporterID=178717884153857 }
+2026-10-27 15:56:18.958856+0000 roma just talk[41611:123736] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-27 15:56:18.958995+0000 roma just talk[41611:123736] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-27 15:56:18.959048+0000 roma just talk[41611:123736] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-27 15:56:20.420689+0000 roma just talk[41611:123766] [AQ]        LoudnessManager.mm:1261  GetHardwarePlatformKey: cannot get acoustic ID
+2026-10-27 15:56:20.431916+0000 roma just talk[41611:123767] [WhisperContext] Flash attention enabled for Metal
+whisper_init_from_file_with_params_no_state: loading model from '/Users/runner/work/_temp/none-profile-inputs/ggml-base.bin'
+whisper_init_with_params_no_state: use gpu    = 1
+whisper_init_with_params_no_state: flash attn = 1
+whisper_init_with_params_no_state: gpu_device = 0
+whisper_init_with_params_no_state: dtw        = 0
+ggml_metal_device_init: tensor API disabled for pre-M5 and pre-A19 devices
+2026-10-27 15:56:20.434495+0000 roma just talk[41611:123689] [Recorder] startPreRollBuffering: active on deviceID=87
+ggml_metal_library_init: using embedded metal library
+2026-10-27 15:56:21.919052+0000 roma just talk[41611:123689] [ModelPrewarm] Prewarm disabled by user
+2026-10-27 15:56:22.359435+0000 roma just talk[41611:123736] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:24.866811+0000 roma just talk[41611:123734] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:25.096660+0000 roma just talk[41611:123766] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:27.560723+0000 roma just talk[41611:123768] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:27.893610+0000 roma just talk[41611:123769] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:34.101097+0000 roma just talk[41611:123847] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constan2026-10-27 15:56:34.101381+0000 roma just talk[41611:123856] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 12026-10-27 15:56:34.101490+0000 roma just talk[41611:123861] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.101523+0000 roma just talk[41611:123857] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.101569+0000 roma just talk[41611:123862] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wu2026-10-27 15:56:34.101637+0000 roma just talk[41611:123864] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF2026-10-27 15:56:34.101740+0000 roma just talk[41611:123866] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.101775+0000 roma just talk[41611:123865] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.101847+0000 roma just talk[41611:123868] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.101934+0000 roma just talk[41611:123869] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.102004+0000 roma just talk[41611:123871] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.102047+0000 roma just talk[41611:123870] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.102082+0000 roma just talk[41611:123873] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:1552:21: warning: unused function 'bilinear_tri' [-Wunused-function]
+static inline float bilinear_tri(float x) {
+                    ^
+2026-10-27 15:56:34.102113+0000 roma just talk[41611:123867] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.102161+0000 roma just talk[41611:123872] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.102221+0000 roma just talk[41611:123874] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.102263+0000 roma just talk[41611:123876] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.102306+0000 roma just talk[41611:123863] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+t float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+nused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:34.590164+0000 roma just talk[41611:123858] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+2026-10-27 15:56:36.945555+0000 roma just talk[41611:123852] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+2026-10-27 15:56:38.391820+0000 roma just talk[41611:123855] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+2026-10-27 15:56:43.095972+0000 roma just talk[41611:123854] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:44.428630+0000 roma just talk[41611:123853] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:49.475904+0000 roma just talk[41611:123851] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:51.423379+0000 roma just talk[41611:123849] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:56.300050+0000 roma just talk[41611:123845] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1436:33: warning: unused variable 'kvalues_iq4nl_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_iq4nl_f[16] = {
+                                ^
+program_source:1440:33: warning: unused variable 'kvalues_mxfp4_f' [-Wunused-const-variable]
+constexpr constant static float kvalues_mxfp4_f[16] = {
+                                ^
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: unused function 'e8m0_to_fp32' [-Wunused-function]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+2026-10-27 15:56:56.300136+0000 roma just talk[41611:123844] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:56.300165+0000 roma just talk[41611:123848] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:56.300195+0000 roma just talk[41611:123846] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:57.396551+0000 roma just talk[41611:123842] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+2026-10-27 15:56:58.738250+0000 roma just talk[41611:123764] [Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1444:19: warning: unused function 'best_index_int8' [-Wunused-function]
+static inline int best_index_int8(int n, constant float * val, float x) {
+                  ^
+program_source:1455:21: warning: function 'e8m0_to_fp32' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline float e8m0_to_fp32(uint8_t x) {
+                    ^
+program_source:1467:21: warning: unused function 'dot' [-Wunused-function]
+static inline float dot(float x, float y) {
+                    ^
+program_source:1471:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float x) {
+                    ^
+program_source:1475:21: warning: unused function 'sum' [-Wunused-function]
+static inline float sum(float4 x) {
+                    ^
+program_source:1484:16: warning: unused variable 'GELU_COEF_A' [-Wunused-const-variable]
+constant float GELU_COEF_A     = 0.044715f;
+               ^
+program_source:1485:16: warning: unused variable 'GELU_QUICK_COEF' [-Wunused-const-variable]
+constant float GELU_QUICK_COEF = -1.702f;
+               ^
+program_source:1486:16: warning: unused variable 'SQRT_2_OVER_PI' [-Wunused-const-variable]
+constant float SQRT_2_OVER_PI  = 0.79788456080286535587989211986876f;
+               ^
+program_source:1487:16: warning: unused variable 'SQRT_2_INV' [-Wunused-const-variable]
+constant float SQRT_2_INV      = 0.70710678118654752440084436210484f;
+               ^
+program_source:1491:16: warning: variable 'p_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float p_erf  = 0.3275911f;
+               ^
+program_source:1492:16: warning: variable 'a1_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a1_erf = 0.254829592f;
+               ^
+program_source:1493:16: warning: variable 'a2_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a2_erf = -0.284496736f;
+               ^
+program_source:1494:16: warning: variable 'a3_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a3_erf = 1.421413741f;
+               ^
+program_source:1495:16: warning: variable 'a4_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a4_erf = -1.453152027f;
+               ^
+program_source:1496:16: warning: variable 'a5_erf' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+constant float a5_erf = 1.061405429f;
+               ^
+program_source:2036:27: warning: variable 'kmask_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, kmask_iq2xs, 8)
+                          ^
+program_source:2040:27: warning: variable 'ksigns_iq2xs' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint8_t, ksigns_iq2xs, 128)
+                          ^
+program_source:2051:28: warning: unused variable 'ksigns64' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(uint64_t, ksigns64, 128)
+                           ^
+program_source:2087:28: warning: variable 'iq2xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xxs_grid, 256)
+                           ^
+program_source:2154:28: warning: variable 'iq2xs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2xs_grid, 512)
+                           ^
+program_source:2285:28: warning: variable 'iq2s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint64_t, iq2s_grid, 1024)
+                           ^
+program_source:2544:28: warning: variable 'iq3xxs_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3xxs_grid, 256)
+                           ^
+program_source:2579:28: warning: variable 'iq3s_grid' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq3s_grid, 512)
+                           ^
+program_source:2647:26: warning: unused variable 'kvalues_iq4nl' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_iq4nl, 16)
+                         ^
+program_source:2653:26: warning: unused variable 'kvalues_fp4' [-Wunused-const-variable]
+GGML_TABLE_BEGIN(int8_t, kvalues_fp4, 16)
+                         ^
+program_source:3177:28: warning: variable 'iq1s_grid_gpu' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+GGML_TABLE_BEGIN(uint32_t, iq1s_grid_gpu, NGRID_IQ1S)
+                           ^
+program_source:3859:22: warning: function 'get_scale_min_k4_just2' is not needed and will not be emitted [-Wunneeded-internal-declaration]
+static inline uchar2 get_scale_min_k4_just2(int j, int k, device const uchar * q) {
+                     ^
+ggml_metal_library_compile_all: compiled 'fa_aux' library in 1.944 sec
+ggml_metal_library_compile_all: compiled 'fa_f16' library in 4.663 sec
+ggml_metal_library_compile_all: compiled 'fa_f32' library in 7.144 sec
+ggml_metal_library_compile_all: compiled 'fa_q4_0' library in 38.291 sec
+ggml_metal_library_compile_all: compiled 'fa_q4_1' library in 4.437 sec
+ggml_metal_library_compile_all: compiled 'fa_q5_0' library in 7.413 sec
+ggml_metal_library_compile_all: compiled 'fa_q5_1' library in 36.920 sec
+ggml_metal_library_compile_all: compiled 'fa_q8_0' library in 35.843 sec
+ggml_metal_library_compile_all: compiled 'fa_tensor' library in 35.842 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_f16' library in 13.691 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_f32' library in 35.847 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q4_0' library in 35.848 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q4_1' library in 30.966 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q5_0' library in 28.985 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q5_1' library in 23.956 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q8_0' library in 22.591 sec
+ggml_metal_library_compile_all: compiled 'mul_mv' library in 16.425 sec
+ggml_metal_library_compile_all: compiled 'mul_mv_mma' library in 17.872 sec
+ggml_metal_library_compile_all: compiled 'mul_mm' library in 13.650 sec
+ggml_metal_library_compile_all: compiled 'quantize' library in 14.047 sec
+ggml_metal_library_compile_all: compiled 'softmax' library in 13.592 sec
+ggml_metal_library_compile_all: compiled 'norm' library in 13.580 sec
+ggml_metal_library_compile_all: compiled 'unary' library in 13.623 sec
+ggml_metal_library_compile_all: compiled 'binbcast' library in 13.620 sec
+ggml_metal_library_compile_all: compiled 'reduce' library in 13.622 sec
+ggml_metal_library_compile_all: compiled 'tri' library in 13.586 sec
+ggml_metal_library_compile_all: compiled 'ssm' library in 13.591 sec
+ggml_metal_library_compile_all: compiled 'wkv' library in 13.592 sec
+ggml_metal_library_compile_all: compiled 'gated_delta_net' library in 13.594 sec
+ggml_metal_library_compile_all: compiled 'solve_tri' library in 13.600 sec
+ggml_metal_library_compile_all: compiled 'rope' library in 13.599 sec
+ggml_metal_library_compile_all: compiled 'conv' library in 13.599 sec
+ggml_metal_library_compile_all: compiled 'upscale' library in 13.598 sec
+ggml_metal_library_compile_all: compiled 'argsort' library in 13.597 sec
+ggml_metal_library_compile_all: compiled 'pool' library in 13.596 sec
+ggml_metal_library_compile_all: compiled 'misc' library in 13.596 sec
+ggml_metal_library_compile_all: loaded 36 libraries from embedded data in 38.307 sec (max single = 38.291 sec)
+ggml_metal_rsets_init: creating a residency set collection (keep_alive = 180 s)
+ggml_metal_device_init: GPU name:   MTL0 (Apple Paravirtual device)
+ggml_metal_device_init: GPU family: MTLGPUFamilyApple5  (1005)
+ggml_metal_device_init: simdgroup reduction   = false
+ggml_metal_device_init: simdgroup matrix mul. = false
+ggml_metal_device_init: has unified memory    = true
+ggml_metal_device_init: has bfloat            = false
+ggml_metal_device_init: has tensor            = false
+ggml_metal_device_init: use residency sets    = true
+ggml_metal_device_init: use shared buffers    = true
+ggml_metal_device_init: recommendedMaxWorkingSetSize  =  5010.80 MB
+whisper_init_with_params_no_state: devices    = 3
+whisper_init_with_params_no_state: backends   = 3
+whisper_model_load: loading model
+whisper_model_load: n_vocab       = 51865
+whisper_model_load: n_audio_ctx   = 1500
+whisper_model_load: n_audio_state = 512
+whisper_model_load: n_audio_head  = 8
+whisper_model_load: n_audio_layer = 6
+whisper_model_load: n_text_ctx    = 448
+whisper_model_load: n_text_state  = 512
+whisper_model_load: n_text_head   = 8
+whisper_model_load: n_text_layer  = 6
+whisper_model_load: n_mels        = 80
+whisper_model_load: ftype         = 1
+whisper_model_load: qntvr         = 0
+whisper_model_load: type          = 2 (base)
+whisper_model_load: adding 1608 extra tokens
+whisper_model_load: n_langs       = 99
+whisper_model_load:         MTL0 total size =   147.37 MB
+whisper_model_load: model size    =  147.37 MB
+whisper_backend_init_gpu: device 0: MTL0 (type: 1)
+whisper_backend_init_gpu: found GPU device 0: MTL0 (type: 1, cnt: 0)
+whisper_backend_init_gpu: using MTL0 backend
+ggml_metal_init: allocating
+ggml_metal_init: found device: Apple Paravirtual device
+ggml_metal_init: picking default device: Apple Paravirtual device
+ggml_metal_init: use fusion         = true
+ggml_metal_init: use concurrency    = true
+ggml_metal_init: use graph optimize = true
+whisper_backend_init: using BLAS backend
+whisper_init_state: kv self size  =    6.29 MB
+whisper_init_state: kv cross size =   18.87 MB
+whisper_init_state: kv pad  size  =    3.15 MB
+whisper_init_state: loading Core ML model from '/Users/runner/work/_temp/none-profile-inputs/ggml-base-encoder.mlmodelc'
+whisper_init_state: first run on a device may take a while ...
+2026-10-27 15:56:59.052604+0000 roma just talk[41611:123767] [coreml] The model is not found at URL: file:///Users/runner/work/_temp/none-profile-inputs/ggml-base-encoder.mlmodelc
+whisper_init_state: failed to load Core ML model from '/Users/runner/work/_temp/none-profile-inputs/ggml-base-encoder.mlmodelc'
+whisper_init_state: compute buffer (conv)   =   23.13 MB
+whisper_init_state: compute buffer (encode) =   40.55 MB
+whisper_init_state: compute buffer (cross)  =   11.33 MB
+whisper_init_state: compute buffer (decode) =  154.98 MB
+2026-10-27 15:56:59.062321+0000 roma just talk[41611:123767] [WhisperContext] VAD model loaded from bundle resources
+2026-10-27 15:56:59.349883+0000 roma just talk[41611:123858] [WhisperTranscriptionService] Initiating local transcription for model: base
+2026-10-27 15:56:59.371574+0000 roma just talk[41611:123858] [WhisperTranscriptionService] Using already loaded model: base
+2026-10-27 15:57:00.567751+0000 roma just talk[41611:123737] [AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+[00:00:00.000 --> 00:00:04.960]   The quick Brown Fox confirms this local speech to text test for Roma just talk.
+2026-10-27 15:57:07.497691+0000 roma just talk[41611:123858] [WhisperTranscriptionService] Whisper transcription completed successfully.
+2026-10-27 15:57:07.558862+0000 roma just talk[41611:123689] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 15:57:07.558920+0000 roma just talk[41611:123689] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+ggml_metal_free: deallocating
+2026-10-27 15:57:07.603848+0000 roma just talk[41611:123689] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-27 15:57:07.604184+0000 roma just talk[41611:123689] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 15:57:07.623016+0000 roma just talk[41611:123689] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 15:57:07.623115+0000 roma just talk[41611:123689] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+✔ Test liveNoneProfileImportQueueUsesRealWhisperRecognition() passed after 48.705 seconds.
+✔ Suite VoiceInkTests passed after 48.707 seconds.
+✔ Test run with 1 test in 1 suite passed after 48.708 seconds.
+2026-10-27 15:57:08.343 xcodebuild[40887:121795] [MT] IDETestOperationsObserverDebug: 54.147 elapsed -- Testing started completed.
+2026-10-27 15:57:08.343 xcodebuild[40887:121795] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-27 15:57:08.343 xcodebuild[40887:121795] [MT] IDETestOperationsObserverDebug: 54.147 sec, +54.147 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/none-profile-proof/import/Import.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

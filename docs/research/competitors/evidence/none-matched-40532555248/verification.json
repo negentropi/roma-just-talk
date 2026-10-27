@@ -1,0 +1,212 @@
+{
+  "source_sha": "333f16773681fdb753189458622c7b6a6687691f",
+  "baseline_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "source_helpers_oracle_packages_verified": true,
+  "lanes": {
+    "baseline": {
+      "source_files": 603,
+      "expected_issues": 12,
+      "raw_test_log_sha256": "db6ba1e3f18aa327c79719ef2abd0db1ebe49d1bfe0480fb366ba312c6f698e2",
+      "identity": {
+        "app_path": "/Users/runner/work/_temp/none-profile-derived-baseline/Build/Products/Debug/roma just talk.app",
+        "designated_requirement": "cdhash H\"c112b8753df69a370c5da295cf53042d128ba610\"",
+        "executable_sha256": "97c52c9a18eb16dcf80359c9eb6e70d643a02009bb4f4bdfc42007277e33d9c6",
+        "test_bundle_sha256": {
+          "roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest": "46faf712a05b59267c133e88d8cd8b49ae19496ac581e7b1f4d5c74f855c10ab"
+        }
+      },
+      "raw_result": {
+        "errors": [],
+        "exit_code": 65,
+        "failure_lines": [
+          19,
+          20,
+          23,
+          30,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          242,
+          243
+        ],
+        "issues": [
+          "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:19:9: Expectation failed: (fixture.delivered.first?.utf8.elementsEqual(raw.utf8) \u2192 false) == true",
+          "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:20:9: Expectation failed: (fixture.delivered.first?.utf16.elementsEqual(raw.utf16) \u2192 false) == true",
+          "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:23:9: Expectation failed: (record.enhancedText \u2192 \"",
+          "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:30:9: Expectation failed: (saved.enhancedText \u2192 \"",
+          "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:44:9: Expectation failed: (fixture.delivered.first?.utf8.elementsEqual(raw.utf8) \u2192 false) == true",
+          "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:45:9: Expectation failed: (fixture.delivered.first?.utf16.elementsEqual(raw.utf16) \u2192 false) == true",
+          "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:46:9: Expectation failed: (record.text.utf8 \u2192 voice change changed replacement new line \u7e41\u9ad4\u4e2d\u6587 \ud83d\udc69\ud83c\udffd\u200d\ud83d\udcbb).elementsEqual(raw.utf8 \u2192 voice change Roma  um [keep] <literal>stay</literal> \"new line\".",
+          "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:47:9: Expectation failed: (record.enhancedText \u2192 \"UNEXPECTED AI OUTPUT\") == nil",
+          "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:48:9: Expectation failed: (fixture.promptDetectionCalls \u2192 1) == 0",
+          "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:49:9: Expectation failed: (fixture.enhancementCalls \u2192 1) == 0",
+          "\u2718 Test canceledQueuedDictationPasteDoesNotWriteTheTarget() recorded an issue at DictationProfilePipelineTests.swift:242:9: Expectation failed: (result \u2192 .textInserted) == .commandNotPosted",
+          "\u2718 Test canceledQueuedDictationPasteDoesNotWriteTheTarget() recorded an issue at DictationProfilePipelineTests.swift:243:9: Expectation failed: (writes \u2192 [\"Canceled queued text\"]).isEmpty \u2192 false"
+        ],
+        "lane": "baseline",
+        "summary": [
+          [
+            "4",
+            "failed"
+          ]
+        ],
+        "tests": {
+          "canceledQueuedDictationPasteDoesNotWriteTheTarget": {
+            "results": [
+              "failed"
+            ],
+            "starts": 1
+          },
+          "dictationCustomRetainsItsExistingCleanupPath": {
+            "results": [
+              "passed"
+            ],
+            "starts": 1
+          },
+          "dictationNoneDoesNotActivatePromptTriggersOrAI": {
+            "results": [
+              "failed"
+            ],
+            "starts": 1
+          },
+          "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally": {
+            "results": [
+              "failed"
+            ],
+            "starts": 1
+          }
+        },
+        "valid": true
+      },
+      "json_roundtrip_stable": true
+    },
+    "candidate": {
+      "source_files": 607,
+      "expected_issues": 0,
+      "raw_test_log_sha256": "ec5fd54c8012ada0a05c49b6780517d7e583473232ed1675a3a52d73d56fa177",
+      "identity": {
+        "app_path": "/Users/runner/work/_temp/none-profile-derived-candidate/Build/Products/Debug/roma just talk.app",
+        "designated_requirement": "cdhash H\"a84dd7127779667eff8b73ef4197b69c5f1d2147\"",
+        "executable_sha256": "f220a6aa6fd876303e76d8b0e16042cf7c4012913d9696a0fe66fed6c00022f0",
+        "test_bundle_sha256": {
+          "roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest": "2162daa744ee3906039b017496cf21a4f9fc6614782e811eee1b7d838dee4960"
+        }
+      },
+      "raw_result": {
+        "errors": [],
+        "exit_code": 0,
+        "failure_lines": [],
+        "issues": [],
+        "lane": "candidate",
+        "summary": [
+          [
+            "4",
+            "passed"
+          ]
+        ],
+        "tests": {
+          "canceledQueuedDictationPasteDoesNotWriteTheTarget": {
+            "results": [
+              "passed"
+            ],
+            "starts": 1
+          },
+          "dictationCustomRetainsItsExistingCleanupPath": {
+            "results": [
+              "passed"
+            ],
+            "starts": 1
+          },
+          "dictationNoneDoesNotActivatePromptTriggersOrAI": {
+            "results": [
+              "passed"
+            ],
+            "starts": 1
+          },
+          "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally": {
+            "results": [
+              "passed"
+            ],
+            "starts": 1
+          }
+        },
+        "valid": true
+      },
+      "json_roundtrip_stable": true
+    },
+    "actual_import": {
+      "result_valid": true,
+      "same_candidate_identity": true,
+      "stored_exact_same_inference": true,
+      "input_and_processed_WAV_hashes_verified": true,
+      "raw_observation": {
+        "audioSHA256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805",
+        "bundleIdentifier": "com.negentropi.RomaJustTalk",
+        "classification": "passed",
+        "completed": true,
+        "enhancedText": null,
+        "executablePath": "/Users/runner/work/_temp/none-profile-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "failureCleanupLimit": "The import API exposes its allocated WAV only after persistence. Failed or canceled allocation may leave a WAV on this disposable runner; failure never claims complete cleanup.",
+        "limitations": "No microphone, human speech, AI semantics, insertion, crash durability, or relaunch proof. Fresh ModelContext reads the retained in-memory store.",
+        "modelSHA256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+        "ownedCleanupCompleted": true,
+        "permanentAudioSHA256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383",
+        "permanentAudioURL": "file:///Users/runner/Library/Application%20Support/com.negentropi.RomaJustTalk/Recordings/transcribed_4A759C98-5AAF-480D-8FE1-CA77635EC329.wav",
+        "processIdentifier": 41611,
+        "queueItemID": "AF3313FB-7CDC-47B2-94C3-BF5A86682807",
+        "recognitionOracle": "The same preloaded WhisperContext.getTranscription result after that inference; no second recognition.",
+        "recordID": "AD6FE89B-B1D4-4452-B2CB-C555A1B4D10A",
+        "sameContextRecognition": " The quick Brown Fox confirms this local speech to text test for Roma just talk.",
+        "scope": "One real public file-import queue inference using AudioProcessor and WhisperTranscriptionService; synthetic Samantha speech.",
+        "sourcePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+        "storedText": " The quick Brown Fox confirms this local speech to text test for Roma just talk.",
+        "testName": "liveNoneProfileImportQueueUsesRealWhisperRecognition",
+        "utf8Equal": true,
+        "utf16Equal": true,
+        "version": 1
+      },
+      "input_metadata": {
+        "audio": {
+          "bytes": 165984,
+          "channels": 1,
+          "frames": 80944,
+          "path": "/Users/runner/work/_temp/none-profile-inputs/input.wav",
+          "phrase": "The quick brown fox confirms this local speech to text test for Roma just talk.",
+          "rate": 135,
+          "retained_path": "import/input.wav",
+          "sample_rate": 16000,
+          "sample_width": 2,
+          "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805",
+          "voice": "Samantha"
+        },
+        "model": {
+          "bytes": 147951465,
+          "path": "/Users/runner/work/_temp/none-profile-inputs/ggml-base.bin",
+          "sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+          "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+        },
+        "scope": "Synthetic speech WAV and hash-pinned local Whisper weights; no microphone or provider credentials",
+        "setup_reference": "scripts/run-ios-remote-stt-e2e.sh",
+        "setup_reference_sha256": "7811fae8aee7040f939aedac481e472b10106ff2a456ad39d36edcc0f0d39d01"
+      },
+      "raw_log_sha256": "0c286f1ffb0b3b022e5d25f8f00f88c99d3be844a1ad099e7e736be08e4ced41"
+    }
+  },
+  "run_id": 40532555248,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40532555248",
+  "conclusion": "success",
+  "classification": "matched-and-actual-import-passed",
+  "limits": [
+    "Matched pipeline/AI text and target insertion are controlled fixtures.",
+    "Actual import uses one synthetic Samantha WAV and one hash-pinned local Whisper inference.",
+    "Exact raw recognition is compared with the same preloaded context after queue completion, without a second inference.",
+    "Fresh ModelContext sees the saved record in an isolated in-memory store; this is not crash or relaunch durability.",
+    "This actual-ASR case has no enhancement service; configured AI bypass is established by separate controlled pipeline cases.",
+    "No actual microphone, human speech, physical shortcut, native-editor insertion, general ASR accuracy or provider semantic proof.",
+    "The failed predecessor run40528585813 is retained separately; its final verifier rejected tuple/list JSON equality and skipped actual import."
+  ],
+  "independent_review": "Passed. Separate reviewer rehashed the actual ZIP and WAVs, independently parsed raw test logs, checked source/helper/identity links and the same-context recognition receipt. No blocking finding for the stated scope."
+}

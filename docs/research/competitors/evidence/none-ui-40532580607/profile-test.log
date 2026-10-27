@@ -1,0 +1,184 @@
+testDictationProfilePreservesCustomSettingsAndPersists]' started.
+    t =     0.00s Start Test at 2026-10-27 16:01:33.845
+    t =     0.31s Set Up
+2026-10-27 16:01:34.323 xcodebuild[52502:128618] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-27 16:01:34.323 xcodebuild[52502:128618] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     0.32s Open com.negentropi.RomaJustTalk
+    t =     0.32s     Launch com.negentropi.RomaJustTalk
+    t =     2.52s         Wait for accessibility to load
+    t =     3.01s         Setting up automation session
+    t =     3.03s         Wait for com.negentropi.RomaJustTalk to idle
+    t =     3.21s Open com.negentropi.RomaJustTalk
+    t =     3.21s     Activate com.negentropi.RomaJustTalk
+    t =     3.22s         Wait for com.negentropi.RomaJustTalk to idle
+    t =     3.23s Wait for com.negentropi.RomaJustTalk to become Running Foreground
+    t =     3.23s Waiting 10.0s for StatusItem (First Match) to exist
+    t =     4.26s     Checking `Expect predicate `existsNoRetry == 1` for object StatusItem (First Match)`
+    t =     4.26s         Checking existence of `StatusItem (First Match)`
+    t =     4.29s Get number of matches for: Descendants matching type StatusItem
+    t =     4.49s Click StatusItem (First Match)
+    t =     4.49s     Wait for com.negentropi.RomaJustTalk to idle
+    t =     4.50s     Find the StatusItem (First Match)
+    t =     4.53s     Check for interrupting elements affecting "menuBarIcon" StatusItem
+    t =     4.53s     Synthesize event
+    t =     5.05s     Wait for com.negentropi.RomaJustTalk to idle
+    t =     5.06s Waiting 5.0s for "Settings" MenuItem to exist
+    t =     6.08s     Checking `Expect predicate `existsNoRetry == 1` for object "Settings" MenuItem`
+    t =     6.08s         Checking existence of `"Settings" MenuItem`
+    t =     6.21s Click "Settings" MenuItem
+    t =     6.21s     Wait for com.negentropi.RomaJustTalk to idle
+    t =     6.21s     Find the "Settings" MenuItem
+    t =     6.33s     Check for interrupting elements affecting "menuAction:" MenuItem
+    t =     6.33s     Synthesize event
+    t =     6.34s         Checking existence of `"menuAction:" MenuItem`
+    t =     6.54s         Hover menu item 'Settings'
+    t =     6.54s             Wait for com.negentropi.RomaJustTalk to idle
+    t =     6.55s             Find the "menuAction:" MenuItem
+    t =     6.62s             Check for interrupting elements affecting "menuAction:" MenuItem
+    t =     6.63s             Synthesize event
+    t =     6.85s             Wait for com.negentropi.RomaJustTalk to idle
+    t =     6.85s         Find the "menuAction:" MenuItem
+    t =     8.33s     Wait for com.negentropi.RomaJustTalk to idle
+    t =     8.47s Waiting 15.0s for "com.negentropi.RomaJustTalk.mainWindow" Window to exist
+    t =     9.49s     Checking `Expect predicate `existsNoRetry == 1` for object "com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =     9.49s         Checking existence of `"com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =     9.81s Get number of matches for: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    10.72s Waiting 10.0s for "Dictionary" Button to exist
+    t =    11.73s     Checking `Expect predicate `existsNoRetry == 1` for object "Dictionary" Button`
+    t =    11.73s         Checking existence of `"Dictionary" Button`
+    t =    12.36s Waiting 10.0s for "models" Button to exist
+    t =    13.38s     Checking `Expect predicate `existsNoRetry == 1` for object "models" Button`
+    t =    13.38s         Checking existence of `"models" Button`
+    t =    13.87s Click "models" Button
+    t =    13.87s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    13.87s     Find the "models" Button
+    t =    14.35s     Check for interrupting elements affecting "models" Button
+    t =    14.41s     Synthesize event
+    t =    16.09s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    16.10s Waiting 10.0s for "models.settings.open" Button to exist
+    t =    17.11s     Checking `Expect predicate `existsNoRetry == 1` for object "models.settings.open" Button`
+    t =    17.11s         Checking existence of `"models.settings.open" Button`
+    t =    17.62s Checking existence of `"models.settings.open" Button`
+    t =    17.98s Find the "models.settings.open" Button
+    t =    18.37s Find the "models.settings.open" Button
+    t =    18.73s Find the "models.settings.open" Button
+    t =    19.12s Find the "models.settings.open" Button
+    t =    19.52s Find the "models.settings.open" Button
+    t =    19.96s Find the "models.settings.open" Button
+    t =    20.37s Find the "models.settings.open" Button
+    t =    20.73s Find the "models.settings.open" Button
+    t =    21.23s Find the "models.settings.open" Button
+    t =    21.64s Click "models.settings.open" Button
+    t =    21.64s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    21.65s     Find the "models.settings.open" Button
+    t =    22.03s     Check for interrupting elements affecting "models.settings.open" Button
+    t =    22.16s     Synthesize event
+    t =    23.28s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    23.28s Waiting 5.0s for "models.settings.close" Button to exist
+    t =    24.29s     Checking `Expect predicate `existsNoRetry == 1` for object "models.settings.close" Button`
+    t =    24.29s         Checking existence of `"models.settings.close" Button`
+    t =    24.84s Waiting 5.0s for "Custom" RadioButton to exist
+    t =    25.85s     Checking `Expect predicate `existsNoRetry == 1` for object "Custom" RadioButton`
+    t =    25.85s         Checking existence of `"Custom" RadioButton`
+    t =    26.29s Waiting 5.0s for "None" RadioButton to exist
+    t =    27.30s     Checking `Expect predicate `existsNoRetry == 1` for object "None" RadioButton`
+    t =    27.30s         Checking existence of `"None" RadioButton`
+    t =    27.82s Get number of matches for: Elements matching predicate 'label IN {"Custom", "None"}'
+    t =    28.16s Find the "Custom" RadioButton
+    t =    28.41s Find the "None" RadioButton
+    t =    28.71s Waiting 5.0s for ScrollView (First Match) to exist
+    t =    29.74s     Checking `Expect predicate `existsNoRetry == 1` for object ScrollView (First Match)`
+    t =    29.74s         Checking existence of `ScrollView (First Match)`
+    t =    29.98s Get number of matches for: Elements containing elements matching type Any with identifier 'dictationProfile.picker'
+    t =    30.42s Checking existence of `"transcriptionSettings.paragraphBreaks" Any`
+    t =    30.55s Find the "transcriptionSettings.paragraphBreaks" Any
+    t =    30.69s Find the ScrollView (First Match)
+    t =    30.81s Find the "transcriptionSettings.paragraphBreaks" Switch
+    t =    30.90s Find the "transcriptionSettings.paragraphBreaks" Switch
+    t =    30.99s Find the "transcriptionSettings.paragraphBreaks" Switch
+    t =    31.07s Waiting 5.0s for ScrollView (First Match) to exist
+    t =    32.09s     Checking `Expect predicate `existsNoRetry == 1` for object ScrollView (First Match)`
+    t =    32.09s         Checking existence of `ScrollView (First Match)`
+    t =    32.22s Get number of matches for: Elements containing elements matching type Any with identifier 'dictationProfile.picker'
+    t =    32.50s Checking existence of `"transcriptionSettings.lowercase" Any`
+    t =    32.66s Find the "transcriptionSettings.lowercase" Any
+    t =    32.86s Find the ScrollView (First Match)
+    t =    33.09s Find the "transcriptionSettings.lowercase" Switch
+    t =    33.20s Find the "transcriptionSettings.lowercase" Switch
+    t =    33.37s Find the "transcriptionSettings.lowercase" Switch
+    t =    33.50s Waiting 5.0s for ScrollView (First Match) to exist
+    t =    34.53s     Checking `Expect predicate `existsNoRetry == 1` for object ScrollView (First Match)`
+    t =    34.53s         Checking existence of `ScrollView (First Match)`
+    t =    34.70s Get number of matches for: Elements containing elements matching type Any with identifier 'dictationProfile.picker'
+    t =    35.08s Checking existence of `"transcriptionSettings.appendTrailingSpace" Any`
+    t =    35.26s Find the "transcriptionSettings.appendTrailingSpace" Any
+    t =    35.45s Find the ScrollView (First Match)
+    t =    35.68s Find the "transcriptionSettings.appendTrailingSpace" Switch
+    t =    35.85s Checking existence of `"transcriptionSettings.paragraphBreaks" Any`
+    t =    36.06s Find the "transcriptionSettings.paragraphBreaks" Any
+    t =    36.27s Find the "transcriptionSettings.paragraphBreaks" Switch
+    t =    36.47s Find the ScrollView at {{587.0, 89.0}, {400.0, 619.0}}
+    t =    36.62s Find the "transcriptionSettings.paragraphBreaks" Switch
+    t =    36.83s Find the "transcriptionSettings.paragraphBreaks" Switch
+    t =    37.16s Checking existence of `"transcriptionSettings.lowercase" Any`
+    t =    37.37s Find the "transcriptionSettings.lowercase" Any
+    t =    37.62s Find the "transcriptionSettings.lowercase" Switch
+    t =    37.88s Find the ScrollView at {{587.0, 89.0}, {400.0, 619.0}}
+    t =    38.13s Find the "transcriptionSettings.lowercase" Switch
+    t =    38.40s Find the "transcriptionSettings.lowercase" Switch
+    t =    38.79s Checking existence of `"transcriptionSettings.appendTrailingSpace" Any`
+    t =    39.05s Find the "transcriptionSettings.appendTrailingSpace" Any
+    t =    39.29s Find the "transcriptionSettings.appendTrailingSpace" Switch
+    t =    39.54s Find the ScrollView at {{587.0, 89.0}, {400.0, 619.0}}
+    t =    39.74s Find the "transcriptionSettings.appendTrailingSpace" Switch
+    t =    39.94s Checking existence of `"Edit" Button`
+    t =    40.21s Find the "Edit" Button
+    t =    40.51s Find the "Edit" Button
+    t =    40.75s Find the ScrollView at {{587.0, 89.0}, {400.0, 619.0}}
+    t =    40.96s Find the "Edit" Button
+    t =    41.29s Find the "Edit" Button
+    t =    41.67s Checking existence of `"Custom" RadioButton`
+    t =    41.87s Find the "Custom" RadioButton
+    t =    42.10s Find the "dictationProfile.custom" RadioButton
+    t =    42.33s Find the ScrollView at {{587.0, 89.0}, {400.0, 619.0}}
+    t =    42.50s Find the "dictationProfile.custom" RadioButton
+    t =    42.71s Find the "dictationProfile.custom" RadioButton
+    t =    42.97s Checking existence of `"None" RadioButton`
+    t =    43.27s Find the "None" RadioButton
+    t =    43.45s Find the "dictationProfile.none" RadioButton
+    t =    43.63s Find the ScrollView at {{587.0, 89.0}, {400.0, 619.0}}
+    t =    43.76s Find the "dictationProfile.none" RadioButton
+    t =    43.99s Find the "dictationProfile.none" RadioButton
+    t =    44.36s Checking existence of `Switch (First Match)`
+    t =    44.50s Checking existence of `Switch (First Match)`
+    t =    44.78s Checking existence of `Switch (First Match)`
+    t =    45.05s Requesting snapshot of accessibility hierarchy for app with pid 58701
+    t =    45.51s Requesting snapshot of accessibility hierarchy for app with pid 58701
+    t =    45.91s Requesting snapshot of accessibility hierarchy for app with pid 58701
+    t =    45.91s Using snapshot previously cached by application
+    t =    45.92s Find: Descendants matching type Window
+    t =    45.92s Find: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    45.92s Find: Descendants matching type ScrollView
+    t =    45.92s Find: Elements containing elements matching type Any with identifier 'dictationProfile.picker'
+    t =    45.93s Requesting snapshot of accessibility hierarchy for app with pid 58701
+    t =    45.93s Using snapshot previously cached by application
+    t =    45.93s Find: Descendants matching type Window
+    t =    45.93s Find: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    45.93s Find: Descendants matching type ScrollView
+    t =    45.94s Requesting snapshot of accessibility hierarchy for app with pid 58701
+    t =    45.94s Using snapshot previously cached by application
+    t =    45.94s Find: Descendants matching type Window
+    t =    45.95s Find: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    45.95s Requesting snapshot of accessibility hierarchy for app with pid 58701
+    t =    45.96s Using snapshot previously cached by application
+    t =    45.96s Find: Descendants matching type Window
+    t =    45.97s Requesting snapshot of accessibility hierarchy for app with pid 58701
+    t =    45.97s Using snapshot previously cached by application
+    t =    45.99s Added attachment named 'Model settings scroll hierarchy'
+    t =    45.99s Find the Target Application 'com.negentropi.RomaJustTalk'
+    t =    46.34s Added attachment named 'Model settings scroll failure'
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:432: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : failed - No visible native settings control could receive the scroll event.
+    t =    46.78s Tear Down
+    t =    47.17s Checking for crash reports corresponding to unexpected termination of com.negentropi.RomaJustTalk
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' failed (48.241 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests 

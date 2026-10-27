@@ -1,0 +1,66 @@
+{
+  "errors": [],
+  "exit_code": 65,
+  "failure_lines": [
+    19,
+    20,
+    23,
+    30,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    242,
+    243
+  ],
+  "issues": [
+    "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:19:9: Expectation failed: (fixture.delivered.first?.utf8.elementsEqual(raw.utf8) \u2192 false) == true",
+    "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:20:9: Expectation failed: (fixture.delivered.first?.utf16.elementsEqual(raw.utf16) \u2192 false) == true",
+    "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:23:9: Expectation failed: (record.enhancedText \u2192 \"",
+    "\u2718 Test dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally() recorded an issue at DictationProfilePipelineTests.swift:30:9: Expectation failed: (saved.enhancedText \u2192 \"",
+    "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:44:9: Expectation failed: (fixture.delivered.first?.utf8.elementsEqual(raw.utf8) \u2192 false) == true",
+    "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:45:9: Expectation failed: (fixture.delivered.first?.utf16.elementsEqual(raw.utf16) \u2192 false) == true",
+    "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:46:9: Expectation failed: (record.text.utf8 \u2192 voice change changed replacement new line \u7e41\u9ad4\u4e2d\u6587 \ud83d\udc69\ud83c\udffd\u200d\ud83d\udcbb).elementsEqual(raw.utf8 \u2192 voice change Roma  um [keep] <literal>stay</literal> \"new line\".",
+    "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:47:9: Expectation failed: (record.enhancedText \u2192 \"UNEXPECTED AI OUTPUT\") == nil",
+    "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:48:9: Expectation failed: (fixture.promptDetectionCalls \u2192 1) == 0",
+    "\u2718 Test dictationNoneDoesNotActivatePromptTriggersOrAI() recorded an issue at DictationProfilePipelineTests.swift:49:9: Expectation failed: (fixture.enhancementCalls \u2192 1) == 0",
+    "\u2718 Test canceledQueuedDictationPasteDoesNotWriteTheTarget() recorded an issue at DictationProfilePipelineTests.swift:242:9: Expectation failed: (result \u2192 .textInserted) == .commandNotPosted",
+    "\u2718 Test canceledQueuedDictationPasteDoesNotWriteTheTarget() recorded an issue at DictationProfilePipelineTests.swift:243:9: Expectation failed: (writes \u2192 [\"Canceled queued text\"]).isEmpty \u2192 false"
+  ],
+  "lane": "baseline",
+  "summary": [
+    [
+      "4",
+      "failed"
+    ]
+  ],
+  "tests": {
+    "canceledQueuedDictationPasteDoesNotWriteTheTarget": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "dictationCustomRetainsItsExistingCleanupPath": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "dictationNoneDoesNotActivatePromptTriggersOrAI": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": true
+}

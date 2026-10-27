@@ -1,0 +1,23 @@
+{
+  "old_sha": "8fc18c519a126018174929849f479fdcaa1aaa45",
+  "new_sha": "d6397ed975ba62d03289d681e53e3bb103eff5a0",
+  "paths": [
+    "VoiceInk",
+    "VoiceInkCore",
+    "VoiceInkNVIDIA",
+    "VoiceInkQwen",
+    "VoiceInk.xcodeproj",
+    "iOS",
+    "Makefile",
+    "VoiceInk.entitlements"
+  ],
+  "production_manifest_entries": 584,
+  "identical": true,
+  "comparison": "Exact git object, mode and path equality for all selected tracked entries.",
+  "canonical_manifest_sha256": "c17877c7d9fc6e74140464655f0ea4f512939b70f0e7b7ed5840d931bd150e98",
+  "current_workspace_used_for_product_binding": false,
+  "excluded_runtime_claims": [
+    "No test, UI or build execution is implied by source equivalence.",
+    "Workflow, test and verification-script changes are outside these product roots. Each run retains its own exact tested SHA."
+  ]
+}

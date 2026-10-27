@@ -1,0 +1,13 @@
+{
+  "canonical_pin_count": 41,
+  "canonical_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "declaration_sha256": {
+    "Tools/RuntimeE2EHarness/Package.swift": "cdb32a2299d1475b674502105be31d4b93874546987e0fbf109f93a1baa55295",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+    "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+    "VoiceInkQwen/Package.swift": "058f93419dd0da3a92dfd135af2c8a6b664192f53ec883168c279b7564b21d4e"
+  },
+  "scope": "package metadata only; existing pins and all dependency declarations unchanged",
+  "source": "reviewed Xcode resolution run 40482229518"
+}

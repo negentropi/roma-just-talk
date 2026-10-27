@@ -1,0 +1,144 @@
+{
+  "run_id": 40532580607,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40532580607",
+  "source_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "classification": "failed-before-profile-mutation",
+  "scope": "Debug UI diagnostic only",
+  "release_validation": false,
+  "artifact": {
+    "id": 12749008512,
+    "bytes": 95266216,
+    "sha256": "7ad992edff660cf33275caff840ed2f8020af3b280ce6467e75108dd9af5e651",
+    "zip_digest_verified": true,
+    "all_member_crcs_verified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40532580607/ui-evidence.zip"
+  },
+  "source_inputs_match_pinned_git": true,
+  "source_inputs_unchanged_after_run": true,
+  "app_executable_unchanged": true,
+  "test_results": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "testTranslationTargetsReorderSelectAndPersist": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "testDictationProfilePreservesCustomSettingsAndPersists": {
+      "starts": 1,
+      "results": [
+        "failed"
+      ]
+    }
+  },
+  "failure": {
+    "test": "testDictationProfilePreservesCustomSettingsAndPersists",
+    "line": 432,
+    "message": "No visible native settings control could receive the scroll event.",
+    "profile_mutation_attempted": false,
+    "wheel_event_attempted": false,
+    "failure_boundary": "Initial Custom settings inspection while revealing trailing-space switch"
+  },
+  "observations": [
+    "Custom selected and None unselected were read from native radio buttons.",
+    "Paragraph and lowercase switch values and enabled states passed before attempting to reveal trailing space.",
+    "Visible source-owned switches, radio buttons and the Edit button exposed no hittable anchor.",
+    "Accessibility diagnostic marks the application, main window, split group and all scroll-view ancestors Disabled.",
+    "The failure screenshot shows the settings panel and scroll bar on screen; descendant values remain readable."
+  ],
+  "inference": "The container-only hit-point premise is insufficient. Disabled accessibility ancestors require investigation before another fixture interaction workaround. SlidingPanel content.disabled(isPresented) is a source suspect, not a proven root cause.",
+  "limits": [
+    "No candidate profile mutation, None behavior, panel reopen or relaunch persistence was exercised by this failed case.",
+    "Screenshot alone does not prove physical input or accessibility behavior.",
+    "Source-bound signing and grant setup do not independently establish TCC authorization readback.",
+    "No Release build or packaging ran in this diagnostic."
+  ],
+  "failed_ci_log": {
+    "local_path": "/tmp/rjt-none-ui-failed-40532580607.log",
+    "bytes": 19512,
+    "sha256": "b2456bf5cb9753e3bb9645fa424b3f41ecdd065f0b5c64b92df002b9912c12c3",
+    "fetched_once": true
+  },
+  "raw_ui_log": {
+    "local_path": "/tmp/rjt-none-ui-tests-40532580607.log",
+    "bytes": 109611,
+    "sha256": "b763d45a4d6b20ca54ecf85829ff460d47a77e91223d176a1d40f1e7af760e3f"
+  },
+  "retained_files": [
+    {
+      "path": "app-signature.txt",
+      "bytes": 954,
+      "sha256": "ca0323286e4e6565a40779ed0da4039a1a298f20262e7ac03287a8b1d7193b9c"
+    },
+    {
+      "path": "diagnostic-result.json",
+      "bytes": 876,
+      "sha256": "a4d05293a8b51d1e8fc16e2c17c4eec7bdc801b1a48074554c07de4fe71d6e93"
+    },
+    {
+      "path": "host-requirement.txt",
+      "bytes": 51,
+      "sha256": "424b237e29678683d696b0d0e536476be2ed5f15b1ed843bfd43fa85e3389a86"
+    },
+    {
+      "path": "identity-after.txt",
+      "bytes": 198,
+      "sha256": "14faad4d57f915b7ca03b9e9f800d40debabadecc556c679461b9c108f2a146d"
+    },
+    {
+      "path": "identity-before.txt",
+      "bytes": 198,
+      "sha256": "14faad4d57f915b7ca03b9e9f800d40debabadecc556c679461b9c108f2a146d"
+    },
+    {
+      "path": "model-settings-failure.png",
+      "bytes": 259573,
+      "sha256": "d3288daee7471ffbe47fbae4cb032e9ae5db8fbaad05583c86a57c2c98c2930d"
+    },
+    {
+      "path": "model-settings-hierarchy.txt",
+      "bytes": 6354,
+      "sha256": "8023c075f02d598c36ee6211e9741bfe3448ac2e03901499cd80fd69c97bc0f4"
+    },
+    {
+      "path": "profile-test.log",
+      "bytes": 13595,
+      "sha256": "4666f1cdce15f5ec0f84c9dba0350fe9cde3798414913b1ede7a782b2a8e8496"
+    },
+    {
+      "path": "result.json",
+      "bytes": 613,
+      "sha256": "daa765bc0569e6fe8647425ba0f68e4c8c48616ea8e2f39d6ec14fd7f9151b8c"
+    },
+    {
+      "path": "source-inputs-after.txt",
+      "bytes": 267,
+      "sha256": "6bf9524a88044723b74ecd38f76121a7c043aae16fd86ce38090d837f3b8649b"
+    },
+    {
+      "path": "source-inputs.sha256",
+      "bytes": 577,
+      "sha256": "c3a42ec4f339d4b7d49559b9ec2b8ca4266c39b44ba062d94518f1f2e3db4b5c"
+    },
+    {
+      "path": "source-sha.txt",
+      "bytes": 41,
+      "sha256": "26d72afae12212289996c134e4195d85e439d59c5939c2ac2233448e8b57e390"
+    }
+  ],
+  "source_input_count": 5,
+  "app_executable_sha256": "036df9d27071a3d7efe71e2eb47fa571af3d383d46930621634a88c983c23d4f",
+  "app_cdhash": "c7b143455b7cd4d7af65500d8f49ac69013592a7",
+  "host_requirement_matches_signature": true
+}

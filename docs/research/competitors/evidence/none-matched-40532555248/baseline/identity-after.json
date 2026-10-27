@@ -1,0 +1,8 @@
+{
+  "app_path": "/Users/runner/work/_temp/none-profile-derived-baseline/Build/Products/Debug/roma just talk.app",
+  "designated_requirement": "cdhash H\"c112b8753df69a370c5da295cf53042d128ba610\"",
+  "executable_sha256": "97c52c9a18eb16dcf80359c9eb6e70d643a02009bb4f4bdfc42007277e33d9c6",
+  "test_bundle_sha256": {
+    "roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest": "46faf712a05b59267c133e88d8cd8b49ae19496ac581e7b1f4d5c74f855c10ab"
+  }
+}

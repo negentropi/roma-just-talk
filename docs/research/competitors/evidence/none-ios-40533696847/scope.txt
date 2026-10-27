@@ -1,0 +1,1 @@
+Direct iOS project compilation and static packaging only. No Simulator launch, runtime tests, microphone, keyboard or device proof.

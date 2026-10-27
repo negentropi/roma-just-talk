@@ -16,4 +16,4 @@ Settings backup includes the choice. Importing an older backup without it leaves
 
 ## Verification status
 
-Implementation and focused source checks are complete. The [current unit plan](research/competitors/raw-profile-plan.md) tracks remote compilation, matched regression, actual file import and settings UI proof. The earlier verified writing/snippet artifact predates this option. Light, Clarity and per-mode profiles remain later work.
+Matched old/new pipeline checks and one real Whisper file import passed on remote macOS. Shared Core also passed the iOS Simulator compile. The [current unit plan](research/competitors/raw-profile-plan.md) tracks a shared settings-panel accessibility defect found by native UI testing; profile selection and relaunch persistence still require a passing rerun, followed by the full Mac Release gate. The earlier verified writing/snippet artifact predates this option. Light, Clarity and per-mode profiles remain later work.

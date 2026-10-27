@@ -1,0 +1,30 @@
+{
+  "classification": "invalid-or-failed",
+  "exit_code": 65,
+  "tests": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "testTranslationTargetsReorderSelectAndPersist": {
+      "starts": 1,
+      "results": [
+        "passed"
+      ]
+    },
+    "testDictationProfilePreservesCustomSettingsAndPersists": {
+      "starts": 1,
+      "results": [
+        "failed"
+      ]
+    }
+  }
+}

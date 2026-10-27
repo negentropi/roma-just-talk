@@ -1,0 +1,266 @@
+{
+  "run_id": 40532555248,
+  "head_sha": "333f16773681fdb753189458622c7b6a6687691f",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40532555248",
+  "conclusion": "success",
+  "classification": "matched-and-actual-import-passed",
+  "observations_artifact": {
+    "id": 12748717121,
+    "bytes": 489486,
+    "sha256": "77a82605b0975c4f116b08b1a49e03edfd323d28104e377ddc199c55f77563c2",
+    "digest_and_all_CRC_verified": true
+  },
+  "baseline_checkpoint": {
+    "id": 12748595007,
+    "bytes": 28245,
+    "sha256": "edccd351c3e0f4e8151170426b5ff70abc1ad2d6883709fce82242ea8bd4be0f",
+    "digest_and_all_CRC_verified": true
+  },
+  "matched_checkpoint": {
+    "id": 12747412521,
+    "bytes": 165029,
+    "sha256": "956bda8e738bac56afbf5944ae449b88196021bd137e4ee36b727f0af3de7988",
+    "retention": "Actions metadata; final observations include its source and result contracts"
+  },
+  "full_artifact": {
+    "id": 12748896842,
+    "bytes": 105398344,
+    "sha256": "7e6efc86547f4a2d6423f55b576ddafa3dcc1760629457b343b847e34b26258a",
+    "retention": "GitHub Actions only; not downloaded"
+  },
+  "retained_files": [
+    {
+      "path": "baseline/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "2f30a4535f4edec6ccb2b0f0be80ad8ed1672a18f978baa7eb8b093d31882893"
+    },
+    {
+      "path": "baseline/identity-after.json",
+      "bytes": 452,
+      "sha256": "b9a3c319d4f336e8890479195e895d45f00d1ce6265b3ad5d98afc10781efe7f"
+    },
+    {
+      "path": "baseline/identity-before.json",
+      "bytes": 452,
+      "sha256": "b9a3c319d4f336e8890479195e895d45f00d1ce6265b3ad5d98afc10781efe7f"
+    },
+    {
+      "path": "baseline/result.json",
+      "bytes": 3581,
+      "sha256": "0d3cfcba6340fbbf33794b48aa3bd384a9223437c4cc04ed36518211c6a39f87"
+    },
+    {
+      "path": "baseline/selection/receipt.json",
+      "bytes": 18293,
+      "sha256": "48fa04167bec62d3e9dcb33bc1e5d804a3d8a283d96521bc8c5a2339af59d42a"
+    },
+    {
+      "path": "baseline/selection/selected-tests.json",
+      "bytes": 25553,
+      "sha256": "be5c19584b63d112597ba91be270b42adf70a74d67c43cac546e67af493c2dc5"
+    },
+    {
+      "path": "baseline/tcc.json",
+      "bytes": 440,
+      "sha256": "22e4b10b061cf70ca3b02924fbe8e59e65df62b4a962c09b6c9f9b8ef7fccda7"
+    },
+    {
+      "path": "baseline/test-exit.txt",
+      "bytes": 3,
+      "sha256": "979b894f2d91bf199766571d58024f020d1a44a417da5f48e1fa1cdf554a14f5"
+    },
+    {
+      "path": "baseline/tests.log",
+      "bytes": 20059,
+      "sha256": "db6ba1e3f18aa327c79719ef2abd0db1ebe49d1bfe0480fb366ba312c6f698e2"
+    },
+    {
+      "path": "baseline-production-after.json",
+      "bytes": 77469,
+      "sha256": "be7f026bb78dc2de6f461afedc61abb0fabb2217f15f07065346873aa3561335"
+    },
+    {
+      "path": "baseline-production.json",
+      "bytes": 77469,
+      "sha256": "be7f026bb78dc2de6f461afedc61abb0fabb2217f15f07065346873aa3561335"
+    },
+    {
+      "path": "candidate/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "bd750379c97004c7a8208e9005099ee3020499f5c8e805b52e236556848ba86d"
+    },
+    {
+      "path": "candidate/identity-after.json",
+      "bytes": 453,
+      "sha256": "9b09dd0e171f84993ed71cd88cf79af54f903c16a2a4aabc0a50da60dbab1d80"
+    },
+    {
+      "path": "candidate/identity-before.json",
+      "bytes": 453,
+      "sha256": "9b09dd0e171f84993ed71cd88cf79af54f903c16a2a4aabc0a50da60dbab1d80"
+    },
+    {
+      "path": "candidate/result.json",
+      "bytes": 715,
+      "sha256": "2e6d5a8fb7d6122d9b283bfb369cbfaec47582e2f9e221fb0d40fcc3c0ae372b"
+    },
+    {
+      "path": "candidate/selection/receipt.json",
+      "bytes": 18487,
+      "sha256": "e986a8574d8cdfa712e481e6940c9a28ea5ee1df097a9c398889687d69d4ca16"
+    },
+    {
+      "path": "candidate/selection/selected-tests.json",
+      "bytes": 25829,
+      "sha256": "4e75846a474747f8cfce05c352ae7fb75cd7b2d1817aea153568307b06cd8978"
+    },
+    {
+      "path": "candidate/tcc.json",
+      "bytes": 440,
+      "sha256": "6c0d7708d3a03c6c3838638f121ed149a31fec722e7f467c4ff76739331fb47d"
+    },
+    {
+      "path": "candidate/test-exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "candidate/tests.log",
+      "bytes": 32064,
+      "sha256": "ec5fd54c8012ada0a05c49b6780517d7e583473232ed1675a3a52d73d56fa177"
+    },
+    {
+      "path": "candidate-production-after.json",
+      "bytes": 77985,
+      "sha256": "09c6ba40a03dd49c27df8cd379105550e63198ee3743fd354c09465c6a115df8"
+    },
+    {
+      "path": "candidate-production.json",
+      "bytes": 77985,
+      "sha256": "09c6ba40a03dd49c27df8cd379105550e63198ee3743fd354c09465c6a115df8"
+    },
+    {
+      "path": "complete-result.json",
+      "bytes": 546,
+      "sha256": "94fec0d5a260aae5bdc2ff2d3c93679ea6daf94324719f7ffd56e247c3e82595"
+    },
+    {
+      "path": "contract.json",
+      "bytes": 5638,
+      "sha256": "b3ea7147b4fa2f6ce97d47ded2fe22ae90db4e44ef19020e479d2454beea8eea"
+    },
+    {
+      "path": "import/audio-info.txt",
+      "bytes": 413,
+      "sha256": "086daf77830a084d9757a50b62258e8f31270d9c44218eeba33304662e4b28df"
+    },
+    {
+      "path": "import/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "bd750379c97004c7a8208e9005099ee3020499f5c8e805b52e236556848ba86d"
+    },
+    {
+      "path": "import/identity-after.json",
+      "bytes": 453,
+      "sha256": "9b09dd0e171f84993ed71cd88cf79af54f903c16a2a4aabc0a50da60dbab1d80"
+    },
+    {
+      "path": "import/identity-before.json",
+      "bytes": 453,
+      "sha256": "9b09dd0e171f84993ed71cd88cf79af54f903c16a2a4aabc0a50da60dbab1d80"
+    },
+    {
+      "path": "import/input.wav",
+      "bytes": 165984,
+      "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+    },
+    {
+      "path": "import/inputs.json",
+      "bytes": 1014,
+      "sha256": "75519747336fa94100072baef154d9f50e0e008d91a5b07397d3e636594f38c8"
+    },
+    {
+      "path": "import/observations/import-observation.json",
+      "bytes": 2038,
+      "sha256": "c2e693b232fe4c497b6ccf89f88ab68498a8eb75ea5cfee8160c4fcef546669d"
+    },
+    {
+      "path": "import/observations/processed-input.wav",
+      "bytes": 165984,
+      "sha256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383"
+    },
+    {
+      "path": "import/result.json",
+      "bytes": 3620,
+      "sha256": "2f8728612654f269b6fc4f4c725eff4a1a535c5c958d8493a848417f7632f045"
+    },
+    {
+      "path": "import/selection/receipt.json",
+      "bytes": 18221,
+      "sha256": "c1377edb68e46f01089a64df07a135b7f149841d99f4c7150b62a72c4468ea8c"
+    },
+    {
+      "path": "import/selection/selected-tests.json",
+      "bytes": 25829,
+      "sha256": "a85a77f662aba5d73d478191678a89b3cdc524c3036b2cfbe9a9ef783f51217c"
+    },
+    {
+      "path": "import/tcc.json",
+      "bytes": 440,
+      "sha256": "6c0d7708d3a03c6c3838638f121ed149a31fec722e7f467c4ff76739331fb47d"
+    },
+    {
+      "path": "import/test-exit.txt",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "import/tests.log",
+      "bytes": 158872,
+      "sha256": "0c286f1ffb0b3b022e5d25f8f00f88c99d3be844a1ad099e7e736be08e4ced41"
+    },
+    {
+      "path": "packages/baseline-strict-resolve.json",
+      "bytes": 57,
+      "sha256": "4584fd12a5a6c90619ed5b3fa824d7c3b27e06fe3f44201e1685542527bf3296"
+    },
+    {
+      "path": "packages/candidate-strict-resolve.json",
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+    },
+    {
+      "path": "packages/canonical-graph-contract.json",
+      "bytes": 833,
+      "sha256": "4510988966c4438c74d1a06349a56385db25e74597b674819d227329733e263b"
+    },
+    {
+      "path": "result.json",
+      "bytes": 10291,
+      "sha256": "8f4105a3b7b93e4c20029179ad8ae1ee93217b2765db450778636045a3896187"
+    }
+  ],
+  "retained_audio_formats": {
+    "import/input.wav": {
+      "channels": 1,
+      "sample_rate": 16000,
+      "sample_width": 2,
+      "frames": 80944
+    },
+    "import/observations/processed-input.wav": {
+      "channels": 1,
+      "sample_rate": 16000,
+      "sample_width": 2,
+      "frames": 80944
+    }
+  },
+  "limits": [
+    "Matched pipeline/AI text and target insertion are controlled fixtures.",
+    "Actual import uses one synthetic Samantha WAV and one hash-pinned local Whisper inference.",
+    "Exact raw recognition is compared with the same preloaded context after queue completion, without a second inference.",
+    "Fresh ModelContext sees the saved record in an isolated in-memory store; this is not crash or relaunch durability.",
+    "This actual-ASR case has no enhancement service; configured AI bypass is established by separate controlled pipeline cases.",
+    "No actual microphone, human speech, physical shortcut, native-editor insertion, general ASR accuracy or provider semantic proof.",
+    "The failed predecessor run40528585813 is retained separately; its final verifier rejected tuple/list JSON equality and skipped actual import."
+  ]
+}

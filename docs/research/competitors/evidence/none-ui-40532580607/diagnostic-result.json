@@ -1,0 +1,36 @@
+{
+  "source_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "github_run_id": "40532580607",
+  "scope": "Debug writing settings UI diagnostics only",
+  "release_validation": false,
+  "driver_result": {
+    "classification": "invalid-or-failed",
+    "exit_code": 65,
+    "tests": {
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+        "starts": 1,
+        "results": [
+          "passed"
+        ]
+      },
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+        "starts": 1,
+        "results": [
+          "passed"
+        ]
+      },
+      "testTranslationTargetsReorderSelectAndPersist": {
+        "starts": 1,
+        "results": [
+          "passed"
+        ]
+      },
+      "testDictationProfilePreservesCustomSettingsAndPersists": {
+        "starts": 1,
+        "results": [
+          "failed"
+        ]
+      }
+    }
+  }
+}

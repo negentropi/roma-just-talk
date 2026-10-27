@@ -1,0 +1,73 @@
+{
+  "errors": [],
+  "exit_code": 0,
+  "failure_lines": [],
+  "inputs": {
+    "audio": {
+      "bytes": 165984,
+      "channels": 1,
+      "frames": 80944,
+      "path": "/Users/runner/work/_temp/none-profile-inputs/input.wav",
+      "phrase": "The quick brown fox confirms this local speech to text test for Roma just talk.",
+      "rate": 135,
+      "retained_path": "import/input.wav",
+      "sample_rate": 16000,
+      "sample_width": 2,
+      "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805",
+      "voice": "Samantha"
+    },
+    "model": {
+      "bytes": 147951465,
+      "path": "/Users/runner/work/_temp/none-profile-inputs/ggml-base.bin",
+      "sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+      "source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+    },
+    "scope": "Synthetic speech WAV and hash-pinned local Whisper weights; no microphone or provider credentials",
+    "setup_reference": "scripts/run-ios-remote-stt-e2e.sh",
+    "setup_reference_sha256": "7811fae8aee7040f939aedac481e472b10106ff2a456ad39d36edcc0f0d39d01"
+  },
+  "issues": [],
+  "lane": "candidate",
+  "observation": {
+    "audioSHA256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805",
+    "bundleIdentifier": "com.negentropi.RomaJustTalk",
+    "classification": "passed",
+    "completed": true,
+    "enhancedText": null,
+    "executablePath": "/Users/runner/work/_temp/none-profile-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "failureCleanupLimit": "The import API exposes its allocated WAV only after persistence. Failed or canceled allocation may leave a WAV on this disposable runner; failure never claims complete cleanup.",
+    "limitations": "No microphone, human speech, AI semantics, insertion, crash durability, or relaunch proof. Fresh ModelContext reads the retained in-memory store.",
+    "modelSHA256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+    "ownedCleanupCompleted": true,
+    "permanentAudioSHA256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383",
+    "permanentAudioURL": "file:///Users/runner/Library/Application%20Support/com.negentropi.RomaJustTalk/Recordings/transcribed_4A759C98-5AAF-480D-8FE1-CA77635EC329.wav",
+    "processIdentifier": 41611,
+    "queueItemID": "AF3313FB-7CDC-47B2-94C3-BF5A86682807",
+    "recognitionOracle": "The same preloaded WhisperContext.getTranscription result after that inference; no second recognition.",
+    "recordID": "AD6FE89B-B1D4-4452-B2CB-C555A1B4D10A",
+    "sameContextRecognition": " The quick Brown Fox confirms this local speech to text test for Roma just talk.",
+    "scope": "One real public file-import queue inference using AudioProcessor and WhisperTranscriptionService; synthetic Samantha speech.",
+    "sourcePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift",
+    "storedText": " The quick Brown Fox confirms this local speech to text test for Roma just talk.",
+    "testName": "liveNoneProfileImportQueueUsesRealWhisperRecognition",
+    "utf16Equal": true,
+    "utf8Equal": true,
+    "version": 1
+  },
+  "scope": "Actual synthetic-WAV decoding, Whisper inference and import queue; no microphone, real speaker, provider semantics, editor insertion or physical-key proof",
+  "summary": [
+    [
+      "1",
+      "passed"
+    ]
+  ],
+  "tests": {
+    "liveNoneProfileImportQueueUsesRealWhisperRecognition": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": true
+}

@@ -1,0 +1,11 @@
+{
+  "actual_import_result_sha256": "2f8728612654f269b6fc4f4c725eff4a1a535c5c958d8493a848417f7632f045",
+  "candidate_source_sha": "333f16773681fdb753189458622c7b6a6687691f",
+  "classification": "passed",
+  "limits": [
+    "Model and synthetic input are public remote fixtures; no credentials moved.",
+    "Full shared core, Mac units, native editor, UI and Release gates run separately."
+  ],
+  "matched_and_import_use_same_candidate_identity": true,
+  "matched_result_sha256": "8f4105a3b7b93e4c20029179ad8ae1ee93217b2765db450778636045a3896187"
+}

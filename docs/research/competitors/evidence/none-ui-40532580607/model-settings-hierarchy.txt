@@ -1,0 +1,83 @@
+Attributes: ScrollView, 0x7d59d3840, {{587.0, 89.0}, {400.0, 619.0}}, Disabled
+Element subtree:
+ →ScrollView, 0x7d59d3840, {{587.0, 89.0}, {400.0, 619.0}}, Disabled
+    StaticText, 0x7d59d3980, {{617.0, 108.8}, {113.0, 16.0}}, label: 'Dictation Cleanup'
+    Group, 0x7d59d3ac0, {{607.0, 135.0}, {360.0, 153.0}}
+      RadioGroup, 0x7d59d3c00, {{617.0, 145.0}, {130.0, 16.0}}, identifier: 'dictationProfile.picker', label: 'Dictation Cleanup'
+        RadioButton, 0x7d59d3d40, {{617.0, 145.0}, {68.0, 16.0}}, identifier: 'dictationProfile.custom', label: 'Custom', value: 1, Selected
+        RadioButton, 0x7d59d3e80, {{693.0, 145.0}, {54.0, 16.0}}, identifier: 'dictationProfile.none', label: 'None', value: 0
+      StaticText, 0x7d5aac000, {{617.0, 182.2}, {339.0, 30.0}}, identifier: 'dictationProfile.summary', value: Uses your formatti...
+      StaticText, 0x7d5aac140, {{617.0, 218.2}, {336.0, 60.0}}, identifier: 'dictationProfile.scope', value: Applies to all app...
+    StaticText, 0x7d5aac280, {{617.0, 323.2}, {93.0, 16.0}}, label: 'Output Format'
+    Image, 0x7d5aac3c0, {{714.0, 318.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+    Group, 0x7d5aac500, {{607.0, 354.0}, {360.0, 67.0}}
+      StaticText, 0x7d5aac640, {{617.0, 364.2}, {248.0, 15.0}}, value: Hello, how are you...
+      Button, 0x7d5aac780, {{617.0, 387.0}, {48.0, 24.0}}, label: 'Edit'
+    StaticText, 0x7d5aac8c0, {{617.0, 451.2}, {138.0, 16.0}}, label: 'Transcript Formatting'
+    Group, 0x7d5aaca00, {{607.0, 477.0}, {360.0, 187.0}}
+      StaticText, 0x7d5aacb40, {{617.0, 492.2}, {107.0, 16.0}}, value: Paragraph breaks
+      Image, 0x7d5aacc80, {{728.0, 487.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      Switch, 0x7d5aacdc0, {{920.0, 491.0}, {38.0, 18.0}}, identifier: 'transcriptionSettings.paragraphBreaks', value: 1
+      StaticText, 0x7d5aacf00, {{617.0, 539.2}, {73.0, 16.0}}, value: Punctuation
+      Image, 0x7d5aad040, {{694.0, 534.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      PopUpButton, 0x7d5aad180, {{772.0, 535.0}, {186.0, 26.0}}, identifier: 'transcriptionSettings.punctuation', value: Remove trailing pe...
+      StaticText, 0x7d5aad2c0, {{617.0, 586.2}, {108.0, 16.0}}, value: Lowercase output
+      Image, 0x7d5aad400, {{729.0, 581.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      Switch, 0x7d5aad540, {{920.0, 585.0}, {38.0, 18.0}}, identifier: 'transcriptionSettings.lowercase', value: 1
+      StaticText, 0x7d5aad680, {{617.0, 633.2}, {119.0, 16.0}}, value: Remove filler words
+      Image, 0x7d5aad7c0, {{744.0, 628.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      CheckBox, 0x7d5aad900, {{921.0, 633.0}, {36.0, 16.0}}, value: 0
+    StaticText, 0x7d5aada40, {{617.0, 694.2}, {63.0, 16.0}}, label: 'Advanced'
+    Group, 0x7d5aadb80, {{607.0, 720.0}, {360.0, 187.0}}
+      StaticText, 0x7d5aadcc0, {{617.0, 735.2}, {137.0, 16.0}}, value: Add Space After Pa...
+      Image, 0x7d5aade00, {{758.0, 730.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      Switch, 0x7d5aadf40, {{920.0, 734.0}, {38.0, 18.0}}, identifier: 'transcriptionSettings.appendTrailingSpace', value: 1
+      StaticText, 0x7d5aae080, {{617.0, 782.2}, {184.0, 16.0}}, value: Voice Activity Det...
+      Image, 0x7d5aae1c0, {{805.0, 777.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      Switch, 0x7d5aae300, {{920.0, 781.0}, {38.0, 18.0}}, value: 1
+      StaticText, 0x7d5aae440, {{617.0, 829.2}, {187.0, 16.0}}, value: Prewarm model (Exp...
+      Image, 0x7d5aae580, {{808.0, 824.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      Switch, 0x7d5aae6c0, {{920.0, 828.0}, {38.0, 18.0}}, value: 0
+      StaticText, 0x7d5aae800, {{617.0, 876.2}, {149.0, 16.0}}, value: Show Transcript Pr...
+      Image, 0x7d5aae940, {{770.0, 871.0}, {26.0, 26.0}}, identifier: 'info.circle.fill', label: 'Info'
+      Switch, 0x7d5aaea80, {{920.0, 875.0}, {38.0, 18.0}}, value: 0
+    ScrollBar, 0x7d5aaebc0, {{969.0, 88.0}, {19.0, 603.5}}, value: 0
+      ValueIndicator, 0x7d5aaed00, {{973.0, 92.0}, {11.0, 439.0}}, value: 0, Disabled
+      IncrementArrow, 0x7d5aaee40, {{970.0, 89.0}, {0.0, 0.0}}, Disabled
+      DecrementArrow, 0x7d5aaef80, {{970.0, 89.0}, {0.0, 0.0}}, Disabled
+      Button, 0x7d5aaf0c0, {{973.0, 532.0}, {11.0, 155.0}}, Disabled
+      Button, 0x7d5aaf200, {{973.0, 92.0}, {11.0, 0.0}}, Disabled
+Path to element:
+ →Application, 0x7d5985540, pid: 58701, title: 'roma just talk', Disabled
+  ↳Window (Main), 0x7d59857c0, {{37.0, 31.0}, {950.0, 677.0}}, identifier: 'com.negentropi.RomaJustTalk.mainWindow', title: 'models', Disabled
+   ↳Group, 0x7d5985900, {{37.0, 31.0}, {950.0, 677.0}}, Disabled
+    ↳SplitGroup, 0x7d5985a40, {{37.0, 31.0}, {950.0, 677.0}}, identifier: 'main-AppWindow-1, SidebarNavigationSplitView', Disabled
+     ↳Group, 0x7d59ab840, {{37.0, 31.0}, {950.0, 677.0}}, Disabled
+      ↳ScrollView, 0x7d59d3840, {{587.0, 89.0}, {400.0, 619.0}}, Disabled
+Query chain:
+ →Find: Target Application 'com.negentropi.RomaJustTalk'
+  Output: {
+    Application, 0x7d5a87c00, pid: 58701, title: 'roma just talk', Disabled
+  }
+  ↪︎Find: Descendants matching type Window
+    Output: {
+      Window (Main), 0x7d5a87ac0, {{37.0, 31.0}, {950.0, 677.0}}, identifier: 'com.negentropi.RomaJustTalk.mainWindow', title: 'models', Disabled
+    }
+    ↪︎Find: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+      Output: {
+        Window (Main), 0x7d5a87ac0, {{37.0, 31.0}, {950.0, 677.0}}, identifier: 'com.negentropi.RomaJustTalk.mainWindow', title: 'models', Disabled
+      }
+      ↪︎Find: Descendants matching type ScrollView
+        Output: {
+          ScrollView, 0x7d59aee40, {{45.0, 83.0}, {210.0, 617.0}}, Disabled
+          ScrollView, 0x7d5a7d2c0, {{255.0, 83.0}, {732.0, 625.0}}, Disabled
+          ScrollView, 0x7d5a78f00, {{587.0, 89.0}, {400.0, 619.0}}, Disabled
+        }
+        ↪︎Find: Elements containing elements matching type Any with identifier 'dictationProfile.picker'
+          Output: {
+            ScrollView, 0x7d5a78f00, {{587.0, 89.0}, {400.0, 619.0}}, Disabled
+          }
+          ↪︎Find: First Match
+            Output: {
+              ScrollView, 0x7d5a78f00, {{587.0, 89.0}, {400.0, 619.0}}, Disabled
+            }

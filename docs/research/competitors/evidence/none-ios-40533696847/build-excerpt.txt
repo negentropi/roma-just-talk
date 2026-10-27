@@ -1,0 +1,13 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild build -project iOS/VoiceInk-ios.xcodeproj -scheme VoiceInk-ios -configuration Debug -destination "generic/platform=iOS Simulator" -derivedDataPath /Users/runner/work/_temp/none-ios-build -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- ENTITLEMENTS_ALLOWED=YES
+
+Build settings from command line:
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    ENTITLEMENTS_ALLOWED = YES
+
+
+SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')
+SwiftCompile normal x86_64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')
+
+** BUILD SUCCEEDED **

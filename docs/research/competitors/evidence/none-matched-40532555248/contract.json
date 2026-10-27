@@ -1,0 +1,110 @@
+{
+  "baseline_reference_sha": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+  "candidate_import_oracle": {
+    "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+    "sha256": "6b2f84761c7a0defed6b50102f9953511b53bcabc83b36ea25c18bc1e9580f02",
+    "test": "liveNoneProfileImportQueueUsesRealWhisperRecognition"
+  },
+  "candidate_source_sha": "333f16773681fdb753189458622c7b6a6687691f",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "canonical_package_pins": 41,
+  "changed_production_paths": [
+    "VoiceInk/Paste/CursorPaster.swift",
+    "VoiceInk/Services/AudioFileTranscriptionManager.swift",
+    "VoiceInk/Services/AudioFileTranscriptionService.swift",
+    "VoiceInk/Services/ImportExportService.swift",
+    "VoiceInk/Services/LastTranscriptionService.swift",
+    "VoiceInk/Transcription/Engine/TranscriptionPipeline.swift",
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift",
+    "VoiceInk/Views/AI Models/ModelManagementView.swift",
+    "VoiceInk/Views/ModelSettingsView.swift",
+    "VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift",
+    "VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/DictationProfileTests.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsPreferencesTests.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/UserDefaultsSettingsBackupPolicyTests.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift",
+    "VoiceInkTests/DictationProfileImportLiveTests.swift",
+    "VoiceInkTests/DictationProfilePipelineTests.swift",
+    "VoiceInkTests/SpokenSnippetPipelineTests.swift",
+    "VoiceInkTests/WritingTargetLiveTests.swift"
+  ],
+  "declarations": {
+    "LocalBuild.xcconfig": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844",
+    "Tools/RuntimeE2EHarness/Package.swift": "cdb32a2299d1475b674502105be31d4b93874546987e0fbf109f93a1baa55295",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+    "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+    "VoiceInkQwen/Package.swift": "058f93419dd0da3a92dfd135af2c8a6b664192f53ec883168c279b7564b21d4e"
+  },
+  "driver_sha": "333f16773681fdb753189458622c7b6a6687691f",
+  "expected_baseline_assertions": {
+    "19": {
+      "message": "None snippet-trigger dictation must deliver exact UTF-8 recognition text.",
+      "test": "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally"
+    },
+    "20": {
+      "message": "None snippet-trigger dictation must deliver exact UTF-16 recognition text.",
+      "test": "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally"
+    },
+    "23": {
+      "message": "None snippet-trigger dictation must not store an expanded result.",
+      "test": "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally"
+    },
+    "30": {
+      "message": "Saved None snippet-trigger dictation must not store an expanded result.",
+      "test": "dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally"
+    },
+    "44": {
+      "message": "None prompt-trigger dictation must deliver exact UTF-8 recognition text.",
+      "test": "dictationNoneDoesNotActivatePromptTriggersOrAI"
+    },
+    "45": {
+      "message": "None prompt-trigger dictation must deliver exact UTF-16 recognition text.",
+      "test": "dictationNoneDoesNotActivatePromptTriggersOrAI"
+    },
+    "46": {
+      "message": "None prompt-trigger dictation must save exact recognition text.",
+      "test": "dictationNoneDoesNotActivatePromptTriggersOrAI"
+    },
+    "47": {
+      "message": "None prompt-trigger dictation must not store AI output.",
+      "test": "dictationNoneDoesNotActivatePromptTriggersOrAI"
+    },
+    "48": {
+      "message": "None prompt-trigger dictation must not analyze prompt triggers.",
+      "test": "dictationNoneDoesNotActivatePromptTriggersOrAI"
+    },
+    "49": {
+      "message": "None prompt-trigger dictation must not request AI output.",
+      "test": "dictationNoneDoesNotActivatePromptTriggersOrAI"
+    },
+    "242": {
+      "message": "A canceled queued dictation paste must return commandNotPosted.",
+      "test": "canceledQueuedDictationPasteDoesNotWriteTheTarget"
+    },
+    "243": {
+      "message": "A canceled queued dictation paste must not call the target inserter.",
+      "test": "canceledQueuedDictationPasteDoesNotWriteTheTarget"
+    }
+  },
+  "oracle_path": "VoiceInkTests/DictationProfilePipelineTests.swift",
+  "oracle_sha256": "362a7f1233ecc78978ea5b35aab07488dce841750532aa37254a56e22e2236a2",
+  "scope": "One unchanged pipeline and queued-paste oracle on pinned products; controlled recognition/AI and target interception, not ASR, microphone, native editor or physical keyboard proof",
+  "source_roots": [
+    "VoiceInk",
+    "VoiceInkCore",
+    "VoiceInkNVIDIA",
+    "VoiceInkQwen",
+    "VoiceInk.xcodeproj",
+    "iOS",
+    "VoiceInkTests"
+  ],
+  "verification_helper_sha256": {
+    "Makefile": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9",
+    "scripts/run-ios-remote-stt-e2e.sh": "7811fae8aee7040f939aedac481e472b10106ff2a456ad39d36edcc0f0d39d01",
+    "scripts/run-none-profile-regression.sh": "154b93628330b9fc31855924514f8fc0f1c56b4c87c50761d4545a4dd48370f3",
+    "scripts/run-writing-feature-regression.sh": "fed579d610ad3e51ffa7f55daa5bcc0c9d1b81cce55b9eb14b04e0724f9464d3"
+  }
+}

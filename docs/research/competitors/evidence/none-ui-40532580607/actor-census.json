@@ -1,0 +1,42 @@
+{
+  "premise_rejected": "The form is enabled and only its XCTest scroll target is wrong.",
+  "input_sha256": "8023c075f02d598c36ee6211e9741bfe3448ac2e03901499cd80fd69c97bc0f4",
+  "actor_census": [
+    {
+      "actor": "form",
+      "role": "ScrollView",
+      "explicitly_disabled": true
+    },
+    {
+      "actor": "ancestors",
+      "role": "Application",
+      "explicitly_disabled": true
+    },
+    {
+      "actor": "ancestors",
+      "role": "Window",
+      "explicitly_disabled": true
+    },
+    {
+      "actor": "ancestors",
+      "role": "Group",
+      "explicitly_disabled": true
+    },
+    {
+      "actor": "ancestors",
+      "role": "SplitGroup",
+      "explicitly_disabled": true
+    },
+    {
+      "actor": "ancestors",
+      "role": "Group",
+      "explicitly_disabled": true
+    },
+    {
+      "actor": "ancestors",
+      "role": "ScrollView",
+      "explicitly_disabled": true
+    }
+  ],
+  "limit": "AX dump reports disabled ancestors; modifier causality still requires a product change and native rerun."
+}

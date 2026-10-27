@@ -1,0 +1,16 @@
+File:           /Users/runner/work/_temp/none-profile-inputs/input.wav
+File type ID:   WAVE
+Num Tracks:     1
+----
+Data format:     1 ch,  16000 Hz, Int16
+                no channel layout.
+estimated duration: 5.059000 sec
+audio bytes: 161888
+audio packets: 80944
+bit rate: 256000 bits per second
+packet size upper bound: 2
+maximum packet size: 2
+audio data file offset: 4096
+optimized
+source bit depth: I16
+----

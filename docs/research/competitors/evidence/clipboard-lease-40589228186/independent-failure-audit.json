@@ -1,0 +1,39 @@
+{
+  "classification": "invalid-pretest-build-settings-framing",
+  "runID": 40589228186,
+  "sourceSHA": "117dd7144cc377e5bb8116cf943bf09194511d15",
+  "testsExecuted": 0,
+  "appBuildForTestingExecuted": false,
+  "knownBadClipboardReproduced": false,
+  "failedLogFetchedOnce": true,
+  "failure": "xcodebuild stderr destination warning merged into JSON stdout before json.loads",
+  "rawSettingsBytes": 41501,
+  "rawSettingsSHA256": "ef87553aed37bac33a0155eb02cf7dcb2e518009994c9f3c86313c4a2355802c",
+  "afterDiagnosticRemovedActualJSONParses": true,
+  "actualLocalBuildSettingPresent": true,
+  "remedy": "Keep xcodebuild stdout in build-settings.json and stderr in a separate immutable diagnostic log; preserve command and warning.",
+  "artifacts": [
+    {
+      "id": 12773737093,
+      "name": "roma.clipboard-lease-observations",
+      "bytes": 73515,
+      "sha256": "c9bc68543b99bcb12503be5e5a05dbe1a6bff0b543f629ed84607fdb3d57be01",
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40589228186/evidence.zip",
+      "CRCValid": true,
+      "members": 16
+    },
+    {
+      "id": 12774670778,
+      "name": "roma.clipboard-lease-native-evidence",
+      "bytes": 5651,
+      "sha256": "fb9950dc9c9048390e6ff181a67d5d51d2b936d15526bd37865ee71bd140cd45",
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40589228186/app-artifact.zip",
+      "CRCValid": true,
+      "members": 3
+    }
+  ],
+  "limits": [
+    "No native selection or clipboard/runtime test occurred.",
+    "No production CursorPaster edit or accepted regression proof."
+  ]
+}

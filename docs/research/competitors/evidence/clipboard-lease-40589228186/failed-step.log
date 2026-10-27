@@ -1,0 +1,19 @@
+regression	Build exact app and native clipboard oracle once	﻿2026-10-27T21:59:43.9188930Z ##[group]Run bash scripts/run-clipboard-lease-regression.sh build
+regression	Build exact app and native clipboard oracle once	2026-10-27T21:59:43.9189680Z ^[[36;1mbash scripts/run-clipboard-lease-regression.sh build^[[0m
+regression	Build exact app and native clipboard oracle once	2026-10-27T21:59:44.1162220Z shell: /bin/bash -e {0}
+regression	Build exact app and native clipboard oracle once	2026-10-27T21:59:44.1162630Z env:
+regression	Build exact app and native clipboard oracle once	2026-10-27T21:59:44.1162920Z   RJT_CLIPBOARD_LEASE_LANE: baseline
+regression	Build exact app and native clipboard oracle once	2026-10-27T21:59:44.1163390Z ##[endgroup]
+regression	Build exact app and native clipboard oracle once	2026-10-27T21:59:47.4863390Z Running xcodebuild; log /Users/runner/work/_temp/clipboard-lease-proof/build-settings.json
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6379780Z Traceback (most recent call last):
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6381730Z   File "<stdin>", line 478, in <module>
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6387230Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/__init__.py", line 371, in loads
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6389850Z     return _default_decoder.decode(s)
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6390520Z            ~~~~~~~~~~~~~~~~~~~~~~~^^^
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6393340Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py", line 358, in decode
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6404770Z     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6423690Z                ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6424690Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/json/decoder.py", line 376, in raw_decode
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6425700Z     raise JSONDecodeError("Expecting value", s, err.value) from None
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.6426300Z json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+regression	Build exact app and native clipboard oracle once	2026-10-27T22:00:19.7135570Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "Expecting value: line 1 column 1 (char 0)",
+  "phase": "build"
+}

@@ -16,6 +16,7 @@ repo="$(cd "$(dirname "$0")/.." && pwd)"
 python3 - "$repo" "${RUNNER_TEMP:-/tmp}/clipboard-lease-proof" "${1:-}" "${RJT_CLIPBOARD_LEASE_LANE:-baseline}" <<'PY'
 import base64
 import collections
+import contextlib
 import hashlib
 import json
 import math
@@ -98,10 +99,12 @@ def verify_source():
     require(digest((repo / oracle_path).read_bytes()) == value['oracle_sha256'], 'Native oracle changed')
 
 
-def run(command, log, *, timeout=3600, allow_failure=False):
+def run(command, log, *, timeout=3600, allow_failure=False, stderr_log=None):
     print('Running ' + command[0] + '; log ' + str(log), flush=True)
-    with log.open('xb') as stream:
-        process = subprocess.Popen(command, cwd=repo, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+    with contextlib.ExitStack() as streams:
+        stream = streams.enter_context(log.open('xb'))
+        diagnostics = streams.enter_context(stderr_log.open('xb')) if stderr_log is not None else subprocess.STDOUT
+        process = subprocess.Popen(command, cwd=repo, stdout=stream, stderr=diagnostics, start_new_session=True)
         try:
             code = process.wait(timeout=timeout)
         except BaseException:
@@ -490,7 +493,8 @@ try:
         write_json(output / 'static-whisper-before.json', whisper)
         arguments = build_arguments()
         write_json(output / 'build-command.json', {'arguments': arguments, 'local_build_condition': 'LOCAL_BUILD'})
-        run(['xcodebuild', '-showBuildSettings', '-json', *arguments, '-only-testing:VoiceInkTests'], output / 'build-settings.json', timeout=180)
+        run(['xcodebuild', '-showBuildSettings', '-json', *arguments, '-only-testing:VoiceInkTests'],
+            output / 'build-settings.json', timeout=180, stderr_log=output / 'build-settings.stderr.log')
         settings = json.loads((output / 'build-settings.json').read_text())
         host = [value['buildSettings'] for value in settings if value.get('target') == 'VoiceInk']
         require(len(host) == 1 and 'LOCAL_BUILD' in host[0].get('SWIFT_ACTIVE_COMPILATION_CONDITIONS', '').split(), 'Actual app settings omit LOCAL_BUILD credential isolation')

@@ -1,0 +1,15 @@
+PASS invalid-modern-0
+PASS invalid-modern-1
+PASS invalid-modern-2
+PASS invalid-modern-3
+PASS invalid-modern-4
+PASS invalid-modern-5
+PASS legacy-carbon-control
+PASS valid-modern-0
+PASS valid-modern-1
+PASS valid-modern-2
+PASS invalid-legacy-0
+PASS invalid-legacy-1
+PASS invalid-legacy-2
+PASS invalid-legacy-3
+Executed 14; failures 0

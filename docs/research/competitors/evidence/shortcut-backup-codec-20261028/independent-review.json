@@ -1,0 +1,17 @@
+{
+  "reviewer": "/root/literal_rule_checks/literal_driver_review",
+  "classification": "clean",
+  "findings": [],
+  "verified": [
+    "Present kind strictly decodes the actual Shortcut representation without fallback; missing kind retains the named legacy Carbon path.",
+    "Pinned baseline owning source, current candidate owning source, unchanged full Shortcut.swift and actual EventKind declaration extraction match retained files.",
+    "The test fixture is retained verbatim in the same fourteen-case oracle.",
+    "Both source lanes compiled successfully; baseline had six malformed-modern failures and eight passing controls with native exit 1; candidate passed all fourteen cases with native exit 0.",
+    "All eighteen original retained member hashes and current source/test hashes verified.",
+    "README scope and extraction limits match the evidence."
+  ],
+  "limits": [
+    "Read-only verification; reviewer did not rebuild, run, edit or download.",
+    "Full app/native test gates, shortcut dispatch, Undo, UI and comprehensive legacy numeric validation remain outside this probe."
+  ]
+}

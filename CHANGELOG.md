@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Reject malformed modern shortcut backups instead of interpreting their legacy fields as another binding.
+
 - Save an approved correction from History as one literal phrase, with a preview, source reference, enable switch and Dictionary editing. Keep complete replacement records in backups and show conflicts before importing.
 - Read replacements from the current operation's store instead of reusing a process-wide dictionary cache.
 - Expand History through a native button with keyboard and accessibility labels, keeping selection and playback controls separate.

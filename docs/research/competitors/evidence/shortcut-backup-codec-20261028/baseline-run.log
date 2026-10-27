@@ -1,0 +1,15 @@
+FAIL invalid-modern-0
+FAIL invalid-modern-1
+FAIL invalid-modern-2
+FAIL invalid-modern-3
+FAIL invalid-modern-4
+FAIL invalid-modern-5
+PASS legacy-carbon-control
+PASS valid-modern-0
+PASS valid-modern-1
+PASS valid-modern-2
+PASS invalid-legacy-0
+PASS invalid-legacy-1
+PASS invalid-legacy-2
+PASS invalid-legacy-3
+Executed 14; failures 6

@@ -1,0 +1,72 @@
+{
+  "classification": "actual-decoder-old-red-candidate-green",
+  "registered_cases": 14,
+  "baseline": {
+    "pass": 8,
+    "fail": 6,
+    "exit": 1
+  },
+  "candidate": {
+    "pass": 14,
+    "fail": 0,
+    "exit": 0
+  },
+  "toolchain_recorded_after_checks": {
+    "swift": "Apple Swift version 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4)\nTarget: arm64-apple-macosx26.0\n",
+    "sdk": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk\n",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.1\nBuildVersion:\t\t25G76\n",
+    "architecture": "arm64\n"
+  },
+  "files": {
+    "baseline-ShortcutMigration.swift": {
+      "bytes": 6013,
+      "sha256": "9302e709bc38090e6c5f3b2ababd7e7755c34c1f9613a23fef0e3c67e3fe50f6"
+    },
+    "candidate-ShortcutMigration.swift": {
+      "bytes": 6239,
+      "sha256": "c62dfa1872e618993d36a87a23563cac0ac8ee9644cd2e527915598f30f6500b"
+    },
+    "Shortcut.swift": {
+      "bytes": 16229,
+      "sha256": "dba2eba1203a1eacd33e547c05725d79fc9796ac767f0f1cc1c02284f54b2817"
+    },
+    "EventKind.swift": {
+      "bytes": 152,
+      "sha256": "cf360fcadd2786f22dc8fd02d02027fd6bd3ff21dbde6ee7053864e0919999e1"
+    },
+    "Backup-baseline.swift": {
+      "bytes": 697,
+      "sha256": "ded4888b1bd222d44d1a622a0519c0037e2ab275e9b4a467b68fe03bdec44393"
+    },
+    "Backup-candidate.swift": {
+      "bytes": 923,
+      "sha256": "095e47311f0d593ae7f33fe5981d4b8ab90d4d048baec9fa6f05a856500eb582"
+    },
+    "Oracle.swift": {
+      "bytes": 3179,
+      "sha256": "c1a39b01797312afdfb45de7160ddc0220416b9dc988525a9e1d60c8ffe6c614"
+    },
+    "baseline-build.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "candidate-build.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "baseline-run.log": {
+      "bytes": 331,
+      "sha256": "f9760d40487ee83b02ce6d94f3c6e4e5c89e92c1443aa2d6cf0e03f17b0b2c12"
+    },
+    "candidate-run.log": {
+      "bytes": 331,
+      "sha256": "645caff6fb4db31838dad85165327652a4c801c468f217202c105028b17d7670"
+    }
+  },
+  "limits": [
+    "Actual serialization source-slice proof, not a full app build or shortcut dispatch/runtime proof.",
+    "Full production Shortcut.swift unchanged; EventKind type declaration extracted from actual owner into its original namespace, without event-monitor implementation.",
+    "Decoder declarations copied verbatim except unused VoiceInkCore import; fixture enum copied verbatim from the new native app test.",
+    "No UI, keyboard event, clipboard, Keychain, model or provider action performed."
+  ]
+}

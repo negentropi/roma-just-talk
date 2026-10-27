@@ -1,0 +1,15 @@
+{
+  "command": [
+    "swiftc",
+    "-module-cache-path",
+    "/var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-shortcut-codec-mvqswyhv/module-cache",
+    "/var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-shortcut-codec-mvqswyhv/Shortcut.swift",
+    "/var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-shortcut-codec-mvqswyhv/EventKind.swift",
+    "/var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-shortcut-codec-mvqswyhv/Backup-candidate.swift",
+    "/var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-shortcut-codec-mvqswyhv/Oracle.swift",
+    "-o",
+    "/var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-shortcut-codec-mvqswyhv/candidate"
+  ],
+  "exit": 0,
+  "seconds": 0.9512477500829846
+}

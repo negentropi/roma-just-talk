@@ -1,0 +1,74 @@
+{
+  "Backup-baseline.swift": {
+    "bytes": 697,
+    "sha256": "ded4888b1bd222d44d1a622a0519c0037e2ab275e9b4a467b68fe03bdec44393"
+  },
+  "Backup-candidate.swift": {
+    "bytes": 923,
+    "sha256": "095e47311f0d593ae7f33fe5981d4b8ab90d4d048baec9fa6f05a856500eb582"
+  },
+  "EventKind.swift": {
+    "bytes": 152,
+    "sha256": "cf360fcadd2786f22dc8fd02d02027fd6bd3ff21dbde6ee7053864e0919999e1"
+  },
+  "Oracle.swift": {
+    "bytes": 3179,
+    "sha256": "c1a39b01797312afdfb45de7160ddc0220416b9dc988525a9e1d60c8ffe6c614"
+  },
+  "Shortcut.swift": {
+    "bytes": 16229,
+    "sha256": "dba2eba1203a1eacd33e547c05725d79fc9796ac767f0f1cc1c02284f54b2817"
+  },
+  "ShortcutBackupTests.swift": {
+    "bytes": 3743,
+    "sha256": "cc6f2f6d30897e60be8d7d3280993f58a2aedc4201f867e2a2f8ae9e39ff44d3"
+  },
+  "baseline-ShortcutMigration.swift": {
+    "bytes": 6013,
+    "sha256": "9302e709bc38090e6c5f3b2ababd7e7755c34c1f9613a23fef0e3c67e3fe50f6"
+  },
+  "baseline-build.json": {
+    "bytes": 710,
+    "sha256": "b051d005e7d9d619180412ec4d569b0de81b20ed50a8d1a7da09b09d45e1aa27"
+  },
+  "baseline-build.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "baseline-run.json": {
+    "bytes": 16,
+    "sha256": "331dd85020eaf7c911e3417ee78f7ff17a0d1257e2a5c310696fc702d1c3f16f"
+  },
+  "baseline-run.log": {
+    "bytes": 331,
+    "sha256": "f9760d40487ee83b02ce6d94f3c6e4e5c89e92c1443aa2d6cf0e03f17b0b2c12"
+  },
+  "candidate-ShortcutMigration.swift": {
+    "bytes": 6239,
+    "sha256": "c62dfa1872e618993d36a87a23563cac0ac8ee9644cd2e527915598f30f6500b"
+  },
+  "candidate-build.json": {
+    "bytes": 712,
+    "sha256": "95b509dd1159439edd7d4313037f4607d54150f2bdad00b6175384a332105ca6"
+  },
+  "candidate-build.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidate-run.json": {
+    "bytes": 16,
+    "sha256": "3e42a2ad3dbeab9d1167d20261ad6305bdea31103ffc09c30f25558345966de2"
+  },
+  "candidate-run.log": {
+    "bytes": 331,
+    "sha256": "645caff6fb4db31838dad85165327652a4c801c468f217202c105028b17d7670"
+  },
+  "contract.json": {
+    "bytes": 1439,
+    "sha256": "7c70eb3dd023042f151c2fbe9bee099ab4ec9b742ddc23d052ccb092f2dd6b7a"
+  },
+  "receipt.json": {
+    "bytes": 2645,
+    "sha256": "8933295fbd73ae0fb70ae02d621fae3e32d749ea37061d63c225a4108492ce7b"
+  }
+}

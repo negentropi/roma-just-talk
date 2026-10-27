@@ -1,0 +1,13 @@
+{
+  "root": "/var/folders/dr/ktjn__jx5mz4zr7shy5c670h0000gn/T/rjt-shortcut-codec-mvqswyhv",
+  "baseline_head": "03887dd257c3ec296df35c44cac3f77870676580",
+  "baseline_full_file_sha256": "9302e709bc38090e6c5f3b2ababd7e7755c34c1f9613a23fef0e3c67e3fe50f6",
+  "baseline_decoder_prefix_sha256": "ded4888b1bd222d44d1a622a0519c0037e2ab275e9b4a467b68fe03bdec44393",
+  "actual_full_shortcut_sha256": "dba2eba1203a1eacd33e547c05725d79fc9796ac767f0f1cc1c02284f54b2817",
+  "actual_eventkind_slice_sha256": "ad58493bab4659a57ca2bc9396d878b03ff6a0c12f022e359e365e8d9182a11e",
+  "oracle_sha256": "c1a39b01797312afdfb45de7160ddc0220416b9dc988525a9e1d60c8ffe6c614",
+  "scope": "Actual full Shortcut.swift and actual ShortcutBackup/LegacyKeyboardShortcut declarations; EventKind actual declaration in its original class namespace only. Unused VoiceInkCore import omitted from decoder prefix; no substitute decoder or Shortcut implementation. No app/UI/TCC/Keychain/provider execution.",
+  "candidate_full_file_sha256": "c62dfa1872e618993d36a87a23563cac0ac8ee9644cd2e527915598f30f6500b",
+  "candidate_decoder_prefix_sha256": "095e47311f0d593ae7f33fe5981d4b8ab90d4d048baec9fa6f05a856500eb582",
+  "eventkind_hash_input": "Exact pinned source substring beginning final class ShortcutMonitor {, including its nested enum EventKind declaration through that enum closing brace. EventKind.swift adds only a newline, the class closing brace, and a final newline."
+}

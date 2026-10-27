@@ -8,6 +8,7 @@ final class WritingFeaturesUITests: XCTestCase {
     private var modelSettingsOpening = 0
     private var shortcutPreferences: WritingFeaturesShortcutPreferences?
     private var writingApplication: XCUIApplication?
+    private var writingApplicationOwnership: WritingFeaturesAppOwnership?
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -467,8 +468,7 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(rows.firstMatch.waitForExistence(timeout: 10))
         XCTAssertEqual(rows.count, 1)
         let row = rows.firstMatch
-        let expand = identified("history.row." + id + ".expand", in: row)
-        XCTAssertTrue(expand.exists)
+        let expand = historyExpandTarget(id, row: row, in: app)
         reveal(expand, identifier: "history.row." + id, in: app)
         expand.click()
         XCTAssertTrue(row.staticTexts["history.text.original"].waitForExistence(timeout: 5))
@@ -482,8 +482,26 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertEqual(Array(actual.utf16), Array(expected.utf16))
     }
 
+    @MainActor private func historyExpandTarget(_ id: String, row: XCUIElement, in app: XCUIApplication) -> XCUIElement {
+        let identifier = "history.row." + id + ".expand"
+        let targets = app.descendants(matching: .any).matching(identifier: identifier)
+        let target = targets.firstMatch
+        guard target.waitForExistence(timeout: 5), targets.count == 1,
+              !row.frame.isEmpty, !target.frame.isEmpty, row.frame.contains(target.frame) else {
+            let hierarchy = XCTAttachment(string: app.debugDescription)
+            hierarchy.name = "History expansion target hierarchy " + id
+            hierarchy.lifetime = .keepAlways
+            add(hierarchy)
+            attachScreenshot(app, named: "History expansion target unavailable")
+            XCTFail("History must expose one exact expansion target inside its owned row.")
+            return target
+        }
+        return target
+    }
+
     @MainActor private func prepareApp() throws -> (XCUIApplication, WritingFeaturesAppOwnership) {
         let ownership = try WritingFeaturesAppOwnership()
+        writingApplicationOwnership = ownership
         let shortcuts = try WritingFeaturesShortcutPreferences()
         let dockPreference = try WritingFeaturesDockPreference()
         let app = XCUIApplication()
@@ -939,14 +957,28 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor private func createSnippet(trigger: String, content: String, in app: XCUIApplication) {
+        guard let ownership = writingApplicationOwnership else {
+            XCTFail("Literal snippet input requires the owned app lifecycle.")
+            return
+        }
+        let clipboard: WritingFeaturesPasteboardOwnership
+        do {
+            clipboard = try ownLiteralPasteboard(ownership: ownership)
+        } catch {
+            XCTFail("Unable to preserve the literal-input pasteboard: \(error)")
+            return
+        }
         app.buttons["snippets.new"].click()
         let triggerField = app.textFields["snippets.editor.trigger"]
         XCTAssertTrue(triggerField.waitForExistence(timeout: 10))
         replaceText(in: triggerField, with: trigger)
         let editor = app.textViews["snippets.editor.content"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
-        replaceText(in: editor, with: content)
+        pasteLiteralText(content, into: editor, clipboard: clipboard, in: app)
         assertValue(content, of: editor)
+        let actual = editor.value as? String ?? ""
+        XCTAssertEqual(Array(actual.utf8), Array(content.utf8))
+        XCTAssertEqual(Array(actual.utf16), Array(content.utf16))
         app.buttons["snippets.editor.save"].click()
         XCTAssertTrue(waitUntil { !editor.exists })
     }
@@ -1004,6 +1036,32 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(preview.waitForExistence(timeout: 5))
         XCTAssertTrue(waitUntil { preview.isEnabled }, "Preview Import did not enable for the selected CSV.")
         preview.click()
+    }
+
+    @MainActor private func ownLiteralPasteboard(
+        ownership: WritingFeaturesAppOwnership
+    ) throws -> WritingFeaturesPasteboardOwnership {
+        let clipboard = try WritingFeaturesPasteboardOwnership()
+        addTeardownBlock {
+            guard ownership.terminateOwnedApplications() else {
+                XCTFail("The owned app did not exit; retained its literal-input pasteboard for inspection.")
+                return
+            }
+            XCTAssertTrue(clipboard.restore(), "The literal-input pasteboard changed ownership before restoration.")
+        }
+        return clipboard
+    }
+
+    @MainActor private func pasteLiteralText(
+        _ text: String, into editor: XCUIElement, clipboard: WritingFeaturesPasteboardOwnership,
+        in app: XCUIApplication
+    ) {
+        XCTAssertTrue(clipboard.installOwnedText(text), "The literal-input pasteboard no longer belonged to this case.")
+        editor.click()
+        editor.typeKey("a", modifierFlags: .command)
+        editor.typeKey("v", modifierFlags: .command)
+        XCTAssertTrue(clipboard.retainsOwnedText(text), "Pasting changed the literal-input pasteboard's ownership.")
+        assertNoUnexpectedRecordingNotification(in: app)
     }
 
     @MainActor private func replaceText(in element: XCUIElement, with text: String) {
@@ -1155,6 +1213,22 @@ private final class WritingFeaturesPasteboardOwnership {
               pasteboard.changeCount == count else { return false }
         lastOwnedChange = count
         return true
+    }
+
+    func installOwnedText(_ text: String) -> Bool {
+        let pasteboard = NSPasteboard.general
+        guard pasteboard.changeCount == lastOwnedChange else { return false }
+        pasteboard.clearContents()
+        guard pasteboard.setString(text, forType: .string) else { return false }
+        return captureOwnedCopy(expected: text)
+    }
+
+    func retainsOwnedText(_ expected: String) -> Bool {
+        let pasteboard = NSPasteboard.general
+        guard pasteboard.changeCount == lastOwnedChange,
+              let text = pasteboard.string(forType: .string),
+              text.utf8.elementsEqual(expected.utf8), text.utf16.elementsEqual(expected.utf16) else { return false }
+        return pasteboard.changeCount == lastOwnedChange
     }
 
     func restore() -> Bool {

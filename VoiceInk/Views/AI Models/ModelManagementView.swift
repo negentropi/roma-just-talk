@@ -88,6 +88,8 @@ struct ModelManagementView: View {
                 }
                 .buttonStyle(.plain)
                 .help(VoiceInkModelManagementPresentation.closeButtonHelp)
+                .accessibilityLabel(VoiceInkModelManagementPresentation.closeButtonHelp)
+                .accessibilityIdentifier("models.settings.close")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -161,6 +163,9 @@ struct ModelManagementView: View {
                         )
                 }
                 .buttonStyle(PlainButtonStyle())
+                .help(VoiceInkModelManagementPresentation.settingsTitle)
+                .accessibilityLabel(VoiceInkModelManagementPresentation.settingsTitle)
+                .accessibilityIdentifier("models.settings.open")
             }
             .padding(.bottom, 12)
             

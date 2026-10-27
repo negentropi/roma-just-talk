@@ -1,0 +1,96 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -xctestrun /Users/runner/work/_temp/dictionary-context-proof/baseline/isolated.xctestrun -destination platform=macOS -parallel-testing-enabled NO "-only-testing:VoiceInkTests/VoiceInkTests/DictionaryContextFreshnessTests/applyingAnotherStoreNeverReusesThePreviousStoresRules()" "-only-testing:VoiceInkTests/VoiceInkTests/DictionaryContextFreshnessTests/aFreshContextReadsChangesSavedByAnotherContext()" -resultBundlePath /Users/runner/work/_temp/dictionary-context-proof/baseline/Native.xcresult
+
+2026-10-27 23:37:45.462 xcodebuild[22583:68881] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+Writing result bundle at path:
+	/Users/runner/work/_temp/dictionary-context-proof/baseline/Native.xcresult
+
+2026-10-27 23:37:45.475 xcodebuild[22583:68881] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64e, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:arm64, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:x86_64, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Mac Catalyst, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:DriverKit, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Designed for [iPad,iPhone], id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:78bcf0616b671bdd02c67a753ee9c291d7ad5f3e, name:My Mac }
+2026-10-27 23:37:47.334 xcodebuild[22583:68881] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 23:37:47.473 xcodebuild[22583:68881] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 23:37:55.386719+0000 roma just talk[22931:69947] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0xbe5487c00> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-27 23:37:55.623826+0000 roma just talk[22931:70019] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.623885+0000 roma just talk[22931:70019] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.624498+0000 roma just talk[22931:70050] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.624517+0000 roma just talk[22931:70050] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.624908+0000 roma just talk[22931:70019] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.624929+0000 roma just talk[22931:70019] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.625341+0000 roma just talk[22931:70019] [Connection] Will NOT re-try to establish the connection
+2026-10-27 23:37:55.625381+0000 roma just talk[22931:70050] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.625402+0000 roma just talk[22931:70050] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:37:55.631011+0000 roma just talk[22931:69947] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:37:55.638372+0000 roma just talk[22931:69947] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-27 23:37:55.639083+0000 roma just talk[22931:69947] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-27 23:37:55.640072+0000 roma just talk[22931:69947] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-27 23:37:55.640085+0000 roma just talk[22931:69947] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-27 23:37:55.650309+0000 roma just talk[22931:70018] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-27 23:37:56.845345+0000 roma just talk[22931:69947] [RecorderUIManager] Resetting recording state on launch
+2026-10-27 23:37:56.845850+0000 roma just talk[22931:69947] [Recorder] stopRecording called
+2026-10-27 23:37:56.846068+0000 roma just talk[22931:69947] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 23:37:56.846084+0000 roma just talk[22931:69947] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-27 23:37:56.846168+0000 roma just talk[22931:69947] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-27 23:37:57.759584+0000 roma just talk[22931:69947] [ContentView] ContentView appeared
+2026-10-27 23:37:57.817377+0000 roma just talk[22931:69947] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:37:57.818743+0000 roma just talk[22931:69947] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-27 23:37:57.818966+0000 roma just talk[22931:69947] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-27 23:37:58.081015+0000 roma just talk[22931:69947] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-27 23:37:58.149922+0000 roma just talk[22931:69947] [ShortcutMonitor] installEventTap: installed
+2026-10-27 23:37:58.150869+0000 roma just talk[22931:69947] [WindowManager] configureWindow: registering main window
+2026-10-27 23:37:58.319481+0000 roma just talk[22931:69947] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 23:37:58.324266+0000 roma just talk[22931:70018] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 23:37:58.337845+0000 roma just talk[22931:70018] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-27 23:37:58.340143+0000 roma just talk[22931:70018] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-27 23:37:58.340267+0000 roma just talk[22931:70018] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-27 23:37:58.340821+0000 roma just talk[22931:70018] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-27 23:37:58.365458+0000 roma just talk[22931:70018] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-27 23:37:58.365508+0000 roma just talk[22931:70018] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-27 23:37:58.379487+0000 roma just talk[22931:70018] [carc] Reporter disconnected. { function=sendMessage, reporterID=98487895064577 }
+2026-10-27 23:37:58.397592+0000 roma just talk[22931:70018] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-27 23:37:58.397674+0000 roma just talk[22931:70018] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-27 23:37:58.397693+0000 roma just talk[22931:70018] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+Test Suite 'Selected tests' started at 2026-10-27 23:37:58.412.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-27 23:37:58.414.
+Test Suite 'VoiceInkTests.xctest' passed at 2026-10-27 23:37:58.415.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'Selected tests' passed at 2026-10-27 23:37:58.415.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+2026-10-27 23:37:58.490494+0000 roma just talk[22931:69947] [Recorder] startPreRollBuffering: active on deviceID=87
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VoiceInkTests started.
+◇ Suite DictionaryContextFreshnessTests started.
+◇ Test applyingAnotherStoreNeverReusesThePreviousStoresRules() started.
+✘ Test applyingAnotherStoreNeverReusesThePreviousStoresRules() recorded an issue at DictionaryContextFreshnessTests.swift:20:13: Expectation failed: (DictionaryService.applyWordReplacements(to: "Roma", using: second.context) → "First store") == "Second store"
+✘ Test applyingAnotherStoreNeverReusesThePreviousStoresRules() failed after 0.138 seconds with 1 issue.
+◇ Test aFreshContextReadsChangesSavedByAnotherContext() started.
+✘ Test aFreshContextReadsChangesSavedByAnotherContext() recorded an issue at DictionaryContextFreshnessTests.swift:41:13: Expectation failed: (DictionaryService.applyWordReplacements(to: "Roma", using: reader) → "First value") == "Second value"
+✘ Test aFreshContextReadsChangesSavedByAnotherContext() failed after 0.034 seconds with 1 issue.
+✘ Suite DictionaryContextFreshnessTests failed after 0.173 seconds with 2 issues.
+✘ Suite VoiceInkTests failed after 0.174 seconds with 2 issues.
+✘ Test run with 2 tests in 2 suites failed after 0.175 seconds with 2 issues.
+2026-10-27 23:38:06.254 xcodebuild[22583:68881] [MT] IDETestOperationsObserverDebug: 18.773 elapsed -- Testing started completed.
+2026-10-27 23:38:06.255 xcodebuild[22583:68881] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-27 23:38:06.255 xcodebuild[22583:68881] [MT] IDETestOperationsObserverDebug: 18.773 sec, +18.773 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/dictionary-context-proof/baseline/Native.xcresult
+
+Failing tests:
+	DictionaryContextFreshnessTests.applyingAnotherStoreNeverReusesThePreviousStoresRules()
+	DictionaryContextFreshnessTests.aFreshContextReadsChangesSavedByAnotherContext()
+
+** TEST EXECUTE FAILED **
+
+Testing started

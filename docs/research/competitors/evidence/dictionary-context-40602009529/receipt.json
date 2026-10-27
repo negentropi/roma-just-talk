@@ -1,0 +1,119 @@
+{
+  "run_id": 40602009529,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40602009529",
+  "head_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "baseline_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "classification": "matched-native-dictionary-context-red-green",
+  "artifacts": {
+    "observations": {
+      "id": 12780701040,
+      "bytes": 684528,
+      "sha256": "a020badc341cb0220115336e8405ed121d25cbd4b7e1958b37ae7681e482fc1c",
+      "crc_members": 63,
+      "download_count": 1
+    },
+    "native": {
+      "id": 12780646341,
+      "bytes": 103975412,
+      "sha256": "c0939d344913b1bd3343332d16d4d42680b58ca397d671acb3b78acb17daa4e5",
+      "crc_members": 1893,
+      "download_count": 1
+    }
+  },
+  "source_checks": {
+    "baseline_tracked_files": 2969,
+    "candidate_tracked_files": 3828,
+    "both_full_tracked_manifests_equal_pinned_git": true,
+    "source_after_equal_before": true,
+    "baseline_only_untracked_injection": "VoiceInkTests/DictionaryContextFreshnessTests.swift",
+    "common_oracle_sha256": "3e76e3c168c50c73b028ba564746981cb0a82e5f0371d3a60174cde76b41cd33",
+    "canonical_packages": 41,
+    "static_whisper_files": 86,
+    "both_lanes_dependency_bytes_equal": true
+  },
+  "native_results": {
+    "baseline": {
+      "classification": "intended-stale-dictionary-failures",
+      "errors": [],
+      "exit_code": 65,
+      "failure_lines": [
+        20,
+        41
+      ],
+      "issues": [
+        "\u2718 Test applyingAnotherStoreNeverReusesThePreviousStoresRules() recorded an issue at DictionaryContextFreshnessTests.swift:20:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: second.context) \u2192 \"First store\") == \"Second store\"",
+        "\u2718 Test aFreshContextReadsChangesSavedByAnotherContext() recorded an issue at DictionaryContextFreshnessTests.swift:41:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: reader) \u2192 \"First value\") == \"Second value\""
+      ],
+      "lane": "baseline",
+      "summaries": [
+        [
+          "2",
+          "2",
+          "failed"
+        ]
+      ],
+      "tests": {
+        "aFreshContextReadsChangesSavedByAnotherContext": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        },
+        "applyingAnotherStoreNeverReusesThePreviousStoresRules": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        }
+      },
+      "valid": true
+    },
+    "candidate": {
+      "classification": "passed",
+      "errors": [],
+      "exit_code": 0,
+      "failure_lines": [],
+      "issues": [],
+      "lane": "candidate",
+      "summaries": [
+        [
+          "2",
+          "2",
+          "passed"
+        ]
+      ],
+      "tests": {
+        "aFreshContextReadsChangesSavedByAnotherContext": {
+          "results": [
+            "passed"
+          ],
+          "starts": 1
+        },
+        "applyingAnotherStoreNeverReusesThePreviousStoresRules": {
+          "results": [
+            "passed"
+          ],
+          "starts": 1
+        }
+      },
+      "valid": true
+    }
+  },
+  "identity": {
+    "each_lane_full_app_files_and_test_bundle_unchanged": true,
+    "fresh_signed_TCC_grants_match_csreq": true,
+    "isolated_xctestrun_bytes_verified": true,
+    "actual_build_settings_LOCAL_BUILD": true,
+    "raw_code_directory_flags": {
+      "baseline": "0x2(adhoc)",
+      "candidate": "0x2(adhoc)"
+    }
+  },
+  "limits": [
+    "Actual per-store/per-context DictionaryService cache behavior only",
+    "Synthetic normal app-host SwiftData fixtures; no physical input or ASR",
+    "No CloudKit synchronization proof",
+    "No future Undo or additional read-only import regression attributed to this head",
+    "Raw build logs and xcresults remain in original remote /data native archive"
+  ]
+}

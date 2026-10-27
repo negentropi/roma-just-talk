@@ -1,0 +1,30 @@
+{
+  "classification": "passed",
+  "errors": [],
+  "exit_code": 0,
+  "failure_lines": [],
+  "issues": [],
+  "lane": "candidate",
+  "summaries": [
+    [
+      "2",
+      "2",
+      "passed"
+    ]
+  ],
+  "tests": {
+    "aFreshContextReadsChangesSavedByAnotherContext": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "applyingAnotherStoreNeverReusesThePreviousStoresRules": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": true
+}

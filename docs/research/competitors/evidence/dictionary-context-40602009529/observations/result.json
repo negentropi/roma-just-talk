@@ -1,0 +1,77 @@
+{
+  "baseline": {
+    "classification": "intended-stale-dictionary-failures",
+    "errors": [],
+    "exit_code": 65,
+    "failure_lines": [
+      20,
+      41
+    ],
+    "issues": [
+      "\u2718 Test applyingAnotherStoreNeverReusesThePreviousStoresRules() recorded an issue at DictionaryContextFreshnessTests.swift:20:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: second.context) \u2192 \"First store\") == \"Second store\"",
+      "\u2718 Test aFreshContextReadsChangesSavedByAnotherContext() recorded an issue at DictionaryContextFreshnessTests.swift:41:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: reader) \u2192 \"First value\") == \"Second value\""
+    ],
+    "lane": "baseline",
+    "summaries": [
+      [
+        "2",
+        "2",
+        "failed"
+      ]
+    ],
+    "tests": {
+      "aFreshContextReadsChangesSavedByAnotherContext": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "applyingAnotherStoreNeverReusesThePreviousStoresRules": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      }
+    },
+    "valid": true
+  },
+  "candidate": {
+    "classification": "passed",
+    "errors": [],
+    "exit_code": 0,
+    "failure_lines": [],
+    "issues": [],
+    "lane": "candidate",
+    "summaries": [
+      [
+        "2",
+        "2",
+        "passed"
+      ]
+    ],
+    "tests": {
+      "aFreshContextReadsChangesSavedByAnotherContext": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "applyingAnotherStoreNeverReusesThePreviousStoresRules": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    },
+    "valid": true
+  },
+  "classification": "matched-red-green",
+  "contract_sha256": "6c9fce035c6661644640a9d7d41a98001775d747172eb7970f38a261893e4ef9",
+  "oracle_sha256": "3e76e3c168c50c73b028ba564746981cb0a82e5f0371d3a60174cde76b41cd33",
+  "scope": "Actual native DictionaryService application across independent stores and fresh contexts. Historical tracked code unchanged; common oracle uses existing public APIs only. No synthetic policy extraction or cache API adaptation.",
+  "source_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "tests": [
+    "applyingAnotherStoreNeverReusesThePreviousStoresRules",
+    "aFreshContextReadsChangesSavedByAnotherContext"
+  ]
+}

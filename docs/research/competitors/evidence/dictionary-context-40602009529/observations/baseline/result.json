@@ -1,0 +1,36 @@
+{
+  "classification": "intended-stale-dictionary-failures",
+  "errors": [],
+  "exit_code": 65,
+  "failure_lines": [
+    20,
+    41
+  ],
+  "issues": [
+    "\u2718 Test applyingAnotherStoreNeverReusesThePreviousStoresRules() recorded an issue at DictionaryContextFreshnessTests.swift:20:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: second.context) \u2192 \"First store\") == \"Second store\"",
+    "\u2718 Test aFreshContextReadsChangesSavedByAnotherContext() recorded an issue at DictionaryContextFreshnessTests.swift:41:13: Expectation failed: (DictionaryService.applyWordReplacements(to: \"Roma\", using: reader) \u2192 \"First value\") == \"Second value\""
+  ],
+  "lane": "baseline",
+  "summaries": [
+    [
+      "2",
+      "2",
+      "failed"
+    ]
+  ],
+  "tests": {
+    "aFreshContextReadsChangesSavedByAnotherContext": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "applyingAnotherStoreNeverReusesThePreviousStoresRules": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": true
+}

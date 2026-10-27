@@ -1,0 +1,34 @@
+{
+  "command_line_arguments": [
+    "-selectedAIProvider",
+    "Local CLI",
+    "-CurrentTranscriptionModel",
+    "whisper-large-v3-turbo",
+    "-PrewarmModelOnWake",
+    "NO",
+    "-hasCompletedOnboarding",
+    "YES",
+    "-isAIEnhancementEnabled",
+    "NO",
+    "-IsAudioCleanupEnabled",
+    "NO",
+    "-IsTranscriptionCleanupEnabled",
+    "NO",
+    "-enableAnnouncements",
+    "NO"
+  ],
+  "credential_contract": "LOCAL_BUILD routes app KeychainService to the fresh lane UserDefaults; no saved Keychain credential queries. This is source/configuration assurance, not SecItem tracing.",
+  "isolated_sha256": "9928dc031db89bf2e991a99feef7d43b33cbcecaace229beec10075e0c13b8bd",
+  "isolated_user_home": "/Users/runner/work/_temp/dictionary-context-proof/baseline/isolated-user",
+  "original_sha256": "66850ee85c25cfdbbd451298203145f63168a185b7d0acd49057017885f16796",
+  "seed_preferences": {
+    "CurrentTranscriptionModel": "whisper-large-v3-turbo",
+    "IsAudioCleanupEnabled": false,
+    "IsTranscriptionCleanupEnabled": false,
+    "PrewarmModelOnWake": false,
+    "enableAnnouncements": false,
+    "hasCompletedOnboarding": true,
+    "isAIEnhancementEnabled": false,
+    "selectedAIProvider": "Local CLI"
+  }
+}

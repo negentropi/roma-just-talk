@@ -1,0 +1,52 @@
+name: Probe native Safari writing target
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-writing-target-probe-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writing-target-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the verification Xcode
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          mkdir -p "$RUNNER_TEMP/writing-target-probe-environment"
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            swift --version
+            sw_vers
+          } > "$RUNNER_TEMP/writing-target-probe-environment/environment.txt"
+          /usr/bin/caffeinate -d -i -u -t 600 </dev/null >/dev/null 2>&1 &
+
+      - name: Build and run the production-class probe
+        run: bash scripts/run-writing-target-probe.sh
+
+      - name: Upload native observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-target-probe
+          path: |
+            ${{ runner.temp }}/writing-target-probe/*.json
+            ${{ runner.temp }}/writing-target-probe/*.txt
+            ${{ runner.temp }}/writing-target-probe/*.log
+            ${{ runner.temp }}/writing-target-probe/observations/**
+            ${{ runner.temp }}/writing-target-probe/source/**
+            ${{ runner.temp }}/writing-target-probe-environment/**
+          if-no-files-found: error

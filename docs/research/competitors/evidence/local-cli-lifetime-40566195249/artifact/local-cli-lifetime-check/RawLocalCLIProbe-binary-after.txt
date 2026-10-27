@@ -1,0 +1,2 @@
+3d1cbe361b230ee9b7b79520e975599decd22b595507bcd12ab8f4361901d971  /Users/runner/work/_temp/local-cli-lifetime-check/RawLocalCLIProbe.app/Contents/MacOS/RawLocalCLIProbe
+0651c87c4edf5cea8c9b3329d102ef06919168cf055193d8e7d7aa4069bd3546  /Users/runner/work/_temp/local-cli-lifetime-check/RawLocalCLIProbe.app/Contents/Info.plist

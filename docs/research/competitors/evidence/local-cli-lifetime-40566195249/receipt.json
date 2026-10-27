@@ -1,0 +1,98 @@
+{
+  "run_id": 40566195249,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40566195249",
+  "source_head": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "baseline_head": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+  "classification": "invalid-process-identity-fixture",
+  "regression_proof_valid": false,
+  "production_failure_established": false,
+  "build": {
+    "successful": true,
+    "elapsed_seconds": 162.12,
+    "real_core_and_nvidia_modules_compiled": true,
+    "actual_service_targets_compiled": [
+      "OldLocalCLIProbe",
+      "NewLocalCLIProbe",
+      "RawLocalCLIProbe"
+    ],
+    "frozen_root_pin_count": 22,
+    "root_lock_sha256": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2"
+  },
+  "source_binding": {
+    "source_files_verified": 153,
+    "dependency_files_verified": 150,
+    "unchanged_before_after": true,
+    "dependency_closure_identical_between_lanes": true,
+    "baseline_service_sha256": "3cd0a32d213f3650c33e7c62c8e10d0c6957078442f7feceffa5f8c7d5e6ec8c",
+    "candidate_service_sha256": "2e4ca951ed5ecc9d85439485f3bfa33332d85520aedbdcf12be8173c0c53369a",
+    "common_probe_sha256": "ddce220a60776a3b4d8a71471c8b06a607dc8e2731ec1c103d34e85b88cbb1e3",
+    "signatures_and_wrapper_manifests_unchanged": true
+  },
+  "lanes": {
+    "baseline": {
+      "native_exit_code": 2,
+      "warm_control_passed": true,
+      "completed_case_receipts": [],
+      "invalid_reasons": [
+        "READY PID/PPID/executable/script arguments did not identify the direct child"
+      ],
+      "supervisor_errors": [
+        "Probe root PID/PPID/executable identity mismatch",
+        "Probe watchdog or root identity guard fired"
+      ],
+      "runtime_process_identity_verified": false,
+      "fixture_cleanup_verified": true,
+      "remaining_children": []
+    },
+    "candidate": {
+      "native_exit_code": 2,
+      "warm_control_passed": true,
+      "completed_case_receipts": [
+        {
+          "id": "pre-cancelled",
+          "passed": true
+        }
+      ],
+      "invalid_reasons": [
+        "READY PID/PPID/executable/script arguments did not identify the direct child"
+      ],
+      "supervisor_errors": [
+        "Probe root PID/PPID/executable identity mismatch",
+        "Probe watchdog or root identity guard fired"
+      ],
+      "runtime_process_identity_verified": false,
+      "fixture_cleanup_verified": true,
+      "remaining_children": []
+    },
+    "raw": {
+      "native_exit_code": 2,
+      "warm_control_passed": true,
+      "completed_case_receipts": [],
+      "invalid_reasons": [
+        "READY PID/PPID/executable/script arguments did not identify the direct child"
+      ],
+      "supervisor_errors": [
+        "Probe root PID/PPID/executable identity mismatch",
+        "Probe watchdog or root identity guard fired"
+      ],
+      "runtime_process_identity_verified": false,
+      "fixture_cleanup_verified": true,
+      "remaining_children": []
+    }
+  },
+  "diagnosis": {
+    "ci_observed": "Independent process identity rejected all lanes; actual mismatched ps tuple was discarded.",
+    "confirmed_separate_darwin_mechanism": "The retained tiny native background process observations show mixed-column ps comm truncation for long/spaced paths. Kernel proc_pidpath plus realpath/device/inode identifies the exact expected executable.",
+    "mechanism_receipt": "darwin-ps-shape-observation.json",
+    "limit": "The separate Darwin observation is not a reconstruction of the missing original CI tuple."
+  },
+  "artifact": {
+    "id": 12763970323,
+    "name": "roma.local-cli-lifetime-evidence",
+    "size_in_bytes": 112305,
+    "digest": "sha256:c130228b442efb54a5776038dc6f1d521f467355d96c6e59848ee53afcac0922",
+    "download_count": 1,
+    "zip_size_hash_integrity_verified": true
+  },
+  "scope": "Compilation/lock/source/signature checks passed. No valid old-native-red/new-green comparison; no app/UI/provider/credential/AI-quality proof."
+}

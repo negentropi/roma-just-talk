@@ -4,6 +4,9 @@ set -euo pipefail
 proof() {
   python3 - "$@" <<'PY'
 import copy
+import ast
+import ctypes
+import errno
 import hashlib
 import io
 import json
@@ -16,12 +19,15 @@ import tarfile
 import time
 import uuid
 from pathlib import Path
+from types import SimpleNamespace
 
 BASELINE = 'aaaa286a794ac6f60773ef5149a30f214c586f23'
 SERVICE = 'VoiceInk/Services/AIEnhancement/LocalCLIService.swift'
 OLD_HASH = '3cd0a32d213f3650c33e7c62c8e10d0c6957078442f7feceffa5f8c7d5e6ec8c'
 DRIVER = 'scripts/run-local-cli-lifetime-check.sh'
 WORKFLOW = '.github/workflows/voiceink-local-cli-lifetime-check.yml'
+IDENTITY_FIXTURE = 'docs/research/competitors/evidence/local-cli-lifetime-40566195249/darwin-ps-shape-observation.json'
+OLD_PARSER = '919670ae5b918afbfad6f4d88982a481c1c4b532'
 CASES = ['pre-cancelled', 'cancel-blocked-stdin', 'dual-pipe', 'timeout-blocked-stdin', 'exit-races', 'later-control']
 RAW_CASES = ['captured-configuration', 'raw-literal', 'legacy-trim']
 digest = lambda data: hashlib.sha256(data).hexdigest()
@@ -34,12 +40,55 @@ def source(root, revision, path):
 def snapshot(root, revision, paths):
     names = git(root, 'ls-tree', '-r', '--name-only', '-z', revision, '--', *paths).split(b'\0')
     return {name.decode(): digest(source(root, revision, name.decode())) for name in names if name}
+def parse_ps_fields(parent_stdout, arguments_stdout):
+    parent = parent_stdout.strip()
+    if not re.fullmatch('[0-9]+', parent): raise ValueError('Expected exactly one numeric PPID field')
+    return {'ppid': int(parent), 'arguments': arguments_stdout.rstrip('\r\n')}
+def identity_differences(expected, actual):
+    differences = []
+    if actual.get('pid') != expected.get('pid'): differences.append('pid')
+    if actual.get('ppid') not in expected.get('allowedPPIDs', []): differences.append('ppid')
+    if actual.get('arguments') != expected.get('arguments'): differences.append('arguments')
+    if not expected.get('realpath') or actual.get('realpath') != expected['realpath']: differences.append('image-realpath')
+    wanted, observed = expected.get('fileIdentity', {}), actual.get('fileIdentity', {})
+    if not wanted or any(not isinstance(wanted.get(key), int) or wanted.get(key) != observed.get(key) for key in ['device', 'inode']): differences.append('image-device-inode')
+    if actual.get('captureErrors'): differences.append('capture-errors')
+    return differences
+def parser_regression(repo):
+    captured = json.loads((repo / IDENTITY_FIXTURE).read_text())
+    old_source = source(repo, OLD_PARSER, DRIVER).decode()
+    old_python = old_source.split("<<'PY'\n", 1)[1].split('\nPY\n', 1)[0]
+    functions = [node for node in ast.walk(ast.parse(old_python)) if isinstance(node, ast.FunctionDef) and node.name == 'identity']
+    if len(functions) != 1: raise ValueError('Pinned old parser extraction is not unique')
+    results = []
+    for row in captured['observations']:
+        def old_ps(command, **kwargs):
+            if command != ['/bin/ps', '-ww', '-p', str(row['pid']), '-o', 'ppid=,comm=,args=']: raise ValueError('Unexpected old parser command')
+            return SimpleNamespace(returncode=0, stdout=row['rows']['ppid=,comm=,args='], stderr='')
+        namespace = {'subprocess': SimpleNamespace(run=old_ps, SubprocessError=subprocess.SubprocessError), 'errors': []}
+        exec(compile(ast.Module(body=functions, type_ignores=[]), '<pinned-old-identity>', 'exec'), namespace)
+        old_actual = namespace['identity'](row['pid'])
+        expected = {'pid': row['pid'], 'allowedPPIDs': [row['expected_ppid']], 'arguments': ' '.join(row['argv']), 'realpath': row['expected_realpath'], 'fileIdentity': row['expected_file_identity']}
+        actual = {'pid': row['pid'], **parse_ps_fields(row['rows']['ppid='], row['rows']['args=']), 'realpath': row['observed_realpath'], 'fileIdentity': row['observed_file_identity'], 'kernelImage': row['kernel_image']}
+        differences = identity_differences(expected, actual)
+        old_valid = old_actual == (row['expected_ppid'], row['executable'], ' '.join(row['argv']))
+        assert not old_valid and not differences, (old_actual, differences)
+        for field, value in [('ppid', row['expected_ppid'] + 1), ('arguments', 'foreign'), ('realpath', '/foreign'), ('fileIdentity', {'device': -1, 'inode': -1})]:
+            assert identity_differences(expected, {**actual, field: value}), field
+        results.append({'pid': row['pid'], 'old_parser_rejected': not old_valid, 'old_actual': old_actual, 'new_identity_accepted': not differences, 'expected': expected, 'actual': actual, 'differences': differences})
+    if len(results) != 2: raise ValueError('Expected both captured native long-path and spaces observations')
+    return {'valid': True, 'fixture_sha256': digest((repo / IDENTITY_FIXTURE).read_bytes()), 'old_parser_revision': OLD_PARSER, 'old_parser_source_sha256': digest(old_source.encode()), 'observations': results}
+def observed_identity_valid(value):
+    identity = value.get('identity', {})
+    expected, actual, rows = [identity.get(name, {}) for name in ['expected', 'actual', 'rawPS']]
+    return identity.get('verified') is True and not identity.get('differences') and not identity_differences(expected, actual) and expected.get('pid') == value.get('pid') and expected.get('allowedPPIDs') == [value.get('ppid')] and expected.get('executable') == value.get('executable') and actual.get('kernelReturnCode', 0) > 0 and all(rows.get(field, {}).get('exitCode') == 0 and rows.get(field, {}).get('timedOut') is False for field in ['ppid', 'args'])
 def case_valid(case):
     processes = case.get('processes', [])
     return case.get('cleanupCompleted') is True and not case.get('invalidReason') and len({value.get('pid') for value in processes}) == len(processes) and all(
         value.get('verified') is True and isinstance(value.get('pid'), int) and value['pid'] > 0
         and value.get('ppid') == case.get('probePID') and value.get('executable') == '/bin/zsh'
         and value.get('arguments') == '/bin/zsh -f ' + value.get('script', '') + ' ' + value.get('token', '')
+        and observed_identity_valid(value)
         for value in processes)
 def output_is(outcome, text):
     return outcome.get('completed') is True and outcome.get('errorKind') == 'none' and outcome.get('stdoutBytes') == len(text.encode()) and outcome.get('stdoutSHA256') == digest(text.encode())
@@ -155,20 +204,76 @@ private struct Invalid: Error { let reason: String }
         while !predicate(), ProcessInfo.processInfo.systemUptime < deadline { try? await Task.sleep(nanoseconds: 10_000_000) }
         return predicate()
     }
-    static func ps(_ pid: pid_t) throws -> (pid_t, String, String) {
+    static func fileIdentity(_ path: String) -> [String: Any] {
+        guard let attributes = try? fm.attributesOfItem(atPath: path),
+              let device = attributes[.systemNumber] as? NSNumber,
+              let inode = attributes[.systemFileNumber] as? NSNumber else { return [:] }
+        return ["device": device.uint64Value, "inode": inode.uint64Value]
+    }
+    static func psField(_ pid: pid_t, field: String) -> [String: Any] {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/ps")
-        process.arguments = ["-ww", "-p", String(pid), "-o", "ppid=,comm=,args="]
-        let output = Pipe()
+        let arguments = ["-ww", "-p", String(pid), "-o", field + "="]
+        process.arguments = arguments
+        let output = Pipe(), errors = Pipe()
         process.standardOutput = output
-        process.standardError = FileHandle.nullDevice
-        try process.run()
-        let data = output.fileHandleForReading.readDataToEndOfFile()
-        process.waitUntilExit()
-        let fields = (String(data: data, encoding: .utf8) ?? "").split(maxSplits: 2, whereSeparator: { $0.isWhitespace }).map(String.init)
-        try require(process.terminationStatus == 0 && fields.count == 3, "Owned ready process was not present in ps")
-        guard let parent = pid_t(fields[0]) else { throw Invalid(reason: "Invalid ready PPID") }
-        return (parent, fields[1], fields[2])
+        process.standardError = errors
+        let ended = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in ended.signal() }
+        var captureErrors: [String] = []
+        for handle in [output.fileHandleForReading, errors.fileHandleForReading] {
+            let flags = fcntl(handle.fileDescriptor, F_GETFL)
+            if flags < 0 || fcntl(handle.fileDescriptor, F_SETFL, flags | O_NONBLOCK) < 0 { captureErrors.append("Could not make ps capture nonblocking") }
+        }
+        var finished = false
+        do {
+            try process.run()
+            try? output.fileHandleForWriting.close()
+            try? errors.fileHandleForWriting.close()
+            finished = ended.wait(timeout: .now() + 2) == .success
+            if !finished { captureErrors.append("ps observation exceeded two seconds") }
+        } catch { captureErrors.append("ps launch failed: " + String(describing: error)) }
+        func read(_ handle: FileHandle) -> String {
+            var data = Data(), bytes = [UInt8](repeating: 0, count: 4096)
+            while true {
+                let count = bytes.withUnsafeMutableBytes { Darwin.read(handle.fileDescriptor, $0.baseAddress, 4096) }
+                if count > 0 { data.append(contentsOf: bytes.prefix(count)) }
+                else if count < 0 && errno == EINTR { continue }
+                else {
+                    if count < 0 && errno != EAGAIN && errno != EWOULDBLOCK { captureErrors.append("ps capture read failed: " + String(errno)) }
+                    break
+                }
+            }
+            try? handle.close()
+            return String(decoding: data, as: UTF8.self)
+        }
+        let stdout = read(output.fileHandleForReading), stderr = read(errors.fileHandleForReading)
+        return ["command": ["/bin/ps"] + arguments, "stdout": stdout, "stderr": stderr, "exitCode": finished ? Int(process.terminationStatus) : NSNull(), "timedOut": !finished, "captureErrors": captureErrors]
+    }
+    static func processIdentity(_ pid: pid_t, arguments: String) -> [String: Any] {
+        var buffer = [CChar](repeating: 0, count: 4096)
+        let capacity = UInt32(buffer.count)
+        let count = proc_pidpath(pid, &buffer, capacity)
+        let kernelErrno = count > 0 ? 0 : errno
+        let image = count > 0 ? String(cString: buffer) : ""
+        let expectedPath = URL(fileURLWithPath: "/bin/zsh").resolvingSymlinksInPath().path
+        let observedPath = image.isEmpty ? "" : URL(fileURLWithPath: image).resolvingSymlinksInPath().path
+        let parent = psField(pid, field: "ppid"), argv = psField(pid, field: "args")
+        let parentText = (parent["stdout"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let observedParent = Int(parentText)
+        let observedArguments = (argv["stdout"] as? String ?? "").trimmingCharacters(in: .newlines)
+        let expectedFile = fileIdentity(expectedPath), actualFile = fileIdentity(observedPath)
+        var differences: [String] = []
+        if observedParent != Int(getpid()) { differences.append("ppid") }
+        if observedArguments != arguments { differences.append("arguments") }
+        if count <= 0 { differences.append("kernel-image") }
+        if expectedPath != observedPath { differences.append("image-realpath") }
+        if expectedFile.isEmpty || (expectedFile["device"] as? UInt64) != (actualFile["device"] as? UInt64) || (expectedFile["inode"] as? UInt64) != (actualFile["inode"] as? UInt64) { differences.append("image-device-inode") }
+        let captureErrors = (parent["captureErrors"] as? [String] ?? []) + (argv["captureErrors"] as? [String] ?? [])
+        if (parent["exitCode"] as? Int) != 0 || (argv["exitCode"] as? Int) != 0 || !captureErrors.isEmpty { differences.append("ps-capture") }
+        let expected: [String: Any] = ["pid": Int(pid), "allowedPPIDs": [Int(getpid())], "arguments": arguments, "executable": "/bin/zsh", "realpath": expectedPath, "fileIdentity": expectedFile]
+        let actual: [String: Any] = ["pid": Int(pid), "ppid": observedParent.map { $0 as Any } ?? NSNull(), "arguments": observedArguments, "kernelImage": image, "kernelReturnCode": Int(count), "kernelErrno": Int(kernelErrno), "realpath": observedPath, "fileIdentity": actualFile, "captureErrors": captureErrors]
+        return ["expected": expected, "actual": actual, "rawPS": ["ppid": parent, "args": argv], "differences": differences, "verified": differences.isEmpty]
     }
     static func fixture(_ name: String, body: String, ignoreTERM: Bool = false) throws -> (URL, String) {
         let directory = evidence.appendingPathComponent(name + "-" + UUID().uuidString)
@@ -190,15 +295,19 @@ private struct Invalid: Error { let reason: String }
         let fields = try String(contentsOf: ready, encoding: .utf8).split(whereSeparator: { $0.isWhitespace })
         try require(fields.count == 2, "Malformed READY PID and PPID")
         guard let pid = pid_t(fields[0]), let parent = pid_t(fields[1]), let item = registry.first(where: { ($0["ready"] as? String) == ready.path }), let script = item["script"] as? String, let token = item["token"] as? String else { throw Invalid(reason: "Unowned READY identity") }
-        let identity = try ps(pid)
         let arguments = "/bin/zsh -f " + script + " " + token
-        try require(parent == getpid() && identity.0 == getpid() && identity.1 == "/bin/zsh" && identity.2 == arguments, "READY PID/PPID/executable/script arguments did not identify the direct child")
+        var identity = processIdentity(pid, arguments: arguments)
+        if parent != getpid() {
+            identity["differences"] = (identity["differences"] as? [String] ?? []) + ["ready-ppid"]
+            identity["verified"] = false
+        }
+        let observation: [String: Any] = ["pid": Int(pid), "ppid": Int(parent), "executable": "/bin/zsh", "arguments": arguments, "script": script, "token": token, "verified": identity["verified"] as? Bool ?? false, "identity": identity]
+        try save("identity-" + directory.lastPathComponent + ".json", observation)
+        try require(identity["verified"] as? Bool == true, "READY PID/PPID/kernel-image/device-inode/script arguments did not identify the direct child")
         let acknowledgment = directory.appendingPathComponent("supervisor-verified")
         try require(await wait(2) { fm.fileExists(atPath: acknowledgment.path) }, "Independent supervisor did not acknowledge the exact child identity")
         let acknowledged = try JSONSerialization.jsonObject(with: Data(contentsOf: acknowledgment)) as? [String: Any]
         try require(acknowledged?["pid"] as? Int == Int(pid) && acknowledged?["token"] as? String == token, "Independent READY acknowledgment identified another child")
-        let observation: [String: Any] = ["pid": Int(pid), "ppid": Int(parent), "executable": identity.1, "arguments": identity.2, "script": script, "token": token, "verified": true]
-        try save("identity-" + directory.lastPathComponent + ".json", observation)
         return Child(directory: directory, script: URL(fileURLWithPath: script), token: token, pid: pid, observation: observation)
     }
     static func release(_ child: Child) throws { try Data().write(to: child.release, options: .atomic) }
@@ -388,7 +497,7 @@ private struct Invalid: Error { let reason: String }
 }
 '''
 
-def self_test():
+def self_test(repo):
     contract = {'baseline_service_sha256': OLD_HASH, 'candidate_service_sha256': 'new', 'bundles': {x: 'unique.' + x for x in ['baseline', 'candidate', 'raw']}, 'executables': {x: '/tmp/' + x for x in ['baseline', 'candidate', 'raw']}}
     def outcome(text='', kind='none', timeout=None):
         return {'completed': True, 'errorKind': kind, 'timeoutSeconds': timeout, 'stdoutBytes': len(text.encode()), 'stdoutSHA256': digest(text.encode())}
@@ -402,6 +511,8 @@ def self_test():
                 pid = len(children) + 42
                 script, token = '/tmp/owned-' + str(pid) + '.zsh', 'owned-' + str(pid)
                 value = {'pid': pid, 'ppid': 20, 'executable': '/bin/zsh', 'script': script, 'token': token, 'arguments': '/bin/zsh -f ' + script + ' ' + token, 'verified': True}
+                expected = {'pid': pid, 'allowedPPIDs': [20], 'executable': '/bin/zsh', 'arguments': value['arguments'], 'realpath': '/bin/zsh', 'fileIdentity': {'device': 1, 'inode': 2}}
+                value['identity'] = {'verified': True, 'differences': [], 'expected': expected, 'actual': {'pid': pid, 'ppid': 20, 'arguments': value['arguments'], 'kernelReturnCode': 9, 'realpath': '/bin/zsh', 'fileIdentity': {'device': 1, 'inode': 2}}, 'rawPS': {field: {'exitCode': 0, 'timedOut': False} for field in ['ppid', 'args']}}
                 processes.append(value)
                 children.append(value.copy())
             cases.append({'id': name, 'passed': True, 'cleanupCompleted': True, 'probePID': 20, 'processes': processes, 'boundary': {}, 'outcomes': []})
@@ -459,6 +570,8 @@ def self_test():
         'survivor-wrong-output': lambda r, s: r['cases'][1]['outcomes'][1].update(stdoutSHA256='wrong'),
         'race-red': lambda r, s: r['cases'][4].update(passed=False),
         'unrelated-pipe-error': lambda r, s: r['cases'][2]['outcomes'][0].update(errorKind='unexpected'),
+        'wrong-kernel-inode': lambda r, s: r['cases'][1]['processes'][0]['identity']['actual']['fileIdentity'].update(inode=999),
+        'wrong-kernel-realpath': lambda r, s: r['cases'][1]['processes'][0]['identity']['actual'].update(realpath='/foreign'),
     }
     for name, mutate in mutations.items():
         receipt, supervisor = copy.deepcopy(sample('baseline'))
@@ -476,20 +589,25 @@ def self_test():
         mutate(receipt)
         results[name] = classify(receipt, 'candidate', supervisor, contract)['valid']
     assert all(results[x] for x in ['baseline', 'candidate', 'raw']) and not any(results[x] for x in [*mutations, *candidate_mutations]), results
-    print(json.dumps({'valid': True, 'fixtures': results}, indent=2))
+    regression = parser_regression(repo)
+    print(json.dumps({'valid': True, 'fixtures': results, 'recorded_native_parser_regression': regression}, indent=2))
 
 command, *args = sys.argv[1:]
 if command == 'self-test':
-    self_test()
+    self_test(Path(args[0]))
 elif command == 'prepare':
     repo, out = map(Path, args)
     revision = git(repo, 'rev-parse', 'HEAD').decode().strip()
     if revision != os.environ.get('GITHUB_SHA'): raise SystemExit('Candidate HEAD must equal GITHUB_SHA')
     git(repo, 'cat-file', '-e', BASELINE + '^{commit}')
-    relevant = [SERVICE, 'VoiceInkCore', 'VoiceInkNVIDIA', DRIVER, WORKFLOW]
+    relevant = [SERVICE, 'VoiceInkCore', 'VoiceInkNVIDIA', DRIVER, WORKFLOW, IDENTITY_FIXTURE]
     subprocess.run(['git', '-C', str(repo), 'diff', '--exit-code', 'HEAD', '--', *relevant], check=True)
     if git(repo, 'ls-files', '--others', '--exclude-standard', '--', *relevant).strip(): raise SystemExit('Untracked relevant source is forbidden')
     git(repo, 'ls-files', '--error-unmatch', DRIVER)
+    parser_proof = parser_regression(repo)
+    write(out / 'identity-parser-regression.json', parser_proof)
+    (out / 'darwin-ps-shape-observation.json').write_bytes((repo / IDENTITY_FIXTURE).read_bytes())
+    (out / 'old-identity-parser-source.txt').write_bytes(source(repo, OLD_PARSER, DRIVER))
     baseline = source(repo, BASELINE, SERVICE)
     current = source(repo, revision, SERVICE)
     if digest(baseline) != OLD_HASH or baseline == current: raise SystemExit('Known-bad service bytes are wrong or candidate is unchanged')
@@ -527,15 +645,16 @@ elif command == 'prepare':
     (package / 'Package.swift').write_text(manifest)
     (package / 'Package.resolved').write_bytes(lock)
     target_sources = {str(path.relative_to(package)): digest(path.read_bytes()) for path in sorted((package / 'Sources').rglob('*')) if path.is_file()}
-    contract = {'version': 1, 'baseline_sha': BASELINE, 'candidate_sha': revision, 'baseline_service_sha256': OLD_HASH, 'candidate_service_sha256': digest(current), 'driver_sha256': digest(source(repo, revision, DRIVER)), 'workflow_sha256': digest(source(repo, revision, WORKFLOW)), 'common_probe_sha256': digest(SWIFT.encode()), 'target_sources': target_sources, 'package_manifest_sha256': digest(manifest.encode()), 'package_lock_sha256': digest(lock), 'dependency_manifest': closure, 'bundles': bundles, 'executables': executables, 'targets': names, 'scope': 'Unchanged production LocalCLIService and complete real Core/NVIDIA dependencies. Direct child lifetime only. No app lifecycle, descendants, provider credentials, Keychain or TCC.'}
+    contract = {'version': 1, 'baseline_sha': BASELINE, 'candidate_sha': revision, 'baseline_service_sha256': OLD_HASH, 'candidate_service_sha256': digest(current), 'driver_sha256': digest(source(repo, revision, DRIVER)), 'workflow_sha256': digest(source(repo, revision, WORKFLOW)), 'identity_fixture_sha256': parser_proof['fixture_sha256'], 'old_parser_revision': OLD_PARSER, 'old_parser_source_sha256': parser_proof['old_parser_source_sha256'], 'common_probe_sha256': digest(SWIFT.encode()), 'target_sources': target_sources, 'package_manifest_sha256': digest(manifest.encode()), 'package_lock_sha256': digest(lock), 'dependency_manifest': closure, 'bundles': bundles, 'executables': executables, 'targets': names, 'scope': 'Unchanged production LocalCLIService and complete real Core/NVIDIA dependencies. Direct child lifetime only. No app lifecycle, descendants, provider credentials, Keychain or TCC.'}
     write(out / 'contract.json', contract)
-    write(out / 'source-before.json', {**closure, SERVICE: digest(current), DRIVER: contract['driver_sha256'], WORKFLOW: contract['workflow_sha256']})
+    write(out / 'source-before.json', {**closure, SERVICE: digest(current), DRIVER: contract['driver_sha256'], WORKFLOW: contract['workflow_sha256'], IDENTITY_FIXTURE: contract['identity_fixture_sha256']})
 elif command == 'verify':
     repo, out = map(Path, args)
     contract = json.loads((out / 'contract.json').read_text())
     expected = json.loads((out / 'source-before.json').read_text())
     actual = {path: digest((repo / path).read_bytes()) for path in expected}
     if actual != expected or git(repo, 'rev-parse', 'HEAD').decode().strip() != contract['candidate_sha']: raise SystemExit('Committed source changed during proof')
+    if digest((out / 'darwin-ps-shape-observation.json').read_bytes()) != contract['identity_fixture_sha256'] or digest((out / 'old-identity-parser-source.txt').read_bytes()) != contract['old_parser_source_sha256']: raise SystemExit('Retained native shape fixture or pinned old parser source changed')
     package = out / 'package'
     for lane, name in contract['targets'].items():
         folder = package / 'Sources' / name
@@ -570,14 +689,53 @@ elif command == 'supervise':
     executable = contract['executables'][lane]
     source_hash = contract['baseline_service_sha256'] if lane == 'baseline' else contract['candidate_service_sha256']
     errors, children, verified, actions = [], {}, False, []
-    def identity(pid):
-        try:
-            result = subprocess.run(['/bin/ps', '-ww', '-p', str(pid), '-o', 'ppid=,comm=,args='], capture_output=True, text=True, timeout=2)
-            fields = result.stdout.strip().split(None, 2)
-            return (int(fields[0]), fields[1], fields[2]) if result.returncode == 0 and len(fields) == 3 else None
-        except (ValueError, OSError, subprocess.SubprocessError) as error:
-            errors.append('Bounded process identity observation failed: ' + str(error))
-            return None
+    library = ctypes.CDLL('/usr/lib/libproc.dylib', use_errno=True)
+    kernel_path = library.proc_pidpath
+    kernel_path.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_uint32]
+    kernel_path.restype = ctypes.c_int
+    def identity(pid, image, arguments, parents, phase):
+        buffer = ctypes.create_string_buffer(4096)
+        ctypes.set_errno(0)
+        count = kernel_path(pid, buffer, len(buffer))
+        kernel_errno = ctypes.get_errno() if count <= 0 else 0
+        kernel_image = os.fsdecode(buffer.value) if count > 0 else ''
+        if count <= 0 and kernel_errno != errno.ESRCH:
+            errors.append('Kernel process image observation failed with errno ' + str(kernel_errno))
+        raw, capture_errors = {}, []
+        for field in ['ppid', 'args']:
+            command = ['/bin/ps', '-ww', '-p', str(pid), '-o', field + '=']
+            try:
+                value = subprocess.run(command, capture_output=True, text=True, timeout=2)
+                raw[field] = {'command': command, 'stdout': value.stdout, 'stderr': value.stderr, 'exitCode': value.returncode, 'timedOut': False}
+            except (OSError, subprocess.SubprocessError) as error:
+                stdout, stderr = getattr(error, 'stdout', '') or '', getattr(error, 'stderr', '') or ''
+                raw[field] = {'command': command, 'stdout': stdout.decode(errors='replace') if isinstance(stdout, bytes) else stdout, 'stderr': stderr.decode(errors='replace') if isinstance(stderr, bytes) else stderr, 'exitCode': None, 'timedOut': isinstance(error, subprocess.TimeoutExpired), 'error': str(error)}
+                capture_errors.append(field + ': ' + str(error))
+                errors.append('Bounded process observation failed: ' + str(error))
+        expected_path, actual_path = os.path.realpath(image), os.path.realpath(kernel_image) if kernel_image else ''
+        def file_identity(path):
+            if not path: return {}
+            try:
+                value = os.stat(path)
+                return {'device': value.st_dev, 'inode': value.st_ino}
+            except OSError as error:
+                capture_errors.append('stat ' + path + ': ' + str(error))
+                return {}
+        expected = {'pid': pid, 'allowedPPIDs': parents, 'executable': image, 'arguments': arguments, 'realpath': expected_path, 'fileIdentity': file_identity(expected_path)}
+        actual = {'pid': pid, 'kernelImage': kernel_image, 'kernelReturnCode': count, 'kernelErrno': kernel_errno, 'realpath': actual_path, 'fileIdentity': file_identity(actual_path), 'captureErrors': capture_errors}
+        try: actual.update(parse_ps_fields(raw['ppid']['stdout'], raw['args']['stdout']))
+        except ValueError as error:
+            actual.update(ppid=None, arguments=raw['args']['stdout'].rstrip('\r\n'))
+            capture_errors.append(str(error))
+        ps_ok = all(value.get('exitCode') == 0 for value in raw.values())
+        if not ps_ok: capture_errors.append('A separate ps field did not return zero')
+        gone = count <= 0 and kernel_errno == errno.ESRCH and all(value.get('exitCode') == 1 and not value.get('stdout') and not value.get('stderr') and not value.get('timedOut') for value in raw.values())
+        state = 'gone' if gone else 'running' if count > 0 and ps_ok else 'changing'
+        differences = identity_differences(expected, actual)
+        result = {'phase': phase, 'state': state, 'expected': expected, 'actual': actual, 'rawPS': raw, 'differences': differences, 'verified': state == 'running' and not differences}
+        with (folder / 'process-observations.jsonl').open('a') as stream:
+            stream.write(json.dumps(result, sort_keys=True) + '\n')
+        return result
     def registry():
         path = folder / 'registry.json'
         if not path.exists(): return []
@@ -597,14 +755,14 @@ elif command == 'supervise':
             pid, parent = map(int, ready.read_text().split())
             key = (pid, item['script'], item['token'])
             if key in children: return
-            current = identity(pid)
-            if current is None: return
             expected_args = '/bin/zsh -f ' + item['script'] + ' ' + item['token']
-            correct = parent == process.pid and current == (process.pid, '/bin/zsh', expected_args)
+            current = identity(pid, '/bin/zsh', expected_args, [process.pid], 'child-ready')
+            if current['state'] != 'running': return
+            correct = parent == process.pid and current['verified']
             if not correct:
                 errors.append('READY child PID/PPID/executable/script identity mismatch')
                 return
-            children[key] = {'pid': pid, 'ppid': parent, 'executable': current[1], 'arguments': current[2], 'script': item['script'], 'token': item['token'], 'verified': True}
+            children[key] = {'pid': pid, 'ppid': parent, 'executable': '/bin/zsh', 'arguments': expected_args, 'script': item['script'], 'token': item['token'], 'verified': True, 'identity': current}
             temporary = ready.parent / 'supervisor-verified.tmp'
             write(temporary, {'pid': pid, 'token': item['token']})
             temporary.replace(ready.parent / 'supervisor-verified')
@@ -616,10 +774,10 @@ elif command == 'supervise':
             if not ready.exists(): continue
             try:
                 pid, original_parent = map(int, ready.read_text().split())
-                current = identity(pid)
                 expected_args = '/bin/zsh -f ' + item['script'] + ' ' + item['token']
-                if current is None: continue
-                if original_parent != process.pid or current[1:] != ('/bin/zsh', expected_args) or current[0] not in [process.pid, 1]:
+                current = identity(pid, '/bin/zsh', expected_args, [process.pid, 1], 'gate-cleanup')
+                if current['state'] == 'gone': continue
+                if original_parent != process.pid or not current['verified']:
                     errors.append('Gate release refused a foreign process identity')
                     continue
                 Path(item['release']).touch()
@@ -633,23 +791,25 @@ elif command == 'supervise':
             if not ready.exists(): continue
             try:
                 pid, parent = map(int, ready.read_text().split())
-                current = identity(pid)
-                if current is not None: live.append({'pid': pid, 'originalPPID': parent, 'current': current, 'script': item['script']})
+                arguments = '/bin/zsh -f ' + item['script'] + ' ' + item['token']
+                current = identity(pid, '/bin/zsh', arguments, [process.pid, 1], 'child-cleanup-readback')
+                if current['state'] != 'gone': live.append({'pid': pid, 'originalPPID': parent, 'current': current, 'script': item['script']})
             except (ValueError, OSError) as error: errors.append('Cleanup identity read failed: ' + str(error))
         return live
     with (folder / 'stdout.log').open('wb') as stdout, (folder / 'stderr.log').open('wb') as stderr:
         try:
-            process = subprocess.Popen([executable, str(folder), lane, contract['bundles'][lane], source_hash], stdout=stdout, stderr=stderr)
+            launch_arguments = [executable, str(folder), lane, contract['bundles'][lane], source_hash]
+            process = subprocess.Popen(launch_arguments, stdout=stdout, stderr=stderr)
         except OSError as error:
             write(folder / 'supervisor.json', {'completed': False, 'watchdogFired': False, 'cleanupVerified': True, 'rootIdentityVerified': False, 'executable': executable, 'errors': ['Probe launch failed: ' + str(error)]})
             raise SystemExit(1)
         started, watchdog = time.monotonic(), False
         try:
             while process.poll() is None and time.monotonic() - started < 120:
-                root = identity(process.pid)
-                if root:
-                    if root[0] != os.getpid() or root[1] != executable:
-                        errors.append('Probe root PID/PPID/executable identity mismatch')
+                root = identity(process.pid, executable, ' '.join(launch_arguments), [os.getpid()], 'probe-root')
+                if root['state'] == 'running':
+                    if not root['verified']:
+                        errors.append('Probe root PID/PPID/kernel-image/device-inode/arguments identity mismatch')
                         break
                     verified = True
                 for item in registry(): observe(item)
@@ -701,7 +861,7 @@ PY
 }
 
 if [[ "${1:-}" == --self-test ]]; then
-  proof self-test
+  proof self-test "$(cd "$(dirname "$0")/.." && pwd)"
   exit
 fi
 if [[ "$#" != 0 || "${GITHUB_ACTIONS:-}" != true || "${RUNNER_ENVIRONMENT:-}" != github-hosted || "$(uname -s)" != Darwin || "$(id -u)" == 0 ]]; then

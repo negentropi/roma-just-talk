@@ -1,0 +1,14 @@
+[
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/captured-BD14DB7B-88D3-435B-95FA-3309E6D46EF4-B34CC230-C2F1-42A3-B597-749BB4A213AD\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/captured-BD14DB7B-88D3-435B-95FA-3309E6D46EF4-B34CC230-C2F1-42A3-B597-749BB4A213AD\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/captured-BD14DB7B-88D3-435B-95FA-3309E6D46EF4-B34CC230-C2F1-42A3-B597-749BB4A213AD\/command.zsh",
+    "token" : "E2D3A390-D356-4D63-BD76-121B521E7851"
+  },
+  {
+    "ready" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/changed-CA130A37-810D-4FDA-ADB1-0BB581C878BD-C3FA0780-71D4-4C51-A77A-5FEA2CD3A75D\/ready",
+    "release" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/changed-CA130A37-810D-4FDA-ADB1-0BB581C878BD-C3FA0780-71D4-4C51-A77A-5FEA2CD3A75D\/release",
+    "script" : "\/Users\/runner\/work\/_temp\/local-cli-lifetime-check\/raw\/changed-CA130A37-810D-4FDA-ADB1-0BB581C878BD-C3FA0780-71D4-4C51-A77A-5FEA2CD3A75D\/command.zsh",
+    "token" : "CC0A08DD-D378-4ED7-8547-B4EA174925AC"
+  }
+]

@@ -1,0 +1,35 @@
+lifetime	Compare the same request boundary on old and new service sources	﻿2026-10-27T19:07:24.5668770Z ##[group]Run set -o pipefail
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:24.5670020Z ^[[36;1mset -o pipefail^[[0m
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:24.5671170Z ^[[36;1mgit fetch --no-tags --depth=1 origin aaaa286a794ac6f60773ef5149a30f214c586f23^[[0m
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:24.5672310Z ^[[36;1mbash scripts/run-local-cli-lifetime-check.sh \^[[0m
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:24.5673260Z ^[[36;1m  2>&1 | tee "$RUNNER_TEMP/local-cli-lifetime-driver.log"^[[0m
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:24.5719310Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:24.5719680Z ##[endgroup]
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:25.0766570Z From https://github.com/negentropi/roma-just-talk
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:07:25.0767190Z  * branch            aaaa286a794ac6f60773ef5149a30f214c586f23 -> FETCH_HEAD
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8412570Z {
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8425350Z   "valid": false,
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8428120Z   "classification": "invalid-or-failed",
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8438620Z   "candidate_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8440350Z   "baseline_sha": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8463420Z   "common_probe_sha256": "ddce220a60776a3b4d8a71471c8b06a607dc8e2731ec1c103d34e85b88cbb1e3",
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8464360Z   "lanes": {
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8465110Z     "baseline": {
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8466420Z       "valid": false,
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8467870Z       "classification": "invalid-or-failed",
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8468190Z       "failedCases": []
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8469030Z     },
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8469230Z     "candidate": {
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8469600Z       "valid": false,
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8470360Z       "classification": "invalid-or-failed",
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8471600Z       "failedCases": []
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8472000Z     },
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8472380Z     "raw": {
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8472670Z       "valid": false,
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8472990Z       "classification": "invalid-or-failed",
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8473420Z       "failedCases": []
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8473710Z     }
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8474490Z   },
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8475960Z   "scope": "Unchanged production LocalCLIService and complete real Core/NVIDIA dependencies. Direct child lifetime only. No app lifecycle, descendants, provider credentials, Keychain or TCC."
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8476820Z }
+lifetime	Compare the same request boundary on old and new service sources	2026-10-27T19:11:05.8542210Z ##[error]Process completed with exit code 1.

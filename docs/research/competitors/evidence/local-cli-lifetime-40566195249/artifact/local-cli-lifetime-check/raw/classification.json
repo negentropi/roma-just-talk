@@ -1,0 +1,44 @@
+{
+  "caseIDs": [],
+  "classification": "invalid-or-failed",
+  "failedCases": [],
+  "lane": "raw",
+  "receipt": {
+    "bundleIdentifier": "com.negentropi.RomaJustTalk.CLILifetime.raw.ec988f50c4854db48a5fd707fa23d8e6",
+    "cases": [],
+    "invalidReasons": [
+      "READY PID/PPID/executable/script arguments did not identify the direct child"
+    ],
+    "lane": "raw",
+    "preferencesUnchanged": true,
+    "probePID": 7368,
+    "setupPassed": true,
+    "sourceSHA256": "2e4ca951ed5ecc9d85439485f3bfa33332d85520aedbdcf12be8173c0c53369a",
+    "version": 1
+  },
+  "supervisor": {
+    "children": [],
+    "cleanupActions": [
+      {
+        "action": "fixture-gate-release",
+        "pid": 7375,
+        "scope": "Harness cleanup after native boundary. Never production-service cleanup.",
+        "script": "/Users/runner/work/_temp/local-cli-lifetime-check/raw/captured-BD14DB7B-88D3-435B-95FA-3309E6D46EF4-B34CC230-C2F1-42A3-B597-749BB4A213AD/command.zsh"
+      }
+    ],
+    "cleanupVerified": true,
+    "completed": true,
+    "errors": [
+      "Probe root PID/PPID/executable identity mismatch",
+      "Probe watchdog or root identity guard fired"
+    ],
+    "executable": "/Users/runner/work/_temp/local-cli-lifetime-check/RawLocalCLIProbe.app/Contents/MacOS/RawLocalCLIProbe",
+    "exitCode": 2,
+    "remainingChildren": [],
+    "rootIdentityVerified": false,
+    "rootPID": 7368,
+    "scope": "Runtime PID/PPID/executable and exact owned script arguments. Fixture gate release and outer watchdog cleanup never count as service cleanup. Only the unreaped direct Popen root may be signaled.",
+    "watchdogFired": true
+  },
+  "valid": false
+}

@@ -1,0 +1,15 @@
+{
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk.CLILifetime.baseline.24979770c2ef44eb99ab295ef92f232b",
+  "cases" : [
+
+  ],
+  "invalidReasons" : [
+    "READY PID\/PPID\/executable\/script arguments did not identify the direct child"
+  ],
+  "lane" : "baseline",
+  "preferencesUnchanged" : true,
+  "probePID" : 6396,
+  "setupPassed" : true,
+  "sourceSHA256" : "3cd0a32d213f3650c33e7c62c8e10d0c6957078442f7feceffa5f8c7d5e6ec8c",
+  "version" : 1
+}

@@ -1,0 +1,24 @@
+{
+  "children": [],
+  "cleanupActions": [
+    {
+      "action": "fixture-gate-release",
+      "pid": 6403,
+      "scope": "Harness cleanup after native boundary. Never production-service cleanup.",
+      "script": "/Users/runner/work/_temp/local-cli-lifetime-check/baseline/precancel-B32C43C6-0A1F-454A-9497-10E2C141AAD1-9232605C-1BFF-484C-B182-B2C7C2714371/command.zsh"
+    }
+  ],
+  "cleanupVerified": true,
+  "completed": true,
+  "errors": [
+    "Probe root PID/PPID/executable identity mismatch",
+    "Probe watchdog or root identity guard fired"
+  ],
+  "executable": "/Users/runner/work/_temp/local-cli-lifetime-check/OldLocalCLIProbe.app/Contents/MacOS/OldLocalCLIProbe",
+  "exitCode": 2,
+  "remainingChildren": [],
+  "rootIdentityVerified": false,
+  "rootPID": 6396,
+  "scope": "Runtime PID/PPID/executable and exact owned script arguments. Fixture gate release and outer watchdog cleanup never count as service cleanup. Only the unreaped direct Popen root may be signaled.",
+  "watchdogFired": true
+}

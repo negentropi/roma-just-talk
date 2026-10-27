@@ -1,0 +1,810 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+Fetching https://github.com/apple/swift-protobuf.git
+Fetching https://github.com/apple/swift-asn1.git
+[1/2051] Fetching swift-asn1
+[2052/57726] Fetching swift-asn1, swift-protobuf
+Fetched https://github.com/apple/swift-protobuf.git from cache (5.80s)
+Fetched https://github.com/apple/swift-asn1.git from cache (5.80s)
+Fetching https://github.com/negentropi/grpc-swift-nio-transport.git
+Fetching https://github.com/apple/swift-nio.git
+[1/4323] Fetching grpc-swift-nio-transport
+[4324/91014] Fetching grpc-swift-nio-transport, swift-nio
+Fetched https://github.com/apple/swift-nio.git from cache (3.87s)
+Fetched https://github.com/negentropi/grpc-swift-nio-transport.git from cache (3.87s)
+Fetching https://github.com/grpc/grpc-swift-protobuf.git
+Fetching https://github.com/apple/swift-nio-extras.git
+[1/6710] Fetching swift-nio-extras
+[1880/9371] Fetching swift-nio-extras, grpc-swift-protobuf
+Fetched https://github.com/apple/swift-nio-extras.git from cache (0.76s)
+Fetched https://github.com/grpc/grpc-swift-protobuf.git from cache (0.78s)
+Fetching https://github.com/apple/swift-async-algorithms.git
+Fetching https://github.com/apple/swift-collections.git
+[1/6825] Fetching swift-async-algorithms
+[206/36187] Fetching swift-async-algorithms, swift-collections
+Fetched https://github.com/apple/swift-async-algorithms.git from cache (0.85s)
+Fetching https://github.com/apple/swift-nio-ssl.git
+[6167/29362] Fetching swift-collections
+[29363/46256] Fetching swift-collections, swift-nio-ssl
+Fetched https://github.com/apple/swift-collections.git from cache (1.51s)
+[1690/16894] Fetching swift-nio-ssl
+Fetching https://github.com/swift-server/swift-service-lifecycle.git
+[16895/19780] Fetching swift-nio-ssl, swift-service-lifecycle
+Fetched https://github.com/swift-server/swift-service-lifecycle.git from cache (0.60s)
+Fetching https://github.com/apple/swift-numerics.git
+Fetched https://github.com/apple/swift-nio-ssl.git from cache (1.55s)
+Fetching https://github.com/apple/swift-system.git
+[1/6766] Fetching swift-numerics
+Fetched https://github.com/apple/swift-numerics.git from cache (0.72s)
+Fetching https://github.com/apple/swift-nio-http2.git
+[1/7381] Fetching swift-system
+Fetched https://github.com/apple/swift-system.git from cache (0.84s)
+Fetching https://github.com/apple/swift-crypto.git
+[1/12319] Fetching swift-nio-http2
+[7639/31178] Fetching swift-nio-http2, swift-crypto
+Fetched https://github.com/apple/swift-nio-http2.git from cache (1.38s)
+[3018/18859] Fetching swift-crypto
+Fetching https://github.com/apple/swift-log.git
+[18860/27240] Fetching swift-crypto, swift-log
+Fetched https://github.com/apple/swift-crypto.git from cache (1.63s)
+[1006/8381] Fetching swift-log
+Fetching https://github.com/apple/swift-certificates.git
+Fetched https://github.com/apple/swift-log.git from cache (0.74s)
+Fetching https://github.com/apple/swift-atomics.git
+[1/7607] Fetching swift-certificates
+[1827/9500] Fetching swift-certificates, swift-atomics
+Fetched https://github.com/apple/swift-atomics.git from cache (0.62s)
+Fetched https://github.com/apple/swift-certificates.git from cache (0.77s)
+Fetching https://github.com/apple/swift-http-types.git
+Fetching https://github.com/apple/swift-algorithms.git
+[1/6159] Fetching swift-algorithms
+[6160/8120] Fetching swift-algorithms, swift-http-types
+Fetched https://github.com/apple/swift-algorithms.git from cache (0.90s)
+Fetched https://github.com/apple/swift-http-types.git from cache (0.90s)
+Fetching https://github.com/apple/swift-nio-transport-services.git
+Fetching https://github.com/apple/swift-http-structured-headers.git
+[1/1284] Fetching swift-http-structured-headers
+[53/4151] Fetching swift-http-structured-headers, swift-nio-transport-services
+Fetched https://github.com/apple/swift-http-structured-headers.git from cache (0.52s)
+Fetched https://github.com/apple/swift-nio-transport-services.git from cache (0.52s)
+Fetching https://github.com/grpc/grpc-swift-2.git
+[1/31249] Fetching grpc-swift-2
+Fetched https://github.com/grpc/grpc-swift-2.git from cache (1.72s)
+Creating working copy for https://github.com/apple/swift-protobuf.git
+Creating working copy for https://github.com/apple/swift-nio.git
+Creating working copy for https://github.com/negentropi/grpc-swift-nio-transport.git
+Working copy of https://github.com/negentropi/grpc-swift-nio-transport.git resolved at 65adb0bc4721a6c4695e1956af9552970c06a59f
+Creating working copy for https://github.com/grpc/grpc-swift-protobuf.git
+Working copy of https://github.com/grpc/grpc-swift-protobuf.git resolved at 2.4.1
+Creating working copy for https://github.com/apple/swift-nio-extras.git
+Working copy of https://github.com/apple/swift-nio-extras.git resolved at 1.35.1
+Creating working copy for https://github.com/apple/swift-asn1.git
+Working copy of https://github.com/apple/swift-asn1.git resolved at 1.7.2
+Creating working copy for https://github.com/apple/swift-async-algorithms.git
+Working copy of https://github.com/apple/swift-async-algorithms.git resolved at 1.1.5
+Creating working copy for https://github.com/apple/swift-collections.git
+Working copy of https://github.com/apple/swift-nio.git resolved at 2.102.0
+Creating working copy for https://github.com/apple/swift-nio-ssl.git
+Working copy of https://github.com/apple/swift-protobuf.git resolved at 1.38.1
+Creating working copy for https://github.com/swift-server/swift-service-lifecycle.git
+Working copy of https://github.com/swift-server/swift-service-lifecycle.git resolved at 2.12.0
+Creating working copy for https://github.com/apple/swift-numerics.git
+Working copy of https://github.com/apple/swift-collections.git resolved at 1.6.0
+Creating working copy for https://github.com/apple/swift-system.git
+Working copy of https://github.com/apple/swift-numerics.git resolved at 1.1.1
+Working copy of https://github.com/apple/swift-nio-ssl.git resolved at 2.37.4
+Creating working copy for https://github.com/apple/swift-certificates.git
+Creating working copy for https://github.com/apple/swift-nio-http2.git
+Working copy of https://github.com/apple/swift-system.git resolved at 1.8.1
+Creating working copy for https://github.com/apple/swift-log.git
+Working copy of https://github.com/apple/swift-log.git resolved at 1.15.0
+Creating working copy for https://github.com/apple/swift-crypto.git
+Working copy of https://github.com/apple/swift-certificates.git resolved at 1.20.0
+Working copy of https://github.com/apple/swift-nio-http2.git resolved at 1.46.0
+Creating working copy for https://github.com/apple/swift-atomics.git
+Creating working copy for https://github.com/apple/swift-http-types.git
+Working copy of https://github.com/apple/swift-atomics.git resolved at 1.3.1
+Creating working copy for https://github.com/apple/swift-http-structured-headers.git
+Working copy of https://github.com/apple/swift-http-types.git resolved at 1.8.0
+Working copy of https://github.com/apple/swift-http-structured-headers.git resolved at 1.7.0
+Creating working copy for https://github.com/apple/swift-algorithms.git
+Creating working copy for https://github.com/apple/swift-nio-transport-services.git
+Working copy of https://github.com/apple/swift-nio-transport-services.git resolved at 1.28.0
+Working copy of https://github.com/apple/swift-algorithms.git resolved at 1.2.1
+Creating working copy for https://github.com/grpc/grpc-swift-2.git
+Working copy of https://github.com/apple/swift-crypto.git resolved at 4.5.2
+Working copy of https://github.com/grpc/grpc-swift-2.git resolved at 2.4.3
+[1/1] Compiling plugin generate-grpc-code-from-protos
+[2/2] Compiling plugin GRPCProtobufGenerator
+[3/3] Compiling plugin SwiftProtobufPlugin
+Building for debugging...
+[3/64] Copying PrivacyInfo.xcprivacy
+[4/64] Write sources
+[7/64] Copying ThirdPartyNotices
+[8/64] Write sources
+[9/64] Copying PrivacyInfo.xcprivacy
+[10/64] Write sources
+[12/64] Write RawLocalCLIProbe-entitlement.plist
+[12/64] Write sources
+[14/64] Write OldLocalCLIProbe-entitlement.plist
+[15/64] Write sources
+[16/64] Write NewLocalCLIProbe-entitlement.plist
+[17/64] Write sources
+[37/64] Compiling CNIOWindows shim.c
+[38/64] Write swift-version-7974D3F7F03D5E95.txt
+[39/64] Compiling CNIOWindows WSAStartup.c
+[40/64] Compiling CNIOWASI CNIOWASI.c
+[41/69] Compiling _AtomicsShims.c
+[43/118] Emitting module _NIODataStructures
+[44/119] Compiling _NIODataStructures PriorityQueue.swift
+[45/119] Compiling _NIOBase64 Base64.swift
+[46/119] Emitting module _NIOBase64
+[47/133] Compiling _NIODataStructures _TinyArray.swift
+[48/133] Compiling _NIODataStructures Heap.swift
+[48/133] Compiling CNIOPosix event_loop_id.c
+[49/133] Compiling CNIOOpenBSD shim.c
+[50/133] Compiling CNIOLinux shim.c
+[51/133] Compiling CNIOLinux liburing_shims.c
+[53/133] Compiling InternalCollectionsUtilities Debugging.swift
+[54/133] Compiling InternalCollectionsUtilities Descriptions.swift
+[55/133] Compiling InternalCollectionsUtilities FixedWidthInteger+roundUpToPowerOfTwo.swift
+[56/133] Compiling InternalCollectionsUtilities Integer rank.swift
+[57/133] Compiling InternalCollectionsUtilities UInt+first and last set bit.swift
+[58/133] Compiling InternalCollectionsUtilities UInt+reversed.swift
+[59/133] Compiling InternalCollectionsUtilities LifetimeOverride.swift
+[60/133] Emitting module InternalCollectionsUtilities
+[61/133] Compiling InternalCollectionsUtilities RandomAccessCollection+Offsets.swift
+[62/133] Compiling InternalCollectionsUtilities Span+Extras.swift
+[63/133] Compiling InternalCollectionsUtilities String+Padding.swift
+[64/133] Compiling InternalCollectionsUtilities _UnsafeBitSet+Index.swift
+[65/133] Compiling InternalCollectionsUtilities _UnsafeBitSet+_Word.swift
+[66/133] Compiling InternalCollectionsUtilities _UnsafeBitSet.swift
+[67/139] Compiling InternalCollectionsUtilities UnsafeBufferPointer+Extras.swift
+[68/139] Compiling InternalCollectionsUtilities UnsafeMutableBufferPointer+Extras.swift
+[69/139] Compiling InternalCollectionsUtilities UnsafeMutableRawBufferPointer+Extras.swift
+[70/139] Compiling InternalCollectionsUtilities UnsafeRawBufferPointer+Extras.swift
+[71/139] Compiling InternalCollectionsUtilities _SortedCollection.swift
+[72/139] Compiling InternalCollectionsUtilities _UniqueCollection.swift
+[72/139] Compiling CNIOLLHTTP c_nio_http.c
+[73/147] Compiling CNIOLLHTTP c_nio_llhttp.c
+[74/166] Compiling CNIOLLHTTP c_nio_api.c
+[75/166] Compiling CNIOFreeBSD shim.c
+[77/166] Compiling ContainersPreview BidirectionalContainer.swift
+[78/166] Compiling ContainersPreview Container+Filter.swift
+[79/166] Compiling ContainersPreview Container+SpanwiseZip.swift
+[80/166] Compiling ContainersPreview Container.swift
+[81/166] Compiling ContainersPreview ContainerIterator.swift
+[82/166] Compiling ContainersPreview DynamicContainer.swift
+[83/166] Compiling ContainersPreview MutableContainer.swift
+[84/166] Compiling ContainersPreview PermutableContainer.swift
+[85/166] Compiling ContainersPreview RandomAccessContainer.swift
+[86/166] Compiling ContainersPreview RangeExpression2.swift
+[87/166] Compiling ContainersPreview RangeReplaceableContainer.swift
+[88/166] Compiling ContainersPreview Strideable+Limits.swift
+[89/166] Compiling ContainersPreview Drain+Map.swift
+[90/179] Emitting module ContainersPreview
+[91/179] Compiling ContainersPreview OutputSpan+Extras.swift
+[92/179] Compiling ContainersPreview TemporaryAllocation.swift
+[93/179] Compiling ContainersPreview BorrowingIteratorProtocol+Copy.swift
+[94/179] Compiling ContainersPreview BorrowingIteratorProtocol+ElementsEqual.swift
+[95/179] Compiling ContainersPreview BorrowingIteratorProtocol+Filter.swift
+[96/179] Compiling ContainersPreview BorrowingIteratorProtocol+Map.swift
+[97/179] Compiling ContainersPreview BorrowingIteratorProtocol+Reduce.swift
+[98/179] Compiling ContainersPreview BorrowingIteratorProtocol+SpanwiseZip.swift
+[99/179] Compiling ContainersPreview BorrowingIteratorProtocol.swift
+[100/179] Compiling ContainersPreview BorrowingSequence+Algorithms.swift
+[101/179] Compiling ContainersPreview BorrowingSequence+Standard Conformances.swift
+[102/179] Compiling ContainersPreview BorrowingSequence+Utilities.swift
+[103/179] Compiling ContainersPreview BorrowingSequence.swift
+[104/179] Compiling ContainersPreview Drain+Reduce.swift
+[105/179] Compiling ContainersPreview Drain.swift
+[106/179] Compiling ContainersPreview Producer+Collect.swift
+[107/179] Compiling ContainersPreview Producer+Filter.swift
+[108/179] Compiling ContainersPreview Producer+Map.swift
+[109/179] Compiling ContainersPreview Producer+Reduce.swift
+[110/179] Compiling ContainersPreview Producer.swift
+[111/179] Compiling ContainersPreview InputSpan.swift
+[112/179] Compiling ContainersPreview MutableRef.swift
+[113/179] Compiling ContainersPreview Ref.swift
+[114/179] Compiling ContainersPreview Shared.swift
+[115/179] Compiling ContainersPreview SpanIterator.swift
+[116/179] Compiling ContainersPreview UniqueBox.swift
+[116/179] Compiling CNIODarwin shim.c
+[118/210] Compiling DequeModule RigidDeque+Consumption.swift
+[119/210] Compiling DequeModule RigidDeque+Container.swift
+[120/210] Compiling DequeModule RigidDeque+Descriptions.swift
+[121/210] Compiling DequeModule RigidDeque+Equatable.swift
+[122/210] Compiling DequeModule RigidDeque+Experimental.swift
+[123/210] Compiling DequeModule RigidDeque+Hashable.swift
+[124/210] Compiling DequeModule RigidDeque+Initializers.swift
+[125/210] Compiling DequeModule RigidDeque+Insertions.swift
+[126/210] Compiling DequeModule RigidDeque+Prepend.swift
+[127/210] Compiling DequeModule RigidDeque+Removals.swift
+[128/210] Compiling DequeModule RigidDeque+Replacements.swift
+[129/210] Compiling DequeModule RigidDeque+Testing.swift
+[130/210] Compiling DequeModule RigidDeque.swift
+[131/210] Compiling DequeModule UniqueDeque+Append.swift
+[132/210] Compiling DequeModule UniqueDeque+Consumption.swift
+[133/225] Emitting module SwiftProtobuf
+[134/249] Compiling DequeModule Deque+Codable.swift
+[135/249] Compiling DequeModule Deque+Collection.swift
+[136/249] Compiling DequeModule Deque+CustomReflectable.swift
+[137/249] Compiling DequeModule Deque+Descriptions.swift
+[138/249] Compiling DequeModule Deque+Equatable.swift
+[139/249] Compiling DequeModule Deque+ExpressibleByArrayLiteral.swift
+[140/249] Compiling DequeModule Deque+Extras.swift
+[141/249] Compiling DequeModule Deque+Hashable.swift
+[142/249] Compiling DequeModule Deque+Testing.swift
+[143/249] Compiling DequeModule Deque._Storage.swift
+[144/249] Compiling DequeModule Deque._UnsafeHandle.swift
+[145/249] Compiling DequeModule Deque.swift
+[146/249] Compiling DequeModule _DequeBuffer.swift
+[147/249] Compiling DequeModule _DequeBufferHeader.swift
+[148/249] Compiling DequeModule RigidDeque+Append.swift
+[149/249] Emitting module DequeModule
+[150/249] Compiling DequeModule UniqueDeque+Container.swift
+[151/249] Compiling DequeModule UniqueDeque+Deprecated.swift
+[152/249] Compiling DequeModule UniqueDeque+Descriptions.swift
+[153/249] Compiling DequeModule UniqueDeque+Equatable.swift
+[154/249] Compiling DequeModule UniqueDeque+Experimental.swift
+[155/249] Compiling DequeModule UniqueDeque+Hashable.swift
+[156/249] Compiling DequeModule UniqueDeque+Initializers.swift
+[157/249] Compiling DequeModule UniqueDeque+Insertions.swift
+[158/249] Compiling DequeModule UniqueDeque+Prepend.swift
+[159/249] Compiling DequeModule UniqueDeque+Removals.swift
+[160/249] Compiling DequeModule UniqueDeque+Replacements.swift
+[161/249] Compiling DequeModule UniqueDeque.swift
+[162/249] Compiling DequeModule _DequeSlot.swift
+[163/249] Compiling DequeModule _UnsafeDequeHandle.swift
+[164/249] Compiling DequeModule _UnsafeDequeSegments.swift
+[165/249] Compiling SwiftProtobuf Message+BinaryAdditions_Data.swift
+[166/249] Compiling SwiftProtobuf Message+FieldMask.swift
+[167/249] Compiling SwiftProtobuf Message+JSONAdditions.swift
+[168/249] Compiling SwiftProtobuf Message+JSONAdditions_Data.swift
+[169/249] Compiling SwiftProtobuf Message+JSONArrayAdditions.swift
+[170/249] Compiling SwiftProtobuf Message+JSONArrayAdditions_Data.swift
+[171/249] Compiling SwiftProtobuf Message+TextFormatAdditions.swift
+[172/249] Compiling SwiftProtobuf Message.swift
+[173/249] Compiling SwiftProtobuf MessageExtension.swift
+[174/249] Compiling SwiftProtobuf NameMap.swift
+[175/249] Compiling SwiftProtobuf PathDecoder.swift
+[176/249] Compiling SwiftProtobuf PathVisitor.swift
+[177/249] Compiling SwiftProtobuf ProtoNameProviding.swift
+[178/249] Compiling SwiftProtobuf ProtobufAPIVersionCheck.swift
+[179/249] Compiling SwiftProtobuf ProtobufMap.swift
+[180/249] Compiling SwiftProtobuf SelectiveVisitor.swift
+[181/249] Compiling SwiftProtobuf SimpleExtensionMap.swift
+[182/249] Compiling SwiftProtobuf StringUtils.swift
+[183/249] Compiling SwiftProtobuf SwiftProtobufContiguousBytes.swift
+[184/249] Compiling SwiftProtobuf SwiftProtobufError.swift
+[185/249] Compiling SwiftProtobuf TextFormatDecoder.swift
+[186/249] Compiling SwiftProtobuf TextFormatDecodingError.swift
+[187/249] Compiling SwiftProtobuf TextFormatDecodingOptions.swift
+[188/249] Compiling SwiftProtobuf TextFormatEncoder.swift
+[234/272] Compiling SwiftProtobuf ExtensionMap.swift
+[235/272] Compiling SwiftProtobuf FieldTag.swift
+[236/272] Compiling SwiftProtobuf FieldTypes.swift
+[236/272] Compiling c-nioatomics.c
+[238/314] Emitting module GRPCCore
+[239/314] Compiling GRPCCore CallOptions.swift
+[240/314] Compiling GRPCCore ClientContext.swift
+[241/314] Compiling GRPCCore ClientInterceptor.swift
+[242/314] Compiling GRPCCore ClientRequest.swift
+[243/314] Compiling GRPCCore ClientResponse.swift
+[244/314] Compiling GRPCCore ClientRPCExecutor+HedgingExecutor.swift
+[245/314] Compiling GRPCCore ClientRPCExecutor+OneShotExecutor.swift
+[246/314] Compiling GRPCCore ClientRPCExecutor+RetryExecutor.swift
+[247/314] Compiling GRPCCore ClientRPCExecutor.swift
+[248/314] Compiling GRPCCore ClientRequest+Convenience.swift
+[249/314] Compiling GRPCCore ClientResponse+Convenience.swift
+[250/314] Compiling GRPCCore ClientStreamExecutor.swift
+[251/314] Compiling GRPCCore RetryDelaySequence.swift
+[252/314] Compiling GRPCCore ConditionalInterceptor.swift
+[253/314] Compiling GRPCCore ServerCancellationManager.swift
+[254/314] Compiling GRPCCore ServerRPCExecutor.swift
+[255/314] Compiling GRPCCore RPCRouter.swift
+[256/314] Compiling GRPCCore RegistrableRPCService.swift
+[257/314] Compiling GRPCCore ServerContext+RPCCancellationHandle.swift
+[258/314] Compiling GRPCCore ServerContext.swift
+[259/314] Compiling GRPCCore ServerInterceptor.swift
+[260/314] Compiling GRPCCore ServerRequest.swift
+[261/314] Compiling GRPCCore ServerResponse.swift
+[262/314] Compiling GRPCCore Coding.swift
+[263/314] Compiling GRPCCore CompressionAlgorithm.swift
+[264/314] Compiling GRPCCore GRPCContiguousBytes.swift
+[265/314] Compiling GRPCCore MethodConfig.swift
+[266/314] Compiling GRPCCore ServiceConfig.swift
+[267/314] Compiling GRPCCore GRPCClient.swift
+[268/314] Compiling GRPCCore GRPCServer.swift
+[269/314] Compiling GRPCCore Base64.swift
+[270/314] Compiling GRPCCore UnsafeTransfer.swift
+[271/314] Compiling GRPCCore Metadata+GRPC.swift
+[272/314] Compiling GRPCCore MethodConfigs.swift
+[273/314] Compiling GRPCCore Result+Catching.swift
+[274/314] Compiling GRPCCore String+Extensions.swift
+[275/314] Compiling GRPCCore TaskGroup+CancellableTask.swift
+[276/314] Compiling GRPCCore Metadata.swift
+[277/314] Compiling GRPCCore MethodDescriptor.swift
+[278/314] Compiling GRPCCore RPCError.swift
+[279/314] Compiling GRPCCore RuntimeError.swift
+[280/334] Compiling GRPCCore ServiceDescriptor.swift
+[281/334] Compiling GRPCCore Status.swift
+[282/334] Compiling GRPCCore AsyncSequenceOfOne.swift
+[283/334] Compiling GRPCCore BroadcastAsyncSequence+RPCWriter.swift
+[284/334] Compiling GRPCCore BroadcastAsyncSequence.swift
+[285/334] Compiling GRPCCore GRPCAsyncThrowingStream.swift
+[286/334] Compiling GRPCCore RPCWriter+Map.swift
+[287/334] Compiling GRPCCore RPCWriter+MessageToRPCResponsePart.swift
+[288/334] Compiling GRPCCore RPCWriter+Serialize.swift
+[289/334] Compiling GRPCCore UncheckedAsyncIteratorSequence.swift
+[290/334] Compiling GRPCCore RPCAsyncSequence.swift
+[291/334] Compiling GRPCCore RPCWriter+Closable.swift
+[292/334] Compiling GRPCCore RPCWriter.swift
+[293/334] Compiling GRPCCore RPCWriterProtocol.swift
+[294/334] Compiling GRPCCore Timeout.swift
+[295/334] Compiling GRPCCore ClientTransport.swift
+[296/334] Compiling GRPCCore RPCParts.swift
+[297/334] Compiling GRPCCore RPCStream.swift
+[298/334] Compiling GRPCCore RetryThrottle.swift
+[299/334] Compiling GRPCCore ServerTransport.swift
+[299/334] Compiling CGRPCNIOTransportZlib empty.c
+[300/334] Write sources
+[301/334] Compiling c-atomics.c
+[303/353] Compiling SwiftProtobuf TextFormatEncodingOptions.swift
+[304/353] Compiling SwiftProtobuf TextFormatEncodingVisitor.swift
+[305/353] Compiling SwiftProtobuf TextFormatScanner.swift
+[306/353] Compiling SwiftProtobuf TimeUtils.swift
+[307/353] Compiling SwiftProtobuf UnknownStorage.swift
+[308/353] Compiling SwiftProtobuf UnsafeRawPointer+Shims.swift
+[309/353] Compiling SwiftProtobuf Varint.swift
+[310/353] Compiling SwiftProtobuf Version.swift
+[311/353] Compiling SwiftProtobuf Visitor.swift
+[312/353] Compiling SwiftProtobuf WireFormat.swift
+[313/353] Compiling SwiftProtobuf ZigZag.swift
+[314/353] Compiling SwiftProtobuf any.pb.swift
+[315/353] Compiling SwiftProtobuf api.pb.swift
+[316/353] Compiling SwiftProtobuf descriptor.pb.swift
+[317/353] Compiling SwiftProtobuf duration.pb.swift
+[318/353] Compiling SwiftProtobuf empty.pb.swift
+[319/353] Compiling SwiftProtobuf field_mask.pb.swift
+[320/353] Compiling SwiftProtobuf source_context.pb.swift
+[321/353] Compiling SwiftProtobuf struct.pb.swift
+[322/353] Compiling SwiftProtobuf timestamp.pb.swift
+[323/353] Compiling SwiftProtobuf type.pb.swift
+[324/353] Compiling SwiftProtobuf wrappers.pb.swift
+[325/353] Compiling SwiftProtobuf resource_bundle_accessor.swift
+[326/362] Compiling GRPCProtobuf error_details.pb.swift
+[327/362] Compiling Atomics AtomicReference.swift
+[328/362] Compiling Atomics AtomicStorage.swift
+[329/362] Compiling Atomics AtomicValue.swift
+[330/362] Compiling Atomics AtomicMemoryOrderings.swift
+[331/362] Compiling Atomics DoubleWord.swift
+[332/368] Compiling GRPCProtobuf Coding.swift
+[333/368] Compiling GRPCProtobuf ContiguousBytesAdapter.swift
+[334/368] Compiling GRPCProtobuf ErrorDetails+AnyPacking.swift
+[335/368] Compiling GRPCProtobuf ErrorDetails+CustomStringConvertible.swift
+[336/368] Emitting module NIOConcurrencyHelpers
+[337/370] Compiling Atomics ManagedAtomic.swift
+[338/370] Compiling Atomics ManagedAtomicLazyReference.swift
+[339/370] Compiling Atomics UnsafeAtomic.swift
+[340/370] Compiling Atomics UnsafeAtomicLazyReference.swift
+[341/370] Compiling Atomics IntegerOperations.swift
+[342/370] Compiling Atomics Unmanaged extensions.swift
+[343/370] Emitting module GRPCProtobuf
+[344/373] Compiling GRPCProtobuf status.pb.swift
+[345/373] Compiling GRPCProtobuf GoogleRPCStatus.swift
+[346/373] Compiling GRPCProtobuf RPCError+GoogleRPCStatus.swift
+[347/373] Compiling NIOConcurrencyHelpers atomics.swift
+[348/373] Compiling NIOConcurrencyHelpers lock.swift
+[349/373] Emitting module Atomics
+[356/373] Compiling GRPCProtobuf code.pb.swift
+[357/422] Compiling NIOCore AsyncChannelInboundStream.swift
+[358/422] Compiling NIOCore AsyncChannelOutboundWriter.swift
+[359/422] Compiling NIOCore NIOAsyncSequenceProducer.swift
+[360/422] Compiling NIOCore NIOAsyncSequenceProducerStrategies.swift
+[361/422] Compiling NIOCore AddressedEnvelope.swift
+[362/422] Compiling NIOCore AsyncAwaitSupport.swift
+[363/422] Compiling NIOCore AsyncChannel.swift
+[364/422] Compiling NIOCore AsyncChannelHandler.swift
+[365/422] Compiling NIOCore ChannelInvoker.swift
+[366/422] Compiling NIOCore ChannelOption.swift
+[367/422] Compiling NIOCore ChannelPipeline.swift
+[368/422] Compiling NIOCore CircularBuffer.swift
+[369/422] Compiling NIOCore Codec.swift
+[370/422] Compiling NIOCore ConvenienceOptionSupport.swift
+[371/422] Compiling NIOCore DeadChannel.swift
+[372/422] Compiling NIOCore DispatchQueue+WithFuture.swift
+[373/422] Compiling NIOCore EventLoop+Deprecated.swift
+[374/422] Compiling NIOCore EventLoop+SerialExecutor.swift
+[375/422] Compiling NIOCore EventLoop.swift
+[376/422] Compiling NIOCore EventLoopFuture+AssumeIsolated.swift
+[377/422] Compiling NIOCore EventLoopFuture+Deprecated.swift
+[378/422] Compiling NIOCore EventLoopFuture+WithEventLoop.swift
+[379/422] Compiling NIOCore EventLoopFuture.swift
+[380/422] Compiling NIOCore FileDescriptor.swift
+[381/422] Compiling NIOCore FileHandle.swift
+[382/422] Compiling NIOCore FileRegion.swift
+[383/422] Compiling NIOCore GlobalSingletons.swift
+[384/422] Compiling NIOCore IO.swift
+[385/422] Compiling NIOCore IOData.swift
+[386/422] Compiling NIOCore IPProtocol.swift
+[387/422] Compiling NIOCore IntegerBitPacking.swift
+[388/422] Compiling NIOCore IntegerTypes.swift
+[389/445] Compiling NIOCore Interfaces.swift
+[390/445] Compiling NIOCore Linux.swift
+[391/445] Compiling NIOCore MarkedCircularBuffer.swift
+[392/445] Compiling NIOCore MulticastChannel.swift
+[393/445] Compiling NIOCore NIOAny.swift
+[394/445] Compiling NIOCore NIOCloseOnErrorHandler.swift
+[395/445] Compiling NIOCore NIOCoreSendableMetatype.swift
+[396/445] Compiling NIOCore NIODecodedAsyncSequence.swift
+[397/445] Compiling NIOCore NIOLoopBound.swift
+[398/445] Compiling NIOCore NIOPooledRecvBufferAllocator.swift
+[399/445] Compiling NIOCore NIOScheduledCallback.swift
+[400/445] Compiling NIOCore NIOSendable.swift
+[401/445] Compiling NIOCore NIOSplitLinesMessageDecoder.swift
+[402/445] Compiling NIOCore NIOTransportAccessibleChannelCore.swift
+[403/445] Compiling NIOCore RecvByteBufferAllocator.swift
+[404/445] Compiling NIOCore SingleStepByteToMessageDecoder.swift
+[405/445] Compiling NIOCore SocketAddresses.swift
+[406/445] Compiling NIOCore SocketOptionProvider.swift
+[407/445] Compiling NIOCore SystemCallHelpers.swift
+[408/445] Compiling NIOCore TimeAmount+Duration.swift
+[409/445] Compiling NIOCore TypeAssistedChannelHandler.swift
+[410/445] Compiling NIOCore UniversalBootstrapSupport.swift
+[411/445] Compiling NIOCore Utilities.swift
+[412/445] Emitting module NIOCore
+[421/445] Compiling NIOCore NIOAsyncWriter.swift
+[422/445] Compiling NIOCore NIOThrowingAsyncSequenceProducer.swift
+[423/445] Compiling NIOCore BSDSocketAPI.swift
+[424/445] Compiling NIOCore ByteBuffer-aux.swift
+[425/445] Compiling NIOCore ByteBuffer-binaryEncodedLengthPrefix.swift
+[426/445] Compiling NIOCore ByteBuffer-conversions.swift
+[427/445] Compiling NIOCore ByteBuffer-core.swift
+[428/445] Compiling NIOCore ByteBuffer-hex.swift
+[429/445] Compiling NIOCore ByteBuffer-int.swift
+[430/445] Compiling NIOCore ByteBuffer-lengthPrefix.swift
+[431/445] Compiling NIOCore ByteBuffer-multi-int.swift
+[432/445] Compiling NIOCore ByteBuffer-quicBinaryEncodingStrategy.swift
+[433/445] Compiling NIOCore ByteBuffer-views.swift
+[434/445] Compiling NIOCore Channel.swift
+[435/445] Compiling NIOCore ChannelHandler.swift
+[436/445] Compiling NIOCore ChannelHandlers.swift
+[437/490] Compiling NIOFoundationEssentialsCompat Codable+ByteBuffer.swift
+[438/490] Compiling NIOEmbedded AsyncTestingEventLoop.swift
+[439/491] Emitting module NIOEmbedded
+[440/491] Compiling NIOEmbedded AsyncTestingChannel.swift
+[441/491] Compiling NIOFoundationEssentialsCompat ByteBuffer-foundation.swift
+[442/491] Emitting module NIOFoundationEssentialsCompat
+[443/491] Compiling NIOEmbedded Embedded.swift
+[444/491] Emitting module NIOPosix
+[445/510] Compiling NIOPosix LinuxCPUSet.swift
+[446/510] Compiling NIOPosix LinuxUring.swift
+[447/510] Compiling NIOPosix MultiThreadedEventLoopGroup.swift
+[448/510] Compiling NIOPosix NIOPosixSendableMetatype.swift
+[449/510] Compiling NIOPosix NIORandomizedDNSResolver.swift
+[450/510] Compiling NIOPosix NIOThreadPool.swift
+[451/510] Compiling NIOPosix NonBlockingFileIO.swift
+[452/510] Compiling NIOPosix PendingDatagramWritesManager.swift
+[453/510] Compiling NIOPosix PendingWritesManager.swift
+[454/510] Compiling NIOPosix PipeChannel.swift
+[455/510] Compiling NIOPosix PipePair.swift
+[456/510] Compiling NIOPosix Pool.swift
+[457/510] Compiling NIOPosix PosixSingletons+ConcurrencyTakeOver.swift
+[458/510] Compiling NIOPosix PosixSingletons.swift
+[459/510] Compiling NIOPosix RawSocketBootstrap.swift
+[460/510] Compiling NIOPosix Resolver.swift
+[461/510] Compiling NIOPosix Selectable.swift
+[462/510] Compiling NIOPosix SelectableChannel.swift
+[463/510] Compiling NIOPosix SelectableEventLoop.swift
+[464/510] Compiling NIOPosix BSDSocketAPICommon.swift
+[465/510] Compiling NIOPosix BSDSocketAPIPosix.swift
+[466/510] Compiling NIOPosix BSDSocketAPIWindows.swift
+[467/510] Compiling NIOPosix BaseSocket.swift
+[468/510] Compiling NIOPosix BaseSocketChannel+AccessibleTransport.swift
+[469/510] Compiling NIOPosix BaseSocketChannel+SocketOptionProvider.swift
+[470/510] Compiling NIOPosix BaseSocketChannel.swift
+[471/510] Compiling NIOPosix BaseStreamSocketChannel.swift
+[472/510] Compiling NIOPosix Bootstrap.swift
+[473/510] Compiling NIOPosix ControlMessage.swift
+[474/510] Compiling NIOPosix DatagramVectorReadManager.swift
+[475/510] Compiling NIOPosix Errors+Any.swift
+[476/510] Compiling NIOPosix FileDescriptor.swift
+[477/510] Compiling NIOPosix GetaddrinfoResolver.swift
+[478/510] Compiling NIOPosix HappyEyeballs.swift
+[479/510] Compiling NIOPosix IO.swift
+[480/510] Compiling NIOPosix IntegerBitPacking.swift
+[481/510] Compiling NIOPosix IntegerTypes.swift
+[482/510] Compiling NIOPosix Linux.swift
+[483/510] Compiling NIOPosix SelectorEpoll.swift
+[484/510] Compiling NIOPosix SelectorGeneric.swift
+[485/510] Compiling NIOPosix SelectorKqueue.swift
+[486/510] Compiling NIOPosix SelectorUring.swift
+[487/510] Compiling NIOPosix SelectorWSAPoll.swift
+[488/510] Compiling NIOPosix ServerSocket.swift
+[489/510] Compiling NIOPosix Socket.swift
+[490/510] Compiling NIOPosix SocketChannel.swift
+[491/510] Compiling NIOPosix SocketProtocols.swift
+[492/510] Compiling NIOPosix StructuredConcurrencyHelpers.swift
+[493/510] Compiling NIOPosix System.swift
+[494/510] Compiling NIOPosix Thread.swift
+[495/510] Compiling NIOPosix ThreadPosix.swift
+[496/510] Compiling NIOPosix ThreadWindows.swift
+[497/510] Compiling NIOPosix Utilities.swift
+[498/510] Compiling NIOPosix VsockAddress.swift
+[499/510] Compiling NIOPosix VsockChannelEvents.swift
+[500/510] Compiling NIOPosix Windows.swift
+[501/510] Compiling NIOPosix resource_bundle_accessor.swift
+[502/512] Emitting module NIO
+[503/512] Compiling NIO Exports.swift
+[504/533] Compiling NIOFoundationCompat JSONSerialization+ByteBuffer.swift
+[505/533] Compiling NIOFoundationCompat Exports.swift
+[506/534] Emitting module NIOFoundationCompat
+[507/534] Compiling NIOFoundationCompat WaitSpinningRunLoop.swift
+[508/534] Compiling NIOHTTP1 HTTPEncoder.swift
+[509/534] Compiling NIOHTTP1 HTTPHeaderValidator.swift
+[510/534] Emitting module NIOTLS
+[511/534] Compiling NIOHTTP1 ByteCollectionUtils.swift
+[512/534] Compiling NIOHTTP1 HTTPDecoder.swift
+[513/535] Compiling NIOTLS TLSEvents.swift
+[514/552] Compiling NIOTransportServices NIOTSBootstraps.swift
+[515/552] Compiling NIOTransportServices NIOTSChannelOptions.swift
+[516/552] Compiling NIOTransportServices NIOTSConnectionBootstrap.swift
+[517/552] Compiling NIOTransportServices NIOTSConnectionChannel.swift
+[518/552] Compiling NIOTransportServices NIOTSErrors.swift
+[519/552] Compiling NIOTransportServices NIOTSEventLoop.swift
+[520/558] Compiling NIOTransportServices AcceptHandler.swift
+[521/558] Compiling NIOTransportServices NIOTSDatagramConnectionBootstrap.swift
+[522/558] Compiling NIOTransportServices NIOTSDatagramConnectionChannel.swift
+[523/558] Compiling NIOTransportServices NIOTSDatagramListenerBootstrap.swift
+[524/558] Compiling NIOTransportServices NIOTSDatagramListenerChannel.swift
+[525/558] Compiling NIOTransportServices NIOFilterEmptyWritesHandler.swift
+[526/558] Emitting module NIOHTTP1
+[527/558] Emitting module NIOTransportServices
+[528/565] Compiling NIOHTTP1 NIOHTTPClientUpgradeHandler.swift
+[529/565] Compiling NIOHTTP1 NIOHTTPObjectAggregator.swift
+[530/565] Compiling NIOHTTP1 NIOTypedHTTPClientUpgradeHandler.swift
+[531/565] Compiling NIOHTTP1 NIOTypedHTTPClientUpgraderStateMachine.swift
+[532/565] Compiling NIOTransportServices NIOTSSingletons.swift
+[533/565] Compiling NIOTransportServices SocketAddress+NWEndpoint.swift
+[534/588] Compiling NIOExtras LineBasedFrameDecoder.swift
+[535/588] Compiling NIOExtras MarkedCircularBuffer+PopFirstCheckMarked.swift
+[536/588] Compiling NIOExtras NIOExtrasError.swift
+[537/588] Compiling NIOExtras NIOLengthFieldBitLength.swift
+[538/588] Compiling NIOExtras NIORequestIdentifiable.swift
+[542/588] Compiling NIOExtras DebugInboundEventsHandler.swift
+[543/588] Compiling NIOExtras DebugOutboundEventsHandler.swift
+[544/588] Compiling NIOExtras FixedLengthFrameDecoder.swift
+[545/588] Compiling NIOExtras HTTP1ProxyConnectHandler.swift
+[546/588] Compiling NIOExtras JSONRPCFraming+ContentLengthHeader.swift
+[547/588] Compiling NIOExtras JSONRPCFraming.swift
+[548/588] Compiling NIOExtras LengthFieldBasedFrameDecoder.swift
+[549/588] Compiling NIOExtras LengthFieldPrepender.swift
+[550/588] Emitting module NIOExtras
+[564/594] Emitting module NIOHPACK
+[573/597] Compiling NIOExtras RequestResponseHandlers+State.swift
+[574/597] Compiling NIOExtras RequestResponseWithIDHandler.swift
+[575/597] Compiling NIOExtras WritePCAPHandler.swift
+[576/597] Compiling NIOTransportServices StateManagedListenerChannel.swift
+[577/597] Compiling NIOTransportServices StateManagedNWConnectionChannel.swift
+[578/597] Compiling NIOTransportServices TCPOptions+SocketChannelOption.swift
+[579/597] Compiling NIOTransportServices UDPOptions+SocketChannelOption.swift
+[580/597] Compiling NIOHPACK IndexedHeaderTable.swift
+[581/597] Compiling NIOHPACK IntegerCoding.swift
+[582/597] Compiling NIOHPACK StaticHeaderTable.swift
+[583/645] Compiling NIOHTTP2 HTTP2ChannelHandler.swift
+[584/645] Compiling NIOHTTP2 HTTP2CommonInboundStreamMultiplexer.swift
+[585/645] Compiling NIOHTTP2 HTTP2ConnectionStateChange.swift
+[586/645] Compiling NIOHTTP2 HTTP2Error.swift
+[587/645] Compiling NIOHTTP2 HTTP2ErrorCode.swift
+[588/645] Compiling NIOHTTP2 HTTP2FlowControlWindow.swift
+[589/645] Compiling NIOHTTP2 ConnectionStateMachine.swift
+[590/645] Compiling NIOHTTP2 ConnectionStreamsState.swift
+[591/645] Compiling NIOHTTP2 MayReceiveFrames.swift
+[592/645] Compiling NIOHTTP2 ReceivingDataState.swift
+[593/645] Compiling NIOHTTP2 ReceivingGoAwayState.swift
+[594/645] Compiling NIOHTTP2 ReceivingHeadersState.swift
+[595/645] Compiling NIOHTTP2 ReceivingPushPromiseState.swift
+[596/645] Compiling NIOHTTP2 ReceivingRstStreamState.swift
+[597/645] Compiling NIOHTTP2 ReceivingWindowUpdateState.swift
+[598/645] Compiling NIOHTTP2 MaySendFrames.swift
+[599/645] Compiling NIOHTTP2 SendingDataState.swift
+[600/645] Compiling NIOHTTP2 SendingGoawayState.swift
+[601/645] Compiling NIOHTTP2 SendingHeadersState.swift
+[602/645] Compiling NIOHTTP2 SendingPushPromiseState.swift
+[603/645] Compiling NIOHTTP2 SendingRstStreamState.swift
+[604/645] Compiling NIOHTTP2 SendingWindowUpdateState.swift
+[605/645] Compiling NIOHTTP2 HTTP2SettingsState.swift
+[606/645] Compiling NIOHTTP2 HasExtendedConnectSettings.swift
+[607/645] Compiling NIOHTTP2 HasFlowControlWindows.swift
+[608/645] Compiling NIOHTTP2 HasLocalSettings.swift
+[609/645] Compiling NIOHTTP2 HasRemoteSettings.swift
+[610/645] Compiling NIOHTTP2 LocallyQuiescingState.swift
+[611/645] Compiling NIOHTTP2 QuiescingState.swift
+[612/645] Compiling NIOHTTP2 RemotelyQuiescingState.swift
+[613/668] Compiling NIOHTTP2 HTTP2PipelineHelpers.swift
+[614/668] Compiling NIOHTTP2 HTTP2Settings.swift
+[615/668] Compiling NIOHTTP2 HTTP2Stream.swift
+[616/668] Compiling NIOHTTP2 HTTP2StreamChannel+OutboundStreamMultiplexer.swift
+[617/668] Compiling NIOHTTP2 HTTP2StreamChannel.swift
+[618/668] Compiling NIOHTTP2 HTTP2StreamDelegate.swift
+[619/668] Compiling NIOHTTP2 HTTP2StreamID.swift
+[620/668] Compiling NIOHTTP2 HTTP2StreamMultiplexer.swift
+[621/668] Compiling NIOHTTP2 HTTP2ToHTTP1Codec.swift
+[622/668] Compiling NIOHTTP2 HTTP2UserEvents.swift
+[623/668] Compiling NIOHTTP2 InboundEventBuffer.swift
+[624/668] Compiling NIOHTTP2 InboundWindowManager.swift
+[625/668] Compiling NIOHTTP2 MultiplexerAbstractChannel.swift
+[626/668] Compiling NIOHTTP2 NIOHTTP2FrameDelegate.swift
+[627/668] Compiling NIOHTTP2 NIOHTTP2ServerConnectionManagementHandler+StateMachine.swift
+[628/668] Compiling NIOHTTP2 NIOHTTP2ServerConnectionManagementHandler.swift
+[629/668] Compiling NIOHTTP2 StreamChannelFlowController.swift
+[630/668] Compiling NIOHTTP2 StreamChannelList.swift
+[631/668] Compiling NIOHTTP2 StreamMap.swift
+[632/668] Compiling NIOHTTP2 StreamStateMachine.swift
+[633/668] Compiling NIOHTTP2 Timer.swift
+[634/668] Compiling NIOHTTP2 UnsafeTransfer.swift
+[635/668] Compiling NIOHTTP2 WatermarkedFlowController.swift
+[636/668] Emitting module NIOHTTP2
+[637/668] Compiling NIOHTTP2 SendAndReceiveGoawayState.swift
+[638/668] Compiling NIOHTTP2 StateMachineResult.swift
+[639/668] Compiling NIOHTTP2 ContentLengthVerifier.swift
+[640/668] Compiling NIOHTTP2 DOSHeuristics.swift
+[641/668] Compiling NIOHTTP2 Error+Any.swift
+[642/668] Compiling NIOHTTP2 ConcurrentStreamBuffer.swift
+[643/668] Compiling NIOHTTP2 ControlFrameBuffer.swift
+[644/668] Compiling NIOHTTP2 OutboundFlowControlBuffer.swift
+[645/668] Compiling NIOHTTP2 OutboundFrameBuffer.swift
+[646/668] Compiling NIOHTTP2 GlitchesMonitor.swift
+[647/668] Compiling NIOHTTP2 HPACKHeaders+Validation.swift
+[648/668] Compiling NIOHTTP2 HTTP2ChannelHandler+InboundStreamMultiplexer.swift
+[649/668] Compiling NIOHTTP2 HTTP2ChannelHandler+InlineStreamMultiplexer.swift
+[656/668] Compiling NIOHTTP2 HTTP2Frame.swift
+[657/668] Compiling NIOHTTP2 HTTP2FrameEncoder.swift
+[658/668] Compiling NIOHTTP2 HTTP2FrameParser.swift
+[659/668] Compiling NIOHTTP2 HTTP2PingData.swift
+[660/713] Emitting module GRPCNIOTransportCore
+[661/713] Compiling GRPCNIOTransportCore SocketAddress.swift
+[662/713] Compiling GRPCNIOTransportCore WrappedChannel+Config.swift
+[663/713] Compiling GRPCNIOTransportCore WrappedChannel+State.swift
+[664/713] Compiling GRPCNIOTransportCore WrappedChannel.swift
+[665/713] Compiling GRPCNIOTransportCore CompressionAlgorithm.swift
+[666/713] Compiling GRPCNIOTransportCore Zlib.swift
+[667/713] Compiling GRPCNIOTransportCore GRPCMessageDecoder.swift
+[668/713] Compiling GRPCNIOTransportCore GRPCMessageFramer.swift
+[669/713] Compiling GRPCNIOTransportCore GRPCNIOTransportBytes.swift
+[670/713] Compiling GRPCNIOTransportCore GRPCStreamStateMachine.swift
+[671/713] Compiling GRPCNIOTransportCore Base64.swift
+[672/713] Compiling GRPCNIOTransportCore CallOptions+MethodConfig.swift
+[673/713] Compiling GRPCNIOTransportCore Channel+AddressInfo.swift
+[674/713] Compiling GRPCNIOTransportCore ConstantAsyncSequence.swift
+[675/713] Compiling GRPCNIOTransportCore ContentType.swift
+[676/713] Compiling GRPCNIOTransportCore DebugOnly.swift
+[677/713] Compiling GRPCNIOTransportCore DiscardingTaskGroup+CancellableHandle.swift
+[678/713] Compiling GRPCNIOTransportCore EventLoopFuture+ChannelInitializer.swift
+[679/713] Compiling GRPCNIOTransportCore FlushCoalescingHandler.swift
+[680/713] Compiling GRPCNIOTransportCore GRPCStatusMessageMarshaller.swift
+[681/713] Compiling GRPCNIOTransportCore IPv6ScopeID.swift
+[682/713] Compiling GRPCNIOTransportCore MethodConfigs.swift
+[683/713] Compiling GRPCNIOTransportCore Backoff.swift
+[684/713] Compiling GRPCNIOTransportCore ClientConnectionHandler.swift
+[685/713] Compiling GRPCNIOTransportCore Connection.swift
+[686/713] Compiling GRPCNIOTransportCore ConnectionFactory.swift
+[687/713] Compiling GRPCNIOTransportCore ConnectivityState.swift
+[688/713] Compiling GRPCNIOTransportCore GRPCChannel.swift
+[689/713] Compiling GRPCNIOTransportCore LoadBalancer.swift
+[690/713] Compiling GRPCNIOTransportCore LoadBalancerEvent.swift
+[691/713] Compiling GRPCNIOTransportCore PickFirstLoadBalancer.swift
+[692/713] Compiling GRPCNIOTransportCore RoundRobinLoadBalancer.swift
+[693/713] Compiling GRPCNIOTransportCore Subchannel.swift
+[694/713] Compiling GRPCNIOTransportCore RequestQueue.swift
+[695/713] Compiling GRPCNIOTransportCore GRPCClientStreamHandler.swift
+[696/713] Compiling GRPCNIOTransportCore HTTP2ClientTransport.swift
+[697/713] Compiling GRPCNIOTransportCore DNSResolver.swift
+[698/713] Compiling GRPCNIOTransportCore NameResolver+DNS.swift
+[699/713] Compiling GRPCNIOTransportCore NameResolver+IPv4.swift
+[700/713] Compiling GRPCNIOTransportCore NameResolver+IPv6.swift
+[701/713] Compiling GRPCNIOTransportCore NameResolver+UDS.swift
+[702/713] Compiling GRPCNIOTransportCore NameResolver+VSOCK.swift
+[703/713] Compiling GRPCNIOTransportCore NameResolver.swift
+[704/713] Compiling GRPCNIOTransportCore NameResolverRegistry.swift
+[705/735] Compiling GRPCNIOTransportCore MethodDescriptor+IsKnown.swift
+[706/735] Compiling GRPCNIOTransportCore NIOChannel+WaitForActive.swift
+[707/735] Compiling GRPCNIOTransportCore NIOChannelPipeline+GRPC.swift
+[708/735] Compiling GRPCNIOTransportCore NIOSocketAddress+GRPCSocketAddress.swift
+[709/735] Compiling GRPCNIOTransportCore PercentEncoding.swift
+[710/735] Compiling GRPCNIOTransportCore ProcessUniqueID.swift
+[711/735] Compiling GRPCNIOTransportCore Result+Catching.swift
+[712/735] Compiling GRPCNIOTransportCore Timer.swift
+[713/735] Compiling GRPCNIOTransportCore ListeningServerTransport.swift
+[714/735] Compiling GRPCNIOTransportCore OneOrManyQueue.swift
+[715/735] Compiling GRPCNIOTransportCore GRPCServerFlushNotificationHandler.swift
+[716/735] Compiling GRPCNIOTransportCore ServerConnection.swift
+[717/735] Compiling GRPCNIOTransportCore ServerConnectionManagementHandler+StateMachine.swift
+[718/735] Compiling GRPCNIOTransportCore ServerConnectionManagementHandler.swift
+[719/735] Compiling GRPCNIOTransportCore ConnectionConfigurator.swift
+[720/735] Compiling GRPCNIOTransportCore CustomTransport.swift
+[721/735] Compiling GRPCNIOTransportCore GRPCServerStreamHandler.swift
+[722/735] Compiling GRPCNIOTransportCore HTTP2ServerTransport.swift
+[723/735] Compiling GRPCNIOTransportCore ListenerConfigurator.swift
+[724/735] Compiling GRPCNIOTransportCore ListenerFactory.swift
+[725/735] Compiling GRPCNIOTransportCore TLSConfig+Internal.swift
+[726/735] Compiling GRPCNIOTransportCore TLSConfig.swift
+[727/739] Compiling GRPCNIOTransportHTTP2TransportServices Config+TLS.swift
+[728/739] Compiling GRPCNIOTransportHTTP2TransportServices Exports.swift
+[729/739] Emitting module GRPCNIOTransportHTTP2TransportServices
+[730/739] Compiling GRPCNIOTransportHTTP2TransportServices HTTP2ClientTransport+TransportServices.swift
+[731/740] Compiling GRPCNIOTransportHTTP2TransportServices HTTP2ServerTransport+TransportServices.swift
+[732/746] Compiling VoiceInkNVIDIA riva_asr.grpc.swift
+[733/746] Compiling VoiceInkNVIDIA riva_asr.pb.swift
+[734/746] Compiling VoiceInkNVIDIA riva_audio.pb.swift
+[735/746] Emitting module VoiceInkNVIDIA
+[736/746] Compiling VoiceInkNVIDIA riva_common.pb.swift
+[737/746] Compiling VoiceInkNVIDIA NVIDIAParakeet.swift
+[738/748] Compiling VoiceInkNVIDIA NVIDIAParakeetClient.swift
+[739/748] Compiling VoiceInkNVIDIA resource_bundle_accessor.swift
+[740/781] Compiling VoiceInkCore AIProviderCatalog.swift
+[741/781] Compiling VoiceInkCore AppIdentity.swift
+[742/781] Compiling VoiceInkCore AudioPlaybackTimeline.swift
+[743/781] Compiling VoiceInkCore AudioPreRoll.swift
+[744/781] Compiling VoiceInkCore AudioRoutingPolicy.swift
+[745/781] Compiling VoiceInkCore AudioTranscriptionService.swift
+[746/781] Compiling VoiceInkCore CustomCloudModelPolicy.swift
+[747/781] Compiling VoiceInkCore CustomPrompt.swift
+[748/781] Compiling VoiceInkCore DashboardMetrics.swift
+[749/781] Compiling VoiceInkCore DictationPolish.swift
+[750/781] Compiling VoiceInkCore DictationProfile.swift
+[751/781] Compiling VoiceInkCore DictionaryPolicy.swift
+[752/781] Compiling VoiceInkCore HistoryCleanupPolicy.swift
+[753/781] Compiling VoiceInkCore IOSDiagnostics.swift
+[754/781] Compiling VoiceInkCore IOSEnhancementBehavior.swift
+[755/781] Compiling VoiceInkCore IOSHelpSupportPresentation.swift
+[756/796] Compiling VoiceInkCore IOSKeyboardDeliveryPolicy.swift
+[757/796] Compiling VoiceInkCore IOSMicrophonePermissionPresentation.swift
+[758/796] Compiling VoiceInkCore IOSRecordingFeedback.swift
+[759/796] Compiling VoiceInkCore IOSSettingsBackup.swift
+[760/796] Compiling VoiceInkCore LanguageCatalog.swift
+[761/796] Compiling VoiceInkCore LatencyTrace.swift
+[762/796] Compiling VoiceInkCore LicensePolicy.swift
+[763/796] Compiling VoiceInkCore LocalOnboardingModelChoice.swift
+[764/796] Compiling VoiceInkCore LocalWhisperTranscriptionFlow.swift
+[765/796] Compiling VoiceInkCore Mode.swift
+[766/796] Compiling VoiceInkCore OnboardingPresentation.swift
+[767/796] Compiling VoiceInkCore PCM16AudioSamples.swift
+[768/796] Compiling VoiceInkCore PowerModePolicy.swift
+[769/796] Compiling VoiceInkCore ProviderAPIKeyState.swift
+[770/796] Compiling VoiceInkCore ProviderCatalog.swift
+[771/796] Compiling VoiceInkCore RecordingStatePolicy.swift
+[772/796] Emitting module VoiceInkCore
+[773/796] Compiling VoiceInkCore RemoteTransport.swift
+[774/796] Compiling VoiceInkCore SpokenSnippets.swift
+[775/796] Compiling VoiceInkCore StoredAudioFile.swift
+[776/796] Compiling VoiceInkCore StreamingStartupResolutionPolicy.swift
+[777/796] Compiling VoiceInkCore SubscriptionPlanPolicy.swift
+[778/796] Compiling VoiceInkCore TranscriptPresentation.swift
+[779/796] Compiling VoiceInkCore TranscriptionCleanupPreferences.swift
+[780/796] Compiling VoiceInkCore TranscriptionModelCatalog.swift
+[781/796] Compiling VoiceInkCore TranscriptionRecord.swift
+[782/796] Compiling VoiceInkCore TranscriptionRunProcessor.swift
+[783/796] Compiling VoiceInkCore TranscriptionStreamingPreference.swift
+[784/796] Compiling VoiceInkCore UpdateExperience.swift
+[785/796] Compiling VoiceInkCore UserDefaultsPreferences.swift
+[786/796] Compiling VoiceInkCore WhisperModelFiles.swift
+[787/796] Compiling VoiceInkCore WritingActions.swift
+[788/805] Compiling NewLocalCLIProbe LocalCLIService.swift
+[789/805] Compiling RawLocalCLIProbe LocalCLIService.swift
+[790/805] Compiling OldLocalCLIProbe LocalCLIService.swift
+[791/805] Emitting module OldLocalCLIProbe
+[792/805] Compiling OldLocalCLIProbe CommonProbe.swift
+[793/805] Emitting module NewLocalCLIProbe
+[794/805] Compiling NewLocalCLIProbe CommonProbe.swift
+[794/805] Write Objects.LinkFileList
+[797/805] Emitting module RawLocalCLIProbe
+[798/805] Compiling RawLocalCLIProbe CommonProbe.swift
+[798/805] Write Objects.LinkFileList
+[799/805] Linking RawLocalCLIProbe
+[800/805] Linking NewLocalCLIProbe
+[801/805] Applying RawLocalCLIProbe
+[802/805] Linking OldLocalCLIProbe
+[803/805] Applying NewLocalCLIProbe
+[804/805] Applying OldLocalCLIProbe
+Build complete! (162.12s)

@@ -1,0 +1,25 @@
+{
+  "valid": false,
+  "classification": "invalid-or-failed",
+  "candidate_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "baseline_sha": "aaaa286a794ac6f60773ef5149a30f214c586f23",
+  "common_probe_sha256": "ddce220a60776a3b4d8a71471c8b06a607dc8e2731ec1c103d34e85b88cbb1e3",
+  "lanes": {
+    "baseline": {
+      "valid": false,
+      "classification": "invalid-or-failed",
+      "failedCases": []
+    },
+    "candidate": {
+      "valid": false,
+      "classification": "invalid-or-failed",
+      "failedCases": []
+    },
+    "raw": {
+      "valid": false,
+      "classification": "invalid-or-failed",
+      "failedCases": []
+    }
+  },
+  "scope": "Unchanged production LocalCLIService and complete real Core/NVIDIA dependencies. Direct child lifetime only. No app lifecycle, descendants, provider credentials, Keychain or TCC."
+}

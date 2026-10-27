@@ -1,0 +1,23 @@
+Executable=/Users/runner/work/_temp/local-cli-lifetime-check/RawLocalCLIProbe.app/Contents/MacOS/RawLocalCLIProbe
+Identifier=com.negentropi.RomaJustTalk.CLILifetime.raw.ec988f50c4854db48a5fd707fa23d8e6
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=79941 flags=0x2(adhoc) hashes=2490+3 location=embedded
+VersionPlatform=1
+VersionMin=917504
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=ae0bb270a060603371ef71f3998692f4288836b6
+CandidateCDHashFull sha256=ae0bb270a060603371ef71f3998692f4288836b6a86d04a040bb24b0a8b1ba4e
+Hash choices=sha256
+CMSDigest=ae0bb270a060603371ef71f3998692f4288836b6a86d04a040bb24b0a8b1ba4e
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=17121280
+Executable Segment flags=0x1
+Page size=16384
+CDHash=ae0bb270a060603371ef71f3998692f4288836b6
+Signature=adhoc
+Info.plist entries=6
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=36
+Internal requirements count=0 size=12

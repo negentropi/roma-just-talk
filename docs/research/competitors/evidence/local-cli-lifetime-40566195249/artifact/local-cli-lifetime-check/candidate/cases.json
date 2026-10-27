@@ -1,0 +1,26 @@
+[
+  {
+    "boundary" : {
+      "commandLaunched" : false,
+      "completedWithinDeadline" : true,
+      "typedCancellation" : true
+    },
+    "cleanupCompleted" : true,
+    "id" : "pre-cancelled",
+    "outcomes" : [
+      {
+        "completed" : true,
+        "errorDescription" : "CancellationError()",
+        "errorKind" : "cancellation",
+        "stdoutBytes" : 0,
+        "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timeoutSeconds" : null
+      }
+    ],
+    "passed" : true,
+    "probePID" : 6775,
+    "processes" : [
+
+    ]
+  }
+]

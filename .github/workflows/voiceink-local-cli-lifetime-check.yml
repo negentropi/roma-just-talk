@@ -24,7 +24,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Verify the result classifier
-        run: bash scripts/run-local-cli-lifetime-check.sh --self-test
+        run: |
+          git fetch --no-tags --depth=1 origin 919670ae5b918afbfad6f4d88982a481c1c4b532
+          bash scripts/run-local-cli-lifetime-check.sh --self-test
 
       - name: Select installed Xcode 26
         run: |

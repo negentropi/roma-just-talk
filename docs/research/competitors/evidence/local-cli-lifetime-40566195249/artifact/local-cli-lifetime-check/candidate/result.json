@@ -1,0 +1,38 @@
+{
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk.CLILifetime.candidate.2c6e447b2dad4a55b2ae29a522cb9b0e",
+  "cases" : [
+    {
+      "boundary" : {
+        "commandLaunched" : false,
+        "completedWithinDeadline" : true,
+        "typedCancellation" : true
+      },
+      "cleanupCompleted" : true,
+      "id" : "pre-cancelled",
+      "outcomes" : [
+        {
+          "completed" : true,
+          "errorDescription" : "CancellationError()",
+          "errorKind" : "cancellation",
+          "stdoutBytes" : 0,
+          "stdoutSHA256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "timeoutSeconds" : null
+        }
+      ],
+      "passed" : true,
+      "probePID" : 6775,
+      "processes" : [
+
+      ]
+    }
+  ],
+  "invalidReasons" : [
+    "READY PID\/PPID\/executable\/script arguments did not identify the direct child"
+  ],
+  "lane" : "candidate",
+  "preferencesUnchanged" : true,
+  "probePID" : 6775,
+  "setupPassed" : true,
+  "sourceSHA256" : "2e4ca951ed5ecc9d85439485f3bfa33332d85520aedbdcf12be8173c0c53369a",
+  "version" : 1
+}

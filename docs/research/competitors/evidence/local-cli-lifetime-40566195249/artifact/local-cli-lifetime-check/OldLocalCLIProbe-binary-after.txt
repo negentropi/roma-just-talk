@@ -1,0 +1,2 @@
+ce555d5d29e851f2fed9b2cea7c210a6bafee89448cdad88e8cf1dbd466c7492  /Users/runner/work/_temp/local-cli-lifetime-check/OldLocalCLIProbe.app/Contents/MacOS/OldLocalCLIProbe
+f27bde679b98f32999dab064826c6d00d793e733b1f31fd74cfead903f1e4d18  /Users/runner/work/_temp/local-cli-lifetime-check/OldLocalCLIProbe.app/Contents/Info.plist

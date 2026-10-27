@@ -1,0 +1,50 @@
+{
+  "baseline_sha": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "candidate_sha": "1f36a74614ac95aca70908f4be345d83f3e7886b",
+  "cases": {
+    "baseline": {
+      "coherent-keys": {
+        "classification": "passed",
+        "failures": []
+      },
+      "divergent-keys": {
+        "classification": "expected-metadata-mismatch",
+        "failures": [
+          "held-result-model-metadata"
+        ],
+        "result_model": "old-model",
+        "wire_model": "new-model"
+      },
+      "no-keys": {
+        "classification": "expected-metadata-mismatch",
+        "failures": [
+          "held-result-model-metadata"
+        ],
+        "result_model": "mistral",
+        "wire_model": "llama2"
+      }
+    },
+    "candidate": {
+      "coherent-keys": {
+        "classification": "passed",
+        "failures": []
+      },
+      "divergent-keys": {
+        "classification": "passed",
+        "failures": []
+      },
+      "no-keys": {
+        "classification": "passed",
+        "failures": []
+      }
+    }
+  },
+  "classification": "passed-red-green",
+  "driver_sha256": "341a3451669fedda847330f47239ed8d1b06e16da5377c883c293254260cf4b1",
+  "expected_baseline": {
+    "coherent-keys": "passed",
+    "divergent-keys": "expected-metadata-mismatch",
+    "no-keys": "expected-metadata-mismatch"
+  },
+  "scope": "Actual eleven app files, VoiceInkCore, LLMkit and 26 pinned external packages. Public loopback synthetic responses. No app lifecycle, real Ollama inference, TCC, microphone, or editor-delivery claim."
+}

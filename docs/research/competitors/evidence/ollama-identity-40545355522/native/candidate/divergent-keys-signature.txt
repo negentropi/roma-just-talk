@@ -1,0 +1,16 @@
+Executable=/Users/runner/work/_temp/writing-ollama-identity-probe/candidate/divergent-keys.app/Contents/MacOS/WritingOllamaProbe
+Identifier=com.negentropi.RomaJustTalk.WritingOllamaProbe.3dca3afbce2b42c686674c3ef1b256d1
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=60648 flags=0x2(adhoc) hashes=1887+3 location=embedded
+Hash type=sha256 size=32
+CandidateCDHash sha256=62db13009c315257ab4c32184cda32636b3b93da
+CandidateCDHashFull sha256=62db13009c315257ab4c32184cda32636b3b93daa6d4ed69af08d6dcd12c53e0
+Hash choices=sha256
+CMSDigest=62db13009c315257ab4c32184cda32636b3b93daa6d4ed69af08d6dcd12c53e0
+CMSDigestType=2
+CDHash=62db13009c315257ab4c32184cda32636b3b93da
+Signature=adhoc
+Info.plist entries=7
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=36
+Internal requirements count=0 size=12

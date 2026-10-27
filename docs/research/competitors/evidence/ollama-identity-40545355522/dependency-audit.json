@@ -1,0 +1,302 @@
+{
+  "artifact_id": 12751684342,
+  "artifact_sha256": "0760d9723c55120eee87f32ac18169a195ac1a97c1a8201295dd3f44f447a46b",
+  "same_dependencies_both_versions": true,
+  "sdk": {
+    "Sources/LLMkit/HTTPClient.swift": {
+      "git_blob": "81db783f7ab47c2b2174a4f2367c1e0f5ac1509d",
+      "sha256": "883506b61d2b000b122009c2aeb365ad24735ccb2485df8273bffe9bb7e766ee"
+    },
+    "Sources/LLMkit/HTTPHelpers.swift": {
+      "git_blob": "7b2a095d066260e194a6b6c1026807e601aaae10",
+      "sha256": "29ca971a2d85acb117993741b46e0612cc074666d52771def2222f1c5a8fb73d"
+    },
+    "Sources/LLMkit/LLM/OllamaClient.swift": {
+      "git_blob": "341c5d0d38edd79733a2da47f412e3ab540c82fb",
+      "sha256": "164b05a453f7c496e64e567f5d8d3502dd66598fe907809c0d97f95f450b14ad"
+    },
+    "Sources/LLMkit/LLMKitError.swift": {
+      "git_blob": "5db3d14e020e3bc3daba752d289aeae530f7b56e",
+      "sha256": "16cec7e074eb8a9bed7ea1799723d13590704e1082fd66c5ab32da964f5eb245"
+    }
+  },
+  "sdk_revision": "adc2239e2a3c586fd442a8ec1d96dec8e9ae8917",
+  "versions": {
+    "baseline": {
+      "package_count": 26,
+      "packages": {
+        "axswift": {
+          "revision": "2efa201fa18184de98674165592fd1ecb0c00a6d",
+          "tracked_file_count": 25,
+          "tracked_sources_dictionary_sha256": "e6df9a2ed6662a468a666c987de6d6991ce6d783c61918aec37698ef037cade0"
+        },
+        "grpc-swift-2": {
+          "revision": "ac33066eb6edb1a21a6ca172ea8184a9b06f3cc7",
+          "tracked_file_count": 437,
+          "tracked_sources_dictionary_sha256": "fcf9ccd2e712c41c338c8487b0517664db3b50ad5346b7e9e1b6a54ba8b56923"
+        },
+        "grpc-swift-nio-transport": {
+          "revision": "65adb0bc4721a6c4695e1956af9552970c06a59f",
+          "tracked_file_count": 220,
+          "tracked_sources_dictionary_sha256": "b27e7e5d67e065c041d59b95820491db18022e78b424abd8fa9b1ef9ed4c0cc6"
+        },
+        "grpc-swift-protobuf": {
+          "revision": "176c5a434fd76f6f479848d1a8f7d44967534168",
+          "tracked_file_count": 105,
+          "tracked_sources_dictionary_sha256": "27348beaa59fec1e9e4c2dbe7ce1d66ecb5411a417fb7e28bf6a5c2e4bf8ed79"
+        },
+        "keysender": {
+          "revision": "99584bf1a03ab600cc44be89a2dcd98b2dbeb9de",
+          "tracked_file_count": 9,
+          "tracked_sources_dictionary_sha256": "6e16b390c4b86966757891525d88aa38b41d1331762a23c629a1e495257611ea"
+        },
+        "llmkit": {
+          "revision": "adc2239e2a3c586fd442a8ec1d96dec8e9ae8917",
+          "tracked_file_count": 32,
+          "tracked_sources_dictionary_sha256": "3960f87dd3a7fa45019285b8b6f516607d6ecf4114b092c2f0c213e07eb699d8"
+        },
+        "selectedtextkit": {
+          "revision": "ecbf46d8be541b54296a0836b7ae2f60c0416b72",
+          "tracked_file_count": 42,
+          "tracked_sources_dictionary_sha256": "86d452710b6e090427ab92a3c740e174cdd501f6e52d1f5aaf6628692556ba66"
+        },
+        "swift-algorithms": {
+          "revision": "87e50f483c54e6efd60e885f7f5aa946cee68023",
+          "tracked_file_count": 119,
+          "tracked_sources_dictionary_sha256": "8849687a1b8f605586ed385edd99ddf4b717aee4933ede6eea04980dc5f48527"
+        },
+        "swift-asn1": {
+          "revision": "d9a5b37470adc940d22c3bcd5ca6953a516b727f",
+          "tracked_file_count": 212,
+          "tracked_sources_dictionary_sha256": "354e7b204b822de5ae3064b1cb09504cc6e2a9fb3c734ba5f91d1504f9ac1a86"
+        },
+        "swift-async-algorithms": {
+          "revision": "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+          "tracked_file_count": 208,
+          "tracked_sources_dictionary_sha256": "a5d3cd87b0cad21f0eb28671d8916fc8461e145e8276c46db310e16e188c8623"
+        },
+        "swift-atomics": {
+          "revision": "b601256eab081c0f92f059e12818ac1d4f178ff7",
+          "tracked_file_count": 144,
+          "tracked_sources_dictionary_sha256": "e3608a3ac996f4185b9baedfe5e64d5a4a925189a1de53f5c515dd9f8b6f9483"
+        },
+        "swift-certificates": {
+          "revision": "84f03fafeca28c19f5fc4b528df3d22ce8896bd7",
+          "tracked_file_count": 365,
+          "tracked_sources_dictionary_sha256": "503494d0f8ccb13de6ad164f6cfafc4377a759e53151e21739ca69a9d2fb2fda"
+        },
+        "swift-collections": {
+          "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+          "tracked_file_count": 842,
+          "tracked_sources_dictionary_sha256": "834db5cdc1a79eed503be2db4fb358c083197adc8635fcf84e26c73b4bed6c35"
+        },
+        "swift-crypto": {
+          "revision": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+          "tracked_file_count": 1044,
+          "tracked_sources_dictionary_sha256": "bec50d9a8f25075cf0fe1a6af67edee65fb2736a37ea55874a44a0918d0548e9"
+        },
+        "swift-http-structured-headers": {
+          "revision": "933538faa42c432d385f02e07df0ace7c5ecfc47",
+          "tracked_file_count": 69,
+          "tracked_sources_dictionary_sha256": "64a5ec5da220d64a0d79df86cff795bf6df3f424791b8e6221386380d1f76b1e"
+        },
+        "swift-http-types": {
+          "revision": "bff4b6903cdc99dda49649dd52f46c11cfd3ed50",
+          "tracked_file_count": 603,
+          "tracked_sources_dictionary_sha256": "4057ffcb9aeafc07ef0f4de32b9497691644b042dcd1f5bcfbcf7c4093405e5b"
+        },
+        "swift-log": {
+          "revision": "c9c6bb9d275ec0d95c3ad16391f3f045dc623104",
+          "tracked_file_count": 144,
+          "tracked_sources_dictionary_sha256": "b5f0ca6974744fa0a5016a10299ed3d0457ba3f1cf46e8d76917c8e06a94f621"
+        },
+        "swift-nio": {
+          "revision": "6db9d9abd92ad7399b8a564cafbb87d3507245fa",
+          "tracked_file_count": 766,
+          "tracked_sources_dictionary_sha256": "818de84d8aea1c31dfac2496fd8f92cc7be7a76c167cee2f583fd2cb1dc4d411"
+        },
+        "swift-nio-extras": {
+          "revision": "8e1249b29f92574e05e0d91637f239e378a9a95b",
+          "tracked_file_count": 180,
+          "tracked_sources_dictionary_sha256": "8df99498793e99623faf35875f3b368124a48648888f7a3703a13df4b876ee98"
+        },
+        "swift-nio-http2": {
+          "revision": "0f3e54e29c944c2e835ad52159da7d9e1c94ac69",
+          "tracked_file_count": 614,
+          "tracked_sources_dictionary_sha256": "926f215fec75f5695e19e45592699a530c2553702dba816d2f263518453dead2"
+        },
+        "swift-nio-ssl": {
+          "revision": "322f3c2a4a21df31c84ca416bf65ee5e9059e440",
+          "tracked_file_count": 769,
+          "tracked_sources_dictionary_sha256": "c07deff9b4d122c7df0b79b1e70fce7279e08cf5453879e4bf33f989aca2ab79"
+        },
+        "swift-nio-transport-services": {
+          "revision": "67787bb645a5e67d2edcdfbe48a216cc549222d5",
+          "tracked_file_count": 61,
+          "tracked_sources_dictionary_sha256": "d9d908f63e54a567318bfc13b547efd0de95704ba8194fbe98d8bf12346a6102"
+        },
+        "swift-numerics": {
+          "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+          "tracked_file_count": 70,
+          "tracked_sources_dictionary_sha256": "1a34e387c2741b9f2c1ce5600de009b8523691a30ee37645f94381aff3c94151"
+        },
+        "swift-protobuf": {
+          "revision": "55d7a1cc5666b85c13464aea1c4b4a90feccb4c8",
+          "tracked_file_count": 2511,
+          "tracked_sources_dictionary_sha256": "d5c1d1dfc1ccb4974f98e18280773d7d2a4d62255a4d99c221c02ba1f600193d"
+        },
+        "swift-service-lifecycle": {
+          "revision": "a18ee16b8039866fd919bdb4e8e906882d4ecc75",
+          "tracked_file_count": 51,
+          "tracked_sources_dictionary_sha256": "c24d11554050b8071cbb8aafdfed5f32ea2d448921fd7ec95cb8650f67104169"
+        },
+        "swift-system": {
+          "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+          "tracked_file_count": 99,
+          "tracked_sources_dictionary_sha256": "e99f4d487c93687d906fbeecc21ecb72b5188e745b1beec9affb1543b4dd850e"
+        }
+      },
+      "sdk_blob_content_matches_recorded_sources": true,
+      "tracked_file_count": 9741,
+      "unchanged_before_after_build": true
+    },
+    "candidate": {
+      "package_count": 26,
+      "packages": {
+        "axswift": {
+          "revision": "2efa201fa18184de98674165592fd1ecb0c00a6d",
+          "tracked_file_count": 25,
+          "tracked_sources_dictionary_sha256": "e6df9a2ed6662a468a666c987de6d6991ce6d783c61918aec37698ef037cade0"
+        },
+        "grpc-swift-2": {
+          "revision": "ac33066eb6edb1a21a6ca172ea8184a9b06f3cc7",
+          "tracked_file_count": 437,
+          "tracked_sources_dictionary_sha256": "fcf9ccd2e712c41c338c8487b0517664db3b50ad5346b7e9e1b6a54ba8b56923"
+        },
+        "grpc-swift-nio-transport": {
+          "revision": "65adb0bc4721a6c4695e1956af9552970c06a59f",
+          "tracked_file_count": 220,
+          "tracked_sources_dictionary_sha256": "b27e7e5d67e065c041d59b95820491db18022e78b424abd8fa9b1ef9ed4c0cc6"
+        },
+        "grpc-swift-protobuf": {
+          "revision": "176c5a434fd76f6f479848d1a8f7d44967534168",
+          "tracked_file_count": 105,
+          "tracked_sources_dictionary_sha256": "27348beaa59fec1e9e4c2dbe7ce1d66ecb5411a417fb7e28bf6a5c2e4bf8ed79"
+        },
+        "keysender": {
+          "revision": "99584bf1a03ab600cc44be89a2dcd98b2dbeb9de",
+          "tracked_file_count": 9,
+          "tracked_sources_dictionary_sha256": "6e16b390c4b86966757891525d88aa38b41d1331762a23c629a1e495257611ea"
+        },
+        "llmkit": {
+          "revision": "adc2239e2a3c586fd442a8ec1d96dec8e9ae8917",
+          "tracked_file_count": 32,
+          "tracked_sources_dictionary_sha256": "3960f87dd3a7fa45019285b8b6f516607d6ecf4114b092c2f0c213e07eb699d8"
+        },
+        "selectedtextkit": {
+          "revision": "ecbf46d8be541b54296a0836b7ae2f60c0416b72",
+          "tracked_file_count": 42,
+          "tracked_sources_dictionary_sha256": "86d452710b6e090427ab92a3c740e174cdd501f6e52d1f5aaf6628692556ba66"
+        },
+        "swift-algorithms": {
+          "revision": "87e50f483c54e6efd60e885f7f5aa946cee68023",
+          "tracked_file_count": 119,
+          "tracked_sources_dictionary_sha256": "8849687a1b8f605586ed385edd99ddf4b717aee4933ede6eea04980dc5f48527"
+        },
+        "swift-asn1": {
+          "revision": "d9a5b37470adc940d22c3bcd5ca6953a516b727f",
+          "tracked_file_count": 212,
+          "tracked_sources_dictionary_sha256": "354e7b204b822de5ae3064b1cb09504cc6e2a9fb3c734ba5f91d1504f9ac1a86"
+        },
+        "swift-async-algorithms": {
+          "revision": "3da39bbc4e687d4192af7c9cf4eab805745a0b9c",
+          "tracked_file_count": 208,
+          "tracked_sources_dictionary_sha256": "a5d3cd87b0cad21f0eb28671d8916fc8461e145e8276c46db310e16e188c8623"
+        },
+        "swift-atomics": {
+          "revision": "b601256eab081c0f92f059e12818ac1d4f178ff7",
+          "tracked_file_count": 144,
+          "tracked_sources_dictionary_sha256": "e3608a3ac996f4185b9baedfe5e64d5a4a925189a1de53f5c515dd9f8b6f9483"
+        },
+        "swift-certificates": {
+          "revision": "84f03fafeca28c19f5fc4b528df3d22ce8896bd7",
+          "tracked_file_count": 365,
+          "tracked_sources_dictionary_sha256": "503494d0f8ccb13de6ad164f6cfafc4377a759e53151e21739ca69a9d2fb2fda"
+        },
+        "swift-collections": {
+          "revision": "a0cb0954ecb21e4e31b0070e6ed5674e8556685a",
+          "tracked_file_count": 842,
+          "tracked_sources_dictionary_sha256": "834db5cdc1a79eed503be2db4fb358c083197adc8635fcf84e26c73b4bed6c35"
+        },
+        "swift-crypto": {
+          "revision": "da9d28d69ebe3894b18376c8f2395c2f37b8448f",
+          "tracked_file_count": 1044,
+          "tracked_sources_dictionary_sha256": "bec50d9a8f25075cf0fe1a6af67edee65fb2736a37ea55874a44a0918d0548e9"
+        },
+        "swift-http-structured-headers": {
+          "revision": "933538faa42c432d385f02e07df0ace7c5ecfc47",
+          "tracked_file_count": 69,
+          "tracked_sources_dictionary_sha256": "64a5ec5da220d64a0d79df86cff795bf6df3f424791b8e6221386380d1f76b1e"
+        },
+        "swift-http-types": {
+          "revision": "bff4b6903cdc99dda49649dd52f46c11cfd3ed50",
+          "tracked_file_count": 603,
+          "tracked_sources_dictionary_sha256": "4057ffcb9aeafc07ef0f4de32b9497691644b042dcd1f5bcfbcf7c4093405e5b"
+        },
+        "swift-log": {
+          "revision": "c9c6bb9d275ec0d95c3ad16391f3f045dc623104",
+          "tracked_file_count": 144,
+          "tracked_sources_dictionary_sha256": "b5f0ca6974744fa0a5016a10299ed3d0457ba3f1cf46e8d76917c8e06a94f621"
+        },
+        "swift-nio": {
+          "revision": "6db9d9abd92ad7399b8a564cafbb87d3507245fa",
+          "tracked_file_count": 766,
+          "tracked_sources_dictionary_sha256": "818de84d8aea1c31dfac2496fd8f92cc7be7a76c167cee2f583fd2cb1dc4d411"
+        },
+        "swift-nio-extras": {
+          "revision": "8e1249b29f92574e05e0d91637f239e378a9a95b",
+          "tracked_file_count": 180,
+          "tracked_sources_dictionary_sha256": "8df99498793e99623faf35875f3b368124a48648888f7a3703a13df4b876ee98"
+        },
+        "swift-nio-http2": {
+          "revision": "0f3e54e29c944c2e835ad52159da7d9e1c94ac69",
+          "tracked_file_count": 614,
+          "tracked_sources_dictionary_sha256": "926f215fec75f5695e19e45592699a530c2553702dba816d2f263518453dead2"
+        },
+        "swift-nio-ssl": {
+          "revision": "322f3c2a4a21df31c84ca416bf65ee5e9059e440",
+          "tracked_file_count": 769,
+          "tracked_sources_dictionary_sha256": "c07deff9b4d122c7df0b79b1e70fce7279e08cf5453879e4bf33f989aca2ab79"
+        },
+        "swift-nio-transport-services": {
+          "revision": "67787bb645a5e67d2edcdfbe48a216cc549222d5",
+          "tracked_file_count": 61,
+          "tracked_sources_dictionary_sha256": "d9d908f63e54a567318bfc13b547efd0de95704ba8194fbe98d8bf12346a6102"
+        },
+        "swift-numerics": {
+          "revision": "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+          "tracked_file_count": 70,
+          "tracked_sources_dictionary_sha256": "1a34e387c2741b9f2c1ce5600de009b8523691a30ee37645f94381aff3c94151"
+        },
+        "swift-protobuf": {
+          "revision": "55d7a1cc5666b85c13464aea1c4b4a90feccb4c8",
+          "tracked_file_count": 2511,
+          "tracked_sources_dictionary_sha256": "d5c1d1dfc1ccb4974f98e18280773d7d2a4d62255a4d99c221c02ba1f600193d"
+        },
+        "swift-service-lifecycle": {
+          "revision": "a18ee16b8039866fd919bdb4e8e906882d4ecc75",
+          "tracked_file_count": 51,
+          "tracked_sources_dictionary_sha256": "c24d11554050b8071cbb8aafdfed5f32ea2d448921fd7ec95cb8650f67104169"
+        },
+        "swift-system": {
+          "revision": "869129b7bf4ecc57b97d0193ad29690ca2134750",
+          "tracked_file_count": 99,
+          "tracked_sources_dictionary_sha256": "e99f4d487c93687d906fbeecc21ecb72b5188e745b1beec9affb1543b4dd850e"
+        }
+      },
+      "sdk_blob_content_matches_recorded_sources": true,
+      "tracked_file_count": 9741,
+      "unchanged_before_after_build": true
+    }
+  }
+}

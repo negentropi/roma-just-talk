@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/no-keys.app/Contents/MacOS/WritingOllamaProbe",
+    "no-keys",
+    "http://127.0.0.1:49208",
+    "http://127.0.0.1:49209",
+    "com.negentropi.RomaJustTalk.WritingOllamaProbe.f9501e9b1b7f45de988809692938bf38",
+    "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+    "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/no-keys",
+    "llama2"
+  ],
+  "driver_sha256": "341a3451669fedda847330f47239ed8d1b06e16da5377c883c293254260cf4b1"
+}

@@ -1,0 +1,2583 @@
+{
+  "actionError" : -25204,
+  "actionErrorDescription" : "AXError(rawValue: -25204)",
+  "actionMatchCount" : 1,
+  "activeAfter" : true,
+  "activeBefore" : true,
+  "activeBeforeAction" : true,
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "calls" : [
+    {
+      "attribute" : "AXFocusedWindow",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "application"
+    },
+    {
+      "attribute" : "AXWindows",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "application"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/0"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/1"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/1"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/1"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/1"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/1"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/1"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/2"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/2"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/2"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/2"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/2"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/2"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/0"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/0"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/1"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/1"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/1"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/1"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/1"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/1"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/2"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/2"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/2\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/0"
+    },
+    {
+      "attribute" : "AXDescription",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/0"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/0"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/2\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0\/3\/2\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/2\/1"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/1"
+    },
+    {
+      "attribute" : "AXDescription",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/1"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/1"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/2\/1"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/2\/1"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0\/3\/2\/1"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/3"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/3"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/3"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/3"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/3"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/3"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/4"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/4"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/4"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/4"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/4"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/4"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/5"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/5"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/5"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/5"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/5"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/5"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/6"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/6"
+    },
+    {
+      "attribute" : "AXDescription",
+      "error" : "AXError(rawValue: -25200)",
+      "errorCode" : -25200,
+      "path" : "window\/0\/0\/3\/6"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/6"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/6"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/6"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/6"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/7"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/7"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/7"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/7"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/7"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/7"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/8"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/8"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/8"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/8"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/8"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/8"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/9"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/9"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/9"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/9"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/9"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/9"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/10"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/10"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/10"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/10"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/10"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/10"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/11"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/11"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/11"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/11"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/11"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/11"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/12"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/12"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/12"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/12"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/12"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/12"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/13"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/13"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/13"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/13"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/13"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/13"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/14"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/14"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/14"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/14"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/14"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/14"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/15"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/15"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/15"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/15"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/15"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/15"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/16"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/16"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/16"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/16"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/16"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/16"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/17"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/17"
+    },
+    {
+      "attribute" : "AXIdentifier",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/17"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/17"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/17"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/17"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/17"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/18"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/18"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/18\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18\/0"
+    },
+    {
+      "attribute" : "AXValue",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/18\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0\/3\/18\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/18\/1"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18\/1"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/18\/1"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0\/3\/18\/1"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/18\/2"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18\/2"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/18\/2"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0\/3\/18\/2"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/18\/3"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18\/3"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/18\/3"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0\/3\/18\/3"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/3\/18\/4"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/3\/18\/4"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/3\/18\/4"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/0\/3\/18\/4"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/4"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/4"
+    },
+    {
+      "attribute" : "AXIdentifier",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/4"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/4"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/4"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/4"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/0\/5"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/5"
+    },
+    {
+      "attribute" : "AXIdentifier",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/5"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/5"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/0\/5"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/0\/5"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/1"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/1"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/1"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/2"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/2\/0\/0"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2\/0\/0"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/2\/0\/0"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/2\/0\/0"
+    },
+    {
+      "errorCode" : 0,
+      "operation" : "copyAttributeNames",
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXRole",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/0\/3"
+    },
+    {
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "operation" : "copyActionNames",
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXChildren",
+      "error" : "AXError(rawValue: -25212)",
+      "errorCode" : -25212,
+      "path" : "window\/0\/3"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "window\/1"
+    },
+    {
+      "attribute" : "AXWindows",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/application"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/window"
+    },
+    {
+      "attribute" : "AXTitle",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/window"
+    },
+    {
+      "attribute" : "AXEnabled",
+      "error" : "AXError(rawValue: 0)",
+      "errorCode" : 0,
+      "path" : "beforePress\/control"
+    }
+  ],
+  "deadlineExceeded" : false,
+  "enabledBeforeAction" : true,
+  "fixtureWindowCount" : 1,
+  "fixtureWindows" : [
+    {
+      "actions" : [
+        "AXRaise"
+      ],
+      "AXRole" : "AXWindow",
+      "AXTitle" : "Roma Onboarding AX Fixture 31649 6CB8A420-D1D0-4008-90B3-616183BA12D1",
+      "children" : [
+        {
+          "actions" : [
+
+          ],
+          "AXRole" : "AXGroup",
+          "children" : [
+            {
+              "actions" : [
+
+              ],
+              "AXEnabled" : true,
+              "AXRole" : "AXImage",
+              "children" : [
+
+              ],
+              "childrenCount" : 0,
+              "path" : "window\/0\/0\/0",
+              "supportedAttributes" : [
+                "AXParent",
+                "AXRoleDescription",
+                "AXAutoInteractable",
+                "AXChildren",
+                "AXIdentifier",
+                "AXPath",
+                "AXAttributedDescription",
+                "AXEnabled",
+                "AXTopLevelUIElement",
+                "AXSubrole",
+                "AXWindow",
+                "AXRole",
+                "AXActivationPoint",
+                "AXSelected",
+                "AXChildrenInNavigationOrder",
+                "AXFrame",
+                "AXSize",
+                "AXPosition"
+              ],
+              "timeoutError" : 0
+            },
+            {
+              "actions" : [
+
+              ],
+              "AXEnabled" : true,
+              "AXRole" : "AXStaticText",
+              "AXValue" : "Download AI Model",
+              "children" : [
+
+              ],
+              "childrenCount" : 0,
+              "path" : "window\/0\/0\/1",
+              "supportedAttributes" : [
+                "AXParent",
+                "AXRoleDescription",
+                "AXAutoInteractable",
+                "AXChildren",
+                "AXPath",
+                "AXEnabled",
+                "AXTopLevelUIElement",
+                "AXSubrole",
+                "AXRole",
+                "AXWindow",
+                "AXVisibleCharacterRange",
+                "AXActivationPoint",
+                "AXValue",
+                "AXChildrenInNavigationOrder",
+                "AXFrame",
+                "AXSize",
+                "AXPosition"
+              ],
+              "timeoutError" : 0
+            },
+            {
+              "actions" : [
+
+              ],
+              "AXEnabled" : true,
+              "AXRole" : "AXStaticText",
+              "AXValue" : "Choose a local model and download it for offline dictation, or select another option. You can also skip setup for now.",
+              "children" : [
+
+              ],
+              "childrenCount" : 0,
+              "path" : "window\/0\/0\/2",
+              "supportedAttributes" : [
+                "AXParent",
+                "AXRoleDescription",
+                "AXAutoInteractable",
+                "AXChildren",
+                "AXPath",
+                "AXEnabled",
+                "AXTopLevelUIElement",
+                "AXSubrole",
+                "AXRole",
+                "AXWindow",
+                "AXVisibleCharacterRange",
+                "AXActivationPoint",
+                "AXValue",
+                "AXChildrenInNavigationOrder",
+                "AXFrame",
+                "AXSize",
+                "AXPosition"
+              ],
+              "timeoutError" : 0
+            },
+            {
+              "actions" : [
+                "AXScrollLeftByPage",
+                "AXScrollRightByPage",
+                "AXScrollUpByPage",
+                "AXScrollDownByPage"
+              ],
+              "AXRole" : "AXScrollArea",
+              "children" : [
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Choose your local model",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/0",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Languages you speak",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/1",
+                  "supportedAttributes" : [
+                    "AXServesAsTitleForUIElements",
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXRadioGroup",
+                  "children" : [
+                    {
+                      "actions" : [
+                        "AXPress"
+                      ],
+                      "AXDescription" : "Chinese + English",
+                      "AXEnabled" : true,
+                      "AXRole" : "AXRadioButton",
+                      "path" : "window\/0\/0\/3\/2\/0",
+                      "supportedAttributes" : [
+                        "AXIdentifier",
+                        "AXEnabled",
+                        "AXFrame",
+                        "AXDescription",
+                        "AXParent",
+                        "AXSize",
+                        "AXFocused",
+                        "AXUserInputLabels",
+                        "AXRole",
+                        "AXTopLevelUIElement",
+                        "AXHelp",
+                        "AXPosition",
+                        "AXValue",
+                        "AXWindow",
+                        "AXRoleDescription",
+                        "AXSubrole"
+                      ],
+                      "timeoutError" : 0
+                    },
+                    {
+                      "actions" : [
+                        "AXPress"
+                      ],
+                      "AXDescription" : "English only",
+                      "AXEnabled" : true,
+                      "AXRole" : "AXRadioButton",
+                      "path" : "window\/0\/0\/3\/2\/1",
+                      "supportedAttributes" : [
+                        "AXIdentifier",
+                        "AXEnabled",
+                        "AXFrame",
+                        "AXDescription",
+                        "AXParent",
+                        "AXSize",
+                        "AXFocused",
+                        "AXUserInputLabels",
+                        "AXRole",
+                        "AXTopLevelUIElement",
+                        "AXHelp",
+                        "AXPosition",
+                        "AXValue",
+                        "AXWindow",
+                        "AXRoleDescription",
+                        "AXSubrole"
+                      ],
+                      "timeoutError" : 0
+                    }
+                  ],
+                  "childrenCount" : 2,
+                  "path" : "window\/0\/0\/3\/2",
+                  "supportedAttributes" : [
+                    "AXFocused",
+                    "AXTextualContext",
+                    "AXFrame",
+                    "AXLayoutDirection",
+                    "AXAutoInteractable",
+                    "AXChildrenInNavigationOrder",
+                    "AXPath",
+                    "AXPosition",
+                    "AXTraits",
+                    "AXEnabled",
+                    "AXSortPriority",
+                    "AXHelp",
+                    "AXChildren",
+                    "AXRole",
+                    "AXParent",
+                    "AXTopLevelUIElement",
+                    "AXTitleUIElement",
+                    "AXRespondsToInteraction",
+                    "AXCustomActions",
+                    "AXDropPoints",
+                    "AXValue",
+                    "AXDirectTouchOptions",
+                    "AXIdentifier",
+                    "AXSize",
+                    "AXRoleDescription",
+                    "AXWindow",
+                    "AXDragSources"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "For people who dictate in English. Transcription runs on your Mac.",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/3",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Parakeet V2",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/4",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Streaming",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/5",
+                  "supportedAttributes" : [
+                    "AXServesAsTitleForUIElements",
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+                    "AXPress",
+                    "AXPress"
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXCheckBox",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/6",
+                  "supportedAttributes" : [
+                    "AXFocused",
+                    "AXTextualContext",
+                    "AXFrame",
+                    "AXLayoutDirection",
+                    "AXChildrenInNavigationOrder",
+                    "AXAutoInteractable",
+                    "AXPath",
+                    "AXPosition",
+                    "AXTraits",
+                    "AXEnabled",
+                    "AXSortPriority",
+                    "AXHelp",
+                    "AXChildren",
+                    "AXRole",
+                    "AXParent",
+                    "AXTopLevelUIElement",
+                    "AXTitleUIElement",
+                    "AXDescription",
+                    "AXSubrole",
+                    "AXRespondsToInteraction",
+                    "AXCustomActions",
+                    "AXDropPoints",
+                    "AXValue",
+                    "AXDirectTouchOptions",
+                    "AXSize",
+                    "AXRoleDescription",
+                    "AXDragSources",
+                    "AXValueDescription",
+                    "AXWindow"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Default Model",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/7",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+                    "AXPress"
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXMenuButton",
+                  "AXTitle" : "More",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/8",
+                  "supportedAttributes" : [
+                    "AXFocused",
+                    "AXTextualContext",
+                    "AXFrame",
+                    "AXLayoutDirection",
+                    "AXAutoInteractable",
+                    "AXTitle",
+                    "AXPath",
+                    "AXTraits",
+                    "AXPosition",
+                    "AXEnabled",
+                    "AXSortPriority",
+                    "AXHelp",
+                    "AXChildren",
+                    "AXRole",
+                    "AXParent",
+                    "AXTopLevelUIElement",
+                    "AXRespondsToInteraction",
+                    "AXCustomActions",
+                    "AXDropPoints",
+                    "AXDirectTouchOptions",
+                    "AXDragSources",
+                    "AXIdentifier",
+                    "AXSize",
+                    "AXRoleDescription",
+                    "AXWindow"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "English-only",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/9",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "474 MB",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/10",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Speed",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/11",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "9.9",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/12",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Accuracy",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/13",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "9.4",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/14",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "NVIDIA's Parakeet V2 model optimized for lightning-fast English-only transcription",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/15",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXStaticText",
+                  "AXValue" : "Roma’s website, hosted by Vercel, uses your IP address for an approximate country suggestion. No audio is sent in this lookup. Your choice always wins.",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/16",
+                  "supportedAttributes" : [
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXChildren",
+                    "AXPath",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXVisibleCharacterRange",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+                    "AXPress"
+                  ],
+                  "AXEnabled" : true,
+                  "AXIdentifier" : "onboarding-model-advanced",
+                  "AXRole" : "AXDisclosureTriangle",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/0\/3\/17",
+                  "supportedAttributes" : [
+                    "AXDisclosing",
+                    "AXParent",
+                    "AXRoleDescription",
+                    "AXAutoInteractable",
+                    "AXValueDescription",
+                    "AXChildren",
+                    "AXIdentifier",
+                    "AXPath",
+                    "AXAttributedDescription",
+                    "AXEnabled",
+                    "AXTopLevelUIElement",
+                    "AXSubrole",
+                    "AXRole",
+                    "AXWindow",
+                    "AXActivationPoint",
+                    "AXValue",
+                    "AXChildrenInNavigationOrder",
+                    "AXFrame",
+                    "AXSize",
+                    "AXPosition"
+                  ],
+                  "timeoutError" : 0
+                },
+                {
+                  "actions" : [
+
+                  ],
+                  "AXEnabled" : true,
+                  "AXRole" : "AXScrollBar",
+                  "children" : [
+                    {
+                      "actions" : [
+
+                      ],
+                      "AXRole" : "AXValueIndicator",
+                      "path" : "window\/0\/0\/3\/18\/0",
+                      "supportedAttributes" : [
+                        "AXRole",
+                        "AXWindow",
+                        "AXPosition",
+                        "AXSize",
+                        "AXRoleDescription",
+                        "AXFrame",
+                        "AXValue",
+                        "AXParent",
+                        "AXTopLevelUIElement"
+                      ],
+                      "timeoutError" : 0
+                    },
+                    {
+                      "actions" : [
+                        "AXPress"
+                      ],
+                      "AXRole" : "AXButton",
+                      "path" : "window\/0\/0\/3\/18\/1",
+                      "supportedAttributes" : [
+                        "AXRole",
+                        "AXWindow",
+                        "AXPosition",
+                        "AXSize",
+                        "AXRoleDescription",
+                        "AXFrame",
+                        "AXSubrole",
+                        "AXParent",
+                        "AXTopLevelUIElement"
+                      ],
+                      "timeoutError" : 0
+                    },
+                    {
+                      "actions" : [
+                        "AXPress"
+                      ],
+                      "AXRole" : "AXButton",
+                      "path" : "window\/0\/0\/3\/18\/2",
+                      "supportedAttributes" : [
+                        "AXRole",
+                        "AXWindow",
+                        "AXPosition",
+                        "AXSize",
+                        "AXRoleDescription",
+                        "AXFrame",
+                        "AXSubrole",
+                        "AXParent",
+                        "AXTopLevelUIElement"
+                      ],
+                      "timeoutError" : 0
+                    },
+                    {
+                      "actions" : [
+                        "AXPress"
+                      ],
+                      "AXRole" : "AXButton",
+                      "path" : "window\/0\/0\/3\/18\/3",
+                      "supportedAttributes" : [
+                        "AXRole",
+                        "AXWindow",
+                        "AXPosition",
+                        "AXSize",
+                        "AXRoleDescription",
+                        "AXFrame",
+                        "AXSubrole",
+                        "AXParent",
+                        "AXTopLevelUIElement"
+                      ],
+                      "timeoutError" : 0
+                    },
+                    {
+                      "actions" : [
+                        "AXPress"
+                      ],
+                      "AXRole" : "AXButton",
+                      "path" : "window\/0\/0\/3\/18\/4",
+                      "supportedAttributes" : [
+                        "AXRole",
+                        "AXWindow",
+                        "AXPosition",
+                        "AXSize",
+                        "AXRoleDescription",
+                        "AXFrame",
+                        "AXSubrole",
+                        "AXParent",
+                        "AXTopLevelUIElement"
+                      ],
+                      "timeoutError" : 0
+                    }
+                  ],
+                  "childrenCount" : 5,
+                  "path" : "window\/0\/0\/3\/18",
+                  "supportedAttributes" : [
+                    "AXEnabled",
+                    "AXOrientation",
+                    "AXFrame",
+                    "AXParent",
+                    "AXChildren",
+                    "AXFocused",
+                    "AXSize",
+                    "AXRole",
+                    "AXTopLevelUIElement",
+                    "AXHelp",
+                    "AXChildrenInNavigationOrder",
+                    "AXPosition",
+                    "AXWindow",
+                    "AXRoleDescription",
+                    "AXValue"
+                  ],
+                  "timeoutError" : 0
+                }
+              ],
+              "childrenCount" : 19,
+              "path" : "window\/0\/0\/3",
+              "supportedAttributes" : [
+                "AXFocused",
+                "AXTextualContext",
+                "AXFrame",
+                "AXLayoutDirection",
+                "AXChildrenInNavigationOrder",
+                "AXVerticalScrollBar",
+                "AXAutoInteractable",
+                "AXPosition",
+                "AXTraits",
+                "AXHorizontalScrollBar",
+                "AXSortPriority",
+                "AXHelp",
+                "AXChildren",
+                "AXRole",
+                "AXParent",
+                "AXTopLevelUIElement",
+                "AXContents",
+                "AXIsElement",
+                "AXRespondsToInteraction",
+                "AXDirectTouchOptions",
+                "AXDropPoints",
+                "AXCustomActions",
+                "AXDragSources",
+                "AXSize",
+                "AXMakeScreenRectVisible",
+                "AXRoleDescription",
+                "AXContentSize",
+                "AXWindow"
+              ],
+              "timeoutError" : 0
+            },
+            {
+              "actions" : [
+                "AXPress"
+              ],
+              "AXEnabled" : true,
+              "AXIdentifier" : "onboarding-model-continue",
+              "AXRole" : "AXButton",
+              "children" : [
+
+              ],
+              "childrenCount" : 0,
+              "path" : "window\/0\/0\/4",
+              "supportedAttributes" : [
+                "AXParent",
+                "AXFocused",
+                "AXRoleDescription",
+                "AXAutoInteractable",
+                "AXChildren",
+                "AXIdentifier",
+                "AXPath",
+                "AXAttributedDescription",
+                "AXEnabled",
+                "AXTopLevelUIElement",
+                "AXSubrole",
+                "AXRole",
+                "AXWindow",
+                "AXActivationPoint",
+                "AXChildrenInNavigationOrder",
+                "AXFrame",
+                "AXSize",
+                "AXPosition"
+              ],
+              "timeoutError" : 0
+            },
+            {
+              "actions" : [
+                "AXPress"
+              ],
+              "AXEnabled" : true,
+              "AXIdentifier" : "onboarding-model-skip",
+              "AXRole" : "AXButton",
+              "children" : [
+
+              ],
+              "childrenCount" : 0,
+              "path" : "window\/0\/0\/5",
+              "supportedAttributes" : [
+                "AXParent",
+                "AXFocused",
+                "AXRoleDescription",
+                "AXAutoInteractable",
+                "AXChildren",
+                "AXIdentifier",
+                "AXPath",
+                "AXAttributedDescription",
+                "AXEnabled",
+                "AXTopLevelUIElement",
+                "AXSubrole",
+                "AXRole",
+                "AXWindow",
+                "AXActivationPoint",
+                "AXChildrenInNavigationOrder",
+                "AXFrame",
+                "AXSize",
+                "AXPosition"
+              ],
+              "timeoutError" : 0
+            }
+          ],
+          "childrenCount" : 6,
+          "path" : "window\/0\/0",
+          "supportedAttributes" : [
+            "AXFrame",
+            "AXParent",
+            "AXChildren",
+            "AXSize",
+            "AXFocused",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXChildrenInNavigationOrder",
+            "AXPosition",
+            "AXWindow",
+            "AXRoleDescription",
+            "AXSubrole"
+          ],
+          "timeoutError" : 0
+        },
+        {
+          "actions" : [
+            "AXPress"
+          ],
+          "AXEnabled" : true,
+          "AXRole" : "AXButton",
+          "path" : "window\/0\/1",
+          "supportedAttributes" : [
+            "AXEnabled",
+            "AXFrame",
+            "AXParent",
+            "AXSize",
+            "AXFocused",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXPosition",
+            "AXTitle",
+            "AXWindow",
+            "AXRoleDescription",
+            "AXSubrole",
+            "AXEdited"
+          ],
+          "timeoutError" : 0
+        },
+        {
+          "actions" : [
+            "AXPress",
+            "AXZoomWindow",
+            "AXShowMenu"
+          ],
+          "AXEnabled" : true,
+          "AXRole" : "AXButton",
+          "children" : [
+            {
+              "actions" : [
+
+              ],
+              "AXRole" : "AXGroup",
+              "children" : [
+                {
+                  "actions" : [
+
+                  ],
+                  "AXRole" : "AXGroup",
+                  "children" : [
+
+                  ],
+                  "childrenCount" : 0,
+                  "path" : "window\/0\/2\/0\/0",
+                  "supportedAttributes" : [
+                    "AXRole",
+                    "AXHelp",
+                    "AXChildrenInNavigationOrder",
+                    "AXChildren",
+                    "AXWindow",
+                    "AXPosition",
+                    "AXRoleDescription",
+                    "AXSize",
+                    "AXFocused",
+                    "AXFrame",
+                    "AXParent",
+                    "AXTopLevelUIElement"
+                  ],
+                  "timeoutError" : 0
+                }
+              ],
+              "childrenCount" : 1,
+              "path" : "window\/0\/2\/0",
+              "supportedAttributes" : [
+                "AXRole",
+                "AXHelp",
+                "AXChildrenInNavigationOrder",
+                "AXChildren",
+                "AXWindow",
+                "AXPosition",
+                "AXRoleDescription",
+                "AXSize",
+                "AXFocused",
+                "AXFrame",
+                "AXParent",
+                "AXTopLevelUIElement"
+              ],
+              "timeoutError" : 0
+            }
+          ],
+          "childrenCount" : 1,
+          "path" : "window\/0\/2",
+          "supportedAttributes" : [
+            "AXEnabled",
+            "AXFrame",
+            "AXParent",
+            "AXSize",
+            "AXFocused",
+            "AXChildren",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXPosition",
+            "AXTitle",
+            "AXWindow",
+            "AXRoleDescription",
+            "AXSubrole"
+          ],
+          "timeoutError" : 0
+        },
+        {
+          "actions" : [
+            "AXPress"
+          ],
+          "AXEnabled" : true,
+          "AXRole" : "AXButton",
+          "path" : "window\/0\/3",
+          "supportedAttributes" : [
+            "AXEnabled",
+            "AXFrame",
+            "AXParent",
+            "AXSize",
+            "AXFocused",
+            "AXRole",
+            "AXTopLevelUIElement",
+            "AXHelp",
+            "AXPosition",
+            "AXTitle",
+            "AXWindow",
+            "AXRoleDescription",
+            "AXSubrole"
+          ],
+          "timeoutError" : 0
+        }
+      ],
+      "childrenCount" : 4,
+      "path" : "window\/0",
+      "supportedAttributes" : [
+        "AXFocused",
+        "AXFullScreen",
+        "AXTitle",
+        "AXChildrenInNavigationOrder",
+        "AXFrame",
+        "AXPosition",
+        "AXGrowArea",
+        "AXMinimizeButton",
+        "AXDocument",
+        "AXSections",
+        "AXCloseButton",
+        "AXMain",
+        "AXActivationPoint",
+        "AXFullScreenButton",
+        "AXProxy",
+        "AXDefaultButton",
+        "AXMinimized",
+        "AXChildren",
+        "AXRole",
+        "AXParent",
+        "AXTitleUIElement",
+        "AXCancelButton",
+        "AXModal",
+        "AXSubrole",
+        "AXZoomButton",
+        "AXRoleDescription",
+        "AXSize",
+        "AXToolbarButton",
+        "AXIdentifier"
+      ],
+      "timeoutError" : 0
+    }
+  ],
+  "focusedWindowTypeID" : 77,
+  "generatedAt" : "2026-10-27T16:58:32Z",
+  "helperPID" : 31976,
+  "hostPID" : 31649,
+  "matchedCount" : 1,
+  "matchedPaths" : [
+    "window\/0\/0\/3\/17"
+  ],
+  "matchValue" : "onboarding-model-advanced",
+  "missingCheckboxDescriptions" : [
+    "window\/0\/0\/3\/6"
+  ],
+  "mode" : "press-id",
+  "nodeCount" : 39,
+  "parentPID" : 31649,
+  "queryIncomplete" : false,
+  "sameWindowBeforeAction" : true,
+  "timeoutError" : 0,
+  "traversalBounded" : false,
+  "trusted" : true,
+  "windowCount" : 2,
+  "windowTitle" : "Roma Onboarding AX Fixture 31649 6CB8A420-D1D0-4008-90B3-616183BA12D1",
+  "windowTitles" : [
+    "Roma Onboarding AX Fixture 31649 6CB8A420-D1D0-4008-90B3-616183BA12D1",
+    "roma-just-talk Onboarding"
+  ]
+}
+

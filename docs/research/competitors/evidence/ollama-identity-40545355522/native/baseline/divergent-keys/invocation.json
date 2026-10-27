@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/divergent-keys.app/Contents/MacOS/WritingOllamaProbe",
+    "divergent-keys",
+    "http://127.0.0.1:49214",
+    "http://127.0.0.1:49215",
+    "com.negentropi.RomaJustTalk.WritingOllamaProbe.57e51f573738400aa3cb1793b537feb0",
+    "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+    "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/divergent-keys",
+    "new-model"
+  ],
+  "driver_sha256": "341a3451669fedda847330f47239ed8d1b06e16da5377c883c293254260cf4b1"
+}

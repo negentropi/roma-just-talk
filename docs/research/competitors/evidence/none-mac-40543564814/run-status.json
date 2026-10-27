@@ -1,0 +1,196 @@
+{
+  "status": "completed",
+  "conclusion": "failure",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40543564814",
+  "run_id": 40543564814,
+  "head_sha": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T16:59:55Z",
+      "conclusion": "failure",
+      "databaseId": 122328046219,
+      "name": "macos",
+      "startedAt": "2026-10-27T16:42:37Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T16:42:39Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T16:42:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:42:48Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T16:42:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:42:48Z",
+          "conclusion": "success",
+          "name": "Keep the disposable desktop awake",
+          "number": 3,
+          "startedAt": "2026-10-27T16:42:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:43:02Z",
+          "conclusion": "success",
+          "name": "Select Xcode and Metal toolchain",
+          "number": 4,
+          "startedAt": "2026-10-27T16:42:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:43:55Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 5,
+          "startedAt": "2026-10-27T16:43:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:45:01Z",
+          "conclusion": "success",
+          "name": "Verify the canonical package graph before compiling",
+          "number": 6,
+          "startedAt": "2026-10-27T16:43:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:49:08Z",
+          "conclusion": "success",
+          "name": "Shared core checks",
+          "number": 7,
+          "startedAt": "2026-10-27T16:45:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:49:15Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper dependencies",
+          "number": 8,
+          "startedAt": "2026-10-27T16:49:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:49:15Z",
+          "conclusion": "skipped",
+          "name": "Preserve verified dependencies for test retries",
+          "number": 9,
+          "startedAt": "2026-10-27T16:49:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:37Z",
+          "conclusion": "failure",
+          "name": "Full Mac unit suite with fresh CI permissions",
+          "number": 10,
+          "startedAt": "2026-10-27T16:49:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:37Z",
+          "conclusion": "skipped",
+          "name": "Live TextEdit and Safari selection transactions",
+          "number": 11,
+          "startedAt": "2026-10-27T16:59:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:37Z",
+          "conclusion": "skipped",
+          "name": "Upload the native check checkpoint",
+          "number": 12,
+          "startedAt": "2026-10-27T16:59:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:37Z",
+          "conclusion": "skipped",
+          "name": "Matched snippet regression",
+          "number": 13,
+          "startedAt": "2026-10-27T16:59:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:37Z",
+          "conclusion": "skipped",
+          "name": "Upload the matched regression checkpoint",
+          "number": 14,
+          "startedAt": "2026-10-27T16:59:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:37Z",
+          "conclusion": "skipped",
+          "name": "Writing, snippet and dictation settings UI",
+          "number": 15,
+          "startedAt": "2026-10-27T16:59:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:41Z",
+          "conclusion": "success",
+          "name": "Preserve test evidence before the Release build",
+          "number": 16,
+          "startedAt": "2026-10-27T16:59:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:41Z",
+          "conclusion": "skipped",
+          "name": "Release build and packaging contracts",
+          "number": 17,
+          "startedAt": "2026-10-27T16:59:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:48Z",
+          "conclusion": "success",
+          "name": "Upload verification evidence",
+          "number": 18,
+          "startedAt": "2026-10-27T16:59:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:48Z",
+          "conclusion": "success",
+          "name": "Upload settings screenshots",
+          "number": 19,
+          "startedAt": "2026-10-27T16:59:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:48Z",
+          "conclusion": "skipped",
+          "name": "Upload verified release app",
+          "number": 20,
+          "startedAt": "2026-10-27T16:59:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:49Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 40,
+          "startedAt": "2026-10-27T16:59:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T16:59:53Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 41,
+          "startedAt": "2026-10-27T16:59:49Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40543564814/job/122328046219"
+    }
+  ]
+}

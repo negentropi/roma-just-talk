@@ -1,0 +1,8 @@
+{
+  "classification": "expected-metadata-mismatch",
+  "failures": [
+    "held-result-model-metadata"
+  ],
+  "result_model": "mistral",
+  "wire_model": "llama2"
+}

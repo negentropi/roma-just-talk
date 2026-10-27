@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/Users/runner/work/_temp/writing-ollama-identity-probe/candidate/coherent-keys.app/Contents/MacOS/WritingOllamaProbe",
+    "coherent-keys",
+    "http://127.0.0.1:49238",
+    "http://127.0.0.1:49239",
+    "com.negentropi.RomaJustTalk.WritingOllamaProbe.b0fcfe706c064f1a902970e4be627494",
+    "1f36a74614ac95aca70908f4be345d83f3e7886b",
+    "/Users/runner/work/_temp/writing-ollama-identity-probe/candidate/coherent-keys",
+    "chosen-model"
+  ],
+  "driver_sha256": "341a3451669fedda847330f47239ed8d1b06e16da5377c883c293254260cf4b1"
+}

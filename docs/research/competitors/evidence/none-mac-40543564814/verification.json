@@ -1,0 +1,64 @@
+{
+  "run_id": 40543564814,
+  "head_sha": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40543564814",
+  "status": "completed",
+  "conclusion": "failure",
+  "classification": "failed-onboarding-advanced-disclosure-external-ax-action",
+  "artifact_id": 12752564051,
+  "artifact_bytes": 96769885,
+  "artifact_sha256": "3f3dc3ae6d65e44a5c8e14d8559334d5efb531d506517440c4770a525de40c76",
+  "source_sha_matches": true,
+  "artifact_size_digest_and_zip_crc_verified": true,
+  "core_checks": 1699,
+  "unit_counts": {
+    "total": 188,
+    "passed": 177,
+    "failed": 1,
+    "skipped": 10,
+    "executed_non_skipped": 178
+  },
+  "all_17_captured_paste_cases_passed": true,
+  "unit_app_and_ax_helper_identity_unchanged": true,
+  "failure": {
+    "identifier": "OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+    "issue_count": 2,
+    "issues": [
+      {
+        "path": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+        "line": 333,
+        "message": "failed - External AX helper failed with 74"
+      },
+      {
+        "path": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+        "line": 334,
+        "message": "failed: caught error: \"missing(\"External AX helper failure\")\""
+      }
+    ],
+    "action": "AXPress",
+    "match_value": "onboarding-model-advanced",
+    "action_error": -25204,
+    "helper_exit_code": 74,
+    "matched_count": 1,
+    "trusted": true,
+    "active_before_action": true,
+    "enabled_before_action": true,
+    "same_window_before_action": true,
+    "query_incomplete": false,
+    "deadline_exceeded": false,
+    "post_action_state": "Unavailable. Only initial query and pre-action tree plus action return code were retained."
+  },
+  "remaining_gate": {
+    "native_six": "skipped after unit failure",
+    "matched_snippet_regression": "skipped after unit failure",
+    "settings_ui_four": "skipped after unit failure",
+    "release_packaging": "skipped after unit failure"
+  },
+  "limits": [
+    "No overall full-gate success.",
+    "No production root-cause conclusion from AX return code alone.",
+    "No new global None UI, native context, import-Whisper, provider quality, microphone, physical-keyboard or human-speech success claim.",
+    "No saved Keychain access or retained TCC database readback.",
+    "This head predates later Ollama backend edits; those edits were not tested by this run."
+  ]
+}

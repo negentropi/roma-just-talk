@@ -1,0 +1,2916 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: 'package': dependency 'axswift' is not used by any target
+warning: 'package': dependency 'grpc-swift-2' is not used by any target
+warning: 'package': dependency 'grpc-swift-nio-transport' is not used by any target
+warning: 'package': dependency 'keysender' is not used by any target
+warning: 'package': dependency 'swift-algorithms' is not used by any target
+warning: 'package': dependency 'swift-asn1' is not used by any target
+warning: 'package': dependency 'swift-atomics' is not used by any target
+warning: 'package': dependency 'swift-certificates' is not used by any target
+warning: 'package': dependency 'swift-crypto' is not used by any target
+warning: 'package': dependency 'swift-http-structured-headers' is not used by any target
+warning: 'package': dependency 'swift-nio' is not used by any target
+warning: 'package': dependency 'swift-nio-extras' is not used by any target
+warning: 'package': dependency 'swift-nio-http2' is not used by any target
+warning: 'package': dependency 'swift-nio-transport-services' is not used by any target
+warning: 'package': dependency 'swift-numerics' is not used by any target
+warning: 'package': dependency 'swift-service-lifecycle' is not used by any target
+warning: 'package': dependency 'swift-system' is not used by any target
+{
+  "identity": "package",
+  "name": "WritingOllamaProbe",
+  "url": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package",
+  "version": "unspecified",
+  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package",
+  "traits": [
+    "default"
+  ],
+  "dependencies": [
+    {
+      "identity": "voiceinkcore",
+      "name": "VoiceInkCore",
+      "url": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/Dependencies/VoiceInkCore",
+      "version": "unspecified",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/Dependencies/VoiceInkCore",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "voiceinknvidia",
+          "name": "VoiceInkNVIDIA",
+          "url": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/Dependencies/VoiceInkNVIDIA",
+          "version": "unspecified",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/Dependencies/VoiceInkNVIDIA",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-protobuf",
+              "name": "SwiftProtobuf",
+              "url": "https://github.com/apple/swift-protobuf.git",
+              "version": "1.38.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-protobuf",
+              "traits": [
+                "FieldMaskUtilities",
+                "BinaryDelimitedStreams"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "grpc-swift-2",
+              "name": "grpc-swift-2",
+              "url": "https://github.com/grpc/grpc-swift-2.git",
+              "version": "2.4.3",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-2",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-nio-transport-services",
+              "name": "swift-nio-transport-services",
+              "url": "https://github.com/apple/swift-nio-transport-services.git",
+              "version": "1.28.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-transport-services",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-nio",
+                  "name": "swift-nio",
+                  "url": "https://github.com/apple/swift-nio.git",
+                  "version": "2.104.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-atomics",
+                      "name": "swift-atomics",
+                      "url": "https://github.com/apple/swift-atomics.git",
+                      "version": "1.3.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-collections",
+                      "name": "swift-collections",
+                      "url": "https://github.com/apple/swift-collections.git",
+                      "version": "1.6.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-system",
+                      "name": "swift-system",
+                      "url": "https://github.com/apple/swift-system.git",
+                      "version": "1.8.1",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "grpc-swift-nio-transport",
+              "name": "grpc-swift-nio-transport",
+              "url": "https://github.com/negentropi/grpc-swift-nio-transport.git",
+              "version": "unspecified",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-nio-transport",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "grpc-swift-2",
+                  "name": "grpc-swift-2",
+                  "url": "https://github.com/grpc/grpc-swift-2.git",
+                  "version": "2.4.3",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-2",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-collections",
+                      "name": "swift-collections",
+                      "url": "https://github.com/apple/swift-collections.git",
+                      "version": "1.6.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-nio",
+                  "name": "swift-nio",
+                  "url": "https://github.com/apple/swift-nio.git",
+                  "version": "2.104.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-atomics",
+                      "name": "swift-atomics",
+                      "url": "https://github.com/apple/swift-atomics.git",
+                      "version": "1.3.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-collections",
+                      "name": "swift-collections",
+                      "url": "https://github.com/apple/swift-collections.git",
+                      "version": "1.6.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-system",
+                      "name": "swift-system",
+                      "url": "https://github.com/apple/swift-system.git",
+                      "version": "1.8.1",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-nio-http2",
+                  "name": "swift-nio-http2",
+                  "url": "https://github.com/apple/swift-nio-http2.git",
+                  "version": "1.46.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-http2",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-nio",
+                      "name": "swift-nio",
+                      "url": "https://github.com/apple/swift-nio.git",
+                      "version": "2.104.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-atomics",
+                          "name": "swift-atomics",
+                          "url": "https://github.com/apple/swift-atomics.git",
+                          "version": "1.3.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-collections",
+                          "name": "swift-collections",
+                          "url": "https://github.com/apple/swift-collections.git",
+                          "version": "1.6.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-system",
+                          "name": "swift-system",
+                          "url": "https://github.com/apple/swift-system.git",
+                          "version": "1.8.1",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-atomics",
+                      "name": "swift-atomics",
+                      "url": "https://github.com/apple/swift-atomics.git",
+                      "version": "1.3.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-nio-transport-services",
+                  "name": "swift-nio-transport-services",
+                  "url": "https://github.com/apple/swift-nio-transport-services.git",
+                  "version": "1.28.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-transport-services",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-nio",
+                      "name": "swift-nio",
+                      "url": "https://github.com/apple/swift-nio.git",
+                      "version": "2.104.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-atomics",
+                          "name": "swift-atomics",
+                          "url": "https://github.com/apple/swift-atomics.git",
+                          "version": "1.3.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-collections",
+                          "name": "swift-collections",
+                          "url": "https://github.com/apple/swift-collections.git",
+                          "version": "1.6.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-system",
+                          "name": "swift-system",
+                          "url": "https://github.com/apple/swift-system.git",
+                          "version": "1.8.1",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-atomics",
+                      "name": "swift-atomics",
+                      "url": "https://github.com/apple/swift-atomics.git",
+                      "version": "1.3.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-nio-ssl",
+                  "name": "swift-nio-ssl",
+                  "url": "https://github.com/apple/swift-nio-ssl.git",
+                  "version": "2.37.5",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-ssl",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-nio",
+                      "name": "swift-nio",
+                      "url": "https://github.com/apple/swift-nio.git",
+                      "version": "2.104.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-atomics",
+                          "name": "swift-atomics",
+                          "url": "https://github.com/apple/swift-atomics.git",
+                          "version": "1.3.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-collections",
+                          "name": "swift-collections",
+                          "url": "https://github.com/apple/swift-collections.git",
+                          "version": "1.6.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-system",
+                          "name": "swift-system",
+                          "url": "https://github.com/apple/swift-system.git",
+                          "version": "1.8.1",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-nio-extras",
+                  "name": "swift-nio-extras",
+                  "url": "https://github.com/apple/swift-nio-extras.git",
+                  "version": "1.35.2",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-extras",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-nio",
+                      "name": "swift-nio",
+                      "url": "https://github.com/apple/swift-nio.git",
+                      "version": "2.104.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-atomics",
+                          "name": "swift-atomics",
+                          "url": "https://github.com/apple/swift-atomics.git",
+                          "version": "1.3.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-collections",
+                          "name": "swift-collections",
+                          "url": "https://github.com/apple/swift-collections.git",
+                          "version": "1.6.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-system",
+                          "name": "swift-system",
+                          "url": "https://github.com/apple/swift-system.git",
+                          "version": "1.8.1",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-nio-http2",
+                      "name": "swift-nio-http2",
+                      "url": "https://github.com/apple/swift-nio-http2.git",
+                      "version": "1.46.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-http2",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-nio",
+                          "name": "swift-nio",
+                          "url": "https://github.com/apple/swift-nio.git",
+                          "version": "2.104.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+                            {
+                              "identity": "swift-atomics",
+                              "name": "swift-atomics",
+                              "url": "https://github.com/apple/swift-atomics.git",
+                              "version": "1.3.0",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            },
+                            {
+                              "identity": "swift-collections",
+                              "name": "swift-collections",
+                              "url": "https://github.com/apple/swift-collections.git",
+                              "version": "1.6.0",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            },
+                            {
+                              "identity": "swift-system",
+                              "name": "swift-system",
+                              "url": "https://github.com/apple/swift-system.git",
+                              "version": "1.8.1",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "identity": "swift-atomics",
+                          "name": "swift-atomics",
+                          "url": "https://github.com/apple/swift-atomics.git",
+                          "version": "1.3.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-http-types",
+                      "name": "swift-http-types",
+                      "url": "https://github.com/apple/swift-http-types.git",
+                      "version": "1.8.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-types",
+                      "traits": [
+                        "FoundationURL"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-http-structured-headers",
+                      "name": "swift-http-structured-headers",
+                      "url": "https://github.com/apple/swift-http-structured-headers.git",
+                      "version": "1.7.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-structured-headers",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-atomics",
+                      "name": "swift-atomics",
+                      "url": "https://github.com/apple/swift-atomics.git",
+                      "version": "1.3.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-algorithms",
+                      "name": "swift-algorithms",
+                      "url": "https://github.com/apple/swift-algorithms.git",
+                      "version": "1.2.1",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-algorithms",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-numerics",
+                          "name": "swift-numerics",
+                          "url": "https://github.com/apple/swift-numerics",
+                          "version": "1.1.1",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-numerics",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-certificates",
+                      "name": "swift-certificates",
+                      "url": "https://github.com/apple/swift-certificates.git",
+                      "version": "1.21.1",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-certificates",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-crypto",
+                          "name": "swift-crypto",
+                          "url": "https://github.com/apple/swift-crypto.git",
+                          "version": "4.5.2",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-crypto",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+                            {
+                              "identity": "swift-asn1",
+                              "name": "swift-asn1",
+                              "url": "https://github.com/apple/swift-asn1.git",
+                              "version": "1.7.2",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "identity": "swift-asn1",
+                          "name": "swift-asn1",
+                          "url": "https://github.com/apple/swift-asn1.git",
+                          "version": "1.7.2",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-nio-ssl",
+                      "name": "swift-nio-ssl",
+                      "url": "https://github.com/apple/swift-nio-ssl.git",
+                      "version": "2.37.5",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-ssl",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-nio",
+                          "name": "swift-nio",
+                          "url": "https://github.com/apple/swift-nio.git",
+                          "version": "2.104.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+                            {
+                              "identity": "swift-atomics",
+                              "name": "swift-atomics",
+                              "url": "https://github.com/apple/swift-atomics.git",
+                              "version": "1.3.0",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            },
+                            {
+                              "identity": "swift-collections",
+                              "name": "swift-collections",
+                              "url": "https://github.com/apple/swift-collections.git",
+                              "version": "1.6.0",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            },
+                            {
+                              "identity": "swift-system",
+                              "name": "swift-system",
+                              "url": "https://github.com/apple/swift-system.git",
+                              "version": "1.8.1",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-asn1",
+                      "name": "swift-asn1",
+                      "url": "https://github.com/apple/swift-asn1.git",
+                      "version": "1.7.2",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-service-lifecycle",
+                      "name": "swift-service-lifecycle",
+                      "url": "https://github.com/swift-server/swift-service-lifecycle.git",
+                      "version": "2.13.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-service-lifecycle",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-log",
+                          "name": "swift-log",
+                          "url": "https://github.com/apple/swift-log.git",
+                          "version": "1.16.2",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+                          "traits": [
+
+                          ],
+                          "dependencies": [
+
+                          ]
+                        },
+                        {
+                          "identity": "swift-async-algorithms",
+                          "name": "swift-async-algorithms",
+                          "url": "https://github.com/apple/swift-async-algorithms.git",
+                          "version": "1.1.5",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+                          "traits": [
+
+                          ],
+                          "dependencies": [
+                            {
+                              "identity": "swift-collections",
+                              "name": "swift-collections",
+                              "url": "https://github.com/apple/swift-collections.git",
+                              "version": "1.6.0",
+                              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                              "traits": [
+                                "default"
+                              ],
+                              "dependencies": [
+
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-async-algorithms",
+                      "name": "swift-async-algorithms",
+                      "url": "https://github.com/apple/swift-async-algorithms.git",
+                      "version": "1.1.5",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+                      "traits": [
+
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-collections",
+                          "name": "swift-collections",
+                          "url": "https://github.com/apple/swift-collections.git",
+                          "version": "1.6.0",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-log",
+                      "name": "swift-log",
+                      "url": "https://github.com/apple/swift-log.git",
+                      "version": "1.16.2",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+                      "traits": [
+
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-certificates",
+                  "name": "swift-certificates",
+                  "url": "https://github.com/apple/swift-certificates.git",
+                  "version": "1.21.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-certificates",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-crypto",
+                      "name": "swift-crypto",
+                      "url": "https://github.com/apple/swift-crypto.git",
+                      "version": "4.5.2",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-crypto",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+                        {
+                          "identity": "swift-asn1",
+                          "name": "swift-asn1",
+                          "url": "https://github.com/apple/swift-asn1.git",
+                          "version": "1.7.2",
+                          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                          "traits": [
+                            "default"
+                          ],
+                          "dependencies": [
+
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "identity": "swift-asn1",
+                      "name": "swift-asn1",
+                      "url": "https://github.com/apple/swift-asn1.git",
+                      "version": "1.7.2",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-asn1",
+                  "name": "swift-asn1",
+                  "url": "https://github.com/apple/swift-asn1.git",
+                  "version": "1.7.2",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "grpc-swift-protobuf",
+              "name": "grpc-swift-protobuf",
+              "url": "https://github.com/grpc/grpc-swift-protobuf.git",
+              "version": "2.4.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-protobuf",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "grpc-swift-2",
+                  "name": "grpc-swift-2",
+                  "url": "https://github.com/grpc/grpc-swift-2.git",
+                  "version": "2.4.3",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-2",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-collections",
+                      "name": "swift-collections",
+                      "url": "https://github.com/apple/swift-collections.git",
+                      "version": "1.6.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-protobuf",
+                  "name": "SwiftProtobuf",
+                  "url": "https://github.com/apple/swift-protobuf.git",
+                  "version": "1.38.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-protobuf",
+                  "traits": [
+                    "FieldMaskUtilities",
+                    "BinaryDelimitedStreams"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "axswift",
+      "name": "AXSwift",
+      "url": "https://github.com/tisfeng/AXSwift.git",
+      "version": "0.3.6",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/AXSwift",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "grpc-swift-2",
+      "name": "grpc-swift-2",
+      "url": "https://github.com/grpc/grpc-swift-2.git",
+      "version": "2.4.3",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-2",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-collections",
+          "name": "swift-collections",
+          "url": "https://github.com/apple/swift-collections.git",
+          "version": "1.6.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "grpc-swift-nio-transport",
+      "name": "grpc-swift-nio-transport",
+      "url": "https://github.com/negentropi/grpc-swift-nio-transport.git",
+      "version": "unspecified",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-nio-transport",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "grpc-swift-2",
+          "name": "grpc-swift-2",
+          "url": "https://github.com/grpc/grpc-swift-2.git",
+          "version": "2.4.3",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-2",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-nio",
+          "name": "swift-nio",
+          "url": "https://github.com/apple/swift-nio.git",
+          "version": "2.104.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-system",
+              "name": "swift-system",
+              "url": "https://github.com/apple/swift-system.git",
+              "version": "1.8.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-nio-http2",
+          "name": "swift-nio-http2",
+          "url": "https://github.com/apple/swift-nio-http2.git",
+          "version": "1.46.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-http2",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-nio",
+              "name": "swift-nio",
+              "url": "https://github.com/apple/swift-nio.git",
+              "version": "2.104.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-system",
+                  "name": "swift-system",
+                  "url": "https://github.com/apple/swift-system.git",
+                  "version": "1.8.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-nio-transport-services",
+          "name": "swift-nio-transport-services",
+          "url": "https://github.com/apple/swift-nio-transport-services.git",
+          "version": "1.28.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-transport-services",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-nio",
+              "name": "swift-nio",
+              "url": "https://github.com/apple/swift-nio.git",
+              "version": "2.104.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-system",
+                  "name": "swift-system",
+                  "url": "https://github.com/apple/swift-system.git",
+                  "version": "1.8.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-nio-ssl",
+          "name": "swift-nio-ssl",
+          "url": "https://github.com/apple/swift-nio-ssl.git",
+          "version": "2.37.5",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-ssl",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-nio",
+              "name": "swift-nio",
+              "url": "https://github.com/apple/swift-nio.git",
+              "version": "2.104.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-system",
+                  "name": "swift-system",
+                  "url": "https://github.com/apple/swift-system.git",
+                  "version": "1.8.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-nio-extras",
+          "name": "swift-nio-extras",
+          "url": "https://github.com/apple/swift-nio-extras.git",
+          "version": "1.35.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-extras",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-nio",
+              "name": "swift-nio",
+              "url": "https://github.com/apple/swift-nio.git",
+              "version": "2.104.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-system",
+                  "name": "swift-system",
+                  "url": "https://github.com/apple/swift-system.git",
+                  "version": "1.8.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-nio-http2",
+              "name": "swift-nio-http2",
+              "url": "https://github.com/apple/swift-nio-http2.git",
+              "version": "1.46.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-http2",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-nio",
+                  "name": "swift-nio",
+                  "url": "https://github.com/apple/swift-nio.git",
+                  "version": "2.104.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-atomics",
+                      "name": "swift-atomics",
+                      "url": "https://github.com/apple/swift-atomics.git",
+                      "version": "1.3.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-collections",
+                      "name": "swift-collections",
+                      "url": "https://github.com/apple/swift-collections.git",
+                      "version": "1.6.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-system",
+                      "name": "swift-system",
+                      "url": "https://github.com/apple/swift-system.git",
+                      "version": "1.8.1",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-http-types",
+              "name": "swift-http-types",
+              "url": "https://github.com/apple/swift-http-types.git",
+              "version": "1.8.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-types",
+              "traits": [
+                "FoundationURL"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-http-structured-headers",
+              "name": "swift-http-structured-headers",
+              "url": "https://github.com/apple/swift-http-structured-headers.git",
+              "version": "1.7.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-structured-headers",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-algorithms",
+              "name": "swift-algorithms",
+              "url": "https://github.com/apple/swift-algorithms.git",
+              "version": "1.2.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-algorithms",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-numerics",
+                  "name": "swift-numerics",
+                  "url": "https://github.com/apple/swift-numerics",
+                  "version": "1.1.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-numerics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-certificates",
+              "name": "swift-certificates",
+              "url": "https://github.com/apple/swift-certificates.git",
+              "version": "1.21.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-certificates",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-crypto",
+                  "name": "swift-crypto",
+                  "url": "https://github.com/apple/swift-crypto.git",
+                  "version": "4.5.2",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-crypto",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-asn1",
+                      "name": "swift-asn1",
+                      "url": "https://github.com/apple/swift-asn1.git",
+                      "version": "1.7.2",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "identity": "swift-asn1",
+                  "name": "swift-asn1",
+                  "url": "https://github.com/apple/swift-asn1.git",
+                  "version": "1.7.2",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-nio-ssl",
+              "name": "swift-nio-ssl",
+              "url": "https://github.com/apple/swift-nio-ssl.git",
+              "version": "2.37.5",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-ssl",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-nio",
+                  "name": "swift-nio",
+                  "url": "https://github.com/apple/swift-nio.git",
+                  "version": "2.104.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-atomics",
+                      "name": "swift-atomics",
+                      "url": "https://github.com/apple/swift-atomics.git",
+                      "version": "1.3.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-collections",
+                      "name": "swift-collections",
+                      "url": "https://github.com/apple/swift-collections.git",
+                      "version": "1.6.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    },
+                    {
+                      "identity": "swift-system",
+                      "name": "swift-system",
+                      "url": "https://github.com/apple/swift-system.git",
+                      "version": "1.8.1",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-asn1",
+              "name": "swift-asn1",
+              "url": "https://github.com/apple/swift-asn1.git",
+              "version": "1.7.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-service-lifecycle",
+              "name": "swift-service-lifecycle",
+              "url": "https://github.com/swift-server/swift-service-lifecycle.git",
+              "version": "2.13.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-service-lifecycle",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-log",
+                  "name": "swift-log",
+                  "url": "https://github.com/apple/swift-log.git",
+                  "version": "1.16.2",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+                  "traits": [
+
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-async-algorithms",
+                  "name": "swift-async-algorithms",
+                  "url": "https://github.com/apple/swift-async-algorithms.git",
+                  "version": "1.1.5",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+                  "traits": [
+
+                  ],
+                  "dependencies": [
+                    {
+                      "identity": "swift-collections",
+                      "name": "swift-collections",
+                      "url": "https://github.com/apple/swift-collections.git",
+                      "version": "1.6.0",
+                      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                      "traits": [
+                        "default"
+                      ],
+                      "dependencies": [
+
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-async-algorithms",
+              "name": "swift-async-algorithms",
+              "url": "https://github.com/apple/swift-async-algorithms.git",
+              "version": "1.1.5",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+              "traits": [
+
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-log",
+              "name": "swift-log",
+              "url": "https://github.com/apple/swift-log.git",
+              "version": "1.16.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+              "traits": [
+
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-certificates",
+          "name": "swift-certificates",
+          "url": "https://github.com/apple/swift-certificates.git",
+          "version": "1.21.1",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-certificates",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-crypto",
+              "name": "swift-crypto",
+              "url": "https://github.com/apple/swift-crypto.git",
+              "version": "4.5.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-crypto",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-asn1",
+                  "name": "swift-asn1",
+                  "url": "https://github.com/apple/swift-asn1.git",
+                  "version": "1.7.2",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-asn1",
+              "name": "swift-asn1",
+              "url": "https://github.com/apple/swift-asn1.git",
+              "version": "1.7.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-asn1",
+          "name": "swift-asn1",
+          "url": "https://github.com/apple/swift-asn1.git",
+          "version": "1.7.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "grpc-swift-protobuf",
+      "name": "grpc-swift-protobuf",
+      "url": "https://github.com/grpc/grpc-swift-protobuf.git",
+      "version": "2.4.1",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-protobuf",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "grpc-swift-2",
+          "name": "grpc-swift-2",
+          "url": "https://github.com/grpc/grpc-swift-2.git",
+          "version": "2.4.3",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/grpc-swift-2",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-protobuf",
+          "name": "SwiftProtobuf",
+          "url": "https://github.com/apple/swift-protobuf.git",
+          "version": "1.38.1",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-protobuf",
+          "traits": [
+            "FieldMaskUtilities",
+            "BinaryDelimitedStreams"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "keysender",
+      "name": "KeySender",
+      "url": "https://github.com/jordanbaird/KeySender",
+      "version": "0.0.5",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/KeySender",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "llmkit",
+      "name": "LLMkit",
+      "url": "https://github.com/Beingpax/LLMkit.git",
+      "version": "unspecified",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/LLMkit",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "selectedtextkit",
+      "name": "SelectedTextKit",
+      "url": "https://github.com/tisfeng/SelectedTextKit",
+      "version": "2.6.2",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/SelectedTextKit",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "axswift",
+          "name": "AXSwift",
+          "url": "https://github.com/tisfeng/AXSwift.git",
+          "version": "0.3.6",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/AXSwift",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "keysender",
+          "name": "KeySender",
+          "url": "https://github.com/jordanbaird/KeySender",
+          "version": "0.0.5",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/KeySender",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-algorithms",
+      "name": "swift-algorithms",
+      "url": "https://github.com/apple/swift-algorithms.git",
+      "version": "1.2.1",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-algorithms",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-numerics",
+          "name": "swift-numerics",
+          "url": "https://github.com/apple/swift-numerics",
+          "version": "1.1.1",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-numerics",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-asn1",
+      "name": "swift-asn1",
+      "url": "https://github.com/apple/swift-asn1.git",
+      "version": "1.7.2",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-async-algorithms",
+      "name": "swift-async-algorithms",
+      "url": "https://github.com/apple/swift-async-algorithms.git",
+      "version": "1.1.5",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+      "traits": [
+
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-collections",
+          "name": "swift-collections",
+          "url": "https://github.com/apple/swift-collections.git",
+          "version": "1.6.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-atomics",
+      "name": "swift-atomics",
+      "url": "https://github.com/apple/swift-atomics.git",
+      "version": "1.3.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-certificates",
+      "name": "swift-certificates",
+      "url": "https://github.com/apple/swift-certificates.git",
+      "version": "1.21.1",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-certificates",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-crypto",
+          "name": "swift-crypto",
+          "url": "https://github.com/apple/swift-crypto.git",
+          "version": "4.5.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-crypto",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-asn1",
+              "name": "swift-asn1",
+              "url": "https://github.com/apple/swift-asn1.git",
+              "version": "1.7.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-asn1",
+          "name": "swift-asn1",
+          "url": "https://github.com/apple/swift-asn1.git",
+          "version": "1.7.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-collections",
+      "name": "swift-collections",
+      "url": "https://github.com/apple/swift-collections.git",
+      "version": "1.6.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-crypto",
+      "name": "swift-crypto",
+      "url": "https://github.com/apple/swift-crypto.git",
+      "version": "4.5.2",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-crypto",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-asn1",
+          "name": "swift-asn1",
+          "url": "https://github.com/apple/swift-asn1.git",
+          "version": "1.7.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-http-structured-headers",
+      "name": "swift-http-structured-headers",
+      "url": "https://github.com/apple/swift-http-structured-headers.git",
+      "version": "1.7.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-structured-headers",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-http-types",
+      "name": "swift-http-types",
+      "url": "https://github.com/apple/swift-http-types.git",
+      "version": "1.8.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-types",
+      "traits": [
+        "FoundationURL"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-log",
+      "name": "swift-log",
+      "url": "https://github.com/apple/swift-log.git",
+      "version": "1.16.2",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+      "traits": [
+
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-nio",
+      "name": "swift-nio",
+      "url": "https://github.com/apple/swift-nio.git",
+      "version": "2.104.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-atomics",
+          "name": "swift-atomics",
+          "url": "https://github.com/apple/swift-atomics.git",
+          "version": "1.3.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "swift-collections",
+          "name": "swift-collections",
+          "url": "https://github.com/apple/swift-collections.git",
+          "version": "1.6.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "swift-system",
+          "name": "swift-system",
+          "url": "https://github.com/apple/swift-system.git",
+          "version": "1.8.1",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-nio-extras",
+      "name": "swift-nio-extras",
+      "url": "https://github.com/apple/swift-nio-extras.git",
+      "version": "1.35.2",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-extras",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-nio",
+          "name": "swift-nio",
+          "url": "https://github.com/apple/swift-nio.git",
+          "version": "2.104.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-system",
+              "name": "swift-system",
+              "url": "https://github.com/apple/swift-system.git",
+              "version": "1.8.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-nio-http2",
+          "name": "swift-nio-http2",
+          "url": "https://github.com/apple/swift-nio-http2.git",
+          "version": "1.46.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-http2",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-nio",
+              "name": "swift-nio",
+              "url": "https://github.com/apple/swift-nio.git",
+              "version": "2.104.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-system",
+                  "name": "swift-system",
+                  "url": "https://github.com/apple/swift-system.git",
+                  "version": "1.8.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-http-types",
+          "name": "swift-http-types",
+          "url": "https://github.com/apple/swift-http-types.git",
+          "version": "1.8.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-types",
+          "traits": [
+            "FoundationURL"
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "swift-http-structured-headers",
+          "name": "swift-http-structured-headers",
+          "url": "https://github.com/apple/swift-http-structured-headers.git",
+          "version": "1.7.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-http-structured-headers",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "swift-atomics",
+          "name": "swift-atomics",
+          "url": "https://github.com/apple/swift-atomics.git",
+          "version": "1.3.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "swift-algorithms",
+          "name": "swift-algorithms",
+          "url": "https://github.com/apple/swift-algorithms.git",
+          "version": "1.2.1",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-algorithms",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-numerics",
+              "name": "swift-numerics",
+              "url": "https://github.com/apple/swift-numerics",
+              "version": "1.1.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-numerics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-certificates",
+          "name": "swift-certificates",
+          "url": "https://github.com/apple/swift-certificates.git",
+          "version": "1.21.1",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-certificates",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-crypto",
+              "name": "swift-crypto",
+              "url": "https://github.com/apple/swift-crypto.git",
+              "version": "4.5.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-crypto",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-asn1",
+                  "name": "swift-asn1",
+                  "url": "https://github.com/apple/swift-asn1.git",
+                  "version": "1.7.2",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            },
+            {
+              "identity": "swift-asn1",
+              "name": "swift-asn1",
+              "url": "https://github.com/apple/swift-asn1.git",
+              "version": "1.7.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-nio-ssl",
+          "name": "swift-nio-ssl",
+          "url": "https://github.com/apple/swift-nio-ssl.git",
+          "version": "2.37.5",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-ssl",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-nio",
+              "name": "swift-nio",
+              "url": "https://github.com/apple/swift-nio.git",
+              "version": "2.104.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-atomics",
+                  "name": "swift-atomics",
+                  "url": "https://github.com/apple/swift-atomics.git",
+                  "version": "1.3.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                },
+                {
+                  "identity": "swift-system",
+                  "name": "swift-system",
+                  "url": "https://github.com/apple/swift-system.git",
+                  "version": "1.8.1",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-asn1",
+          "name": "swift-asn1",
+          "url": "https://github.com/apple/swift-asn1.git",
+          "version": "1.7.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-asn1",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "swift-service-lifecycle",
+          "name": "swift-service-lifecycle",
+          "url": "https://github.com/swift-server/swift-service-lifecycle.git",
+          "version": "2.13.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-service-lifecycle",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-log",
+              "name": "swift-log",
+              "url": "https://github.com/apple/swift-log.git",
+              "version": "1.16.2",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+              "traits": [
+
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-async-algorithms",
+              "name": "swift-async-algorithms",
+              "url": "https://github.com/apple/swift-async-algorithms.git",
+              "version": "1.1.5",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+              "traits": [
+
+              ],
+              "dependencies": [
+                {
+                  "identity": "swift-collections",
+                  "name": "swift-collections",
+                  "url": "https://github.com/apple/swift-collections.git",
+                  "version": "1.6.0",
+                  "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+                  "traits": [
+                    "default"
+                  ],
+                  "dependencies": [
+
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-async-algorithms",
+          "name": "swift-async-algorithms",
+          "url": "https://github.com/apple/swift-async-algorithms.git",
+          "version": "1.1.5",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+          "traits": [
+
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-log",
+          "name": "swift-log",
+          "url": "https://github.com/apple/swift-log.git",
+          "version": "1.16.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+          "traits": [
+
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-nio-http2",
+      "name": "swift-nio-http2",
+      "url": "https://github.com/apple/swift-nio-http2.git",
+      "version": "1.46.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-http2",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-nio",
+          "name": "swift-nio",
+          "url": "https://github.com/apple/swift-nio.git",
+          "version": "2.104.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-system",
+              "name": "swift-system",
+              "url": "https://github.com/apple/swift-system.git",
+              "version": "1.8.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-atomics",
+          "name": "swift-atomics",
+          "url": "https://github.com/apple/swift-atomics.git",
+          "version": "1.3.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-nio-ssl",
+      "name": "swift-nio-ssl",
+      "url": "https://github.com/apple/swift-nio-ssl.git",
+      "version": "2.37.5",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-ssl",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-nio",
+          "name": "swift-nio",
+          "url": "https://github.com/apple/swift-nio.git",
+          "version": "2.104.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-system",
+              "name": "swift-system",
+              "url": "https://github.com/apple/swift-system.git",
+              "version": "1.8.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-nio-transport-services",
+      "name": "swift-nio-transport-services",
+      "url": "https://github.com/apple/swift-nio-transport-services.git",
+      "version": "1.28.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio-transport-services",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-nio",
+          "name": "swift-nio",
+          "url": "https://github.com/apple/swift-nio.git",
+          "version": "2.104.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-nio",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-atomics",
+              "name": "swift-atomics",
+              "url": "https://github.com/apple/swift-atomics.git",
+              "version": "1.3.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            },
+            {
+              "identity": "swift-system",
+              "name": "swift-system",
+              "url": "https://github.com/apple/swift-system.git",
+              "version": "1.8.1",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        },
+        {
+          "identity": "swift-atomics",
+          "name": "swift-atomics",
+          "url": "https://github.com/apple/swift-atomics.git",
+          "version": "1.3.0",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-atomics",
+          "traits": [
+            "default"
+          ],
+          "dependencies": [
+
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-numerics",
+      "name": "swift-numerics",
+      "url": "https://github.com/apple/swift-numerics",
+      "version": "1.1.1",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-numerics",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-protobuf",
+      "name": "SwiftProtobuf",
+      "url": "https://github.com/apple/swift-protobuf.git",
+      "version": "1.38.1",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-protobuf",
+      "traits": [
+        "FieldMaskUtilities",
+        "BinaryDelimitedStreams"
+      ],
+      "dependencies": [
+
+      ]
+    },
+    {
+      "identity": "swift-service-lifecycle",
+      "name": "swift-service-lifecycle",
+      "url": "https://github.com/swift-server/swift-service-lifecycle.git",
+      "version": "2.13.0",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-service-lifecycle",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+        {
+          "identity": "swift-log",
+          "name": "swift-log",
+          "url": "https://github.com/apple/swift-log.git",
+          "version": "1.16.2",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-log",
+          "traits": [
+
+          ],
+          "dependencies": [
+
+          ]
+        },
+        {
+          "identity": "swift-async-algorithms",
+          "name": "swift-async-algorithms",
+          "url": "https://github.com/apple/swift-async-algorithms.git",
+          "version": "1.1.5",
+          "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-async-algorithms",
+          "traits": [
+
+          ],
+          "dependencies": [
+            {
+              "identity": "swift-collections",
+              "name": "swift-collections",
+              "url": "https://github.com/apple/swift-collections.git",
+              "version": "1.6.0",
+              "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-collections",
+              "traits": [
+                "default"
+              ],
+              "dependencies": [
+
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "identity": "swift-system",
+      "name": "swift-system",
+      "url": "https://github.com/apple/swift-system.git",
+      "version": "1.8.1",
+      "path": "/Users/runner/work/_temp/writing-ollama-identity-probe/baseline/package/.build/checkouts/swift-system",
+      "traits": [
+        "default"
+      ],
+      "dependencies": [
+
+      ]
+    }
+  ]
+}
+

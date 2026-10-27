@@ -1,0 +1,17 @@
+{
+  "app_sources_per_version": 11,
+  "baseline_sha": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "canonical_pins": 41,
+  "driver_matches_committed_script": true,
+  "driver_sha256": "341a3451669fedda847330f47239ed8d1b06e16da5377c883c293254260cf4b1",
+  "head_sha": "1f36a74614ac95aca70908f4be345d83f3e7886b",
+  "input_artifact_id": 12753105681,
+  "input_artifact_sha256": "9fade7186de7d67ab1a5b0ef615cc1e86b695f02e98f9466519e9f3277d82bb6",
+  "local_dependency_sources_per_version": 148,
+  "native_status": "passed-red-green",
+  "run_id": 40545355522,
+  "script_sha256": "2433dab32f69e0d21a8999cbdd84ba9d58dc938e7da7337116b6d1d0b739206d",
+  "service_pins": 26,
+  "source_contract_matches_git": true,
+  "unique_bundle_ids": 6
+}

@@ -1,0 +1,16 @@
+Executable=/Users/runner/work/_temp/writing-ollama-identity-probe/candidate/coherent-keys.app/Contents/MacOS/WritingOllamaProbe
+Identifier=com.negentropi.RomaJustTalk.WritingOllamaProbe.b0fcfe706c064f1a902970e4be627494
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=60648 flags=0x2(adhoc) hashes=1887+3 location=embedded
+Hash type=sha256 size=32
+CandidateCDHash sha256=a8c145e51a383af08961f2781aa67392f743f88c
+CandidateCDHashFull sha256=a8c145e51a383af08961f2781aa67392f743f88c6003b5a5b61057d61af0905a
+Hash choices=sha256
+CMSDigest=a8c145e51a383af08961f2781aa67392f743f88c6003b5a5b61057d61af0905a
+CMSDigestType=2
+CDHash=a8c145e51a383af08961f2781aa67392f743f88c
+Signature=adhoc
+Info.plist entries=7
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=36
+Internal requirements count=0 size=12

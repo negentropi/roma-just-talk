@@ -1,0 +1,106 @@
+{
+  "baseline_sha": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "case_results": [
+    {
+      "case": "no-keys",
+      "classification": "expected-metadata-mismatch",
+      "exit_code": 0,
+      "preference_checks": 9,
+      "result_fresh": "later-model",
+      "result_held": "mistral",
+      "routing": "A then B",
+      "snapshot_retained": "mistral",
+      "version": "baseline",
+      "wire_fresh": "later-model",
+      "wire_held": "llama2"
+    },
+    {
+      "case": "divergent-keys",
+      "classification": "expected-metadata-mismatch",
+      "exit_code": 0,
+      "preference_checks": 9,
+      "result_fresh": "later-model",
+      "result_held": "old-model",
+      "routing": "A then B",
+      "snapshot_retained": "old-model",
+      "version": "baseline",
+      "wire_fresh": "later-model",
+      "wire_held": "new-model"
+    },
+    {
+      "case": "coherent-keys",
+      "classification": "passed",
+      "exit_code": 0,
+      "preference_checks": 9,
+      "result_fresh": "later-model",
+      "result_held": "chosen-model",
+      "routing": "A then B",
+      "snapshot_retained": "chosen-model",
+      "version": "baseline",
+      "wire_fresh": "later-model",
+      "wire_held": "chosen-model"
+    },
+    {
+      "case": "no-keys",
+      "classification": "passed",
+      "exit_code": 0,
+      "preference_checks": 9,
+      "result_fresh": "later-model",
+      "result_held": "llama2",
+      "routing": "A then B",
+      "snapshot_retained": "llama2",
+      "version": "candidate",
+      "wire_fresh": "later-model",
+      "wire_held": "llama2"
+    },
+    {
+      "case": "divergent-keys",
+      "classification": "passed",
+      "exit_code": 0,
+      "preference_checks": 9,
+      "result_fresh": "later-model",
+      "result_held": "new-model",
+      "routing": "A then B",
+      "snapshot_retained": "new-model",
+      "version": "candidate",
+      "wire_fresh": "later-model",
+      "wire_held": "new-model"
+    },
+    {
+      "case": "coherent-keys",
+      "classification": "passed",
+      "exit_code": 0,
+      "preference_checks": 9,
+      "result_fresh": "later-model",
+      "result_held": "chosen-model",
+      "routing": "A then B",
+      "snapshot_retained": "chosen-model",
+      "version": "candidate",
+      "wire_fresh": "later-model",
+      "wire_held": "chosen-model"
+    }
+  ],
+  "conclusion": "passed-red-green",
+  "discovery_requests": 12,
+  "head_sha": "1f36a74614ac95aca70908f4be345d83f3e7886b",
+  "independent_classification_recomputed": true,
+  "package_graph_receipt_limit": {
+    "dependency_verdict_inputs": [
+      "exact Package.resolved pins",
+      "checkout revisions before and after build",
+      "tracked-source hashes before and after build"
+    ],
+    "raw_command_output_preserved": true,
+    "standalone_json": false,
+    "used_for_dependency_verdict": false,
+    "warning_prefix_bytes_each": 1373
+  },
+  "persistent_preference_checkpoints": 54,
+  "run_id": 40545355522,
+  "same_system_user_utf8_across_six_cases": true,
+  "source_and_bundle_checks": "All retained source/driver/manifest/pin and bundle hashes match; all signature verification logs successful.",
+  "successful_generation_requests": 12,
+  "successful_process_exits": 6,
+  "total_http_requests": 24,
+  "unintended_persistent_changes": 0
+}

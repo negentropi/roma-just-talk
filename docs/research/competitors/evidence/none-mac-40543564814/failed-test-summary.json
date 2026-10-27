@@ -1,0 +1,374 @@
+{
+  "activitySummaries": [
+    {},
+    {
+      "activityType": "com.apple.dt.xctest.activity-type.userCreated",
+      "attachments": [
+        {
+          "filename": "public.plain-text_0_51310893-6603-4F1F-8EA3-29B246FAE905.txt",
+          "lifetime": "keepAlways",
+          "payloadRef": {
+            "id": "0~A04aRsUGJYxYNou1mal-hnU3wQDlZc0RrLE2GPf_vt3_8P5pdQC6rpYLH4tZ6Fg9rOM7EGoYiTjUKgdHTtdslg=="
+          },
+          "payloadSize": "69713",
+          "timestamp": "2026-10-27T16:58:31.988+0000",
+          "uniformTypeIdentifier": "public.plain-text",
+          "uuid": "7ACBACA3-F707-4BA9-869E-63973411449E"
+        }
+      ],
+      "finish": "2026-10-27T16:58:31.988+0000",
+      "start": "2026-10-27T16:58:31.985+0000",
+      "title": "External AX probe",
+      "uuid": "51310893-6603-4F1F-8EA3-29B246FAE905"
+    },
+    {
+      "activityType": "com.apple.dt.xctest.activity-type.userCreated",
+      "attachments": [
+        {
+          "filename": "public.plain-text_0_C47D00A0-4DBD-43A1-A99B-E334FD0A0A6B.txt",
+          "lifetime": "keepAlways",
+          "payloadRef": {
+            "id": "0~4YzrY3j8jdJT3JhwWEmUIzs0IKcrFNOdKfw2jDGRmGwxkVhRKqT1vK7hUAFwAAzWgspBhrjIs4BX3ZudS4H_mA=="
+          },
+          "payloadSize": "72005",
+          "timestamp": "2026-10-27T16:58:33.236+0000",
+          "uniformTypeIdentifier": "public.plain-text",
+          "uuid": "63506E30-F60D-4856-B320-E4DA276D5F37"
+        }
+      ],
+      "finish": "2026-10-27T16:58:33.237+0000",
+      "start": "2026-10-27T16:58:33.235+0000",
+      "title": "External AX probe",
+      "uuid": "C47D00A0-4DBD-43A1-A99B-E334FD0A0A6B"
+    }
+  ],
+  "duration": "6.051136016845703",
+  "failureSummaries": [
+    {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+      "isTopLevelFailure": "true",
+      "issueType": "Assertion Failure",
+      "lineNumber": "333",
+      "message": "failed - External AX helper failed with 74",
+      "sourceCodeContext": {
+        "callStack": [
+          {
+            "addressString": "4619448376"
+          },
+          {
+            "addressString": "4619041575"
+          },
+          {
+            "addressString": "4619041059"
+          },
+          {
+            "addressString": "4619042523"
+          },
+          {
+            "addressString": "4629287087"
+          },
+          {
+            "addressString": "4749044047",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+                "lineNumber": "333"
+              },
+              "symbolName": "OnboardingTestWindow.queryExternalAccessibility(mode:match:attemptsRemaining:)"
+            }
+          },
+          {
+            "addressString": "4748941828",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+                "lineNumber": "377"
+              },
+              "symbolName": "OnboardingTestWindow.press(identifier:)"
+            }
+          },
+          {
+            "addressString": "4748938252",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+                "lineNumber": "104"
+              },
+              "symbolName": "OnboardingRegionViewTests.testAdvancedDisclosureRejectsPendingTaiwanSuggestion()"
+            }
+          },
+          {
+            "addressString": "4748943720",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "@objc closure #1 in OnboardingRegionViewTests.testAdvancedDisclosureRejectsPendingTaiwanSuggestion()"
+            }
+          },
+          {
+            "addressString": "4749069912",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for @objc closure #1 in OnboardingRegionViewTests.testAdvancedDisclosureRejectsPendingTaiwanSuggestion()"
+            }
+          },
+          {
+            "addressString": "4749089652",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "thunk for @escaping @callee_guaranteed @Sendable @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749093176",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for thunk for @escaping @callee_guaranteed @Sendable @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749089860",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "thunk for @escaping @isolated(any) @callee_guaranteed @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749093520",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for thunk for @escaping @isolated(any) @callee_guaranteed @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749091480",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "specialized thunk for @escaping @isolated(any) @callee_guaranteed @async () -> (@out A)"
+            }
+          },
+          {
+            "addressString": "4749093832",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for specialized thunk for @escaping @isolated(any) @callee_guaranteed @async () -> (@out A)"
+            }
+          },
+          {
+            "addressString": "10973904580"
+          }
+        ],
+        "location": {
+          "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+          "lineNumber": "333"
+        }
+      },
+      "timestamp": "2026-10-27T16:58:33.240+0000",
+      "uuid": "E23256D3-5E90-40E3-A4EC-8316712F8CFD"
+    },
+    {
+      "associatedError": {
+        "code": "0",
+        "domain": "VoiceInkTests.(unknown context at $11b309820).OnboardingTestWindow.Failure",
+        "userInfo": [
+          {}
+        ]
+      },
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+      "isTopLevelFailure": "true",
+      "issueType": "Thrown Error",
+      "lineNumber": "334",
+      "message": "failed: caught error: \"missing(\"External AX helper failure\")\"",
+      "sourceCodeContext": {
+        "callStack": [
+          {
+            "addressString": "4619453096"
+          },
+          {
+            "addressString": "4619453271"
+          },
+          {
+            "addressString": "4618891015"
+          },
+          {
+            "addressString": "4633063463"
+          },
+          {
+            "addressString": "4633062007"
+          },
+          {
+            "addressString": "6914175935"
+          },
+          {
+            "addressString": "4749044159",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+                "lineNumber": "334"
+              },
+              "symbolName": "OnboardingTestWindow.queryExternalAccessibility(mode:match:attemptsRemaining:)"
+            }
+          },
+          {
+            "addressString": "4748941828",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+                "lineNumber": "377"
+              },
+              "symbolName": "OnboardingTestWindow.press(identifier:)"
+            }
+          },
+          {
+            "addressString": "4748938252",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+                "lineNumber": "104"
+              },
+              "symbolName": "OnboardingRegionViewTests.testAdvancedDisclosureRejectsPendingTaiwanSuggestion()"
+            }
+          },
+          {
+            "addressString": "4748943720",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "@objc closure #1 in OnboardingRegionViewTests.testAdvancedDisclosureRejectsPendingTaiwanSuggestion()"
+            }
+          },
+          {
+            "addressString": "4749069912",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for @objc closure #1 in OnboardingRegionViewTests.testAdvancedDisclosureRejectsPendingTaiwanSuggestion()"
+            }
+          },
+          {
+            "addressString": "4749089652",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "thunk for @escaping @callee_guaranteed @Sendable @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749093176",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for thunk for @escaping @callee_guaranteed @Sendable @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749089860",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "thunk for @escaping @isolated(any) @callee_guaranteed @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749093520",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for thunk for @escaping @isolated(any) @callee_guaranteed @async () -> ()"
+            }
+          },
+          {
+            "addressString": "4749091480",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "specialized thunk for @escaping @isolated(any) @callee_guaranteed @async () -> (@out A)"
+            }
+          },
+          {
+            "addressString": "4749093832",
+            "symbolInfo": {
+              "imageName": "VoiceInkTests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "partial apply for specialized thunk for @escaping @isolated(any) @callee_guaranteed @async () -> (@out A)"
+            }
+          },
+          {
+            "addressString": "10973904580"
+          }
+        ],
+        "location": {
+          "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/OnboardingRegionViewTests.swift",
+          "lineNumber": "334"
+        }
+      },
+      "timestamp": "2026-10-27T16:58:34.286+0000",
+      "uuid": "8E80EA8E-61A4-44B3-A49C-544C278A50DB"
+    }
+  ],
+  "identifier": "OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+  "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests/OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion",
+  "name": "testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+  "testStatus": "Failure"
+}

@@ -2,7 +2,7 @@
 
 Research snapshot: 2026-10-27, Asia/Taipei. RJT source inspected at `9e35e991`.
 
-Lip dictation is not implemented. The requested behavior is defined below, but integration is blocked on a commercially usable recognition model or SDK. No model was downloaded, camera activated, vendor contacted, or runtime claim established during this research.
+Lip dictation is not implemented. No approach has yet passed the commercial-rights, recognition-quality, and app-runtime checks. The initial specialist-model search did not cover every route. Subsequent probes use commercially permissive test weights and public video on the remote server. No app camera was activated and no commercial-access inquiry was sent.
 
 ## Requested behavior
 
@@ -36,7 +36,48 @@ The following candidates were checked. This is a targeted search, not proof that
 
 Interfaces' public [research agreement](https://www.interfaces.inc/research-agreement) requires participation in its preview research. Covered data includes face and mouth video, audio, and derived information. The agreement permits research use of covered information and says an integrator must obtain the required end-user permissions. These preview terms do not establish a suitable commercial RJT agreement. No agreement was accepted and no customer recordings were submitted.
 
-The next dependency is a specific checkpoint with documented commercial rights, or a vendor SDK or API with an applicable commercial agreement and test access. The evidence must cover the required visual encoder, decoder, model assets, deployment, and redistribution. A price page or permissive wrapper license is insufficient.
+Commercial SDK access is one possible route. It is not a prerequisite for testing a general video model or building a fresh visual recognizer from permitted paired recordings. Any selected approach needs evidence for its recognition quality, deployment, required assets, and applicable rights. A price page or permissive wrapper license is insufficient.
+
+## Challenge the shared premise
+
+The earlier search assumed that useful lip dictation requires an existing specialist checkpoint or a vendor SDK. Several rejected candidates inherit the same Auto-AVSR or AV-HuBERT families. Repeating that licensing check through independent agents improved confidence about those families, but added little coverage of other approaches.
+
+The revised search separates the following hypotheses.
+
+| Approach | Evidence or opportunity | Falsification test |
+| --- | --- | --- |
+| Direct video-language model | Official [Qwen3-VL weights](https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/tree/52d6c8ffea26cc873ac5ad116f8631268d7eb503) declare Apache-2.0. They provide a candidate outside the rejected specialist lineages, without establishing lip-reading ability. | Give the model silent mouth video without a transcript or candidate phrases. Preserve frame coverage. Compare intact motion with frozen and shuffled controls. A small-model failure does not reject larger models or different video encodings. |
+| Fresh visual model with audio supervision | Commercially usable audio recognition can supply training labels for permitted paired recordings. Random initialization avoids inheriting a restricted visual checkpoint. | Withhold entire speakers and sentence compositions. Test video-only inference against shuffled labels and a text-prior baseline. Fixed-phrase memorization does not establish dictation. |
+| Independent voice and lip recognizers | The user requested simultaneous activation. A single joint audio-visual model is a design choice, not a user requirement. | Compare a single-output selection rule with each recognizer alone. Both inputs must contribute useful evidence without duplicate insertion or silent degradation. |
+
+[CREMA-D](https://github.com/CheyneyComputerScience/CREMA-D/tree/1658cd342dff90010aa843eaeebd53610a08b1dc) provides a small-test data route. Its contents use [DbCL](https://opendatacommons.org/licenses/dbcl/1-0/), which expressly permits commercial copyright use subject to ODbL. Database obligations and other applicable rights still matter. Its 12 sentence templates can support a screening experiment, but cannot establish open-vocabulary dictation or a complete training corpus.
+
+Black Swan reasoning changes the failure tests: fluent invented text on closed-mouth, obscured-mouth, unrelated-motion, or audio-video disagreement cases can matter more than an average accuracy score. Einstellung reasoning changes the search: test a structurally different route before treating repeated failures of one model family as a universal blocker. Neither principle establishes that an untested alternative works.
+
+One valid positive result could overturn the specialist-only premise. It would still require broader, answer-hidden evaluation before product adoption. A negative result rejects only the tested model, input representation, prompt, and conditions. It does not eliminate untested model families or training routes.
+
+## Offline direct-model probe
+
+The [machine-readable receipt](lip-dictation-probe.json) records pinned models, artifact hashes, prompts, settings, and raw responses. Official Qwen3-VL 2B and 8B Q4 weights ran through llama.cpp `b11918` on the remote CPU. The model received no audio, reference text, candidate phrase list, or original filename.
+
+One CREMA-D utterance was exercised. Its published reference is "Don't forget a jacket." The source is about 29.97 FPS. Preparation cropped the lower face and resampled to 52 frames at 25 FPS. All 52 prepared frames reached the successful sequence and native-video runs. This preserves the prepared sequence, not every original source frame.
+
+| Completed probe | Observed response |
+| --- | --- |
+| 2B, timestamped intact image sequence | Empty transcript. |
+| 2B, matched frozen image sequence | Empty transcript. |
+| 2B, intact native video at 25 FPS | Empty transcript. |
+| 2B, single-frame visual sanity check | Described the visible mouth and teeth. This checks basic image transport, not lip reading. |
+| 8B, intact native video at 25 FPS | "I'm not sure what you're talking about." This does not match the reference. |
+| 8B, matched frozen native video, same prompt | Empty transcript. |
+
+The 8B model produced words for intact input and an empty transcript for frozen input. Its intact words were wrong. The 2B responses show no useful transcription signal under the tested prompts. Neither result is a general VLM capability verdict. The guarded prompts permit abstention. The quantization, crop, visual-token budget, and single utterance limit the conclusion. Pretraining overlap is unknown.
+
+Three clips and shuffled controls were prepared, but only the first utterance and its frozen controls were run locally. The frozen video has minor codec drift, not speech motion. No open-vocabulary quality or broad hallucination-safety claim follows from this screen.
+
+Public hosted inference attempts produced no usable response and do not count as capability failures. Initial 8B memory and context failures likewise do not count. The final 8B pair completed after correcting those limits without dropping prepared frames. This is an unoptimized CPU experiment, not a product-latency or Mac-memory benchmark.
+
+The next informative experiment is a bounded learning curve for a fresh visual speech head using permitted paired data and audio labels. Its acceptance test must withhold speakers and sentence compositions. CREMA-D's fixed templates are only a starting screen, so success there would still need a broader corpus. Vendor licensing remains an option, and the inquiry below remains unsent.
 
 ## Existing RJT integration points
 
@@ -79,7 +120,7 @@ Review was requested from GPT-6.1 Sol. The review returned contract corrections,
 
 ## Verification status
 
-The completed evidence is source inspection and primary-source research. Runtime evidence remains absent.
+The evidence includes source inspection, primary-source research, and bounded offline model probes. Shipping-app runtime evidence remains absent. Offline responses cannot establish camera permissions, microphone isolation, or real shortcut behavior.
 
 | Check | Status on 2026-10-27 | Required proof before acceptance |
 | --- | --- | --- |
@@ -88,13 +129,13 @@ The completed evidence is source inspection and primary-source research. Runtime
 | Default-off behavior | Required, not implemented | Fresh preferences and upgrade preserve voice behavior, with no camera access or lip runtime activity. |
 | Simultaneous activation | Required, not implemented | Capture timestamps show both inputs belong to the same session. One transcript is inserted once. |
 | Lip-only microphone isolation | Required, not implemented | Microphone capture and pre-roll remain stopped through launch, queued startup, device changes, recovery, cleanup, and dictation. Retained PCM is cleared. No microphone permission request occurs. The orange privacy indicator alone is insufficient proof. |
-| Silent dictation quality | Not tested | Use rights-cleared, answer-hidden clips and real webcam sessions. Test silence, ordinary mouthing, face loss, lighting, unsupported languages, and false text generation. |
+| Silent dictation quality | Isolated offline screening only; app and open-vocabulary quality untested | Use answer-hidden clips and real webcam sessions with applicable rights. Test silence, ordinary mouthing, face loss, lighting, unsupported languages, and false text generation. A single utterance cannot establish general quality. |
 | Stop and cancellation | Required, not implemented | Test stop during startup, cancel during capture and inference, disable mid-session, repeated activation, and a delayed old result. No canceled text is inserted. |
 | Permissions and failures | Required, not implemented | Test fresh camera permission, denial, restriction, recovery, camera removal, missing runtime, and failed inference in the signed macOS app. |
 | Resource and latency behavior | Not measured | Record cold and warm latency, active and idle CPU, memory, and camera lifetime on supported Macs. Agree acceptance limits from the actual backend and product requirements. |
 | Existing voice behavior | Not retested | Run relevant shared checks, macOS build and tests, and actual voice dictation with the lip feature off. |
 
-No build, automated test, or runtime verification was run for this documentation-only snapshot. None is presented as proof of lip dictation.
+No app build, automated app test, or app-runtime verification was run for this documentation-only change. None is presented as proof of the feature.
 
 ## Unsent commercial-access inquiry
 

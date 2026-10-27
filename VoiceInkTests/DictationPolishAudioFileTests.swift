@@ -232,6 +232,70 @@ extension VoiceInkTests {
             } catch { await fixture.close(); throw error }
         }
 
+        @Test @MainActor func importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() async throws {
+            final class Completions: @unchecked Sendable {
+                private let lock = NSLock()
+                private var records: [Transcription] = []
+                func receive(_ notification: Notification) {
+                    guard let record = notification.object as? Transcription else { return }
+                    lock.withLock { records.append(record) }
+                }
+                func snapshot() -> [Transcription] { lock.withLock { records } }
+            }
+            let fixture = try PolishAudioFixture(readOnlyStore: true)
+            do {
+                fixture.profile(.none)
+                let bystander = try #require(fixture.context.fetch(FetchDescriptor<VocabularyWord>()).first)
+                let savedWord = bystander.word
+                bystander.word = "Unrelated unsaved import edit"
+                let input = try Data(contentsOf: fixture.audio)
+                let gate = fixture.gate()
+                let registry = fixture.registry([.init("Read-only imported e\u{301} 🧪", gate: gate)])
+                let manager = fixture.manager([registry])
+                manager.addToQueue(urls: [fixture.audio])
+                let item = try #require(manager.queue.first)
+                let engine = fixture.engine()
+                manager.startProcessing(modelContext: fixture.context, engine: engine)
+                try await gate.waitUntilEntered()
+                let copy = try #require(registry.inputs.first)
+                fixture.ownedCopies.insert(copy)
+                #expect(copy != fixture.audio)
+                #expect(copy.deletingLastPathComponent() == VoiceInkMacOSStorageDirectories.recordingsDirectory)
+                #expect(try Data(contentsOf: copy).isEmpty == false)
+                let completions = Completions()
+                let tokens = [Notification.Name.transcriptionCreated, .transcriptionCompleted].map { name in
+                    NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) {
+                        // Store references without inspecting model state before the controlled first query.
+                        completions.receive($0)
+                    }
+                }
+                defer { for token in tokens { NotificationCenter.default.removeObserver(token) } }
+                gate.release()
+                try await fixture.waitUntil { !manager.isProcessingQueue && registry.cleanupCalls == 1 }
+
+                // This must be the first caller-context read after the failed queue operation.
+                let firstVisibleRows = try fixture.records()
+                #expect(firstVisibleRows.isEmpty)
+                if case .failed(let message) = item.status {
+                    #expect(!message.isEmpty)
+                } else {
+                    Issue.record("The actual read-only import did not fail its completed-record save.")
+                }
+                #expect(item.transcription == nil && manager.lastCompletedItemId == nil)
+                #expect(completions.snapshot().filter { $0.audioFileURL == copy.absoluteString }.isEmpty)
+                #expect(!FileManager.default.fileExists(atPath: copy.path))
+                #expect(try Data(contentsOf: fixture.audio) == input)
+                #expect(bystander.word == "Unrelated unsaved import edit" && fixture.context.hasChanges)
+                let fresh = ModelContext(fixture.container)
+                fresh.autosaveEnabled = false
+                #expect(try fresh.fetch(FetchDescriptor<Transcription>()).isEmpty)
+                #expect(try fresh.fetch(FetchDescriptor<VocabularyWord>()).map(\.word) == [savedWord])
+                #expect(bystander.word == "Unrelated unsaved import edit" && fixture.context.hasChanges)
+                #expect(fixture.enhancement.requests.isEmpty && fixture.warnings.isEmpty)
+                await fixture.close()
+            } catch { await fixture.close(); throw error }
+        }
+
         @Test @MainActor func importCapturesEachItemWhenItStartsAndPreservesItsRawMetadata() async throws {
             let fixture = try PolishAudioFixture()
             do {

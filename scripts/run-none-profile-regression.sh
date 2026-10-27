@@ -151,7 +151,7 @@ def classify(text, exit_code, lane, sites, selected_cases=cases):
     expected_lines = sorted(sites) if lane == "baseline" else []
     if len(issues) != len(expected_lines) or sorted(observed_lines) != expected_lines:
         errors.append("Issues must exclusively identify the named None and cancellation assertions")
-    return {"valid": not errors, "errors": errors, "lane": lane, "exit_code": exit_code, "tests": observations, "summary": summaries, "issues": issues, "failure_lines": observed_lines}
+    return {"valid": not errors, "errors": errors, "lane": lane, "exit_code": exit_code, "tests": observations, "summary": [list(value) for value in summaries], "issues": issues, "failure_lines": observed_lines}
 
 
 def contract():
@@ -402,6 +402,9 @@ def self_test():
     bad = log("baseline")
     require(classify(good, 0, "candidate", sites)["valid"], "Valid candidate rejected")
     require(classify(bad, 65, "baseline", sites)["valid"], "Valid baseline rejected")
+    for text, code, lane in [(good, 0, "candidate"), (bad, 65, "baseline")]:
+        result = classify(text, code, lane, sites)
+        require(json.loads(json.dumps(result)) == result, "A valid verdict changed through JSON persistence")
     single_cases = {"liveImportFixture": []}
     single_log = "Test liveImportFixture() started.\nTest liveImportFixture() passed after 0.1 seconds.\nTest run with 1 test in 1 suite passed\n"
     require(classify(single_log, 0, "candidate", {}, single_cases)["valid"], "Valid single import test rejected")

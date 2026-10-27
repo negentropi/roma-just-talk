@@ -92,9 +92,13 @@ class AudioTranscriptionService {
                 enhancementFailurePolicy: .omitEnhancedText
             )
             try Task.checkCancellation()
-            let newTranscription = Transcription(completedDraft: draft)
-            try saveCompletedTranscription(newTranscription)
+            let savedID = try saveCompletedTranscription(draft)
             committed = true
+            guard let newTranscription = modelContext.model(for: savedID) as? Transcription else {
+                throw SavedTranscriptionUnavailable()
+            }
+            NotificationCenter.default.post(name: .transcriptionCreated, object: newTranscription)
+            NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
             return newTranscription
         } catch {
             let message = VoiceInkAudioFileTranscriptionDiagnostics.transcriptionFailedMessage(
@@ -105,14 +109,21 @@ class AudioTranscriptionService {
         }
     }
 
-    private func saveCompletedTranscription(_ transcription: Transcription) throws {
-        modelContext.insert(transcription)
+    private struct SavedTranscriptionUnavailable: LocalizedError {
+        var errorDescription: String? { "The transcription was saved, but History could not reopen it." }
+    }
+
+    private func saveCompletedTranscription(_ draft: VoiceInkCompletedTranscriptionDraft) throws -> PersistentIdentifier {
+        // A rejected save can leak a pending row into its context's first fetch. Keep that writer private.
+        let writer = ModelContext(modelContext.container)
+        writer.autosaveEnabled = false
+        let transcription = Transcription(completedDraft: draft)
+        writer.insert(transcription)
         do {
-            try modelContext.save()
-            NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
-            NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
+            try writer.save()
+            return transcription.persistentModelID
         } catch {
-            modelContext.delete(transcription)
+            writer.rollback()
             let message = VoiceInkAudioFileTranscriptionDiagnostics.saveFailedMessage(
                 localizedDescription: error.localizedDescription
             )

@@ -205,6 +205,34 @@ extension VoiceInkTests {
             } catch { await fixture.close(); throw error }
         }
 
+        @Test @MainActor func retranscriptionSavesOnlyItsRowAndReturnsTheCallersContext() async throws {
+            let fixture = try PolishAudioFixture()
+            do {
+                fixture.profile(.none)
+                let bystander = VocabularyWord(word: "saved vocabulary")
+                fixture.context.insert(bystander)
+                try fixture.context.save()
+                bystander.word = "unrelated unsaved edit"
+                let raw = "  Saved e\u{301} 🧪\r\nexactly. "
+                let registry = fixture.registry([.init(raw)])
+                let result = try await fixture.retranscribe(fixture.service(registry: registry)).value
+                #expect(result.modelContext === fixture.context)
+                #expect(result.text.utf8.elementsEqual(raw.utf8))
+                #expect(result.recognitionText?.utf16.elementsEqual(raw.utf16) == true)
+                #expect(result.dictationProfile == VoiceInkDictationProfile.none)
+                #expect(result.transcriptionState == .completed)
+                let visible = try fixture.records()
+                #expect(visible.count == 1 && visible.first?.id == result.id)
+                #expect(bystander.word == "unrelated unsaved edit" && fixture.context.hasChanges)
+                let fresh = ModelContext(fixture.container)
+                fresh.autosaveEnabled = false
+                #expect(try fresh.fetch(FetchDescriptor<Transcription>()).map(\.id) == [result.id])
+                #expect(try fresh.fetch(FetchDescriptor<VocabularyWord>()).map(\.word) == ["saved vocabulary"])
+                #expect(bystander.word == "unrelated unsaved edit" && fixture.context.hasChanges)
+                await fixture.close()
+            } catch { await fixture.close(); throw error }
+        }
+
         @Test @MainActor func importCapturesEachItemWhenItStartsAndPreservesItsRawMetadata() async throws {
             let fixture = try PolishAudioFixture()
             do {

@@ -1,0 +1,67 @@
+[
+  {
+    "member": "build.log",
+    "bytes": 786,
+    "sha256": "34e9083d7e5476c1bf0da71ee99c57913be225b5bc9aec29440ffd7ca2b1f7ef"
+  },
+  {
+    "member": "isolated-ui-first-dirty-release-writer.json",
+    "bytes": 4909,
+    "sha256": "44f9a6bd72039cf2fbf43a6f91b34ad6c80f1e111bc968a8df8584f479442f28"
+  },
+  {
+    "member": "isolated-ui-first-dirty.json",
+    "bytes": 5206,
+    "sha256": "bf70f591201c6da1b8864e7678960ef79a721a79f75b743afbdc4a45aea42d08"
+  },
+  {
+    "member": "environment.txt",
+    "bytes": 351,
+    "sha256": "37ef5aba9ffccdb1f751bf038df884728c4d4ca557c554879d81de37a8b72669"
+  },
+  {
+    "member": "isolated-ui-first-unchanged.json",
+    "bytes": 4284,
+    "sha256": "d3fb1ea6a72715c0f4a1a26e8ecb56b7c3f33d3fc276193b9b894631d4e9c85b"
+  },
+  {
+    "member": "isolated-write-first-dirty.json",
+    "bytes": 5233,
+    "sha256": "b868418c0888f3bcad27c823c4d2441f00803e4a578920b352b4525774a836e8"
+  },
+  {
+    "member": "old-ui-first-dirty.json",
+    "bytes": 7952,
+    "sha256": "145a11745df10437b18eb5d105d46274eb14185eeb791aae7f5898d9702f0e22"
+  },
+  {
+    "member": "old-write-first-dirty.json",
+    "bytes": 7979,
+    "sha256": "3e4de7c9a56d744f8eb7fe748732e38a986a4544e4c693a6a66760e519e145d1"
+  },
+  {
+    "member": "pending-ui-first-dirty.json",
+    "bytes": 6102,
+    "sha256": "59dcd3804ddf61d898f2eb2611569c87e339301c3160ae59852191c72df71c4e"
+  },
+  {
+    "member": "pending-write-first-dirty.json",
+    "bytes": 6129,
+    "sha256": "b424234fdabdd2afbe590a16049674475482ddeaa8e6e22ee062aa0a4f342d3e"
+  },
+  {
+    "member": "report.json",
+    "bytes": 56679,
+    "sha256": "7faaf48329176f3d88b49abda0762313ab34decb4256c700ded636e4a42a2fd2"
+  },
+  {
+    "member": "run.log",
+    "bytes": 87693,
+    "sha256": "9bb768bab8f393930d6d85219a4775a63d3e30eb753b2137e916a7b670ddac2c"
+  },
+  {
+    "member": "source.swift",
+    "bytes": 13104,
+    "sha256": "3c34def2e3f57ff4c9cf246f2fc01954f592cb87ef60fdae0ff9348637d5944a"
+  }
+]

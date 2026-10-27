@@ -1,0 +1,242 @@
+{
+  "run_id": 40592622003,
+  "head_sha": "cc263308934cf82d5d7e95769562d8e77d04a7f6",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40592622003",
+  "status": "completed",
+  "conclusion": "success",
+  "classification": "observational-sdk-matrix-supports-isolated-owned-writer-app-regression-pending",
+  "artifact_id": 12773939375,
+  "artifact_bytes": 19485,
+  "artifact_sha256": "22769ccc75ad0d8a132235aa58ed7fcd04f655d1b8e604ef4282880ebf362a29",
+  "size_digest_and_all_13_zip_crcs_verified": true,
+  "source_sha256": "3c34def2e3f57ff4c9cf246f2fc01954f592cb87ef60fdae0ff9348637d5944a",
+  "raw_report_sha256": "7faaf48329176f3d88b49abda0762313ab34decb4256c700ded636e4a42a2fd2",
+  "toolchain": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "pid": 1635,
+  "actual_cases": 8,
+  "aborted_cases": 0,
+  "actual_readonly_error_513_cases": 8,
+  "actual_first_query_events": 8,
+  "actual_state_snapshots": 40,
+  "matrix": [
+    {
+      "recipe": {
+        "cleanup": "delete",
+        "dirtyBystander": true,
+        "firstQuery": "ui",
+        "name": "old-ui-first-dirty",
+        "releasePrivateWriterBeforeFirstQuery": false,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 1,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "ui"
+      },
+      "second_query_count": 0,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": true,
+      "writer_weakly_alive_before_first_query": true
+    },
+    {
+      "recipe": {
+        "cleanup": "delete",
+        "dirtyBystander": true,
+        "firstQuery": "write",
+        "name": "old-write-first-dirty",
+        "releasePrivateWriterBeforeFirstQuery": false,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 1,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "write"
+      },
+      "second_query_count": 0,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": true,
+      "writer_weakly_alive_before_first_query": true
+    },
+    {
+      "recipe": {
+        "cleanup": "processPending",
+        "dirtyBystander": true,
+        "firstQuery": "ui",
+        "name": "pending-ui-first-dirty",
+        "releasePrivateWriterBeforeFirstQuery": false,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 1,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "ui"
+      },
+      "second_query_count": 0,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": true,
+      "writer_weakly_alive_before_first_query": true
+    },
+    {
+      "recipe": {
+        "cleanup": "processPending",
+        "dirtyBystander": true,
+        "firstQuery": "write",
+        "name": "pending-write-first-dirty",
+        "releasePrivateWriterBeforeFirstQuery": false,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 1,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "write"
+      },
+      "second_query_count": 0,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": true,
+      "writer_weakly_alive_before_first_query": true
+    },
+    {
+      "recipe": {
+        "cleanup": "isolatedRollback",
+        "dirtyBystander": true,
+        "firstQuery": "ui",
+        "name": "isolated-ui-first-dirty",
+        "releasePrivateWriterBeforeFirstQuery": false,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 0,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "ui"
+      },
+      "second_query_count": 1,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": true,
+      "writer_weakly_alive_before_first_query": true
+    },
+    {
+      "recipe": {
+        "cleanup": "isolatedRollback",
+        "dirtyBystander": true,
+        "firstQuery": "write",
+        "name": "isolated-write-first-dirty",
+        "releasePrivateWriterBeforeFirstQuery": false,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 1,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "write"
+      },
+      "second_query_count": 0,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": true,
+      "writer_weakly_alive_before_first_query": true
+    },
+    {
+      "recipe": {
+        "cleanup": "isolatedRollback",
+        "dirtyBystander": false,
+        "firstQuery": "ui",
+        "name": "isolated-ui-first-unchanged",
+        "releasePrivateWriterBeforeFirstQuery": false,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 0,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "ui"
+      },
+      "second_query_count": 1,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": false,
+      "writer_weakly_alive_before_first_query": true
+    },
+    {
+      "recipe": {
+        "cleanup": "isolatedRollback",
+        "dirtyBystander": true,
+        "firstQuery": "ui",
+        "name": "isolated-ui-first-dirty-release-writer",
+        "releasePrivateWriterBeforeFirstQuery": true,
+        "transcriptionFetchBeforeAttemptedSave": false
+      },
+      "actual_save_error": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "first_query": {
+        "count": 0,
+        "includesOwnedSwiftObjectReference": false,
+        "target": "ui"
+      },
+      "second_query_count": null,
+      "fresh_context_count": 0,
+      "ui_word_preserved": true,
+      "ui_has_changes_after_first_query": true,
+      "writer_weakly_alive_before_first_query": false
+    }
+  ],
+  "interpretation": [
+    "Shared-context delete and delete/processPendingChanges each return one row on the first UI fetch in fresh fixtures. Targeted pending-change processing alone does not satisfy immediate UI invisibility here.",
+    "An isolated writer rolled back after failure gives zero on the original UI context first fetch, with both unchanged and dirty bystander words. The failed private writer still returns one if fetched, so its state must not be reused as the UI context.",
+    "Releasing the isolated writer is observed through weak liveness=false before the first UI fetch. The UI still returns zero and its unrelated dirty word remains changed with hasChanges=true.",
+    "UI-first cases perform no writer/fresh fetch or SDK state getter after cleanup and before the UI query, resolving the previous probe first-read ordering confound.",
+    "All eight fresh contexts return zero and the seeded saved word; no persisted ghost-row claim is made."
+  ],
+  "supersedes_ordering_gap_of_probe": 40591876983,
+  "guidance": "Use a separately owned write context for the new completed transcription; on failure roll back/discard only that private context, leaving the caller UI context and unrelated dirty edits untouched. Verify the real application error boundary before accepting a product fix.",
+  "independent_read_only_audit": "All 13 artifact members, eight case JSON reports, eight 513 errors, eight first-query events, 40 snapshots, source/head/toolchain and uninstrumented cleanup-to-first-query order independently verified. No discrepancy.",
+  "limits": [
+    "This is a two-model SDK probe, not the application Transcription schema or an app-level regression proof.",
+    "Application run 40587793807 at ebf remains red; its real failing case and all related acceptance paths must pass on the candidate.",
+    "No SDK/private CoreData cache internals are inferred; the observation identifies safe ownership boundaries under this fixture.",
+    "Swift object reference comparison does not establish persistent row identity; no model identifiers were read after invalidation.",
+    "State inspections after the first fetch may affect later queries. Only the selected first-query ordering is controlled.",
+    "The build passed with one nonblocking weak-variable mutability warning; no local typecheck, build or runtime occurred."
+  ]
+}

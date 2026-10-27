@@ -13,27 +13,45 @@ fi
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo"
 out="$RUNNER_TEMP/writing-target-probe"
-test ! -e "$out"
-mkdir -p "$out/source" "$out/observations"
-phase=source
+baseline_sha=479fa1768e554433467b1355e4c8ded962b01627
+candidate_sha="$(git rev-parse HEAD)"
+mode="${1:-all}"
+if [[ "$mode" == all ]]; then
+  bash "$0" prepare
+  for lane in candidate baseline; do
+    bash "$0" run "$lane" || true
+  done
+  bash "$0" verify
+  exit
+fi
+phase="$mode"
+mkdir -p "$(dirname "$out")"
 trap 'exit_code=$?; if [[ "$exit_code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$exit_code" > "$out/failure.json"; fi' EXIT
 
-python3 - "$repo" "$out" <<'PY'
+if [[ "$mode" == prepare ]]; then
+test ! -e "$out"
+mkdir -p "$out"
+git fetch --no-tags origin "$baseline_sha"
+python3 - "$repo" "$out" "$baseline_sha" "$candidate_sha" <<'PY'
 import hashlib
+import io
 import json
 import subprocess
 import sys
+import tarfile
 from pathlib import Path
 
-repo, output = map(Path, sys.argv[1:])
-target_path = "VoiceInk/Services/WritingTarget.swift"
+repo, output = map(Path, sys.argv[1:3])
+baseline_sha, candidate_sha = sys.argv[3:]
+def source(revision, path):
+    return subprocess.check_output(["git", "-C", str(repo), "show", revision + ":" + path])
+
+native_paths = [
+    "VoiceInk/Services/WritingTarget.swift", "VoiceInk/Paste/CursorPaster.swift",
+    "VoiceInk/Services/CursorTextContextReader.swift", "VoiceInk/Paste/ClipboardManager.swift"
+]
 fixture_path = "VoiceInkTests/WritingTargetLiveTests.swift"
-target = (repo / target_path).read_bytes()
-fixture = (repo / fixture_path).read_bytes()
-for path, data in [(target_path, target), (fixture_path, fixture)]:
-    committed = subprocess.check_output(["git", "-C", str(repo), "show", "HEAD:" + path])
-    if data != committed:
-        raise SystemExit("The probe requires committed source: " + path)
+fixture = source(candidate_sha, fixture_path)
 marker = b"private enum LiveWritingFailure:"
 if fixture.count(marker) != 1:
     raise SystemExit("The editor helper extraction boundary changed")
@@ -159,7 +177,7 @@ private enum ProbeRun {
         try await editor.select(NSRange(location: 0, length: 3))
         var refused = false
         do {
-            try captured.replace(with: "MUST NOT BE INSERTED")
+            try await captured.replace(with: "MUST NOT BE INSERTED")
         } catch {
             refused = error as? WritingTarget.Failure == .targetChanged
         }
@@ -171,7 +189,7 @@ private enum ProbeRun {
         phase = .replacement
         let replacement = "Translated 日本語\nNext paragraph"
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
-        do { try target.replace(with: replacement) }
+        do { try await target.replace(with: replacement) }
         catch {
             await observeFailedReplacement(editor, expected: expected, error: error, output: output)
             throw error
@@ -196,7 +214,7 @@ private enum ProbeRun {
         if passed { phase = .completed }
         let result: [String: Any] = [
             "classification": passed ? "passed" : "invalid-or-failed",
-            "scope": "Production WritingTarget plus the extracted live Safari helper; not full app E2E",
+            "scope": "Real native delivery files and Core/NVIDIA packages plus the shared live Safari helper; not full app E2E",
             "phase": phase.rawValue, "checks": checks,
             "error": failure as Any? ?? NSNull(), "fixtureIssues": Issue.messages,
             "bundleIdentifier": Bundle.main.bundleIdentifier ?? "<missing>",
@@ -252,24 +270,191 @@ private enum ProbeMain {
 }
 '''
 imports = b"import AppKit\nimport Carbon.HIToolbox\nimport Darwin\nimport Foundation\n\n"
-(output / "source/WritingTarget.swift").write_bytes(target)
-(output / "source/Probe.swift").write_bytes(imports + helper + driver.encode())
 digest = lambda value: hashlib.sha256(value).hexdigest()
-manifest = {
-    "source_sha": subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip(),
-    "production_source": {"path": target_path, "sha256": digest(target)},
-    "fixture_source": {"path": fixture_path, "sha256": digest(fixture)},
-    "extracted_helper_sha256": digest(helper),
-    "generated_probe_sha256": digest(imports + helper + driver.encode()),
-    "driver_sha256": digest(driver.encode()),
-    "extraction": "The byte-identical suffix beginning private enum LiveWritingFailure; production WritingTarget is copied unchanged",
-    "testing_adapter": "Issue.record collects helper diagnostics as failures; no Testing module, AX mock, helper predicate or target behavior substitution",
-    "boundary": "Native production-class and live-fixture diagnosis only; full application gates remain required"
+lock_path = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+canonical_bytes = source(candidate_sha, lock_path)
+if source(baseline_sha, lock_path) != canonical_bytes:
+    raise SystemExit("The reviewed app lock differs between comparison revisions")
+canonical = json.loads(canonical_bytes)
+canonical_pins = {pin["identity"]: pin for pin in canonical["pins"]}
+closure_bytes = source(candidate_sha, "VoiceInkNVIDIA/Package.resolved")
+closure = {pin["identity"] for pin in json.loads(closure_bytes)["pins"]}
+if not closure or closure - canonical_pins.keys():
+    raise SystemExit("The declared Core/NVIDIA closure is missing from the reviewed app lock")
+for path in ["VoiceInkCore/Package.swift", "VoiceInkNVIDIA/Package.swift"]:
+    if source(baseline_sha, path) != source(candidate_sha, path):
+        raise SystemExit("Dependency declarations differ between native comparison revisions: " + path)
+retained = [canonical_pins[key] for key in sorted(closure)]
+subset = {"pins": retained, "version": 2}
+subset_bytes = (json.dumps(subset, indent=2, sort_keys=True) + "\n").encode()
+dependencies = ['.package(path: "Dependencies/VoiceInkCore")']
+for pin in retained:
+    state = pin["state"]
+    requirement = "exact: " + json.dumps(state["version"]) if "version" in state else "revision: " + json.dumps(state["revision"])
+    dependencies.append(".package(url: " + json.dumps(pin["location"]) + ", " + requirement + ")")
+package_manifest = '''// swift-tools-version: 5.9
+import PackageDescription
+
+let package = Package(
+    name: "WritingTargetProbe",
+    platforms: [.macOS(.v14)],
+    dependencies: [
+        ''' + ",\n        ".join(dependencies) + '''
+    ],
+    targets: [.executableTarget(
+        name: "WritingTargetProbe",
+        dependencies: [.product(name: "VoiceInkCore", package: "VoiceInkCore")]
+    )],
+    swiftLanguageVersions: [.v5]
+)
+'''
+generated_probe = imports + helper + driver.encode()
+pin_receipt = {
+    "canonical_path": lock_path, "canonical_sha256": digest(canonical_bytes),
+    "canonical_pin_count": len(canonical_pins), "retained_pins": retained,
+    "omitted_identities": sorted(canonical_pins.keys() - closure),
+    "retained_pin_count": len(retained), "changed_retained_pins": [],
+    "selection": "NVIDIA closure identities from its tracked lock; ALL pin states from the reviewed app lock",
+    "resolution_policy": "Every retained version/revision is constrained exactly; reject extras, omissions or state changes before build"
 }
-(output / "source-contract.json").write_text(json.dumps(manifest, indent=2) + "\n")
+(output / "pin-subset-before-resolution.json").write_text(json.dumps(pin_receipt, indent=2, sort_keys=True) + "\n")
+(output / "canonical.Package.resolved").write_bytes(canonical_bytes)
+lane_contracts = {}
+for lane, revision in [("baseline", baseline_sha), ("candidate", candidate_sha)]:
+    lane_root = output / lane
+    package = lane_root / "package"
+    sources = package / "Sources/WritingTargetProbe"
+    dependencies_root = package / "Dependencies"
+    sources.mkdir(parents=True)
+    dependencies_root.mkdir()
+    (lane_root / "observations").mkdir()
+    archive = subprocess.check_output(["git", "-C", str(repo), "archive", revision, "VoiceInkCore", "VoiceInkNVIDIA"])
+    with tarfile.open(fileobj=io.BytesIO(archive), mode="r:") as stream:
+        members = stream.getmembers()
+        for member in members:
+            relative = Path(member.name)
+            if relative.is_absolute() or ".." in relative.parts or relative.parts[0] not in {"VoiceInkCore", "VoiceInkNVIDIA"}:
+                raise SystemExit("Unexpected dependency archive path")
+            if not member.isdir() and not member.isfile():
+                raise SystemExit("Dependency snapshots require regular files and directories")
+        stream.extractall(dependencies_root, members=members)
+    native_hashes = {}
+    for path in native_paths:
+        data = source(revision, path)
+        (sources / Path(path).name).write_bytes(data)
+        native_hashes[path] = digest(data)
+    (sources / "Probe.swift").write_bytes(generated_probe)
+    (package / "Package.swift").write_text(package_manifest)
+    (package / "Package.resolved").write_bytes(subset_bytes)
+    dependency_hashes = {
+        str(path.relative_to(dependencies_root)): digest(path.read_bytes())
+        for path in sorted(dependencies_root.rglob("*")) if path.is_file()
+    }
+    lane_contracts[lane] = {
+        "source_sha": revision, "native_sources": native_hashes,
+        "dependency_sources": dependency_hashes,
+        "generated_probe_sha256": digest(generated_probe),
+        "package_manifest_sha256": digest(package_manifest.encode()),
+        "package_seed_lock_sha256": digest(subset_bytes)
+    }
+    (lane_root / "source-contract.json").write_text(json.dumps(lane_contracts[lane], indent=2, sort_keys=True) + "\n")
+contract = {
+    "baseline_sha": baseline_sha, "candidate_sha": candidate_sha,
+    "oracle_fixture": {"source_sha": candidate_sha, "path": fixture_path, "sha256": digest(fixture)},
+    "extracted_helper_sha256": digest(helper), "driver_sha256": digest(driver.encode()),
+    "lanes": lane_contracts,
+    "extraction": "Each lane uses byte-identical native and Core/NVIDIA source files from its own revision; both use one shared current helper and driver",
+    "testing_adapter": "Issue.record collects helper diagnostics as failures; no AX or dependency behavior substitution",
+    "swift_language": "5, matching the app project; awaiting historical sync replace may warn without changing its body",
+    "boundary": "Matched native delivery and real dependency comparison only; full application gates remain required"
+}
+(output / "source-contract.json").write_text(json.dumps(contract, indent=2, sort_keys=True) + "\n")
+PY
+exit
+fi
+
+if [[ "$mode" == verify ]]; then
+phase=comparison
+python3 - "$out" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+expected_checks = {"captured-selection-exact", "selected-range-drift-refused", "drift-left-original-untouched", "replacement-exact-prefix-suffix"}
+verdicts = {}
+for lane in ["baseline", "candidate"]:
+    path = root / lane
+    errors = []
+    result = json.loads((path / "result.json").read_text()) if (path / "result.json").is_file() else {}
+    checks = result.get("checks", {})
+    if lane == "candidate":
+        if result.get("classification") != "passed" or set(checks) != expected_checks or not all(checks.values()) or result.get("error") is not None:
+            errors.append("Candidate did not pass every native check")
+    else:
+        if result.get("classification") != "invalid-or-failed" or result.get("phase") != "replacement" or result.get("error") != "replacementUnconfirmed" or set(checks) != expected_checks - {"replacement-exact-prefix-suffix"} or not all(checks.values()):
+            errors.append("Baseline did not reproduce the precise confirmed precondition and failed replacement")
+        observation_path = path / "replacement-failure.json"
+        observation = json.loads(observation_path.read_text()) if observation_path.is_file() else {}
+        samples = observation.get("samples", [])
+        if not samples or observation.get("expectedAppearedAfterError") is not False or any(sample.get("exactOriginalUTF16") is not True or sample.get("exactExpectedUTF16") is not False or sample.get("observedValue") != observation.get("originalValue") or sample.get("contentState") != "original" for sample in samples):
+            errors.append("Baseline readback did not remain readable and exactly unchanged throughout observation")
+    if result.get("fixtureIssues") or (path / "failure.json").exists() or not (path / "identity-after.txt").is_file():
+        errors.append("Lane setup, cleanup, source, build or identity proof failed")
+    pin_receipt_path = path / "resolved-pin-receipt.json"
+    pin_receipt = json.loads(pin_receipt_path.read_text()) if pin_receipt_path.is_file() else {}
+    if pin_receipt.get("valid") is not True or pin_receipt.get("expected_pins") != pin_receipt.get("observed_pins"):
+        errors.append("Exact resolved package proof is missing or invalid")
+    source_receipt_path = path / "sources-after-build.json"
+    source_receipt = json.loads(source_receipt_path.read_text()) if source_receipt_path.is_file() else {}
+    if source_receipt != {"native_sources_match": True, "dependency_sources_match": True, "oracle_matches": True}:
+        errors.append("Post-build source fidelity proof is missing or invalid")
+    if (path / "identity-before.txt").is_file() and (path / "identity-after.txt").is_file():
+        if (path / "identity-before.txt").read_bytes() != (path / "identity-after.txt").read_bytes():
+            errors.append("The runtime executable identity changed")
+    else:
+        errors.append("Executable identity receipts are missing")
+    verdicts[lane] = {"valid": not errors, "errors": errors, "observed": result}
+valid = all(value["valid"] for value in verdicts.values())
+(root / "result.json").write_text(json.dumps({"classification": "matched-red-green" if valid else "invalid-or-failed", "scope": "Native delivery with real Core/NVIDIA dependencies, not full app E2E", "lanes": verdicts}, indent=2) + "\n")
+if not valid:
+    raise SystemExit("Native comparison did not prove the precise known-bad failure and candidate success")
+PY
+exit
+fi
+
+if [[ "$mode" != run || "${2:-}" != candidate && "${2:-}" != baseline ]]; then
+  echo "Use prepare, run candidate, run baseline, verify, or all." >&2
+  exit 2
+fi
+lane="$2"
+comparison_root="$out"
+out="$comparison_root/$lane"
+package="$out/package"
+scratch="$comparison_root/swiftpm-build"
+test -f "$package/Package.swift"
+phase="$lane-resolve"
+xcrun swift package --package-path "$package" --scratch-path "$scratch" --cache-path "$RUNNER_TEMP/writing-target-probe-package-cache" \
+  --skip-update resolve > "$out/resolve.log" 2>&1
+python3 - "$comparison_root" "$out" <<'PY'
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+comparison, lane = map(Path, sys.argv[1:])
+receipt = json.loads((comparison / "pin-subset-before-resolution.json").read_text())
+expected = {pin["identity"]: pin for pin in receipt["retained_pins"]}
+raw = (lane / "package/Package.resolved").read_bytes()
+observed = {pin["identity"]: pin for pin in json.loads(raw)["pins"]}
+valid = expected == observed
+(lane / "resolved-pin-receipt.json").write_text(json.dumps({"valid": valid, "expected_pins": expected, "observed_pins": observed, "resolved_sha256": hashlib.sha256(raw).hexdigest()}, indent=2, sort_keys=True) + "\n")
+if not valid:
+    raise SystemExit("Probe resolution changed the canonical subset; review before building")
+(lane / "resolved-before-build.json").write_bytes(raw)
 PY
 
-phase=build
+phase="$lane-build"
 app="$out/WritingTargetProbe.app"
 executable="$app/Contents/MacOS/WritingTargetProbe"
 mkdir -p "$app/Contents/MacOS"
@@ -285,9 +470,46 @@ Path(sys.argv[1]).write_bytes(plistlib.dumps({
     "NSPrincipalClass": "NSApplication", "LSUIElement": True
 }))
 PY
-xcrun swiftc -swift-version 6 -strict-concurrency=complete -parse-as-library \
-  -module-name WritingTargetProbe "$out/source/WritingTarget.swift" "$out/source/Probe.swift" \
-  -o "$executable" > "$out/build.log" 2>&1
+xcrun swift build --package-path "$package" --scratch-path "$scratch" --cache-path "$RUNNER_TEMP/writing-target-probe-package-cache" \
+  --force-resolved-versions --configuration debug --product WritingTargetProbe > "$out/build.log" 2>&1
+cmp "$out/resolved-before-build.json" "$package/Package.resolved"
+python3 - "$out" <<'PY'
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+contract = json.loads((root / "source-contract.json").read_text())
+package = root / "package"
+digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+for path, expected in contract["native_sources"].items():
+    if digest(package / "Sources/WritingTargetProbe" / Path(path).name) != expected:
+        raise SystemExit("Build changed a native source: " + path)
+for path, expected in contract["dependency_sources"].items():
+    if digest(package / "Dependencies" / path) != expected:
+        raise SystemExit("Build changed a Core/NVIDIA source: " + path)
+if digest(package / "Sources/WritingTargetProbe/Probe.swift") != contract["generated_probe_sha256"] or digest(package / "Package.swift") != contract["package_manifest_sha256"]:
+    raise SystemExit("Build changed the shared oracle or package declaration")
+(root / "sources-after-build.json").write_text(json.dumps({"native_sources_match": True, "dependency_sources_match": True, "oracle_matches": True}, indent=2) + "\n")
+PY
+xcrun swift build --package-path "$package" --scratch-path "$scratch" --cache-path "$RUNNER_TEMP/writing-target-probe-package-cache" \
+  --force-resolved-versions --configuration debug --show-bin-path > "$out/bin-path.txt"
+bin_path="$(cat "$out/bin-path.txt")"
+test -x "$bin_path/WritingTargetProbe"
+cp "$bin_path/WritingTargetProbe" "$executable"
+python3 - "$bin_path" "$app" <<'PY'
+import shutil
+import sys
+from pathlib import Path
+
+binary, app = map(Path, sys.argv[1:])
+resources = app / "Contents/Resources"
+resources.mkdir()
+for bundle in binary.glob("*.bundle"):
+    shutil.copytree(bundle, resources / bundle.name)
+PY
+cmp "$out/resolved-before-build.json" "$package/Package.resolved"
 codesign --force --sign - "$app" > "$out/signing.log" 2>&1
 codesign --verify --deep --strict "$app"
 codesign -dr - "$app" 2>&1 | sed -n \
@@ -296,7 +518,7 @@ test -s "$out/host-requirement.txt"
 csreq -r "$out/host-requirement.txt" -b "$out/host.csreq"
 shasum -a 256 "$executable" > "$out/identity-before.txt"
 
-phase=permissions
+phase="$lane-permissions"
 requirement_hex="$(xxd -p "$out/host.csreq" | tr -d '\n')"
 test -n "$requirement_hex"
 for service in kTCCServiceAccessibility kTCCServiceScreenCapture; do
@@ -320,8 +542,8 @@ killall tccd 2>/dev/null || true
 sudo killall tccd 2>/dev/null || true
 sleep 2
 
-phase=run
-python3 - "$out" "$app" "$executable" <<'PY'
+phase="$lane-run"
+python3 - "$out" "$app" "$executable" "$lane" <<'PY'
 import json
 import os
 import signal
@@ -329,7 +551,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-output, app, executable = map(Path, sys.argv[1:])
+output, app, executable = map(Path, sys.argv[1:4])
+lane = sys.argv[4]
 command = ["/usr/bin/open", "-n", "-W", "-o", str(output / "process.stdout.log"), "--stderr", str(output / "process.stderr.log"), str(app), "--args", "--output", str(output)]
 with (output / "launcher.log").open("w") as log:
     process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
@@ -351,14 +574,11 @@ result_path = output / "result.json"
 if not result_path.is_file():
     raise SystemExit("The native probe did not produce a result")
 result = json.loads(result_path.read_text())
-expected = {"captured-selection-exact", "selected-range-drift-refused", "drift-left-original-untouched", "replacement-exact-prefix-suffix"}
-if result.get("classification") != "passed" or set(result.get("checks", {})) != expected or not all(result["checks"].values()) or result.get("fixtureIssues"):
-    raise SystemExit("The native production-class probe failed; inspect result.json and observations")
 if result.get("bundleIdentifier") != "com.negentropi.RomaJustTalk.WritingTargetProbe" or Path(result.get("executablePath", "")).resolve() != executable.resolve() or result.get("processIdentifier") != int((output / "process-id.txt").read_text()):
     raise SystemExit("The observed probe identity does not match the built application")
-print("PASS: four native Safari checks with production target and unchanged live helper")
+print(f"Retained {lane} native result: {result.get('classification')}; final comparison owns the verdict")
 PY
-phase=identity
+phase="$lane-identity"
 shasum -a 256 "$executable" > "$out/identity-after.txt"
 cmp "$out/identity-before.txt" "$out/identity-after.txt"
 codesign --verify --deep --strict "$app"

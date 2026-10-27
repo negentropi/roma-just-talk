@@ -189,10 +189,59 @@ private final class LiveWritingEditor {
         let application = try await NSWorkspace.shared.open(
             [resource], withApplicationAt: applicationURL, configuration: configuration
         )
+        let openCompleted = ProcessInfo.processInfo.systemUptime
         let appElement = AXUIElementCreateApplication(application.processIdentifier)
         let priorWindows = windowsBeforeLaunch[application.processIdentifier] ?? []
+        let activationRequested = ProcessInfo.processInfo.systemUptime
+        let activationAccepted = application.activate(options: [.activateAllWindows])
+        var startupStages: [[String: Any]] = [
+            ["stage": "workspace-open-completed", "sinceOpenMilliseconds": (openCompleted - openStarted) * 1_000],
+            ["stage": "application-activation-requested", "sinceOpenMilliseconds": (activationRequested - openStarted) * 1_000,
+             "accepted": activationAccepted]
+        ]
+        var frontmostObserved = false
+        var documentWindow: AXUIElement?
+        var startupPhase = "owned-document-readiness"
         var surface: (AXUIElement, AXUIElement)?
         do {
+            let documentDeadline = ProcessInfo.processInfo.systemUptime + 20
+            _ = AXUIElementSetMessagingTimeout(appElement, 0.1)
+            repeat {
+                guard !application.isTerminated else {
+                    throw LiveWritingFailure.failed("The owned editor application terminated during startup.")
+                }
+                if NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier {
+                    if !frontmostObserved {
+                        frontmostObserved = true
+                        startupStages.append([
+                            "stage": "frontmost-identity-observed",
+                            "sinceOpenMilliseconds": (ProcessInfo.processInfo.systemUptime - openStarted) * 1_000
+                        ])
+                    }
+                    for window in windows(in: appElement) ?? [] {
+                        guard ProcessInfo.processInfo.systemUptime < documentDeadline else { break }
+                        guard hasDocumentMarker(window, token: token, deadline: documentDeadline) else { continue }
+                        if kind == .textEdit, priorWindows.contains(where: { CFEqual($0, window) }) { continue }
+                        documentWindow = window
+                        startupStages.append([
+                            "stage": "owned-document-observed",
+                            "sinceOpenMilliseconds": (ProcessInfo.processInfo.systemUptime - openStarted) * 1_000,
+                            "ownershipMarkerMatched": true,
+                            "titleContainsToken": string(kAXTitleAttribute, from: window)?.contains(token) == true,
+                            "documentIsOwnedFile": scopedURL(kAXDocumentAttribute, from: window, resource: resource) == resource.absoluteString,
+                            "existedBeforeOpen": priorWindows.contains { CFEqual($0, window) }
+                        ])
+                        break
+                    }
+                }
+                if documentWindow != nil { break }
+                try await Task.sleep(for: .milliseconds(30))
+            } while ProcessInfo.processInfo.systemUptime < documentDeadline
+            guard documentWindow != nil else {
+                throw LiveWritingFailure.failed("The owned \(kind.bundleIdentifier) document did not become frontmost and accessible.")
+            }
+            _ = AXUIElementSetMessagingTimeout(appElement, 0)
+            startupPhase = "exact-textarea-readiness"
             try await wait("The owned \(kind.bundleIdentifier) editor did not become accessible.") {
                 guard let windows = windows(in: appElement) else { return false }
                 for window in windows where identifies(window, token: token) {
@@ -207,7 +256,16 @@ private final class LiveWritingEditor {
                 }
                 return false
             }
+            startupStages.append([
+                "stage": "exact-textarea-observed",
+                "sinceOpenMilliseconds": (ProcessInfo.processInfo.systemUptime - openStarted) * 1_000,
+                "sameDocumentWindow": surface.map { pair in documentWindow.map { CFEqual($0, pair.0) } == true } == true
+            ])
         } catch {
+            recordStartup(
+                token: token, kind: kind, application: application, stages: startupStages,
+                finalStage: startupPhase, failure: String(describing: error)
+            )
             recordSetupFailure(
                 kind: kind, token: token, resource: resource, application: application,
                 appElement: appElement, previousWindows: priorWindows
@@ -232,8 +290,20 @@ private final class LiveWritingEditor {
         )
         do {
             try await fixture.focus()
+            startupStages.append([
+                "stage": "owned-editor-focused",
+                "sinceOpenMilliseconds": (ProcessInfo.processInfo.systemUptime - openStarted) * 1_000
+            ])
+            recordStartup(
+                token: token, kind: kind, application: application, stages: startupStages,
+                finalStage: "ready", failure: nil
+            )
             return fixture
         } catch {
+            recordStartup(
+                token: token, kind: kind, application: application, stages: startupStages,
+                finalStage: "owned-editor-focus", failure: String(describing: error)
+            )
             fixture.close()
             throw error
         }
@@ -415,6 +485,45 @@ private final class LiveWritingEditor {
         return (environment["RJT_LIVE_WRITING_TARGET_EVIDENCE"]
             ?? environment["TEST_RUNNER_RJT_LIVE_WRITING_TARGET_EVIDENCE"])
             .map { URL(fileURLWithPath: $0, isDirectory: true) }
+    }
+
+    private static func recordStartup(
+        token: String, kind: Kind, application: NSRunningApplication, stages: [[String: Any]],
+        finalStage: String, failure: String?
+    ) {
+        guard let output = evidenceDirectory else { return }
+        let receipt: [String: Any] = [
+            "checkpoint": "fixture-startup", "token": token, "bundleIdentifier": kind.bundleIdentifier,
+            "processIdentifier": application.processIdentifier,
+            "documentBudgetMilliseconds": 20_000, "textareaBudgetMilliseconds": 5_000,
+            "finalStage": finalStage, "failure": failure as Any? ?? NSNull(), "stages": stages
+        ]
+        do {
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+                .write(to: output.appendingPathComponent("\(token)-fixture-startup.json"))
+        } catch { Issue.record("Could not write live editor startup evidence: \(error)") }
+    }
+
+    private static func hasDocumentMarker(_ window: AXUIElement, token: String, deadline: TimeInterval) -> Bool {
+        func read(_ name: String, from node: AXUIElement) -> String? {
+            let remaining = deadline - ProcessInfo.processInfo.systemUptime
+            guard remaining > 0 else { return nil }
+            _ = AXUIElementSetMessagingTimeout(node, Float(min(0.1, remaining)))
+            let value = string(name, from: node)
+            return ProcessInfo.processInfo.systemUptime < deadline ? value : nil
+        }
+        if read(kAXTitleAttribute, from: window)?.contains(token) == true
+            || read(kAXDocumentAttribute, from: window)?.contains(token) == true { return true }
+        let remaining = deadline - ProcessInfo.processInfo.systemUptime
+        guard remaining > 0 else { return false }
+        let tree = diagnosticTree(window, deadline: Date(timeIntervalSinceNow: min(2, remaining)))
+        for node in tree.nodes {
+            guard ProcessInfo.processInfo.systemUptime < deadline else { return false }
+            if read(kAXDescriptionAttribute, from: node)?.contains(token) == true
+                || read(kAXTitleAttribute, from: node)?.contains(token) == true { return true }
+        }
+        return false
     }
 
     private static func recordSetupFailure(

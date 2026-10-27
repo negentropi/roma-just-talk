@@ -345,7 +345,9 @@ def isolated_configuration(directory, derived):
     (preferences / (bundle_id + ".plist")).write_bytes(plistlib.dumps(seed))
     environment = target.setdefault("EnvironmentVariables", {})
     environment.update({"CFFIXED_USER_HOME": str(isolated_user_home), "GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"})
-    arguments = [item for key, value in seed.items() for item in ["-" + key, "YES" if value is True else "NO" if value is False else value]]
+    # xctestrun splits spaced argv values. Keep the provider in the isolated preference plist.
+    arguments = [item for key, value in seed.items() if key != "selectedAIProvider"
+        for item in ["-" + key, "YES" if value is True else "NO" if value is False else value]]
     target["CommandLineArguments"] = arguments
     target["ParallelizationEnabled"] = False
     # Relocation changes __TESTROOT__; expand it before writing the isolated copy.
@@ -447,7 +449,42 @@ def verify_baseline_preserved():
         "scope": "Tracked test replacement and new test source are explicit instrumentation. Production source differs only by the captured-value initializer; no delivery or import fix is injected."})
 
 
+def check_isolated_provider_configuration():
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix="rjt-isolated-provider-") as temporary:
+        root = Path(temporary)
+        for modern in [False, True]:
+            derived = root / ("modern" if modern else "legacy")
+            products = derived / "Build/Products"
+            products.mkdir(parents=True)
+            target = {"BlueprintName": "VoiceInkTests", "TestBundlePath": "__TESTROOT__/VoiceInkTests.xctest",
+                "TestHostPath": "__TESTROOT__/roma just talk.app"}
+            original = {"TestConfigurations": [{"TestTargets": [target]}]} if modern else {"VoiceInkTests": target}
+            (products / "Host.xctestrun").write_bytes(plistlib.dumps(original))
+            directory = derived / "evidence"
+            directory.mkdir()
+            configuration = isolated_configuration(directory, derived)
+            value = plistlib.loads(configuration.read_bytes())
+            result = value["TestConfigurations"][0]["TestTargets"][0] if modern else value["VoiceInkTests"]
+            receipt = json.loads((directory / "configuration.json").read_text())
+            preference_path = Path(receipt["isolated_user_home"]) / "Library/Preferences" / (bundle_id + ".plist")
+            preferences = plistlib.loads(preference_path.read_bytes())
+            require(preferences == receipt["seed_preferences"] and preferences["selectedAIProvider"] == "Local CLI",
+                "The isolated plist must retain the complete provider name")
+            arguments = result["CommandLineArguments"]
+            expected = [item for key, item_value in preferences.items() if key != "selectedAIProvider"
+                for item in ["-" + key, "YES" if item_value is True else "NO" if item_value is False else item_value]]
+            # Plist serialization may reorder keys; compare each key/value pair, preserving all other options.
+            require(len(arguments) % 2 == 0 and dict(zip(arguments[::2], arguments[1::2])) ==
+                dict(zip(expected[::2], expected[1::2])) and "-selectedAIProvider" not in arguments,
+                "Only the spaced provider option may be omitted from argv")
+            require(result["EnvironmentVariables"]["CFFIXED_USER_HOME"] == receipt["isolated_user_home"],
+                "The launched target must use the seeded preference home")
+            require(receipt["isolated_sha256"] == digest(configuration.read_bytes()), "Configuration identity changed")
+
+
 def self_test():
+    check_isolated_provider_configuration()
     for path, sha in oracle_hashes.items(): require(digest((repo / path).read_bytes()) == sha, "Frozen common oracle changed: " + path)
     sites = failure_sites()
     def log(selected_lane):

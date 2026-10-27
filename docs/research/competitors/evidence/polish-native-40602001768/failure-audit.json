@@ -1,0 +1,212 @@
+{
+  "classification": "actual-launch-provider-truncation-setup-failure",
+  "runID": 40602001768,
+  "sourceSHA": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "nativeTestsStartedOnce": [
+    "liveLightImportQueueUsesRealWhisperRecognition",
+    "liveClarityImportQueueUsesRealWhisperRecognition",
+    "liveLightRetranscriptionUsesRealWhisperRecognition",
+    "liveClarityRetranscriptionUsesRealWhisperRecognition",
+    "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+  ],
+  "nativeTestsFailedOnce": 5,
+  "actualWhisperInferences": 0,
+  "actualEditorScenarios": 0,
+  "actualCLIRequests": 0,
+  "publicSetupObservations": [
+    {
+      "testName": "liveClarityImportQueueUsesRealWhisperRecognition",
+      "snapshots": [
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-ai-init",
+          "standardDefaultsProvider": "Local"
+        },
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-enhancement-init",
+          "standardDefaultsProvider": "Local"
+        }
+      ]
+    },
+    {
+      "testName": "liveClarityRetranscriptionUsesRealWhisperRecognition",
+      "snapshots": [
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-ai-init",
+          "standardDefaultsProvider": "Local"
+        },
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-enhancement-init",
+          "standardDefaultsProvider": "Local"
+        }
+      ]
+    },
+    {
+      "testName": "liveDictationPolishPipelineDeliversLiteralTextToTextEdit",
+      "snapshots": [
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-ai-init",
+          "standardDefaultsProvider": "Local"
+        },
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-enhancement-init",
+          "standardDefaultsProvider": "Local"
+        }
+      ]
+    },
+    {
+      "testName": "liveLightImportQueueUsesRealWhisperRecognition",
+      "snapshots": [
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-ai-init",
+          "standardDefaultsProvider": "Local"
+        },
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-enhancement-init",
+          "standardDefaultsProvider": "Local"
+        }
+      ]
+    },
+    {
+      "testName": "liveLightRetranscriptionUsesRealWhisperRecognition",
+      "snapshots": [
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-ai-init",
+          "standardDefaultsProvider": "Local"
+        },
+        {
+          "aiCommandIsConfigured": true,
+          "aiCommandMatchesFixture": true,
+          "apiKeyIsEmpty": true,
+          "argumentDomainProvider": "Local",
+          "commandArgumentDomainKeyExists": false,
+          "commandPreferenceMatchesFixture": true,
+          "isAPIKeyValid": false,
+          "provider": "Gemini",
+          "stage": "after-enhancement-init",
+          "standardDefaultsProvider": "Local"
+        }
+      ]
+    }
+  ],
+  "cause": "Actual NSArgumentDomain and standard defaults contain Local rather than Local CLI. The unknown provider selects the documented Gemini default, with empty credentials and invalid state. The actual CLI command is configured and unchanged before/after enhancer initialization.",
+  "driverChange": "Omit spaced selectedAIProvider from test-host launch arguments; preserve complete Local CLI in the isolated preferences plist and existing fixture writes. No provider/validity forcing.",
+  "appBuildAndLaunchPassed": true,
+  "actualDebugSignature": {
+    "app_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "3a88eefc966a18e432249dc7bbd2b3054578451a135ac02b63ec211ec7acd5a9",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "resolvedBuildSettings": {
+    "ENABLE_DEBUG_DYLIB": "NO",
+    "ENABLE_HARDENED_RUNTIME": "YES",
+    "ENABLE_PREVIEWS": "NO"
+  },
+  "sourceCensus": 646,
+  "sourceBeforeAfterEqual": true,
+  "sourceMatchesPinnedGit": true,
+  "signedAppAndTestBundleIdentityBeforeAfterEqual": true,
+  "actualCanonicalDependencyPinsBefore": 41,
+  "hostPID": 27870,
+  "hostClosurePassed": true,
+  "selectedTestCount": 5,
+  "artifact": {
+    "id": 12780090567,
+    "bytes": 319157,
+    "sha256": "3a179bfef3b91a33158d76d144dd73595536eb945bbcb683db89d7f71cbefc67",
+    "zipMembers": 45,
+    "crcValid": true,
+    "downloads": 1,
+    "path": "/data/rjt-writing-check-01a17bef/40602001768/evidence.zip"
+  },
+  "largeArtifactDownloaded": false,
+  "limits": [
+    "Test bodies started, then failed strict fixture setup before inference, CLI or editor work; no feature acceptance.",
+    "The fixed launch configuration still requires actual native readback and execution.",
+    "App startup attempted pre-roll; no microphone inactivity claim.",
+    "Failed setup now restores its owned preferences/sound/Power Mode/temp directory; this is source behavior, not an independently retained per-key restoration census."
+  ]
+}

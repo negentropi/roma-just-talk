@@ -1,0 +1,5 @@
+{
+  "mode": "native",
+  "classification": "invalid-or-failed",
+  "error": "Exactly five per-method observation receipts are required"
+}

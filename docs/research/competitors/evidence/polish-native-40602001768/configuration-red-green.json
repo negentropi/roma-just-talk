@@ -1,0 +1,11 @@
+{
+  "classification": "matched-configuration-serialization-only",
+  "oldSource": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "scope": "Same new self-test and script; only configuration() replaced with exact old source. No native app/argument-parser claim.",
+  "oldFunctionSHA256": "aa812201a33fe3a531550cea48d6f484e118819bd57657bd7198676d08fc67dd",
+  "oldExit": 1,
+  "oldExpectedFailure": "RuntimeError: The configuration fixture still shadows the persistent provider",
+  "newExit": 0,
+  "newStdout": "{\"classification\": \"passed\", \"valid_log\": true, \"invalid_logs_rejected\": 8, \"valid_observations\": 5, \"invalid_observations_rejected\": 41, \"exact_string_and_uuid_controls\": true}",
+  "candidateDriverSHA256": "5dcc70ad84d53f9017d8cd3e057aade41811730ef6e2a98a79a10c7c07ed160f"
+}

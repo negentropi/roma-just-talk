@@ -23,6 +23,7 @@ import re
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 import uuid
 import wave
@@ -255,7 +256,13 @@ def configuration():
         'RJT_DICTATION_POLISH_MODEL': str(output / 'inputs/ggml-base.bin'), 'RJT_DICTATION_POLISH_AUDIO': str(output / 'inputs/input.wav'),
         'RJT_DICTATION_POLISH_EVIDENCE': str(observations)}
     target.setdefault('EnvironmentVariables', {}).update(flags)
-    arguments = [item for key, item_value in seed.items() for item in ['-' + key, 'YES' if item_value is True else 'NO' if item_value is False else item_value]]
+    # The spaced provider launch value became Local in NSArgumentDomain; use the isolated plist.
+    arguments = [item for key, item_value in seed.items() if key != 'selectedAIProvider'
+        for item in ['-' + key, 'YES' if item_value is True else 'NO' if item_value is False else item_value]]
+    require('-selectedAIProvider' not in arguments and all(not any(character.isspace() for character in str(item)) for item in arguments),
+        'Launch arguments must not shadow the isolated provider or contain a spaced value')
+    require(plistlib.loads((preferences / (bundle_id + '.plist')).read_bytes())['selectedAIProvider'] == 'Local CLI',
+        'The isolated persistent provider must retain its complete raw value')
     target['CommandLineArguments'], target['ParallelizationEnabled'] = arguments, False
     def expand(node):
         if isinstance(node, str):
@@ -452,6 +459,27 @@ def observation_errors(name, value, executable, processed_audio=None):
 
 
 def self_test():
+    global derived, output
+    original_derived, original_output = derived, output
+    try:
+        with tempfile.TemporaryDirectory(prefix='rjt-polish-configuration-') as temporary:
+            output = Path(temporary) / 'proof'
+            output.mkdir()
+            derived = Path(temporary) / 'derived'
+            products = derived / 'Build/Products'
+            products.mkdir(parents=True)
+            target = {'BlueprintName': 'VoiceInkTests', 'TestBundlePath': '__TESTROOT__/VoiceInkTests.xctest',
+                'TestHostPath': '__TESTROOT__/roma just talk.app'}
+            (products / 'fixture.xctestrun').write_bytes(plistlib.dumps({'TestConfigurations': [{'TestTargets': [target]}]}))
+            configured = plistlib.loads(configuration().read_bytes())['TestConfigurations'][0]['TestTargets'][0]
+            arguments = configured['CommandLineArguments']
+            require('-selectedAIProvider' not in arguments and 'Local CLI' not in arguments and 'Local' not in arguments,
+                'The configuration fixture still shadows the persistent provider')
+            home = Path(configured['EnvironmentVariables']['CFFIXED_USER_HOME'])
+            require(plistlib.loads((home / 'Library/Preferences' / (bundle_id + '.plist')).read_bytes())['selectedAIProvider'] == 'Local CLI',
+                'The actual serialized configuration lost the complete persistent provider')
+    finally:
+        derived, output = original_derived, original_output
     good = ''.join('Test ' + name + '() started.\nTest ' + name + '() passed after 1.0 seconds.\n' for name in cases) + 'Test run with 5 tests in 1 suite passed after 5.0 seconds.\n'
     require(classify(good, 0)['valid'], 'Valid exact-five log rejected')
     bad = [good.replace(cases[0], 'wrong'), good.replace('with 5 tests', 'with 4 tests'), good.replace('passed after 1.0', 'skipped after 1.0', 1),

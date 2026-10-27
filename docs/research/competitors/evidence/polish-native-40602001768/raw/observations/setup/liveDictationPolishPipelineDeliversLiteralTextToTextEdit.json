@@ -1,0 +1,29 @@
+{
+  "snapshots" : [
+    {
+      "aiCommandIsConfigured" : true,
+      "aiCommandMatchesFixture" : true,
+      "apiKeyIsEmpty" : true,
+      "argumentDomainProvider" : "Local",
+      "commandArgumentDomainKeyExists" : false,
+      "commandPreferenceMatchesFixture" : true,
+      "isAPIKeyValid" : false,
+      "provider" : "Gemini",
+      "stage" : "after-ai-init",
+      "standardDefaultsProvider" : "Local"
+    },
+    {
+      "aiCommandIsConfigured" : true,
+      "aiCommandMatchesFixture" : true,
+      "apiKeyIsEmpty" : true,
+      "argumentDomainProvider" : "Local",
+      "commandArgumentDomainKeyExists" : false,
+      "commandPreferenceMatchesFixture" : true,
+      "isAPIKeyValid" : false,
+      "provider" : "Gemini",
+      "stage" : "after-enhancement-init",
+      "standardDefaultsProvider" : "Local"
+    }
+  ],
+  "testName" : "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+}

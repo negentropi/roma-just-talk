@@ -1,0 +1,182 @@
+{
+  "build-command.json": {
+    "bytes": 1121,
+    "sha256": "996f00063b2b71a50c6a412faace54edc8d07709c702007ead5d6a1dff1f394e"
+  },
+  "build-settings.json": {
+    "bytes": 41217,
+    "sha256": "2299d967c92b526e5c56a31705efad6d58da47274e8da236c503d43393bc5d50"
+  },
+  "configuration.json": {
+    "bytes": 1792,
+    "sha256": "b63cc5ee6803dceecaa7667a8616ccf4b8ee63ca17730faf4492917b540a79e7"
+  },
+  "contract.json": {
+    "bytes": 1248,
+    "sha256": "3da66f02cee2342e77adee0079c0b062a0e20c0a7dece8ef9bf6fd7fc052a67c"
+  },
+  "discovery/enumeration.log": {
+    "bytes": 13038,
+    "sha256": "a8af08567b0a47bf6bb174336432aac06535bfc3abfb1c00b492442c221edb9a"
+  },
+  "discovery/selected-tests.json": {
+    "bytes": 42845,
+    "sha256": "28666fcc9f7581ce9abb280aba519e2d3f196b44f18246cbe6d19bd038b70ba4"
+  },
+  "exit.json": {
+    "bytes": 44,
+    "sha256": "69fef3b5ef7cd3e1773d281641365b46cc3d058163dbc51803deee9b35b8e1a8"
+  },
+  "failure-native.json": {
+    "bytes": 136,
+    "sha256": "35f6c6ce42f207aa2073b8664bff1432c551e978b045d119d8644808245f7869"
+  },
+  "failure-verify.json": {
+    "bytes": 184,
+    "sha256": "4bae798fa452010603cfb2682a082a6255a207597151d9ec5226a7f62a1ac5d0"
+  },
+  "host-closed.json": {
+    "bytes": 4324,
+    "sha256": "ed67c1597ba4ddbfd413c951c52163e9e2ca7e4b01c5d51a3c3350267c03f313"
+  },
+  "host-live.json": {
+    "bytes": 4018,
+    "sha256": "ef87cd6e885e2c052421b2732aa3e3ed5f471ac348450202ee2f075532361fbb"
+  },
+  "host-requirement.txt": {
+    "bytes": 51,
+    "sha256": "4ae99b10e919ebe888f992743b8f69ca423a01ee7f2ddbe90a0a6c004dbcdd15"
+  },
+  "identity-after.json": {
+    "bytes": 94898,
+    "sha256": "d743e9630fcf0da04eda49c832c7032f209f137aab1c0b87568281e8f2e18ffb"
+  },
+  "identity-before.json": {
+    "bytes": 94898,
+    "sha256": "d743e9630fcf0da04eda49c832c7032f209f137aab1c0b87568281e8f2e18ffb"
+  },
+  "inputs/input.wav": {
+    "bytes": 165984,
+    "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+  },
+  "inputs.json": {
+    "bytes": 710,
+    "sha256": "2ae9e5bd7109418bc7753150caa3e827996d5e5a09556d15c5245a60a0fdd530"
+  },
+  "observations/setup/liveClarityImportQueueUsesRealWhisperRecognition.json": {
+    "bytes": 890,
+    "sha256": "9fbd82a6615037c58d46df0a61cdd570b47fb9866a5a1c41010c396f42b52fed"
+  },
+  "observations/setup/liveClarityRetranscriptionUsesRealWhisperRecognition.json": {
+    "bytes": 894,
+    "sha256": "835a7397ec56fb1fc8cb9cbaa5962dd317619c58d07035788f7ec0645bf0eb06"
+  },
+  "observations/setup/liveDictationPolishPipelineDeliversLiteralTextToTextEdit.json": {
+    "bytes": 898,
+    "sha256": "f785e0857bdd9ef7efd3dbeaa9970062f2abd539969eaa9a92ee4a3a6192b2d0"
+  },
+  "observations/setup/liveLightImportQueueUsesRealWhisperRecognition.json": {
+    "bytes": 888,
+    "sha256": "b2ab83366b885958c57e24627bb3744e872f8705cf8f2e99519375b08c716205"
+  },
+  "observations/setup/liveLightRetranscriptionUsesRealWhisperRecognition.json": {
+    "bytes": 892,
+    "sha256": "c3bb6d9d2ad1e5b85cdc03b7bf870eb43a17a24fa603411f4c4e2fb756d18ca9"
+  },
+  "packages/candidate-strict-resolve.json": {
+    "bytes": 48,
+    "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+  },
+  "packages/canonical-graph-contract.json": {
+    "bytes": 838,
+    "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f"
+  },
+  "packages/canonical.Package.resolved": {
+    "bytes": 11320,
+    "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  "resolved-test-host-settings.json": {
+    "bytes": 411,
+    "sha256": "275722e248d8b74a288cfd70e2f2cc3c92753562959f176181796ad2362eaceb"
+  },
+  "packages-before.json": {
+    "bytes": 6824,
+    "sha256": "d2fd7ea4df957a932fd5eb85915aa8a3239c324c17f27cb433d74b96e740adf7"
+  },
+  "selection/receipt.json": {
+    "bytes": 31282,
+    "sha256": "9229ab3fcda415cef52185035a28e8a5aaadd6ca2bff00680341d4042592703e"
+  },
+  "selection/enumeration.log": {
+    "bytes": 12478,
+    "sha256": "4e7412429351ac32a5626edd15e02fd07e1c68085d55f79e2d7239a1a4d2e5f9"
+  },
+  "selection/selected-tests.json": {
+    "bytes": 42843,
+    "sha256": "43ca6ea00058da72d02c3e0f4ff0168666f91a96d9ed757549a77c33e752753c"
+  },
+  "source/DictationProfileImportLiveTests.swift": {
+    "bytes": 40772,
+    "sha256": "f9ea899d5d565009a545dd3846b22b9d23b143a08092e098f597113f4687ac54"
+  },
+  "source/WritingTargetLiveTests.swift": {
+    "bytes": 95557,
+    "sha256": "259a0b77b10eb58e20a2f5d6c708afe16822fcdee96c90e5cca26717ed4f751b"
+  },
+  "source-after.json": {
+    "bytes": 82889,
+    "sha256": "2eb9b0f0bd029d7073dc8f7988f9fb5e8b1512ff9b58a966a031cf4fc8ac488f"
+  },
+  "source-before.json": {
+    "bytes": 82889,
+    "sha256": "2eb9b0f0bd029d7073dc8f7988f9fb5e8b1512ff9b58a966a031cf4fc8ac488f"
+  },
+  "static-whisper-before.json": {
+    "bytes": 11104,
+    "sha256": "b90e912c7f892580e7c18e14626cf3dc54bb90b2c73207c03e2b605fc3bfb2c7"
+  },
+  "sw-vers.txt": {
+    "bytes": 65,
+    "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+  },
+  "swift-version.txt": {
+    "bytes": 128,
+    "sha256": "5fa4b669e41b23b9ad0760253d062493487f93cf5d8ad8c44f0d4fd635137499"
+  },
+  "tcc.json": {
+    "bytes": 440,
+    "sha256": "62c8518feac7d576cdb0a9d9be058f1dc4730c176e32b68b8ad8d4cd14fd62a2"
+  },
+  "test-host-signature/deep-verification.txt": {
+    "bytes": 6182,
+    "sha256": "6223584c3354bafeb82acec72892cb051343db68f6fa2eb9f7c83a9d7d068f40"
+  },
+  "test-host-signature/entitlements.log": {
+    "bytes": 231,
+    "sha256": "7bdef633129d84f2284094d09832fdf553f1bd5bfed41aac36affa1855a32235"
+  },
+  "test-host-signature/entitlements.plist": {
+    "bytes": 1017,
+    "sha256": "99cb83381cba5abc770fb567deafb883cca077d42909457c808a289ac2f004ab"
+  },
+  "test-host-signature/linked-libraries.txt": {
+    "bytes": 8301,
+    "sha256": "7797badf4499643266556097f3c2a6703a607ee089a400a66fc69d14547692c4"
+  },
+  "test-host-signature/result.json": {
+    "bytes": 1011,
+    "sha256": "2186cf6d54fd705e19d35f65122167ad5ac15627280567d7456aa4d2ab7244c7"
+  },
+  "test-host-signature/signature.txt": {
+    "bytes": 794,
+    "sha256": "f6db7f0d7604cd44ed5425016f59a023f0305e1176fee46d923838a181004976"
+  },
+  "tests.log": {
+    "bytes": 22173,
+    "sha256": "4a1bb7dd8fccc95ef37ba0b1cac8738ccb7900ea962050120d578bc0e33ce926"
+  },
+  "xcode-version.txt": {
+    "bytes": 32,
+    "sha256": "18730ed2ae28a2c9cf0c2d5db549033a4f07089331391a7133b7b32187454fa9"
+  }
+}

@@ -279,7 +279,9 @@ def isolated_configuration(directory, derived):
     (preferences / (bundle_id + ".plist")).write_bytes(plistlib.dumps(seed))
     environment = target.setdefault("EnvironmentVariables", {})
     environment.update({"CFFIXED_USER_HOME": str(isolated_user_home), "GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "github-hosted"})
-    arguments = [item for key, value in seed.items() for item in ["-" + key, "YES" if value is True else "NO" if value is False else value]]
+    # Xcode split the spaced provider value in argv; the plist and fixture own it.
+    arguments = [item for key, value in seed.items() if key != "selectedAIProvider"
+        for item in ["-" + key, "YES" if value is True else "NO" if value is False else value]]
     target["CommandLineArguments"] = arguments
     target["ParallelizationEnabled"] = False
     # Relocation changes __TESTROOT__; expand it before writing the isolated copy.
@@ -381,6 +383,25 @@ def restore_baseline():
 
 
 def self_test():
+    with tempfile.TemporaryDirectory(prefix="rjt-finalizer-config-") as temporary:
+        root = Path(temporary)
+        derived = root / "derived"
+        products = derived / "Build/Products"
+        products.mkdir(parents=True)
+        generated = {"TestConfigurations": [{"TestTargets": [{"BlueprintName": "VoiceInkTests",
+            "TestBundlePath": "__TESTROOT__/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest",
+            "TestHostPath": "__TESTROOT__/Debug/roma just talk.app/Contents/MacOS/roma just talk"}]}]}
+        (products / "generated.xctestrun").write_bytes(plistlib.dumps(generated))
+        evidence = root / "evidence"
+        evidence.mkdir()
+        configuration = plistlib.loads(isolated_configuration(evidence, derived).read_bytes())
+        target = configuration["TestConfigurations"][0]["TestTargets"][0]
+        seed_path = Path(target["EnvironmentVariables"]["CFFIXED_USER_HOME"]) / "Library/Preferences" / (bundle_id + ".plist")
+        require(plistlib.loads(seed_path.read_bytes())["selectedAIProvider"] == "Local CLI", "The isolated preferences truncated the provider value")
+        require("-selectedAIProvider" not in target["CommandLineArguments"] and "Local CLI" not in target["CommandLineArguments"],
+            "The spaced provider value must not enter Xcode command-line arguments")
+        require(target["CommandLineArguments"][:2] == ["-CurrentTranscriptionModel", "whisper-large-v3-turbo"],
+            "The existing non-provider startup arguments changed")
     source = git(repo, "show", "HEAD:" + oracle_path).decode()
     require(digest(source.encode()) == oracle_sha, "Pinned common oracle changed")
     sites = failure_sites(source)

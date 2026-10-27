@@ -1,0 +1,75 @@
+{
+  "source_head": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3",
+  "purpose": "Actor-isolation shape regression only; exact pinned Libraries/PreparationFailure and DictionaryService snapshot method, with SwiftData and Core types replaced by inert declarations. Not app compilation or runtime proof.",
+  "compiler": "Apple Swift version 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4)\nTarget: arm64-apple-macosx26.0",
+  "results": [
+    {
+      "language_mode": "5",
+      "case": "known-bad",
+      "command": [
+        "xcrun",
+        "swiftc",
+        "-typecheck",
+        "-swift-version",
+        "5",
+        "/tmp/rjt-postprocessing-isolation-40579487616/known-bad.swift"
+      ],
+      "exit_code": 1,
+      "error_lines": [
+        "/tmp/rjt-postprocessing-isolation-40579487616/known-bad.swift:37:56: error: call to main actor-isolated static method 'snapshotEnabledReplacementRules(using:)' in a synchronous nonisolated context [#ActorIsolatedCall]"
+      ],
+      "source_sha256": "9fd6f6c8f1cb092d52a7849b674cc1ab939d8470b8e8d603ca9382d64bef31f1",
+      "log_sha256": "c7350cb2271f76b5477be437e6b0b1219357d6225999cc32b09d4e97623bacb1"
+    },
+    {
+      "language_mode": "5",
+      "case": "candidate",
+      "command": [
+        "xcrun",
+        "swiftc",
+        "-typecheck",
+        "-swift-version",
+        "5",
+        "/tmp/rjt-postprocessing-isolation-40579487616/candidate.swift"
+      ],
+      "exit_code": 0,
+      "error_lines": [],
+      "source_sha256": "4337be3693833660f5b7b35b5671e57e6c406624d23d31366ec9f946987f265e",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "language_mode": "6",
+      "case": "known-bad",
+      "command": [
+        "xcrun",
+        "swiftc",
+        "-typecheck",
+        "-swift-version",
+        "6",
+        "/tmp/rjt-postprocessing-isolation-40579487616/known-bad.swift"
+      ],
+      "exit_code": 1,
+      "error_lines": [
+        "/tmp/rjt-postprocessing-isolation-40579487616/known-bad.swift:37:56: error: call to main actor-isolated static method 'snapshotEnabledReplacementRules(using:)' in a synchronous nonisolated context [#ActorIsolatedCall]"
+      ],
+      "source_sha256": "9fd6f6c8f1cb092d52a7849b674cc1ab939d8470b8e8d603ca9382d64bef31f1",
+      "log_sha256": "c7350cb2271f76b5477be437e6b0b1219357d6225999cc32b09d4e97623bacb1"
+    },
+    {
+      "language_mode": "6",
+      "case": "candidate",
+      "command": [
+        "xcrun",
+        "swiftc",
+        "-typecheck",
+        "-swift-version",
+        "6",
+        "/tmp/rjt-postprocessing-isolation-40579487616/candidate.swift"
+      ],
+      "exit_code": 0,
+      "error_lines": [],
+      "source_sha256": "4337be3693833660f5b7b35b5671e57e6c406624d23d31366ec9f946987f265e",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

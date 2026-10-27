@@ -1,0 +1,48 @@
+{
+  "zip_members": [
+    {
+      "member": "_temp/writing-proof-snapshot/source-sha.txt",
+      "bytes": 41,
+      "sha256": "61807f951baba13e1a94ea5cc843bcf7ab2d4de94a0c29f3d0afe37ac51a9c74",
+      "text": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3"
+    },
+    {
+      "member": "_temp/writing-package-proof/candidate-strict-resolve.json",
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+    },
+    {
+      "member": "_temp/writing-package-proof/candidate-strict-resolve.log",
+      "bytes": 11912,
+      "sha256": "2a1325ab294b949897d290267d6a70dde0a1c4a29d2fcfefaa8be96e73e55b7e"
+    },
+    {
+      "member": "_temp/writing-package-proof/canonical-graph-contract.json",
+      "bytes": 838,
+      "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f"
+    },
+    {
+      "member": "_temp/writing-package-proof/canonical.Package.resolved",
+      "bytes": 11320,
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+    },
+    {
+      "member": "_temp/writing-core-checks.log",
+      "bytes": 209708,
+      "sha256": "079cb6954a87f7f9c30ec9d5cca451265647c2df5cc0147e2558881e1f858e9d",
+      "pass_lines": 1749,
+      "unique_pass_names": 1749,
+      "failed_lines": [],
+      "declared_totals": [
+        "1749"
+      ],
+      "sorted_names_sha256": "823ea763de920e309face851f6c131344c0c3aab47e2a0828cbe309867a8c61f"
+    },
+    {
+      "member": "_temp/writing-dependency-setup.log",
+      "bytes": 334,
+      "sha256": "34ccdd96043718159310ec312a3160c4e6c104fd23717602d504dc7dd4915add"
+    }
+  ],
+  "xcresult_present": false
+}

@@ -1,0 +1,20 @@
+/tmp/rjt-postprocessing-isolation-40579487616/known-bad.swift:37:56: error: call to main actor-isolated static method 'snapshotEnabledReplacementRules(using:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+ 8 | @MainActor
+ 9 | enum DictionaryService {
+10 |     static func snapshotEnabledReplacementRules(using context: ModelContext) throws -> [VoiceInkWordReplacementRule] {
+   |                 `- note: calls to static method 'snapshotEnabledReplacementRules(using:)' from outside of its actor context are implicitly asynchronous
+11 |         try context.fetch(FetchDescriptor<WordReplacement>())
+12 |             .filter(\.isEnabled)
+   :
+32 |         let replacementRules: Result<[VoiceInkWordReplacementRule], PreparationFailure>
+33 | 
+34 |         fileprivate static func capture(snippets: [VoiceInkSpokenSnippet], context: ModelContext) -> Self {
+   |                                 `- note: add '@MainActor' to make static method 'capture(snippets:context:)' part of global actor 'MainActor'
+35 |             let rules: Result<[VoiceInkWordReplacementRule], PreparationFailure>
+36 |             do {
+37 |                 rules = .success(try DictionaryService.snapshotEnabledReplacementRules(using: context))
+   |                                                        `- error: call to main actor-isolated static method 'snapshotEnabledReplacementRules(using:)' in a synchronous nonisolated context [#ActorIsolatedCall]
+38 |             } catch {
+39 |                 rules = .failure(.replacementLibrary(VoiceInkErrorDescription.text(for: error)))
+
+[#ActorIsolatedCall]: <https://docs.swift.org/compiler/documentation/diagnostics/actor-isolated-call>

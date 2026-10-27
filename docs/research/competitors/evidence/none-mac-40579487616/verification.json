@@ -1,0 +1,81 @@
+{
+  "run_id": 40579487616,
+  "head_sha": "4d5b65b5c662d1b78ccff883a10bf510ed7d82f3",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40579487616",
+  "status": "completed",
+  "conclusion": "failure",
+  "classification": "app-compile-failure-before-unit-execution",
+  "artifact": {
+    "id": 12769113110,
+    "bytes": 43823,
+    "sha256": "8dc7f27500fbd4a1591e1494be6172659298390dc1068b2d10dc4e9d21a1c47c",
+    "remote_path": "/data/rjt-writing-check-01a17bef/40579487616/evidence.zip",
+    "size_digest_and_all_zip_crc_verified": true,
+    "zip_members": 7
+  },
+  "core": {
+    "member": "_temp/writing-core-checks.log",
+    "bytes": 209708,
+    "sha256": "079cb6954a87f7f9c30ec9d5cca451265647c2df5cc0147e2558881e1f858e9d",
+    "pass_lines": 1749,
+    "unique_pass_names": 1749,
+    "failed_lines": [],
+    "declared_totals": [
+      "1749"
+    ],
+    "sorted_names_sha256": "823ea763de920e309face851f6c131344c0c3aab47e2a0828cbe309867a8c61f"
+  },
+  "unit_result_records": null,
+  "unit_execution_proof_available": false,
+  "native": "skipped",
+  "matched_regression": "skipped",
+  "ui": "skipped",
+  "release_and_package": "skipped",
+  "failure": {
+    "path": "VoiceInk/Services/DictationPostprocessingPlan.swift",
+    "line": 27,
+    "column": 56,
+    "error": "call to main actor-isolated static method 'snapshotEnabledReplacementRules(using:)' in a synchronous nonisolated context",
+    "compiler_error_count": 1,
+    "failed_log_fetched_once": true,
+    "failed_log_local_path": "/tmp/rjt-none-failed-40579487616.log",
+    "failed_log_bytes": 6527837,
+    "failed_log_sha256": "077368fd12cf76c0fa506e57732f720bb325c493bfb4909d89e60c5ddbb068be",
+    "cause": "Nested Libraries.capture does not inherit the containing enum MainActor isolation; the synchronous factory calls actor-isolated DictionaryService."
+  },
+  "candidate_correction": {
+    "scope": "Only annotate Libraries.capture with @MainActor; immutable Libraries values remain nonisolated.",
+    "source_bindings": [
+      {
+        "path": "VoiceInk/Services/DictationPostprocessingPlan.swift",
+        "tested_head_sha256": "1c96f86f582403c23c5ea945576223eba458aeab7624024a5dd9270f64f6ed08",
+        "candidate_worktree_sha256": "86038482eccdb95d90747fcee20c16299c56b08ce82e6de58a2b910b0177418e",
+        "same": false
+      },
+      {
+        "path": "VoiceInk/Services/DictionaryService.swift",
+        "tested_head_sha256": "e630a6de3d0851a1222447ee7a03e1167481ac6d2f102909514555e070365966",
+        "candidate_worktree_sha256": "e630a6de3d0851a1222447ee7a03e1167481ac6d2f102909514555e070365966",
+        "same": true
+      },
+      {
+        "path": "VoiceInkTests/DictationPostprocessingPlanTests.swift",
+        "tested_head_sha256": "4a0740c9b5e890aadef3114892be8322d375bb439197c5a2c908066b0bdc4666",
+        "candidate_worktree_sha256": "4a0740c9b5e890aadef3114892be8322d375bb439197c5a2c908066b0bdc4666",
+        "same": true
+      }
+    ],
+    "local_parse": "passed for plan, dictionary service, and plan tests",
+    "diff_check": "passed",
+    "isolation_shape_regression": "known-bad RED with the same sole actor-call diagnostic, candidate GREEN, under Swift5 and Swift6 modes",
+    "app_compilation_after_fix": "not executed by this audit"
+  },
+  "limits": [
+    "This exact full run is red; the app and app-hosted tests did not compile successfully.",
+    "The artifact has no xcresult. No unit pass/skip/zero-test count is claimed.",
+    "Native, matched UI and Release proof from other heads is not attributed to this run.",
+    "The tiny compiler harness substitutes model types and does not prove SwiftData/Core integration or app compilation.",
+    "Concurrent uncommitted model metadata and Views work is excluded from the tested-head claim.",
+    "No app launch, model request, native runtime, physical-keyboard or human-speech verification performed by this audit."
+  ]
+}

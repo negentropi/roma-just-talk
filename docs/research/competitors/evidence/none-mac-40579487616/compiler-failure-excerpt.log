@@ -1,0 +1,16 @@
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8381310Z /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/DictationPostprocessingPlan.swift:27:56: error: call to main actor-isolated static method 'snapshotEnabledReplacementRules(using:)' in a synchronous nonisolated context
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8382690Z                 rules = .success(try DictionaryService.snapshotEnabledReplacementRules(using: context))
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8383200Z                                                        ^
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8384140Z /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/DictionaryService.swift:154:17: note: calls to static method 'snapshotEnabledReplacementRules(using:)' from outside of its actor context are implicitly asynchronous
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8385460Z     static func snapshotEnabledReplacementRules(using context: ModelContext) throws -> [VoiceInkWordReplacementRule] {
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8386010Z                 ^
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8386810Z /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/DictationPostprocessingPlan.swift:24:33: note: add '@MainActor' to make static method 'capture(snippets:context:)' part of global actor 'MainActor'
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8387880Z         fileprivate static func capture(snippets: [VoiceInkSpokenSnippet], context: ModelContext) -> Self {
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8388350Z                                 ^
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8388590Z         @MainActor 
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8388720Z 
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8389240Z SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/DictionaryService.swift (in target 'VoiceInk' from project 'VoiceInk')
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:23.8390200Z     cd /Users/runner/work/roma-just-talk/roma-just-talk
+
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:24.0854770Z ** TEST BUILD FAILED **
+macos	Full Mac unit suite with fresh CI permissions	2026-10-27T20:49:24.5640600Z ##[error]Process completed with exit code 65.

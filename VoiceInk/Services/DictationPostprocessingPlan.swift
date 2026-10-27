@@ -21,6 +21,7 @@ enum DictationPostprocessingPlan {
         let snippets: [VoiceInkSpokenSnippet]
         let replacementRules: Result<[VoiceInkWordReplacementRule], PreparationFailure>
 
+        @MainActor
         fileprivate static func capture(snippets: [VoiceInkSpokenSnippet], context: ModelContext) -> Self {
             let rules: Result<[VoiceInkWordReplacementRule], PreparationFailure>
             do {

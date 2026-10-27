@@ -1,0 +1,33 @@
+{
+  "run_id": 40575148195,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40575148195",
+  "head_sha": "31651718c058593719742a220aa85c05827ded7a",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "oracle_sha256": "e9bebc93c6628cd8abeb82521c1d72eaa6bb09a88bb47a013332690a9afb78b0",
+  "baseline_expected_red_line": 377,
+  "candidate_cases_passed": 4,
+  "candidate_errors_or_skips": 0,
+  "typed_shortcut_census_groups": 5,
+  "fatal_baseline_restore_succeeded": true,
+  "candidate_restoration_succeeded_all4": true,
+  "all_census_phase_categories": [
+    "before",
+    "isolated",
+    "after-launch",
+    "restored"
+  ],
+  "historical_trigger_causality": "Unproven; prior run did not capture shortcut prefs or unified shortcut trace.",
+  "artifact": {
+    "id": 12768048669,
+    "bytes": 214077043,
+    "api_sha256": "b5aec28d363b336880fd1be9b4eed20961cc5d46b58582065de930c93ff189f9",
+    "whole_archive_downloaded": false,
+    "whole_archive_hash_verified": false,
+    "selected_range_bytes": 3145906,
+    "selected_member_crc_verified_by_zipfile": true,
+    "original_pngs": 10,
+    "remote_selected_path": "/data/rjt-writing-check-01a17bef/40575148195/selected/"
+  },
+  "scope": "Matched Debug UI with isolated global shortcuts and exact restoration assertions; no Release, physical speech, dynamic-existing-PowerMode-key or VoiceOver proof.",
+  "restoration_runtime_scope": "All32 owned keys absent before and restored absent after every case, including fatal baseline. Nonempty binding/Data and dynamic Power Mode branches not exercised."
+}

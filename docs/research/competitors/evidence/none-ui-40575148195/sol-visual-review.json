@@ -1,0 +1,29 @@
+{
+  "reviewer_model": "gpt-6.1-sol",
+  "reviewer": "/root/polish_ui_sol_review",
+  "source_sha": "31651718c058593719742a220aa85c05827ded7a",
+  "classification": "no-blocking-visual-findings",
+  "screenshots_individually_viewed": {
+    "custom-dictation-cleanup-settings.png": "c79df91c41f17884fa19ddded2d138a613f51aff39657915cd114647e0b226c9",
+    "custom-formatting-restored-without-changing-saved-values.png": "c69c917d26b000d726153723ebb35fa86ccbc4b882580e55460ad840c2268773",
+    "dictionary-settings-native-sheet.png": "23952ffd9a6c9313996e3df2c0560c85bd996755f39e54d7c6b674c5e54b0979",
+    "enhancement-settings-native-sheet.png": "8f22e47bb759b67b04c097f47f91e0d578e5bc1ad09dd9d71fc3165d52566205",
+    "none-dictation-cleanup-persisted-after-relaunch.png": "e3ab243c7488b4875765d06fa403ea21fddf77a055b982e15946903c3c210a3f",
+    "none-dictation-cleanup-selected.png": "cf2ec748109be7a9c9759d3e6cc88049ce9a704502b3ceddbc19f1eb70c93986",
+    "none-preserves-inactive-custom-formatting.png": "2d82ca79be24890daa7b9f7b2e9fe787f303d721b3987c16e4443fe186b17b66",
+    "power-mode-reorder-native-sheet.png": "fd0a36ce2eba12b88c8343d549a1e7f524e71c69f55b7d0fe285df7c5de9faa5",
+    "power-mode-unsaved-native-sheet.png": "aa7be903c2adaed3077d6b1ec3bfaea3d511831cf1d70b741128b29730acc871",
+    "prompt-editor-unsaved-native-sheet.png": "980ff90842946f72b6130f2b4acba6de44752d50f07e94a467df08e737ef8e59"
+  },
+  "observations": [
+    "None selected and explanatory retained Custom settings visible; relaunch screenshot remains None.",
+    "Initial/restored Custom settings agree visually.",
+    "Prompt Cancel/Save footer and Power Mode footer unobstructed.",
+    "Dictionary and Enhancement controls readable; empty reorder Close visible."
+  ],
+  "limits": [
+    "Screenshot review alone does not establish interactions or persistence.",
+    "Physical keyboard, speech, VoiceOver, dark mode, small windows and populated reordering not evaluated.",
+    "Future Opus profile/style/History UI is outside this source and review."
+  ]
+}

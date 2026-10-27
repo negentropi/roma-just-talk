@@ -1,0 +1,35 @@
+{
+  "run_id": 40575148195,
+  "candidate_sha": "31651718c058593719742a220aa85c05827ded7a",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "oracle_marker_line": 377,
+  "inputs": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "e9bebc93c6628cd8abeb82521c1d72eaa6bb09a88bb47a013332690a9afb78b0",
+    "scripts/run-writing-settings-ui-regression.sh": "c992dc02b715849b362d13c13851180deb86760064f3d738e01883521e75ace8",
+    "scripts/run-writing-feature-regression.sh": "3071693cf442929cc46edc881845e60044e7827fff44c2f7dc0f60faefb28a9c",
+    ".github/workflows/voiceink-writing-ui-check.yml": "12515fc46db59e3b9e6487e6e8ec89d9a759beda85fd4e3acbb95703bd16255a",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  "ui_views_unchanged_from": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "ui_paths": [
+    "VoiceInk/PowerMode/PowerModeConfigView.swift",
+    "VoiceInk/PowerMode/PowerModeView.swift",
+    "VoiceInk/Views/AI Models/ModelManagementView.swift",
+    "VoiceInk/Views/Components/EnhancementSettingsPanel.swift",
+    "VoiceInk/Views/Components/SlidingPanel.swift",
+    "VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift",
+    "VoiceInk/Views/Dictionary/DictionarySettingsView.swift",
+    "VoiceInk/Views/EnhancementSettingsView.swift",
+    "VoiceInk/Views/PromptEditorView.swift"
+  ],
+  "product_changed_paths_since_full_failure": [
+    "VoiceInk/Services/AIEnhancement/AIEnhancementService.swift",
+    "VoiceInk/Services/WritingActionSession.swift",
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift",
+    "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/LiteralCorrectionRuleTests.swift",
+    "VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift"
+  ],
+  "scope": "Source binding only; runtime pending."
+}

@@ -1,0 +1,71 @@
+{
+  "acceptance": "Matched Debug UI; no Release, speech or VoiceOver proof",
+  "baseline_intended_red": true,
+  "candidate_failed_or_skipped": 0,
+  "candidate_passed": 4,
+  "historical_typing_trigger_attributed": false,
+  "shortcut_censuses": {
+    "baseline-testDictationProfilePreservesCustomSettingsAndPersists": {
+      "dynamic_power_mode_keys_present": false,
+      "key_count": 32,
+      "phase_counts": {
+        "after-launch": 1,
+        "before": 1,
+        "isolated": 1,
+        "restored": 1
+      },
+      "redacted_before_restored_equal": true,
+      "runtime_restore_assertion_succeeded": true
+    },
+    "candidate-testCSVImportPreviewsMultilineContentBeforeReplacing": {
+      "dynamic_power_mode_keys_present": false,
+      "key_count": 32,
+      "phase_counts": {
+        "after-launch": 1,
+        "before": 1,
+        "isolated": 1,
+        "restored": 1
+      },
+      "redacted_before_restored_equal": true,
+      "runtime_restore_assertion_succeeded": true
+    },
+    "candidate-testDictationProfilePreservesCustomSettingsAndPersists": {
+      "dynamic_power_mode_keys_present": false,
+      "key_count": 32,
+      "phase_counts": {
+        "after-launch": 2,
+        "before": 1,
+        "isolated": 1,
+        "restored": 1
+      },
+      "redacted_before_restored_equal": true,
+      "runtime_restore_assertion_succeeded": true
+    },
+    "candidate-testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+      "dynamic_power_mode_keys_present": false,
+      "key_count": 32,
+      "phase_counts": {
+        "after-launch": 2,
+        "before": 1,
+        "isolated": 1,
+        "restored": 1
+      },
+      "redacted_before_restored_equal": true,
+      "runtime_restore_assertion_succeeded": true
+    },
+    "candidate-testTranslationTargetsReorderSelectAndPersist": {
+      "dynamic_power_mode_keys_present": false,
+      "key_count": 32,
+      "phase_counts": {
+        "after-launch": 2,
+        "before": 1,
+        "isolated": 1,
+        "restored": 1
+      },
+      "redacted_before_restored_equal": true,
+      "runtime_restore_assertion_succeeded": true
+    }
+  },
+  "source_identity_tcc_process_verified": true,
+  "unexpected_microphone_notification_observed": false
+}

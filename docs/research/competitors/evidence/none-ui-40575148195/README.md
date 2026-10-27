@@ -1,0 +1,13 @@
+# Isolated UI fixture: matched red/green and restoration
+
+[Run40575148195](https://github.com/negentropi/roma-just-talk/actions/runs/40575148195), exact candidate `31651718c058593719742a220aa85c05827ded7a`; baseline `bdd608cf6111e8d7e88c12678f530318713acf67`. Same UI oracle in both lanes: `e9bebc93c6628cd8abeb82521c1d72eaa6bb09a88bb47a013332690a9afb78b0`.
+
+Baseline: one expected foreground-control failure at line377, accepted as intended red. Candidate: all four distinct UI cases started once and passed, zero failures/skips, exit0 (604.028s). None/Custom persistence and retained formatting values, ordinary Model/Dictionary pointer checks, keyboard dismissal, literal snippets, CSV review, translation targets and all five shared sheet presentations completed. Power Mode draft cancel/no-persistence and empty reorder presentation/Close completed; actual mode reordering is outside this smoke.
+
+Each candidate case retains before/isolated/after-launch/restored shortcut censuses; relaunching cases have two after-launch records. The fatal baseline also retained restoration. All32 owned keys match their prior redacted census afterward; runtime teardown assertions additionally verify exact CF type/value/existence before declaring success. Raw shortcut Data/configuration Data are not rewritten. All32 owned keys were absent before every case on this fresh runner and absent again after restoration. This directly proves absent-key restoration. Retained nonempty raw binding Data and dynamic Power Mode keys were not present, so preservation of those branches has source review but no runtime branch proof here.
+
+The same exact native-control predicates remain strict. The explicit unexpected-microphone-notification guard did not fire, and ten original screenshots are retained for visual review. This green run proves isolated editor interactions and restoration. It does not establish the missing historical typing/shortcut event attribution behind the previous notification.
+
+Both lane signing identity, observed executable paths and fresh Accessibility/Microphone TCC readbacks verified. Source and canonical-lock contracts bind immutable head316. Run `python3 docs/research/competitors/evidence/none-ui-40575148195/analyze-results.py` from repository root to reproduce the strict result, source hashes, selected-file hashes and census checks.
+
+HTTP Range retained 3,145,906 bytes of the214,077,043-byte artifact. Selected ZIP members passed CRC checks and have retained SHA256 hashes. The whole artifact was not downloaded/hash-verified; its API digest is recorded separately. Debug UI acceptance only; full Mac/Release, physical speech and VoiceOver remain separate gates.

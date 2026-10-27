@@ -1,0 +1,130 @@
+VoiceInkUITests/WritingFeaturesUITests.swift:509
+509:         guard let promptSnapshot = preferences.panelValues() else {
+510:             XCTFail("Unable to read saved prompt settings before opening the editor.")
+511:             return
+512:         }
+513:         let addPrompt = app.buttons["enhancement.prompts.add"]
+514:         reveal(addPrompt, identifier: "enhancement.prompts.add", in: app)
+515:         addPrompt.click()
+516:         let promptSheet = requiredSettingsSheet(in: app)
+517:         let promptName = promptSheet.textFields["promptEditor.name"]
+518:         XCTAssertTrue(promptName.waitForExistence(timeout: 5))
+519:         XCTAssertTrue(promptName.isEnabled && promptName.isHittable)
+520:         let unsavedPrompt = "Unsent sheet proof " + UUID().uuidString
+521:         replaceText(in: promptName, with: unsavedPrompt)
+522:         assertValue(unsavedPrompt, of: promptName)
+523:         attachScreenshot(app, named: "Prompt editor unsaved native sheet")
+524:         dismissSettingsSheet("promptEditor.cancel", usingKeyboard: true, in: app)
+525:         XCTAssertTrue(preferences.panelValuesAreUnchanged(from: promptSnapshot), "Cancel persisted an unsaved prompt draft.")
+526:         XCTAssertTrue(addPrompt.isEnabled && addPrompt.isHittable)
+
+VoiceInkUITests/WritingFeaturesUITests.swift:568
+568:     @MainActor private func dismissSettingsSheet(_ closeIdentifier: String, usingKeyboard: Bool, in app: XCUIApplication) {
+569:         let close = app.sheets.firstMatch.buttons[closeIdentifier]
+570:         XCTAssertTrue(close.waitForExistence(timeout: 5))
+571:         XCTAssertTrue(close.isEnabled && close.isHittable)
+572:         if usingKeyboard {
+573:             app.typeKey(.escape, modifierFlags: [])
+574:         } else {
+575:             close.click()
+576:         }
+577:         XCTAssertTrue(waitUntil { !close.exists && app.sheets.count == 0 }, "The native settings sheet did not dismiss.")
+578:     }
+
+VoiceInk/Views/PromptEditorView.swift:76
+76:             // Footer
+77:             VStack(spacing: 0) {
+78:                 HStack {
+79:                     Button(VoiceInkCustomPromptPresentation.cancelActionTitle) { dismissPanel() }
+80:                         .keyboardShortcut(.escape, modifiers: [])
+81:                         .buttonStyle(.plain)
+82:                         .foregroundColor(.secondary)
+83:                         .accessibilityIdentifier("promptEditor.cancel")
+84: 
+85:                     Spacer()
+86: 
+87:                     Button {
+88:                         save()
+89:                         dismissPanel()
+90:                     } label: {
+91:                         Text(VoiceInkCustomPromptPresentation.saveChangesButtonTitle)
+92:                             .frame(minWidth: 100)
+93:                     }
+94:                     .buttonStyle(.borderedProminent)
+95:                     .disabled(editorContext.isSaveButtonDisabled(for: draft))
+96:                     .keyboardShortcut(.return, modifiers: .command)
+97:                 }
+98:                 .padding(.horizontal, 20)
+99:                 .padding(.vertical, 16)
+100:                 .background(Color(NSColor.windowBackgroundColor))
+101:             }
+
+VoiceInk/Notifications/NotificationManager.swift:46
+46:         let size = hostingController.view.fittingSize
+47: 
+48:         let panel = NSPanel(
+49:             contentRect: NSRect(origin: .zero, size: size),
+50:             styleMask: [.borderless, .nonactivatingPanel],
+51:             backing: .buffered,
+52:             defer: false
+53:         )
+54:         
+55:         panel.contentView = hostingController.view
+56:         panel.isFloatingPanel = true
+57:         panel.level = NSWindow.Level.mainMenu
+58:         panel.backgroundColor = NSColor.clear
+59:         panel.hasShadow = false
+60:         panel.isMovableByWindowBackground = false
+61:         
+62:         positionWindow(panel)
+63:         panel.alphaValue = 0
+64:         panel.makeKeyAndOrderFront(nil as Any?)
+65:         
+66:         self.notificationWindow = panel
+67:         
+68:         NSAnimationContext.runAnimationGroup({ context in
+69:             context.duration = 0.3
+70:             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+71:             panel.animator().alphaValue = 1
+72:         })
+73:         
+74:         // Schedule a new timer to dismiss the new notification.
+75:         dismissTimer = Timer.scheduledTimer(
+76:             withTimeInterval: duration,
+77:             repeats: false
+78:         ) { [weak self] _ in
+79:             self?.dismissNotification()
+80:         }
+81:     }
+82: 
+83:     @MainActor
+
+VoiceInk/Notifications/NotificationManager.swift:88
+88:         
+89:         // Position notification centered horizontally on screen
+90:         let notificationX = screenRect.midX - (notificationRect.width / 2)
+91:         
+92:         // Position notification near bottom of screen with appropriate spacing
+93:         let bottomPadding: CGFloat = 24
+94:         let componentHeight: CGFloat = 34
+95:         let notificationSpacing: CGFloat = 16
+96:         let notificationY = screenRect.minY + bottomPadding + componentHeight + notificationSpacing
+97:         
+98:         window.setFrameOrigin(NSPoint(x: notificationX, y: notificationY))
+99:     }
+100: 
+101:     @MainActor
+102:     func dismissNotification() {
+103:         guard let window = notificationWindow else { return }
+104:         
+105:         notificationWindow = nil
+106:         
+107:         dismissTimer?.invalidate()
+
+VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift:2008
+2008:     public static let microphonePermissionRequired = VoiceInkRecordingNotificationPresentation(
+2009:         title: "Microphone permission required",
+2010:         duration: 8.0,
+2011:         actionButtonTitle: "Grant"
+2012:     )
+

@@ -1,0 +1,13 @@
+{
+  "conclusion": "cancelled",
+  "headBranch": "ci/rjt-writing-check-none-01a17bef",
+  "headSha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "status": "completed",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40567595944",
+  "workflowName": "VoiceInk iOS single-repo migration",
+  "run_id": 40567595944,
+  "authorization": "Coordinator explicitly authorized cancellation only for auto iOS on this exact owned ref/head.",
+  "authenticated_writer": "negentropi",
+  "cancellation_requested_by_this_audit": true,
+  "scope": "Avoid duplicate auto iOS compile; no iOS validation success claimed."
+}

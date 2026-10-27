@@ -1,0 +1,50 @@
+{
+  "historical_values_available": false,
+  "historical_keyboard_event_trace_available": false,
+  "no_direct_unit_key_contamination_found": true,
+  "source_default_if_primary_selection_absent": {
+    "selection": "custom",
+    "binding": "Left Shift",
+    "mode": "special",
+    "doubleShiftIntervalMilliseconds": 300
+  },
+  "fixture_before": "No global shortcut isolation in prepareApp or profile preference helper.",
+  "fixture_changes": {
+    "primaryRecordingShortcut": "custom",
+    "secondaryRecordingShortcut": "none",
+    "primaryRecordingShortcutMode": "hybrid",
+    "secondaryRecordingShortcutMode": "hybrid",
+    "Shortcut_LegacyKeyboardShortcutsMigrated": true,
+    "Shortcut_LegacyCustomRecordingShortcutsMigrated": true,
+    "isMiddleClickToggleEnabled": false,
+    "specialShortcutDoubleShiftTapInterval": 0
+  },
+  "cleared_sentinels": [
+    "primaryRecording",
+    "secondaryRecording",
+    "pasteLastTranscription",
+    "pasteLastEnhancement",
+    "retryLastTranscription",
+    "openHistoryWindow",
+    "quickAddToDictionary",
+    "translateRecording",
+    "rewriteSelectionRecording",
+    "draftRecording"
+  ],
+  "dynamic_keys": "Existing Shortcut_powerMode_<valid UUID> Data or sentinel keys; clear each corresponding sentinel.",
+  "legacy_keys_backed_up": [
+    "selectedHotkey1",
+    "selectedHotkey2",
+    "hotkeyMode1",
+    "hotkeyMode2"
+  ],
+  "raw_shortcut_data_and_power_mode_configuration_data": "Unchanged",
+  "restoration": "Exact CF values/existence, only after owned applications have terminated",
+  "runtime_censuses": [
+    "before",
+    "isolated",
+    "after-launch",
+    "restored"
+  ],
+  "limits": "No historical causal typing trace; new runtime validation not yet performed."
+}

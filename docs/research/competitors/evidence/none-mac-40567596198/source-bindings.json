@@ -1,0 +1,185 @@
+{
+  "run_id": 40567596198,
+  "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "source_method": "git show/git ls-tree at exact pinned commits, independent of future working-tree edits. Source comparison does not establish test execution.",
+  "source_hashes": [
+    {
+      "path": ".github/workflows/voiceink-writing-actions-check.yml",
+      "bytes": 9156,
+      "sha256": "51414a14b253a0cab9cccdc51b5fc83d5bdcdb089324fe8a105ff63617996587"
+    },
+    {
+      "path": "scripts/run-macos-ci-unit-tests.sh",
+      "bytes": 2975,
+      "sha256": "dce0cac74da7caca17f74a13cfaae8eb291bc9b4f9ce5572c566e89f84299836"
+    },
+    {
+      "path": "scripts/run-writing-feature-regression.sh",
+      "bytes": 29081,
+      "sha256": "3071693cf442929cc46edc881845e60044e7827fff44c2f7dc0f60faefb28a9c"
+    },
+    {
+      "path": "scripts/run-writing-settings-ui-regression.sh",
+      "bytes": 30822,
+      "sha256": "c992dc02b715849b362d13c13851180deb86760064f3d738e01883521e75ace8"
+    },
+    {
+      "path": "Tools/OnboardingAccessibilityProbe.swift",
+      "bytes": 10821,
+      "sha256": "1b087e88d6956163b04ee75371074bd7d29c6eb6e840231a3524d928e285b78a"
+    },
+    {
+      "path": "VoiceInkTests/OnboardingRegionViewTests.swift",
+      "bytes": 33080,
+      "sha256": "828f0155ee7dca9b4a4adbcad56596e6f87585fa01d5341eca81cb9a2a27cf6b"
+    },
+    {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "bytes": 86225,
+      "sha256": "78e5a1d8c7f99dd3790bbf143373925c33891241fb32544068022d0b9c5bd06d"
+    },
+    {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "bytes": 13856,
+      "sha256": "4d9a642646296520730da117bd6d646d825a045e46579aa7eeb47610bf111907"
+    },
+    {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "bytes": 14932,
+      "sha256": "6b2f84761c7a0defed6b50102f9953511b53bcabc83b36ea25c18bc1e9580f02"
+    },
+    {
+      "path": "VoiceInkUITests/WritingFeaturesUITests.swift",
+      "bytes": 51718,
+      "sha256": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69"
+    },
+    {
+      "path": "scripts/verify-static-whisper-app.sh",
+      "bytes": 1926,
+      "sha256": "e40475d402148fbde4327619c94ad046de1fb4ff18a3f04228a35534d64e2ad8"
+    },
+    {
+      "path": "scripts/verify-adhoc-library-validation.sh",
+      "bytes": 2085,
+      "sha256": "642d8dfc9fdd7d3494898829e29cfb01c4560653103b272c9b02eba117eb13b1"
+    },
+    {
+      "path": "scripts/verify-macos-release-instrumentation.sh",
+      "bytes": 888,
+      "sha256": "dddfbe5bd1ada1a27584f47f0b7b7220905eb64218e6cf45deb7bd21f984b564"
+    },
+    {
+      "path": "scripts/tests/verify-adhoc-library-validation.test.sh",
+      "bytes": 3662,
+      "sha256": "26ca935ee73b1e1e3f1d9c7b0c65794c9b108527ab37db61a34f0746f9bc3622"
+    },
+    {
+      "path": "scripts/tests/writing-dependency-declarations.test.py",
+      "bytes": 5745,
+      "sha256": "7186ac5224827c95cbc03ff115323dbbb6dd973c6cc2e1f50203e3873d00dd21"
+    },
+    {
+      "path": "VoiceInk/Services/AIEnhancement/AIEnhancementService.swift",
+      "bytes": 21601,
+      "sha256": "aeb6673c9dae27550c77181b6fc6c025c85bc6bedb703535fc3ba73b0cb70cf0"
+    },
+    {
+      "path": "VoiceInk/Services/OllamaService.swift",
+      "bytes": 4730,
+      "sha256": "9f1108d8949551f13ce66757e1629e97cad0f6bab23aa6ca8615d6b43e084fd5"
+    },
+    {
+      "path": "VoiceInk/Services/AIEnhancement/LocalCLIService.swift",
+      "bytes": 20953,
+      "sha256": "2e4ca951ed5ecc9d85439485f3bfa33332d85520aedbdcf12be8173c0c53369a"
+    },
+    {
+      "path": "VoiceInkTests/LocalCLIServiceTests.swift",
+      "bytes": 25819,
+      "sha256": "bf27803af3515a47b08e83dd711e463147880dbf9e01b7fcf211b793c3b1f802"
+    },
+    {
+      "path": "VoiceInkTests/DictationStoreSeedLiveTests.swift",
+      "bytes": 25753,
+      "sha256": "ad146f0800c148acd6d25e3500f6c7a4f8d3c1e7da887fe9b46642afc99bb5e7"
+    },
+    {
+      "path": "VoiceInkCore/Sources/VoiceInkCore/DictationPolish.swift",
+      "bytes": 5472,
+      "sha256": "3da954073cf273cace0eaa3a6b8bf761ae5d74424c5372c805166ad49fc4d7f1"
+    },
+    {
+      "path": "VoiceInkCore/Tests/VoiceInkCoreTests/DictationPolishTests.swift",
+      "bytes": 8799,
+      "sha256": "a6ecaab7ce90877101ed01096bd176dc4c85e04c83ce79df127f5f5a49d7d8ef"
+    },
+    {
+      "path": "VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift",
+      "bytes": 385111,
+      "sha256": "9d1802f2730901528e808da1ebfcf3ab5b5a3c539d42cceb0aa44c32eeb2a265"
+    }
+  ],
+  "production_comparison": {
+    "baseline_head": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+    "candidate_head": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+    "roots": [
+      "VoiceInk",
+      "VoiceInkCore",
+      "VoiceInkNVIDIA",
+      "VoiceInkQwen",
+      "VoiceInk.xcodeproj",
+      "VoiceInk.xcworkspace",
+      "iOS",
+      "Makefile",
+      "LocalBuild.xcconfig"
+    ],
+    "baseline_entries": 588,
+    "candidate_entries": 590,
+    "baseline_manifest_sha256": "31dec8c2f347c9156efab19396b168fac45938b2a6806ee7864ff94e0c372ad7",
+    "candidate_manifest_sha256": "22751bd5dcc4b5d5b7901af9897c7310d1881e5566189c29e89f402c8049b6ca",
+    "changes": [
+      {
+        "path": "VoiceInk/Services/AIEnhancement/LocalCLIService.swift",
+        "baseline": {
+          "mode": "100644",
+          "git_blob": "38a46bafea063a304a40d718918d696aa7310558"
+        },
+        "candidate": {
+          "mode": "100644",
+          "git_blob": "93970a370c304dcbf311dc0764e1b37de0884ee4"
+        }
+      },
+      {
+        "path": "VoiceInkCore/Sources/VoiceInkCore/DictationPolish.swift",
+        "baseline": null,
+        "candidate": {
+          "mode": "100644",
+          "git_blob": "3031a38ad38f55aca037128570c277681976b40c"
+        }
+      },
+      {
+        "path": "VoiceInkCore/Tests/VoiceInkCoreTests/DictationPolishTests.swift",
+        "baseline": null,
+        "candidate": {
+          "mode": "100644",
+          "git_blob": "6c2abbf208c85e8726711c725bd33e65cd1f3df0"
+        }
+      },
+      {
+        "path": "VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift",
+        "baseline": {
+          "mode": "100644",
+          "git_blob": "767f0731f76a25befa16447e372e4d15a8a4575d"
+        },
+        "candidate": {
+          "mode": "100644",
+          "git_blob": "917caac58bfd193a084f58be57cbaa436096e090"
+        }
+      }
+    ]
+  },
+  "limits": [
+    "Exact actual test counts/skips, new Local CLI runtime cases, UI observations and Release results require raw artifacts.",
+    "Separate UI/CLI/store companion runs have different scope and are not silently combined."
+  ]
+}

@@ -1,0 +1,50 @@
+    t =   157.76s Click "enhancement.prompts.add" Button
+    t =   157.76s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   157.76s     Find the "enhancement.prompts.add" Button
+    t =   157.95s     Check for interrupting elements affecting "enhancement.prompts.add" Button
+    t =   157.97s     Synthesize event
+    t =   158.40s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   158.66s Waiting 5.0s for Sheet (First Match) to exist
+    t =   159.70s     Checking `Expect predicate `existsNoRetry == 1` for object Sheet (First Match)`
+    t =   159.70s         Checking existence of `Sheet (First Match)`
+    t =   159.71s Get number of matches for: Descendants matching type Sheet
+    t =   159.95s Waiting 5.0s for "promptEditor.name" TextField to exist
+    t =   160.96s     Checking `Expect predicate `existsNoRetry == 1` for object "promptEditor.name" TextField`
+    t =   160.96s         Checking existence of `"promptEditor.name" TextField`
+    t =   161.00s Find the "promptEditor.name" TextField
+    t =   161.04s Find the "promptEditor.name" TextField
+    t =   161.10s Click "promptEditor.name" TextField
+    t =   161.10s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   161.10s     Find the "promptEditor.name" TextField
+    t =   161.13s     Check for interrupting elements affecting "promptEditor.name" TextField
+    t =   161.15s     Synthesize event
+    t =   161.48s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   161.48s Type 'a' key with modifiers '⌘' (0x10)
+    t =   161.48s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   161.49s     Find the "promptEditor.name" TextField
+    t =   161.52s     Check for interrupting elements affecting "promptEditor.name" TextField
+    t =   161.55s     Synthesize event
+    t =   161.61s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   161.61s Type 'Unsent sheet proof...' into "promptEditor.name" TextField
+    t =   161.62s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   161.62s     Find the "promptEditor.name" TextField
+    t =   161.67s     Check for interrupting elements affecting "promptEditor.name" TextField
+    t =   161.72s     Synthesize event
+    t =   166.89s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   166.90s Waiting 5.0s for "promptEditor.name" TextField to exist
+    t =   167.91s     Checking `Expect predicate `existsNoRetry == 1` for object "promptEditor.name" TextField`
+    t =   167.91s         Checking existence of `"promptEditor.name" TextField`
+    t =   167.96s Find the "promptEditor.name" TextField
+    t =   168.01s Find the "promptEditor.name" TextField
+    t =   168.05s Find the Target Application 'com.negentropi.RomaJustTalk'
+    t =   168.37s Added attachment named 'Prompt editor unsaved native sheet'
+    t =   168.37s Waiting 5.0s for "promptEditor.cancel" Button to exist
+    t =   169.37s     Checking `Expect predicate `existsNoRetry == 1` for object "promptEditor.cancel" Button`
+    t =   169.37s         Checking existence of `"promptEditor.cancel" Button`
+    t =   169.42s Find the "promptEditor.cancel" Button
+    t =   169.47s Find the "promptEditor.cancel" Button
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:571: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed
+    t =   169.89s Tear Down
+    t =   172.12s Checking for crash reports corresponding to unexpected termination of com.negentropi.RomaJustTalk
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' failed (192.178 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' started.

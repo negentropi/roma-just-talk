@@ -1,0 +1,472 @@
+{
+  "run_id": 40567596198,
+  "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+  "status": "Failure",
+  "summary_reference": "0~VghuySBZJ04UOX1ZxKdhiB-sovCr4eroFVq5QUMjXXJflRi8ZF6VTdICneOMRZzWXqvMw8eje6BkbZJ3umz3Ig==",
+  "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~VghuySBZJ04UOX1ZxKdhiB-sovCr4eroFVq5QUMjXXJflRi8ZF6VTdICneOMRZzWXqvMw8eje6BkbZJ3umz3Ig==",
+  "decoded_summary_sha256": "fd2d310051ebd9cd5e6752edf1062fd832dd8004aad52b2b9a8f7aa6a09fc7ec",
+  "failure_summaries": [
+    {
+      "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+      "isTopLevelFailure": "true",
+      "issueType": "Assertion Failure",
+      "lineNumber": "571",
+      "message": "XCTAssertTrue failed",
+      "sourceCodeContext": {
+        "callStack": [
+          {
+            "addressString": "4376277048"
+          },
+          {
+            "addressString": "4375870247"
+          },
+          {
+            "addressString": "4375869731"
+          },
+          {
+            "addressString": "4375871195"
+          },
+          {
+            "addressString": "4399883719"
+          },
+          {
+            "addressString": "4403146007",
+            "symbolInfo": {
+              "imageName": "VoiceInkUITests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+                "lineNumber": "571"
+              },
+              "symbolName": "WritingFeaturesUITests.dismissSettingsSheet(_:usingKeyboard:in:)"
+            }
+          },
+          {
+            "addressString": "4403114839",
+            "symbolInfo": {
+              "imageName": "VoiceInkUITests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+                "lineNumber": "524"
+              },
+              "symbolName": "WritingFeaturesUITests.exerciseOtherSettingsSheets(in:preferences:)"
+            }
+          },
+          {
+            "addressString": "4403091995",
+            "symbolInfo": {
+              "imageName": "VoiceInkUITests",
+              "location": {
+                "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+                "lineNumber": "236"
+              },
+              "symbolName": "WritingFeaturesUITests.testDictationProfilePreservesCustomSettingsAndPersists()"
+            }
+          },
+          {
+            "addressString": "4403119059",
+            "symbolInfo": {
+              "imageName": "VoiceInkUITests",
+              "location": {
+                "filePath": "/<compiler-generated>",
+                "lineNumber": "0"
+              },
+              "symbolName": "@objc WritingFeaturesUITests.testDictationProfilePreservesCustomSettingsAndPersists()"
+            }
+          },
+          {
+            "addressString": "6516545123"
+          },
+          {
+            "addressString": "6516544751"
+          },
+          {
+            "addressString": "4375786715"
+          },
+          {
+            "addressString": "4375786615"
+          },
+          {
+            "addressString": "4375784879"
+          },
+          {
+            "addressString": "4375721163"
+          },
+          {
+            "addressString": "4376282355"
+          },
+          {
+            "addressString": "4376282511"
+          },
+          {
+            "addressString": "4375720899"
+          },
+          {
+            "addressString": "4375784259"
+          },
+          {
+            "addressString": "4375786083"
+          },
+          {
+            "addressString": "4375787503"
+          },
+          {
+            "addressString": "4375949295"
+          },
+          {
+            "addressString": "4375952423"
+          },
+          {
+            "addressString": "4376138771"
+          },
+          {
+            "addressString": "4375966439"
+          },
+          {
+            "addressString": "4375951727"
+          },
+          {
+            "addressString": "4375977379"
+          },
+          {
+            "addressString": "4375950011"
+          },
+          {
+            "addressString": "4375958155"
+          },
+          {
+            "addressString": "4375977379"
+          },
+          {
+            "addressString": "4375956603"
+          },
+          {
+            "addressString": "4375708011"
+          },
+          {
+            "addressString": "4375707739"
+          },
+          {
+            "addressString": "4375955211"
+          },
+          {
+            "addressString": "4375936083"
+          },
+          {
+            "addressString": "4376004931"
+          },
+          {
+            "addressString": "4376004423"
+          },
+          {
+            "addressString": "4376001759"
+          },
+          {
+            "addressString": "4375708011"
+          },
+          {
+            "addressString": "4375707739"
+          },
+          {
+            "addressString": "4376001615"
+          },
+          {
+            "addressString": "4376003015"
+          },
+          {
+            "addressString": "4375936083"
+          },
+          {
+            "addressString": "4376004931"
+          },
+          {
+            "addressString": "4376004423"
+          },
+          {
+            "addressString": "4376001759"
+          },
+          {
+            "addressString": "4375708011"
+          },
+          {
+            "addressString": "4375707739"
+          },
+          {
+            "addressString": "4376001615"
+          },
+          {
+            "addressString": "4376003015"
+          },
+          {
+            "addressString": "4375936083"
+          },
+          {
+            "addressString": "4376004931"
+          },
+          {
+            "addressString": "4376004423"
+          },
+          {
+            "addressString": "4376001759"
+          },
+          {
+            "addressString": "4375708011"
+          },
+          {
+            "addressString": "4375707739"
+          },
+          {
+            "addressString": "4376001615"
+          },
+          {
+            "addressString": "4376003015"
+          },
+          {
+            "addressString": "4375936083"
+          },
+          {
+            "addressString": "4376125759"
+          },
+          {
+            "addressString": "4375708011"
+          },
+          {
+            "addressString": "4375707739"
+          },
+          {
+            "addressString": "4376125415"
+          },
+          {
+            "addressString": "4376082339"
+          },
+          {
+            "addressString": "4376086531"
+          },
+          {
+            "addressString": "4376086967"
+          },
+          {
+            "addressString": "4376081919"
+          },
+          {
+            "addressString": "4376081271"
+          },
+          {
+            "addressString": "4376082663"
+          },
+          {
+            "addressString": "4376073735"
+          },
+          {
+            "addressString": "4376168111"
+          },
+          {
+            "addressString": "4376072159"
+          },
+          {
+            "addressString": "4376080375"
+          },
+          {
+            "addressString": "4373240507"
+          },
+          {
+            "addressString": "6511920355"
+          }
+        ],
+        "location": {
+          "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift",
+          "lineNumber": "571"
+        }
+      },
+      "timestamp": "2026-10-27T19:46:06.018+0000",
+      "uuid": "AEB46847-A1EE-478D-863D-C0F4B04377E5"
+    }
+  ],
+  "screenshot_attachments": [
+    {
+      "filename": "Custom dictation cleanup settings_0_D333816E-630E-4AB9-91B6-E7FFAEBF7EE6.png",
+      "lifetime": "keepAlways",
+      "name": "Custom dictation cleanup settings",
+      "payloadRef": {
+        "id": "0~YOmFAsfqDo82R76ljMF9SbCFynLg27W1Mi8eSFZ2-TjgNyI4P8Ip-IaHJflPp1lbTtXYq7gYJoWUx_KUZket-g=="
+      },
+      "payloadSize": "247735",
+      "timestamp": "2026-10-27T19:43:56.113+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "765241D8-23E3-4628-ACD6-2D22A3066129",
+      "activity_title": "Added attachment named 'Custom dictation cleanup settings'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~YOmFAsfqDo82R76ljMF9SbCFynLg27W1Mi8eSFZ2-TjgNyI4P8Ip-IaHJflPp1lbTtXYq7gYJoWUx_KUZket-g==",
+      "payload_sha256": "caf7e32f5562b8167849b0751e5e84127674bf63921e4ab21731876993a72c83"
+    },
+    {
+      "filename": "None dictation cleanup selected_0_46E7B72E-0B23-4743-AD12-2B0B5EFB01EB.png",
+      "lifetime": "keepAlways",
+      "name": "None dictation cleanup selected",
+      "payloadRef": {
+        "id": "0~_w-uZbFjizjwVYY0VDZVaf4IIFy14vQwHqebqhXfPBs3bmtHWisFJFAm5aDfmVJZHY-ZhFvh5BmLvKUH670O3g=="
+      },
+      "payloadSize": "259523",
+      "timestamp": "2026-10-27T19:44:00.629+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "01129E8B-FD10-42A1-B1CC-4065C89316E2",
+      "activity_title": "Added attachment named 'None dictation cleanup selected'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~_w-uZbFjizjwVYY0VDZVaf4IIFy14vQwHqebqhXfPBs3bmtHWisFJFAm5aDfmVJZHY-ZhFvh5BmLvKUH670O3g==",
+      "payload_sha256": "dfc2ce255a95676205f2d16caa7bb4d9d58ff0dda4b435cdbc90043fdc591f33"
+    },
+    {
+      "filename": "None preserves inactive Custom formatting_0_20A7DD82-CE39-4932-AD41-FFF8C369FDCA.png",
+      "lifetime": "keepAlways",
+      "name": "None preserves inactive Custom formatting",
+      "payloadRef": {
+        "id": "0~-E-Bwf1vuT7PyLsr9VAWCBN1PwumLhsAGqWMsm7JGmOtCrzpwZ9Tzd_GZdayt6xxsJhkiS92Ri5wD_KdLmnBAw=="
+      },
+      "payloadSize": "257710",
+      "timestamp": "2026-10-27T19:44:07.753+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "CDA0FAA5-3F4E-4AE3-9549-6296E8F5F835",
+      "activity_title": "Added attachment named 'None preserves inactive Custom formatting'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~-E-Bwf1vuT7PyLsr9VAWCBN1PwumLhsAGqWMsm7JGmOtCrzpwZ9Tzd_GZdayt6xxsJhkiS92Ri5wD_KdLmnBAw==",
+      "payload_sha256": "b9e64753e91883e82391eac75ffc4ab8468506d164e100e2672ae88928b9e1d7"
+    },
+    {
+      "filename": "None dictation cleanup persisted after relaunch_0_55BFB8DD-745F-413C-8D35-4BC003D88F3B.png",
+      "lifetime": "keepAlways",
+      "name": "None dictation cleanup persisted after relaunch",
+      "payloadRef": {
+        "id": "0~iOaydF6RwUmoUnvd8q0l3CRS-Q7TlcqYomaK1tuk0rjxTY4txSoDETll9hx2IdkrfdUd6zwf0rEyJ6-I8b_sdw=="
+      },
+      "payloadSize": "259588",
+      "timestamp": "2026-10-27T19:45:06.592+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "B2414C63-29F2-4BB3-985E-B6CA46B3AA01",
+      "activity_title": "Added attachment named 'None dictation cleanup persisted after relaunch'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~iOaydF6RwUmoUnvd8q0l3CRS-Q7TlcqYomaK1tuk0rjxTY4txSoDETll9hx2IdkrfdUd6zwf0rEyJ6-I8b_sdw==",
+      "payload_sha256": "9d5e5b4ec999e48deb2615c9d882dec5cf182fd522cc2681fdddaf8df51f363a"
+    },
+    {
+      "filename": "Custom formatting restored without changing saved values_0_70A16A55-7A45-490E-A6D1-EDB646CDA087.png",
+      "lifetime": "keepAlways",
+      "name": "Custom formatting restored without changing saved values",
+      "payloadRef": {
+        "id": "0~K0UbAEOLEEAkdL8GqoNsyqBsgXLh47gfR8UAEs5PzRSNYfx99i3jicV9ryRRuZgmDTswpLXHLzK6aIjDBy9ABw=="
+      },
+      "payloadSize": "247682",
+      "timestamp": "2026-10-27T19:45:24.150+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "0CC2C3EE-7EA5-423E-8F5D-9BA1724F5D81",
+      "activity_title": "Added attachment named 'Custom formatting restored without changing saved values'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~K0UbAEOLEEAkdL8GqoNsyqBsgXLh47gfR8UAEs5PzRSNYfx99i3jicV9ryRRuZgmDTswpLXHLzK6aIjDBy9ABw==",
+      "payload_sha256": "61c7e8143445023753e1f88cf01172b6758388f7a408d84b88461dd89ef6a3b7"
+    },
+    {
+      "filename": "Dictionary settings native sheet_0_44557B8B-BF87-4D6C-8760-7D7A57D55E09.png",
+      "lifetime": "keepAlways",
+      "name": "Dictionary settings native sheet",
+      "payloadRef": {
+        "id": "0~XpIQ0Dj9-hJ2o9zAefZ_PSisEFGHqTybCQ_ui5gLxFYkPKQdHzldIUTFKt9174z3dlqqURxi6Wc0CKoPtpFVLA=="
+      },
+      "payloadSize": "208334",
+      "timestamp": "2026-10-27T19:45:36.441+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "32C5B3F9-97D0-4A1A-895D-855956498BFC",
+      "activity_title": "Added attachment named 'Dictionary settings native sheet'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~XpIQ0Dj9-hJ2o9zAefZ_PSisEFGHqTybCQ_ui5gLxFYkPKQdHzldIUTFKt9174z3dlqqURxi6Wc0CKoPtpFVLA==",
+      "payload_sha256": "dfcfb7409cc3fe7d3054fbbad3b133f1bee5972bee951eb1e457de0f52d4636d"
+    },
+    {
+      "filename": "Enhancement settings native sheet_0_121A4194-F55E-446D-800F-DC5BC077D9B2.png",
+      "lifetime": "keepAlways",
+      "name": "Enhancement settings native sheet",
+      "payloadRef": {
+        "id": "0~TB3OH8d7VFZaeyN6aZ8MVtYL5VmtbrcMsbF87WS7ARn-C6L1V-XxeBwhQVxgZ-mVDYSLVExsxEhYQgkqn6Xu-g=="
+      },
+      "payloadSize": "223734",
+      "timestamp": "2026-10-27T19:45:45.519+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "9DDBE7A3-55F2-4519-B264-ACA8AA9BFD34",
+      "activity_title": "Added attachment named 'Enhancement settings native sheet'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~TB3OH8d7VFZaeyN6aZ8MVtYL5VmtbrcMsbF87WS7ARn-C6L1V-XxeBwhQVxgZ-mVDYSLVExsxEhYQgkqn6Xu-g==",
+      "payload_sha256": "93ad9502f5de3509dd5d70f5b706f8345a5ee6e79804e57f4fdccccfff980182"
+    },
+    {
+      "filename": "Prompt editor unsaved native sheet_0_5057CF89-D68D-4F46-B62E-A6BAB3413BBF.png",
+      "lifetime": "keepAlways",
+      "name": "Prompt editor unsaved native sheet",
+      "payloadRef": {
+        "id": "0~kK2gNUEhuhwPLd1cbuYHLgFu9eC4ap5xkViGsl-abswidZnhbfz8Ow1papTK9oaKBOe6hJDGbbl1UJFWr1Y-tQ=="
+      },
+      "payloadSize": "227185",
+      "timestamp": "2026-10-27T19:46:04.820+0000",
+      "uniformTypeIdentifier": "public.png",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "Scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "561927FC-6D91-4B4C-BEE4-48359DBA1E69",
+      "activity_title": "Added attachment named 'Prompt editor unsaved native sheet'",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~kK2gNUEhuhwPLd1cbuYHLgFu9eC4ap5xkViGsl-abswidZnhbfz8Ow1papTK9oaKBOe6hJDGbbl1UJFWr1Y-tQ==",
+      "payload_sha256": "f37d4e9b079a0f161e63526ba6b4ad169625758147aed0a714d8a61ab9089335"
+    }
+  ],
+  "postfailure_cancel_traits_available": false
+}

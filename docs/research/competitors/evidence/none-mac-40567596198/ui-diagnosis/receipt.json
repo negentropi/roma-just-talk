@@ -1,0 +1,34 @@
+{
+  "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "source_sha256": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69",
+    "VoiceInk/Views/PromptEditorView.swift": "45f18dfb8165a6abb69019ee0bd2f6cf6ce42926f4dad7198ea089d094dfc2e0",
+    "VoiceInk/Views/Components/SlidingPanel.swift": "e2172bf91ff6c98755406726c11796793f10edbb907671cfb093675e3e665862",
+    "VoiceInk/Notifications/NotificationManager.swift": "be415e7b81a2a05e108b47968433b79ad67d28d7dbe9d7bc7566aaa7aed7b3ee",
+    "VoiceInkCore/Sources/VoiceInkCore/RecordingStatePolicy.swift": "ec39fb9e3694d1265b11651a58b82be5f95eb0b4a0b2160f36aad9d68637adbb"
+  },
+  "image": {
+    "path": "prompt-editor-unsaved.png",
+    "bytes": 227185,
+    "sha256": "f37d4e9b079a0f161e63526ba6b4ad169625758147aed0a714d8a61ab9089335"
+  },
+  "shared_archive": {
+    "path": "/data/rjt-writing-check-01a17bef/40567596198/evidence.zip",
+    "owner": "none_result_receipt",
+    "bytes": 472406175,
+    "sha256": "0c8ffa8d60a31ae90b4dea76352de45273a058a1ad5d5897ce87c906a69a0708",
+    "duplicate_download": false
+  },
+  "premise": "Immediate existence does not prove pointer reachability while an independent transient notification covers the footer.",
+  "proposed_smallest_change": "Centralized typed preference isolation of established global shortcut bindings with exact owned restoration; unchanged strict control predicates.",
+  "status": "UI fixture correction implemented and independently source-reviewed; remote validation pending.",
+  "initial_wait_proposal": "Rejected before implementation: unexpected recording startup must be isolated, not hidden by toast timeout.",
+  "candidate_oracle_sha256": "e9bebc93c6628cd8abeb82521c1d72eaa6bb09a88bb47a013332690a9afb78b0",
+  "source_checks": [
+    "Swift syntax parse passed",
+    "Extracted CF helper typecheck passed against Foundation/CoreFoundation",
+    "All four test method bodies unchanged",
+    "Independent ownership/type/migration/dynamic-sentinel review clean",
+    "git diff --check passed"
+  ]
+}

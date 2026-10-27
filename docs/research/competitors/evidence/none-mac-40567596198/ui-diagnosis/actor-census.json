@@ -1,0 +1,49 @@
+{
+  "run_id": 40567596198,
+  "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "oracle_sha256": "d6980c023e3e0794df840afa173e22e097a02513898b3f010defc04d6f3e9d69",
+  "failure": {
+    "method": "testDictationProfilePreservesCustomSettingsAndPersists",
+    "line": 571,
+    "condition": "close.isEnabled && close.isHittable",
+    "identifier": "promptEditor.cancel",
+    "usingKeyboard": true,
+    "exists": true,
+    "enabled": null,
+    "hittable": null,
+    "trait_split": "Unknown; combined assertion and AX handle-only snapshots do not retain these values."
+  },
+  "timing": {
+    "prompt_draft_entered_seconds": 161.61,
+    "typing_finished_seconds": 166.89,
+    "draft_value_check_seconds": 168.01,
+    "screenshot_seconds": 168.37,
+    "cancel_exist_check_seconds": 169.37,
+    "trait_checks_seconds": [
+      169.42,
+      169.47
+    ],
+    "escape_attempted": false
+  },
+  "visual": {
+    "source": "Original Prompt editor unsaved native sheet screenshot",
+    "microphone_permission_notification_visible": true,
+    "notification_overlays_footer_cancel_save_area": true,
+    "exact_cancel_frame": null,
+    "exact_notification_frame": null,
+    "geometry_scope": "Visual obstruction only; no numeric actor frames retained or invented."
+  },
+  "source": {
+    "permission_notification_duration_seconds": 8.0,
+    "notification_window_level": "NSWindow.Level.mainMenu",
+    "independent_ns_panel": true,
+    "prompt_cancel_explicit_disabled_modifier": false,
+    "shared_sheet_escape_handler": ".onExitCommand { item = nil }"
+  },
+  "limits": [
+    "No later control availability observation exists; an eventual wait is untested.",
+    "Why recording permission notification appeared during UI typing remains unproven.",
+    "Prior identical oracle passed all4 on40562078437, but no reproducible event or random-test causality established."
+  ],
+  "hypothesis": "Transient notification occluded footer Cancel at immediate pointer availability check; native sheet geometry defect unsupported."
+}

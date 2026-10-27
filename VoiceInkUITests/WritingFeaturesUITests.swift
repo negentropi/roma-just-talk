@@ -6,6 +6,8 @@ import XCTest
 final class WritingFeaturesUITests: XCTestCase {
     private static let mainWindowIdentifier = "com.negentropi.RomaJustTalk.mainWindow"
     private var modelSettingsOpening = 0
+    private var shortcutPreferences: WritingFeaturesShortcutPreferences?
+    private var writingApplication: XCUIApplication?
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -238,8 +240,10 @@ final class WritingFeaturesUITests: XCTestCase {
 
     @MainActor private func prepareApp() throws -> (XCUIApplication, WritingFeaturesAppOwnership) {
         let ownership = try WritingFeaturesAppOwnership()
+        let shortcuts = try WritingFeaturesShortcutPreferences()
         let dockPreference = try WritingFeaturesDockPreference()
         let app = XCUIApplication()
+        writingApplication = app
         // XCTest runs teardown blocks in reverse order, including after a fatal UI lookup.
         addTeardownBlock {
             guard ownership.terminateOwnedApplications() else {
@@ -249,10 +253,24 @@ final class WritingFeaturesUITests: XCTestCase {
             XCTAssertTrue(dockPreference.restore(), "Unable to restore the Dock preference.")
         }
         addTeardownBlock { @MainActor in
+            guard ownership.terminateOwnedApplications() else {
+                XCTFail("The owned app did not exit; retained shortcut preferences for inspection.")
+                return
+            }
+            let restored = shortcuts.restore()
+            self.attachShortcutCensus("restored", preferences: shortcuts)
+            XCTAssertTrue(restored, "Unable to restore the exact owned shortcut preferences.")
+        }
+        addTeardownBlock { @MainActor in
             if ownership.hasOnlyOwnedRunningApplications {
                 app.terminate()
             }
         }
+        shortcutPreferences = shortcuts
+        attachShortcutCensus("before", preferences: shortcuts)
+        try ownership.requireNoRunningApplication()
+        try shortcuts.install()
+        attachShortcutCensus("isolated", preferences: shortcuts)
         return (app, ownership)
     }
 
@@ -275,6 +293,12 @@ final class WritingFeaturesUITests: XCTestCase {
         guard app.wait(for: .runningForeground, timeout: 20) else {
             attachLaunchFailure(app)
             throw WritingFeaturesUIError.appDidNotBecomeForeground
+        }
+        if let shortcuts = shortcutPreferences {
+            attachShortcutCensus("after-launch", preferences: shortcuts)
+            XCTAssertTrue(shortcuts.isIsolated(), "App startup changed the isolated global shortcut settings.")
+        } else {
+            XCTFail("The UI app launched without its owned shortcut fixture.")
         }
         // Settings opens the main SwiftUI scene even when launch restores no window.
         let statusItems = app.descendants(matching: .statusItem)
@@ -568,6 +592,7 @@ final class WritingFeaturesUITests: XCTestCase {
     @MainActor private func dismissSettingsSheet(_ closeIdentifier: String, usingKeyboard: Bool, in app: XCUIApplication) {
         let close = app.sheets.firstMatch.buttons[closeIdentifier]
         XCTAssertTrue(close.waitForExistence(timeout: 5))
+        assertNoUnexpectedRecordingNotification(in: app)
         XCTAssertTrue(close.isEnabled && close.isHittable)
         if usingKeyboard {
             app.typeKey(.escape, modifierFlags: [])
@@ -741,6 +766,38 @@ final class WritingFeaturesUITests: XCTestCase {
         element.click()
         element.typeKey("a", modifierFlags: .command)
         element.typeText(text)
+        guard let app = writingApplication else {
+            XCTFail("The text editor had no owned UI application.")
+            return
+        }
+        assertNoUnexpectedRecordingNotification(in: app)
+    }
+
+    @MainActor private func assertNoUnexpectedRecordingNotification(in app: XCUIApplication) {
+        let notification = app.staticTexts.matching(
+            NSPredicate(format: "label == %@ OR value == %@", "Microphone permission required", "Microphone permission required")
+        )
+        guard notification.firstMatch.exists else { return }
+        let hierarchy = XCTAttachment(string: app.debugDescription)
+        hierarchy.name = "Unexpected recording notification hierarchy"
+        hierarchy.lifetime = .keepAlways
+        add(hierarchy)
+        attachScreenshot(app, named: "Unexpected recording notification during UI editing")
+        if let shortcuts = shortcutPreferences { attachShortcutCensus("unexpected-recording", preferences: shortcuts) }
+        XCTFail("Editing UI settings unexpectedly started a recording permission request.")
+    }
+
+    @MainActor private func attachShortcutCensus(_ phase: String, preferences: WritingFeaturesShortcutPreferences) {
+        do {
+            let attachment = XCTAttachment(data: try JSONSerialization.data(
+                withJSONObject: preferences.census(phase: phase), options: [.prettyPrinted, .sortedKeys]
+            ), uniformTypeIdentifier: "public.json")
+            attachment.name = "UI shortcut preference census " + phase
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        } catch {
+            XCTFail("Unable to retain the owned shortcut preference census: \(error)")
+        }
     }
 
     @MainActor private func assertValue(_ expected: String, of element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
@@ -983,6 +1040,109 @@ private final class WritingFeaturesAppOwnership {
             RunLoop.current.run(until: Date().addingTimeInterval(0.05))
         } while Date() < deadline
         return Self.runningApplications.isEmpty
+    }
+}
+
+private final class WritingFeaturesShortcutPreferences {
+    private static let bundleIdentifier = "com.negentropi.RomaJustTalk" as CFString
+    private static let values: [String: Any] = [
+        "primaryRecordingShortcut": "custom",
+        "secondaryRecordingShortcut": "none",
+        "primaryRecordingShortcutMode": "hybrid",
+        "secondaryRecordingShortcutMode": "hybrid",
+        "Shortcut_LegacyKeyboardShortcutsMigrated": true,
+        "Shortcut_LegacyCustomRecordingShortcutsMigrated": true,
+        "isMiddleClickToggleEnabled": false,
+        "specialShortcutDoubleShiftTapInterval": 0
+    ]
+    private static let actionNames = [
+        "primaryRecording", "secondaryRecording", "pasteLastTranscription", "pasteLastEnhancement",
+        "retryLastTranscription", "openHistoryWindow", "quickAddToDictionary", "translateRecording",
+        "rewriteSelectionRecording", "draftRecording"
+    ]
+    private let shortcutKeys: [String]
+    private let keys: [String]
+    private let saved: [String: Any]
+
+    init() throws {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else {
+            throw WritingFeaturesUIError.preferenceSyncFailed
+        }
+        let existing = CFPreferencesCopyKeyList(Self.bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost) as? [String] ?? []
+        let prefix = "Shortcut_powerMode_"
+        let powerModeKeys = existing.compactMap { key -> String? in
+            let base = key.hasSuffix("_cleared") ? String(key.dropLast("_cleared".count)) : key
+            guard base.hasPrefix(prefix), UUID(uuidString: String(base.dropFirst(prefix.count))) != nil else { return nil }
+            return base
+        }
+        shortcutKeys = Array(Set(Self.actionNames.map { "Shortcut_" + $0 } + powerModeKeys)).sorted()
+        keys = Array(Set(Array(Self.values.keys) + ["selectedHotkey1", "selectedHotkey2", "hotkeyMode1", "hotkeyMode2"]
+            + shortcutKeys.flatMap { [$0, $0 + "_cleared"] })).sorted()
+        saved = Dictionary(uniqueKeysWithValues: keys.compactMap { key in Self.read(key).map { (key, $0) } })
+    }
+
+    func install() throws {
+        // Missing primary selection recreates Left Shift. Keep a valid selection and clear its binding.
+        for (key, value) in Self.values { Self.write(value, for: key) }
+        for key in shortcutKeys { Self.write(true, for: key + "_cleared") }
+        guard isIsolated() else { throw WritingFeaturesUIError.preferenceSyncFailed }
+    }
+
+    func isIsolated() -> Bool {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        return Self.values.allSatisfy { Self.equal($0.value, Self.read($0.key)) }
+            && shortcutKeys.allSatisfy {
+                Self.equal(true, Self.read($0 + "_cleared")) && Self.equal(saved[$0], Self.read($0))
+            }
+    }
+
+    func restore() -> Bool {
+        for key in keys { Self.write(saved[key], for: key) }
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        return keys.allSatisfy { Self.equal(saved[$0], Self.read($0)) }
+    }
+
+    func census(phase: String) -> [String: Any] {
+        let synchronized = CFPreferencesAppSynchronize(Self.bundleIdentifier)
+        let visibleStrings: Set<String> = ["custom", "none", "hybrid", "special", "toggle", "pushToTalk"]
+        return [
+            "version": 1, "phase": phase, "synchronized": synchronized,
+            "keys": Dictionary(uniqueKeysWithValues: keys.map { key -> (String, [String: Any]) in
+                guard let value = Self.read(key) else { return (key, ["exists": false]) }
+                var observation: [String: Any] = ["exists": true, "cfTypeID": CFGetTypeID(value as CFTypeRef)]
+                if let data = value as? Data {
+                    observation["dataBytes"] = data.count
+                } else if let number = value as? NSNumber {
+                    observation["value"] = number
+                    observation["numberEncoding"] = String(cString: number.objCType)
+                } else if let string = value as? String {
+                    if visibleStrings.contains(string) { observation["value"] = string }
+                    else { observation["redactedStringLength"] = string.count }
+                } else {
+                    observation["valueRedacted"] = true
+                }
+                return (key, observation)
+            })
+        ]
+    }
+
+    private static func equal(_ expected: Any?, _ actual: Any?) -> Bool {
+        switch (expected, actual) {
+        case (nil, nil): return true
+        case let (expected?, actual?):
+            return CFGetTypeID(expected as CFTypeRef) == CFGetTypeID(actual as CFTypeRef)
+                && (expected as? NSObject)?.isEqual(actual) == true
+        default: return false
+        }
+    }
+
+    private static func read(_ key: String) -> Any? {
+        CFPreferencesCopyValue(key as CFString, bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+    }
+
+    private static func write(_ value: Any?, for key: String) {
+        CFPreferencesSetValue(key as CFString, value as CFPropertyList?, bundleIdentifier,
+                              kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
     }
 }
 

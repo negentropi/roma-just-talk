@@ -1,0 +1,76 @@
+{
+  "run_id": 40567596198,
+  "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40567596198",
+  "status": "completed",
+  "conclusion": "failure",
+  "artifact_id": 12766545772,
+  "artifact_bytes": 472406175,
+  "artifact_sha256": "0c8ffa8d60a31ae90b4dea76352de45273a058a1ad5d5897ce87c906a69a0708",
+  "artifact_size_digest_and_zip_crc_verified": true,
+  "source_sha_matches": true,
+  "classification": "failed-profile-ui-prompt-cancel-interactivity",
+  "core_checks": 1707,
+  "counts": {
+    "unit": {
+      "total": 200,
+      "passed": 189,
+      "failed": 0,
+      "skipped": 11,
+      "executed_non_skipped": 189
+    },
+    "live": {
+      "total": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "executed_non_skipped": 6
+    },
+    "ui": {
+      "total": 4,
+      "passed": 3,
+      "failed": 1,
+      "skipped": 0,
+      "executed_non_skipped": 4
+    }
+  },
+  "new_local_cli_methods_passed": 10,
+  "all_17_captured_paste_cases_passed": true,
+  "same_debug_app_across_unit_native_ui": true,
+  "debug_app_sha256": "79cfbed3a535d098b7533557b801009ef90c15923f9603bc19f7b72ea52902f7",
+  "signature_requirements_equal": true,
+  "same_run_native_checkpoint_matches_full_artifact": true,
+  "matched_regression": {
+    "classification": "matched-red-green",
+    "scope": [
+      "literal-snippets",
+      "deferred-permission-callback"
+    ],
+    "stale_startup_catch": "candidate-only coverage",
+    "candidate": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+    "baseline": "ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb"
+  },
+  "failure": {
+    "path": "VoiceInkUITests/WritingFeaturesUITests.swift",
+    "line": 571,
+    "source_line": "XCTAssertTrue(close.isEnabled && close.isHittable)",
+    "identifier": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "context": "dismissSettingsSheet(promptEditor.cancel, usingKeyboard: true) after Prompt editor unsaved native sheet screenshot; test stops before Escape.",
+    "message": "XCTAssertTrue failed",
+    "scene": "Microphone permission required banner covers the lower Prompt-sheet footer in retained screenshot.",
+    "separate_enabled_and_hittable_values_available": false,
+    "root_cause_established_by_this_audit": false
+  },
+  "release": "skipped-after-ui-failure",
+  "limits": [
+    "Overall full gate failed at Prompt Cancel interactivity; Release and packaging did not execute.",
+    "Unit skips are actual gated records, not executed provider/import/store evidence. Six native methods executed separately.",
+    "All ten new CLI methods passed in the app-hosted suite; separate CLI lifetime comparison is a distinct scope and is not silently combined.",
+    "Native context tests use real engine/recorder and capture-call spies, not ASR or OS clipboard/screen-content reads.",
+    "Native pipeline recognition and child output are synthetic; in-memory History save visibility is not crash/relaunch durability.",
+    "Native cleanup observations are unavailable or still readable; neither proves window closure.",
+    "No independent TCC database readback, saved-Keychain, physical-keyboard, human-speech, general provider quality, rich-text or notarized distribution proof.",
+    "Screenshot banner and combined Cancel assertion do not alone establish product root cause or separate enabled/hittable values.",
+    "Companion-head UI/store/CLI proofs remain separate; no future working-tree code is attributed to this run."
+  ]
+}

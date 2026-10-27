@@ -1,0 +1,28 @@
+{
+  "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/tests.log",
+  "bytes": 172407,
+  "sha256": "c676ff2cc6c3720296c34ca6c43a0756aecd936e5b49fba356dab38133b77d20",
+  "http_range_bytes_read": 1761151,
+  "path": "/data/rjt-writing-check-01a17bef/40567596198/ui-tests-range.log",
+  "errors": [
+    {
+      "line": 1584,
+      "text": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:571: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed",
+      "context": [
+        "    t =   168.01s Find the \"promptEditor.name\" TextField",
+        "    t =   168.05s Find the Target Application 'com.negentropi.RomaJustTalk'",
+        "    t =   168.37s Added attachment named 'Prompt editor unsaved native sheet'",
+        "    t =   168.37s Waiting 5.0s for \"promptEditor.cancel\" Button to exist",
+        "    t =   169.37s     Checking `Expect predicate `existsNoRetry == 1` for object \"promptEditor.cancel\" Button`",
+        "    t =   169.37s         Checking existence of `\"promptEditor.cancel\" Button`",
+        "    t =   169.42s Find the \"promptEditor.cancel\" Button",
+        "    t =   169.47s Find the \"promptEditor.cancel\" Button",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:571: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed",
+        "    t =   169.89s Tear Down",
+        "    t =   172.12s Checking for crash reports corresponding to unexpected termination of com.negentropi.RomaJustTalk",
+        "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' failed (192.178 seconds).",
+        "Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' started."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,258 @@
+{
+  "run_id": 40567596198,
+  "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "conclusion": "failure",
+  "headSha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T19:50:46Z",
+      "conclusion": "failure",
+      "databaseId": 122412904116,
+      "name": "macos",
+      "startedAt": "2026-10-27T19:16:25Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T19:16:29Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T19:16:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:16:35Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T19:16:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:16:35Z",
+          "conclusion": "success",
+          "name": "Keep the disposable desktop awake",
+          "number": 3,
+          "startedAt": "2026-10-27T19:16:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:16:45Z",
+          "conclusion": "success",
+          "name": "Select Xcode and Metal toolchain",
+          "number": 4,
+          "startedAt": "2026-10-27T19:16:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:17:22Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 5,
+          "startedAt": "2026-10-27T19:16:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:18:13Z",
+          "conclusion": "success",
+          "name": "Verify the canonical package graph before compiling",
+          "number": 6,
+          "startedAt": "2026-10-27T19:17:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:21:06Z",
+          "conclusion": "success",
+          "name": "Shared core checks",
+          "number": 7,
+          "startedAt": "2026-10-27T19:18:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:21:10Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper dependencies",
+          "number": 8,
+          "startedAt": "2026-10-27T19:21:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:21:10Z",
+          "conclusion": "skipped",
+          "name": "Preserve verified dependencies for test retries",
+          "number": 9,
+          "startedAt": "2026-10-27T19:21:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:29:38Z",
+          "conclusion": "success",
+          "name": "Full Mac unit suite with fresh CI permissions",
+          "number": 10,
+          "startedAt": "2026-10-27T19:21:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:30:51Z",
+          "conclusion": "success",
+          "name": "Live TextEdit and Safari selection transactions",
+          "number": 11,
+          "startedAt": "2026-10-27T19:29:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:30:53Z",
+          "conclusion": "success",
+          "name": "Upload the native check checkpoint",
+          "number": 12,
+          "startedAt": "2026-10-27T19:30:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:40:23Z",
+          "conclusion": "success",
+          "name": "Matched snippet regression",
+          "number": 13,
+          "startedAt": "2026-10-27T19:30:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:40:25Z",
+          "conclusion": "success",
+          "name": "Upload the matched regression checkpoint",
+          "number": 14,
+          "startedAt": "2026-10-27T19:40:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:03Z",
+          "conclusion": "failure",
+          "name": "Writing, snippet and dictation settings UI",
+          "number": 15,
+          "startedAt": "2026-10-27T19:40:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:06Z",
+          "conclusion": "success",
+          "name": "Preserve test evidence before the Release build",
+          "number": 16,
+          "startedAt": "2026-10-27T19:50:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:06Z",
+          "conclusion": "skipped",
+          "name": "Release build and packaging contracts",
+          "number": 17,
+          "startedAt": "2026-10-27T19:50:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:31Z",
+          "conclusion": "success",
+          "name": "Upload verification evidence",
+          "number": 18,
+          "startedAt": "2026-10-27T19:50:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:33Z",
+          "conclusion": "success",
+          "name": "Upload settings screenshots",
+          "number": 19,
+          "startedAt": "2026-10-27T19:50:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:33Z",
+          "conclusion": "skipped",
+          "name": "Upload verified release app",
+          "number": 20,
+          "startedAt": "2026-10-27T19:50:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:34Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 40,
+          "startedAt": "2026-10-27T19:50:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T19:50:39Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 41,
+          "startedAt": "2026-10-27T19:50:34Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40567596198/job/122412904116"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40567596198",
+  "artifacts": {
+    "artifacts": [
+      {
+        "digest": "sha256:c540e84494f2b4477a0718ad2c23f29a65a53f98f75e1ac20101b5b67c98b796",
+        "expired": false,
+        "id": 12766865430,
+        "name": "roma.writing-actions-screenshots",
+        "size_in_bytes": 12271188,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+          "id": 40567596198,
+          "repository_id": 1253985786
+        }
+      },
+      {
+        "digest": "sha256:0c8ffa8d60a31ae90b4dea76352de45273a058a1ad5d5897ce87c906a69a0708",
+        "expired": false,
+        "id": 12766545772,
+        "name": "roma.writing-actions-evidence",
+        "size_in_bytes": 472406175,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+          "id": 40567596198,
+          "repository_id": 1253985786
+        }
+      },
+      {
+        "digest": "sha256:1ac1ac2ae81f613cbff09df26bb54cb6ad51d514c5ea95794507dc02e82a4584",
+        "expired": false,
+        "id": 12764582477,
+        "name": "roma.writing-live-checkpoint",
+        "size_in_bytes": 41773,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+          "id": 40567596198,
+          "repository_id": 1253985786
+        }
+      },
+      {
+        "digest": "sha256:93a3e68fb1353bb1476ef90ff1ce8b36a78535e2a5f40acad5690563835e4133",
+        "expired": false,
+        "id": 12764248735,
+        "name": "roma.writing-regression-checkpoint",
+        "size_in_bytes": 73859,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "919670ae5b918afbfad6f4d88982a481c1c4b532",
+          "id": 40567596198,
+          "repository_id": 1253985786
+        }
+      }
+    ],
+    "total_count": 4
+  }
+}

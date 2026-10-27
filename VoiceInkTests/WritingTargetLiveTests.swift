@@ -117,6 +117,46 @@ extension VoiceInkTests {
         #endif
     }
 
+    @Test(.enabled(if: LiveWritingEditor.isEnabled))
+    @MainActor func liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges() async throws {
+        let environment = ProcessInfo.processInfo.environment
+        try #require((environment["TEST_RUNNER_GITHUB_ACTIONS"] ?? environment["GITHUB_ACTIONS"]) == "true")
+        try #require((environment["TEST_RUNNER_RUNNER_ENVIRONMENT"] ?? environment["RUNNER_ENVIRONMENT"]) == "github-hosted")
+        #if LOCAL_BUILD
+        let fixture = try LiveWritingStartupContextFixture()
+        defer { fixture.restore() }
+        let checkpoint = "dictation-profile-context-snapshot"
+        let testName = "liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges"
+        let filename = "dictation-profile-context-snapshot.json"
+        do {
+            try await fixture.runCase(
+                .activeOrdinary,
+                profileAtStart: "none",
+                profileDuringPermission: "custom",
+                observationCaseName: "none-to-custom-during-permission"
+            )
+            try await fixture.runCase(
+                .activeOrdinary,
+                profileAtStart: "custom",
+                profileDuringPermission: "none",
+                observationCaseName: "custom-to-none-during-permission"
+            )
+            try fixture.saveEvidence(
+                noSetupFailure: true,
+                checkpoint: checkpoint, testName: testName, filename: filename
+            )
+        } catch {
+            try? fixture.saveEvidence(
+                noSetupFailure: false, error: String(describing: error),
+                checkpoint: checkpoint, testName: testName, filename: filename
+            )
+            throw error
+        }
+        #else
+        throw LiveWritingPipelineFailure.localBuildRequired
+        #endif
+    }
+
     @MainActor private func expectLiveTargetChanged(_ target: WritingTarget) async {
         do {
             try await target.replace(with: "MUST NOT BE INSERTED")
@@ -368,7 +408,7 @@ private final class LiveWritingStartupContextFixture {
     private let savedDefaults: [String: Any]
     private var cases: [String: [String: Any]] = [:]
     private static let extraPreferenceKeys = [
-        "activeConfigurationId", "powerModePersistConfig",
+        "activeConfigurationId", "powerModePersistConfig", "VoiceInkDictationProfile",
         VoiceInkAudioInputPreference.lastUsedMicrophoneDeviceIDKey,
         VoiceInkRecordingFeedbackPreference.systemMuteModeKey,
         VoiceInkRecordingFeedbackPreference.legacyIsSystemMuteEnabledKey,
@@ -391,6 +431,7 @@ private final class LiveWritingStartupContextFixture {
         })
         PowerModeManager.shared.configurations = []
         PowerModeManager.shared.activeConfiguration = nil
+        defaults.set("custom", forKey: "VoiceInkDictationProfile")
         defaults.set(false, forKey: "powerModePersistConfig")
         VoiceInkRecordingFeedbackPreference.saveSystemMuteMode(.never)
         defaults.set(false, forKey: VoiceInkRecordingFeedbackPreference.isPauseMediaEnabledKey)
@@ -399,7 +440,14 @@ private final class LiveWritingStartupContextFixture {
         VoiceInkLocalCLIPreference.saveCommandTemplate("/usr/bin/false")
     }
 
-    func runCase(_ scenario: LiveWritingStartupContextCase) async throws {
+    func runCase(
+        _ scenario: LiveWritingStartupContextCase,
+        profileAtStart: String = "custom",
+        profileDuringPermission: String? = nil,
+        observationCaseName: String? = nil
+    ) async throws {
+        let defaults = UserDefaults.standard
+        defaults.set(profileAtStart, forKey: "VoiceInkDictationProfile")
         let gate = LiveWritingStartupLoadGate()
         let whisper = LiveWritingGatedWhisperManager(modelsDirectory: directory, gate: gate)
         let model = ImportedWhisperModel(fileBaseName: "RJT-Context-\(UUID().uuidString)")
@@ -414,7 +462,18 @@ private final class LiveWritingStartupContextFixture {
             qwenRuntimeResult: .failure(LiveWritingPipelineFailure.unusedRecognizerRuntime),
             enhancementService: enhancement
         )
-        engine.recordPermissionRequestForTesting = { true }
+        var permissionCalls = 0
+        var didFlipProfile = false
+        var storedProfileAfterFlip: String?
+        engine.recordPermissionRequestForTesting = {
+            permissionCalls += 1
+            if let profileDuringPermission {
+                defaults.set(profileDuringPermission, forKey: "VoiceInkDictationProfile")
+                storedProfileAfterFlip = defaults.string(forKey: "VoiceInkDictationProfile")
+                didFlipProfile = storedProfileAfterFlip == profileDuringPermission
+            }
+            return true
+        }
         enhancement.isOwnerRecording = { [weak engine] in engine?.recordingState == .recording }
         let editor = scenario.usesWritingAction ? try await LiveWritingEditor.open(.textEdit) : nil
         defer { editor?.close() }
@@ -425,6 +484,8 @@ private final class LiveWritingStartupContextFixture {
         } else {
             writing = nil
         }
+        let storedProfileBeforeStart = defaults.string(forKey: "VoiceInkDictationProfile")
+        try #require(storedProfileBeforeStart == profileAtStart)
         let starting = Task { await engine.toggleRecord(writingSession: writing) }
         var startupTask: Task<Void, Never>?
         var audioURL: URL?
@@ -434,6 +495,12 @@ private final class LiveWritingStartupContextFixture {
             await starting.value
             try #require(engine.recordingState == .recording)
             try #require(whisper.loadCalls == 1)
+            try #require(permissionCalls == 1, "The actual startup must request permission exactly once.")
+            if let profileDuringPermission {
+                try #require(didFlipProfile, "The permission callback must change the stored profile.")
+                try #require(storedProfileAfterFlip == profileDuringPermission)
+                try #require(defaults.string(forKey: "VoiceInkDictationProfile") == profileDuringPermission)
+            }
             let task = try #require(engine.recordingStartupTask)
             startupTask = task
             audioURL = try #require(engine.recordedFile)
@@ -444,6 +511,7 @@ private final class LiveWritingStartupContextFixture {
             gate.release()
             await task.value
             let wasRecordingAtCompletion = engine.recordingState == .recording
+            let storedProfileAtTaskCompletion = defaults.string(forKey: "VoiceInkDictationProfile")
             if !scenario.cancelsBeforeLoadCompletion { await engine.cancelRecording() }
             let ownerEnded = engine.recordingState == .idle && engine.writingActionKind == nil
             #expect(ownerEnded)
@@ -456,12 +524,17 @@ private final class LiveWritingStartupContextFixture {
                 #expect(enhancement.screenReads == 0, "Canceled ordinary startup must not capture screen context")
             case .activeOrdinary:
                 #expect(wasRecordingAtCompletion)
-                #expect(enhancement.clipboardReads == 1, "Active ordinary startup must capture clipboard context")
-                #expect(enhancement.screenReads == 1, "Active ordinary startup must capture screen context")
+                if profileAtStart == "none" {
+                    #expect(enhancement.clipboardReads == 0, "None startup must retain disabled clipboard context after a profile change")
+                    #expect(enhancement.screenReads == 0, "None startup must retain disabled screen context after a profile change")
+                } else {
+                    #expect(enhancement.clipboardReads == 1, "Active ordinary startup must capture clipboard context")
+                    #expect(enhancement.screenReads == 1, "Active ordinary startup must capture screen context")
+                }
                 let onlyActiveOwnerReads = enhancement.captureStates.allSatisfy { $0 }
                 #expect(onlyActiveOwnerReads)
             }
-            cases[scenario.rawValue] = [
+            var observation: [String: Any] = [
                 "gateEntered": gateEntered, "taskCompleted": true, "ownerEnded": ownerEnded,
                 "recordingCanceled": ownerEnded, "clipboardReads": enhancement.clipboardReads,
                 "screenReads": enhancement.screenReads, "modelLoadCalls": whisper.loadCalls,
@@ -470,6 +543,16 @@ private final class LiveWritingStartupContextFixture {
                 "wasRecordingAtTaskCompletion": wasRecordingAtCompletion,
                 "captureStatesWereRecording": enhancement.captureStates
             ]
+            if let profileDuringPermission {
+                observation["profileAtStart"] = profileAtStart
+                observation["storedProfileBeforeStart"] = storedProfileBeforeStart as Any? ?? NSNull()
+                observation["profileDuringPermission"] = profileDuringPermission
+                observation["permissionCalls"] = permissionCalls
+                observation["didFlipProfile"] = didFlipProfile
+                observation["storedProfileAfterFlip"] = storedProfileAfterFlip as Any? ?? NSNull()
+                observation["storedProfileAtTaskCompletion"] = storedProfileAtTaskCompletion as Any? ?? NSNull()
+            }
+            cases[observationCaseName ?? scenario.rawValue] = observation
         } catch {
             let taskToDrain = startupTask ?? engine.recordingStartupTask
             let fileToRemove = audioURL ?? engine.recordedFile
@@ -488,13 +571,19 @@ private final class LiveWritingStartupContextFixture {
         }
     }
 
-    func saveEvidence(noSetupFailure: Bool, error: String? = nil) throws {
+    func saveEvidence(
+        noSetupFailure: Bool,
+        error: String? = nil,
+        checkpoint: String = "startup-context-ownership",
+        testName: String = "liveWritingStartupContextRespectsOwnerAfterCancellation",
+        filename: String = "startup-context-ownership.json"
+    ) throws {
         let environment = ProcessInfo.processInfo.environment
         let path = try #require(environment["RJT_LIVE_WRITING_TARGET_EVIDENCE"] ?? environment["TEST_RUNNER_RJT_LIVE_WRITING_TARGET_EVIDENCE"])
         let output = URL(fileURLWithPath: path, isDirectory: true)
         try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
         let receipt: [String: Any] = [
-            "checkpoint": "startup-context-ownership", "test": "liveWritingStartupContextRespectsOwnerAfterCancellation",
+            "checkpoint": checkpoint, "test": testName,
             "version": 2, "cases": cases, "noSetupFailure": noSetupFailure,
             "error": error as Any? ?? NSNull(), "bundleIdentifier": Bundle.main.bundleIdentifier as Any? ?? NSNull(),
             "executablePath": Bundle.main.executableURL?.path as Any? ?? NSNull(),
@@ -502,7 +591,7 @@ private final class LiveWritingStartupContextFixture {
             "scope": "Actual engine and recorder with gated Whisper loader and context-call spies; no model weights, transcription or OS context reads"
         ]
         try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
-            .write(to: output.appendingPathComponent("startup-context-ownership.json"))
+            .write(to: output.appendingPathComponent(filename))
     }
 
     func restore() {

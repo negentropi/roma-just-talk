@@ -138,7 +138,7 @@ jobs:
             ${{ runner.temp }}/writing-feature-regression/packages/*strict-resolve.log
           if-no-files-found: warn
 
-      - name: Snippet and translation settings UI
+      - name: Writing, snippet and dictation settings UI
         id: ui
         if: ${{ !cancelled() && steps.units.outcome == 'success' }}
         run: bash scripts/run-writing-feature-regression.sh ui

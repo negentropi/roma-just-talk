@@ -260,6 +260,7 @@ case "$mode" in
       liveWritingTargetSafariTextareaReplacesOnlySelection
       liveWritingActionPipelineUsesLocalCLIAndRetainsFailure
       liveWritingStartupContextRespectsOwnerAfterCancellation
+      liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges
     )
     test_arguments "$repo_root" "$debug_dir"
     select_tests "${live_names[@]}"
@@ -472,6 +473,7 @@ names = [
     "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
     "testCSVImportPreviewsMultilineContentBeforeReplacing",
     "testTranslationTargetsReorderSelectAndPersist",
+    "testDictationProfilePreservesCustomSettingsAndPersists",
 ]
 observations = {}
 for name in names:
@@ -481,11 +483,11 @@ for name in names:
     observations[name] = {"starts": len(started), "results": finished}
 counts = re.findall(r"Executed (\d+) tests?,[^\n]*?with (\d+) failures?", text)
 valid = int(exit_code) == 0 and bool(counts) and all(
-    int(count) == 3 and int(failures) == 0 for count, failures in counts
+    int(count) == 4 and int(failures) == 0 for count, failures in counts
 ) and all(value == {"starts": 1, "results": ["passed"]} for value in observations.values())
 Path(output).write_text(json.dumps({"classification": "passed" if valid else "invalid-or-failed", "exit_code": int(exit_code), "tests": observations}, indent=2) + "\n")
 if not valid:
-    raise SystemExit("UI verification requires exactly three started, passed tests and no skips")
+    raise SystemExit("UI verification requires exactly four started, passed tests and no skips")
 PY
     then
       tail -n 120 "$out/tests.log" >&2

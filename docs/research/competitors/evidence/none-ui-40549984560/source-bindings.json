@@ -1,0 +1,28 @@
+{
+  "run_id": 40549984560,
+  "candidate_sha": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "oracle_marker_line": 353,
+  "oracle_marker": "Opening model settings disabled the panel or blocked a visible panel control.",
+  "inputs": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "9bbf692457cd30b31fcaf3ddee22adeb679fe53b502f69f2aa51d154c36067ca",
+    "scripts/run-writing-settings-ui-regression.sh": "a426dc477b94279d5e63d45eae4300b47dfcd3d8322a804f85f8b1891c3b686e",
+    "scripts/run-writing-feature-regression.sh": "3bc7e4b5f554044ebf2c41251c2c15f020c1cacf924643904da76dd05a873ebd",
+    ".github/workflows/voiceink-writing-ui-check.yml": "12515fc46db59e3b9e6487e6e8ec89d9a759beda85fd4e3acbb95703bd16255a",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  "production_ui_unchanged_from": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+  "production_ui_paths": [
+    "VoiceInk/PowerMode/PowerModeConfigView.swift",
+    "VoiceInk/PowerMode/PowerModeView.swift",
+    "VoiceInk/Views/AI Models/ModelManagementView.swift",
+    "VoiceInk/Views/Components/EnhancementSettingsPanel.swift",
+    "VoiceInk/Views/Components/SlidingPanel.swift",
+    "VoiceInk/Views/Dictionary/DictionarySettingsPanel.swift",
+    "VoiceInk/Views/Dictionary/DictionarySettingsView.swift",
+    "VoiceInk/Views/EnhancementSettingsView.swift",
+    "VoiceInk/Views/PromptEditorView.swift"
+  ],
+  "scope": "Pre-run source binding only; no runtime result yet."
+}

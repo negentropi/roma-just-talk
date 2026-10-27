@@ -1,0 +1,27 @@
+{
+  "run_id": 40549984560,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40549984560",
+  "head_sha": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+  "conclusion": "failure",
+  "phase": "prebuild source-declaration comparison",
+  "actual_error": "Baseline dependency declarations differ",
+  "baseline_test_count": 0,
+  "candidate_test_count": 0,
+  "baseline_regression_verdict": "not run",
+  "candidate_ui_verdict": "not run",
+  "identity_tcc_process": "not generated: stopped before UI builds and launches",
+  "artifact": {
+    "id": 12753969198,
+    "name": "roma.writing-ui-diagnostic-evidence",
+    "bytes": 76287,
+    "sha256": "7879e693370b76fc1f85c5fc460bed0aa9f7d72bcf66731ba8d1c4323d171766",
+    "downloaded": false,
+    "reason": "Failed step log and immutable Git census fully identify prebuild failure; no runtime artifacts expected."
+  },
+  "failed_log": {
+    "fetched_once": true,
+    "bytes": 3061,
+    "sha256": "1fbefdef7b7c22e812bd87b667d6b59a0ca426ec8b07c5347bc5721c222ac005",
+    "path": "/tmp/rjt-none-ui-failed-40549984560.log"
+  }
+}

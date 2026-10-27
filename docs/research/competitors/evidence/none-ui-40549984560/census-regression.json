@@ -1,0 +1,45 @@
+{
+  "valid": true,
+  "comparisons": [
+    {
+      "script": "scripts/run-writing-feature-regression.sh",
+      "known_bad_revision": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+      "old_function_sha256": "2f5d7e073d03d4997c0f524efef07dbd736002902040af4a0975638d583f8af5",
+      "current_function_sha256": "eede6db193199f71f69e0a2dec10d0f60391ffbe4f47be8af31e761db09a6abf",
+      "known_bad_rejects_identical_products_with_archived_manifests": true,
+      "current_accepts_identical_products_with_archived_manifests": true,
+      "real_declaration_changes_rejected": [
+        "Package.swift",
+        "VoiceInk/Packages/Native/Package.swift",
+        "VoiceInkCore/Package.swift",
+        "VoiceInkNVIDIA/Package.swift",
+        "VoiceInkQwen/Package.swift",
+        "VoiceInk.xcodeproj/project.pbxproj",
+        "iOS/Package.swift",
+        "iOS/VoiceInk-ios.xcodeproj/project.pbxproj"
+      ],
+      "added_live_manifest_rejected": true,
+      "removed_live_manifest_rejected": true
+    },
+    {
+      "script": "scripts/run-writing-settings-ui-regression.sh",
+      "known_bad_revision": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+      "old_function_sha256": "da0928f3b1eb622dbbad1a16f00ef9c3c54390e8d32331739488f47ba031127c",
+      "current_function_sha256": "afb86cc5af117d1b7b3028d73e2e782059e2522cf2c85330f74ae9f296951d5e",
+      "known_bad_rejects_identical_products_with_archived_manifests": true,
+      "current_accepts_identical_products_with_archived_manifests": true,
+      "real_declaration_changes_rejected": [
+        "Package.swift",
+        "VoiceInk/Packages/Native/Package.swift",
+        "VoiceInkCore/Package.swift",
+        "VoiceInkNVIDIA/Package.swift",
+        "VoiceInkQwen/Package.swift",
+        "VoiceInk.xcodeproj/project.pbxproj",
+        "iOS/Package.swift",
+        "iOS/VoiceInk-ios.xcodeproj/project.pbxproj"
+      ],
+      "added_live_manifest_rejected": true,
+      "removed_live_manifest_rejected": true
+    }
+  ]
+}

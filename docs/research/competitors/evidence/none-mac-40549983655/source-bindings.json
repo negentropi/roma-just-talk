@@ -1,0 +1,126 @@
+{
+  "run_id": 40549983655,
+  "head_sha": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+  "source_method": "git show/git ls-tree at exact pinned commits, independent of future working-tree edits. Source comparison does not establish test execution.",
+  "source_hashes": [
+    {
+      "path": ".github/workflows/voiceink-writing-actions-check.yml",
+      "bytes": 9156,
+      "sha256": "51414a14b253a0cab9cccdc51b5fc83d5bdcdb089324fe8a105ff63617996587"
+    },
+    {
+      "path": "scripts/run-macos-ci-unit-tests.sh",
+      "bytes": 2975,
+      "sha256": "dce0cac74da7caca17f74a13cfaae8eb291bc9b4f9ce5572c566e89f84299836"
+    },
+    {
+      "path": "scripts/run-writing-feature-regression.sh",
+      "bytes": 28964,
+      "sha256": "3bc7e4b5f554044ebf2c41251c2c15f020c1cacf924643904da76dd05a873ebd"
+    },
+    {
+      "path": "scripts/run-writing-settings-ui-regression.sh",
+      "bytes": 30807,
+      "sha256": "a426dc477b94279d5e63d45eae4300b47dfcd3d8322a804f85f8b1891c3b686e"
+    },
+    {
+      "path": "Tools/OnboardingAccessibilityProbe.swift",
+      "bytes": 10821,
+      "sha256": "1b087e88d6956163b04ee75371074bd7d29c6eb6e840231a3524d928e285b78a"
+    },
+    {
+      "path": "VoiceInkTests/OnboardingRegionViewTests.swift",
+      "bytes": 33080,
+      "sha256": "828f0155ee7dca9b4a4adbcad56596e6f87585fa01d5341eca81cb9a2a27cf6b"
+    },
+    {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "bytes": 86225,
+      "sha256": "78e5a1d8c7f99dd3790bbf143373925c33891241fb32544068022d0b9c5bd06d"
+    },
+    {
+      "path": "VoiceInkTests/WritingActionProviderTests.swift",
+      "bytes": 13856,
+      "sha256": "4d9a642646296520730da117bd6d646d825a045e46579aa7eeb47610bf111907"
+    },
+    {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "bytes": 14932,
+      "sha256": "6b2f84761c7a0defed6b50102f9953511b53bcabc83b36ea25c18bc1e9580f02"
+    },
+    {
+      "path": "VoiceInkUITests/WritingFeaturesUITests.swift",
+      "bytes": 52253,
+      "sha256": "9bbf692457cd30b31fcaf3ddee22adeb679fe53b502f69f2aa51d154c36067ca"
+    },
+    {
+      "path": "scripts/verify-static-whisper-app.sh",
+      "bytes": 1926,
+      "sha256": "e40475d402148fbde4327619c94ad046de1fb4ff18a3f04228a35534d64e2ad8"
+    },
+    {
+      "path": "scripts/verify-adhoc-library-validation.sh",
+      "bytes": 2085,
+      "sha256": "642d8dfc9fdd7d3494898829e29cfb01c4560653103b272c9b02eba117eb13b1"
+    },
+    {
+      "path": "scripts/verify-macos-release-instrumentation.sh",
+      "bytes": 888,
+      "sha256": "dddfbe5bd1ada1a27584f47f0b7b7220905eb64218e6cf45deb7bd21f984b564"
+    },
+    {
+      "path": "scripts/tests/verify-adhoc-library-validation.test.sh",
+      "bytes": 3662,
+      "sha256": "26ca935ee73b1e1e3f1d9c7b0c65794c9b108527ab37db61a34f0746f9bc3622"
+    }
+  ],
+  "production_comparison": {
+    "baseline_head": "830d45210816a36c2db70b09d1329a0ef8b7ddf6",
+    "candidate_head": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+    "roots": [
+      "VoiceInk",
+      "VoiceInkCore",
+      "VoiceInkNVIDIA",
+      "VoiceInkQwen",
+      "VoiceInk.xcodeproj",
+      "VoiceInk.xcworkspace",
+      "iOS",
+      "Makefile",
+      "LocalBuild.xcconfig"
+    ],
+    "baseline_entries": 588,
+    "candidate_entries": 588,
+    "baseline_manifest_sha256": "92df289f16fa600b5f1a724fdd1cc7102157d4e7838d45f794957f4bd8d416a7",
+    "candidate_manifest_sha256": "31dec8c2f347c9156efab19396b168fac45938b2a6806ee7864ff94e0c372ad7",
+    "changes": [
+      {
+        "path": "VoiceInk/Services/AIEnhancement/AIEnhancementService.swift",
+        "baseline": {
+          "mode": "100644",
+          "git_blob": "efeda530ca64746c6f2c9789e2d671234c1e1a48"
+        },
+        "candidate": {
+          "mode": "100644",
+          "git_blob": "1d8ff02a806e6a6c0a2f9900d0947b782305b0a8"
+        }
+      },
+      {
+        "path": "VoiceInk/Services/OllamaService.swift",
+        "baseline": {
+          "mode": "100644",
+          "git_blob": "5ac50710ffad9363729c558de97ba9850afc2fb0"
+        },
+        "candidate": {
+          "mode": "100644",
+          "git_blob": "5f9df5b1a5e1dff7ee4d00d89d92cbf0202bc910"
+        }
+      }
+    ],
+    "all_other_tracked_product_entries_equal": true,
+    "production_ui_unchanged": true
+  },
+  "limits": [
+    "This source comparison permits describing which code changed. It does not combine runtime proofs from different heads.",
+    "Run was canceled during units. Actual unit counts/skips, pointer attempts, native checks and Release results are not established by this source receipt."
+  ]
+}

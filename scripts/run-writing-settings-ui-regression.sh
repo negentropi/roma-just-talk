@@ -106,8 +106,8 @@ elif command == 'sources':
     manifests = {label: tracked(root, PRODUCT) for label, root in [('candidate', candidate), ('baseline', baseline)]}
     for label, manifest in manifests.items(): write(output / (label + '-production-before.json'), manifest)
     def declarations(root):
-        names = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z']).split(b'\0')
-        return {name.decode(): digest((root / name.decode()).read_bytes()) for name in names if name and (name.endswith(b'/Package.swift') or name in [b'Package.swift', b'VoiceInk.xcodeproj/project.pbxproj'])}
+        names = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z', '--', 'Package.swift', *PRODUCT]).split(b'\0')
+        return {name.decode(): digest((root / name.decode()).read_bytes()) for name in names if name and (name == b'Package.swift' or name.endswith((b'/Package.swift', b'/project.pbxproj')))}
     if declarations(candidate) != declarations(baseline): raise SystemExit('Baseline dependency declarations differ')
     build_inputs = ['Makefile', 'LocalBuild.xcconfig', 'scripts/verify-static-whisper-xcframework.sh']
     for name in build_inputs:

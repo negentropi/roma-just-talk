@@ -1,0 +1,240 @@
+{
+  "run_id": 40549983655,
+  "head_sha": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40549983655",
+  "status": "completed",
+  "conclusion": "cancelled",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T17:30:33Z",
+      "conclusion": "cancelled",
+      "databaseId": 122350786733,
+      "name": "macos",
+      "startedAt": "2026-10-27T17:22:37Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T17:22:39Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T17:22:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:22:45Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T17:22:39Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:22:45Z",
+          "conclusion": "success",
+          "name": "Keep the disposable desktop awake",
+          "number": 3,
+          "startedAt": "2026-10-27T17:22:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:22:54Z",
+          "conclusion": "success",
+          "name": "Select Xcode and Metal toolchain",
+          "number": 4,
+          "startedAt": "2026-10-27T17:22:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:23:21Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 5,
+          "startedAt": "2026-10-27T17:22:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:24:22Z",
+          "conclusion": "success",
+          "name": "Verify the canonical package graph before compiling",
+          "number": 6,
+          "startedAt": "2026-10-27T17:23:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:27:46Z",
+          "conclusion": "success",
+          "name": "Shared core checks",
+          "number": 7,
+          "startedAt": "2026-10-27T17:24:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:27:51Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper dependencies",
+          "number": 8,
+          "startedAt": "2026-10-27T17:27:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:27:51Z",
+          "conclusion": "skipped",
+          "name": "Preserve verified dependencies for test retries",
+          "number": 9,
+          "startedAt": "2026-10-27T17:27:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "cancelled",
+          "name": "Full Mac unit suite with fresh CI permissions",
+          "number": 10,
+          "startedAt": "2026-10-27T17:27:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "skipped",
+          "name": "Live TextEdit and Safari selection transactions",
+          "number": 11,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "skipped",
+          "name": "Upload the native check checkpoint",
+          "number": 12,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "skipped",
+          "name": "Matched snippet regression",
+          "number": 13,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "skipped",
+          "name": "Upload the matched regression checkpoint",
+          "number": 14,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "skipped",
+          "name": "Writing, snippet and dictation settings UI",
+          "number": 15,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "success",
+          "name": "Preserve test evidence before the Release build",
+          "number": 16,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:21Z",
+          "conclusion": "skipped",
+          "name": "Release build and packaging contracts",
+          "number": 17,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:24Z",
+          "conclusion": "success",
+          "name": "Upload verification evidence",
+          "number": 18,
+          "startedAt": "2026-10-27T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:25Z",
+          "conclusion": "success",
+          "name": "Upload settings screenshots",
+          "number": 19,
+          "startedAt": "2026-10-27T17:30:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:25Z",
+          "conclusion": "skipped",
+          "name": "Upload verified release app",
+          "number": 20,
+          "startedAt": "2026-10-27T17:30:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:26Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 40,
+          "startedAt": "2026-10-27T17:30:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:30:32Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 41,
+          "startedAt": "2026-10-27T17:30:26Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40549983655/job/122350786733"
+    }
+  ],
+  "artifacts": {
+    "artifacts": [
+      {
+        "digest": "sha256:fdb5592ade114f451839c4a1b540a3090887cc7504ee4a9ee18cc31837433026",
+        "expired": false,
+        "id": 12754083248,
+        "name": "roma.writing-actions-evidence",
+        "size_in_bytes": 42657,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "5bf8e4df18d3e38756a431122b5fa98208daeb2c",
+          "id": 40549983655,
+          "repository_id": 1253985786
+        }
+      }
+    ],
+    "total_count": 1
+  },
+  "cancellation": {
+    "source": "Coordinator message in this task",
+    "reason": "Coordinator canceled while units were running after separate UI prebuild retry found the shared declaration census included archived evidence Package.swift paths. A census fix with matched old/new fixtures follows.",
+    "separate_run_id": 40549984560,
+    "separate_failure_independently_audited_here": false
+  },
+  "scope": {
+    "completed_steps": "Canonical package graph, Core checks and dependency preparation succeeded per GitHub metadata.",
+    "unit": "Canceled. No raw complete result aggregate retained or count asserted.",
+    "native": "Skipped; no native checkpoint.",
+    "matched_regression": "Skipped.",
+    "settings_ui": "Skipped.",
+    "release_packaging": "Skipped.",
+    "source": "source-bindings.json compares exact pinned product entries and scripts. Source comparison is not runtime proof."
+  },
+  "retention": {
+    "full_evidence_archive_downloaded": false,
+    "native_checkpoint_downloaded": false,
+    "reason": "Coordinator requested minimal cancellation/source receipts; no completed native checkpoint. Full ZIP not fetched."
+  },
+  "limits": [
+    "No overall full-gate pass.",
+    "No actual unit, gated-skip or Core check count claim from step metadata alone.",
+    "No new runtime, None UI, pointer click, provider quality, TCC or Release claim."
+  ]
+}

@@ -58,8 +58,9 @@ if len(canonical_pins) != 41:
     raise SystemExit("Canonical graph must contain the reviewed 41 pins")
 
 def declarations(root):
-    tracked = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z"]).split(b"\0")
-    return {value.decode(): (root / value.decode()).read_bytes() for value in tracked if value and (value.endswith(b"/Package.swift") or value in (b"Package.swift", b"VoiceInk.xcodeproj/project.pbxproj"))}
+    roots = ["Package.swift", "VoiceInk", "VoiceInkCore", "VoiceInkNVIDIA", "VoiceInkQwen", "VoiceInk.xcodeproj", "iOS"]
+    tracked = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z", "--", *roots]).split(b"\0")
+    return {value.decode(): (root / value.decode()).read_bytes() for value in tracked if value and (value == b"Package.swift" or value.endswith((b"/Package.swift", b"/project.pbxproj")))}
 
 inputs = declarations(candidate)
 receipt = {"canonical_sha256": expected_hash, "canonical_pin_count": 41, "declaration_sha256": {path: digest(data) for path, data in inputs.items()}, "source": "reviewed Xcode resolution run 40482229518", "scope": "package metadata only; existing pins and all dependency declarations unchanged"}

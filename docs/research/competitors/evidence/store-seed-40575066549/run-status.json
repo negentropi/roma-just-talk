@@ -1,0 +1,142 @@
+{
+  "conclusion": "success",
+  "databaseId": 40575066549,
+  "headBranch": "ci/rjt-dictation-store-seed-check-01a17bef",
+  "headSha": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T20:29:28Z",
+      "conclusion": "success",
+      "databaseId": 122439164882,
+      "name": "store-control",
+      "startedAt": "2026-10-27T20:06:34Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T20:06:35Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T20:06:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:06:42Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T20:06:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:06:50Z",
+          "conclusion": "success",
+          "name": "Select Xcode 26 and Metal toolchain",
+          "number": 3,
+          "startedAt": "2026-10-27T20:06:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:07:04Z",
+          "conclusion": "success",
+          "name": "Check strict driver classifiers and closed-copy controls",
+          "number": 4,
+          "startedAt": "2026-10-27T20:06:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:07:09Z",
+          "conclusion": "success",
+          "name": "Pin real products and seed disposable startup defaults",
+          "number": 5,
+          "startedAt": "2026-10-27T20:07:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:07:35Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 6,
+          "startedAt": "2026-10-27T20:07:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:09:09Z",
+          "conclusion": "success",
+          "name": "Build and freeze one shared static Whisper dependency",
+          "number": 7,
+          "startedAt": "2026-10-27T20:07:35Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:09:09Z",
+          "conclusion": "skipped",
+          "name": "Run actions/cache/save@v4",
+          "number": 8,
+          "startedAt": "2026-10-27T20:09:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:19:36Z",
+          "conclusion": "success",
+          "name": "Seed and reopen in separate actual predecessor hosts",
+          "number": 9,
+          "startedAt": "2026-10-27T20:09:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:19:42Z",
+          "conclusion": "success",
+          "name": "Preserve predecessor checkpoint before current app build",
+          "number": 10,
+          "startedAt": "2026-10-27T20:19:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:28:42Z",
+          "conclusion": "success",
+          "name": "Read a new closed-seed clone in the unchanged-schema current host",
+          "number": 11,
+          "startedAt": "2026-10-27T20:19:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:29:07Z",
+          "conclusion": "success",
+          "name": "Require exact runtime identity and all old values across hosts",
+          "number": 12,
+          "startedAt": "2026-10-27T20:28:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:29:16Z",
+          "conclusion": "success",
+          "name": "Retain complete native results and closed fixture receipts",
+          "number": 13,
+          "startedAt": "2026-10-27T20:29:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:29:17Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 26,
+          "startedAt": "2026-10-27T20:29:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T20:29:19Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "startedAt": "2026-10-27T20:29:17Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40575066549/job/122439164882"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-10-27T20:29:28Z",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40575066549"
+}

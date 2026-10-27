@@ -1,0 +1,14 @@
+{
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "classification" : "passed",
+  "executablePath" : "\/Users\/runner\/work\/_temp\/dictation-store-seed-derived-candidate\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "fixturePath" : "\/Users\/runner\/work\/_temp\/dictation-store-seed-proof\/stores\/current-read",
+  "hostPID" : 44325,
+  "normalSupportPath" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk",
+  "phase" : "current-read",
+  "scope" : "Actual VoiceInk model classes, unchanged-schema local persistent-store seed\/control; no new metadata or migration proof.",
+  "sourcePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/VoiceInkTests\/DictationStoreSeedLiveTests.swift",
+  "sourceSHA" : "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+  "testName" : "liveDictationPersistentStoreSeedControl",
+  "version" : 1
+}

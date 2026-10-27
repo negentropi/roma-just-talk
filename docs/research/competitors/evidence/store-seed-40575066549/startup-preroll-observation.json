@@ -1,0 +1,15 @@
+{
+  "classification": "startup-log-observation",
+  "limit": "Actual app startup ran its pre-roll path. This is not proof of microphone inactivity or user speech/recognition behavior.",
+  "phases": {
+    "current-read": [
+      "2026-10-27 20:28:21.013699+0000 roma just talk[44325:138239] [Recorder] startPreRollBuffering: active on deviceID=81"
+    ],
+    "old-reopen": [
+      "2026-10-27 20:19:22.247231+0000 roma just talk[25409:85042] [Recorder] startPreRollBuffering: active on deviceID=81"
+    ],
+    "seed": [
+      "2026-10-27 20:18:08.427460+0000 roma just talk[22406:74359] [Recorder] startPreRollBuffering: active on deviceID=81"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "classification": "unchanged-schema-seed-control-passed",
+  "distinct_host_pids": [
+    22406,
+    25409,
+    44325
+  ],
+  "limits": [
+    "Prerequisite control only. No new fields or schema migration have been tested.",
+    "Actual app initialization opened fresh normal Application Support stores; inventories retained.",
+    "Explicit local fixtures disable CloudKit; no deployed CloudKit schema, real user store, audio or provider call tested."
+  ],
+  "original_seed_immutable": true,
+  "phases": [
+    "seed",
+    "old-reopen",
+    "current-read"
+  ],
+  "runtime_schema_and_all_old_values_equal": true,
+  "schema_hashes": {
+    "current-read": {
+      "canonical_sha256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "raw_sha256": "e03941dda9daef99cbfe8cba2d84ad96a9b12831758f867c782588c24df0c412",
+      "snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0"
+    },
+    "old-reopen": {
+      "canonical_sha256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "raw_sha256": "0b81c00d6096c23711007d0dbe441059b1397c974c0e6c53692182be89062f83",
+      "snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0"
+    },
+    "seed": {
+      "canonical_sha256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "raw_sha256": "4b99d9256bda2673945b261f333771dc70f5680ce3fa2e53fe0efab65f9ec336",
+      "snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0"
+    }
+  },
+  "source_sha": {
+    "candidate": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  }
+}

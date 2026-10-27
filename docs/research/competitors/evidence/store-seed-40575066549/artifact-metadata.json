@@ -1,0 +1,45 @@
+{
+  "artifacts": [
+    {
+      "archive_download_url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12768295700/zip",
+      "created_at": "2026-10-27T20:19:42Z",
+      "digest": "sha256:5ebf1b251421d8763210cf75634414275824756328b54ee73ed82c69d626d537",
+      "expired": false,
+      "expires_at": "2027-01-25T20:06:32Z",
+      "id": 12768295700,
+      "name": "roma.dictation-store-predecessor-seed",
+      "node_id": "MDg6QXJ0aWZhY3QxMjc2ODI5NTcwMA==",
+      "size_in_bytes": 79398100,
+      "updated_at": "2026-10-27T20:19:42Z",
+      "url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12768295700",
+      "workflow_run": {
+        "head_branch": "ci/rjt-dictation-store-seed-check-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+        "id": 40575066549,
+        "repository_id": 1253985786
+      }
+    },
+    {
+      "archive_download_url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12768167662/zip",
+      "created_at": "2026-10-27T20:29:16Z",
+      "digest": "sha256:64d1d26bf70b2b5ed21bb3193e4ee46ead37a41cf8a06f4a2e9676aec4256c2a",
+      "expired": false,
+      "expires_at": "2027-01-25T20:06:32Z",
+      "id": 12768167662,
+      "name": "roma.dictation-store-seed-control",
+      "node_id": "MDg6QXJ0aWZhY3QxMjc2ODE2NzY2Mg==",
+      "size_in_bytes": 157863079,
+      "updated_at": "2026-10-27T20:29:16Z",
+      "url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12768167662",
+      "workflow_run": {
+        "head_branch": "ci/rjt-dictation-store-seed-check-01a17bef",
+        "head_repository_id": 1253985786,
+        "head_sha": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+        "id": 40575066549,
+        "repository_id": 1253985786
+      }
+    }
+  ],
+  "total_count": 2
+}

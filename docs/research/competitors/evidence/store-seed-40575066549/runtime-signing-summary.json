@@ -1,0 +1,120 @@
+{
+  "classification": "both-actual-hosts-hardened-runtime-signature-contract-passed",
+  "lanes": {
+    "candidate": {
+      "actualExports": {
+        "ENABLE_DEBUG_DYLIB": [
+          "    export ENABLE_DEBUG_DYLIB\\=NO"
+        ],
+        "ENABLE_HARDENED_RUNTIME": [
+          "    export ENABLE_HARDENED_RUNTIME\\=YES"
+        ],
+        "ENABLE_PREVIEWS": [
+          "    export ENABLE_PREVIEWS\\=NO"
+        ],
+        "ENABLE_XOJIT_PREVIEWS": [
+          "    export ENABLE_XOJIT_PREVIEWS\\=NO"
+        ]
+      },
+      "actualRunnerSignatureGuardPassed": true,
+      "codeDirectories": [
+        {
+          "adhoc": true,
+          "bytes": 445820,
+          "flags": "0x10002",
+          "hardenedRuntime": true,
+          "identifier": "com.negentropi.RomaJustTalk",
+          "slot": 0,
+          "version": "0x20500"
+        }
+      ],
+      "mainEntitlements": [
+        {
+          "com.apple.security.app-sandbox": false,
+          "com.apple.security.automation.apple-events": true,
+          "com.apple.security.cs.disable-library-validation": true,
+          "com.apple.security.device.audio-input": true,
+          "com.apple.security.files.user-selected.read-only": true,
+          "com.apple.security.get-task-allow": true,
+          "com.apple.security.network.client": true,
+          "com.apple.security.network.server": true,
+          "com.apple.security.screen-capture": true,
+          "com.apple.security.temporary-exception.files.absolute-path.read-only": [
+            "/"
+          ],
+          "com.apple.security.temporary-exception.mach-lookup.global-name": [
+            "com.apple.testmanagerd",
+            "com.apple.dt.testmanagerd.runner",
+            "com.apple.coresymbolicationd"
+          ]
+        }
+      ],
+      "mainSHA256": [
+        "bff485ea47d704e327b839fba945da0c2503b8a43a74a527212f64c6ee32b7ae"
+      ],
+      "runtimeDisableNotes": []
+    },
+    "predecessor": {
+      "actualExports": {
+        "ENABLE_DEBUG_DYLIB": [
+          "    export ENABLE_DEBUG_DYLIB\\=NO"
+        ],
+        "ENABLE_HARDENED_RUNTIME": [
+          "    export ENABLE_HARDENED_RUNTIME\\=YES"
+        ],
+        "ENABLE_PREVIEWS": [
+          "    export ENABLE_PREVIEWS\\=NO"
+        ],
+        "ENABLE_XOJIT_PREVIEWS": [
+          "    export ENABLE_XOJIT_PREVIEWS\\=NO"
+        ]
+      },
+      "actualRunnerSignatureGuardPassed": true,
+      "codeDirectories": [
+        {
+          "adhoc": true,
+          "bytes": 444828,
+          "flags": "0x10002",
+          "hardenedRuntime": true,
+          "identifier": "com.negentropi.RomaJustTalk",
+          "slot": 0,
+          "version": "0x20500"
+        }
+      ],
+      "mainEntitlements": [
+        {
+          "com.apple.security.app-sandbox": false,
+          "com.apple.security.automation.apple-events": true,
+          "com.apple.security.cs.disable-library-validation": true,
+          "com.apple.security.device.audio-input": true,
+          "com.apple.security.files.user-selected.read-only": true,
+          "com.apple.security.get-task-allow": true,
+          "com.apple.security.network.client": true,
+          "com.apple.security.network.server": true,
+          "com.apple.security.screen-capture": true,
+          "com.apple.security.temporary-exception.files.absolute-path.read-only": [
+            "/"
+          ],
+          "com.apple.security.temporary-exception.mach-lookup.global-name": [
+            "com.apple.testmanagerd",
+            "com.apple.dt.testmanagerd.runner",
+            "com.apple.coresymbolicationd"
+          ]
+        }
+      ],
+      "mainSHA256": [
+        "76259f7ae5e34992a5ef727636aa20378f845d54761f31ac74e2c1a3dc2cad52"
+      ],
+      "runtimeDisableNotes": []
+    }
+  },
+  "limits": [
+    "Remote Mach-O parser verifies actual recorded flag/entitlement content. Retained native macOS guard supplies deep/strict code-signature verification.",
+    "Unchanged-schema store control only. No new metadata fields or migration."
+  ],
+  "runID": 40575066549,
+  "sourceSHA": {
+    "candidate": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  }
+}

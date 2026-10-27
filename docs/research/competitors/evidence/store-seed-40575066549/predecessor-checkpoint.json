@@ -1,0 +1,26 @@
+{
+  "candidate_not_built": true,
+  "classification": "predecessor-seed-and-reopen-passed",
+  "distinct_host_pids": [
+    22406,
+    25409
+  ],
+  "original_seed_immutable": true,
+  "phases": [
+    "seed",
+    "old-reopen"
+  ],
+  "runtime_schema_and_all_old_values_equal": true,
+  "schema_hashes": {
+    "old-reopen": {
+      "canonical_sha256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "raw_sha256": "0b81c00d6096c23711007d0dbe441059b1397c974c0e6c53692182be89062f83",
+      "snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0"
+    },
+    "seed": {
+      "canonical_sha256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "raw_sha256": "4b99d9256bda2673945b261f333771dc70f5680ce3fa2e53fe0efab65f9ec336",
+      "snapshots_sha256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0"
+    }
+  }
+}

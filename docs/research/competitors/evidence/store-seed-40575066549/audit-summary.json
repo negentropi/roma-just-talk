@@ -1,0 +1,31 @@
+{
+  "actualStoredFields": 35,
+  "all3NativeTestsPassed": true,
+  "allClosedCopiesAndOriginalSeedChecksPassed": true,
+  "allSavedIdentifiersAndModuleEntityStoreGroupsEqual": true,
+  "bothActualSignatureGuardsPassed": true,
+  "canonicalPackagePins": 41,
+  "classification": "actual-unchanged-schema-seed-reopen-current-read-audited",
+  "fixtureRowsPerModel": 2,
+  "fullArtifactID": 12768167662,
+  "fullArtifactSHA256": "64d1d26bf70b2b5ed21bb3193e4ee46ead37a41cf8a06f4a2e9676aec4256c2a",
+  "hostPIDs": [
+    22406,
+    25409,
+    44325
+  ],
+  "limitations": [
+    "Unchanged-schema prerequisite control only. No new metadata fields or schema migration tested.",
+    "Fresh normal app Application Support opened on disposable runner; inventories retained.",
+    "Actual startup pre-roll path ran. No microphone inactivity or real speech/recognition claim.",
+    "CloudKit disabled for fixtures. No deployed CloudKit or real user store upgrade tested."
+  ],
+  "remoteArtifact": "/data/rjt-writing-check-01a17bef/40575066549/roma.dictation-store-seed-control.zip",
+  "runID": 40575066549,
+  "schemaCanonicalFileSHA256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+  "snapshotsFileSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+  "sourceSHA": {
+    "candidate": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  }
+}

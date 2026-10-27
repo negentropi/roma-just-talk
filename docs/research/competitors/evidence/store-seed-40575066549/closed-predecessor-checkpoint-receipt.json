@@ -1,0 +1,15 @@
+{
+  "bytes": 1473845,
+  "classification": "closed-original-predecessor-seed-retained-for-future-runs",
+  "entryCount": 46,
+  "limits": [
+    "Copied from the verified complete original run artifact without reopening SQLite.",
+    "This reusable seed is not evidence of any later schema migration.",
+    "Original immutable seed receipts and both actual old-host observations are included."
+  ],
+  "originalArtifactID": 12768167662,
+  "path": "/data/rjt-writing-check-01a17bef/40575066549/closed-predecessor-checkpoint.zip",
+  "runID": 40575066549,
+  "sha256": "02b2d555f64c4af8e057216b3a1466c1bb669f3592d26494cb64b07b05cb8cb3",
+  "sourceSHA": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+}

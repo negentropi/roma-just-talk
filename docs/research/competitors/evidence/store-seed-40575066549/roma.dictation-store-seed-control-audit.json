@@ -1,0 +1,366 @@
+{
+  "archive": "roma.dictation-store-seed-control.zip",
+  "archiveBytes": 157863079,
+  "archiveSHA256": "64d1d26bf70b2b5ed21bb3193e4ee46ead37a41cf8a06f4a2e9676aec4256c2a",
+  "builds": {
+    "candidate": {
+      "appTreeEntries": 669,
+      "archives": {
+        "actual-host.app.zip": {
+          "bytes": 74229162,
+          "sha256": "dafd577c6fb4f2cf2957dd7179a06b1f4677e87dcd23d697adbca063b1cb90f3"
+        },
+        "actual-tests-0.xctest.zip": {
+          "bytes": 4899258,
+          "sha256": "f5e52b48184e094265d2611ea351f930ac7693d12c936cf79894ccedbbd7533d"
+        }
+      },
+      "designatedRequirement": "cdhash H\"3b0a193450501dbc4e3a813916a02db66e3b7958\"",
+      "executablePath": "/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "testBundleCount": 1
+    },
+    "predecessor": {
+      "appTreeEntries": 669,
+      "archives": {
+        "actual-host.app.zip": {
+          "bytes": 73749838,
+          "sha256": "40a4035db491e50885c19e05e7fa58e98e09c30a0908d22f26cf281c9e4187e7"
+        },
+        "actual-tests-0.xctest.zip": {
+          "bytes": 4543306,
+          "sha256": "d63cfeb71c87185a6a1ad5ae8c9f8e8d849253c4220c07f44432e09067e4b6e3"
+        }
+      },
+      "designatedRequirement": "cdhash H\"91021a06c6c085233306fd21ea7b3594b45350bd\"",
+      "executablePath": "/Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "testBundleCount": 1
+    }
+  },
+  "classification": "independent-archive-audit-passed",
+  "distinctHostPIDs": [
+    22406,
+    25409,
+    44325
+  ],
+  "entryCount": 336,
+  "frameworkEntryCount": 121,
+  "limitations": [
+    "Unchanged-schema control only. No new metadata or migration proof.",
+    "Fresh normal Application Support opened by actual app initialization.",
+    "App startup attempts recorder pre-roll; microphone inactivity not established."
+  ],
+  "packageInventories": {
+    "axswift": {
+      "entryCount": 25,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "eventsource": {
+      "entryCount": 19,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "fluidaudio": {
+      "entryCount": 524,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "grpc-swift-2": {
+      "entryCount": 441,
+      "gitlinks": {},
+      "symlinkCount": 8
+    },
+    "grpc-swift-nio-transport": {
+      "entryCount": 220,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "grpc-swift-protobuf": {
+      "entryCount": 107,
+      "gitlinks": {},
+      "symlinkCount": 2
+    },
+    "keysender": {
+      "entryCount": 9,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "launchatlogin-modern": {
+      "entryCount": 9,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "llmkit": {
+      "entryCount": 32,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "mediaremote-adapter": {
+      "entryCount": 13,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "mlx-audio-swift": {
+      "entryCount": 434,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "mlx-swift": {
+      "entryCount": 741,
+      "gitlinks": {
+        "Source/Cmlx/mlx": {
+          "git_object": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+          "revision": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+          "state": "initialized",
+          "trackedSourceCount": 883
+        },
+        "Source/Cmlx/mlx-c": {
+          "git_object": "0726ca922fc902c4c61ef9c27d94132be418e945",
+          "revision": "0726ca922fc902c4c61ef9c27d94132be418e945",
+          "state": "initialized",
+          "trackedSourceCount": 126
+        }
+      },
+      "symlinkCount": 0
+    },
+    "mlx-swift-lm": {
+      "entryCount": 273,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "permissionflow": {
+      "entryCount": 57,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "selectedtextkit": {
+      "entryCount": 42,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "sparkle": {
+      "entryCount": 600,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-algorithms": {
+      "entryCount": 119,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-asn1": {
+      "entryCount": 212,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-async-algorithms": {
+      "entryCount": 208,
+      "gitlinks": {},
+      "symlinkCount": 2
+    },
+    "swift-atomics": {
+      "entryCount": 144,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-certificates": {
+      "entryCount": 365,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-collections": {
+      "entryCount": 842,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-crypto": {
+      "entryCount": 1044,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-http-structured-headers": {
+      "entryCount": 69,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-http-types": {
+      "entryCount": 603,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-huggingface": {
+      "entryCount": 101,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-jinja": {
+      "entryCount": 37,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-log": {
+      "entryCount": 144,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio": {
+      "entryCount": 767,
+      "gitlinks": {},
+      "symlinkCount": 2
+    },
+    "swift-nio-extras": {
+      "entryCount": 180,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio-http2": {
+      "entryCount": 614,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio-ssl": {
+      "entryCount": 769,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-nio-transport-services": {
+      "entryCount": 61,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-numerics": {
+      "entryCount": 70,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-protobuf": {
+      "entryCount": 2511,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-service-lifecycle": {
+      "entryCount": 51,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-syntax": {
+      "entryCount": 872,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-system": {
+      "entryCount": 99,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "swift-transformers": {
+      "entryCount": 95,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "yyjson": {
+      "entryCount": 903,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "zip": {
+      "entryCount": 71,
+      "gitlinks": {},
+      "symlinkCount": 0
+    }
+  },
+  "packagePinCount": 41,
+  "phases": {
+    "current-read": {
+      "canonicalSchemaSHA256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "fixturePath": "/Users/runner/work/_temp/dictation-store-seed-proof/stores/current-read",
+      "hostPID": 44325,
+      "nativeResult": {
+        "test_action_id": "0~ntbD8ppPVc8bA4h0tO-29YZh0jQZPK-cYl1kLnV8eNWdnmSoKMbNRUWETy4YxkE2cYbDw9N6eGEeeh1AkDkpCA==",
+        "tests": [
+          {
+            "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+            "status": "Success"
+          }
+        ],
+        "valid": true
+      },
+      "normalSupportPath": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk",
+      "rawSchemaSHA256": "e03941dda9daef99cbfe8cba2d84ad96a9b12831758f867c782588c24df0c412",
+      "snapshotSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "sourceSHA": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+      "storeBytes": 344064,
+      "storeFileCount": 9
+    },
+    "old-reopen": {
+      "canonicalSchemaSHA256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "fixturePath": "/Users/runner/work/_temp/dictation-store-seed-proof/stores/old-reopen",
+      "hostPID": 25409,
+      "nativeResult": {
+        "test_action_id": "0~RixVtkSdZjhOcGf0xsPM68ei40GHaWa_Tiv55xpCCrKuNARvY3A8d9vYp0yvG1khjCR9h7DssZz5_a3wfvKnZA==",
+        "tests": [
+          {
+            "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+            "status": "Success"
+          }
+        ],
+        "valid": true
+      },
+      "normalSupportPath": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk",
+      "rawSchemaSHA256": "0b81c00d6096c23711007d0dbe441059b1397c974c0e6c53692182be89062f83",
+      "snapshotSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "sourceSHA": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+      "storeBytes": 344064,
+      "storeFileCount": 9
+    },
+    "seed": {
+      "canonicalSchemaSHA256": "3f5375d2aa78bfa771c24d43f3e712b0177b5429d92afb6d1c8e0457cca4548a",
+      "fixturePath": "/Users/runner/work/_temp/dictation-store-seed-proof/stores/seed",
+      "hostPID": 22406,
+      "nativeResult": {
+        "test_action_id": "0~Ca_Rq4AFJ21Ujm58OVDnbHa9SJn6KWGSMgEGJfMMnWDvclSWunw5G3328L-x2fB2kJO6_-keRrGDhYyK-LuWfw==",
+        "tests": [
+          {
+            "identifier": "VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+            "status": "Success"
+          }
+        ],
+        "valid": true
+      },
+      "normalSupportPath": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk",
+      "rawSchemaSHA256": "4b99d9256bda2673945b261f333771dc70f5680ce3fa2e53fe0efab65f9ec336",
+      "snapshotSHA256": "7d93c5cd868a756fb963fb93414045b655594c4cc069170e8955361edcb5e2d0",
+      "sourceSHA": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5",
+      "storeBytes": 344064,
+      "storeFileCount": 9
+    }
+  },
+  "snapshotRowsPerModel": 2,
+  "snapshotStoredFieldCount": 35,
+  "sourceBridgeEqual": true,
+  "sourceInventories": {
+    "candidate": {
+      "entryCount": 619,
+      "gitlinks": {},
+      "symlinkCount": 0
+    },
+    "predecessor": {
+      "entryCount": 610,
+      "gitlinks": {},
+      "symlinkCount": 0
+    }
+  },
+  "sourceOracleSHA256": "4d607b8965ba05c8d5bcb33a67e2b48f4c99fa93127686bbe8a869b2ead66b20",
+  "sourceSHA": {
+    "candidate": "f25fc0ff38b5ca20a686b2eb359e76ea6e7f8626",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  },
+  "whisperInventory": {
+    "entryCount": 2057,
+    "gitlinks": {},
+    "symlinkCount": 0
+  },
+  "whisperSourceRevision": "21ba6d269a02c14309355cb96822db6058d4cf48",
+  "whisperTrackedSourceFileCount": 2057,
+  "zipCRCValid": true
+}

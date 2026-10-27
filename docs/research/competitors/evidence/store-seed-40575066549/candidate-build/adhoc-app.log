@@ -1,0 +1,39 @@
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUnit.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUnit.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTAutomationSupport.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTAutomationSupport.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Autoupdate
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUIAutomation.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCUIAutomation.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Downloader.xpc
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/Updater.app
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices/Installer.xpc
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libswiftCompatibilitySpan.dylib
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libswiftCompatibilitySpan.dylib
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTest.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestSupport.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTest.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestSupport.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestCore.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/XCTestCore.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestBundleInject.dylib
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestBundleInject.dylib
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/MediaRemoteAdapter.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/MediaRemoteAdapter.framework/Versions/Current/.
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestSwiftSupport.dylib
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/libXCTestSwiftSupport.dylib
+--prepared:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Testing.framework/Versions/Current/.
+--validated:/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Testing.framework/Versions/Current/.
+/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app: valid on disk
+/Users/runner/work/_temp/dictation-store-seed-derived-candidate/Build/Products/Debug/roma just talk.app: satisfies its Designated Requirement
+Verified ad-hoc Library Validation contract: @rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter
+@rpath/Sparkle.framework/Versions/B/Sparkle
+@rpath/libswiftCompatibilitySpan.dylib

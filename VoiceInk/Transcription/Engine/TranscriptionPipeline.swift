@@ -13,8 +13,14 @@ class TranscriptionPipeline {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
     private var activePasteTasks: [UUID: Task<CursorPaster.PasteResult, Never>] = [:]
     private var activeProcessingTasks: [UUID: Task<DictationPostprocessingPlan.Output?, Error>] = [:]
+    private var activeWritingTasks: [UUID: Task<VoiceInkAIEnhancementResult, Error>] = [:]
     private var activeOperationCancellations: [UUID: Bool] = [:]
     private let reportProcessingFailure: @MainActor (String) -> Void
+    private let reportWritingSaveFailure: @MainActor (String) -> Void
+    private let autoSend: @MainActor (VoiceInkAutoSendKey) -> Void
+    let writingActionUndoController: WritingActionUndoController
+
+    var hasActiveOperations: Bool { !activeOperationCancellations.isEmpty }
 
     var licenseViewModel: LicenseViewModel
 
@@ -22,14 +28,24 @@ class TranscriptionPipeline {
         modelContext: ModelContext,
         serviceRegistry: TranscriptionServiceRegistry,
         enhancementService: AIEnhancementService?,
+        writingActionUndoController: WritingActionUndoController? = nil,
         reportProcessingFailure: @escaping @MainActor (String) -> Void = {
             NotificationManager.shared.showNotification(title: $0, type: .warning, duration: 6)
+        },
+        reportWritingSaveFailure: @escaping @MainActor (String) -> Void = {
+            NotificationManager.shared.showNotification(title: $0, type: .error, duration: 6)
+        },
+        autoSend: @escaping @MainActor (VoiceInkAutoSendKey) -> Void = {
+            CursorPaster.performAutoSend($0)
         }
     ) {
         self.modelContext = modelContext
         self.serviceRegistry = serviceRegistry
         self.enhancementService = enhancementService
+        self.writingActionUndoController = writingActionUndoController ?? WritingActionUndoController()
         self.reportProcessingFailure = reportProcessingFailure
+        self.reportWritingSaveFailure = reportWritingSaveFailure
+        self.autoSend = autoSend
         self.licenseViewModel = LicenseViewModel()
     }
 
@@ -38,6 +54,7 @@ class TranscriptionPipeline {
             activeOperationCancellations[transcriptionID] = true
         }
         activeProcessingTasks[transcriptionID]?.cancel()
+        activeWritingTasks[transcriptionID]?.cancel()
         activePasteTasks[transcriptionID]?.cancel()
     }
 
@@ -70,13 +87,52 @@ class TranscriptionPipeline {
         defer {
             activeOperationCancellations[transcription.id] = nil
             activeProcessingTasks[transcription.id] = nil
+            activeWritingTasks[transcription.id] = nil
         }
-        func isCanceled() -> Bool {
-            shouldCancel() || Task.isCancelled || activeOperationCancellations[transcription.id] == true
-        }
+        let deliveryID = writingActionUndoController.beginDelivery(transcriptionID: transcription.id)
         let capturedProfile = writingSession == nil ? (dictationPlan?.profile ?? cleanupProfile) : .custom
-        if writingSession == nil, capturedProfile != .custom {
-            SpecialShortcutEmptyTranscriptionFallback.clear()
+        if writingSession == nil, capturedProfile != .custom { SpecialShortcutEmptyTranscriptionFallback.clear() }
+        let alreadyCanceled = Task.isCancelled || shouldCancel()
+        let plan: DictationPostprocessingPlan = writingSession == nil && !alreadyCanceled
+            ? (dictationPlan ?? .capture(profile: capturedProfile, using: modelContext, enhancementService: enhancementService))
+            : .custom
+        let customSnippets = writingSession == nil && capturedProfile == .custom && !alreadyCanceled
+            ? (spokenSnippets ?? VoiceInkSpokenSnippets.load()) : []
+        let parentCancellation = OSAllocatedUnfairLock(initialState: false)
+        await withTaskCancellationHandler {
+            await runOperation(
+                transcription: transcription, audioURL: audioURL, model: model, session: session,
+                writingSession: writingSession, capturedProfile: capturedProfile,
+                plan: plan, customSnippets: customSnippets, deliveryID: deliveryID,
+                latencyTraceToken: latencyTraceToken, onStateChange: onStateChange,
+                shouldCancel: shouldCancel, onCancel: onCancel, onDismiss: onDismiss,
+                parentCancellation: parentCancellation
+            )
+        } onCancel: {
+            parentCancellation.withLock { $0 = true }
+        }
+    }
+
+    private func runOperation(
+        transcription: Transcription,
+        audioURL: URL,
+        model: any TranscriptionModel,
+        session: TranscriptionSession?,
+        writingSession: WritingActionSession?,
+        capturedProfile: VoiceInkDictationProfile,
+        plan: DictationPostprocessingPlan,
+        customSnippets: [VoiceInkSpokenSnippet],
+        deliveryID: WritingActionUndoController.DeliveryID,
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
+        onStateChange: @escaping (VoiceInkRecordingState) -> Void,
+        shouldCancel: @escaping () -> Bool,
+        onCancel: @escaping () async -> Void,
+        onDismiss: @escaping () async -> Void,
+        parentCancellation: OSAllocatedUnfairLock<Bool>
+    ) async {
+        func isCanceled() -> Bool {
+            parentCancellation.withLock { $0 } || shouldCancel() || Task.isCancelled
+                || activeOperationCancellations[transcription.id] == true
         }
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
@@ -90,6 +146,16 @@ class TranscriptionPipeline {
         var promptDetectionResult: VoiceInkPromptDetectionResult?
         var processingFailureReason: String?
         var didDeliverOrdinaryText = false
+        var writingDeliveryWasAttempted = false
+        var writingDeliveryWasConfirmed = false
+        var deliveryOutcome: WritingTarget.DeliveryOutcome = .notAttempted(CancellationError())
+        var pipelineFinished = false
+        var suppressAutoSend = false
+        defer {
+            suppressAutoSend = isCanceled()
+            pipelineFinished = true
+            writingActionUndoController.finishDelivery(deliveryOutcome, for: deliveryID)
+        }
 
         func restorePromptDetectionSettingsIfNeeded() async {
             if let result = promptDetectionResult,
@@ -143,12 +209,6 @@ class TranscriptionPipeline {
             await finishCanceledTranscription()
             return
         }
-        let plan: DictationPostprocessingPlan = writingSession == nil
-            ? (dictationPlan ?? .capture(profile: capturedProfile, using: modelContext, enhancementService: enhancementService))
-            : .custom
-        let customSnippets = writingSession == nil && capturedProfile == .custom
-            ? (spokenSnippets ?? VoiceInkSpokenSnippets.load()) : []
-
         let cursorContextCheckpoint = latencyTrace.executorEnqueued(
             "pipeline.cursor_context_prefetch",
             token: traceToken
@@ -227,7 +287,17 @@ class TranscriptionPipeline {
                         request: request,
                         shouldCancel: isCanceled,
                         perform: { request in
-                            let result = try await enhancementService.performWritingAction(request, using: writingSession.provider)
+                            let requestTask = Task { @MainActor in
+                                try Task.checkCancellation()
+                                return try await enhancementService.performWritingAction(request, using: writingSession.provider)
+                            }
+                            self.activeWritingTasks[transcription.id] = requestTask
+                            defer { self.activeWritingTasks[transcription.id] = nil }
+                            let result = try await withTaskCancellationHandler {
+                                try await requestTask.value
+                            } onCancel: {
+                                requestTask.cancel()
+                            }
                             // Preserve generated text even when the captured destination changed.
                             transcription.enhancedText = result.text
                             transcription.aiEnhancementModelName = result.modelName
@@ -238,21 +308,37 @@ class TranscriptionPipeline {
                             return result
                         },
                         deliver: { text in
-                            try await writingSession.target.replace(with: text, shouldCancel: isCanceled)
+                            let outcome = await writingSession.target.deliver(
+                                with: text,
+                                shouldCancel: { isCanceled() || !self.writingActionUndoController.isCurrentDelivery(deliveryID) },
+                                willAttempt: {
+                                    if isCanceled() { throw CancellationError() }
+                                    try self.writingActionUndoController.willAttemptDelivery(deliveryID)
+                                    writingDeliveryWasAttempted = true
+                                },
+                                onConfirmed: { edit in
+                                    // External delivery is committed before the caller can suspend or cancel.
+                                    writingDeliveryWasConfirmed = true
+                                    let undoEdit = writingSession.kind == .rewriteSelection ? edit : nil
+                                    deliveryOutcome = .confirmed(undoEdit)
+                                    self.writingActionUndoController.confirmedDelivery(undoEdit, for: deliveryID)
+                                }
+                            )
+                            if !writingDeliveryWasConfirmed { deliveryOutcome = outcome }
+                            if let failure = outcome.failure, !writingDeliveryWasConfirmed { throw failure }
                         }
                     )
                     transcription.transcriptionState = .completed
                 } catch {
-                    if isCanceled() || error is CancellationError {
+                    if !writingDeliveryWasAttempted, isCanceled() || error is CancellationError {
                         await finishCanceledTranscription()
                         return
                     }
                     transcription.transcriptionState = .failed
-                    NotificationManager.shared.showNotification(
-                        title: "\(error.localizedDescription) The recording and any generated text are available in History.",
-                        type: .warning,
-                        duration: 6
-                    )
+                    let advice = writingDeliveryWasAttempted
+                        ? "The editor action was not confirmed. Check the original field before retrying. The recording and generated text are retained for History."
+                        : "The recording and any generated text are retained for History."
+                    reportProcessingFailure("\(error.localizedDescription) \(advice)")
                 }
             } else if capturedProfile != .custom {
                 if isCanceled() { await finishCanceledTranscription(); return }
@@ -399,7 +485,7 @@ class TranscriptionPipeline {
                 }
             }
         } catch {
-            if isCanceled() || error is CancellationError {
+            if !writingDeliveryWasAttempted, isCanceled() || error is CancellationError {
                 await finishCanceledTranscription()
                 return
             }
@@ -421,7 +507,12 @@ class TranscriptionPipeline {
                 }
             }
 
-            transcription.markAsFailedTranscription(reason: errorDescription)
+            if writingDeliveryWasAttempted {
+                transcription.transcriptionState = writingDeliveryWasConfirmed ? .completed : .failed
+                reportProcessingFailure("\(errorDescription) The editor action will not be repeated; the generated text is retained for History.")
+            } else {
+                transcription.markAsFailedTranscription(reason: errorDescription)
+            }
         }
 
         func saveTranscriptionAndPostCompletion() {
@@ -442,10 +533,8 @@ class TranscriptionPipeline {
                 didInsertSessionMetric = false
             }
 
-            var didSaveTranscription = false
             do {
                 try modelContext.save()
-                didSaveTranscription = true
                 if didInsertSessionMetric {
                     NotificationCenter.default.post(name: .sessionMetricsDidChange, object: nil)
                 }
@@ -453,11 +542,17 @@ class TranscriptionPipeline {
                 NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
             } catch {
                 logger.error("Failed to save transcription: \(error.localizedDescription, privacy: .public)")
+                if writingDeliveryWasAttempted {
+                    let delivery = writingDeliveryWasConfirmed
+                        ? "The edit was delivered, but History couldn’t be saved."
+                        : "An editor action was attempted, but History couldn’t be saved. Check the original field before retrying."
+                    reportWritingSaveFailure("\(delivery) \(error.localizedDescription)")
+                }
             }
 
         }
 
-        if isCanceled() {
+        if isCanceled(), !writingDeliveryWasAttempted {
             await finishCanceledTranscription()
             return
         }
@@ -472,7 +567,8 @@ class TranscriptionPipeline {
         } else if capturedProfile == .custom,
                   SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(
             for: transcription,
-            modelContext: modelContext
+            modelContext: modelContext,
+            writingActionUndoController: writingActionUndoController
         ) {
             latencyTrace.event("pipeline.empty_transcription_fallback", token: traceToken)
             SoundManager.shared.play(.stop)
@@ -505,10 +601,19 @@ class TranscriptionPipeline {
                 await finishCanceledTranscription()
                 return
             }
+            var ordinaryMutationAuthorized = false
             let pasteTask = CursorPaster.startPasteAtCursor(
                 pastedText,
                 preparedCursorTextContext: preparedCursorTextContext,
-                latencyTraceToken: traceToken
+                latencyTraceToken: traceToken,
+                willAttempt: {
+                    if isCanceled() { throw CancellationError() }
+                    guard self.writingActionUndoController.isCurrentDelivery(deliveryID) else { throw CancellationError() }
+                    if !ordinaryMutationAuthorized {
+                        try self.writingActionUndoController.willAttemptDelivery(deliveryID)
+                        ordinaryMutationAuthorized = true
+                    }
+                }
             )
             activePasteTasks[transcription.id] = pasteTask
             let pasteResult = await withTaskCancellationHandler {
@@ -517,6 +622,10 @@ class TranscriptionPipeline {
                 pasteTask.cancel()
             }
             activePasteTasks[transcription.id] = nil
+            if ordinaryMutationAuthorized {
+                deliveryOutcome = pasteResult == .textInserted ? .confirmed(nil)
+                    : .attemptedUnconfirmed(WritingTarget.Failure.replacementUnconfirmed)
+            }
             didDeliverOrdinaryText = pasteResult.didDeliverText
             latencyTrace.end(
                 pasteSpan,
@@ -541,7 +650,10 @@ class TranscriptionPipeline {
                    let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
                     Task { @MainActor in
                         try? await Task.sleep(nanoseconds: delayAfterPaste)
-                        CursorPaster.performAutoSend(autoSendKey)
+                        // Normal engine cleanup ends run ownership; it is not a delayed user cancellation.
+                        guard !Task.isCancelled, !(pipelineFinished ? suppressAutoSend : isCanceled()),
+                              self.writingActionUndoController.isLatestDelivery(deliveryID) else { return }
+                        self.autoSend(autoSendKey)
                     }
                 }
             }
@@ -558,7 +670,7 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         }
 
-        if writingSession == nil, !didDeliverOrdinaryText, isCanceled() {
+        if isCanceled(), writingSession == nil ? !didDeliverOrdinaryText : !writingDeliveryWasAttempted {
             await finishCanceledTranscription()
             return
         }
@@ -576,7 +688,7 @@ class TranscriptionPipeline {
             latencyTrace.end(durationSpan)
         }
 
-        if writingSession == nil, !didDeliverOrdinaryText, isCanceled() {
+        if isCanceled(), writingSession == nil ? !didDeliverOrdinaryText : !writingDeliveryWasAttempted {
             await finishCanceledTranscription()
             return
         }

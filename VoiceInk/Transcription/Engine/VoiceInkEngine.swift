@@ -41,6 +41,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     let modelContext: ModelContext
     internal let serviceRegistry: TranscriptionServiceRegistry
     let enhancementService: AIEnhancementService?
+    let writingActionUndoController: WritingActionUndoController
     private let pipeline: TranscriptionPipeline
 
     let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "VoiceInkEngine")
@@ -70,10 +71,13 @@ class VoiceInkEngine: NSObject, ObservableObject {
             ownsQwenRuntime: true
         )
         self.serviceRegistry = serviceRegistry
+        let writingActionUndoController = WritingActionUndoController()
+        self.writingActionUndoController = writingActionUndoController
         self.pipeline = TranscriptionPipeline(
             modelContext: modelContext,
             serviceRegistry: serviceRegistry,
-            enhancementService: enhancementService
+            enhancementService: enhancementService,
+            writingActionUndoController: writingActionUndoController
         )
 
         super.init()
@@ -96,6 +100,22 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     func getEnhancementService() -> AIEnhancementService? {
         return enhancementService
+    }
+
+    var canUndoLastWritingEdit: Bool {
+        recordingState == .idle && activePipelineTranscriptionID == nil
+            && activeRecordingRunID == nil && !pipeline.hasActiveOperations
+            && writingActionUndoController.isAvailable
+    }
+
+    func undoLastWritingEdit() async -> WritingTarget.UndoOutcome {
+        guard recordingState == .idle, activePipelineTranscriptionID == nil,
+              activeRecordingRunID == nil, !pipeline.hasActiveOperations else { return .busy }
+        return await writingActionUndoController.undo { [weak self] in
+            guard let self else { return true }
+            return self.recordingState != .idle || self.activePipelineTranscriptionID != nil
+                || self.activeRecordingRunID != nil || self.pipeline.hasActiveOperations
+        }
     }
 
     private func invalidateRecordingStartup() {

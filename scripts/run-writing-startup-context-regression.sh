@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ "${1:-}" != self-test ]]; then
 if [[ "${GITHUB_ACTIONS:-}" != true || "${RUNNER_ENVIRONMENT:-}" != github-hosted || "$(uname -s)" != Darwin ]]; then
   echo "Run this regression only on a disposable GitHub-hosted Mac." >&2
   exit 2
@@ -9,9 +10,10 @@ if [[ "$(id -u)" == 0 || "$(stat -f %u /dev/console)" != "$(id -u)" ]]; then
   echo "The regression must own the logged-in desktop session." >&2
   exit 2
 fi
+fi
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-python3 - "$repo" "$RUNNER_TEMP/writing-startup-context-proof" "${1:-}" <<'PY'
+python3 - "$repo" "${RUNNER_TEMP:-/tmp}/writing-startup-context-proof" "${1:-}" <<'PY'
 import difflib
 import hashlib
 import json
@@ -25,6 +27,10 @@ from pathlib import Path
 repo, output = map(Path, sys.argv[1:3])
 mode = sys.argv[3]
 baseline_sha = "b1161b7debb720afd41f3216b7aa85924944ae17"
+historical_runtime_sha = "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+historical_oracle_sha = "2a76c4ca7dc7870bd48d19f3244a16ad5454c2ef41b9605df94ba5d0a89ccee3"
+historical_engine_sha = "df05d81e5d2ff4a06604d5116a6bd50b4be22dcbe366731396f37abab0e0f12b"
+historical = output.parent / "writing-startup-context-historical"
 engine_path = "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
 oracle_path = "VoiceInkTests/WritingTargetLiveTests.swift"
 lock_path = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
@@ -35,13 +41,15 @@ production_paths = ["VoiceInk", "VoiceInkCore", "VoiceInkNVIDIA", "VoiceInkQwen"
 derived = repo / ".local-build"
 app = derived / "Build/Products/Debug/roma just talk.app"
 executable = app / "Contents/MacOS/roma just talk"
-arguments = [
-    "-project", str(repo / "VoiceInk.xcodeproj"), "-scheme", "VoiceInk", "-configuration", "Debug",
+def build_arguments(checkout):
+    return [
+    "-project", str(checkout / "VoiceInk.xcodeproj"), "-scheme", "VoiceInk", "-configuration", "Debug",
     "-destination", "platform=macOS", "-parallel-testing-enabled", "NO",
-    "-derivedDataPath", str(derived), "-xcconfig", str(repo / "LocalBuild.xcconfig"),
+    "-derivedDataPath", str(checkout / ".local-build"), "-xcconfig", str(checkout / "LocalBuild.xcconfig"),
+    "-clonedSourcePackagesDirPath", str(derived / "SourcePackages"),
     "-disableAutomaticPackageResolution", "-onlyUsePackageVersionsFromResolvedFile",
     "CODE_SIGN_IDENTITY=-", "CODE_SIGNING_REQUIRED=NO", "CODE_SIGNING_ALLOWED=YES", "DEVELOPMENT_TEAM=",
-    "CODE_SIGN_ENTITLEMENTS=" + str(repo / "VoiceInk/VoiceInk.local.entitlements"),
+    "CODE_SIGN_ENTITLEMENTS=" + str(checkout / "VoiceInk/VoiceInk.local.entitlements"),
     "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD"
 ]
 
@@ -63,9 +71,9 @@ def git(*args):
     return subprocess.check_output(["git", "-C", str(repo), *args])
 
 
-def production_manifest():
-    paths = git("ls-files", "-z", "--", *production_paths).split(b"\0")
-    return {path.decode(): digest((repo / path.decode()).read_bytes()) for path in paths if path}
+def production_manifest(checkout=repo):
+    paths = subprocess.check_output(["git", "-C", str(checkout), "ls-files", "-z", "--", *production_paths]).split(b"\0")
+    return {path.decode(): digest((checkout / path.decode()).read_bytes()) for path in paths if path}
 
 
 def require(condition, message):
@@ -73,10 +81,60 @@ def require(condition, message):
         raise RuntimeError(message)
 
 
-def run(command, log, *, environment=None, allow_failure=False):
+def selected_method(oracle):
+    anchor = "@MainActor func " + test_name + "() async throws {"
+    text = oracle.decode()
+    require(text.count(anchor) == 1, "Exactly one selected startup method is required")
+    start = text.index(anchor)
+    opening = text.index("{", start)
+    depth = 1
+    for index in range(opening + 1, len(text)):
+        depth += (text[index] == "{") - (text[index] == "}")
+        if depth == 0:
+            return text[start:index + 1].encode()
+    raise RuntimeError("The selected startup method is incomplete")
+
+
+def historical_sources():
+    oracle = git("show", historical_runtime_sha + ":" + oracle_path)
+    engine = git("show", historical_runtime_sha + ":" + engine_path)
+    require(digest(oracle) == historical_oracle_sha and digest(engine) == historical_engine_sha,
+            "Frozen historical runtime/oracle bytes changed")
+    changed = git("diff", "--name-only", baseline_sha, historical_runtime_sha, "--", *production_paths).decode().splitlines()
+    require(changed == [engine_path], "Historical products differ outside the reviewed Engine correction")
+    return oracle, engine
+
+
+def context_assertion_lines(oracle):
+    lines = oracle.decode().splitlines()
+    markers = ["Canceled writing startup must not capture clipboard context", "Canceled writing startup must not capture screen context", "Canceled ordinary startup must not capture clipboard context", "Canceled ordinary startup must not capture screen context"]
+    result = []
+    for marker in markers:
+        matches = [i + 1 for i, line in enumerate(lines) if marker in line and "#expect(" in line]
+        require(len(matches) == 1, "The four named context assertions must remain unambiguous")
+        result.extend(matches)
+    require(len(set(result)) == 4, "Each context assertion must have its own source location")
+    return sorted(result)
+
+
+def instrument_historical_engine():
+    old = git("show", baseline_sha + ":" + engine_path).decode()
+    property_anchor = "    private var activeRecordingStartID: UUID?\n"
+    task_anchor = "                            Task { @MainActor [weak self] in\n                                guard let self else { return }\n\n                                if let model = self.transcriptionModelManager.currentTranscriptionModel {"
+    property_line = "    private(set) var recordingStartupTask: Task<Void, Never>?\n"
+    require(old.count(property_anchor) == 1 and old.count(task_anchor) == 1, "Pinned baseline task observation anchors changed")
+    instrumented = old.replace(property_anchor, property_anchor + property_line).replace(task_anchor, task_anchor.replace("Task {", "recordingStartupTask = Task {", 1))
+    patch = "".join(difflib.unified_diff(old.splitlines(keepends=True), instrumented.splitlines(keepends=True), fromfile="a/" + engine_path, tofile="b/" + engine_path))
+    added = [line[1:] for line in patch.splitlines() if line.startswith("+") and not line.startswith("+++")]
+    removed = [line[1:] for line in patch.splitlines() if line.startswith("-") and not line.startswith("---")]
+    require(added == [property_line.rstrip("\n"), "                            recordingStartupTask = Task { @MainActor [weak self] in"] and removed == ["                            Task { @MainActor [weak self] in"], "Baseline instrumentation exceeded the observation-only property and assignment")
+    return instrumented.encode(), patch, {"reference_sha": baseline_sha, "original_engine_sha256": digest(old.encode()), "effective_engine_sha256": digest(instrumented.encode()), "patch_sha256": digest(patch.encode()), "added_lines": added, "removed_lines": removed, "scope": "Observe the original late Task completion only; no cancellation, guards or changed await behavior"}
+
+
+def run(command, log, *, environment=None, allow_failure=False, checkout=repo):
     print("Running " + command[0] + "; log " + str(log), flush=True)
     with log.open("xb") as stream:
-        process = subprocess.Popen(command, cwd=repo, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+        process = subprocess.Popen(command, cwd=checkout, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
         try:
             exit_code = process.wait()
         except BaseException:
@@ -98,11 +156,20 @@ def contract():
 
 
 def require_sources(lane):
+    checkout = historical if lane == "baseline" else repo
     expected = json.loads((output / (lane + "-production.json")).read_text())
-    require(production_manifest() == expected, lane + " production source bytes changed")
+    require(production_manifest(checkout) == expected, lane + " production source bytes changed")
     current = contract()
-    require(digest((repo / oracle_path).read_bytes()) == current["oracle_sha256"], "The common native oracle changed")
-    require(digest((repo / lock_path).read_bytes()) == lock_sha256, "Canonical package lock changed")
+    require(digest((checkout / oracle_path).read_bytes()) == current["oracles"][lane]["sha256"], lane + " native oracle changed")
+    require(digest((checkout / lock_path).read_bytes()) == lock_sha256, "Canonical package lock changed")
+    expected_sha = historical_runtime_sha if lane == "baseline" else current["candidate_source_sha"]
+    actual_sha = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
+    require(actual_sha == expected_sha, lane + " checkout revision changed")
+    if lane == "baseline":
+        changed = subprocess.check_output(["git", "-C", str(checkout), "diff", "--name-only", "HEAD"], text=True).splitlines()
+        require(changed == [engine_path], "Historical tracked bytes changed outside the named Engine instrumentation")
+        untracked = subprocess.check_output(["git", "-C", str(checkout), "ls-files", "--others", "--exclude-standard", "-z"])
+        require(not untracked, "Historical checkout contains an unexpected untracked source")
 
 
 def native_environment(directory):
@@ -114,7 +181,7 @@ def native_environment(directory):
     })
 
 
-def provision(directory):
+def provision(directory, app):
     subprocess.run(["codesign", "--verify", "--deep", "--strict", str(app)], check=True)
     info = subprocess.check_output(["plutil", "-extract", "CFBundleIdentifier", "raw", "-o", "-", str(app / "Contents/Info.plist")], text=True).strip()
     require(info == "com.negentropi.RomaJustTalk", "Unexpected test-host bundle identity")
@@ -144,6 +211,8 @@ def provision(directory):
 
 def validate_lane(lane):
     directory = output / lane
+    checkout = historical if lane == "baseline" else repo
+    executable = checkout / ".local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk"
     text = (directory / "tests.log").read_text(errors="replace")
     exit_code = int((directory / "test-exit.txt").read_text())
     expected = "passed" if lane == "candidate" else "failed"
@@ -153,13 +222,8 @@ def validate_lane(lane):
     errors = []
     if len(starts) != 1 or finishes != [expected] or summaries != [("1", expected)] or exit_code != (0 if lane == "candidate" else 65):
         errors.append("Exactly one executed native test and its expected result/exit are required")
-    oracle_lines = (repo / oracle_path).read_text().splitlines()
-    markers = ["Canceled writing startup must not capture clipboard context", "Canceled writing startup must not capture screen context", "Canceled ordinary startup must not capture clipboard context", "Canceled ordinary startup must not capture screen context"]
-    expected_failure_lines = []
-    for marker in markers:
-        matches = [i + 1 for i, line in enumerate(oracle_lines) if marker in line and "#expect(" in line]
-        require(len(matches) == 1, "The four named context assertions must remain unambiguous")
-        expected_failure_lines.extend(matches)
+    require(digest((directory / "oracle.swift").read_bytes()) == contract()["oracles"][lane]["sha256"], lane + " retained oracle changed")
+    expected_failure_lines = context_assertion_lines((directory / "oracle.swift").read_bytes())
     issues = re.findall(r"^.*\brecorded an issue\b[^\n]*", text, re.M)
     locations = [re.search(r"recorded an issue at (.+):(\d+):\d+:", issue) for issue in issues]
     failures = [int(location[2]) for location in locations if location and Path(location[1]).name == Path(oracle_path).name]
@@ -193,21 +257,25 @@ def validate_lane(lane):
     require(not errors, lane + " did not satisfy the matched native contract: " + "; ".join(errors))
 
 
-def identity():
+def identity(app=app):
+    executable = app / "Contents/MacOS/roma just talk"
     signature = subprocess.run(["codesign", "-dr", "-", str(app)], text=True, capture_output=True, check=True)
     return {"executable_sha256": digest(executable.read_bytes()), "requirement": signature.stdout + signature.stderr}
 
 
 def native(lane):
     directory = output / lane
+    checkout = historical if lane == "baseline" else repo
+    app = checkout / ".local-build/Build/Products/Debug/roma just talk.app"
+    arguments = build_arguments(checkout)
     observations = directory / "observations"
     observations.mkdir()
     require_sources(lane)
-    provision(directory)
+    provision(directory, app)
     environment = native_environment(observations)
     selection = directory / "selection"
     selection.mkdir()
-    run(["xcodebuild", "test-without-building", *arguments, selector, "-enumerate-tests", "-test-enumeration-style", "flat", "-test-enumeration-format", "json", "-test-enumeration-output-path", str(selection / "selected-tests.json")], selection / "enumeration.log", environment=environment)
+    run(["xcodebuild", "test-without-building", *arguments, selector, "-enumerate-tests", "-test-enumeration-style", "flat", "-test-enumeration-format", "json", "-test-enumeration-output-path", str(selection / "selected-tests.json")], selection / "enumeration.log", environment=environment, checkout=checkout)
     enumeration = json.loads((selection / "selected-tests.json").read_text())
     enabled = [test["identifier"] for plan in enumeration.get("values", []) for test in plan.get("enabledTests", [])]
     disabled = [test.get("identifier") for plan in enumeration.get("values", []) for test in plan.get("disabledTests", [])]
@@ -215,13 +283,13 @@ def native(lane):
     valid = not enumeration.get("errors") and enabled == [expected] and expected not in disabled
     write_json(selection / "receipt.json", {"valid": valid, "requested": expected, "enabled": enabled, "disabled": disabled})
     require(valid, "The exact enabled native test did not resolve")
-    write_json(directory / "identity-before.json", identity())
-    result = run(["xcodebuild", "test-without-building", *arguments, selector, "-resultBundlePath", str(directory / "Native.xcresult")], directory / "tests.log", environment=environment, allow_failure=True)
+    write_json(directory / "identity-before.json", identity(app))
+    result = run(["xcodebuild", "test-without-building", *arguments, selector, "-resultBundlePath", str(directory / "Native.xcresult")], directory / "tests.log", environment=environment, allow_failure=True, checkout=checkout)
     (directory / "test-exit.txt").write_text(str(result) + "\n")
-    write_json(directory / "identity-after.json", identity())
+    write_json(directory / "identity-after.json", identity(app))
     subprocess.run(["codesign", "--verify", "--deep", "--strict", str(app)], check=True)
     require_sources(lane)
-    write_json(output / (lane + "-production-after.json"), production_manifest())
+    write_json(output / (lane + "-production-after.json"), production_manifest(checkout))
     validate_lane(lane)
 
 
@@ -233,24 +301,40 @@ signal.signal(signal.SIGTERM, interrupted)
 signal.signal(signal.SIGINT, interrupted)
 
 try:
-    if mode == "prepare":
+    if mode == "self-test":
+        old_oracle, _ = historical_sources()
+        current_oracle = git("show", "HEAD:" + oracle_path)
+        require(selected_method(old_oracle) == selected_method(current_oracle), "Current and historical selected test orchestration differs")
+        for value in [old_oracle, current_oracle]:
+            require(len(context_assertion_lines(value)) == 4, "Each lane must use its own four assertion sites")
+        instrumented, _, receipt = instrument_historical_engine()
+        require(digest(instrumented) == receipt["effective_engine_sha256"], "Historical instrumentation receipt differs")
+        require(b"target.replace(" in old_oracle, "The frozen historical oracle no longer exercises its native API")
+        print("PASS: historical source/oracle pins, identical selected method and observation-only instrumentation; no native execution")
+    elif mode == "prepare":
         output.mkdir(exist_ok=False)
         for lane in ["candidate", "baseline"]:
             (output / lane).mkdir()
         subprocess.run(["git", "-C", str(repo), "fetch", "--no-tags", "origin", baseline_sha], check=True)
+        subprocess.run(["git", "-C", str(repo), "fetch", "--no-tags", "origin", historical_runtime_sha], check=True)
         candidate_sha = git("rev-parse", "HEAD").decode().strip()
         subprocess.run(["git", "-C", str(repo), "diff", "--quiet", "HEAD", "--", *production_paths, oracle_path], check=True)
-        changed = git("diff", "--name-only", baseline_sha, "HEAD", "--", *production_paths).decode().splitlines()
-        require(changed == [engine_path], "The matched products differ outside the Engine ownership correction")
+        changed = git("diff", "--name-only", historical_runtime_sha, "HEAD", "--", *production_paths).decode().splitlines()
         oracle = (repo / oracle_path).read_bytes()
-        require(test_name.encode() in oracle, "The common real-engine oracle is missing")
-        marker = b"private enum LiveWritingFailure:"
-        require(oracle.count(marker) == 1, "The shared native helper boundary changed")
+        old_oracle, old_engine = historical_sources()
+        require(selected_method(oracle) == selected_method(old_oracle), "The selected current and historical test orchestration must remain identical")
         require(digest((repo / lock_path).read_bytes()) == lock_sha256, "The reviewed package lock changed")
-        (output / "candidate-engine.swift").write_bytes((repo / engine_path).read_bytes())
-        (output / "common-oracle.swift").write_bytes(oracle)
+        require(not historical.exists(), "Historical runtime path already exists; refusing to reuse another checkout")
+        subprocess.run(["git", "-C", str(repo), "worktree", "add", "--detach", str(historical), historical_runtime_sha], check=True)
+        subprocess.run(["git", "-C", str(historical), "diff", "--quiet", "HEAD"], check=True)
+        require((historical / oracle_path).read_bytes() == old_oracle, "Historical checkout does not contain its exact frozen oracle")
+        require(digest((historical / lock_path).read_bytes()) == lock_sha256, "Historical canonical package lock differs")
+        (output / "historical-engine.swift").write_bytes(old_engine)
+        (output / "candidate/oracle.swift").write_bytes(oracle)
+        (output / "baseline/oracle.swift").write_bytes(old_oracle)
         write_json(output / "candidate-production.json", production_manifest())
-        write_json(output / "contract.json", {"driver_sha": candidate_sha, "candidate_source_sha": candidate_sha, "baseline_reference_sha": baseline_sha, "candidate_engine_sha256": digest((repo / engine_path).read_bytes()), "oracle_path": oracle_path, "oracle_sha256": digest(oracle), "shared_native_helper_sha256": digest(oracle[oracle.index(marker):]), "canonical_lock_sha256": lock_sha256, "changed_production_paths": changed, "scope": "Real native engine/recorder with one shared oracle; baseline adds only a task handle for observing completion; no provider, model-weight, real context read or physical-key proof"})
+        write_json(output / "historical-production.json", production_manifest(historical))
+        write_json(output / "contract.json", {"schema_version": 2, "driver_sha": candidate_sha, "candidate_source_sha": candidate_sha, "historical_runtime_sha": historical_runtime_sha, "baseline_reference_sha": baseline_sha, "candidate_engine_sha256": digest((repo / engine_path).read_bytes()), "oracles": {"candidate": {"path": oracle_path, "source_sha": candidate_sha, "sha256": digest(oracle)}, "baseline": {"path": oracle_path, "source_sha": historical_runtime_sha, "sha256": digest(old_oracle)}}, "selected_method_sha256": digest(selected_method(oracle)), "canonical_lock_sha256": lock_sha256, "intervening_production_paths": changed, "scope": "Current full Mac units and native startup acceptance, plus a separately frozen historical red control. Historical runtime changes only Engine to the original baseline plus observation-only task handle. Shared selected orchestration and observed cases/counts; different whole oracles and intervening product changes. No guard-only causal comparison, provider, model-weight, real context read or physical-key proof"})
         run(["bash", "scripts/run-writing-feature-regression.sh", "packages", str(output / "packages")], output / "package-contract.log")
     elif mode == "units":
         require_sources("candidate")
@@ -272,36 +356,30 @@ try:
         require(json.loads((output / "candidate/archive-identity.json").read_text()) == json.loads((output / "candidate/identity-before.json").read_text()), "The archived candidate differs from the native test host")
     elif mode == "baseline":
         require_sources("candidate")
-        old = git("show", baseline_sha + ":" + engine_path).decode()
-        property_anchor = "    private var activeRecordingStartID: UUID?\n"
-        task_anchor = "                            Task { @MainActor [weak self] in\n                                guard let self else { return }\n\n                                if let model = self.transcriptionModelManager.currentTranscriptionModel {"
-        property_line = "    private(set) var recordingStartupTask: Task<Void, Never>?\n"
-        require(old.count(property_anchor) == 1 and old.count(task_anchor) == 1, "Pinned baseline task observation anchors changed")
-        instrumented = old.replace(property_anchor, property_anchor + property_line).replace(task_anchor, task_anchor.replace("Task {", "recordingStartupTask = Task {", 1))
-        patch = "".join(difflib.unified_diff(old.splitlines(keepends=True), instrumented.splitlines(keepends=True), fromfile="a/" + engine_path, tofile="b/" + engine_path))
-        added = [line[1:] for line in patch.splitlines() if line.startswith("+") and not line.startswith("+++")]
-        removed = [line[1:] for line in patch.splitlines() if line.startswith("-") and not line.startswith("---")]
-        require(added == [property_line.rstrip("\n"), "                            recordingStartupTask = Task { @MainActor [weak self] in"] and removed == ["                            Task { @MainActor [weak self] in"], "Baseline instrumentation exceeded the observation-only property and assignment")
+        require(production_manifest(historical) == json.loads((output / "historical-production.json").read_text()), "Historical runtime changed before instrumentation")
+        subprocess.run(["git", "-C", str(historical), "diff", "--quiet", "HEAD"], check=True)
+        instrumented, patch, receipt = instrument_historical_engine()
         (output / "baseline/engine-instrumentation.patch").write_text(patch)
-        write_json(output / "baseline/engine-instrumentation.json", {"reference_sha": baseline_sha, "original_engine_sha256": digest(old.encode()), "effective_engine_sha256": digest(instrumented.encode()), "patch_sha256": digest(patch.encode()), "added_lines": added, "removed_lines": removed, "scope": "Observe the original late Task completion only; no cancellation, guards or changed await behavior"})
+        write_json(output / "baseline/engine-instrumentation.json", receipt)
         try:
-            (repo / engine_path).write_text(instrumented)
-            expected = json.loads((output / "candidate-production.json").read_text())
-            expected[engine_path] = digest(instrumented.encode())
+            (historical / engine_path).write_bytes(instrumented)
+            expected = json.loads((output / "historical-production.json").read_text())
+            expected[engine_path] = digest(instrumented)
             write_json(output / "baseline-production.json", expected)
             require_sources("baseline")
-            run(["xcodebuild", "build-for-testing", *arguments, "-only-testing:VoiceInkTests"], output / "baseline/build.log")
+            run(["xcodebuild", "build-for-testing", *build_arguments(historical), "-only-testing:VoiceInkTests"], output / "baseline/build.log", checkout=historical)
             require_sources("baseline")
             build_log = (output / "baseline/build.log").read_text(errors="replace")
-            require(re.search(r"(?:SwiftCompile|CompileSwiftSources)[^\n]*VoiceInkEngine\.swift", build_log) is not None, "The incremental build did not record Engine compilation")
+            require(re.search(r"(?:SwiftCompile|CompileSwiftSources)[^\n]*VoiceInkEngine\.swift", build_log) is not None, "The historical build did not record Engine compilation")
             candidate_identity = json.loads((output / "candidate/identity-before.json").read_text())
-            require(identity()["executable_sha256"] != candidate_identity["executable_sha256"], "The baseline build did not change the candidate executable")
+            require(identity(historical / ".local-build/Build/Products/Debug/roma just talk.app")["executable_sha256"] != candidate_identity["executable_sha256"], "Historical and current executable bytes unexpectedly match")
             native("baseline")
         finally:
-            (repo / engine_path).write_bytes((output / "candidate-engine.swift").read_bytes())
-            restored = production_manifest() == json.loads((output / "candidate-production.json").read_text())
-            write_json(output / "baseline/source-restoration.json", {"candidate_sources_restored": restored})
-            require(restored, "Candidate source restoration did not match its original manifest")
+            (historical / engine_path).write_bytes((output / "historical-engine.swift").read_bytes())
+            restored = production_manifest(historical) == json.loads((output / "historical-production.json").read_text())
+            current_unchanged = production_manifest() == json.loads((output / "candidate-production.json").read_text())
+            write_json(output / "baseline/source-restoration.json", {"historical_sources_restored": restored, "current_sources_unchanged": current_unchanged})
+            require(restored and current_unchanged, "Historical restoration or current source fidelity failed")
     elif mode == "verify":
         require_sources("candidate")
         require(json.loads((output / "candidate/archive-identity.json").read_text()) == json.loads((output / "candidate/identity-before.json").read_text()), "The archived candidate differs from the native test host")
@@ -309,10 +387,12 @@ try:
         for lane in ["candidate", "baseline"]:
             validate_lane(lane)
             require(json.loads((output / (lane + "-production.json")).read_text()) == json.loads((output / (lane + "-production-after.json")).read_text()), lane + " source manifests differ before and after native testing")
-        require(json.loads((output / "baseline/source-restoration.json").read_text())["candidate_sources_restored"] is True, "Candidate source restoration receipt is missing")
-        write_json(output / "result.json", {"classification": "matched-red-green", **contract(), "candidate": json.loads((output / "candidate/result.json").read_text()), "baseline": json.loads((output / "baseline/result.json").read_text()), "full_candidate_units": json.loads((output / "candidate/unit-result.json").read_text())})
+        restoration = json.loads((output / "baseline/source-restoration.json").read_text())
+        require(restoration == {"historical_sources_restored": True, "current_sources_unchanged": True}, "Historical/current source fidelity receipt is missing")
+        require(production_manifest(historical) == json.loads((output / "historical-production.json").read_text()), "Restored historical source changed")
+        write_json(output / "result.json", {"classification": "current-native-pass-with-historical-red-control", **contract(), "candidate": json.loads((output / "candidate/result.json").read_text()), "historical_control": json.loads((output / "baseline/result.json").read_text()), "full_candidate_units": json.loads((output / "candidate/unit-result.json").read_text())})
     else:
-        raise RuntimeError("Use prepare, units, candidate, baseline, or verify")
+        raise RuntimeError("Use prepare, units, candidate, baseline, verify, or self-test")
 except BaseException as error:
     if output.is_dir():
         write_json(output / ("failure-" + mode + ".json"), {"classification": "invalid-or-failed", "phase": mode, "error": str(error)})

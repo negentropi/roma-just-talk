@@ -92,7 +92,7 @@ struct VoiceInkTests {
                 return expectedResult
             }
 
-            let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
+            let result = await CursorPaster.startPasteAtCursor("dictated text").value
             try await Task.sleep(nanoseconds: 350_000_000)
 
             #expect(result == expectedResult)
@@ -140,7 +140,7 @@ struct VoiceInkTests {
             .insertedViaValueWithoutSelection
         ] {
             insertionResult = result
-            #expect(await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text") == .textInserted)
+            #expect(await CursorPaster.startPasteAtCursor("dictated text").value == .textInserted)
         }
         #expect(!postedCommand)
         #expect(pasteboard.string(forType: .string) == "previous clipboard")
@@ -183,7 +183,7 @@ struct VoiceInkTests {
             pasteboard.clearContents()
             pasteboard.setString("previous clipboard", forType: .string)
 
-            #expect(await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text") == .commandPosted)
+            #expect(await CursorPaster.startPasteAtCursor("dictated text").value == .commandPosted)
             #expect(pasteboard.string(forType: .string) == "dictated text")
         }
 

@@ -140,7 +140,8 @@ struct WritingTargetTests {
         let access = FakeWritingAccess(value: "前chosen後", range: NSRange(location: 1, length: 6))
         let target = try access.makeTarget()
 
-        try await target.replace(with: "😀 replacement")
+        let outcome = await target.deliver(with: "😀 replacement")
+        #expect(outcome.isConfirmed)
 
         #expect(access.value == "前😀 replacement後")
         #expect(access.range == NSRange(location: 15, length: 0))
@@ -151,9 +152,9 @@ struct WritingTargetTests {
         let access = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         let target = try access.makeTarget()
 
-        await #expect(throws: CancellationError.self) {
-            try await target.replace(with: "new", shouldCancel: { true })
-        }
+        let outcome = await target.deliver(with: "new", shouldCancel: { true })
+        #expect(!outcome.wasAttempted)
+        #expect(outcome.failure is CancellationError)
 
         #expect(access.value == "prefix old suffix")
         #expect(access.range == NSRange(location: 7, length: 3))
@@ -165,7 +166,9 @@ struct WritingTargetTests {
         access.selectedBehavior = .unsupported
         let target = try access.makeTarget()
 
-        await #expect(throws: WritingTarget.Failure.replacementFailed) { try await target.replace(with: "😀") }
+        let outcome = await target.deliver(with: "😀")
+        #expect(!outcome.wasAttempted)
+        #expect(outcome.failure as? WritingTarget.Failure == .replacementFailed)
 
         #expect(access.value == "prefix old suffix")
         #expect(access.range == NSRange(location: 7, length: 3))
@@ -177,7 +180,9 @@ struct WritingTargetTests {
         let target = try access.makeTarget()
         access.validationFailure = .targetChanged
 
-        await #expect(throws: WritingTarget.Failure.targetChanged) { try await target.replace(with: "new") }
+        let outcome = await target.deliver(with: "new")
+        #expect(!outcome.wasAttempted)
+        #expect(outcome.failure as? WritingTarget.Failure == .targetChanged)
 
         #expect(access.value == "prefix old suffix")
         #expect(access.range == NSRange(location: 7, length: 3))
@@ -188,14 +193,18 @@ struct WritingTargetTests {
         let textDrift = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         let textTarget = try textDrift.makeTarget()
         textDrift.value = "prefix old suffix typed"
-        await #expect(throws: WritingTarget.Failure.targetChanged) { try await textTarget.replace(with: "new") }
+        let textOutcome = await textTarget.deliver(with: "new")
+        #expect(!textOutcome.wasAttempted)
+        #expect(textOutcome.failure as? WritingTarget.Failure == .targetChanged)
         #expect(textDrift.value == "prefix old suffix typed")
         #expect(textDrift.selectedWrites == 0)
 
         let rangeDrift = FakeWritingAccess(value: "prefix old suffix", range: NSRange(location: 7, length: 3))
         let rangeTarget = try rangeDrift.makeTarget()
         rangeDrift.range = NSRange(location: 0, length: 6)
-        await #expect(throws: WritingTarget.Failure.targetChanged) { try await rangeTarget.replace(with: "new") }
+        let rangeOutcome = await rangeTarget.deliver(with: "new")
+        #expect(!rangeOutcome.wasAttempted)
+        #expect(rangeOutcome.failure as? WritingTarget.Failure == .targetChanged)
         #expect(rangeDrift.value == "prefix old suffix")
         #expect(rangeDrift.range == NSRange(location: 0, length: 6))
         #expect(rangeDrift.selectedWrites == 0)
@@ -206,7 +215,9 @@ struct WritingTargetTests {
         access.selectedBehavior = .unchanged(.success)
         let target = try access.makeTarget()
 
-        await #expect(throws: WritingTarget.Failure.replacementUnconfirmed) { try await target.replace(with: "new") }
+        let outcome = await target.deliver(with: "new")
+        #expect(outcome.wasAttempted)
+        #expect(outcome.failure as? WritingTarget.Failure == .replacementUnconfirmed)
 
         #expect(access.value == "prefix old suffix")
         #expect(access.selectedWrites == 1)
@@ -217,7 +228,9 @@ struct WritingTargetTests {
         access.selectedBehavior = .overwrite("prefix partial suffix", .cannotComplete)
         let target = try access.makeTarget()
 
-        await #expect(throws: WritingTarget.Failure.replacementUnconfirmed) { try await target.replace(with: "new") }
+        let outcome = await target.deliver(with: "new")
+        #expect(outcome.wasAttempted)
+        #expect(outcome.failure as? WritingTarget.Failure == .replacementUnconfirmed)
 
         #expect(access.value == "prefix partial suffix")
         #expect(access.selectedWrites == 1)
@@ -228,7 +241,8 @@ struct WritingTargetTests {
         access.selectedBehavior = .replace(.cannotComplete)
         let target = try access.makeTarget()
 
-        try await target.replace(with: "new")
+        let outcome = await target.deliver(with: "new")
+        #expect(outcome.isConfirmed)
 
         #expect(access.value == "prefix new suffix")
         #expect(access.selectedWrites == 1)
@@ -239,7 +253,9 @@ struct WritingTargetTests {
         access.selectedBehavior = .unchanged(.cannotComplete)
         let target = try access.makeTarget()
 
-        await #expect(throws: WritingTarget.Failure.replacementFailed) { try await target.replace(with: "new") }
+        let outcome = await target.deliver(with: "new")
+        #expect(outcome.wasAttempted)
+        #expect(outcome.failure as? WritingTarget.Failure == .replacementUnconfirmed)
 
         #expect(access.value == "prefix old suffix")
         #expect(access.range == NSRange(location: 7, length: 3))
@@ -261,6 +277,9 @@ private final class FakeWritingAccess: WritingTarget.Access {
     var validationFailure: WritingTarget.Failure?
     var selectedBehavior: WriteBehavior = .replace(.success)
     private(set) var selectedWrites = 0
+    var supportsUndoSelection: Bool { false }
+    var isUndoTargetAlive: Bool { false }
+    func isUndoTargetApplication(_ application: NSRunningApplication) -> Bool { false }
 
     init(value: String, range: NSRange) {
         self.value = value
@@ -282,8 +301,13 @@ private final class FakeWritingAccess: WritingTarget.Access {
 
     func readValue() -> String? { value }
 
-    func replaceSelection(_ text: String) -> AXError? {
+    func validateUndoIdentity() throws { throw WritingTarget.Failure.unsupportedEditor }
+    func setSelectedRange(_ range: NSRange) -> AXError? { nil }
+
+    func replaceSelection(_ text: String, willAttempt: () throws -> Void) throws -> AXError? {
         selectedWrites += 1
+        if case .unsupported = selectedBehavior { return nil }
+        try willAttempt()
         switch selectedBehavior {
         case .unsupported:
             return nil

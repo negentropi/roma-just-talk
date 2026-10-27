@@ -17,6 +17,38 @@ class CursorPaster {
     @MainActor private static var pasteCommandPosterForTesting: ((Bool) async -> PasteResult)?
     @MainActor private static var accessibilityTextInserterForTesting:
         ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
+    @MainActor private static var clipboardRestorations: [NSPasteboard.Name: ClipboardRestoration] = [:]
+    @MainActor private static var clipboardPreparations: [NSPasteboard.Name: UUID] = [:]
+
+    @MainActor
+    private final class ClipboardRestoration {
+        enum State { case pending, settled, failed(Int) }
+        let board: NSPasteboard
+        var contents: ClipboardSnapshot
+        let text: String
+        let sessionID: String
+        let changeCount: Int
+        let deadline: TimeInterval
+        var state: State = .pending
+        var timer: Task<Void, Never>?
+
+        init(board: NSPasteboard, contents: ClipboardSnapshot, text: String, sessionID: String,
+             changeCount: Int, delay: TimeInterval) {
+            self.board = board
+            self.contents = contents
+            self.text = text
+            self.sessionID = sessionID
+            self.changeCount = changeCount
+            deadline = ProcessInfo.processInfo.systemUptime + max(0, delay)
+        }
+
+        var ownsClipboard: Bool {
+            board.changeCount == changeCount
+                && board.string(forType: .string)?.utf16.elementsEqual(text.utf16) == true
+                && board.string(forType: ClipboardManager.pasteSessionType) == sessionID
+                && board.changeCount == changeCount
+        }
+    }
 
     struct PreparedPasteContext {
         fileprivate let changeCount: Int
@@ -44,9 +76,99 @@ class CursorPaster {
         case attemptedUnconfirmed
     }
 
-    enum WritingPasteError: Error {
+    enum WritingPasteError: LocalizedError {
         case clipboardChanged
         case clipboardWriteFailed
+        case clipboardUnreadable
+        case clipboardRestorationFailed
+
+        var errorDescription: String? {
+            switch self {
+            case .clipboardChanged:
+                return "Another paste was using the clipboard, or the clipboard changed. Let any other paste finish, then check your clipboard."
+            case .clipboardWriteFailed:
+                return "Roma Just Talk couldn't put the text on the clipboard, so your clipboard may have changed. Check it and copy what you need again."
+            case .clipboardUnreadable:
+                return "Roma Just Talk couldn't read your clipboard. Check your clipboard and copy what you need again."
+            case .clipboardRestorationFailed:
+                return "Roma Just Talk couldn't safely put back what was on your clipboard. Check your clipboard and copy what you need again."
+            }
+        }
+    }
+
+    @MainActor
+    static func settlePendingClipboardRestore(
+        pasteboard: NSPasteboard = .general,
+        shouldCancel: () -> Bool = { false }
+    ) async throws {
+        while let restoration = clipboardRestorations[pasteboard.name] {
+            try checkPasteCancellation(shouldCancel)
+            switch restoration.state {
+            case .settled:
+                retireRestoration(restoration)
+            case .failed(let generation):
+                guard pasteboard.changeCount != generation else { throw WritingPasteError.clipboardRestorationFailed }
+                retireRestoration(restoration)
+            case .pending:
+                guard restoration.ownsClipboard else {
+                    retireRestoration(restoration)
+                    continue
+                }
+                let remaining = restoration.deadline - ProcessInfo.processInfo.systemUptime
+                if remaining > 0 {
+                    // Cancel this waiter without canceling the earlier paste's independent timer.
+                    try await Task.sleep(for: .seconds(min(remaining, 0.05)))
+                } else {
+                    settleRestoration(restoration)
+                }
+            }
+        }
+        try checkPasteCancellation(shouldCancel)
+    }
+
+    @MainActor
+    private static func checkPasteCancellation(_ shouldCancel: () -> Bool) throws {
+        if Task.isCancelled || shouldCancel() { throw CancellationError() }
+    }
+
+    @MainActor
+    private static func claimClipboardPreparation(on board: NSPasteboard) throws -> UUID {
+        guard clipboardPreparations[board.name] == nil else { throw WritingPasteError.clipboardChanged }
+        let id = UUID()
+        clipboardPreparations[board.name] = id
+        return id
+    }
+
+    @MainActor
+    private static func releaseClipboardPreparation(_ id: UUID, on board: NSPasteboard) {
+        if clipboardPreparations[board.name] == id { clipboardPreparations.removeValue(forKey: board.name) }
+    }
+
+    @MainActor
+    private static func retireRestoration(_ restoration: ClipboardRestoration) {
+        guard clipboardRestorations[restoration.board.name] === restoration else { return }
+        restoration.state = .settled
+        restoration.timer?.cancel()
+        restoration.timer = nil
+        clipboardRestorations.removeValue(forKey: restoration.board.name)
+    }
+
+    @MainActor
+    private static func settleRestoration(_ restoration: ClipboardRestoration) {
+        guard clipboardRestorations[restoration.board.name] === restoration,
+              case .pending = restoration.state else { return }
+        guard restoration.ownsClipboard else { retireRestoration(restoration); return }
+        do {
+            try restoreClipboardSnapshot(restoration.contents, on: restoration.board, expectedChangeCount: restoration.changeCount)
+            retireRestoration(restoration)
+        } catch WritingPasteError.clipboardChanged {
+            retireRestoration(restoration)
+        } catch {
+            restoration.state = .failed(restoration.board.changeCount)
+            restoration.contents = []
+            restoration.timer = nil
+            logger.error("Could not restore the owned clipboard: \(String(describing: error), privacy: .public)")
+        }
     }
 
     @MainActor
@@ -65,15 +187,21 @@ class CursorPaster {
         shouldCancel: () -> Bool,
         pasteboard: NSPasteboard = .general,
         restoreClipboard: Bool = VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(),
-        restorationDelay: TimeInterval = VoiceInkPastePreference.boundedClipboardRestoreDelay()
+        restorationDelay: TimeInterval = VoiceInkPastePreference.boundedClipboardRestoreDelay(),
+        onConfirmed: (@MainActor () -> Void)? = nil
     ) async throws -> WritingPasteResult {
         func checkCancellation() throws {
             if Task.isCancelled || shouldCancel() { throw CancellationError() }
         }
         try checkCancellation()
         try access.validateTarget()
+        guard !restoreClipboard || restorationDelay.isFinite else { throw WritingPasteError.clipboardRestorationFailed }
+        try await settlePendingClipboardRestore(pasteboard: pasteboard, shouldCancel: shouldCancel)
+        try access.validateTarget()
+        let preparation = try claimClipboardPreparation(on: pasteboard)
+        defer { releaseClipboardPreparation(preparation, on: pasteboard) }
         let previousChangeCount = pasteboard.changeCount
-        let savedContents = snapshotClipboard(from: pasteboard)
+        let savedContents = try snapshotClipboard(from: pasteboard)
         try checkCancellation()
         try access.validateTarget()
         guard pasteboard.changeCount == previousChangeCount else {
@@ -87,13 +215,16 @@ class CursorPaster {
             throw WritingPasteError.clipboardWriteFailed
         }
         if restoreClipboard {
-            item.setData(Data(), forType: NSPasteboard.PasteboardType("org.nspasteboard.TransientType"))
-            item.setData(Data(), forType: NSPasteboard.PasteboardType("org.nspasteboard.AutoGeneratedType"))
+            guard item.setData(Data(), forType: NSPasteboard.PasteboardType("org.nspasteboard.TransientType")),
+                  item.setData(Data(), forType: NSPasteboard.PasteboardType("org.nspasteboard.AutoGeneratedType")) else {
+                throw WritingPasteError.clipboardWriteFailed
+            }
         }
         guard pasteboard.changeCount == previousChangeCount else {
             throw WritingPasteError.clipboardChanged
         }
         let clearedChangeCount = pasteboard.clearContents()
+        guard pasteboard.changeCount == clearedChangeCount else { throw WritingPasteError.clipboardChanged }
         let written = pasteboard.writeObjects([item])
         let ownedChangeCount = clearedChangeCount
         func ownsClipboard() -> Bool {
@@ -102,18 +233,23 @@ class CursorPaster {
                 && pasteboard.string(forType: ClipboardManager.pasteSessionType) == sessionID
                 && pasteboard.changeCount == ownedChangeCount
         }
-        func restoreIfOwned() {
-            guard ownsClipboard() else { return }
-            pasteboard.clearContents()
-            if !savedContents.isEmpty { pasteboard.writeObjects(pasteboardItems(from: savedContents)) }
+        var restorationAttempted = false
+        func restoreIfOwned() throws {
+            guard !restorationAttempted, ownsClipboard() else { return }
+            restorationAttempted = true
+            do { try restoreClipboardSnapshot(savedContents, on: pasteboard, expectedChangeCount: ownedChangeCount) }
+            catch WritingPasteError.clipboardChanged { throw WritingPasteError.clipboardChanged }
+            catch { recordFailedRestoration(on: pasteboard); throw error }
         }
         guard written, ownsClipboard() else {
             if ownsClipboard() {
-                restoreIfOwned()
+                try restoreIfOwned()
             } else if pasteboard.changeCount == clearedChangeCount,
                       pasteboard.pasteboardItems?.isEmpty != false,
                       pasteboard.changeCount == clearedChangeCount {
-                if !savedContents.isEmpty { pasteboard.writeObjects(pasteboardItems(from: savedContents)) }
+                do { try restoreClipboardSnapshot(savedContents, on: pasteboard, expectedChangeCount: clearedChangeCount) }
+                catch WritingPasteError.clipboardChanged { throw WritingPasteError.clipboardChanged }
+                catch { recordFailedRestoration(on: pasteboard); throw error }
             }
             throw WritingPasteError.clipboardWriteFailed
         }
@@ -130,46 +266,38 @@ class CursorPaster {
             switch result {
             case .notAttempted:
                 guard !attempted else { return .attemptedUnconfirmed }
-                restoreIfOwned()
+                try restoreIfOwned()
                 return .notAttempted
             case .attempted:
                 attempted = true
                 for attempt in 0..<CursorTextContextReader.pasteDeliveryObservationAttempts {
-                    guard !Task.isCancelled, !shouldCancel() else { return .attemptedUnconfirmed }
                     if let value = access.readValue(), value.utf16.elementsEqual(expectedValue.utf16) {
                         if restoreClipboard {
-                            if restorationDelay <= 0 {
-                                restoreIfOwned()
-                            } else {
-                                scheduleClipboardRestore(
-                                    savedContents, expectedText: text, sessionID: sessionID,
-                                    on: pasteboard, latencyTraceToken: nil,
-                                    expectedChangeCount: ownedChangeCount, delay: restorationDelay
-                                )
-                            }
+                            scheduleClipboardRestore(
+                                savedContents, expectedText: text, sessionID: sessionID,
+                                on: pasteboard, latencyTraceToken: nil,
+                                expectedChangeCount: ownedChangeCount, delay: restorationDelay,
+                                settleImmediately: false
+                            )
                         }
+                        // Delivery is a fact before cancellation, actor reentry or restoration work.
+                        onConfirmed?()
+                        if restoreClipboard, restorationDelay <= 0,
+                           let restoration = clipboardRestorations[pasteboard.name] { settleRestoration(restoration) }
                         return .confirmed
                     }
+                    guard !Task.isCancelled, !shouldCancel() else { return .attemptedUnconfirmed }
                     guard attempt < CursorTextContextReader.pasteDeliveryObservationAttempts - 1 else { break }
                     do {
                         try await Task.sleep(nanoseconds: UInt64(CursorTextContextReader.pasteDeliveryObservationDelay * 1_000_000_000))
-                    } catch { return .attemptedUnconfirmed }
+                    } catch { continue }
                 }
                 return .attemptedUnconfirmed
             }
         } catch {
             if attempted { return .attemptedUnconfirmed }
-            restoreIfOwned()
+            try restoreIfOwned()
             throw error
-        }
-    }
-
-    static func pasteAtCursor(_ text: String) {
-        Task {
-            let pasteTask = await MainActor.run {
-                startPasteAtCursor(text)
-            }
-            _ = await pasteTask.value
         }
     }
 
@@ -222,7 +350,8 @@ class CursorPaster {
         _ text: String,
         preparedContext: PreparedPasteContext? = nil,
         preparedCursorTextContext: Task<CursorTextContextReader.PreparedContext?, Never>? = nil,
-        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil
+        latencyTraceToken: VoiceInkLatencyTrace.Token? = nil,
+        willAttempt: (@MainActor () throws -> Void)? = nil
     ) -> Task<PasteResult, Never> {
         let traceToken = latencyTraceToken ?? VoiceInkLatencyTrace.shared.currentToken()
         return Task { @MainActor in
@@ -230,14 +359,10 @@ class CursorPaster {
                 text,
                 preparedContext: preparedContext,
                 preparedCursorTextContext: preparedCursorTextContext,
-                latencyTraceToken: traceToken
+                latencyTraceToken: traceToken,
+                willAttempt: willAttempt
             )
         }
-    }
-
-    @MainActor
-    static func pasteAtCursorAndWaitUntilPosted(_ text: String) async -> PasteResult {
-        await startPasteAtCursor(text).value
     }
 
     @MainActor
@@ -247,10 +372,9 @@ class CursorPaster {
         }
 
         let pasteboard = NSPasteboard.general
-        return PreparedPasteContext(
-            changeCount: pasteboard.changeCount,
-            savedContents: snapshotClipboard(from: pasteboard)
-        )
+        let generation = pasteboard.changeCount
+        guard let contents = try? snapshotClipboard(from: pasteboard), pasteboard.changeCount == generation else { return nil }
+        return PreparedPasteContext(changeCount: generation, savedContents: contents)
     }
 
     @MainActor
@@ -263,12 +387,27 @@ class CursorPaster {
         _ text: String,
         preparedContext: PreparedPasteContext? = nil,
         preparedCursorTextContext: Task<CursorTextContextReader.PreparedContext?, Never>? = nil,
-        latencyTraceToken: VoiceInkLatencyTrace.Token?
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
+        willAttempt: (@MainActor () throws -> Void)?
     ) async -> PasteResult {
         guard !Task.isCancelled else { return .commandNotPosted }
         let latencyTrace = VoiceInkLatencyTrace.shared
         let pasteboard = NSPasteboard.general
         let shouldRestoreClipboard = VoiceInkPastePreference.shouldRestoreClipboardAfterPaste()
+        let restorationDelay = VoiceInkPastePreference.boundedClipboardRestoreDelay()
+        guard !shouldRestoreClipboard || restorationDelay.isFinite else { return .commandNotPosted }
+        var authorizationRejected = false
+        var attempted = false
+        func authorizeAttempt() throws {
+            do {
+                try checkPasteCancellation({ false })
+                try willAttempt?()
+                attempted = true
+            } catch {
+                authorizationRejected = true
+                throw error
+            }
+        }
         var shouldRetryCommandVMenuDiscovery = false
         let cursorContext = if VoiceInkPasteMethod.current() == .standard {
             await preparedCursorTextContext?.value
@@ -292,13 +431,19 @@ class CursorPaster {
                 return .commandNotPosted
             }
             let insertionResult = if let accessibilityTextInserterForTesting {
-                accessibilityTextInserterForTesting(text, cursorContext)
+                if (try? authorizeAttempt()) != nil {
+                    accessibilityTextInserterForTesting(text, cursorContext)
+                } else {
+                    CursorTextContextReader.SelectedTextInsertionResult.notApplied
+                }
             } else {
                 CursorTextContextReader.insertSelectedText(
                     text,
-                    preparedContext: cursorContext
+                    preparedContext: cursorContext,
+                    willAttempt: authorizeAttempt
                 )
             }
+            guard !authorizationRejected else { return .commandNotPosted }
             latencyTrace.end(
                 insertionSpan,
                 details: "result=\(insertionResult.rawValue)"
@@ -318,16 +463,23 @@ class CursorPaster {
             "paste_session.snapshot_clipboard",
             token: latencyTraceToken
         )
-        let savedContents: ClipboardSnapshot = if shouldRestoreClipboard {
-            if let preparedContext,
-               preparedContext.changeCount == pasteboard.changeCount {
-                preparedContext.savedContents
+        do {
+            try await settlePendingClipboardRestore(pasteboard: pasteboard)
+        } catch { return .commandNotPosted }
+        let preparation: UUID
+        let savedContents: ClipboardSnapshot
+        do {
+            preparation = try claimClipboardPreparation(on: pasteboard)
+        } catch { return .commandNotPosted }
+        defer { releaseClipboardPreparation(preparation, on: pasteboard) }
+        do {
+            // A retired temporary payload cannot be reused through an earlier prepared context.
+            if let preparedContext, preparedContext.changeCount == pasteboard.changeCount {
+                savedContents = preparedContext.savedContents
             } else {
-                snapshotClipboard(from: pasteboard)
+                savedContents = try snapshotClipboard(from: pasteboard)
             }
-        } else {
-            []
-        }
+        } catch { return .commandNotPosted }
         latencyTrace.end(
             clipboardSnapshotSpan,
             details: "items=\(savedContents.count)"
@@ -342,15 +494,34 @@ class CursorPaster {
             latencyTrace.end(clipboardWriteSpan, details: "result=cancelled_before_write")
             return .commandNotPosted
         }
+        var preparedGeneration: Int?
+        var stillOwnsPreparation = false
         guard ClipboardManager.setClipboard(
             text,
             transient: shouldRestoreClipboard,
-            sessionID: shouldRestoreClipboard ? sessionID : nil
+            sessionID: shouldRestoreClipboard ? sessionID : nil,
+            didWrite: { generation, owned in
+                preparedGeneration = generation
+                stillOwnsPreparation = owned
+            }
         ) else {
+            if let preparedGeneration, stillOwnsPreparation, pasteboard.changeCount == preparedGeneration {
+                do { try restoreClipboardSnapshot(savedContents, on: pasteboard, expectedChangeCount: preparedGeneration) }
+                catch WritingPasteError.clipboardChanged { }
+                catch { recordFailedRestoration(on: pasteboard) }
+            }
             latencyTrace.end(clipboardWriteSpan, details: "result=failure")
             logger.error("\(VoiceInkPasteDiagnostics.failedToPrepareClipboardMessage, privacy: .public)")
             return .commandNotPosted
         }
+        guard let ownedChangeCount = preparedGeneration, stillOwnsPreparation else { return .commandNotPosted }
+        func ownsClipboard() -> Bool {
+            pasteboard.changeCount == ownedChangeCount
+                && pasteboard.string(forType: .string)?.utf16.elementsEqual(text.utf16) == true
+                && (!shouldRestoreClipboard || pasteboard.string(forType: ClipboardManager.pasteSessionType) == sessionID)
+                && pasteboard.changeCount == ownedChangeCount
+        }
+        guard ownsClipboard() else { return .commandNotPosted }
         latencyTrace.end(clipboardWriteSpan, details: "result=success")
 
         let commandSpan = latencyTrace.begin("paste_session.post_command", token: latencyTraceToken)
@@ -358,12 +529,22 @@ class CursorPaster {
             expectedText: text,
             retryCommandVMenuDiscovery: shouldRetryCommandVMenuDiscovery,
             preparedCursorTextContext: cursorContext,
-            latencyTraceToken: latencyTraceToken
+            latencyTraceToken: latencyTraceToken,
+            willAttempt: {
+                guard ownsClipboard() else { authorizationRejected = true; throw WritingPasteError.clipboardChanged }
+                try authorizeAttempt()
+            }
         )
         latencyTrace.end(
             commandSpan,
             details: "result=\(String(describing: pasteResult))"
         )
+        if authorizationRejected, !attempted, ownsClipboard() {
+            do { try restoreClipboardSnapshot(savedContents, on: pasteboard, expectedChangeCount: ownedChangeCount) }
+            catch WritingPasteError.clipboardChanged { }
+            catch { recordFailedRestoration(on: pasteboard) }
+        }
+        guard !authorizationRejected else { return attempted ? .commandDeliveryUncertain : .commandNotPosted }
         if shouldRestoreClipboard, pasteResult.didPostPasteCommand {
             latencyTrace.event(
                 "paste_session.restore_scheduled",
@@ -375,7 +556,9 @@ class CursorPaster {
                 expectedText: text,
                 sessionID: sessionID,
                 on: pasteboard,
-                latencyTraceToken: latencyTraceToken
+                latencyTraceToken: latencyTraceToken,
+                expectedChangeCount: ownedChangeCount,
+                delay: restorationDelay
             )
         } else if shouldRestoreClipboard {
             latencyTrace.event(
@@ -391,15 +574,21 @@ class CursorPaster {
         return pasteResult
     }
 
-    private static func snapshotClipboard(from pasteboard: NSPasteboard) -> ClipboardSnapshot {
-        (pasteboard.pasteboardItems ?? []).map { item in
-            item.types.compactMap { type in
-                if let data = item.data(forType: type) {
-                    return (type, data)
-                }
-                return nil
+    @MainActor
+    private static func snapshotClipboard(from pasteboard: NSPasteboard) throws -> ClipboardSnapshot {
+        let generation = pasteboard.changeCount
+        let items = pasteboard.pasteboardItems
+        guard items != nil || (pasteboard.types ?? []).isEmpty else { throw WritingPasteError.clipboardUnreadable }
+        let contents = try (items ?? []).map { item in
+            let types = item.types
+            guard Set(types).count == types.count else { throw WritingPasteError.clipboardUnreadable }
+            return try types.map { type in
+                guard let data = item.data(forType: type) else { throw WritingPasteError.clipboardUnreadable }
+                return (type, data)
             }
         }
+        guard pasteboard.changeCount == generation else { throw WritingPasteError.clipboardChanged }
+        return contents
     }
 
     @MainActor
@@ -407,15 +596,17 @@ class CursorPaster {
         expectedText: String,
         retryCommandVMenuDiscovery: Bool,
         preparedCursorTextContext: CursorTextContextReader.PreparedContext?,
-        latencyTraceToken: VoiceInkLatencyTrace.Token?
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
+        willAttempt: @escaping @MainActor () throws -> Void
     ) async -> PasteResult {
         guard !Task.isCancelled else { return .commandNotPosted }
         if let pasteCommandPosterForTesting {
+            do { try willAttempt() } catch { return .commandNotPosted }
             return await pasteCommandPosterForTesting(retryCommandVMenuDiscovery)
         }
 
         if VoiceInkPasteMethod.current() == .appleScript {
-            let didPost = pasteUsingAppleScript()
+            let didPost = pasteUsingAppleScript(willAttempt: willAttempt)
             if didPost {
                 VoiceInkLatencyTrace.shared.event(
                     "paste_event_posted",
@@ -429,62 +620,77 @@ class CursorPaster {
                 expectedText: expectedText,
                 retryCommandVMenuDiscovery: retryCommandVMenuDiscovery,
                 preparedCursorTextContext: preparedCursorTextContext,
-                latencyTraceToken: latencyTraceToken
+                latencyTraceToken: latencyTraceToken,
+                willAttempt: willAttempt
             )
         }
     }
 
+    @MainActor
     private static func scheduleClipboardRestore(
         _ savedContents: ClipboardSnapshot,
         expectedText: String,
         sessionID: String,
         on pasteboard: NSPasteboard,
         latencyTraceToken: VoiceInkLatencyTrace.Token?,
-        expectedChangeCount: Int? = nil,
-        delay: TimeInterval? = nil
+        expectedChangeCount: Int,
+        delay: TimeInterval,
+        settleImmediately: Bool = true
     ) {
-        let delay = delay ?? VoiceInkPastePreference.boundedClipboardRestoreDelay()
-
-        Task { @MainActor in
-            await wait(delay)
-            guard expectedChangeCount.map({ pasteboard.changeCount == $0 }) ?? true,
-                  pasteboardStillOwnedByPasteSession(pasteboard, expectedText: expectedText, sessionID: sessionID),
-                  expectedChangeCount.map({ pasteboard.changeCount == $0 }) ?? true else {
-                VoiceInkLatencyTrace.shared.event(
-                    "paste_session.restore_skipped",
-                    details: "reason=clipboard_changed",
-                    token: latencyTraceToken
-                )
-                return
+        let restoration = ClipboardRestoration(board: pasteboard, contents: savedContents,
+            text: expectedText, sessionID: sessionID, changeCount: expectedChangeCount, delay: delay)
+        guard restoration.ownsClipboard else { return }
+        clipboardRestorations[pasteboard.name] = restoration
+        if delay <= 0, settleImmediately {
+            settleRestoration(restoration)
+        } else if delay > 0 {
+            restoration.timer = Task { @MainActor in
+                do {
+                    let remaining = restoration.deadline - ProcessInfo.processInfo.systemUptime
+                    if remaining > 0 { try await Task.sleep(for: .seconds(remaining)) }
+                } catch { return }
+                settleRestoration(restoration)
             }
-            pasteboard.clearContents()
-            if !savedContents.isEmpty {
-                pasteboard.writeObjects(pasteboardItems(from: savedContents))
-            }
-            VoiceInkLatencyTrace.shared.event(
-                "paste_session.restore_executed",
-                details: "items=\(savedContents.count)",
-                token: latencyTraceToken
-            )
         }
     }
 
-    private static func pasteboardStillOwnedByPasteSession(
-        _ pasteboard: NSPasteboard,
-        expectedText: String,
-        sessionID: String
-    ) -> Bool {
-        pasteboard.string(forType: .string) == expectedText &&
-            pasteboard.string(forType: ClipboardManager.pasteSessionType) == sessionID
+    @MainActor
+    private static func recordFailedRestoration(on board: NSPasteboard) {
+        let failure = ClipboardRestoration(board: board, contents: [], text: "", sessionID: "",
+            changeCount: board.changeCount, delay: 0)
+        failure.state = .failed(board.changeCount)
+        clipboardRestorations[board.name] = failure
+        logger.error("An owned clipboard restoration failed; another paste requires a newer clipboard generation")
     }
 
-    private static func pasteboardItems(from snapshot: ClipboardSnapshot) -> [NSPasteboardItem] {
-        snapshot.map { itemSnapshot in
+    @MainActor
+    private static func pasteboardItems(from snapshot: ClipboardSnapshot) throws -> [NSPasteboardItem] {
+        try snapshot.map { itemSnapshot in
             let item = NSPasteboardItem()
             for (type, data) in itemSnapshot {
-                item.setData(data, forType: type)
+                guard item.setData(data, forType: type) else { throw WritingPasteError.clipboardRestorationFailed }
             }
             return item
+        }
+    }
+
+    @MainActor
+    private static func restoreClipboardSnapshot(_ snapshot: ClipboardSnapshot, on board: NSPasteboard, expectedChangeCount: Int) throws {
+        let items = try pasteboardItems(from: snapshot)
+        guard board.changeCount == expectedChangeCount else { throw WritingPasteError.clipboardChanged }
+        let clearedChangeCount = board.clearContents()
+        guard board.changeCount == clearedChangeCount else { throw WritingPasteError.clipboardChanged }
+        let written = items.isEmpty || board.writeObjects(items)
+        guard board.changeCount == clearedChangeCount else { throw WritingPasteError.clipboardChanged }
+        guard written else { throw WritingPasteError.clipboardRestorationFailed }
+        let readback = try snapshotClipboard(from: board)
+        guard board.changeCount == clearedChangeCount else { throw WritingPasteError.clipboardChanged }
+        guard readback.count == snapshot.count else { throw WritingPasteError.clipboardRestorationFailed }
+        for (actual, expected) in zip(readback, snapshot) {
+            guard actual.count == expected.count,
+                  Dictionary(uniqueKeysWithValues: actual) == Dictionary(uniqueKeysWithValues: expected) else {
+                throw WritingPasteError.clipboardRestorationFailed
+            }
         }
     }
 
@@ -510,12 +716,13 @@ class CursorPaster {
     }
 
     @MainActor
-    private static func pasteUsingAppleScript() -> Bool {
+    private static func pasteUsingAppleScript(willAttempt: () throws -> Void) -> Bool {
         guard let script = layoutSwitchesToQWERTYOnCommand ? pasteScriptKeyCode : pasteScriptKeystroke else {
             logger.error("\(VoiceInkPasteDiagnostics.appleScriptPasteScriptUnavailableMessage, privacy: .public)")
             return false
         }
 
+        do { try willAttempt() } catch { return false }
         var error: NSDictionary?
         script.executeAndReturnError(&error)
         if let error {
@@ -535,7 +742,8 @@ class CursorPaster {
         expectedText: String,
         retryCommandVMenuDiscovery: Bool,
         preparedCursorTextContext: CursorTextContextReader.PreparedContext?,
-        latencyTraceToken: VoiceInkLatencyTrace.Token?
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
+        willAttempt: @escaping @MainActor () throws -> Void
     ) async -> PasteResult {
         VoiceInkLatencyTrace.shared.event(
             "paste_cgevent.enter",
@@ -557,7 +765,8 @@ class CursorPaster {
         let menuAttempt = await CursorTextContextReader.pressFocusedCommandVMenuItem(
             retryIfUnavailable: retryCommandVMenuDiscovery,
             preparedContext: preparedCursorTextContext,
-            latencyTraceToken: latencyTraceToken
+            latencyTraceToken: latencyTraceToken,
+            willAttempt: willAttempt
         )
         let stableTarget: CursorTextContextReader.FocusedPasteTarget?
         switch menuAttempt {
@@ -585,7 +794,8 @@ class CursorPaster {
             if let keyboardPaste = await CursorTextContextReader.postFocusedCommandVShortcut(
                 target: stableTarget,
                 expectedText: expectedText,
-                latencyTraceToken: latencyTraceToken
+                latencyTraceToken: latencyTraceToken,
+                willAttempt: willAttempt
             ) {
                 switch keyboardPaste.disposition {
                 case .delivered:
@@ -608,7 +818,8 @@ class CursorPaster {
             if let contextMenuPaste = await CursorTextContextReader.pressFocusedContextMenuPasteItem(
                 target: stableTarget,
                 expectedText: expectedText,
-               latencyTraceToken: latencyTraceToken
+               latencyTraceToken: latencyTraceToken,
+               willAttempt: willAttempt
             ) {
                 if Task.isCancelled {
                     return .commandDeliveryUncertain
@@ -667,6 +878,14 @@ class CursorPaster {
                     }
                 }
                 return .commandNotPosted
+            }
+            if index == 1 {
+                do { try willAttempt() }
+                catch {
+                    if let targetProcessIdentifier { cmdUp.postToPid(targetProcessIdentifier) }
+                    else { cmdUp.post(tap: .cghidEventTap) }
+                    return .commandNotPosted
+                }
             }
             if let targetProcessIdentifier {
                 event.postToPid(targetProcessIdentifier)

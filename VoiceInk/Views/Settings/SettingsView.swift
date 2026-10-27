@@ -140,6 +140,23 @@ struct SettingsView: View {
                         .controlSize(.small)
                 }
 
+                LabeledContent {
+                    HStack(spacing: 8) {
+                        UndoLastWritingEditAvailabilityLabel()
+                        ShortcutRecorder(action: .undoLastWritingEdit) {
+                            recordingShortcutManager.updateShortcutStatus()
+                        }
+                            .controlSize(.small)
+                            .accessibilityElement(children: .contain)
+                            .accessibilityIdentifier(UndoLastWritingEditPresentation.AccessibilityID.shortcutRecorder)
+                    }
+                } label: {
+                    Text(UndoLastWritingEditPresentation.title)
+                    Text(UndoLastWritingEditPresentation.scope)
+                }
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier(UndoLastWritingEditPresentation.AccessibilityID.settingsRow)
+
                 LabeledContent(Self.recordingShortcutPresentation.cancelRecordingLabel) {
                     HStack(spacing: 8) {
                         ShortcutRecorder(

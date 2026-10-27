@@ -183,7 +183,10 @@ extension VoiceInkTests {
                     #expect(record.processingFailureReason == nil)
                     #expect(fixture.delivered.count == before)
                     let sentinel = Transcription(text: "", duration: 1, transcriptionStatus: .completed)
-                    #expect(!SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: sentinel, modelContext: fixture.context))
+                    #expect(!SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(
+                        for: sentinel, modelContext: fixture.context,
+                        writingActionUndoController: WritingActionUndoController()
+                    ))
                 }
                 #expect(fixture.enhancement.requests.isEmpty && fixture.warnings.count == 1)
                 await fixture.close()

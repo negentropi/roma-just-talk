@@ -1,0 +1,5 @@
+{
+  "probeSHA256": "08816dd5c4f88f3358936de474fae0f28b2b53f1dd60a8b2f43cbc4f8d999127",
+  "resultSHA256": "bc9d5fda8285f162fbbffca4121fb3f1b4f54ab0d81ecd59ad27762f6b8727dd",
+  "scope": "Owned ephemeral unique pasteboard; no general clipboard, app, signed host or CI runtime claim"
+}

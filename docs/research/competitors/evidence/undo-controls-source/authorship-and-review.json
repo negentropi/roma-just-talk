@@ -1,0 +1,124 @@
+{
+  "classification": "source-authorship-and-review-only",
+  "implementation_status": "five isolated control acceptance sources frozen; native compile and execution pending",
+  "author_cli": {
+    "binary": "claude",
+    "version": "2.1.310",
+    "model_selection": "explicit human instruction",
+    "settings": "user auth settings; hooks disabled; strict empty MCP; no session persistence"
+  },
+  "invocations": [
+    {
+      "invocation": "isolated-native-control-host-ui",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "81fc30f541dba0e9fb446a21553e32f642c5844d84201ac3fee1090202ed1ba1",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 202717,
+        "total_cost_usd": 0.949498
+      }
+    },
+    {
+      "invocation": "four-fixed-clipboard-error-descriptions",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "bdd34997b670e8dbd655b221a6900106f5dfa348f43f123ea606f31e1845c56c",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 51525,
+        "total_cost_usd": 0.1989428
+      }
+    }
+  ],
+  "authorship_scope": {
+    "actual_claude_opus_5_5": [
+      "scripts/fixtures/WritingUndoControlHost.swift",
+      "CursorPaster.WritingPasteError enum conformance and four fixed descriptions only"
+    ],
+    "gpt_authored_native_verification": [
+      "scripts/fixtures/WritingUndoControlOracle.swift",
+      "scripts/run-writing-undo-controls-check.sh",
+      "scripts/verify-writing-undo-controls.py",
+      ".github/workflows/voiceink-writing-undo-controls-check.yml"
+    ],
+    "supplemental_undo_view_copy": "Recorded separately in evidence/undo-ui-source/authorship-and-review.json; not double-counted here."
+  },
+  "source_sha256": {
+    "scripts/fixtures/WritingUndoControlHost.swift": "38c0e548c2613ee842b2929b0a2aa8cb6fce56b49e3c6b65d5e53b183dc61289",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "a4d87a78ba31077f4cc3b653cfae0947fd41e603bcc6e04d1bb99f4cc2ea9ded",
+    "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
+    "scripts/verify-writing-undo-controls.py": "0411ac08e977a976b287b5c9833600df8b7b530970dfb1916c914aef83c2d702",
+    ".github/workflows/voiceink-writing-undo-controls-check.yml": "5cdd950bfbb54d48b3ae980f58cc2004cc63fa08a0cf0611ab0afbb8e18863f6"
+  },
+  "clipboard_error_copy": {
+    "path": "VoiceInk/Paste/CursorPaster.swift",
+    "before_sha256": "b7b79a290e8b3c7fd4c28a11ba2e2271115731d54af7520482feefcd0907c3df",
+    "reviewed_after_sha256": "5fd70d8025265e5f5e389b8c4bc5e70f27488c305bab22bd3023afda90c09bb8",
+    "enum_sha256": "60885be3cbb7cd1230d372f36c324f896ec789d1485d32cb6291baf97cf89d66",
+    "scope": "Only Error to LocalizedError and exhaustive fixed descriptions; four case identities, throws and control flow unchanged. Later parent-authorized wrapper removal may change other file bytes independently.",
+    "historical_reviewed_delta_outside_enum_identical_to_before": true,
+    "separate_backend_cleanup": {
+      "after_sha256": "0954eaa9465d0725278c5f955600ce3338a426d00915d08f6803401319e26342",
+      "enum_sha256_preserved": "60885be3cbb7cd1230d372f36c324f896ec789d1485d32cb6291baf97cf89d66",
+      "ownership": "Separately root-authorized Paster owner removed two obsolete wrappers after the enum source review. This is a composite integration hash, not an Opus authorship claim for those deletions; current outside-enum bytes differ from the historical b7b79 baseline."
+    }
+  },
+  "review": {
+    "requested_model": "gpt-6.1-sol",
+    "actual_model": "gpt-6.1-sol",
+    "status": "clean for all five exact-hash acceptance sources and the historical Paster enum-only delta",
+    "reviewed_at_head": "073f4c400d23c7ccf75737492c046b28d87dd263",
+    "resolved_findings": [
+      "Use actual positive visible AX frames rather than retained menu-node presence.",
+      "Wait actual expected enabled state after native menu opens.",
+      "Keep exact spawned-process cleanup identity separate from mapped-code acceptance.",
+      "Handle successful process exit between polling and ps without accepting an unobserved host.",
+      "Wait prior feedback absent; observe the new notice before final exact editor/focus assertions."
+    ],
+    "native_limit": "Source-only. No compilation, self-AX/MenuBarExtra, configured hotkey, focus retention, screenshots or editor restoration proof."
+  },
+  "source_contract": {
+    "host_owner": "One actual engine and its own controller, RecorderUIManager and RecordingShortcutManager; production VoiceInkApp composition excluded only in disposable candidate copy.",
+    "menu": "Unchanged product UndoLastWritingEditMenuButton mounted in actual MenuBarExtra menu style; actual unique AXPress control required.",
+    "shortcut": "Actual ShortcutRecorder capture and global CGEvent chord through the real registered event tap; no private handler or direct Undo command call.",
+    "native_editor_helper": "Exact source tail of WritingTargetLiveTests.swift, imports only prepended; no helper behavior changes or Testing macros.",
+    "cases": [
+      "textedit-menu",
+      "textedit-shortcut",
+      "safari-menu",
+      "safari-shortcut"
+    ],
+    "state_checks": [
+      "unavailable menu disabled",
+      "explicit busy engine-state fixture: menu disabled and actual shortcut notice with no editor mutation",
+      "actual wrong-window focus refusal via configured shortcut"
+    ],
+    "acceptance": "Exact full UTF-16, selected text/range, same focused live process/window/editor after fresh feedback; actual controls/actions/frames, screenshots, editor cleanup and closed host required.",
+    "transport": "41 canonical dependency pins, static framework identity, actual Swift compiler input lists, signed host identity and exact fresh Accessibility/ListenEvent/PostEvent/ScreenCapture grants bound; no microphone grant."
+  },
+  "checks": {
+    "swift_frontend_parse": "host, native oracle, clipboard enum and supplemental Undo helper passed",
+    "bash_syntax": "passed",
+    "python_source_parse": "passed",
+    "workflow_yaml_parse": "passed",
+    "classifier_self_test": "passed; 22 malformed receipts rejected; creates no native success evidence",
+    "git_diff_check": "passed"
+  },
+  "native_runtime_verified": false,
+  "screenshots_reviewed": false,
+  "limits": [
+    "No normal shipping VoiceInkApp lifecycle or full recording pipeline claim.",
+    "No ASR, microphone, provider, model loading/download or physical keyboard proof.",
+    "Source authoring and pure classifier/syntax checks only; parent owns remote run, screenshot review, commit and CI.",
+    "Plain-text guarded inverse only; no restart, generic Cmd-Z, rich-format or general editor compatibility claim."
+  ],
+  "total_author_cost_usd": 1.1484408,
+  "raw_log_policy": "Only model, status, timing, cost and hashes retained; raw JSONL stays outside the repository."
+}

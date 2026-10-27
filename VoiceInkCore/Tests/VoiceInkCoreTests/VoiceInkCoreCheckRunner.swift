@@ -10,6 +10,11 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "UndoShortcutTests.testUndoStartsUnassignedWithoutRecordingDefaultsOrLegacyAliases", run: { try UndoShortcutTests().testUndoStartsUnassignedWithoutRecordingDefaultsOrLegacyAliases() }),
+            VoiceInkCoreCheck(name: "UndoShortcutTests.testUndoStorageRestoresStateAndResetClearsOnlyItsManagedBinding", run: { try UndoShortcutTests().testUndoStorageRestoresStateAndResetClearsOnlyItsManagedBinding() }),
+            VoiceInkCoreCheck(name: "UndoShortcutTests.testUndoBackupRoundTripsAndImportsWithoutRecordingSelection", run: { try UndoShortcutTests().testUndoBackupRoundTripsAndImportsWithoutRecordingSelection() }),
+            VoiceInkCoreCheck(name: "UndoShortcutTests.testOldMissingAndNullUndoBackupsLeaveTheExistingBindingUntouched", run: { try UndoShortcutTests().testOldMissingAndNullUndoBackupsLeaveTheExistingBindingUntouched() }),
+            VoiceInkCoreCheck(name: "UndoShortcutTests.testInvalidTypedUndoBackupRejectsBeforeAnyShortcutApplication", run: { try UndoShortcutTests().testInvalidTypedUndoBackupRejectsBeforeAnyShortcutApplication() }),
             VoiceInkCoreCheck(name: "DictationProfileRoutingTests.testAllProfilesPersistWithoutChangingUnknownDefaultsFallback", run: { try DictationProfileRoutingTests().testAllProfilesPersistWithoutChangingUnknownDefaultsFallback() }),
             VoiceInkCoreCheck(name: "DictationProfileRoutingTests.testNewProfilesPreserveRawTextAndNeverUseLegacyPreparationOrEnhancement", run: { try DictationProfileRoutingTests().testNewProfilesPreserveRawTextAndNeverUseLegacyPreparationOrEnhancement() }),
             VoiceInkCoreCheck(name: "DictationProfileRoutingTests.testNewProfilesRoundTripAndImportThroughExistingGeneralBackupCodec", run: { try DictationProfileRoutingTests().testNewProfilesRoundTripAndImportThroughExistingGeneralBackupCodec() }),

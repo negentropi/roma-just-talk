@@ -1,0 +1,43 @@
+{
+  "allSettersRetainOwnedGeneration" : true,
+  "classification" : "actual-unique-pasteboard-setter-generations",
+  "clearReturnedGeneration" : 1,
+  "events" : [
+    {
+      "generation" : 1,
+      "name" : "clear",
+      "success" : true
+    },
+    {
+      "generation" : 1,
+      "name" : "string",
+      "success" : true
+    },
+    {
+      "generation" : 1,
+      "name" : "source",
+      "success" : true
+    },
+    {
+      "generation" : 1,
+      "name" : "transient",
+      "success" : true
+    },
+    {
+      "generation" : 1,
+      "name" : "automatic",
+      "success" : true
+    },
+    {
+      "generation" : 1,
+      "name" : "session",
+      "success" : true
+    },
+    {
+      "generation" : 1,
+      "name" : "readback",
+      "success" : true
+    }
+  ],
+  "scope" : "Owned ephemeral unique pasteboard; no general clipboard, app, signed host or CI runtime claim"
+}

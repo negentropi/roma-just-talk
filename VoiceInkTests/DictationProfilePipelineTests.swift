@@ -125,7 +125,8 @@ extension VoiceInkTests {
             let sentinel = Transcription(text: "", duration: 1, transcriptionStatus: .completed)
             let pendingWasLeftBehind = SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(
                 for: sentinel,
-                modelContext: fixture.context
+                modelContext: fixture.context,
+                writingActionUndoController: WritingActionUndoController()
             )
 
             #expect(record.text.utf8.elementsEqual(raw.utf8))
@@ -412,7 +413,9 @@ private final class DictationProfilePipelineFixture {
 
     private func discardPendingFallback() {
         let sentinel = Transcription(text: "Owned fixture cleanup", duration: 1, transcriptionStatus: .completed)
-        _ = SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: sentinel, modelContext: context)
+        _ = SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(
+            for: sentinel, modelContext: context, writingActionUndoController: WritingActionUndoController()
+        )
     }
 
     func restore() {

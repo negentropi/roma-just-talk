@@ -15,7 +15,7 @@ Your libraries and Custom settings stay saved when you switch profiles. Inactive
 
 The choice applies globally. A recording captures it before microphone permission and Power Mode preparation. Each imported file captures it when that item starts processing; retranscription captures it when invoked. Later profile, style or library changes affect the next operation. Custom retains its existing live formatting and enhancement behavior.
 
-Dedicated **Translate**, **Edit selected text** and **Draft** Writing Actions retain their separate behavior and AI settings.
+Dedicated **Translate**, **Edit selected text** and **Draft** Writing Actions retain their separate behavior and AI settings. The candidate's [Undo Last Writing Edit](undo-writing-edit.md) covers the latest confirmed selected-text rewrite; its native verification is still pending.
 
 ## Light
 

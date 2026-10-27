@@ -2,6 +2,9 @@
 
 ## v1.95.2 - Unreleased
 
+- Add Undo Last Writing Edit in the menu and as an optional shortcut for the latest confirmed selected-text rewrite, guarded by the same editor, text and caret.
+- Preserve the clipboard across overlapping pastes and Undo, and retain Writing Action results and request metadata when cancellation follows an editor attempt.
+
 - Reject malformed modern shortcut backups instead of interpreting their legacy fields as another binding.
 
 - Save an approved correction from History as one literal phrase, with a preview, source reference, enable switch and Dictionary editing. Keep complete replacement records in backups and show conflicts before importing.

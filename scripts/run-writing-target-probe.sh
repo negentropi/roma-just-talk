@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+mode="${1:-all}"
+if [[ "$mode" != self-test ]]; then
 if [[ "${GITHUB_ACTIONS:-}" != true || "${RUNNER_ENVIRONMENT:-}" != github-hosted || "$(uname -s)" != Darwin ]]; then
   echo "Run the writing-target probe only on a disposable GitHub-hosted Mac." >&2
   exit 2
@@ -9,13 +11,13 @@ if [[ "$(id -u)" == 0 || "$(stat -f %u /dev/console)" != "$(id -u)" ]]; then
   echo "The probe must own the logged-in desktop session." >&2
   exit 2
 fi
+fi
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo"
-out="$RUNNER_TEMP/writing-target-probe"
+out="${RUNNER_TEMP:-/tmp}/writing-target-probe"
 baseline_sha=479fa1768e554433467b1355e4c8ded962b01627
 candidate_sha="$(git rev-parse HEAD)"
-mode="${1:-all}"
 if [[ "$mode" == all ]]; then
   bash "$0" prepare
   for lane in candidate baseline; do
@@ -26,25 +28,71 @@ if [[ "$mode" == all ]]; then
 fi
 phase="$mode"
 mkdir -p "$(dirname "$out")"
-trap 'exit_code=$?; if [[ "$exit_code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$exit_code" > "$out/failure.json"; fi' EXIT
+trap 'exit_code=$?; if [[ "$exit_code" != 0 && "$mode" != self-test ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$exit_code" > "$out/failure.json"; fi' EXIT
 
+if [[ "$mode" == prepare || "$mode" == self-test ]]; then
 if [[ "$mode" == prepare ]]; then
 test ! -e "$out"
 mkdir -p "$out"
 git fetch --no-tags origin "$baseline_sha"
-python3 - "$repo" "$out" "$baseline_sha" "$candidate_sha" <<'PY'
+fi
+python3 - "$repo" "$out" "$baseline_sha" "$candidate_sha" "$mode" <<'PY'
 import hashlib
 import io
 import json
+import re
 import subprocess
 import sys
 import tarfile
 from pathlib import Path
 
 repo, output = map(Path, sys.argv[1:3])
-baseline_sha, candidate_sha = sys.argv[3:]
+baseline_sha, candidate_sha, mode = sys.argv[3:]
 def source(revision, path):
     return subprocess.check_output(["git", "-C", str(repo), "show", revision + ":" + path])
+
+def delivery_adapter(native):
+    # Adapt only the public delivery result; target validation and writes stay native.
+    replaces = len(re.findall(rb"\bfunc replace\(with text: String(?:\)|,)", native))
+    delivers = len(re.findall(rb"\bfunc deliver\(\s*with text: String,", native))
+    if (replaces, delivers) == (1, 0):
+        api = "historical-throwing-replace"
+        body = "        try await target.replace(with: text)"
+    elif (replaces, delivers) == (0, 1):
+        api = "delivery-outcome"
+        body = """        switch await target.deliver(with: text) {
+        case .confirmed: return
+        case .notAttempted(let error), .attemptedUnconfirmed(let error): throw error
+        }"""
+    else:
+        raise ValueError("Expected exactly one recognized native delivery API")
+    adapter = """@MainActor
+private enum ProbeDelivery {
+    static func perform(_ target: WritingTarget, with text: String) async throws {
+""" + body + """
+    }
+}
+
+"""
+    return api, adapter.encode()
+
+if mode == "self-test":
+    historical = source(baseline_sha, "VoiceInk/Services/WritingTarget.swift")
+    assert delivery_adapter(historical)[0] == "historical-throwing-replace"
+    current = source(candidate_sha, "VoiceInk/Services/WritingTarget.swift")
+    api, adapter = delivery_adapter(current)
+    assert (b"target.replace(" in adapter) is (api == "historical-throwing-replace")
+    assert (b"target.deliver(" in adapter) is (api == "delivery-outcome")
+    outcome = b"func deliver(\n        with text: String,"
+    assert delivery_adapter(outcome)[0] == "delivery-outcome"
+    for invalid in [b"", historical + outcome, historical + historical, outcome + outcome]:
+        try:
+            delivery_adapter(invalid)
+        except ValueError:
+            continue
+        raise AssertionError("An ambiguous or missing native API was accepted")
+    print("PASS: source-bound native delivery adapters; four invalid API shapes rejected; no native execution")
+    raise SystemExit(0)
 
 native_paths = [
     "VoiceInk/Services/WritingTarget.swift", "VoiceInk/Paste/CursorPaster.swift",
@@ -177,7 +225,7 @@ private enum ProbeRun {
         try await editor.select(NSRange(location: 0, length: 3))
         var refused = false
         do {
-            try await captured.replace(with: "MUST NOT BE INSERTED")
+            try await ProbeDelivery.perform(captured, with: "MUST NOT BE INSERTED")
         } catch {
             refused = error as? WritingTarget.Failure == .targetChanged
         }
@@ -189,7 +237,7 @@ private enum ProbeRun {
         phase = .replacement
         let replacement = "Translated 日本語\nNext paragraph"
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
-        do { try await target.replace(with: replacement) }
+        do { try await ProbeDelivery.perform(target, with: replacement) }
         catch {
             await observeFailedReplacement(editor, expected: expected, error: error, output: output)
             throw error
@@ -308,7 +356,7 @@ let package = Package(
     swiftLanguageVersions: [.v5]
 )
 '''
-generated_probe = imports + helper + driver.encode()
+shared_probe = imports + helper + driver.encode()
 pin_receipt = {
     "canonical_path": lock_path, "canonical_sha256": digest(canonical_bytes),
     "canonical_pin_count": len(canonical_pins), "retained_pins": retained,
@@ -343,6 +391,8 @@ for lane, revision in [("baseline", baseline_sha), ("candidate", candidate_sha)]
         data = source(revision, path)
         (sources / Path(path).name).write_bytes(data)
         native_hashes[path] = digest(data)
+    delivery_api, adapter = delivery_adapter(source(revision, native_paths[0]))
+    generated_probe = shared_probe + adapter
     (sources / "Probe.swift").write_bytes(generated_probe)
     (package / "Package.swift").write_text(package_manifest)
     (package / "Package.resolved").write_bytes(subset_bytes)
@@ -354,6 +404,8 @@ for lane, revision in [("baseline", baseline_sha), ("candidate", candidate_sha)]
         "source_sha": revision, "native_sources": native_hashes,
         "dependency_sources": dependency_hashes,
         "generated_probe_sha256": digest(generated_probe),
+        "delivery_api": delivery_api, "delivery_adapter_sha256": digest(adapter),
+        "shared_probe_sha256": digest(shared_probe),
         "package_manifest_sha256": digest(package_manifest.encode()),
         "package_seed_lock_sha256": digest(subset_bytes)
     }
@@ -363,8 +415,8 @@ contract = {
     "oracle_fixture": {"source_sha": candidate_sha, "path": fixture_path, "sha256": digest(fixture)},
     "extracted_helper_sha256": digest(helper), "driver_sha256": digest(driver.encode()),
     "lanes": lane_contracts,
-    "extraction": "Each lane uses byte-identical native and Core/NVIDIA source files from its own revision; both use one shared current helper and driver",
-    "testing_adapter": "Issue.record collects helper diagnostics as failures; no AX or dependency behavior substitution",
+    "extraction": "Each lane uses byte-identical native and Core/NVIDIA files from its own revision; both use one shared current helper and behavioral driver",
+    "testing_adapter": "Explicit source-selected native API adapters map throwing replace or deliver outcomes to the same confirmed-success/error checks. Issue.record collects helper diagnostics; no AX or dependency behavior substitution",
     "swift_language": "5, matching the app project; awaiting historical sync replace may warn without changing its body",
     "boundary": "Matched native delivery and real dependency comparison only; full application gates remain required"
 }

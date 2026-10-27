@@ -49,7 +49,12 @@ class LastTranscriptionService: ObservableObject {
         }
     }
 
-    static func pasteLastTranscription(from modelContext: ModelContext, excluding excludedID: UUID? = nil) {
+    @MainActor
+    static func pasteLastTranscription(
+        from modelContext: ModelContext,
+        writingActionUndoController: WritingActionUndoController,
+        excluding excludedID: UUID? = nil
+    ) {
         guard let lastTranscription = getLastTranscription(from: modelContext, excluding: excludedID) else {
             Task { @MainActor in
                 showNotification(VoiceInkLastTranscriptionPolicy.noTranscriptionNotification)
@@ -62,12 +67,11 @@ class LastTranscriptionService: ObservableObject {
             preference: .original
         )
 
-        Task { @MainActor in
-            CursorPaster.pasteAtCursor(CursorPaster.preparedTextForPaste(textToPaste))
-        }
+        paste(textToPaste, transcriptionID: lastTranscription.id, controller: writingActionUndoController)
     }
     
-    static func pasteLastEnhancement(from modelContext: ModelContext) {
+    @MainActor
+    static func pasteLastEnhancement(from modelContext: ModelContext, writingActionUndoController: WritingActionUndoController) {
         guard let lastTranscription = getLastTranscription(from: modelContext) else {
             Task { @MainActor in
                 showNotification(VoiceInkLastTranscriptionPolicy.noTranscriptionNotification)
@@ -80,8 +84,35 @@ class LastTranscriptionService: ObservableObject {
             preference: .preferred
         )
 
+        paste(textToPaste, transcriptionID: lastTranscription.id, controller: writingActionUndoController)
+    }
+
+    @MainActor
+    private static func paste(_ text: String, transcriptionID: UUID, controller: WritingActionUndoController) {
+        let deliveryID = controller.beginDelivery(transcriptionID: transcriptionID)
         Task { @MainActor in
-            CursorPaster.pasteAtCursor(CursorPaster.preparedTextForPaste(textToPaste))
+            var outcome: WritingTarget.DeliveryOutcome = .notAttempted(CancellationError())
+            defer { controller.finishDelivery(outcome, for: deliveryID) }
+            var attempted = false
+            let pasteTask = CursorPaster.startPasteAtCursor(
+                CursorPaster.preparedTextForPaste(text),
+                willAttempt: {
+                    guard controller.isCurrentDelivery(deliveryID), !Task.isCancelled else { throw CancellationError() }
+                    if !attempted {
+                        try controller.willAttemptDelivery(deliveryID)
+                        attempted = true
+                    }
+                }
+            )
+            let result = await withTaskCancellationHandler {
+                await pasteTask.value
+            } onCancel: {
+                pasteTask.cancel()
+            }
+            if attempted {
+                outcome = result == .textInserted ? .confirmed(nil)
+                    : .attemptedUnconfirmed(WritingTarget.Failure.replacementUnconfirmed)
+            }
         }
     }
     
@@ -198,7 +229,11 @@ enum SpecialShortcutEmptyTranscriptionFallback {
         pendingFallback = nil
     }
 
-    static func consumeIfNeeded(for transcription: Transcription, modelContext: ModelContext) -> Bool {
+    static func consumeIfNeeded(
+        for transcription: Transcription,
+        modelContext: ModelContext,
+        writingActionUndoController: WritingActionUndoController
+    ) -> Bool {
         guard let pendingFallback else {
             return false
         }
@@ -214,7 +249,9 @@ enum SpecialShortcutEmptyTranscriptionFallback {
             return false
         }
 
-        LastTranscriptionService.pasteLastTranscription(from: modelContext, excluding: transcription.id)
+        LastTranscriptionService.pasteLastTranscription(
+            from: modelContext, writingActionUndoController: writingActionUndoController, excluding: transcription.id
+        )
         return true
     }
 }

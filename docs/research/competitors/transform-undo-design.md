@@ -1,6 +1,8 @@
 # Undo the latest confirmed writing edit
 
-Implementation plan for the existing Mac app, after the selected cleanup/styles and approved-correction units. Preparation only: no undo implementation, UI change, model call or runtime proof accompanies this document. Start implementation after the current None/settings full gate passes. Claude Opus 5.5 owns the user-facing controls; GPT-6.1 Sol reviews them.
+Implementation contract for the existing Mac app. The current candidate contains the live-target receipt, memory-only controller, pipeline/engine integration, optional shortcut/backup support and menu/settings controls. These changes form the Undo unit. Claude Opus 5.5 authored the user-facing controls and label; GPT-6.1 Sol reviewed them.
+
+The candidate now implements shared clipboard-restoration ownership, guarded all-format snapshots and the post-delivery metadata boundary. The [known-bad clipboard run](evidence/clipboard-lease-40602002286/independent-audit.json) reproduced three failures with two passing controls; the candidate comparison remains pending. Full native editor, clipboard, cancellation and product-control verification is also pending; source implementation does not establish those outcomes. No release or general editor support is claimed. See the [user guide](../../undo-writing-edit.md) for scope and outcome wording. The source audit below records the historical starting point, not the current implementation's line numbers or a runtime result.
 
 ## First unit and decisions
 

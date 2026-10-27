@@ -1,0 +1,12 @@
+{
+  "classification" : "actual-owned-unreadable-format-fixture",
+  "dataUnreadable" : true,
+  "declared" : true,
+  "generationStable" : true,
+  "itemCount" : 1,
+  "scope" : "Unique ephemeral pasteboard only; no general clipboard, app, CursorPaster or editor",
+  "types" : [
+    "com.negentropi.RomaJustTalk.tests.unreadable"
+  ],
+  "written" : true
+}

@@ -16,7 +16,7 @@ extension VoiceInkTests {
         let target = try WritingTarget.capture(requiresSelection: true)
         #expect(target.selectedText.utf16.elementsEqual(LiveWritingEditor.passage.utf16))
         let replacement = "Rewritten 台灣\nSecond line"
-        try await target.replace(with: replacement)
+        try await requireConfirmedLiveDelivery(target, text: replacement)
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
         try await editor.waitForValue(expected)
         #expect(editor.value?.utf16.elementsEqual(expected.utf16) == true)
@@ -67,7 +67,7 @@ extension VoiceInkTests {
         #expect(target.selectedText.utf16.elementsEqual(LiveWritingEditor.passage.utf16))
         let replacement = "Translated 日本語\nNext paragraph"
         let expected = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
-        do { try await target.replace(with: replacement) }
+        do { try await requireConfirmedLiveDelivery(target, text: replacement) }
         catch {
             editor.recordOperationFailure("safari-replacement-failure", expected: expected)
             throw error
@@ -157,9 +157,18 @@ extension VoiceInkTests {
         #endif
     }
 
+    @MainActor private func requireConfirmedLiveDelivery(_ target: WritingTarget, text: String) async throws {
+        switch await target.deliver(with: text) {
+        case .confirmed:
+            return
+        case .notAttempted(let error), .attemptedUnconfirmed(let error):
+            throw error
+        }
+    }
+
     @MainActor private func expectLiveTargetChanged(_ target: WritingTarget) async {
         do {
-            try await target.replace(with: "MUST NOT BE INSERTED")
+            try await requireConfirmedLiveDelivery(target, text: "MUST NOT BE INSERTED")
             Issue.record("A stale live editor accepted a writing replacement.")
         } catch {
             #expect(error as? WritingTarget.Failure == .targetChanged)
@@ -830,7 +839,7 @@ private enum LiveWritingFailure: Error, CustomStringConvertible {
 }
 
 @MainActor
-private final class LiveWritingEditor {
+final class LiveWritingEditor {
     enum Kind {
         case textEdit, safari
         var bundleIdentifier: String {

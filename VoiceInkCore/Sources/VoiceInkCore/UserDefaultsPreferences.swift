@@ -1831,6 +1831,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
     private let translateRecordingShortcut: ShortcutBackup?
     private let rewriteSelectionRecordingShortcut: ShortcutBackup?
     private let draftRecordingShortcut: ShortcutBackup?
+    private let undoLastWritingEditShortcut: ShortcutBackup?
     public let writingActions: VoiceInkWritingActionPreferences?
     private let primaryRecordingShortcutRawValue: String?
     private let secondaryRecordingShortcutRawValue: String?
@@ -1879,6 +1880,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
         self.translateRecordingShortcut = shortcutBackupRecords[.translateRecording]
         self.rewriteSelectionRecordingShortcut = shortcutBackupRecords[.rewriteSelectionRecording]
         self.draftRecordingShortcut = shortcutBackupRecords[.draftRecording]
+        self.undoLastWritingEditShortcut = shortcutBackupRecords[.undoLastWritingEdit]
         self.writingActions = writingActions
         self.primaryRecordingShortcutRawValue = preferences.recordingShortcut.primaryRecordingShortcutRawValue
         self.secondaryRecordingShortcutRawValue = preferences.recordingShortcut.secondaryRecordingShortcutRawValue
@@ -1924,6 +1926,7 @@ public struct VoiceInkGeneralSettingsBackupPayload<ShortcutBackup: Codable>: Cod
         records[.translateRecording] = translateRecordingShortcut
         records[.rewriteSelectionRecording] = rewriteSelectionRecordingShortcut
         records[.draftRecording] = draftRecordingShortcut
+        records[.undoLastWritingEdit] = undoLastWritingEditShortcut
         return records
     }
 
@@ -4250,6 +4253,7 @@ public enum VoiceInkShortcutActionIdentifier: Hashable, Sendable {
     case translateRecording
     case rewriteSelectionRecording
     case draftRecording
+    case undoLastWritingEdit
     case powerMode(UUID)
     case miniRecorderEscape
     case miniRecorderPrompt(Int)
@@ -4281,6 +4285,8 @@ public enum VoiceInkShortcutActionIdentifier: Hashable, Sendable {
             return "rewriteSelectionRecording"
         case .draftRecording:
             return "draftRecording"
+        case .undoLastWritingEdit:
+            return "undoLastWritingEdit"
         case .powerMode(let id):
             return "powerMode_\(id.uuidString)"
         case .miniRecorderEscape:
@@ -4379,7 +4385,7 @@ public enum VoiceInkShortcutActionIdentifier: Hashable, Sendable {
             return "toggleEnhancement"
         case .powerMode(let id):
             return "powerMode_\(id.uuidString)"
-        case .translateRecording, .rewriteSelectionRecording, .draftRecording,
+        case .translateRecording, .rewriteSelectionRecording, .draftRecording, .undoLastWritingEdit,
              .miniRecorderEscape, .miniRecorderPrompt, .miniRecorderPowerMode:
             return nil
         }
@@ -4449,6 +4455,8 @@ public enum VoiceInkShortcutActionPresentation {
             return "Rewrite Selected Text"
         case .draftRecording:
             return "Draft from Instructions"
+        case .undoLastWritingEdit:
+            return "Undo Last Writing Edit"
         case .powerMode:
             guard let powerModeName else {
                 return fallbackPowerModeDisplayName
@@ -4733,7 +4741,8 @@ public enum VoiceInkShortcutBackupPolicy {
         .toggleEnhancement,
         .translateRecording,
         .rewriteSelectionRecording,
-        .draftRecording
+        .draftRecording,
+        .undoLastWritingEdit
     ]
 
     public static func generalBackupShortcutExportPlan(
@@ -5325,6 +5334,9 @@ public enum VoiceInkSharedPreferenceReset {
         for action in [VoiceInkShortcutActionIdentifier.translateRecording, .rewriteSelectionRecording, .draftRecording] {
             defaults.removeObject(forKey: action.shortcutStorageKey)
         }
+        VoiceInkShortcutStoragePreference.removeShortcutStorage(
+            for: VoiceInkShortcutActionIdentifier.undoLastWritingEdit.shortcutStorageKey, from: defaults
+        )
         VoiceInkAudioInputPreference.clearLastUsedMicrophoneDeviceID(from: defaults)
     }
 }

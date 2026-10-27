@@ -1,0 +1,140 @@
+[
+  {
+    "path": "app-archive-sha256.txt",
+    "bytes": 133,
+    "sha256": "fb58d0a95afe2cfd99f3c534f1048a08aaee8723f9bb03ddce16716183f859ae",
+    "retained": true
+  },
+  {
+    "path": "build.log",
+    "bytes": 4562069,
+    "sha256": "b826b8c5d3c348e6657f7ad37fe817a46e8b30641e50415f5b0bd759a6672d09",
+    "retained": false
+  },
+  {
+    "path": "config-verifier.log",
+    "bytes": 5940,
+    "sha256": "3af9a9fe260bc0bf52550a917eda64c5ac5c77cf316f347fef6c79477a85cd70",
+    "retained": true
+  },
+  {
+    "path": "__pycache__/pin_contract.cpython-315.pyc",
+    "bytes": 2885,
+    "sha256": "78b9ec1e6dbb9b6d46c41a6bae59e2f1f2513e536745795c28ef50058101d7af",
+    "retained": true
+  },
+  {
+    "path": "dependencies.log",
+    "bytes": 39579,
+    "sha256": "fdbdc8ce9f2ca775e5172ab073b12216b1ba82d67d6d28808e1998d1be6cd76c",
+    "retained": false
+  },
+  {
+    "path": "executable-sha256.txt",
+    "bytes": 177,
+    "sha256": "66a1937c3f451324dce4bf132ccb5666b1831cf86625d149628e238ae03ac610",
+    "retained": true
+  },
+  {
+    "path": "package-locks-after.json",
+    "bytes": 3423,
+    "sha256": "80cde48f28e3448da25ecb26de8272576262c43432f4af2c7ec7957232309cb5",
+    "retained": true
+  },
+  {
+    "path": "package-locks-before.json",
+    "bytes": 173086,
+    "sha256": "e29cc561a5404f29cf2872d61977c7c367a98e082ce44209c32cd72f2db53635",
+    "retained": true
+  },
+  {
+    "path": "package-resolution-receipt.json",
+    "bytes": 471,
+    "sha256": "b3f0759c882bc02bef53d052f1df5a7514dacad1143a0be987799c3effd8e125",
+    "retained": true
+  },
+  {
+    "path": "package-resolution.log",
+    "bytes": 8298,
+    "sha256": "c01be1da0d7115ef01d57422617842a5b76d3374987566878728eaa4a3eb8363",
+    "retained": false
+  },
+  {
+    "path": "package-seed-receipt.json",
+    "bytes": 782,
+    "sha256": "9a7593cb8d9fb5e301c537031fef477ae92f2ba07ad2c73830df810fc755165f",
+    "retained": true
+  },
+  {
+    "path": "pin_contract.py",
+    "bytes": 1678,
+    "sha256": "940ccb49b99a2754ae38855c583503359fb111274efb32bfb26caf639e865f8d",
+    "retained": true
+  },
+  {
+    "path": "project-list.json",
+    "bytes": 438,
+    "sha256": "57f262dec0ccdf3ba9d8f672cef75ed5e10787cd67424db6b8655a7b30755329",
+    "retained": true
+  },
+  {
+    "path": "resolved-ios.Package.resolved",
+    "bytes": 6989,
+    "sha256": "9ef0281253cc36305582b4e077be84fc659d9ad62abb2f112118e8f86d9f9a0f",
+    "retained": true
+  },
+  {
+    "path": "scope.txt",
+    "bytes": 132,
+    "sha256": "c0e286aa3ce3e1e41ebd3bc1d4fa0d4d90061bcf88c38846666be7ebf23c001e",
+    "retained": true
+  },
+  {
+    "path": "seed-ios.Package.resolved",
+    "bytes": 11337,
+    "sha256": "f2272461a6b8fb943c5e40051fecf8b37bf06816a0dd453ebc1bf2d6219431d2",
+    "retained": true
+  },
+  {
+    "path": "signature-identity.txt",
+    "bytes": 936,
+    "sha256": "1950870206f200ff98aba7b778a8c1ed2c0a46f3f22ff41cb933fe96fccb3d0e",
+    "retained": true
+  },
+  {
+    "path": "signature-verification.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained": true
+  },
+  {
+    "path": "source-integrity.json",
+    "bytes": 278,
+    "sha256": "d8005f137013d457d5abf142c464a05ea61476ec8a7bf610d312f7d7385af91b",
+    "retained": true
+  },
+  {
+    "path": "source-manifest-before.json",
+    "bytes": 76521,
+    "sha256": "3bf2645dae6e9e8687ac965c35fd3e8038d6ee515e9c0dcb207e36f6e7461ea2",
+    "retained": true
+  },
+  {
+    "path": "source-sha.txt",
+    "bytes": 41,
+    "sha256": "e0685ca1be41f1649cb1b3d0ba7dbadde172f1dbc09728fbc1f350a024e67175",
+    "retained": true
+  },
+  {
+    "path": "xcode-version.txt",
+    "bytes": 32,
+    "sha256": "18730ed2ae28a2c9cf0c2d5db549033a4f07089331391a7133b7b32187454fa9",
+    "retained": true
+  },
+  {
+    "path": "static-whisper.log",
+    "bytes": 55,
+    "sha256": "1fa0d07e853ab4ca576cd5d1a22565fd28aeb3127735ad30550388cd084f05e5",
+    "retained": true
+  }
+]

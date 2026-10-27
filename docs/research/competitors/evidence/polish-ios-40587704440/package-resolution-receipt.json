@@ -1,0 +1,9 @@
+{
+  "target": "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+  "original_pins_preserved": 2,
+  "resolved_pins": 25,
+  "all_package_states_match_reviewed_sources": true,
+  "repository_equivalence": "Optional terminal .git suffix only",
+  "resolved_sha256": "9ef0281253cc36305582b4e077be84fc659d9ad62abb2f112118e8f86d9f9a0f",
+  "scope": "Generated resolution metadata only; no source or dependency declaration changes authorized"
+}

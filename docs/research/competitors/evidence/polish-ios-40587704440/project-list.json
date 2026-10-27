@@ -1,0 +1,24 @@
+{
+  "project" : {
+    "configurations" : [
+      "Debug",
+      "Release"
+    ],
+    "name" : "VoiceInk-ios",
+    "schemes" : [
+      "KeyboardKit",
+      "VoiceInk-ios",
+      "VoiceInkAudioProof",
+      "VoiceInkCore",
+      "VoiceInkCoreChecks",
+      "VoiceInkKeyboard",
+      "VoiceInkNVIDIA"
+    ],
+    "targets" : [
+      "VoiceInk-ios",
+      "VoiceInk-iosTests",
+      "VoiceInk-iosUITests",
+      "VoiceInkKeyboard"
+    ]
+  }
+}

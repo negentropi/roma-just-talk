@@ -1,0 +1,97 @@
+{
+  "run_id": 40587704440,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40587704440",
+  "head_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "classification": "ios-simulator-compile-and-static-package-passed",
+  "artifact": {
+    "id": 12773197566,
+    "bytes": 252728,
+    "sha256": "b03127e5b53a1e9d829facf11433a447327acf191901872adf4dcf9189ae2940",
+    "crc_members": 23,
+    "download_count": 1,
+    "remote_archive": "/data/rjt-polish-ios-40587704440/compile-evidence.zip"
+  },
+  "simulator_app_artifact": {
+    "id": 12773562068,
+    "name": "roma.none-profile-ios-simulator.app",
+    "size_in_bytes": 79267303,
+    "digest": "sha256:da33176cdfbb0a6edd83ffccfdc68eabbcb84a8986feffa0e2b10b213e537217"
+  },
+  "simulator_app_downloaded": false,
+  "source_checks": {
+    "bound_sources": 594,
+    "source_hashes_match_git": true,
+    "original_lock_files": 21,
+    "all_original_lock_values_match_git": true,
+    "all_sources_unchanged": true,
+    "allowed_generated_metadata": "iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved",
+    "artifact_pin_contract_equals_pinned_workflow": true
+  },
+  "dependencies": {
+    "original_pins_preserved": 2,
+    "canonical_mac_pins": 41,
+    "seed_pins": 42,
+    "resolved_pins": 25,
+    "all_states_and_repositories_match_reviewed_sources": true,
+    "repository_equivalence": "Optional terminal .git suffix only",
+    "resolved_sha256": "9ef0281253cc36305582b4e077be84fc659d9ad62abb2f112118e8f86d9f9a0f"
+  },
+  "build": {
+    "configuration": "Debug",
+    "destination": "generic/platform=iOS Simulator",
+    "architectures": [
+      "arm64",
+      "x86_64"
+    ],
+    "actual_core_compile_entries": [
+      {
+        "source": "DictationProfile.swift",
+        "architecture": "arm64",
+        "line": 17848,
+        "text": "SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      },
+      {
+        "source": "DictationProfile.swift",
+        "architecture": "x86_64",
+        "line": 17917,
+        "text": "SwiftCompile normal x86_64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      },
+      {
+        "source": "TranscriptionRunProcessor.swift",
+        "architecture": "arm64",
+        "line": 17978,
+        "text": "SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      },
+      {
+        "source": "TranscriptionRunProcessor.swift",
+        "architecture": "x86_64",
+        "line": 17660,
+        "text": "SwiftCompile normal x86_64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      },
+      {
+        "source": "DictationPolish.swift",
+        "architecture": "arm64",
+        "line": 17844,
+        "text": "SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationPolish.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      },
+      {
+        "source": "DictationPolish.swift",
+        "architecture": "x86_64",
+        "line": 17913,
+        "text": "SwiftCompile normal x86_64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore/Sources/VoiceInkCore/DictationPolish.swift (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+      }
+    ],
+    "succeeded_markers": 1,
+    "raw_log_bytes": 4562069,
+    "raw_log_sha256": "b826b8c5d3c348e6657f7ad37fe817a46e8b30641e50415f5b0bd759a6672d09",
+    "signed_app": "Ad-hoc; deep strict verification completed successfully",
+    "executable_sha256_receipt": "4df789daa98de318399afc78c07b2b415514725a3a7ea6552318074936a21825  /Users/runner/work/_temp/none-ios-build/Build/Products/Debug-iphonesimulator/roma just talk.app/roma just talk",
+    "inner_app_archive_sha256_receipt": "f9c02e8559caa86704bb733978c3616c4557ca66d982779fe6cb6f779327d067  /Users/runner/work/_temp/roma.just.talk.none-ios-simulator.app.zip"
+  },
+  "limits": [
+    "Compilation and static package validation only",
+    "No Simulator launch, native runtime tests, microphone, keyboard, device, or iOS Light/Clarity feature proof",
+    "Actual Simulator app archive not downloaded; its artifact and inner digest are metadata/CI receipts only",
+    "No full runtime dependency checkout/tree census retained by this workflow"
+  ]
+}

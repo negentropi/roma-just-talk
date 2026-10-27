@@ -1,0 +1,141 @@
+{
+  "conclusion": "success",
+  "databaseId": 40587704440,
+  "headBranch": "ci/rjt-none-ios-check-polish-01a17bef",
+  "headSha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T21:51:19Z",
+      "conclusion": "success",
+      "databaseId": 122483460019,
+      "name": "compile",
+      "startedAt": "2026-10-27T21:32:57Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T21:32:58Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T21:32:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:33:02Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T21:32:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:33:02Z",
+          "conclusion": "success",
+          "name": "Bind source and dependency locks",
+          "number": 3,
+          "startedAt": "2026-10-27T21:33:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:33:13Z",
+          "conclusion": "success",
+          "name": "Select Xcode and Metal toolchain",
+          "number": 4,
+          "startedAt": "2026-10-27T21:33:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:33:13Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 5,
+          "startedAt": "2026-10-27T21:33:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:35:04Z",
+          "conclusion": "success",
+          "name": "Resolve the direct iOS project and validate package metadata",
+          "number": 6,
+          "startedAt": "2026-10-27T21:33:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:35:08Z",
+          "conclusion": "success",
+          "name": "Verify existing iOS configuration contracts",
+          "number": 7,
+          "startedAt": "2026-10-27T21:35:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:44:25Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper dependencies",
+          "number": 8,
+          "startedAt": "2026-10-27T21:35:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:44:52Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/save@v4",
+          "number": 9,
+          "startedAt": "2026-10-27T21:44:25Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:50:45Z",
+          "conclusion": "success",
+          "name": "Compile the iOS Simulator app and shared Core",
+          "number": 10,
+          "startedAt": "2026-10-27T21:44:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:51:02Z",
+          "conclusion": "success",
+          "name": "Verify the built app and unchanged sources",
+          "number": 11,
+          "startedAt": "2026-10-27T21:50:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:51:04Z",
+          "conclusion": "success",
+          "name": "Upload compile evidence",
+          "number": 12,
+          "startedAt": "2026-10-27T21:51:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:51:09Z",
+          "conclusion": "success",
+          "name": "Upload the verified Simulator app",
+          "number": 13,
+          "startedAt": "2026-10-27T21:51:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:51:09Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 26,
+          "startedAt": "2026-10-27T21:51:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T21:51:13Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 27,
+          "startedAt": "2026-10-27T21:51:09Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40587704440/job/122483460019"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40587704440"
+}

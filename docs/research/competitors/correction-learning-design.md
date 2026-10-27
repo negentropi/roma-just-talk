@@ -1,6 +1,6 @@
 # Queued Mac unit: approved corrections
 
-Design only. Add an explicit **Save correction** action in History before attempting automatic correction learning.
+The approval flow remains design only. Shared matching preparation is implemented below; no History approval, SwiftData field, automatic learning or new literal entry is exposed yet. Add an explicit **Save correction** action before attempting automatic correction learning.
 
 ## User contract
 
@@ -46,3 +46,15 @@ The ASCII-only boundary pattern also changed `éclair` to `éclear` and `Romaé`
 7. Inspect actual approval/Dictionary UI, keyboard use, persistence and failure recovery.
 
 Automatic correction learning remains separate work. It needs a persisted successful-delivery receipt and reliable attribution of later edits to that exact owned range. This proposed History action does not establish those capabilities.
+
+## Shared matching preparation
+
+`VoiceInkWordReplacementRule` now has explicit legacy comma-alternative and literal kinds. Existing two-string construction and missing JSON kind preserve legacy behavior; legacy encoding retains its original two keys. Explicit null, wrong-type and unknown kinds reject rather than reinterpret comma-containing data. New literal kinds are not safe for an older array reader that ignores unknown keys. They must remain outside legacy export maps; full-record backup/import and version handling are prerequisites before app activation. Shared edit reconstruction preserves kind, but its legacy trim/duplicate validation is not yet a complete literal-editor contract.
+
+Literal rules match the original input. Select non-overlapping source spans by leftmost start, longest matched UTF-16 length, then declared rule order. Keep those source spans present while running existing legacy passes over the full text, rejecting any legacy match that crosses a protected span. Apply accepted legacy edits right-to-left and remap protected offsets. Insert literal outputs last and stop. Replacement output never becomes another rule's input or boundary context. Legacy-only libraries retain their current sequential behavior; this is a bounded compatibility choice for stored comma configuration, not a newly discovered promise for arbitrary chains.
+
+Do not split the input into gaps or use opaque placeholders. Gaps create false word boundaries. Spaced scripts retain the existing ICU boundary policy. Non-spaced matches use Foundation search and advance one Unicode scalar to find overlaps, preserving its canonical matching behavior and actual matched UTF-16 length. A tiny [same-oracle production-engine probe](evidence/literal-rule-canonical-probe/receipt.json) caught and corrected the initial regex mismatch for decomposed `é東京`; four checks failed before the correction, all five pass afterward. This proves that Foundation boundary only.
+
+Fourteen registered Core tests use the pre-existing Codable/apply APIs with JSON fixtures, so the same source can run on the actual old implementation. They cover literal commas, terminal output, overlaps, crossing legacy matches, exact Unicode/dollars/backslashes, canonical matches, missing/invalid kinds, legacy encoding, edit-kind retention and omission from legacy maps. Full Core compilation and the pinned old/new comparison are still pending.
+
+At app integration, read unknown stored matching kinds as unsupported data. Never turn an explicit unknown value into comma alternatives. The throwing Light/Clarity snapshot should fail preparation; Custom must not execute an invalid rule as legacy. Approval conflicts, enabled-state invalidation, provenance and persistent-store upgrades remain separate acceptance work.

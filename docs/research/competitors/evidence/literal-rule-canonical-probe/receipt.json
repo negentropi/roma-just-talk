@@ -1,0 +1,82 @@
+{
+  "classification": "passed-matched-native-engine-probe",
+  "execution": {
+    "host": "local Mac",
+    "swift_command": [
+      "/usr/bin/swift",
+      "-"
+    ],
+    "per_child_timeout_seconds": 2,
+    "harness_exit_code": 0,
+    "both_swift_child_exit_codes": 0,
+    "captured_harness_wall_time_seconds": 0.53837875,
+    "timing_scope": "Tool-call wall time only; no benchmark or latency claim.",
+    "swift_version_observed_before_probe": "swift-driver version: 1.127.11.2 Apple Swift version 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4); Target: arm64-apple-macosx26.0",
+    "execution_timestamp": "Not retained.",
+    "stdin_source_files_created": false,
+    "cache_limit": "Swift interpreter may use its normal toolchain cache.",
+    "packaging_reran_swift": false
+  },
+  "source_path": "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift",
+  "source_revision_scope": "Hash-bound working-tree source; no immutable candidate commit existed at probe execution.",
+  "lanes": {
+    "known-bad": {
+      "full_source_sha256": "fbe661fa91ea1d3e573c764e1f03d611449329bccd7952d859be86181a6d4a66",
+      "engine_fragment": "known-bad-engine.swift",
+      "engine_fragment_sha256": "7325e447e55107bad9de1d37f11465c2d1ce2a8439fda5e5f97e42b96a029e93"
+    },
+    "candidate": {
+      "full_source_sha256": "5ed4974691a8ceeb85c63a4b2f8c8a1357ad223469d3705ce4baca677f2a270d",
+      "engine_fragment": "candidate-engine.swift",
+      "engine_fragment_sha256": "215a3df07dd12af0b9ba9c8b5c7eaad05be20dbe13f053fdedd9c337a368302b"
+    }
+  },
+  "known_bad_reconstruction": {
+    "method": "The retained harness reverses only the canonical-search change in memory, then asserts the previously observed full-file SHA-256 before its first Swift subprocess.",
+    "assertion_before_first_swift_exec": true,
+    "previous_full_file_sha256": "fbe661fa91ea1d3e573c764e1f03d611449329bccd7952d859be86181a6d4a66",
+    "retained_fragments_scope": "Engine fragments were packaged after execution from the same hash-checked reconstruction."
+  },
+  "identical_oracle": {
+    "file": "oracle.swift",
+    "sha256": "2bad2ccd6f3806ee04b8450d2d82d02080a6519fc136a380824667647cf2ab56",
+    "stdin_composition": "import Foundation followed by the lane engine fragment and this unchanged oracle."
+  },
+  "harness": {
+    "file": "probe.py",
+    "sha256": "7ed623e749b1bd5b02385b93a67ed8d564189ad5c2dce31766d2baff035c89e5",
+    "retention_scope": "Retained body of the completed Python stdin harness; not rerun during packaging."
+  },
+  "raw_result": {
+    "file": "raw-result.json",
+    "sha256": "e3ee4ea81adbd8a2fb5f53aa92e27bc7a68a3ecf7a65be6b99aed85af7a25268",
+    "capture_scope": "Actual completed harness stdout JSON. Per-child observations were parsed by that harness; original child stdout strings were not retained separately."
+  },
+  "observations": {
+    "candidate": {
+      "observed": {
+        "canonical": true,
+        "canonicalLongest": true,
+        "exactUTF16": true,
+        "exactUTF8": true,
+        "repeatOverlapControl": true
+      },
+      "source_sha256": "5ed4974691a8ceeb85c63a4b2f8c8a1357ad223469d3705ce4baca677f2a270d"
+    },
+    "known_bad": {
+      "observed": {
+        "canonical": false,
+        "canonicalLongest": false,
+        "exactUTF16": false,
+        "exactUTF8": false,
+        "repeatOverlapControl": true
+      },
+      "source_sha256": "fbe661fa91ea1d3e573c764e1f03d611449329bccd7952d859be86181a6d4a66"
+    }
+  },
+  "limits": [
+    "Actual Foundation engine behavior for canonical CJK-mixed matches, longest source spans, repeats, UTF-8/UTF-16 output, and the repeated Japanese overlap control only.",
+    "No model, provider, normal app, SwiftData, UI, iOS runtime, or full Core executable was run by this probe.",
+    "The separate full Core and 14-test baseline/candidate comparison remains pending."
+  ]
+}

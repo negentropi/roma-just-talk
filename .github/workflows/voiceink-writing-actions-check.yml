@@ -84,18 +84,25 @@ jobs:
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
       - name: Full Mac unit suite with fresh CI permissions
+        id: units
         run: |
           defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
           defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
           bash scripts/run-macos-ci-unit-tests.sh
 
       - name: Live TextEdit and Safari selection transactions
+        id: live
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
         run: bash scripts/run-writing-feature-regression.sh live
 
       - name: Matched snippet regression
+        id: regression
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
         run: bash scripts/run-writing-feature-regression.sh regression "$BASELINE_REF"
 
       - name: Snippet and translation settings UI
+        id: ui
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
         run: bash scripts/run-writing-feature-regression.sh ui
 
       - name: Preserve test evidence before the Release build

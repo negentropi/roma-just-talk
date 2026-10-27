@@ -30,11 +30,13 @@ extension VoiceInkTests {
     }
 }
 
-private struct DictationStoreSeedInputs {
+struct DictationStoreSeedInputs {
     enum Phase: String {
         case seed
         case oldReopen = "old-reopen"
         case currentRead = "current-read"
+        case metadataWrite = "metadata-write"
+        case metadataReopen = "metadata-reopen"
     }
 
     static var isEnabled: Bool {
@@ -109,7 +111,7 @@ private struct DictationStoreSeedInputs {
 
 @available(macOS 15, *)
 @MainActor
-private final class DictationStoreSeedFixture {
+final class DictationStoreSeedFixture {
     private struct StoreGroup {
         let name: String
         let fileName: String
@@ -125,7 +127,7 @@ private final class DictationStoreSeedFixture {
     private let schema: Schema
     private let configurations: [ModelConfiguration]
     private let container: ModelContainer
-    private let context: ModelContext
+    let context: ModelContext
 
     init(inputs: DictationStoreSeedInputs) throws {
         self.inputs = inputs
@@ -165,7 +167,7 @@ private final class DictationStoreSeedFixture {
         context.autosaveEnabled = false
     }
 
-    func run() throws {
+    func run(allowedAdditionalTranscriptionIDs: Set<UUID> = []) throws {
         if inputs.phase == .seed {
             try #require(context.fetchCount(FetchDescriptor<Transcription>()) == 0)
             try #require(context.fetchCount(FetchDescriptor<VocabularyWord>()) == 0)
@@ -174,7 +176,11 @@ private final class DictationStoreSeedFixture {
             insertRows()
             try context.save()
         }
-        let transcriptions = try context.fetch(FetchDescriptor<Transcription>()).sorted { $0.id.uuidString < $1.id.uuidString }
+        let allTranscriptions = try context.fetch(FetchDescriptor<Transcription>()).sorted { $0.id.uuidString < $1.id.uuidString }
+        let additionalTranscriptions = allTranscriptions.filter { allowedAdditionalTranscriptionIDs.contains($0.id) }
+        try #require(Set(additionalTranscriptions.map(\.id)) == allowedAdditionalTranscriptionIDs)
+        try #require(additionalTranscriptions.count == allowedAdditionalTranscriptionIDs.count)
+        let transcriptions = allTranscriptions.filter { !allowedAdditionalTranscriptionIDs.contains($0.id) }
         let vocabulary = try context.fetch(FetchDescriptor<VocabularyWord>()).sorted { Array($0.word.utf8).lexicographicallyPrecedes(Array($1.word.utf8)) }
         let replacements = try context.fetch(FetchDescriptor<WordReplacement>()).sorted { $0.id.uuidString < $1.id.uuidString }
         let metrics = try context.fetch(FetchDescriptor<SessionMetric>()).sorted { $0.id.uuidString < $1.id.uuidString }
@@ -331,7 +337,7 @@ private final class DictationStoreSeedFixture {
         ]
     }
 
-    private static func transcriptionSnapshot(_ row: Transcription) -> [String: Any] {
+    static func transcriptionSnapshot(_ row: Transcription) -> [String: Any] {
         ["id": row.id.uuidString, "text": string(row.text), "enhancedText": optionalString(row.enhancedText),
          "timestamp": row.timestamp.timeIntervalSince1970, "duration": row.duration, "audioFileURL": optionalString(row.audioFileURL),
          "transcriptionModelName": optionalString(row.transcriptionModelName), "aiEnhancementModelName": optionalString(row.aiEnhancementModelName),
@@ -354,7 +360,7 @@ private final class DictationStoreSeedFixture {
          "aiEnhancementModelName": optionalString(row.aiEnhancementModelName), "enhancementDuration": optional(row.enhancementDuration)]
     }
 
-    private static func persistentIdentity<T: PersistentModel>(_ row: T) throws -> [String: Any] {
+    static func persistentIdentity<T: PersistentModel>(_ row: T) throws -> [String: Any] {
         let identifier = row.persistentModelID
         let storeIdentifier = try #require(identifier.storeIdentifier)
         try #require(!storeIdentifier.isEmpty && identifier.entityName == Schema.entityName(for: T.self))
@@ -364,11 +370,11 @@ private final class DictationStoreSeedFixture {
                 "encodedBase64": try encoder.encode(identifier).base64EncodedString()]
     }
 
-    private static func string(_ value: String) -> [String: Any] {
+    static func string(_ value: String) -> [String: Any] {
         ["value": value, "utf8": Array(value.utf8), "utf16": Array(value.utf16)]
     }
 
-    private static func optionalString(_ value: String?) -> Any {
+    static func optionalString(_ value: String?) -> Any {
         value.map(string) as Any? ?? NSNull()
     }
 

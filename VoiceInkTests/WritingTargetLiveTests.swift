@@ -104,8 +104,9 @@ extension VoiceInkTests {
         let fixture = try LiveWritingStartupContextFixture()
         defer { fixture.restore() }
         do {
-            try await fixture.runCase(cancelWriting: true)
-            try await fixture.runCase(cancelWriting: false)
+            for scenario in LiveWritingStartupContextCase.allCases {
+                try await fixture.runCase(scenario)
+            }
             try fixture.saveEvidence(noSetupFailure: true)
         } catch {
             try? fixture.saveEvidence(noSetupFailure: false, error: String(describing: error))
@@ -349,6 +350,15 @@ private final class LiveWritingFixedTranscriptSession: TranscriptionSession {
     func cancel() { Issue.record("The fixed transcript session unexpectedly canceled.") }
 }
 
+private enum LiveWritingStartupContextCase: String, CaseIterable {
+    case canceledWriting = "canceled-writing"
+    case canceledOrdinary = "canceled-ordinary"
+    case activeOrdinary = "active-ordinary"
+
+    var usesWritingAction: Bool { self == .canceledWriting }
+    var cancelsBeforeLoadCompletion: Bool { self != .activeOrdinary }
+}
+
 @MainActor
 private final class LiveWritingStartupContextFixture {
     private let environmentFixture: LiveWritingPipelineFixture
@@ -389,8 +399,7 @@ private final class LiveWritingStartupContextFixture {
         VoiceInkLocalCLIPreference.saveCommandTemplate("/usr/bin/false")
     }
 
-    func runCase(cancelWriting: Bool) async throws {
-        let label = cancelWriting ? "canceled-writing" : "active-ordinary"
+    func runCase(_ scenario: LiveWritingStartupContextCase) async throws {
         let gate = LiveWritingStartupLoadGate()
         let whisper = LiveWritingGatedWhisperManager(modelsDirectory: directory, gate: gate)
         let model = ImportedWhisperModel(fileBaseName: "RJT-Context-\(UUID().uuidString)")
@@ -407,7 +416,7 @@ private final class LiveWritingStartupContextFixture {
         )
         engine.recordPermissionRequestForTesting = { true }
         enhancement.isOwnerRecording = { [weak engine] in engine?.recordingState == .recording }
-        let editor = cancelWriting ? try await LiveWritingEditor.open(.textEdit) : nil
+        let editor = scenario.usesWritingAction ? try await LiveWritingEditor.open(.textEdit) : nil
         defer { editor?.close() }
         let writing: WritingActionSession?
         if let editor {
@@ -430,25 +439,29 @@ private final class LiveWritingStartupContextFixture {
             audioURL = try #require(engine.recordedFile)
             let audioExists = audioURL.map { FileManager.default.fileExists(atPath: $0.path) } == true
             try #require(audioExists, "The actual recorder did not create its owned audio file.")
-            if cancelWriting { await engine.cancelRecording() }
-            let detachedAfterCancellation = cancelWriting && engine.recordingStartupTask == nil
+            if scenario.cancelsBeforeLoadCompletion { await engine.cancelRecording() }
+            let detachedAfterCancellation = scenario.cancelsBeforeLoadCompletion && engine.recordingStartupTask == nil
             gate.release()
             await task.value
             let wasRecordingAtCompletion = engine.recordingState == .recording
-            if !cancelWriting { await engine.cancelRecording() }
+            if !scenario.cancelsBeforeLoadCompletion { await engine.cancelRecording() }
             let ownerEnded = engine.recordingState == .idle && engine.writingActionKind == nil
             #expect(ownerEnded)
-            if cancelWriting {
+            switch scenario {
+            case .canceledWriting:
                 #expect(enhancement.clipboardReads == 0, "Canceled writing startup must not capture clipboard context")
                 #expect(enhancement.screenReads == 0, "Canceled writing startup must not capture screen context")
-            } else {
+            case .canceledOrdinary:
+                #expect(enhancement.clipboardReads == 0, "Canceled ordinary startup must not capture clipboard context")
+                #expect(enhancement.screenReads == 0, "Canceled ordinary startup must not capture screen context")
+            case .activeOrdinary:
                 #expect(wasRecordingAtCompletion)
                 #expect(enhancement.clipboardReads == 1, "Active ordinary startup must capture clipboard context")
                 #expect(enhancement.screenReads == 1, "Active ordinary startup must capture screen context")
                 let onlyActiveOwnerReads = enhancement.captureStates.allSatisfy { $0 }
                 #expect(onlyActiveOwnerReads)
             }
-            cases[label] = [
+            cases[scenario.rawValue] = [
                 "gateEntered": gateEntered, "taskCompleted": true, "ownerEnded": ownerEnded,
                 "recordingCanceled": ownerEnded, "clipboardReads": enhancement.clipboardReads,
                 "screenReads": enhancement.screenReads, "modelLoadCalls": whisper.loadCalls,
@@ -482,7 +495,7 @@ private final class LiveWritingStartupContextFixture {
         try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
         let receipt: [String: Any] = [
             "checkpoint": "startup-context-ownership", "test": "liveWritingStartupContextRespectsOwnerAfterCancellation",
-            "version": 1, "cases": cases, "noSetupFailure": noSetupFailure,
+            "version": 2, "cases": cases, "noSetupFailure": noSetupFailure,
             "error": error as Any? ?? NSNull(), "bundleIdentifier": Bundle.main.bundleIdentifier as Any? ?? NSNull(),
             "executablePath": Bundle.main.executableURL?.path as Any? ?? NSNull(),
             "processIdentifier": ProcessInfo.processInfo.processIdentifier,

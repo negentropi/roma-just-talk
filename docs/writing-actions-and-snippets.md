@@ -4,7 +4,7 @@ These features belong to the existing VoiceInk-based Mac app. They use your conf
 
 ## Set up Writing Actions
 
-1. Open **AI Enhancement** and configure an AI provider.
+1. Open **style** and configure an AI provider.
 2. Under **Writing Actions**, assign shortcuts for **Translate dictation**, **Edit selected text**, or **Draft from instructions**.
 3. Under **Translation Target**, add the languages you use. Select a target and use the arrow controls to reorder favorites.
 
@@ -31,7 +31,7 @@ Native editors use selected-text Accessibility writes. Browser fields use the ca
 
 Browser delivery temporarily uses the clipboard; clipboard contents are not included in the AI request. After confirmed replacement, restoration follows your existing clipboard setting and preserves newer copies. If delivery cannot be confirmed, generated text remains on the clipboard and in History so a delayed paste cannot consume restored, unrelated content. Check the field before trying again.
 
-If generation fails or the destination changes, the instruction is not inserted. Open **History** to recover the recording, transcript, and any generated result. Canceling prevents delivery. Explicit writing actions do not use snippets, ordinary cleanup prompts, screen or clipboard context, or automatic Send.
+If generation fails or the destination changes, the instruction is not inserted. Open **past** (History) to recover the recording, transcript, and any generated result. Canceling prevents delivery. Explicit writing actions do not use snippets, ordinary cleanup prompts, screen or clipboard context, or automatic Send.
 
 ## Save and use a snippet
 

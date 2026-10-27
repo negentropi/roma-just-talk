@@ -35,6 +35,10 @@ paster_path = 'VoiceInk/Paste/CursorPaster.swift'
 oracle_path = 'VoiceInkTests/ClipboardRestorationLeaseTests.swift'
 driver_path = 'scripts/run-clipboard-lease-regression.sh'
 workflow_path = '.github/workflows/voiceink-clipboard-lease-check.yml'
+test_host_verifier_path = 'scripts/verify-adhoc-macos-test-host.sh'
+test_host_verifier_tests_path = 'scripts/tests/verify-adhoc-macos-test-host.test.sh'
+test_host_verifier_sha = '06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5'
+test_host_verifier_tests_sha = '3b74b785210bd5452f8f11247897c44f340d9b26fa1aa5efb52cfad8e7826855'
 lock_path = 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
 lock_sha = 'bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f'
 baseline_paster_sha = 'c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0'
@@ -52,7 +56,8 @@ package_checkouts = derived / 'SourcePackages'
 app = derived / 'Build/Products/Debug/roma just talk.app'
 executable = app / 'Contents/MacOS/roma just talk'
 roots = ['VoiceInk', 'VoiceInkCore', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj', 'iOS',
-    'VoiceInkTests', driver_path, workflow_path, 'Makefile', 'LocalBuild.xcconfig',
+    'VoiceInkTests', driver_path, workflow_path, test_host_verifier_path, test_host_verifier_tests_path,
+    'Makefile', 'LocalBuild.xcconfig',
     'scripts/run-writing-feature-regression.sh', 'scripts/verify-static-whisper-xcframework.sh',
     'scripts/verify-static-whisper-app.sh', 'scripts/verify-adhoc-library-validation.sh']
 
@@ -97,6 +102,8 @@ def verify_source():
     require(source_manifest() == json.loads((output / 'source-before.json').read_text()), 'Source inputs changed')
     require(digest((repo / lock_path).read_bytes()) == lock_sha, 'Canonical package lock changed')
     require(digest((repo / oracle_path).read_bytes()) == value['oracle_sha256'], 'Native oracle changed')
+    require(digest((repo / test_host_verifier_path).read_bytes()) == test_host_verifier_sha, 'Exact Debug test-host verifier changed')
+    require(digest((repo / test_host_verifier_tests_path).read_bytes()) == test_host_verifier_tests_sha, 'Exact Debug verifier tests changed')
 
 
 def run(command, log, *, timeout=3600, allow_failure=False, stderr_log=None):
@@ -200,6 +207,7 @@ def build_arguments():
         '-disableAutomaticPackageResolution', '-onlyUsePackageVersionsFromResolvedFile', '-skipPackageUpdates',
         'CODE_SIGN_IDENTITY=-', 'CODE_SIGNING_REQUIRED=NO', 'CODE_SIGNING_ALLOWED=YES', 'DEVELOPMENT_TEAM=',
         'CODE_SIGN_ENTITLEMENTS=' + str(repo / 'VoiceInk/VoiceInk.local.entitlements'),
+        'ENABLE_DEBUG_DYLIB=NO', 'ENABLE_PREVIEWS=NO', 'ENABLE_HARDENED_RUNTIME=YES',
         'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD']
 
 
@@ -473,13 +481,16 @@ try:
             require(len(re.findall(r'func\s+' + name + r'\(', oracle.decode())) == 1, 'Native method missing or duplicated')
         source = output / 'source'
         source.mkdir()
-        for path in [paster_path, oracle_path, driver_path, workflow_path, lock_path, 'VoiceInk/Services/KeychainService.swift']:
+        for path in [paster_path, oracle_path, driver_path, workflow_path, lock_path,
+                     test_host_verifier_path, test_host_verifier_tests_path, 'VoiceInk/Services/KeychainService.swift']:
             destination = source / path
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes((repo / path).read_bytes())
         write_json(output / 'source-before.json', source_manifest())
         write_json(output / 'contract.json', {'source_sha': source_sha, 'lane': lane, 'paster_sha256': paster_sha,
             'known_bad_paster_sha256': baseline_paster_sha, 'oracle_sha256': digest(oracle),
+            'test_host_verifier_sha256': test_host_verifier_sha,
+            'test_host_verifier_tests_sha256': test_host_verifier_tests_sha,
             'canonical_lock_sha256': lock_sha, 'failure_sites': sites, 'cases': cases,
             'scope': scope, 'acceptance': 'known-bad reproduction only' if lane == 'baseline' else 'candidate boundary; matched oracle identity must also be verified against retained old run'})
         write_json(output / 'toolchain-before.json', {name: subprocess.check_output(command, text=True).strip() for name, command in {
@@ -498,18 +509,24 @@ try:
         settings = json.loads((output / 'build-settings.json').read_text())
         host = [value['buildSettings'] for value in settings if value.get('target') == 'VoiceInk']
         require(len(host) == 1 and 'LOCAL_BUILD' in host[0].get('SWIFT_ACTIVE_COMPILATION_CONDITIONS', '').split(), 'Actual app settings omit LOCAL_BUILD credential isolation')
+        signing_settings = {key: host[0].get(key) for key in ['ENABLE_DEBUG_DYLIB', 'ENABLE_PREVIEWS', 'ENABLE_HARDENED_RUNTIME']}
+        require(signing_settings == {'ENABLE_DEBUG_DYLIB': 'NO', 'ENABLE_PREVIEWS': 'NO', 'ENABLE_HARDENED_RUNTIME': 'YES'},
+            'Actual Debug build settings differ from the captured test-host configuration')
+        write_json(output / 'resolved-test-host-settings.json', signing_settings)
         run(['xcodebuild', 'build-for-testing', *arguments, '-only-testing:VoiceInkTests'], output / 'build.log')
         build_log = (output / 'build.log').read_text(errors='replace')
         require(re.search(r'(?:SwiftCompile|CompileSwiftSources)[^\n]*CursorPaster\.swift', build_log) is not None, 'Native build did not record actual CursorPaster compilation')
         require(re.search(r'(?:SwiftCompile|CompileSwiftSources)[^\n]*ClipboardRestorationLeaseTests\.swift', build_log) is not None, 'Native build did not record oracle compilation')
         verify_source()
         require(package_identity() == packages and static_identity() == whisper, 'Dependency sources changed during build')
-        identity()
+        built_identity = identity()
+        write_json(output / 'build-identity.json', built_identity)
         run(['bash', 'scripts/verify-static-whisper-app.sh', str(app)], output / 'static-app.log')
-        run(['bash', 'scripts/verify-adhoc-library-validation.sh', str(app)], output / 'signing.log')
+        run(['bash', str(repo / test_host_verifier_path), str(app), str(output / 'test-host-signature')], output / 'signing.log')
+        require(identity() == built_identity, 'Read-only Debug signature verification changed the built host')
         provision_startup_microphone()
         isolated_configuration()
-        write_json(output / 'build-identity.json', identity())
+        require(identity() == built_identity, 'Native launch preparation changed the frozen host')
     elif mode == 'run':
         verify_source()
         require(identity() == json.loads((output / 'build-identity.json').read_text()), 'Prepared app identity changed')

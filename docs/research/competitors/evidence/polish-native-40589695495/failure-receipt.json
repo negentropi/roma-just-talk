@@ -1,0 +1,22 @@
+{
+  "classification": "pre-native-app-unit-compile-failure",
+  "run_id": 40589695495,
+  "source_sha": "30feb011086c5f123aa80360df1117d4b0936089",
+  "build_exit": 65,
+  "actual_selected_native_tests_executed": 0,
+  "actual_whisper_inferences": 0,
+  "actual_textedit_scenarios": 0,
+  "diagnosis": "Pinned fixture references nonexistent AudioFileTranscriptionService; actual class is AudioTranscriptionService. The exact compiler diagnostic is retained by the single-fetch owner of same-fixture run40591803544. This run failed before native execution; its short failed-step log does not contain the compiler diagnostic.",
+  "fixture_source_sha256": "a1ec31a313e35393e4bd1a9142db7fcbf05abf09cc37494577e03a6cd5043151",
+  "wrong_constructor_occurrences": 1,
+  "failed_log_sha256": "28c12b8bac582f97eb074a57c34d44c7bf5f03efea3f44d1c6c848991a76e478",
+  "artifact_downloads_by_this_owner": 0,
+  "limits": [
+    "No native acceptance, model inference, editor delivery or new signing-helper acceptance.",
+    "Source-bound duplicate compile diagnosis from another actual build; this run raw full build artifact not downloaded."
+  ],
+  "diagnostic_evidence": "../clipboard-lease-40591803544/compiler-error-context.txt",
+  "diagnostic_raw_log_identity": "../clipboard-lease-40591803544/raw-build-log-identity.json",
+  "same_fixture_bytes_verified_against_other_run": "bf470b86",
+  "same_fixture_bytes_equal": true
+}

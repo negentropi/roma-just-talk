@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "error": "Command failed with exit 1; inspect /Users/runner/work/_temp/recording-finalizer-proof/baseline/signing.log",
+  "phase": "baseline"
+}

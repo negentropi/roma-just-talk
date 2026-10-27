@@ -52,7 +52,7 @@ derived = repo / '.local-build'
 package_checkouts = derived / 'SourcePackages'
 roots = ['VoiceInk', 'VoiceInkCore', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj', 'VoiceInkTests', 'iOS',
     driver_path, workflow_path, wave_path, 'Makefile', 'LocalBuild.xcconfig', 'scripts/run-writing-feature-regression.sh',
-    'scripts/verify-static-whisper-xcframework.sh', 'scripts/verify-static-whisper-app.sh', 'scripts/verify-adhoc-library-validation.sh']
+    'scripts/verify-static-whisper-xcframework.sh', 'scripts/verify-static-whisper-app.sh', 'scripts/verify-adhoc-macos-test-host.sh']
 
 
 def require(condition, message):
@@ -171,6 +171,7 @@ def build_arguments():
         '-disableAutomaticPackageResolution', '-onlyUsePackageVersionsFromResolvedFile', '-skipPackageUpdates',
         'CODE_SIGN_IDENTITY=-', 'CODE_SIGNING_REQUIRED=NO', 'CODE_SIGNING_ALLOWED=YES', 'DEVELOPMENT_TEAM=',
         'CODE_SIGN_ENTITLEMENTS=' + str(repo / 'VoiceInk/VoiceInk.local.entitlements'),
+        'ENABLE_DEBUG_DYLIB=NO', 'ENABLE_PREVIEWS=NO', 'ENABLE_HARDENED_RUNTIME=YES',
         'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD']
 
 
@@ -548,12 +549,17 @@ try:
         settings = json.loads((output / 'build-settings.json').read_text())
         host_settings = [value['buildSettings'] for value in settings if value.get('target') == 'VoiceInk']
         require(len(host_settings) == 1 and 'LOCAL_BUILD' in host_settings[0].get('SWIFT_ACTIVE_COMPILATION_CONDITIONS', '').split(), 'Actual host build lacks LOCAL_BUILD credential isolation')
+        expected = {'ENABLE_DEBUG_DYLIB': 'NO', 'ENABLE_PREVIEWS': 'NO', 'ENABLE_HARDENED_RUNTIME': 'YES'}
+        actual = {key: host_settings[0].get(key) for key in expected}
+        require(actual == expected, 'Resolved native app build settings differ from the frozen request')
+        write_json(output / 'resolved-test-host-settings.json', {'target': 'VoiceInk', 'requested': expected, 'resolved': actual,
+            'limits': 'Build settings only; actual ad-hoc CodeDirectory flags are retained and verified separately. No Hardened Runtime signature claim.'})
         run(['xcodebuild', 'build-for-testing', *arguments, '-only-testing:VoiceInkTests'], output / 'build.log')
         verify_source()
         require(package_identity() == packages and static_identity() == whisper, 'Dependency bytes changed during build')
         host = identity()
         run(['bash', 'scripts/verify-static-whisper-app.sh', host['app_path']], output / 'static-app.log')
-        run(['bash', 'scripts/verify-adhoc-library-validation.sh', host['app_path']], output / 'signing.log')
+        run(['bash', str(repo / 'scripts/verify-adhoc-macos-test-host.sh'), host['app_path'], str(output / 'test-host-signature')], output / 'signing.log')
         inputs = output / 'inputs'
         inputs.mkdir()
         (inputs / 'input.wav').write_bytes((repo / wave_path).read_bytes())

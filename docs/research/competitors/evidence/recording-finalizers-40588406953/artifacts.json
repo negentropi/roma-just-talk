@@ -1,0 +1,18 @@
+{
+  "artifacts": [
+    {
+      "compressed_bytes": 303129,
+      "downloaded_once": true,
+      "id": 12775055825,
+      "name": "roma.recording-finalizer-observations"
+    },
+    {
+      "compressed_bytes": 499126,
+      "downloaded_once": true,
+      "id": 12774248074,
+      "name": "roma.recording-finalizer-native-evidence"
+    }
+  ],
+  "reason_native_log_artifact_needed": "Exact signing and build settings/logs after pre-test failure; no large app/DerivedData archive was downloaded.",
+  "run_id": 40588406953
+}

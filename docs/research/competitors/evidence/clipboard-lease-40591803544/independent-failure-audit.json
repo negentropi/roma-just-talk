@@ -1,0 +1,48 @@
+{
+  "classification": "invalid-pretest-test-fixture-compilation",
+  "runID": 40591803544,
+  "sourceSHA": "bf470b863f8b543b765b3bc73c5f881fe644f848",
+  "testsExecuted": 0,
+  "nativeSelectionExecuted": false,
+  "knownBadClipboardReproduced": false,
+  "actualCompilerErrors": [
+    {
+      "path": "VoiceInkTests/DictationProfileImportLiveTests.swift",
+      "line": 559,
+      "column": 27,
+      "message": "cannot find 'AudioFileTranscriptionService' in scope",
+      "actualType": "AudioTranscriptionService",
+      "owningFile": "VoiceInk/Services/AudioFileTranscriptionService.swift"
+    }
+  ],
+  "stdioFramingFixedActualXcodebuild": true,
+  "actualBuildSettings": {
+    "ENABLE_HARDENED_RUNTIME": "YES",
+    "LOCAL_BUILD": true
+  },
+  "signatureCheckReached": false,
+  "artifacts": [
+    {
+      "id": 12774128061,
+      "bytes": 73508,
+      "sha256": "62ccbb4f1f5de2dd1399fcbc0ec3515fdfc3f38c6079a43088d63a825aed5e18",
+      "members": 16,
+      "CRCValid": true,
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40591803544/evidence.zip"
+    },
+    {
+      "id": 12774203065,
+      "bytes": 245366,
+      "sha256": "3db55dfef281c03d957cb95b38899bf49bce36d7f9fbbd118d16ebb2ab914911",
+      "members": 5,
+      "CRCValid": true,
+      "downloadedOnce": "/data/rjt-writing-check-01a17bef/40591803544/app-artifact.zip"
+    }
+  ],
+  "failedLogFetchedOnce": true,
+  "limits": [
+    "App unit bundle failed compilation before exact native enumeration or runtime.",
+    "No clipboard behavior, old-red proof or candidate fix accepted.",
+    "Hardened Runtime was enabled in actual build settings; its signed-code result was not reached."
+  ]
+}

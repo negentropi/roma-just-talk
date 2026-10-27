@@ -23,6 +23,7 @@ import re
 import signal
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 repo, output = map(Path, sys.argv[1:3])
@@ -36,7 +37,7 @@ lock_path = "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package
 lock_sha = "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
 candidate_engine_sha = "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c"
 baseline_engine_sha = "4f9723565f85e6ae9ea7b7ae1ebb6b539626f95533d0fb44cc4cd8120c545a0f"
-oracle_sha = "9633072b341513c0a3f92c8ad9fe1618407490f272e433d4f2075e6c544bb51b"
+oracle_sha = "e1fcf3544f12aeb2c1ec461e5f26bb4c74d5a274e4c22878b91dcd801a3f98c4"
 baseline = output.parent / "recording-finalizer-baseline"
 package_checkouts = repo / ".local-build/SourcePackages"
 bundle_id = "com.negentropi.RomaJustTalk"
@@ -47,7 +48,7 @@ cases = [
 expressions = ["fixture.enhancement.capturedContextMarker == context", "fixture.enhancement.clearContextCalls == clears"]
 helper_paths = [driver_path, workflow_path, fixture_path, "scripts/run-writing-feature-regression.sh",
     "scripts/verify-static-whisper-xcframework.sh", "scripts/verify-static-whisper-app.sh",
-    "scripts/verify-adhoc-library-validation.sh", "Makefile", "LocalBuild.xcconfig",
+    "scripts/verify-adhoc-macos-test-host.sh", "scripts/tests/verify-adhoc-macos-test-host.test.sh", "Makefile", "LocalBuild.xcconfig",
     "VoiceInk/Services/KeychainService.swift"]
 
 
@@ -201,6 +202,8 @@ def build_arguments(lane):
         "-xcconfig", str(checkout / "LocalBuild.xcconfig"), "-clonedSourcePackagesDirPath", str(package_checkouts),
         "-disableAutomaticPackageResolution", "-onlyUsePackageVersionsFromResolvedFile", "-skipPackageUpdates",
         "CODE_SIGN_IDENTITY=-", "CODE_SIGNING_REQUIRED=NO", "CODE_SIGNING_ALLOWED=YES", "DEVELOPMENT_TEAM=",
+        "ENABLE_HARDENED_RUNTIME=YES",
+        "ENABLE_DEBUG_DYLIB=NO", "ENABLE_PREVIEWS=NO",
         "CODE_SIGN_ENTITLEMENTS=" + str(checkout / "VoiceInk/VoiceInk.local.entitlements"),
         "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD"]
     return checkout, derived, arguments
@@ -323,13 +326,16 @@ def execute_lane(lane):
     host_settings = [value["buildSettings"] for value in settings if value.get("target") == "VoiceInk"]
     require(len(host_settings) == 1 and "LOCAL_BUILD" in host_settings[0].get("SWIFT_ACTIVE_COMPILATION_CONDITIONS", "").split(),
         "The actual app build settings do not enable LOCAL_BUILD credential isolation")
+    require(all(host_settings[0].get(key) == "NO" for key in ["ENABLE_DEBUG_DYLIB", "ENABLE_PREVIEWS"]),
+        "Actual debug-dylib/preview settings differ from the matched test-host configuration")
     run(["xcodebuild", "build-for-testing", *arguments, "-only-testing:VoiceInkTests"], directory / "build.log", checkout)
     require(re.search(r"(?:SwiftCompile|CompileSwiftSources)[^\n]*VoiceInkEngine\.swift", (directory / "build.log").read_text(errors="replace")) is not None, "Native build did not record Engine compilation")
     verify_sources(lane)
     require(package_identity() == packages and static_identity() == whisper, "Dependency source or static Whisper bytes changed during build")
     host = identity(derived)
     run(["bash", "scripts/verify-static-whisper-app.sh", host["app_path"]], directory / "static-app.log", checkout)
-    run(["bash", "scripts/verify-adhoc-library-validation.sh", host["app_path"]], directory / "signing.log", checkout)
+    run(["bash", str(repo / "scripts/verify-adhoc-macos-test-host.sh"), host["app_path"], str(directory / "test-host-signature")],
+        directory / "signing.log", checkout)
     provision(directory, host)
     configuration = isolated_configuration(directory, derived)
     config_sha = digest(configuration.read_bytes())
@@ -372,7 +378,7 @@ def restore_baseline():
 
 
 def self_test():
-    source = (repo / oracle_path).read_text()
+    source = git(repo, "show", "HEAD:" + oracle_path).decode()
     require(digest(source.encode()) == oracle_sha, "Pinned common oracle changed")
     sites = failure_sites(source)
     def log(lane):
@@ -399,8 +405,16 @@ def self_test():
         (bad + "Test host crashed\n", 65, "baseline"), (bad + "error: compile failed\n", 65, "baseline"),
         (bad.replace("2 tests", "3 tests"), 65, "baseline"), (bad.replace("2 suites", "0 suites"), 65, "baseline")]
     require(all(not classify(text, code, lane, sites)["valid"] for text, code, lane in invalid), "Invalid native result accepted")
-    require(digest((repo / engine_path).read_bytes()) == candidate_engine_sha, "Pinned candidate Engine changed")
-    subprocess.run(["git", "apply", "--check", str(repo / fixture_path)], cwd=repo, check=True)
+    committed_engine = git(repo, "show", "HEAD:" + engine_path)
+    require(digest(committed_engine) == candidate_engine_sha, "Pinned committed candidate Engine changed")
+    with tempfile.TemporaryDirectory(prefix="rjt-finalizer-fixture-") as temporary:
+        checkout = Path(temporary)
+        engine = checkout / engine_path
+        engine.parent.mkdir(parents=True)
+        engine.write_bytes(committed_engine)
+        subprocess.run(["git", "apply", "--check", str(repo / fixture_path)], cwd=checkout, check=True)
+        subprocess.run(["git", "apply", str(repo / fixture_path)], cwd=checkout, check=True)
+        require(digest(engine.read_bytes()) == baseline_engine_sha, "Guard fixture does not reproduce the pinned known-bad Engine")
     print(json.dumps({"classification": "offline-classifier-passed", "valid_cases": 2, "invalid_cases": len(invalid), "source_bound_assertions": len(sites),
         "scope": "Classifier/source fixture only; no native build or test execution"}))
 
@@ -434,7 +448,8 @@ try:
         require(changed == [engine_path], "Known-bad fixture changed source outside the Engine guards")
         for lane, checkout in [("candidate", repo), ("baseline", baseline)]:
             (output / ("source/" + lane + "-engine.swift")).write_bytes((checkout / engine_path).read_bytes())
-        for source_path in [oracle_path, fixture_path, driver_path, workflow_path]:
+        for source_path in [oracle_path, fixture_path, driver_path, workflow_path,
+            "scripts/verify-adhoc-macos-test-host.sh", "scripts/tests/verify-adhoc-macos-test-host.test.sh"]:
             (output / "source" / Path(source_path).name).write_bytes((repo / source_path).read_bytes())
         write_json(output / "candidate-source.json", candidate_manifest)
         write_json(output / "baseline-source.json", baseline_manifest)

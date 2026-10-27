@@ -1,0 +1,15 @@
+{
+  "classification": "source-only-oracle-bridge",
+  "new_committed_source_sha": "46dd2a13e719cb61e2a2bbf83aa24e7d15a4bf7e",
+  "new_oracle_native_execution": false,
+  "new_oracle_sha256": "e1fcf3544f12aeb2c1ec461e5f26bb4c74d5a274e4c22878b91dcd801a3f98c4",
+  "only_change": "Unselected heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun assertion: optional .none to explicit VoiceInkDictationProfile.none",
+  "previous_oracle_sha256": "9633072b341513c0a3f92c8ad9fe1618407490f272e433d4f2075e6c544bb51b",
+  "previous_run_id": 40588406953,
+  "previous_run_source_sha": "650fab297aa0fcc7f3c9a6549583034b32942850",
+  "selected_method_bodies_identical": true,
+  "selected_method_sha256": {
+    "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": "d03da25eebd7ce1ba1b4174c95bae012a72a605615465bad14642c7f487e247a",
+    "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": "cc4557417fba847515b82ba65293882310eec56fa99e532cf1880e547d50571f"
+  }
+}

@@ -556,7 +556,7 @@ private final class DictationPolishWhisperFixture {
         var warningSawSavedRecord = false
         let record: Transcription
         if retranscribing {
-            let service = AudioFileTranscriptionService(modelContext: context, serviceRegistry: registry,
+            let service = AudioTranscriptionService(modelContext: context, serviceRegistry: registry,
                 enhancementService: environment.enhancement)
             record = try await service.retranscribeAudio(from: audio, using: ImportedWhisperModel(fileBaseName: "base"))
         } else {

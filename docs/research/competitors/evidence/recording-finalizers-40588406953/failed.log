@@ -1,0 +1,44 @@
+regression	Require exact known-bad context ownership failures	﻿2026-10-27T21:50:42.5572910Z ##[group]Run bash scripts/run-recording-finalizer-regression.sh baseline
+regression	Require exact known-bad context ownership failures	2026-10-27T21:50:42.5573390Z ^[[36;1mbash scripts/run-recording-finalizer-regression.sh baseline^[[0m
+regression	Require exact known-bad context ownership failures	2026-10-27T21:50:42.6818370Z shell: /bin/bash -e {0}
+regression	Require exact known-bad context ownership failures	2026-10-27T21:50:42.6818600Z ##[endgroup]
+regression	Require exact known-bad context ownership failures	2026-10-27T21:50:46.3933900Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/build-settings.json
+regression	Require exact known-bad context ownership failures	2026-10-27T21:51:16.2698360Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/build.log
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:18.1365650Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/static-app.log
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:23.6531310Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/baseline/signing.log
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:23.6816740Z ad-hoc app is missing Hardened Runtime: /Users/runner/work/_temp/recording-finalizer-derived-baseline/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:24.0280860Z Traceback (most recent call last):
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:24.0285480Z   File "<stdin>", line 437, in <module>
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:24.0285890Z   File "<stdin>", line 316, in execute_lane
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:24.0286190Z   File "<stdin>", line 98, in run
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:24.0286760Z RuntimeError: Command failed with exit 1; inspect /Users/runner/work/_temp/recording-finalizer-proof/baseline/signing.log
+regression	Require exact known-bad context ownership failures	2026-10-27T21:57:24.0605060Z ##[error]Process completed with exit code 1.
+regression	Require both candidate native regressions to pass	﻿2026-10-27T21:57:24.0979290Z ##[group]Run bash scripts/run-recording-finalizer-regression.sh candidate
+regression	Require both candidate native regressions to pass	2026-10-27T21:57:24.0979850Z ^[[36;1mbash scripts/run-recording-finalizer-regression.sh candidate^[[0m
+regression	Require both candidate native regressions to pass	2026-10-27T21:57:24.2179910Z shell: /bin/bash -e {0}
+regression	Require both candidate native regressions to pass	2026-10-27T21:57:24.2180130Z ##[endgroup]
+regression	Require both candidate native regressions to pass	2026-10-27T21:57:28.0911070Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/build-settings.json
+regression	Require both candidate native regressions to pass	2026-10-27T21:57:56.9129300Z Running xcodebuild; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/build.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:54.3295650Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/static-app.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.2959350Z Running bash; log /Users/runner/work/_temp/recording-finalizer-proof/candidate/signing.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.3226110Z ad-hoc app is missing Hardened Runtime: /Users/runner/work/_temp/recording-finalizer-derived-candidate/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.3515130Z Traceback (most recent call last):
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.3519310Z   File "<stdin>", line 437, in <module>
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.3520210Z   File "<stdin>", line 316, in execute_lane
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.3520720Z   File "<stdin>", line 98, in run
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.3521810Z RuntimeError: Command failed with exit 1; inspect /Users/runner/work/_temp/recording-finalizer-proof/candidate/signing.log
+regression	Require both candidate native regressions to pass	2026-10-27T22:03:57.3697760Z ##[error]Process completed with exit code 1.
+regression	Require the matched native red and green result	﻿2026-10-27T22:03:57.4101040Z ##[group]Run bash scripts/run-recording-finalizer-regression.sh verify
+regression	Require the matched native red and green result	2026-10-27T22:03:57.4101760Z ^[[36;1mbash scripts/run-recording-finalizer-regression.sh verify^[[0m
+regression	Require the matched native red and green result	2026-10-27T22:03:57.5333120Z shell: /bin/bash -e {0}
+regression	Require the matched native red and green result	2026-10-27T22:03:57.5333380Z ##[endgroup]
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2918360Z Traceback (most recent call last):
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2922420Z   File "<stdin>", line 449, in <module>
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2923000Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 986, in read_text
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2924000Z     with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2924620Z          ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2925310Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 970, in open
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2926000Z     return io.open(self, mode, buffering, encoding, errors, newline)
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2927140Z            ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2927830Z FileNotFoundError: [Errno 2] No such file or directory: '/Users/runner/work/_temp/recording-finalizer-proof/baseline/exit.json'
+regression	Require the matched native red and green result	2026-10-27T22:03:59.2994670Z ##[error]Process completed with exit code 1.

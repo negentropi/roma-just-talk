@@ -53,7 +53,9 @@ jobs:
           xcrun metal --version
 
       - name: Verify strict verdict classifier
-        run: bash scripts/run-clipboard-lease-regression.sh self-test
+        run: |
+          bash scripts/run-clipboard-lease-regression.sh self-test
+          bash scripts/tests/verify-adhoc-macos-test-host.test.sh
 
       - uses: actions/cache/restore@v4
         id: deps-cache
@@ -99,8 +101,10 @@ jobs:
             ${{ runner.temp }}/clipboard-lease-proof/source/**
             ${{ runner.temp }}/clipboard-lease-proof/observations/**
             ${{ runner.temp }}/clipboard-lease-proof/selection/**
+            ${{ runner.temp }}/clipboard-lease-proof/test-host-signature/**
             ${{ runner.temp }}/clipboard-lease-proof/packages/*.json
             ${{ runner.temp }}/clipboard-lease-proof/packages/*.resolved
+          include-hidden-files: true
           if-no-files-found: error
 
       - name: Upload native logs and exact launch configuration

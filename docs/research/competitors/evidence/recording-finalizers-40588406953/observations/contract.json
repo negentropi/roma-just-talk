@@ -1,0 +1,48 @@
+{
+  "baseline_engine_sha256": "4f9723565f85e6ae9ea7b7ae1ebb6b539626f95533d0fb44cc4cd8120c545a0f",
+  "candidate_engine_sha256": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "changed_paths": [
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
+  ],
+  "expected_baseline_assertions": {
+    "433": {
+      "expression": "fixture.enhancement.capturedContextMarker == context",
+      "test": "heldCancellationCannotClearContextCapturedByANewerAcceptedRun"
+    },
+    "434": {
+      "expression": "fixture.enhancement.clearContextCalls == clears",
+      "test": "heldCancellationCannotClearContextCapturedByANewerAcceptedRun"
+    },
+    "469": {
+      "expression": "fixture.enhancement.capturedContextMarker == context",
+      "test": "resetCleanupCannotClearContextCapturedByANewerAcceptedRun"
+    },
+    "470": {
+      "expression": "fixture.enhancement.clearContextCalls == clears",
+      "test": "resetCleanupCannotClearContextCapturedByANewerAcceptedRun"
+    }
+  },
+  "fixture_sha256": "69b305908f75d26af44697cc6a0023f75725ffe780bacc2c094c0a06d91d2233",
+  "helper_sha256": {
+    ".github/workflows/voiceink-recording-finalizer-check.yml": "439fe3fe9fe907d964c924a9460ccd5094a403fd3dbc368a92ab2713833c9b2f",
+    "LocalBuild.xcconfig": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844",
+    "Makefile": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9",
+    "VoiceInk/Services/KeychainService.swift": "78ede0cfc66704712ec972a002c6369fc19aa4620a3d1eb4aad4d845b61b5301",
+    "scripts/fixtures/recording-finalizers-before-guard.patch": "69b305908f75d26af44697cc6a0023f75725ffe780bacc2c094c0a06d91d2233",
+    "scripts/run-recording-finalizer-regression.sh": "e12ec9adce61d0dac2b6d4de7d908a398b16e2fc8c1f5f73bbc7c13e35f4ea90",
+    "scripts/run-writing-feature-regression.sh": "2645cea671fa8a613437e1c53aef70d9c75ea859abf1d1016a7ed536feb4c42f",
+    "scripts/verify-adhoc-library-validation.sh": "642d8dfc9fdd7d3494898829e29cfb01c4560653103b272c9b02eba117eb13b1",
+    "scripts/verify-static-whisper-app.sh": "e40475d402148fbde4327619c94ad046de1fb4ff18a3f04228a35534d64e2ad8",
+    "scripts/verify-static-whisper-xcframework.sh": "325bb8ec708dab070d6639a5efdc40f462ddc2f052c1c38c94737ca744277327"
+  },
+  "oracle_path": "VoiceInkTests/DictationPolishPipelineTests.swift",
+  "oracle_sha256": "9633072b341513c0a3f92c8ad9fe1618407490f272e433d4f2075e6c544bb51b",
+  "scope": "Actual native app-hosted unit execution with controlled recorder/registry and context marker, not microphone, physical input, real clipboard context, provider semantics or full global Mode/ASR cleanup proof.",
+  "source_sha": "650fab297aa0fcc7f3c9a6549583034b32942850",
+  "task_owned_baseline": "/Users/runner/work/_temp/recording-finalizer-baseline",
+  "tests": [
+    "heldCancellationCannotClearContextCapturedByANewerAcceptedRun",
+    "resetCleanupCannotClearContextCapturedByANewerAcceptedRun"
+  ]
+}

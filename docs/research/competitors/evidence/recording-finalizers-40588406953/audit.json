@@ -1,0 +1,65 @@
+{
+  "artifacts_fetched_once": {
+    "native_evidence_zip_bytes": 499126,
+    "observations_zip_bytes": 303129
+  },
+  "classification": "invalid-signature-preflight-no-tests",
+  "clean_shared_package_pins": 41,
+  "expected_baseline_assertion_sites": 4,
+  "lanes": {
+    "baseline": {
+      "actual_build_settings": {
+        "CODE_SIGNING_ALLOWED": "YES",
+        "CODE_SIGN_IDENTITY": "-",
+        "ENABLE_DEBUG_DYLIB": "NO",
+        "ENABLE_HARDENED_RUNTIME": "YES",
+        "ENABLE_PREVIEWS": "NO",
+        "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD LOCAL_BUILD"
+      },
+      "failed_boundary": "Hardened Runtime requirement in release/local signature helper; before TCC, isolated launch configuration, enumeration or tests",
+      "intended_assertion_failures_observed": 0,
+      "native_build_succeeded": true,
+      "static_whisper_macho_count": 18,
+      "tests_started": 0,
+      "xcode_explicitly_disabled_runtime_for_adhoc_signing": true
+    },
+    "candidate": {
+      "actual_build_settings": {
+        "CODE_SIGNING_ALLOWED": "YES",
+        "CODE_SIGN_IDENTITY": "-",
+        "ENABLE_DEBUG_DYLIB": "NO",
+        "ENABLE_HARDENED_RUNTIME": "YES",
+        "ENABLE_PREVIEWS": "NO",
+        "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG ENABLE_NATIVE_SPEECH_ANALYZER DEBUG ENABLE_NATIVE_SPEECH_ANALYZER  LOCAL_BUILD LOCAL_BUILD"
+      },
+      "failed_boundary": "Hardened Runtime requirement in release/local signature helper; before TCC, isolated launch configuration, enumeration or tests",
+      "intended_assertion_failures_observed": 0,
+      "native_build_succeeded": true,
+      "static_whisper_macho_count": 18,
+      "tests_started": 0,
+      "xcode_explicitly_disabled_runtime_for_adhoc_signing": true
+    }
+  },
+  "limitations": [
+    "No matched red/green evidence.",
+    "No observed recording-generation/context values, native test starts, isolated launch configuration or before/after test signature receipts.",
+    "Build settings requested Hardened Runtime YES; Xcode disabled it for the ad-hoc build-for-testing host."
+  ],
+  "logs_fetched_once": true,
+  "only_production_difference": [
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
+  ],
+  "run_id": 40588406953,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40588406953",
+  "source_ref": "ci/rjt-recording-finalizer-01a17bef",
+  "source_sha": "650fab297aa0fcc7f3c9a6549583034b32942850",
+  "static_whisper_bytes_matched": true,
+  "task_owned_source_restored": true,
+  "verified_source_pins": {
+    "baseline_engine_sha256": "4f9723565f85e6ae9ea7b7ae1ebb6b539626f95533d0fb44cc4cd8120c545a0f",
+    "candidate_engine_sha256": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c",
+    "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+    "fixture_sha256": "69b305908f75d26af44697cc6a0023f75725ffe780bacc2c094c0a06d91d2233",
+    "oracle_sha256": "9633072b341513c0a3f92c8ad9fe1618407490f272e433d4f2075e6c544bb51b"
+  }
+}

@@ -89,6 +89,7 @@ jobs:
             ${{ runner.temp }}/dictation-polish-native-proof/source/**
             ${{ runner.temp }}/dictation-polish-native-proof/observations/**
             ${{ runner.temp }}/dictation-polish-native-proof/editor-observations/**
+            ${{ runner.temp }}/dictation-polish-native-proof/test-host-signature/**
             ${{ runner.temp }}/dictation-polish-native-proof/discovery/**
             ${{ runner.temp }}/dictation-polish-native-proof/selection/**
             ${{ runner.temp }}/dictation-polish-native-proof/packages/*.json

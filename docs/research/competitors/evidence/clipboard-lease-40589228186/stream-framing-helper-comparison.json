@@ -1,0 +1,29 @@
+{
+  "classification": "same-subprocess-stream-framing-helper-red-green",
+  "boundary": "Actual unchanged helper AST and identical subprocess emitting JSON stdout plus diagnostic stderr; excludes xcodebuild/app execution.",
+  "command": [
+    "/Users/atalphalnmomhappyhouse/.pyenv/versions/3.11.9/bin/python3",
+    "-c",
+    "import sys; sys.stderr.write(\"--- xcodebuild: WARNING: multiple matching destinations\\n\"); print('{\"target\":\"VoiceInk\",\"LOCAL_BUILD\":true}')"
+  ],
+  "knownBadRawXcodebuildArtifact": "build-settings.json",
+  "lanes": [
+    {
+      "lane": "known-bad",
+      "sourceSHA256": "93918acb4561fc9c9ce21f306e4a3b74f934f7c920ad18e8da2d7a64aebe9e37",
+      "exitCode": 0,
+      "jsonStdoutParses": false,
+      "stdout": "--- xcodebuild: WARNING: multiple matching destinations\n{\"target\":\"VoiceInk\",\"LOCAL_BUILD\":true}\n",
+      "stderr": null
+    },
+    {
+      "lane": "candidate",
+      "sourceSHA256": "2486de6109d3608597eb4aebdbc55491aa28ce666b02ba6e25d891017765a9dd",
+      "exitCode": 0,
+      "jsonStdoutParses": true,
+      "stdout": "{\"target\":\"VoiceInk\",\"LOCAL_BUILD\":true}\n",
+      "stderr": "--- xcodebuild: WARNING: multiple matching destinations\n"
+    }
+  ],
+  "valid": true
+}

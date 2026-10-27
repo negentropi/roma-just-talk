@@ -1,0 +1,5 @@
+    
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift:559:27: error: cannot find 'AudioFileTranscriptionService' in scope
+            let service = AudioFileTranscriptionService(modelContext: context, serviceRegistry: registry,
+                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationProfileImportLiveTests.swift:582:35: warning: '#require(_:_:)' is redundant because 'record.audioFileURL.flatMap(URL.init(string:))' never equals 'nil' (from macro 'require')

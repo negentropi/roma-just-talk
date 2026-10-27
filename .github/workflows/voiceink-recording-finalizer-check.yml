@@ -52,7 +52,9 @@ jobs:
           key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
       - name: Check strict result classification and source fixture
-        run: bash scripts/run-recording-finalizer-regression.sh self-test
+        run: |
+          bash scripts/tests/verify-adhoc-macos-test-host.test.sh
+          bash scripts/run-recording-finalizer-regression.sh self-test
 
       - name: Bind exact Engine sources, common oracle and package graph
         id: prepare
@@ -98,11 +100,13 @@ jobs:
             ${{ runner.temp }}/recording-finalizer-proof/packages/*.resolved
             ${{ runner.temp }}/recording-finalizer-proof/baseline/*.json
             ${{ runner.temp }}/recording-finalizer-proof/baseline/*.txt
+            ${{ runner.temp }}/recording-finalizer-proof/baseline/test-host-signature/**
             ${{ runner.temp }}/recording-finalizer-proof/baseline/tests.log
             ${{ runner.temp }}/recording-finalizer-proof/baseline/discovery/**
             ${{ runner.temp }}/recording-finalizer-proof/baseline/selection/**
             ${{ runner.temp }}/recording-finalizer-proof/candidate/*.json
             ${{ runner.temp }}/recording-finalizer-proof/candidate/*.txt
+            ${{ runner.temp }}/recording-finalizer-proof/candidate/test-host-signature/**
             ${{ runner.temp }}/recording-finalizer-proof/candidate/tests.log
             ${{ runner.temp }}/recording-finalizer-proof/candidate/discovery/**
             ${{ runner.temp }}/recording-finalizer-proof/candidate/selection/**

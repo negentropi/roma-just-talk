@@ -1,0 +1,27 @@
+{
+  "actualBuildNotes": [
+    "note: Disabling hardened runtime with ad-hoc codesigning. (in target 'VoiceInk' from project 'VoiceInk')"
+  ],
+  "actualBuildSettingExports": {
+    "export ENABLE_DEBUG_DYLIB": [
+      "    export ENABLE_DEBUG_DYLIB\\=NO"
+    ],
+    "export ENABLE_HARDENED_RUNTIME": [
+      "    export ENABLE_HARDENED_RUNTIME\\=NO"
+    ],
+    "export ENABLE_PREVIEWS": [
+      "    export ENABLE_PREVIEWS\\=NO"
+    ],
+    "export ENABLE_XOJIT_PREVIEWS": [
+      "    export ENABLE_XOJIT_PREVIEWS\\=YES"
+    ]
+  },
+  "actualMacOSFiles": {
+    "Contents/MacOS/roma just talk": {
+      "bytes": 228025056,
+      "kind": "file",
+      "sha256": "a262fed707d4eed98ae155241d72eafde5aa3fe9098672a24a9ed3685c7b086e"
+    }
+  },
+  "source": "Already retained original predecessor-build/build.log and identity.json. No new artifact or log retrieval."
+}

@@ -55,6 +55,7 @@ extension VoiceInkTests {
 
 @MainActor
 private final class SpokenSnippetPipelineFixture {
+    private let container: ModelContainer
     let context: ModelContext
     private let pipeline: TranscriptionPipeline
     private let provider: SnippetUnusedWhisperProvider
@@ -84,11 +85,19 @@ private final class SpokenSnippetPipelineFixture {
 
     init(enableEnhancement: Bool = false) throws {
         let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
+        let configuration = ModelConfiguration(
+            "SpokenSnippetPipeline-\(UUID().uuidString)",
+            schema: schema,
+            isStoredInMemoryOnly: true,
+            groupContainer: .none,
+            cloudKitDatabase: .none
+        )
         let container = try ModelContainer(
             for: schema,
-            configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)]
+            configurations: [configuration]
         )
-        let modelContext = ModelContext(container)
+        self.container = container
+        let modelContext = container.mainContext
         context = modelContext
         let modelProvider = SnippetUnusedWhisperProvider()
         provider = modelProvider

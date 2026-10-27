@@ -10,6 +10,15 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "ClarityStylePreferenceTests.testMissingUnknownAndWrongTypeStylesUseNatural", run: { ClarityStylePreferenceTests().testMissingUnknownAndWrongTypeStylesUseNatural() }),
+            VoiceInkCoreCheck(name: "ClarityStylePreferenceTests.testStyleSurvivesPreferencesReopenAndLeavesCustomSettingsIntact", run: { ClarityStylePreferenceTests().testStyleSurvivesPreferencesReopenAndLeavesCustomSettingsIntact() }),
+            VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testAudioDraftCarriesExactRecognitionWithoutEnhancement", run: { DictationDraftMetadataTests().testAudioDraftCarriesExactRecognitionWithoutEnhancement() }),
+            VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testAudioDraftPreservesMetadataAndSameOutputEnhancementSuccess", run: { DictationDraftMetadataTests().testAudioDraftPreservesMetadataAndSameOutputEnhancementSuccess() }),
+            VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testAudioDraftKeepsExplicitProcessingFailureSeparateFromEnhancementFailure", run: { DictationDraftMetadataTests().testAudioDraftKeepsExplicitProcessingFailureSeparateFromEnhancementFailure() }),
+            VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testLegacyDraftAndAudioCompletionDefaultsKeepMetadataAbsent", run: { await DictationDraftMetadataTests().testLegacyDraftAndAudioCompletionDefaultsKeepMetadataAbsent() }),
+            VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testLegacyCompletionFailureDoesNotInventProcessingFailure", run: { await DictationDraftMetadataTests().testLegacyCompletionFailureDoesNotInventProcessingFailure() }),
+            VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testExplicitProcessingFailureWithoutEnhancementDoesNotInventRequestMetadata", run: { DictationDraftMetadataTests().testExplicitProcessingFailureWithoutEnhancementDoesNotInventRequestMetadata() }),
+            VoiceInkCoreCheck(name: "DictationDraftMetadataTests.testLegacyCompletionCancellationKeepsItsExistingOutcome", run: { await DictationDraftMetadataTests().testLegacyCompletionCancellationKeepsItsExistingOutcome() }),
             VoiceInkCoreCheck(name: "WordReplacementLibraryCodecCompatibilityTests.testSettingsCodecRoundTripsFullLibraryWithoutLosingMetadata", run: { try WordReplacementLibraryCodecCompatibilityTests().testSettingsCodecRoundTripsFullLibraryWithoutLosingMetadata() }),
             VoiceInkCoreCheck(name: "WordReplacementLibraryCodecCompatibilityTests.testSettingsCodecRetainsPresentEmptyLibraryAlongsideLegacyMap", run: { try WordReplacementLibraryCodecCompatibilityTests().testSettingsCodecRetainsPresentEmptyLibraryAlongsideLegacyMap() }),
             VoiceInkCoreCheck(name: "WordReplacementLibraryCodecCompatibilityTests.testSettingsCodecRejectsInvalidPresentLibraryBeforeLegacyFallback", run: { try WordReplacementLibraryCodecCompatibilityTests().testSettingsCodecRejectsInvalidPresentLibraryBeforeLegacyFallback() }),

@@ -4,6 +4,16 @@ public enum VoiceInkClarityStyle: String, Codable, CaseIterable, Sendable {
     case natural
     case casual
     case formal
+
+    public static let storageKey = "VoiceInkClarityStyle"
+
+    public static func current(in defaults: UserDefaults = .standard) -> Self {
+        defaults.string(forKey: storageKey).flatMap(Self.init(rawValue:)) ?? .natural
+    }
+
+    public func save(to defaults: UserDefaults = .standard) {
+        defaults.set(rawValue, forKey: Self.storageKey)
+    }
 }
 
 /// Removes one leading hesitation only with an explicit English language choice.

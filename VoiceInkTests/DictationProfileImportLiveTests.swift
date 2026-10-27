@@ -430,9 +430,58 @@ final class DictationPolishLiveEnvironment {
         PowerModeManager.shared.activeConfiguration = nil
         SoundManager.shared.isEnabled = false
         SpecialShortcutEmptyTranscriptionFallback.clear()
+        let cleanupDefaults = savedDefaults
+        let cleanupSound = savedSound
+        let cleanupPowerMode = savedPowerMode
+        let cleanupDirectory = directory
+        var setupSucceeded = false
+        defer {
+            if !setupSucceeded {
+                SoundManager.shared.isEnabled = cleanupSound
+                PowerModeManager.shared.activeConfiguration = cleanupPowerMode
+                for key in Self.keys {
+                    if let value = cleanupDefaults[key] { defaults.set(value, forKey: key) }
+                    else { defaults.removeObject(forKey: key) }
+                }
+                do { try FileManager.default.removeItem(at: cleanupDirectory) }
+                catch { Issue.record("Failed to clean up the owned native setup: \(error)") }
+            }
+        }
         ai = AIService()
+        try Self.writeSetupSnapshot(stage: "after-ai-init", ai: ai, testName: testName, evidence: evidence)
         enhancement = AIEnhancementService(aiService: ai, modelContext: context)
-        try #require(ai.selectedProvider == .localCLI && ai.isAPIKeyValid && ai.apiKey.isEmpty)
+        try Self.writeSetupSnapshot(stage: "after-enhancement-init", ai: ai, testName: testName, evidence: evidence)
+        try #require(ai.selectedProvider == .localCLI)
+        try #require(ai.isAPIKeyValid)
+        try #require(ai.apiKey.isEmpty)
+        setupSucceeded = true
+    }
+
+    private static func writeSetupSnapshot(stage: String, ai: AIService, testName: String, evidence: URL) throws {
+        let defaults = UserDefaults.standard
+        let arguments = defaults.volatileDomain(forName: UserDefaults.argumentDomain)
+        let directory = evidence.appendingPathComponent("setup", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let file = directory.appendingPathComponent(testName + ".json")
+        var snapshots: [[String: Any]] = []
+        if FileManager.default.fileExists(atPath: file.path) {
+            let previous = try JSONSerialization.jsonObject(with: Data(contentsOf: file)) as? [String: Any]
+            snapshots = previous?["snapshots"] as? [[String: Any]] ?? []
+        }
+        snapshots.append([
+            "stage": stage,
+            "provider": ai.selectedProvider.rawValue,
+            "isAPIKeyValid": ai.isAPIKeyValid,
+            "apiKeyIsEmpty": ai.apiKey.isEmpty,
+            "aiCommandMatchesFixture": ai.localCLICommandTemplate == "/usr/bin/true",
+            "aiCommandIsConfigured": VoiceInkLocalCLIPreference.isCommandConfigured(ai.localCLICommandTemplate),
+            "commandPreferenceMatchesFixture": VoiceInkLocalCLIPreference.commandTemplate() == "/usr/bin/true",
+            "commandArgumentDomainKeyExists": arguments[VoiceInkLocalCLIPreference.commandTemplateKey] != nil,
+            "standardDefaultsProvider": defaults.string(forKey: VoiceInkUserDefaultsKey.selectedAIProvider) as Any? ?? NSNull(),
+            "argumentDomainProvider": (arguments[VoiceInkUserDefaultsKey.selectedAIProvider] as? String) as Any? ?? NSNull()
+        ])
+        try JSONSerialization.data(withJSONObject: ["testName": testName, "snapshots": snapshots],
+            options: [.prettyPrinted, .sortedKeys]).write(to: file, options: .atomic)
     }
 
     var hostReceipt: [String: Any] {

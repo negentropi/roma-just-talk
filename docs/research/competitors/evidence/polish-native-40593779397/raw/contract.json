@@ -1,0 +1,24 @@
+{
+  "canonical_pins": 41,
+  "github_run_id": "40593779397",
+  "limits": [
+    "No microphone or real-speaker proof.",
+    "Local CLI responses are deterministic fixtures, not model-quality evidence.",
+    "Native editor insertion applies only to the three pipeline scenarios.",
+    "No release, CloudKit or general editor compatibility claim."
+  ],
+  "lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "oracle_sha256": {
+    "VoiceInkTests/DictationProfileImportLiveTests.swift": "f2b5fe8dad4ccfee08efbdda360cc2d20ca2f4685f931626f6a97fefdd78b83e",
+    "VoiceInkTests/WritingTargetLiveTests.swift": "3510438983b444d206a75b1cf2c054e7342565c99fd2f0633f307ad13cd1a677"
+  },
+  "scope": "Four real synthetic-WAV Whisper file operations and three native TextEdit pipeline scenarios with controlled recognition and real synthetic Local CLI transport",
+  "source_sha": "e7b49af2239447246af6a8144e870ace37f4b161",
+  "tests": [
+    "liveLightImportQueueUsesRealWhisperRecognition",
+    "liveClarityImportQueueUsesRealWhisperRecognition",
+    "liveLightRetranscriptionUsesRealWhisperRecognition",
+    "liveClarityRetranscriptionUsesRealWhisperRecognition",
+    "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+  ]
+}

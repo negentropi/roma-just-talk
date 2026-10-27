@@ -1,0 +1,31 @@
+native	Execute four real Whisper file operations and native TextEdit delivery	﻿2026-10-27T22:21:04.9505060Z ##[group]Run bash scripts/run-dictation-polish-native-check.sh native
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:21:04.9505670Z ^[[36;1mbash scripts/run-dictation-polish-native-check.sh native^[[0m
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:21:04.9960510Z shell: /bin/bash -e {0}
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:21:04.9960750Z ##[endgroup]
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:21:13.3840880Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/build-settings.json
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:21:49.4132880Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/build.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:29:46.0638940Z Running bash; log /Users/runner/work/_temp/dictation-polish-native-proof/static-app.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:29:52.7771720Z Running bash; log /Users/runner/work/_temp/dictation-polish-native-proof/signing.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:29:53.6644190Z Running curl; log /Users/runner/work/_temp/dictation-polish-native-proof/model-download.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:29:59.2923480Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/discovery/enumeration.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:30:16.4339750Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/selection/enumeration.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:30:24.8241520Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/tests.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:31:18.4814350Z Traceback (most recent call last):
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:31:18.4820300Z   File "<stdin>", line 577, in <module>
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:31:18.4822220Z   File "<stdin>", line 44, in require
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:31:18.4824540Z RuntimeError: Exactly five per-method observation receipts are required
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T22:31:18.5531610Z ##[error]Process completed with exit code 1.
+native	Recheck frozen source, signed app and native observations	﻿2026-10-27T22:31:18.6102330Z ##[group]Run bash scripts/run-dictation-polish-native-check.sh verify
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:18.6103290Z ^[[36;1mbash scripts/run-dictation-polish-native-check.sh verify^[[0m
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:18.8284170Z shell: /bin/bash -e {0}
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:18.8284760Z ##[endgroup]
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6482520Z Traceback (most recent call last):
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6487930Z   File "<stdin>", line 593, in <module>
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6489190Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 986, in read_text
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6491520Z     with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6492260Z          ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6493340Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 970, in open
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6495080Z     return io.open(self, mode, buffering, encoding, errors, newline)
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6496170Z            ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6497860Z FileNotFoundError: [Errno 2] No such file or directory: '/Users/runner/work/_temp/dictation-polish-native-proof/result.json'
+native	Recheck frozen source, signed app and native observations	2026-10-27T22:31:19.6571650Z ##[error]Process completed with exit code 1.

@@ -11,6 +11,7 @@ class TranscriptionPipeline {
     private let serviceRegistry: TranscriptionServiceRegistry
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
+    private var activePasteTasks: [UUID: Task<CursorPaster.PasteResult, Never>] = [:]
 
     var licenseViewModel: LicenseViewModel
 
@@ -23,6 +24,10 @@ class TranscriptionPipeline {
         self.serviceRegistry = serviceRegistry
         self.enhancementService = enhancementService
         self.licenseViewModel = LicenseViewModel()
+    }
+
+    func cancelDelivery(for transcriptionID: UUID) {
+        activePasteTasks[transcriptionID]?.cancel()
     }
 
     /// Run the full pipeline for a given transcription record.
@@ -42,12 +47,16 @@ class TranscriptionPipeline {
         session: TranscriptionSession?,
         writingSession: WritingActionSession? = nil,
         spokenSnippets: [VoiceInkSpokenSnippet] = VoiceInkSpokenSnippets.load(),
+        cleanupProfile: VoiceInkDictationProfile = .current(),
         latencyTraceToken: VoiceInkLatencyTrace.Token?,
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
         shouldCancel: () -> Bool,
         onCancel: @escaping () async -> Void,
         onDismiss: @escaping () async -> Void
     ) async {
+        if writingSession == nil, cleanupProfile == .none {
+            SpecialShortcutEmptyTranscriptionFallback.clear()
+        }
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
         latencyTrace.event(
@@ -56,7 +65,7 @@ class TranscriptionPipeline {
             token: traceToken
         )
         var finalPastedText: String?
-        var literalSnippetOutput: String?
+        var literalOutput: String?
         var promptDetectionResult: VoiceInkPromptDetectionResult?
 
         func restorePromptDetectionSettingsIfNeeded() async {
@@ -107,7 +116,7 @@ class TranscriptionPipeline {
             )
         }
 
-        if shouldCancel() {
+        if shouldCancel() || Task.isCancelled {
             await finishCanceledTranscription()
             return
         }
@@ -173,12 +182,15 @@ class TranscriptionPipeline {
                 )
                 throw error
             }
+            if shouldCancel() || Task.isCancelled {
+                await finishCanceledTranscription()
+                return
+            }
             if let writingSession {
                 transcription.text = rawText
                 transcription.transcriptionModelName = model.displayName
                 transcription.transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
                 transcription.promptName = writingSession.kind.title
-                if shouldCancel() { await finishCanceledTranscription(); return }
                 onStateChange(.enhancing)
                 do {
                     guard let enhancementService else { throw VoiceInkAIEnhancementError.notConfigured }
@@ -214,11 +226,23 @@ class TranscriptionPipeline {
                         duration: 6
                     )
                 }
+            } else if cleanupProfile == .none {
+                literalOutput = rawText
+                finalPastedText = rawText
+                transcription.applyCompletedDraft(VoiceInkCompletedTranscriptionDraft(
+                    cleanedText: rawText,
+                    duration: transcription.duration,
+                    audioFileURL: transcription.audioFileURL,
+                    transcriptionModelName: model.displayName,
+                    transcriptionDuration: Date().timeIntervalSince(transcriptionStart),
+                    powerModeName: transcription.powerModeName,
+                    powerModeEmoji: transcription.powerModeEmoji
+                ))
             } else {
                 let snippetExpansion = VoiceInkSpokenSnippets.expansion(of: rawText, using: spokenSnippets)
                 if snippetExpansion.didExpand {
                     // Snippet utterances stay literal so cleanup cannot rewrite saved content or its trigger.
-                    literalSnippetOutput = snippetExpansion.text
+                    literalOutput = snippetExpansion.text
                     finalPastedText = snippetExpansion.text
                     transcription.text = rawText
                     transcription.enhancedText = snippetExpansion.text
@@ -369,7 +393,7 @@ class TranscriptionPipeline {
 
         }
 
-        if shouldCancel() {
+        if shouldCancel() || Task.isCancelled {
             await finishCanceledTranscription()
             return
         }
@@ -381,13 +405,17 @@ class TranscriptionPipeline {
         if writingSession != nil {
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
-        } else if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
+        } else if cleanupProfile == .custom,
+                  SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(
+            for: transcription,
+            modelContext: modelContext
+        ) {
             latencyTrace.event("pipeline.empty_transcription_fallback", token: traceToken)
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = pasteDecision.textToPaste {
             let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
-            if literalSnippetOutput == nil {
+            if literalOutput == nil {
                 textToPaste = await CursorPaster.preparedTextForPaste(
                     textToPaste,
                     preparedCursorTextContext: preparedCursorTextContext
@@ -400,7 +428,7 @@ class TranscriptionPipeline {
             } else {
                 isTrialExpired = false
             }
-            let pastedText = literalSnippetOutput ?? VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
+            let pastedText = literalOutput ?? VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
                 textToPaste,
                 appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(),
                 isTrialExpired: isTrialExpired
@@ -408,15 +436,32 @@ class TranscriptionPipeline {
             latencyTrace.end(pastePreparationSpan, details: "chars=\(pastedText.count)")
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
             await pasteAuthorizationPreflight.value
-            let pasteResult = await CursorPaster.startPasteAtCursor(
+            if shouldCancel() || Task.isCancelled {
+                latencyTrace.end(pasteSpan, details: "result=cancelled_before_post")
+                await finishCanceledTranscription()
+                return
+            }
+            let pasteTask = CursorPaster.startPasteAtCursor(
                 pastedText,
                 preparedCursorTextContext: preparedCursorTextContext,
                 latencyTraceToken: traceToken
-            ).value
+            )
+            activePasteTasks[transcription.id] = pasteTask
+            let pasteResult = await withTaskCancellationHandler {
+                await pasteTask.value
+            } onCancel: {
+                pasteTask.cancel()
+            }
+            activePasteTasks[transcription.id] = nil
             latencyTrace.end(
                 pasteSpan,
                 details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"
             )
+            if pasteResult == .commandNotPosted,
+               pasteTask.isCancelled || shouldCancel() || Task.isCancelled {
+                await finishCanceledTranscription()
+                return
+            }
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
             let stopSoundSpan = latencyTrace.begin("pipeline.stop_sound", token: traceToken)
             SoundManager.shared.play(.stop)
@@ -424,6 +469,9 @@ class TranscriptionPipeline {
             let dismissSpan = latencyTrace.begin("pipeline.dismiss_recorder", token: traceToken)
             await restorePromptDetectionSettingsAndDismiss {
                 if pasteResult.didDeliverText,
+                   !pasteTask.isCancelled,
+                   !Task.isCancelled,
+                   !shouldCancel(),
                    let autoSendKey,
                    let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
                     Task { @MainActor in

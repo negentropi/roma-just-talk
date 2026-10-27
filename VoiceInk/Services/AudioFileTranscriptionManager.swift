@@ -121,6 +121,7 @@ class AudioTranscriptionManager: ObservableObject {
     }
 
     private func processItem(_ item: AudioFileQueueItem, modelContext: ModelContext, engine: VoiceInkEngine) async {
+        let cleanupProfile = VoiceInkDictationProfile.current()
         let serviceRegistry = TranscriptionServiceRegistry(
             modelProvider: engine.whisperModelManager,
             modelsDirectory: engine.whisperModelManager.modelsDirectory,
@@ -148,6 +149,7 @@ class AudioTranscriptionManager: ObservableObject {
 
             let audioAsset = AVURLAsset(url: item.url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
+            try Task.checkCancellation()
 
             let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
@@ -161,6 +163,7 @@ class AudioTranscriptionManager: ObservableObject {
             item.status = .processing(phase: .transcribing)
             let transcriptionStart = Date()
             let rawText = try await serviceRegistry.transcribe(audioURL: permanentURL, model: currentModel)
+            try Task.checkCancellation()
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
 
@@ -170,18 +173,23 @@ class AudioTranscriptionManager: ObservableObject {
 
             let textPlan = VoiceInkTranscriptionRunPreparation.prepareAudioFileText(
                 rawText,
-                cleanupConfiguration: cleanupConfiguration
+                cleanupConfiguration: cleanupConfiguration,
+                cleanupProfile: cleanupProfile
             ) { text in
                 DictionaryService.applyWordReplacements(to: text, using: modelContext)
             }
             let cleanedText = textPlan.cleanedText
             try Task.checkCancellation()
 
-            let enhancementRequest = textPlan.enhancementRequest(
-                isEnhancementEnabled: engine.enhancementService?.isEnhancementEnabled == true,
-                isEnhancementConfigured: engine.enhancementService?.isConfigured == true,
-                skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
-            )
+            let enhancementRequest: VoiceInkTranscriptionEnhancementRequest? = if textPlan.allowsEnhancement {
+                textPlan.enhancementRequest(
+                    isEnhancementEnabled: engine.enhancementService?.isEnhancementEnabled == true,
+                    isEnhancementConfigured: engine.enhancementService?.isConfigured == true,
+                    skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
+                )
+            } else {
+                nil
+            }
             let draftContext = VoiceInkAudioFileTranscriptionDraftContext(
                 cleanedText: cleanedText,
                 duration: duration,
@@ -196,15 +204,22 @@ class AudioTranscriptionManager: ObservableObject {
                 item.status = .processing(phase: .enhancing)
             }
 
-            let completionResult = await VoiceInkAudioFileTranscriptionDraft.completionResult(
-                context: draftContext,
-                enhancementRequest: enhancementRequest,
-                enhancementFailurePolicy: .storeFailureText
-            ) { request in
-                guard let enhancementService = engine.enhancementService else {
-                    throw VoiceInkEngineError.unknownError
+            let completionResult: VoiceInkAudioFileTranscriptionCompletionResult
+            if textPlan.allowsEnhancement {
+                completionResult = await VoiceInkAudioFileTranscriptionDraft.completionResult(
+                    context: draftContext,
+                    enhancementRequest: enhancementRequest,
+                    enhancementFailurePolicy: .storeFailureText
+                ) { request in
+                    guard let enhancementService = engine.enhancementService else {
+                        throw VoiceInkEngineError.unknownError
+                    }
+                    return try await enhancementService.enhance(request.text)
                 }
-                return try await enhancementService.enhance(request.text)
+            } else {
+                completionResult = VoiceInkAudioFileTranscriptionCompletionResult(
+                    draft: VoiceInkAudioFileTranscriptionDraft.completed(context: draftContext)
+                )
             }
 
             if let errorDescription = completionResult.enhancementFailureReason {
@@ -216,6 +231,7 @@ class AudioTranscriptionManager: ObservableObject {
 
             let transcription = Transcription(completedDraft: completionResult.draft)
 
+            try Task.checkCancellation()
             modelContext.insert(transcription)
             try modelContext.save()
             NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)

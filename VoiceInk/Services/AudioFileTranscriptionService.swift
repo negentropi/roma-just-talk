@@ -32,13 +32,16 @@ class AudioTranscriptionService {
     }
     
     func retranscribeAudio(from url: URL, using model: any TranscriptionModel) async throws -> Transcription {
+        let cleanupProfile = VoiceInkDictationProfile.current()
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw VoiceInkEngineError.audioFileNotFound
         }
         
         do {
+            try Task.checkCancellation()
             let transcriptionStart = Date()
             let rawText = try await serviceRegistry.transcribe(audioURL: url, model: model)
+            try Task.checkCancellation()
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
 
@@ -48,16 +51,20 @@ class AudioTranscriptionService {
 
             let textPlan = VoiceInkTranscriptionRunPreparation.prepareAudioFileText(
                 rawText,
-                cleanupConfiguration: cleanupConfiguration
+                cleanupConfiguration: cleanupConfiguration,
+                cleanupProfile: cleanupProfile
             ) { text in
                 DictionaryService.applyWordReplacements(to: text, using: modelContext)
             }
             let text = textPlan.textForEnhancement
-            logger.notice("\(VoiceInkAudioFileTranscriptionDiagnostics.wordReplacementsAppliedMessage, privacy: .public)")
+            if textPlan.allowsEnhancement {
+                logger.notice("\(VoiceInkAudioFileTranscriptionDiagnostics.wordReplacementsAppliedMessage, privacy: .public)")
+            }
             let cleanedText = textPlan.cleanedText
 
             let audioAsset = AVURLAsset(url: url)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
+            try Task.checkCancellation()
             let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
             
@@ -88,7 +95,8 @@ class AudioTranscriptionService {
             )
             var promptDetectionResult: VoiceInkPromptDetectionResult? = nil
 
-            if let enhancementService = enhancementService,
+            if textPlan.allowsEnhancement,
+               let enhancementService = enhancementService,
                enhancementService.isConfigured,
                enhancementService.hasPromptTriggerWords {
                 let detectionResult = enhancementService.analyzePromptTrigger(in: text)
@@ -103,24 +111,36 @@ class AudioTranscriptionService {
                 }
             }
 
-            let enhancementRequest = textPlan.enhancementRequest(
-                isEnhancementEnabled: enhancementService?.isEnhancementEnabled == true,
-                isEnhancementConfigured: enhancementService?.isConfigured == true,
-                promptDetectionResult: promptDetectionResult,
-                skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
-            )
-
-            let completionResult = await VoiceInkAudioFileTranscriptionDraft.completionResult(
-                context: draftContext,
-                enhancementRequest: enhancementRequest,
-                enhancementFailurePolicy: .omitEnhancedText
-            ) { [enhancementService] request in
-                guard let enhancementService else {
-                    throw VoiceInkEngineError.unknownError
-                }
-                return try await enhancementService.enhance(request.text)
+            let enhancementRequest: VoiceInkTranscriptionEnhancementRequest? = if textPlan.allowsEnhancement {
+                textPlan.enhancementRequest(
+                    isEnhancementEnabled: enhancementService?.isEnhancementEnabled == true,
+                    isEnhancementConfigured: enhancementService?.isConfigured == true,
+                    promptDetectionResult: promptDetectionResult,
+                    skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
+                )
+            } else {
+                nil
             }
 
+            let completionResult: VoiceInkAudioFileTranscriptionCompletionResult
+            if textPlan.allowsEnhancement {
+                completionResult = await VoiceInkAudioFileTranscriptionDraft.completionResult(
+                    context: draftContext,
+                    enhancementRequest: enhancementRequest,
+                    enhancementFailurePolicy: .omitEnhancedText
+                ) { [enhancementService] request in
+                    guard let enhancementService else {
+                        throw VoiceInkEngineError.unknownError
+                    }
+                    return try await enhancementService.enhance(request.text)
+                }
+            } else {
+                completionResult = VoiceInkAudioFileTranscriptionCompletionResult(
+                    draft: VoiceInkAudioFileTranscriptionDraft.completed(context: draftContext)
+                )
+            }
+
+            try Task.checkCancellation()
             let newTranscription = Transcription(completedDraft: completionResult.draft)
             saveCompletedTranscription(newTranscription)
             return newTranscription

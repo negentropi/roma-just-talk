@@ -2,6 +2,8 @@
 
 ## v1.95.2 - Unreleased
 
+- Add a global None dictation cleanup option that preserves the transcription model’s text and bypasses AI, snippets, replacements, capitalization and added spaces. Keep existing behavior and saved settings under Custom.
+- Let cancellation reach queued dictation paste tasks before they write text or post paste commands.
 - Add separate recording shortcuts for translation, selected-text editing, and drafting, with saved translation targets independent of the transcription language. Keep results in History when the original field changes, and refuse unsafe replacements.
 - Add spoken snippets with exact multiline content, enable controls, and CSV import and export. Snippet-containing dictation stays literal so cleanup and AI cannot alter the saved text or its spoken trigger.
 - Keep a canceled recording start from clearing a newer recording after delayed permission or model preparation finishes.

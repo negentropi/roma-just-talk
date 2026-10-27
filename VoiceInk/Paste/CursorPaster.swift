@@ -265,6 +265,7 @@ class CursorPaster {
         preparedCursorTextContext: Task<CursorTextContextReader.PreparedContext?, Never>? = nil,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
+        guard !Task.isCancelled else { return .commandNotPosted }
         let latencyTrace = VoiceInkLatencyTrace.shared
         let pasteboard = NSPasteboard.general
         let shouldRestoreClipboard = VoiceInkPastePreference.shouldRestoreClipboardAfterPaste()
@@ -274,6 +275,7 @@ class CursorPaster {
         } else {
             nil as CursorTextContextReader.PreparedContext?
         }
+        guard !Task.isCancelled else { return .commandNotPosted }
         latencyTrace.event(
             "paste_session.enter",
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
@@ -285,6 +287,10 @@ class CursorPaster {
                 "paste_session.accessibility_insert",
                 token: latencyTraceToken
             )
+            guard !Task.isCancelled else {
+                latencyTrace.end(insertionSpan, details: "result=cancelled_before_insert")
+                return .commandNotPosted
+            }
             let insertionResult = if let accessibilityTextInserterForTesting {
                 accessibilityTextInserterForTesting(text, cursorContext)
             } else {
@@ -332,6 +338,10 @@ class CursorPaster {
             "paste_session.write_clipboard",
             token: latencyTraceToken
         )
+        guard !Task.isCancelled else {
+            latencyTrace.end(clipboardWriteSpan, details: "result=cancelled_before_write")
+            return .commandNotPosted
+        }
         guard ClipboardManager.setClipboard(
             text,
             transient: shouldRestoreClipboard,
@@ -399,6 +409,7 @@ class CursorPaster {
         preparedCursorTextContext: CursorTextContextReader.PreparedContext?,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> PasteResult {
+        guard !Task.isCancelled else { return .commandNotPosted }
         if let pasteCommandPosterForTesting {
             return await pasteCommandPosterForTesting(retryCommandVMenuDiscovery)
         }
@@ -647,6 +658,16 @@ class CursorPaster {
 
         let events = [cmdDown, vDown, vUp, cmdUp]
         for (index, event) in events.enumerated() {
+            if index < 2, Task.isCancelled {
+                if index == 1 {
+                    if let targetProcessIdentifier {
+                        cmdUp.postToPid(targetProcessIdentifier)
+                    } else {
+                        cmdUp.post(tap: .cghidEventTap)
+                    }
+                }
+                return .commandNotPosted
+            }
             if let targetProcessIdentifier {
                 event.postToPid(targetProcessIdentifier)
             } else {

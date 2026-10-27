@@ -20,6 +20,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private var stopRequestedDuringStart = false
     @Published private var activeWritingSession: WritingActionSession?
     private var activeSpokenSnippets: [VoiceInkSpokenSnippet] = []
+    private var activeDictationProfile: VoiceInkDictationProfile = .custom
     var writingActionKind: VoiceInkWritingActionKind? { activeWritingSession?.kind }
     var recordPermissionRequestForTesting: (() async -> Bool)?
     var recordingStartupPreparationForTesting: (() async throws -> Void)?
@@ -167,6 +168,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
             activePipelineTranscriptionID = nil
             activeWritingSession = writingSession
             activeSpokenSnippets = VoiceInkSpokenSnippets.load()
+            // Power Mode resolution can suspend after recording starts, before a second toggle stops it.
+            let cleanupProfile = VoiceInkDictationProfile.current()
+            activeDictationProfile = cleanupProfile
+            if writingSession == nil, cleanupProfile == .none {
+                SpecialShortcutEmptyTranscriptionFallback.clear()
+            }
             shouldCancelRecording = false
             stopRequestedDuringStart = false
             partialTranscript = ""
@@ -364,7 +371,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 return
                             }
 
-                            let capturesDictationContext = writingSession == nil
+                            let capturesDictationContext = writingSession == nil && cleanupProfile == .custom
                             recordingStartupTask = Task { @MainActor [weak self] in
                                 guard let self else { return }
                                 defer {
@@ -453,6 +460,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 invalidateRecordingStartup()
                 activeWritingSession = nil
                 activeSpokenSnippets = []
+                activeDictationProfile = .custom
                 recordingState = .idle
                 latencyTrace.event("engine.permission.denied", token: traceToken)
                 logger.error("❌ Recording permission denied.")
@@ -721,6 +729,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let session = currentSession
         let writingSession = activeWritingSession
         let spokenSnippets = activeSpokenSnippets
+        let cleanupProfile = activeDictationProfile
         let transcriptionID = transcription.id
         activePipelineTranscriptionID = transcriptionID
 
@@ -731,6 +740,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             session: session,
             writingSession: writingSession,
             spokenSnippets: spokenSnippets,
+            cleanupProfile: cleanupProfile,
             latencyTraceToken: traceToken,
             onStateChange: { [weak self] state in
                 guard let self, self.activePipelineTranscriptionID == transcriptionID else { return }
@@ -759,6 +769,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             recordedFile = nil
             activeWritingSession = nil
             activeSpokenSnippets = []
+            activeDictationProfile = .custom
             shouldCancelRecording = false
         }
         canceledPipelineTranscriptionIDs.remove(transcriptionID)
@@ -814,13 +825,18 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let traceToken = latencyTrace.currentToken()
         cancelCurrentSession()
         invalidateRecordingStartup()
+        if let activePipelineTranscriptionID {
+            // The old pipeline may resume after a new recording starts; it removes its own ID when drained.
+            canceledPipelineTranscriptionIDs.insert(activePipelineTranscriptionID)
+            pipeline.cancelDelivery(for: activePipelineTranscriptionID)
+        }
         activePipelineTranscriptionID = nil
-        canceledPipelineTranscriptionIDs.removeAll()
         shouldCancelRecording = false
         stopRequestedDuringStart = false
         partialTranscript = ""
         activeWritingSession = nil
         activeSpokenSnippets = []
+        activeDictationProfile = .custom
         await recorder.stopRecording(latencyTraceToken: traceToken)
         recordedFile = nil
         recordingState = .idle
@@ -837,6 +853,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         if recordingState.isPostRecordingProcessing,
            let activePipelineTranscriptionID {
             canceledPipelineTranscriptionIDs.insert(activePipelineTranscriptionID)
+            pipeline.cancelDelivery(for: activePipelineTranscriptionID)
         }
 
         cancelCurrentSession()

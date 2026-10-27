@@ -155,7 +155,7 @@ enum SpecialShortcutEmptyTranscriptionFallback {
         pendingFallback = PendingFallback(createdAt: Date())
     }
 
-    static func resetForTesting() {
+    static func clear() {
         pendingFallback = nil
     }
 

@@ -1,0 +1,21 @@
+{
+  "run_id": 40576969692,
+  "source_head": "143ce8fbb4b2cc3f5a8383d98f7ce8443e018dd5",
+  "reviewer": "/root/literal_rule_checks/literal_driver_review",
+  "classification": "clean",
+  "findings": [],
+  "verified": [
+    "Read-only analyzer recomputation, suppressing only receipt.write_text, exactly matched the retained receipt.",
+    "All 1744 ordered unique PASS rows, one Executed marker, successful build and native exit 0; prior 1721 checks plus all expected 23 additions.",
+    "All 157 immutable Git source blobs match the retained source census and after-check OK lines; source HEAD stayed unchanged and final Git status was empty.",
+    "Exact Core/NVIDIA/Xcode lock bytes preserve 22/22/41 pins.",
+    "Full API artifact metadata binds artifact ID 12768595631, name, run, branch and exact source SHA; all eleven retained member hashes verify.",
+    "README scope and limits match the actual evidence."
+  ],
+  "limits": [
+    "Whole ZIP hash and CRC checks accepted from the owner's one-download receipt; reviewer did not download again.",
+    "Actual dependency checkout trees and post-check toolchain were not retained.",
+    "Candidate Core compilation and feature checks; no app activation, migration, UI, provider, semantic, release or old-reader comparison proof.",
+    "Read-only review; no edits, downloads, builds, commits or pushes."
+  ]
+}

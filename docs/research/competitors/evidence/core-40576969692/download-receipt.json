@@ -1,0 +1,55 @@
+{
+  "run_id": 40576969692,
+  "artifact_id": 12768595631,
+  "download_route": "repos/negentropi/roma-just-talk/actions/artifacts/12768595631/zip",
+  "download_count": 1,
+  "zip_bytes": 51419,
+  "zip_sha256": "a0415a0d64229c2b2e26cd9e095dc97ed329ecc32b68db5cfbfd939991d04872",
+  "all_members_crc_verified": true,
+  "members": {
+    "check-exit-code.txt": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "git-status.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pins/Core.Package.resolved": {
+      "bytes": 6140,
+      "sha256": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2"
+    },
+    "core-checks.log": {
+      "bytes": 205484,
+      "sha256": "b0ab41824654242d32a37521f00f9bc150010a116df496c2fd273b152f7b05c9"
+    },
+    "pins/NVIDIA.Package.resolved": {
+      "bytes": 6225,
+      "sha256": "3a6af795e40cc28c19650da7cdaaf41c127bb2924e37deda63e246f2242bb639"
+    },
+    "pins/Xcode.Package.resolved": {
+      "bytes": 11320,
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+    },
+    "source-after-head.txt": {
+      "bytes": 41,
+      "sha256": "fca8f86d7f9984cbde533aa245175d45603e4c06f77d8897b549449531bf8fb8"
+    },
+    "source-before.sha256": {
+      "bytes": 21243,
+      "sha256": "ccb39bee17166345f64690be67593e91a2054181583ee7be775e51d99c2e8cc7"
+    },
+    "source-head.txt": {
+      "bytes": 41,
+      "sha256": "fca8f86d7f9984cbde533aa245175d45603e4c06f77d8897b549449531bf8fb8"
+    },
+    "source-verification.log": {
+      "bytes": 11509,
+      "sha256": "8d87ec16f74283d26f36fd2d885fec4f11749d2a770e7c60c58f851d9976cc2c"
+    },
+    "toolchain.log": {
+      "bytes": 225,
+      "sha256": "a6bc9a0f658f75ad89cf17f2f023e1da8f38604f41f8dbfe79f59a278a8a0588"
+    }
+  }
+}

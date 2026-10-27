@@ -1,0 +1,156 @@
+{
+  "run_id": 40576969692,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40576969692",
+  "source_head": "143ce8fbb4b2cc3f5a8383d98f7ce8443e018dd5",
+  "conclusion": "success",
+  "scope": "Full native Core compilation and policy/codec checks; no app activation, store migration, provider, UI, semantic-quality, release or known-bad comparison proof.",
+  "command": "swift run --package-path VoiceInkCore --force-resolved-versions --skip-update VoiceInkCoreChecks",
+  "checks": {
+    "registered": 1744,
+    "executed": 1744,
+    "passed": 1744,
+    "failed": 0,
+    "skipped": 0,
+    "ordered_pass_names_equal_all_registrations": true,
+    "prior_checks_each_passed_once": 1721,
+    "new_checks_each_passed_once": [
+      "ClarityStylePreferenceTests.testMissingUnknownAndWrongTypeStylesUseNatural",
+      "ClarityStylePreferenceTests.testStyleSurvivesPreferencesReopenAndLeavesCustomSettingsIntact",
+      "DictationDraftMetadataTests.testAudioDraftCarriesExactRecognitionWithoutEnhancement",
+      "DictationDraftMetadataTests.testAudioDraftPreservesMetadataAndSameOutputEnhancementSuccess",
+      "DictationDraftMetadataTests.testAudioDraftKeepsExplicitProcessingFailureSeparateFromEnhancementFailure",
+      "DictationDraftMetadataTests.testLegacyDraftAndAudioCompletionDefaultsKeepMetadataAbsent",
+      "DictationDraftMetadataTests.testLegacyCompletionFailureDoesNotInventProcessingFailure",
+      "DictationDraftMetadataTests.testExplicitProcessingFailureWithoutEnhancementDoesNotInventRequestMetadata",
+      "DictationDraftMetadataTests.testLegacyCompletionCancellationKeepsItsExistingOutcome",
+      "WordReplacementLibraryCodecCompatibilityTests.testSettingsCodecRoundTripsFullLibraryWithoutLosingMetadata",
+      "WordReplacementLibraryCodecCompatibilityTests.testSettingsCodecRetainsPresentEmptyLibraryAlongsideLegacyMap",
+      "WordReplacementLibraryCodecCompatibilityTests.testSettingsCodecRejectsInvalidPresentLibraryBeforeLegacyFallback",
+      "WordReplacementLibraryCodecCompatibilityTests.testSettingsCodecLeavesOldMapOnlyShapeUntouched",
+      "WordReplacementLibraryTests.testRecordsValidateBlanknessWithoutChangingExactLiteralContent",
+      "WordReplacementLibraryTests.testFullRecordsRequireEveryFieldAndCompleteKnownProvenance",
+      "WordReplacementLibraryTests.testIdenticalIdentityIsIdempotentAndEveryChangedFieldConflicts",
+      "WordReplacementLibraryTests.testDuplicateLiteralKeepsExistingIdentityDateEnabledAndProvenance",
+      "WordReplacementLibraryTests.testSourceConflictsAreExplicitAndBlockEveryInsertion",
+      "WordReplacementLibraryTests.testLegacyAlternativesKeepCaseInsensitiveWholeTokenConflicts",
+      "WordReplacementLibraryTests.testLiteralCommasStayWholeAndDifferentMatchingSemanticsRequireReview",
+      "WordReplacementLibraryTests.testBatchPreflightReportsEveryConflictingRecordWithoutMutatingInputs",
+      "WordReplacementLibraryTests.testRepeatedDuplicatesAlwaysReferToTheRetainedIdentity",
+      "WordReplacementLibraryTests.testLegacyAlternativeMultiplicityAndOrderRequireReview"
+    ]
+  },
+  "source_verification": {
+    "file_count": 157,
+    "complete_workflow_source_census": true,
+    "all_before_hashes_match_pinned_git_blobs": true,
+    "all_after_hash_checks_passed": true,
+    "head_unchanged": true,
+    "git_status_empty": true
+  },
+  "locks": {
+    "VoiceInkCore/Package.resolved": {
+      "sha256": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2",
+      "format_version": 2,
+      "pin_count": 22,
+      "unchanged_after_checks": true
+    },
+    "VoiceInkNVIDIA/Package.resolved": {
+      "sha256": "3a6af795e40cc28c19650da7cdaaf41c127bb2924e37deda63e246f2242bb639",
+      "format_version": 3,
+      "pin_count": 22,
+      "unchanged_after_checks": true
+    },
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": {
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+      "format_version": 3,
+      "pin_count": 41,
+      "unchanged_after_checks": true
+    }
+  },
+  "artifact": {
+    "id": 12768595631,
+    "node_id": "MDg6QXJ0aWZhY3QxMjc2ODU5NTYzMQ==",
+    "name": "roma.core-check-evidence",
+    "size_in_bytes": 51419,
+    "url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12768595631",
+    "archive_download_url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12768595631/zip",
+    "expired": false,
+    "digest": "sha256:a0415a0d64229c2b2e26cd9e095dc97ed329ecc32b68db5cfbfd939991d04872",
+    "created_at": "2026-10-27T20:22:51Z",
+    "updated_at": "2026-10-27T20:22:51Z",
+    "expires_at": "2027-01-25T20:19:15Z",
+    "workflow_run": {
+      "id": 40576969692,
+      "repository_id": 1253985786,
+      "head_repository_id": 1253985786,
+      "head_branch": "ci/rjt-core-check-polish-01a17bef",
+      "head_sha": "143ce8fbb4b2cc3f5a8383d98f7ce8443e018dd5"
+    }
+  },
+  "download": {
+    "run_id": 40576969692,
+    "artifact_id": 12768595631,
+    "download_route": "repos/negentropi/roma-just-talk/actions/artifacts/12768595631/zip",
+    "download_count": 1,
+    "zip_bytes": 51419,
+    "zip_sha256": "a0415a0d64229c2b2e26cd9e095dc97ed329ecc32b68db5cfbfd939991d04872",
+    "all_members_crc_verified": true,
+    "members": {
+      "check-exit-code.txt": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "git-status.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "pins/Core.Package.resolved": {
+        "bytes": 6140,
+        "sha256": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2"
+      },
+      "core-checks.log": {
+        "bytes": 205484,
+        "sha256": "b0ab41824654242d32a37521f00f9bc150010a116df496c2fd273b152f7b05c9"
+      },
+      "pins/NVIDIA.Package.resolved": {
+        "bytes": 6225,
+        "sha256": "3a6af795e40cc28c19650da7cdaaf41c127bb2924e37deda63e246f2242bb639"
+      },
+      "pins/Xcode.Package.resolved": {
+        "bytes": 11320,
+        "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+      },
+      "source-after-head.txt": {
+        "bytes": 41,
+        "sha256": "fca8f86d7f9984cbde533aa245175d45603e4c06f77d8897b549449531bf8fb8"
+      },
+      "source-before.sha256": {
+        "bytes": 21243,
+        "sha256": "ccb39bee17166345f64690be67593e91a2054181583ee7be775e51d99c2e8cc7"
+      },
+      "source-head.txt": {
+        "bytes": 41,
+        "sha256": "fca8f86d7f9984cbde533aa245175d45603e4c06f77d8897b549449531bf8fb8"
+      },
+      "source-verification.log": {
+        "bytes": 11509,
+        "sha256": "8d87ec16f74283d26f36fd2d885fec4f11749d2a770e7c60c58f851d9976cc2c"
+      },
+      "toolchain.log": {
+        "bytes": 225,
+        "sha256": "a6bc9a0f658f75ad89cf17f2f023e1da8f38604f41f8dbfe79f59a278a8a0588"
+      }
+    }
+  },
+  "toolchain_before_checks": "Xcode 26.6\nBuild version 17F113\nswift-driver version: 1.148.6 Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0\nProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\n",
+  "limits": [
+    "Actual dependency checkout trees were not retained; pins are verified lock bytes and frozen-resolution command.",
+    "Toolchain was logged before compilation only; no post-check toolchain capture.",
+    "Candidate compilation and feature checks only; no matched old-reader comparison in this run."
+  ],
+  "warnings": [
+    "'--skip-update' option is deprecated and will be removed in a future release"
+  ],
+  "job_started_at": "2026-10-27T20:19:18Z",
+  "job_completed_at": "2026-10-27T20:23:04Z"
+}

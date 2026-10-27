@@ -173,7 +173,7 @@ Seven standard Swift Testing cases exercise actual Local CLI transport with lite
 
 ## Independent draft preparation
 
-Core completed drafts now carry default-nil recognition text, captured profile/style and a distinct processing failure reason. Audio-file contexts forward these values through completion without changing the legacy helper's cancellation/failure policy. Processing failure is explicit; a legacy enhancement error never invents it. Seven new checks cover exact code units, same-output success metadata, explicit failure and old defaults. The style preference follows the profile preference pattern and defaults to Natural for missing/unknown values; two checks cover reopening and preserving Custom settings. All remain pending the next full Core execution. No Mac model field, active call site, profile option or History label changes in this unit.
+Core completed drafts now carry default-nil recognition text, captured profile/style and a distinct processing failure reason. Audio-file contexts forward these values through completion without changing the legacy helper's cancellation/failure policy. Processing failure is explicit; a legacy enhancement error never invents it. Seven new checks cover exact code units, same-output success metadata, explicit failure and old defaults. The style preference follows the profile preference pattern and defaults to Natural for missing/unknown values; two checks cover reopening and preserving Custom settings. [Actual Core run 40576969692](evidence/core-40576969692/README.md), exact `143ce8fb`, passed all 1,744 checks including these nine. No Mac model field, active call site, profile option or History label changes in this unit.
 
 ## Unwired shared processor
 

@@ -1,0 +1,51 @@
+    t =   255.48s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   255.49s Waiting 5.0s for "powerMode.configuration.add" Button to exist
+    t =   256.50s     Checking `Expect predicate `existsNoRetry == 1` for object "powerMode.configuration.add" Button`
+    t =   256.50s         Checking existence of `"powerMode.configuration.add" Button`
+    t =   256.79s Click "powerMode.configuration.add" Button
+    t =   256.79s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   256.80s     Find the "powerMode.configuration.add" Button
+    t =   256.94s     Check for interrupting elements affecting "powerMode.configuration.add" Button
+    t =   256.95s     Synthesize event
+    t =   257.45s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   257.56s Waiting 5.0s for Sheet (First Match) to exist
+    t =   258.58s     Checking `Expect predicate `existsNoRetry == 1` for object Sheet (First Match)`
+    t =   258.58s         Checking existence of `Sheet (First Match)`
+    t =   258.59s Get number of matches for: Descendants matching type Sheet
+    t =   258.81s Waiting 5.0s for "powerMode.configuration.name" TextField to exist
+    t =   259.82s     Checking `Expect predicate `existsNoRetry == 1` for object "powerMode.configuration.name" TextField`
+    t =   259.82s         Checking existence of `"powerMode.configuration.name" TextField`
+    t =   259.87s Find the "powerMode.configuration.name" TextField
+    t =   259.92s Find the "powerMode.configuration.name" TextField
+    t =   259.98s Click "powerMode.configuration.name" TextField
+    t =   259.98s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   259.98s     Find the "powerMode.configuration.name" TextField
+    t =   260.03s     Check for interrupting elements affecting "powerMode.configuration.name" TextField
+    t =   260.05s     Synthesize event
+    t =   260.38s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   260.38s Type 'a' key with modifiers '⌘' (0x10)
+    t =   260.38s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   260.38s     Find the "powerMode.configuration.name" TextField
+    t =   260.42s     Check for interrupting elements affecting "powerMode.configuration.name" TextField
+    t =   260.44s     Synthesize event
+    t =   260.50s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   260.50s Type 'Unsent mode proof ...' into "powerMode.configuration.name" TextField
+    t =   260.50s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   260.50s     Find the "powerMode.configuration.name" TextField
+    t =   260.55s     Check for interrupting elements affecting "powerMode.configuration.name" TextField
+    t =   260.57s     Synthesize event
+    t =   270.19s     Wait for com.negentropi.RomaJustTalk to idle
+    t =   270.20s Waiting 5.0s for "powerMode.configuration.name" TextField to exist
+    t =   271.20s     Checking `Expect predicate `existsNoRetry == 1` for object "powerMode.configuration.name" TextField`
+    t =   271.21s         Checking existence of `"powerMode.configuration.name" TextField`
+    t =   271.30s Find the "powerMode.configuration.name" TextField
+    t =   271.35s Find the "powerMode.configuration.name" TextField
+    t =   271.46s Find the Sheet (First Match)
+    t =   271.47s Checking existence of `"powerMode.configuration.add" Button`
+    t =   271.93s Find the "powerMode.configuration.add" Button
+    t =   272.22s Find the "powerMode.configuration.add" Button
+    t =   272.51s Find the "powerMode.configuration.add" Button
+    t =   272.86s Find the Sheet at {{312.0, 89.0}, {400.0, 560.0}}
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:390: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : failed - The background pointer probe overlapped the active sheet.
+    t =   273.25s Tear Down
+    t =   275.72s Checking for crash reports corresponding to unexpected termination of com.negentropi.RomaJustTalk

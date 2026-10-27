@@ -1,0 +1,14 @@
+{
+  "baseline_intended_red": true,
+  "candidate_passed": 3,
+  "candidate_failed": 1,
+  "model_background_pointer_attempted": true,
+  "click_counts": {
+    "models.settings.open": 4,
+    "dictionary.settings.open": 2,
+    "powerMode.configuration.add": 1
+  },
+  "both_lane_identity_tcc_process_verified": true,
+  "candidate_accepted": false,
+  "scope": "Partial UI assertions only"
+}

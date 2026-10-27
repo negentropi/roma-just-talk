@@ -1,0 +1,19 @@
+ui	Compare the disabled-panel baseline and current writing settings UI	﻿2026-10-27T17:36:58.0401740Z ##[group]Run defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.0403820Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.0405590Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.0407010Z ^[[36;1mshasum -a 256 -c "$RUNNER_TEMP/writing-ui-proof/source-inputs.sha256"^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.0408190Z ^[[36;1mbash scripts/run-writing-settings-ui-regression.sh^[[0m
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.0539110Z shell: /bin/bash -e {0}
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.0539510Z ##[endgroup]
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.1975020Z VoiceInkUITests/WritingFeaturesUITests.swift: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.1989410Z scripts/run-writing-settings-ui-regression.sh: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.1990730Z scripts/run-writing-feature-regression.sh: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.2006060Z .github/workflows/voiceink-writing-ui-check.yml: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.2019590Z VoiceInk.xcodeproj/project.pbxproj: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:36:58.2022360Z VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved: OK
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:37:02.7810990Z From https://github.com/negentropi/roma-just-talk
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:37:02.7913460Z  * branch              bdd608cf6111e8d7e88c12678f530318713acf67 -> FETCH_HEAD
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:37:02.8020230Z Preparing worktree (detached HEAD bdd608cf)
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T17:37:03.1590890Z HEAD is now at bdd608cf test: scroll the settings Form through visible native controls
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:06:55.6243590Z swift-driver version: 1.148.6 Matched UI comparison requires intended baseline red and four candidate cases green
+ui	Compare the disabled-panel baseline and current writing settings UI	2026-10-27T18:06:55.6902770Z ##[error]Process completed with exit code 1.

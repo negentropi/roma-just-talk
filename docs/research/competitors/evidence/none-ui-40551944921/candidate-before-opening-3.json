@@ -1,0 +1,52 @@
+{
+  "actors" : {
+    "application" : {
+      "enabled" : false,
+      "exists" : true,
+      "hittable" : false
+    },
+    "background-filter" : {
+      "enabled" : true,
+      "exists" : true,
+      "hittable" : true
+    },
+    "custom" : {
+      "enabled" : null,
+      "exists" : false,
+      "hittable" : null
+    },
+    "form" : {
+      "enabled" : null,
+      "exists" : false,
+      "hittable" : null
+    },
+    "main-window" : {
+      "enabled" : false,
+      "exists" : true,
+      "hittable" : true
+    },
+    "none" : {
+      "enabled" : null,
+      "exists" : false,
+      "hittable" : null
+    },
+    "settings-close" : {
+      "enabled" : null,
+      "exists" : false,
+      "hittable" : null
+    },
+    "settings-open" : {
+      "enabled" : true,
+      "exists" : true,
+      "hittable" : true
+    }
+  },
+  "boundaryFailures" : [
+
+  ],
+  "mainWindowCount" : 1,
+  "nativeSheetCount" : 0,
+  "opening" : 3,
+  "phase" : "before-opening",
+  "version" : 1
+}

@@ -100,10 +100,10 @@ Reuse the request transport in [AIEnhancementService](../../../VoiceInk/Services
 
 Generalize the internal `WritingActionProviderSnapshot` name and update its callers directly, without an alias. Keep provider-specific configuration as immutable values. Capture execution plan, actual endpoint/model, cached credential, timeout/retry policy, and CLI command/CLI timeout. Reuse the existing rate-limit/retry owner. Retries must reuse the same request and snapshot.
 
-Two observed traps must be resolved within that extraction:
+The extraction has one remaining filter trap and one separately completed identity prerequisite:
 
 - Existing provider results pass through [AIEnhancementOutputFilter](../../../VoiceInkCore/Sources/VoiceInkCore/AIProviderCatalog.swift), which deletes `<think>`/`<thinking>`/`<reasoning>` blocks and trailing `codex_follow_up` JSON. Clarity must bypass that destructive content filter.
-- The current Ollama snapshot records `AIService.currentModel`, but its newly constructed [OllamaService](../../../VoiceInk/Services/OllamaService.swift) reads a separate runtime model preference and execution ignores the plan's model argument. Their unsaved defaults differ. Use one explicitly captured endpoint/model for both the request and metadata. Constructing that executor must not persist settings or launch model refresh.
+- The old Ollama snapshot at `830d4521` could report a different model from its runtime request. The existing [OllamaService](../../../VoiceInk/Services/OllamaService.swift) now captures one immutable runtime endpoint/model for request and metadata, without selection writes or refresh. [Matched actual SDK proof](evidence/ollama-identity-40545355522/native-audit.json) passed at `1f36a746`; reuse that owner instead of repeating the fix.
 
 The current snapshot factory reads cached credential state and preferences; it does not itself create a new `AIService` or issue a connection request. A fresh `AIService` loads credential state and is not an equivalent snapshot. Keep credentials in memory and out of records, logs and evidence.
 

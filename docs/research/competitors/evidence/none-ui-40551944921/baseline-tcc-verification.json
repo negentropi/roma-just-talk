@@ -1,0 +1,9 @@
+{
+  "expected_services": [
+    "kTCCServiceAccessibility",
+    "kTCCServiceMicrophone"
+  ],
+  "host_requirement_sha256": "b2c5a9626b4990739d5db382f3be80b5de7cb0b2321eef79fb9259848ac35e65",
+  "scope": "Fresh permission database row readback only; native control interaction supplies separate accessibility evidence",
+  "valid": true
+}

@@ -1,0 +1,22 @@
+{
+  "reviewer_model": "gpt-6.1-sol",
+  "scope": "Actual six original candidate screenshots and corresponding partial-run execution",
+  "verdict": "No concrete visual finding on exercised surfaces",
+  "observations": [
+    "None selected after relaunch; inactive Custom values remain visible with disabled styling",
+    "Restored Custom controls enabled at their saved values",
+    "Dictionary, Enhancement and Prompt sheets have readable headers and accessible close controls; prompt footer visible"
+  ],
+  "limits": [
+    "Overall profile case failed later at optional PowerMode Add overlap guard.",
+    "PowerMode cancel/reorder and fresh strict four-case/full Release gates remain pending."
+  ],
+  "images": {
+    "none-dictation-cleanup-persisted-after-relaunch.png": "9576e0e62eaf95d42faace908433e558d5e17862178386d000b5b844dd90e4ee",
+    "none-preserves-inactive-custom-formatting.png": "a8ed192312ed227ecc6c7694abe87a386ce53d11b7cdb178a87fc61c10bd9874",
+    "custom-formatting-restored-without-changing-saved-values.png": "8b5aa572605d314a6dd48e898845ead245f7af68d2ab9b9749d8cb06ff453a0e",
+    "dictionary-settings-native-sheet.png": "6877a00fc45285407e1a8fceb902e81db9a2b3b7abef5ffd5c1c315aa50b6bda",
+    "enhancement-settings-native-sheet.png": "29e1e3f4c967f904ec18c22de34c6d96080a01bed6df191eaec8fb64edc4fb1b",
+    "prompt-editor-unsaved-native-sheet.png": "095a6b9ca48e2fe9dee3eb678b51e2198fc579e8c7abb44ed2fc886e38c71ba3"
+  }
+}

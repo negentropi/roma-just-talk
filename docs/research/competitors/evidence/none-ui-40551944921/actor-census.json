@@ -1,0 +1,59 @@
+{
+  "run_id": 40551944921,
+  "head_sha": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+  "oracle_sha256": "9bbf692457cd30b31fcaf3ddee22adeb679fe53b502f69f2aa51d154c36067ca",
+  "baseline_valid": true,
+  "candidate_total": 4,
+  "candidate_passed": 3,
+  "candidate_failed": 1,
+  "failure": {
+    "method": "testDictationProfilePreservesCustomSettingsAndPersists",
+    "line": 390,
+    "message": "The background pointer probe overlapped the active sheet.",
+    "caller": "Power Mode unsaved draft: optional background Add pointer probe",
+    "pointer_attempted": false
+  },
+  "actors": {
+    "powerMode.configuration.add": {
+      "exists": true,
+      "enabled": true,
+      "hittable": true,
+      "frame": null,
+      "frame_nonempty": true,
+      "frame_intersects_sheet": true,
+      "basis": "Exact source-bound branch: interactive and nonempty guards passed, intersection guard failed. Numeric Add frame was not printed."
+    },
+    "native-sheet": {
+      "frame": {
+        "x": 312,
+        "y": 89,
+        "width": 400,
+        "height": 560
+      },
+      "basis": "Original XCTest trace immediately before error."
+    },
+    "powerMode.configuration.name": {
+      "unsaved_unique_name_was_entered_and_read": true,
+      "basis": "Original trace and execution beyond assertValue before pointer guard."
+    }
+  },
+  "actual_button_click_counts_within_profile_case": {
+    "models.settings.open": 4,
+    "dictionary.settings.open": 2,
+    "powerMode.configuration.add": 1
+  },
+  "partial_checks_reached_without_failure": [
+    "None/Custom selection and saved cleanup/trailing-space values",
+    "None persists after sheet close/reopen and app relaunch",
+    "Custom controls restore enabled with original values",
+    "Model and Dictionary outside-sheet pointer checks",
+    "Dictionary and Enhancement settings Escape dismissal",
+    "Prompt draft edit, Escape, no persistence",
+    "Power Mode unique unsaved draft edit/read"
+  ],
+  "not_reached": [
+    "Power Mode draft Escape/no-persistence",
+    "Power Mode reorder open/close"
+  ],
+  "limits": "No full four-case acceptance. Other partial checks supported by retained flow and continueAfterFailure=false; source-bound frame boolean is distinguished from numeric frame observation."
+}

@@ -1,0 +1,27 @@
+{
+  "run_id": 40551944921,
+  "head_sha": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "oracle_sha256": "9bbf692457cd30b31fcaf3ddee22adeb679fe53b502f69f2aa51d154c36067ca",
+  "artifact": {
+    "id": 12758185216,
+    "name": "roma.writing-ui-diagnostic-evidence",
+    "bytes": 277191801,
+    "sha256": "f0a66a311b7f3180dd46f07ba16b2526178d9fdca2a7facee655282442278de6",
+    "entire_hash_verified": true,
+    "all_member_crc_verified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40551944921/ui-evidence.zip",
+    "full_download_count": 1,
+    "fast_boundary_range_bytes": 917610
+  },
+  "source_inputs_verified_against_immutable_git": true,
+  "candidate_accepted": false,
+  "known_failure": {
+    "file": "VoiceInkUITests/WritingFeaturesUITests.swift",
+    "line": 390,
+    "message": "The background pointer probe overlapped the active sheet.",
+    "caller": "optional Power Mode Add background pointer probe",
+    "no_overlapping_click_performed": true
+  },
+  "limits": "Failed Debug UI candidate; final Power Mode cancel/reorder not executed. No Release or VoiceOver proof."
+}

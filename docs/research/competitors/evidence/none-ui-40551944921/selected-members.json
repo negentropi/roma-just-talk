@@ -1,0 +1,177 @@
+{
+  "comparison-contract.json": {
+    "member": "_temp/writing-settings-ui-regression/contract.json",
+    "sha256": "d365ff10df46c33186747cf8b5aef4080138c036f68b11a1de45eb2a1cc894f5",
+    "bytes": 1813
+  },
+  "source-verification.json": {
+    "member": "_temp/writing-settings-ui-regression/source-verification.json",
+    "sha256": "819bf300970fa2122a0777830f5cbe77f17232e91d0cf924ac0139915ac4116f",
+    "bytes": 232
+  },
+  "diagnostic-result.json": {
+    "member": "_temp/writing-ui-proof/diagnostic-result.json",
+    "sha256": "2ffa7c2715841790e5fccb9054b8f57f1d81cdc61bcb571cf89417fa666b52e7",
+    "bytes": 13326
+  },
+  "runtime-source-inputs.sha256": {
+    "member": "_temp/writing-ui-proof/source-inputs.sha256",
+    "sha256": "53107568d9ab0de0cc57f09e01aa5f8c6df03ee87bc6c794edfa709583fd8838",
+    "bytes": 689
+  },
+  "runtime-source-inputs-after.txt": {
+    "member": "_temp/writing-ui-proof/source-inputs-after.txt",
+    "sha256": "1056a7b3c7c1595408119e0ccdceb95781169fc449f49b353aee106747beade7",
+    "bytes": 317
+  },
+  "candidate-result.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/result.json",
+    "sha256": "daa765bc0569e6fe8647425ba0f68e4c8c48616ea8e2f39d6ec14fd7f9151b8c",
+    "bytes": 613
+  },
+  "candidate-identity-verification.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/identity-verification.json",
+    "sha256": "68e789e2202f710d9b488e69c0a428d0a75bca96770dac5b1ef91c6095e538fa",
+    "bytes": 1590
+  },
+  "candidate-tcc-verification.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/tcc-verification.json",
+    "sha256": "8b183ad93788ea16438b1eaf1fff2a2bbac17ee2dda0800910dd82693b4fda83",
+    "bytes": 334
+  },
+  "candidate-process-verification.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/process-verification.json",
+    "sha256": "4d5c76273955da2004483f5cde55781892a51b72466bccc2539745d058aae5af",
+    "bytes": 1654
+  },
+  "candidate-screenshots-manifest.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/manifest.json",
+    "sha256": "5bb55b2508f311d83a91208a53501f66c0bcb7e29de380b18cb0364317d00ada",
+    "bytes": 51726
+  },
+  "prompt-editor-unsaved-native-sheet.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/67920A1F-527E-4F43-AC97-DBCA2B988B06.png",
+    "sha256": "095a6b9ca48e2fe9dee3eb678b51e2198fc579e8c7abb44ed2fc886e38c71ba3",
+    "bytes": 218295
+  },
+  "enhancement-settings-native-sheet.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/B61D0275-9177-4169-BC96-A9EB1826ADB8.png",
+    "sha256": "29e1e3f4c967f904ec18c22de34c6d96080a01bed6df191eaec8fb64edc4fb1b",
+    "bytes": 224166
+  },
+  "dictionary-settings-native-sheet.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/D498E81B-1EA9-4011-903B-18839E9F1A43.png",
+    "sha256": "6877a00fc45285407e1a8fceb902e81db9a2b3b7abef5ffd5c1c315aa50b6bda",
+    "bytes": 208823
+  },
+  "candidate-after-closing-3.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/E6E75D80-F25E-4BD9-935D-EC48AB7D3DAA.json",
+    "sha256": "0c33943883a0f56056e73448b7b781ad92ad209f1af8e2a874fb03ed3f7d7113",
+    "bytes": 965
+  },
+  "custom-formatting-restored-without-changing-saved-values.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/EA37F87F-41AF-4E6F-8A8E-AB07229A599B.png",
+    "sha256": "8b5aa572605d314a6dd48e898845ead245f7af68d2ab9b9749d8cb06ff453a0e",
+    "bytes": 248100
+  },
+  "none-dictation-cleanup-persisted-after-relaunch.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/FD9299FA-36DB-46ED-8BD5-834AB52652AC.png",
+    "sha256": "9576e0e62eaf95d42faace908433e558d5e17862178386d000b5b844dd90e4ee",
+    "bytes": 260019
+  },
+  "candidate-after-opening-3.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/BE7B22E6-787D-4A4A-952C-6106067D5D9F.json",
+    "sha256": "8ab7eba4873d43c083a045459d9b5838bc8563b9d39f00fbc0af024ee7ccf364",
+    "bytes": 962
+  },
+  "candidate-before-opening-3.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/A210C0E0-A1FF-4838-864B-3FF08D3B5129.json",
+    "sha256": "14f9058c22962cedd0a84b6e65e50e71177ddbc0c9ea8778d136dca569f5770e",
+    "bytes": 966
+  },
+  "candidate-after-opening-2.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/D7085B6F-FE6E-4682-BFF0-0169AF5A13A5.json",
+    "sha256": "132b764fa5ffe8ec0e401059d2f6ccf96b447ac60ac127895611dc355cfc7a68",
+    "bytes": 962
+  },
+  "candidate-before-opening-2.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/83590BE5-F0AE-446B-B83F-518E0DB3667E.json",
+    "sha256": "22ef8334529fa3fd25ed37d8df63ab91f7036d4eb26a0347b408d3bdfedad095",
+    "bytes": 966
+  },
+  "candidate-after-closing-1.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/1A2E2E75-D255-410C-B5BC-F1A31FFB415A.json",
+    "sha256": "6a4ccb9814f061e8d2ebb8ad82c5fbc6a71d8493b22f32160a356f12664b912d",
+    "bytes": 965
+  },
+  "none-preserves-inactive-custom-formatting.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/46F13C27-BA90-4A31-95B7-FBF753523986.png",
+    "sha256": "a8ed192312ed227ecc6c7694abe87a386ce53d11b7cdb178a87fc61c10bd9874",
+    "bytes": 257831
+  },
+  "none-dictation-cleanup-selected.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/6C057B74-809E-4BB7-AB0C-C88CA7168D2A.png",
+    "sha256": "ad13493e51f107b83a95ab11558da7255575e5ecae21dc754cdd36d0154438eb",
+    "bytes": 260070
+  },
+  "custom-dictation-cleanup-settings.png": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/3568551D-35EE-4208-8313-F9B050F43A89.png",
+    "sha256": "35922b5f37bc54f7051a9341545087e3ad4fb4a526b70f2b71bab2f81465e8a9",
+    "bytes": 248069
+  },
+  "candidate-after-background-pointer-hierarchy.txt": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/4EC02952-9657-4460-9BD4-4E2D21BD6DEC.txt",
+    "sha256": "a9669d50717fabe4aae7f923d8eea8da60de5b004e6e20e022ffcedf82fd0bf2",
+    "bytes": 51020
+  },
+  "candidate-after-background-pointer-1.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/F766716E-ABC5-45E3-B971-FEF9A3950C6F.json",
+    "sha256": "026c913fdd2a80daf9108f370aa7e3fd09cadf4bf28dd9fa7030ee1ca17cacbd",
+    "bytes": 1012
+  },
+  "candidate-after-opening-1.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/23EFB021-7D89-4753-8F82-26B5FC527597.json",
+    "sha256": "2e7e6187b943ab3a6285ae050a4cb2c414db147e61617f414218ae903e5099fa",
+    "bytes": 962
+  },
+  "candidate-before-opening-1.json": {
+    "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshots/83B495DE-478A-4984-AFEA-839272F3951C.json",
+    "sha256": "2fd48f8adae614f1f06b6d870a0875f019c6ce1e6a0be772823567a03684e79c",
+    "bytes": 966
+  },
+  "baseline-result.json": {
+    "member": "_temp/writing-settings-ui-regression/baseline/result.json",
+    "sha256": "2d1fbe3f87669d7aa343ea5a86212cd45f5f8d39f8e08bd4eab20834dbed8f79",
+    "bytes": 3535
+  },
+  "baseline-identity-verification.json": {
+    "member": "_temp/writing-settings-ui-regression/baseline/identity-verification.json",
+    "sha256": "99d28b75cf487b98239517170da20578c49a957feece3c0930e52beebd1cbd3e",
+    "bytes": 1653
+  },
+  "baseline-tcc-verification.json": {
+    "member": "_temp/writing-settings-ui-regression/baseline/tcc-verification.json",
+    "sha256": "73943e8d842af5f09f850853d41d5af6a1d7bd340238ec78c82afc7ab1187c0c",
+    "bytes": 334
+  },
+  "baseline-process-verification.json": {
+    "member": "_temp/writing-settings-ui-regression/baseline/process-verification.json",
+    "sha256": "db8faa0624be41bdca81ef4753ea71b5a083ddc24973eef62cef6c29307a515b",
+    "bytes": 526
+  },
+  "baseline-screenshots-manifest.json": {
+    "member": "_temp/writing-settings-ui-regression/baseline/screenshots/manifest.json",
+    "sha256": "145add044f2ce1d193d038b510f028f852c4542945ce2da359e6cc855e11d89d",
+    "bytes": 4889
+  },
+  "baseline-after-opening-1.json": {
+    "member": "_temp/writing-settings-ui-regression/baseline/screenshots/7E362E89-BC87-42ED-93D4-78B8E7741CF4.json",
+    "sha256": "d154bbfe802ab2421ae1d1c748180b2d1786a101a01d1da059b3145092afd3dd",
+    "bytes": 991
+  },
+  "baseline-before-opening-1.json": {
+    "member": "_temp/writing-settings-ui-regression/baseline/screenshots/A0A6F48D-126E-4008-9A39-3B1FC28EB7F0.json",
+    "sha256": "2fd48f8adae614f1f06b6d870a0875f019c6ce1e6a0be772823567a03684e79c",
+    "bytes": 966
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "observation": {
+    "expected_executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "observer_completed": true,
+    "processes": [
+      {
+        "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "pid": 39761
+      },
+      {
+        "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "pid": 44426
+      },
+      {
+        "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "pid": 48683
+      },
+      {
+        "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "pid": 54352
+      },
+      {
+        "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "pid": 57555
+      },
+      {
+        "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "pid": 59997
+      },
+      {
+        "executable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "pid": 62550
+      }
+    ],
+    "sampling_errors": []
+  },
+  "valid": true
+}

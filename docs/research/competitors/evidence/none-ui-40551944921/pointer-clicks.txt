@@ -1,0 +1,7 @@
+    t =    23.58s Click "models.settings.open" Button
+    t =    41.72s Click "models.settings.open" Button
+    t =   104.30s Click "models.settings.open" Button
+    t =   157.01s Click "models.settings.open" Button
+    t =   218.18s Click "dictionary.settings.open" Button
+    t =   222.36s Click "dictionary.settings.open" Button
+    t =   256.79s Click "powerMode.configuration.add" Button

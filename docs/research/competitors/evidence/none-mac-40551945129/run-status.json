@@ -1,0 +1,282 @@
+{
+  "run_id": 40551945129,
+  "head_sha": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40551945129",
+  "status": "completed",
+  "conclusion": "cancelled",
+  "jobs": [
+    {
+      "completedAt": "2026-10-27T18:12:21Z",
+      "conclusion": "cancelled",
+      "databaseId": 122357742474,
+      "name": "macos",
+      "startedAt": "2026-10-27T17:34:58Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-27T17:34:59Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-27T17:34:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:35:08Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-27T17:34:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:35:08Z",
+          "conclusion": "success",
+          "name": "Keep the disposable desktop awake",
+          "number": 3,
+          "startedAt": "2026-10-27T17:35:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:35:31Z",
+          "conclusion": "success",
+          "name": "Select Xcode and Metal toolchain",
+          "number": 4,
+          "startedAt": "2026-10-27T17:35:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:35:57Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 5,
+          "startedAt": "2026-10-27T17:35:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:37:04Z",
+          "conclusion": "success",
+          "name": "Verify the canonical package graph before compiling",
+          "number": 6,
+          "startedAt": "2026-10-27T17:35:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:41:03Z",
+          "conclusion": "success",
+          "name": "Shared core checks",
+          "number": 7,
+          "startedAt": "2026-10-27T17:37:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:41:08Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper dependencies",
+          "number": 8,
+          "startedAt": "2026-10-27T17:41:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:41:08Z",
+          "conclusion": "skipped",
+          "name": "Preserve verified dependencies for test retries",
+          "number": 9,
+          "startedAt": "2026-10-27T17:41:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:50:17Z",
+          "conclusion": "success",
+          "name": "Full Mac unit suite with fresh CI permissions",
+          "number": 10,
+          "startedAt": "2026-10-27T17:41:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:51:43Z",
+          "conclusion": "success",
+          "name": "Live TextEdit and Safari selection transactions",
+          "number": 11,
+          "startedAt": "2026-10-27T17:50:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T17:51:45Z",
+          "conclusion": "success",
+          "name": "Upload the native check checkpoint",
+          "number": 12,
+          "startedAt": "2026-10-27T17:51:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:01:42Z",
+          "conclusion": "success",
+          "name": "Matched snippet regression",
+          "number": 13,
+          "startedAt": "2026-10-27T17:51:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:01:43Z",
+          "conclusion": "success",
+          "name": "Upload the matched regression checkpoint",
+          "number": 14,
+          "startedAt": "2026-10-27T18:01:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:11:27Z",
+          "conclusion": "cancelled",
+          "name": "Writing, snippet and dictation settings UI",
+          "number": 15,
+          "startedAt": "2026-10-27T18:01:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:11:34Z",
+          "conclusion": "success",
+          "name": "Preserve test evidence before the Release build",
+          "number": 16,
+          "startedAt": "2026-10-27T18:11:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:11:34Z",
+          "conclusion": "skipped",
+          "name": "Release build and packaging contracts",
+          "number": 17,
+          "startedAt": "2026-10-27T18:11:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:12:08Z",
+          "conclusion": "success",
+          "name": "Upload verification evidence",
+          "number": 18,
+          "startedAt": "2026-10-27T18:11:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:12:08Z",
+          "conclusion": "success",
+          "name": "Upload settings screenshots",
+          "number": 19,
+          "startedAt": "2026-10-27T18:12:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:12:08Z",
+          "conclusion": "skipped",
+          "name": "Upload verified release app",
+          "number": 20,
+          "startedAt": "2026-10-27T18:12:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:12:10Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 40,
+          "startedAt": "2026-10-27T18:12:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-27T18:12:15Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 41,
+          "startedAt": "2026-10-27T18:12:10Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40551945129/job/122357742474"
+    }
+  ],
+  "artifacts": {
+    "artifacts": [
+      {
+        "digest": "sha256:1425da1ffb00e304c631d0054529882de059c57ce8f4be477c1d2126a25fe94c",
+        "expired": false,
+        "id": 12758800186,
+        "name": "roma.writing-actions-evidence",
+        "size_in_bytes": 313915093,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+          "id": 40551945129,
+          "repository_id": 1253985786
+        }
+      },
+      {
+        "digest": "sha256:5ed39c377dcde238fa2fcf744348cce79d3b826e2a26231af6dec68d64d2c49a",
+        "expired": false,
+        "id": 12756109506,
+        "name": "roma.writing-regression-checkpoint",
+        "size_in_bytes": 72598,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+          "id": 40551945129,
+          "repository_id": 1253985786
+        }
+      },
+      {
+        "digest": "sha256:7b628cc2531eddfd4858477bb72d10f6f7052724145b58fa97d4145a5b0843e4",
+        "expired": false,
+        "id": 12756048883,
+        "name": "roma.writing-live-checkpoint",
+        "size_in_bytes": 41193,
+        "workflow_run": {
+          "head_branch": "ci/rjt-writing-check-none-01a17bef",
+          "head_repository_id": 1253985786,
+          "head_sha": "2734017b616b36dc0581ce75c5e4ab0bb7b7f151",
+          "id": 40551945129,
+          "repository_id": 1253985786
+        }
+      }
+    ],
+    "total_count": 3
+  },
+  "cancellation": {
+    "source": "Coordinator message in this task",
+    "reason": "Coordinator canceled during UI after the separate UI counterpart exposed an optional Power Mode Add-background-button probe whose frame overlapped the active sheet. The guard refused to click. The test owner removes that optional probe and preserves the Power Mode draft/Escape/reopen checks before another UI-only run and later full gate.",
+    "separate_run_id": 40551944921,
+    "separate_ui_failure_independently_audited_here": false
+  },
+  "verified_scopes": {
+    "source": "source-bindings.json compares exact5bf/273 product manifests:588 entries identical;17 pinned verification/test/backend hashes retained.",
+    "native_checkpoint": {
+      "file": "native-checkpoint/checkpoint-receipt.json",
+      "sha256": "138054ebab12cff7b1c2ed64949c035a73cca2ca6db0c5fbe065bab6a16b7642",
+      "summary": {
+        "executed": 6,
+        "passed": 6,
+        "failed": 0,
+        "skipped": 0
+      },
+      "independent_review": "Second read-only reviewer independently checked ZIP bytes/digest/CRC, metadata, six selectors/executions and raw context/editor/pipeline receipts."
+    },
+    "core_unit_and_matched": "GitHub metadata reports successful steps. Full raw aggregates/counts were not fetched for this canceled run."
+  },
+  "not_established": [
+    "Exact full-unit count or gated-skip count.",
+    "Exact Core check count.",
+    "Completion of the four settings UI scenarios in this run.",
+    "Release build or packaging success.",
+    "Overall full-gate success."
+  ],
+  "retention": {
+    "full_evidence_archive_downloaded_by_this_audit": false,
+    "native_checkpoint_downloaded_by_this_audit": true,
+    "matched_checkpoint_downloaded_by_this_audit": false,
+    "reason": "Coordinator requested minimal canceled-run source/native/step receipts. Avoid duplicate large artifacts; separate UI audit owns its own failed-case artifact."
+  },
+  "limits": [
+    "Native startup tests use real engine/recorder and capture-call spies, not ASR or OS clipboard/screen-content reads.",
+    "Pipeline fixture uses synthetic recognition and deterministic Local CLI output; not general provider quality or human-speech proof.",
+    "No independent TCC database readback, saved-Keychain, physical-input or cleanup-window-closure claim."
+  ]
+}

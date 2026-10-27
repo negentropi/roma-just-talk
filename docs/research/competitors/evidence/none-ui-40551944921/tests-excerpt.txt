@@ -1,0 +1,12 @@
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing]' started.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testCSVImportPreviewsMultilineContentBeforeReplacing]' passed (154.162 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' started.
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkUITests/WritingFeaturesUITests.swift:390: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : failed - The background pointer probe overlapped the active sheet.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' failed (295.816 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' started.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch]' passed (164.472 seconds).
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' started.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' passed (97.767 seconds).
+	 Executed 4 tests, with 1 failure (0 unexpected) in 712.217 (712.227) seconds
+	 Executed 4 tests, with 1 failure (0 unexpected) in 712.217 (712.230) seconds
+	 Executed 4 tests, with 1 failure (0 unexpected) in 712.217 (712.232) seconds

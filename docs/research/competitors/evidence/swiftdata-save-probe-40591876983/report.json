@@ -1,0 +1,1131 @@
+{
+  "headSHA" : "46dd2a13e719cb61e2a2bbf83aa24e7d15a4bf7e",
+  "limits" : [
+    "Minimal two-model SDK probe; not the application schema or an app regression result.",
+    "Every mode has its own newly seeded private store; CloudKit is disabled and autosave is off.",
+    "Counts and states are observations. No mode is required to reproduce the application failure.",
+    "Only the isolated owned write context is rolled back; the unrelated UI edit is never rolled back."
+  ],
+  "observations" : [
+    {
+      "allowsSave" : false,
+      "explicitPrivateStoreURL" : true,
+      "freshContextCount" : 0,
+      "freshContextWordValues" : [
+        "saved-word"
+      ],
+      "immediateWriteContextCount" : 1,
+      "immediateWriteContextIncludesOwnedObject" : false,
+      "isolatedWriteContext" : false,
+      "mode" : "old-delete",
+      "saveError" : {
+        "code" : 513,
+        "description" : "The file couldn’t be saved because you don’t have permission.",
+        "domain" : "NSCocoaErrorDomain"
+      },
+      "saveSucceeded" : false,
+      "snapshots" : [
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-old-delete",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "before-insert",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-old-delete",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : false,
+          "phase" : "after-insert-before-save",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-old-delete",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : false,
+          "phase" : "save-threw-before-cleanup",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-old-delete",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : true,
+          "phase" : "after-delete-or-owned-rollback-before-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-old-delete",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : true,
+          "phase" : "after-immediate-write-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-old-delete",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : true,
+          "phase" : "after-ui-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-old-delete",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : true,
+          "phase" : "after-fresh-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        }
+      ],
+      "storeURL" : "\/Users\/runner\/work\/_temp\/swiftdata-save-probe\/stores\/old-delete-D3660C12-1E83-4514-99DE-64AF999B4CBB\/read-only.store",
+      "uiBystanderValue" : "unsaved-bystander-old-delete",
+      "uiBystanderValueUnchanged" : true,
+      "uiContextCount" : 0
+    },
+    {
+      "allowsSave" : false,
+      "explicitPrivateStoreURL" : true,
+      "freshContextCount" : 0,
+      "freshContextWordValues" : [
+        "saved-word"
+      ],
+      "immediateWriteContextCount" : 1,
+      "immediateWriteContextIncludesOwnedObject" : false,
+      "isolatedWriteContext" : false,
+      "mode" : "delete-process-pending",
+      "saveError" : {
+        "code" : 513,
+        "description" : "The file couldn’t be saved because you don’t have permission.",
+        "domain" : "NSCocoaErrorDomain"
+      },
+      "saveSucceeded" : false,
+      "snapshots" : [
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "before-insert",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : false,
+          "phase" : "after-insert-before-save",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : false,
+          "phase" : "save-threw-before-cleanup",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : true,
+          "phase" : "after-delete-or-owned-rollback-before-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : true,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-process-pending-before-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-immediate-write-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-ui-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-delete-process-pending",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-fresh-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          }
+        }
+      ],
+      "storeURL" : "\/Users\/runner\/work\/_temp\/swiftdata-save-probe\/stores\/delete-process-pending-9A13A05B-3502-47C7-82B8-C09CBE07B654\/read-only.store",
+      "uiBystanderValue" : "unsaved-bystander-delete-process-pending",
+      "uiBystanderValueUnchanged" : true,
+      "uiContextCount" : 0
+    },
+    {
+      "allowsSave" : false,
+      "explicitPrivateStoreURL" : true,
+      "freshContextCount" : 0,
+      "freshContextWordValues" : [
+        "saved-word"
+      ],
+      "immediateWriteContextCount" : 1,
+      "immediateWriteContextIncludesOwnedObject" : false,
+      "isolatedWriteContext" : true,
+      "mode" : "isolated-write-rollback",
+      "saveError" : {
+        "code" : 513,
+        "description" : "The file couldn’t be saved because you don’t have permission.",
+        "domain" : "NSCocoaErrorDomain"
+      },
+      "saveSucceeded" : false,
+      "snapshots" : [
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-isolated-write-rollback",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "before-insert",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : false,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-isolated-write-rollback",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : false,
+          "phase" : "after-insert-before-save",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-isolated-write-rollback",
+          "event" : "snapshot",
+          "ownedHasModelContext" : true,
+          "ownedIsDeleted" : false,
+          "phase" : "save-threw-before-cleanup",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+              {
+                "bystander" : false,
+                "isDeleted" : false,
+                "owned" : true,
+                "type" : "ProbeTranscription"
+              }
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-isolated-write-rollback",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-delete-or-owned-rollback-before-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : false,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-isolated-write-rollback",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-immediate-write-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : false,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-isolated-write-rollback",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-ui-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : false,
+            "inserted" : [
+
+            ]
+          }
+        },
+        {
+          "bystanderIsDeleted" : false,
+          "bystanderValue" : "unsaved-bystander-isolated-write-rollback",
+          "event" : "snapshot",
+          "ownedHasModelContext" : false,
+          "ownedIsDeleted" : false,
+          "phase" : "after-fresh-context-fetch",
+          "ui" : {
+            "changed" : [
+              {
+                "bystander" : true,
+                "isDeleted" : false,
+                "owned" : false,
+                "type" : "ProbeWord"
+              }
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : true,
+            "inserted" : [
+
+            ]
+          },
+          "write" : {
+            "changed" : [
+
+            ],
+            "deleted" : [
+
+            ],
+            "hasChanges" : false,
+            "inserted" : [
+
+            ]
+          }
+        }
+      ],
+      "storeURL" : "\/Users\/runner\/work\/_temp\/swiftdata-save-probe\/stores\/isolated-write-rollback-A5AB573A-ADA9-4D89-BB03-9E27C9D3F950\/read-only.store",
+      "uiBystanderValue" : "unsaved-bystander-isolated-write-rollback",
+      "uiBystanderValueUnchanged" : true,
+      "uiContextCount" : 0
+    }
+  ],
+  "os" : "Version 26.6.2 (Build 25G83)",
+  "pid" : 1505,
+  "schema" : [
+    "ProbeTranscription",
+    "ProbeWord"
+  ],
+  "sourceSHA256" : "85270123b4fdafaf884a9fe119e87b8f613e49d4a4fa60ad28fab207bc60aeeb",
+  "swiftCompiler" : "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "version" : 1
+}

@@ -1,0 +1,80 @@
+{
+  "run_id": 40587793807,
+  "head_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40587793807",
+  "status": "completed",
+  "conclusion": "failure",
+  "classification": "two-runtime-unit-assertion-failures-after-successful-compilation",
+  "artifact_id": 12774156438,
+  "artifact_bytes": 54054393,
+  "artifact_sha256": "447067cef1bfd2f07e095b51a9723ce5b899ff02b40480c54718cdff601d39bc",
+  "artifact_size_digest_and_all_2350_zip_crcs_verified": true,
+  "core_checks": 1753,
+  "unit_counts": {
+    "total": 253,
+    "passed": 238,
+    "failed": 2,
+    "skipped": 13,
+    "executed_non_skipped": 240
+  },
+  "required_unit_subset": {
+    "records": 61,
+    "success": 59,
+    "failure": 2,
+    "skipped": 0,
+    "new_groups": {
+      "capture": 5,
+      "audio_file": 10,
+      "pipeline": 17
+    },
+    "existing_plan_service_cli": 29
+  },
+  "all_17_captured_paste_cases_passed": true,
+  "failures": [
+    {
+      "identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+      "path": "VoiceInkTests/DictationPolishAudioFileTests.swift",
+      "line": 200,
+      "assertion": "try fixture.records().isEmpty",
+      "observed": "Expected read-only save failure Cocoa513 occurred; same source ModelContext still returned a transcription. The subsequent owned-audio-copy cleanup assertion did not fail.",
+      "classification": "same-context visibility after failed save; exact pending/deleted settlement mechanism unresolved",
+      "source_facts": [
+        "Fresh UUID fixture seeds only VocabularyWord, not Transcription.",
+        "Service inserts an owned Transcription, failed save calls delete on that object then immediately rethrows.",
+        "Test fetch includes pending changes from the same source context; no on-disk row is proven.",
+        "Sibling pipeline durability assertion uses a fresh ModelContext."
+      ],
+      "next_proof": "Under the same known-bad build, inspect owned object pending/deleted state plus fresh-context count before choosing a targeted settlement fix or test-boundary correction."
+    },
+    {
+      "identifier": "VoiceInkTests/DictationPolishPipelineTests/heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()",
+      "path": "VoiceInkTests/DictationPolishPipelineTests.swift",
+      "line": 367,
+      "assertion": "completed.transcriptionState == .completed && completed.dictationProfile == .none",
+      "observed": "Completed state true; optional profile compared to inferred Optional.none nil is false. Compiler explicitly warned to name VoiceInkDictationProfile.none. Subsequent raw-text, model, delivery and idle assertions had no issues.",
+      "classification": "confirmed test premise: optional nil versus enum None",
+      "narrow_correction": "Explicit VoiceInkDictationProfile.none; no product change warranted by this assertion."
+    }
+  ],
+  "failed_log": {
+    "fetched_once": true,
+    "local_path": "/tmp/rjt-polish-failed-40587793807.log",
+    "bytes": 15183926,
+    "sha256": "3b4f12af95a7eae6112356d842d3bd244ae67a303450c9ce0c2604f0b1823dc9"
+  },
+  "later_stages": {
+    "native": "skipped",
+    "matched": "skipped",
+    "ui": "skipped",
+    "release_package": "skipped"
+  },
+  "limits": [
+    "This full feature gate is red; normal unit compilation succeeded and two runtime assertions failed.",
+    "Raw aggregate has 253 testStatus records, 240 non-skipped. The log summary says 242 tests; it is not substituted for the decoded aggregate census.",
+    "Thirteen gated unit skips, including the new History factory selector, are not migration, UI, provider or ASR proof.",
+    "Foundation 40581988482 at 3ada remains separately green; no source-equivalence claim combines it with this ebf feature head.",
+    "Standalone UI and iOS runs belong to other owners and are not consumed or attributed here.",
+    "No code fix, build, app launch, model request, commit or push performed by this audit.",
+    "No persisted ghost row, failed audio-copy deletion, or exact SwiftData internal cause inferred solely from a same-context fetch."
+  ]
+}

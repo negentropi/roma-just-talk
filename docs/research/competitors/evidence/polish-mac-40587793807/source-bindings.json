@@ -1,0 +1,217 @@
+{
+  "run_id": 40587793807,
+  "head_sha": "ebf629b4cf109f7a36109ccac7b20ac70f9f48ab",
+  "sources": [
+    {
+      "path": "VoiceInkTests/DictationPlanCaptureTests.swift",
+      "bytes": 14547,
+      "sha256": "f83b3475edcd133e9497dd6e149aaf7dab649562e9b7973a6b136189887db9f5"
+    },
+    {
+      "path": "VoiceInkTests/DictationPolishAudioFileTests.swift",
+      "bytes": 36166,
+      "sha256": "8fc213b317dbdbc75622e07776cfaef27eb6f1e7b52d20fe3d0ce77a5c58c966"
+    },
+    {
+      "path": "VoiceInkTests/DictationPolishPipelineTests.swift",
+      "bytes": 49290,
+      "sha256": "9633072b341513c0a3f92c8ad9fe1618407490f272e433d4f2075e6c544bb51b"
+    },
+    {
+      "path": "VoiceInkTests/DictationPostprocessingPlanTests.swift",
+      "bytes": 21890,
+      "sha256": "4a0740c9b5e890aadef3114892be8322d375bb439197c5a2c908066b0bdc4666"
+    },
+    {
+      "path": "VoiceInkTests/ClarityProviderTests.swift",
+      "bytes": 17325,
+      "sha256": "85580bed6dda374494026bfd44fccd898dbc04b2cf1e8167e68f0742de03a054"
+    },
+    {
+      "path": "VoiceInkTests/LocalCLIServiceTests.swift",
+      "bytes": 25819,
+      "sha256": "bf27803af3515a47b08e83dd711e463147880dbf9e01b7fcf211b793c3b1f802"
+    },
+    {
+      "path": "VoiceInkTests/WritingTargetLiveTests.swift",
+      "bytes": 86199,
+      "sha256": "14f50537b5059809771a63f8baa536475ba47f3e1091f45f1d873fe5808edfbd"
+    },
+    {
+      "path": "VoiceInkTests/DictationHistoryUISeedLiveTests.swift",
+      "bytes": 25580,
+      "sha256": "5d381d292a6fd2c7d7313c8652f270a07893f0d26ef97ba00d5e9f4c8973a70f"
+    },
+    {
+      "path": "VoiceInkUITests/WritingFeaturesUITests.swift",
+      "bytes": 81716,
+      "sha256": "b15177d9b4dff602969279f86aaed407a1ab40fcf8ba6f9889ea0fc4647b5386"
+    },
+    {
+      "path": "scripts/run-writing-feature-regression.sh",
+      "bytes": 44959,
+      "sha256": "2645cea671fa8a613437e1c53aef70d9c75ea859abf1d1016a7ed536feb4c42f"
+    },
+    {
+      "path": "scripts/run-writing-settings-ui-regression.sh",
+      "bytes": 37568,
+      "sha256": "eed60b47c93e58276baa4fe96b2b749d35a5c3c349ee8faaf9ac8ec4162de72b"
+    },
+    {
+      "path": "VoiceInkTests/DictationMetadataStoreLiveTests.swift",
+      "bytes": 15458,
+      "sha256": "d6c22e6adccc8f8defe6355d53f5f9a186d6827a6c9a92ba2dd12a19da10a1c0"
+    },
+    {
+      "path": "VoiceInkTests/VoiceInkTests.swift",
+      "bytes": 72932,
+      "sha256": "e146b334f8a16775a7b28a0628d1cdbf7f6ba7b2b49185c43e1ab3fe282d97ba"
+    },
+    {
+      "path": "VoiceInkTests/DictationStoreSeedLiveTests.swift",
+      "bytes": 26303,
+      "sha256": "cdd61d3e67b96371944d2d59bb41b3313e38fc6116bfda41cf04321352d4acc5"
+    },
+    {
+      "path": "VoiceInk/VoiceInk.swift",
+      "bytes": 23766,
+      "sha256": "063d2de45ce7a7b9f454421decd213a2d4bf4c4e78f37f7084f6a324502d5188"
+    },
+    {
+      "path": "VoiceInk/Models/Transcription.swift",
+      "bytes": 7137,
+      "sha256": "7a33f68bd7235304e195fab40518679e6481a077fe61ea851187b284e481039c"
+    },
+    {
+      "path": "VoiceInk/Models/VocabularyWord.swift",
+      "bytes": 251,
+      "sha256": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b"
+    },
+    {
+      "path": "VoiceInk/Models/WordReplacement.swift",
+      "bytes": 686,
+      "sha256": "602004b8f8fd7da3eea1bc3e74e5a2d03d91c56f96decb303658f68e34256d44"
+    },
+    {
+      "path": "VoiceInk/Models/SessionMetric.swift",
+      "bytes": 2621,
+      "sha256": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8"
+    },
+    {
+      "path": "VoiceInk/Services/DictationPostprocessingPlan.swift",
+      "bytes": 7717,
+      "sha256": "9e06e1d0c48ce6bb0b4da5b2fbd6e07ed6784891e9774f7690001345a1217ec1"
+    },
+    {
+      "path": "VoiceInk/Services/DictionaryService.swift",
+      "bytes": 5719,
+      "sha256": "e630a6de3d0851a1222447ee7a03e1167481ac6d2f102909514555e070365966"
+    },
+    {
+      "path": "VoiceInk/Services/AIEnhancement/AIEnhancementService.swift",
+      "bytes": 24564,
+      "sha256": "986b0c1fae4a939faec9eed4c46a8c6065f6ed5489a922ed337d88994a06bb98"
+    },
+    {
+      "path": "VoiceInk/Services/AIEnhancement/LocalCLIService.swift",
+      "bytes": 20953,
+      "sha256": "2e4ca951ed5ecc9d85439485f3bfa33332d85520aedbdcf12be8173c0c53369a"
+    },
+    {
+      "path": "VoiceInk/Services/AudioFileTranscriptionManager.swift",
+      "bytes": 10669,
+      "sha256": "55fd02a85cffc4e9d84d7ddd5754a7dacee2bf2c16b05cf7f737cddb711edea5"
+    },
+    {
+      "path": "VoiceInk/Services/AudioFileTranscriptionService.swift",
+      "bytes": 10131,
+      "sha256": "607f8ec016e574f6a890aecea8bc009dfaa58c6cd79c4db25f367ff1b1855f1e"
+    },
+    {
+      "path": "VoiceInk/Services/LastTranscriptionService.swift",
+      "bytes": 8427,
+      "sha256": "dad4c626445d37a978a22361b3d21f5fc648787f0a0fb53792e7bb3f69051fb7"
+    },
+    {
+      "path": "VoiceInk/Transcription/Engine/VoiceInkEngine.swift",
+      "bytes": 55680,
+      "sha256": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c"
+    },
+    {
+      "path": "VoiceInk/Transcription/Engine/TranscriptionPipeline.swift",
+      "bytes": 28978,
+      "sha256": "e9229a9879a67c3b422e7a1d913c8b6386583837dc73484f28e5a0a173cd6bd9"
+    },
+    {
+      "path": "VoiceInk/Views/ModelSettingsView.swift",
+      "bytes": 16225,
+      "sha256": "18676bf774c7ddd9f5e01d978081ac3989950b9d98c993596b6b37cb83262487"
+    },
+    {
+      "path": "VoiceInk/Views/History/HistoryProcessingViews.swift",
+      "bytes": 6772,
+      "sha256": "6702314f2fd462b91075fbe50dff9c00a4974b60bb5834ddcde713520b99bea7"
+    },
+    {
+      "path": "VoiceInk/Views/History/InlineHistoryView.swift",
+      "bytes": 23788,
+      "sha256": "84ae9011a8e380f01ad25785b3688fbe0436667f8cf26b1865448593281312b1"
+    },
+    {
+      "path": "VoiceInk/Views/History/TranscriptionDetailView.swift",
+      "bytes": 4383,
+      "sha256": "0d020575a8e18647684ccf3f63974b994b44652e2ca4a8df7a610b4d54cd0720"
+    },
+    {
+      "path": "VoiceInk/Views/History/TranscriptionListItem.swift",
+      "bytes": 3238,
+      "sha256": "69774febf8b9347ea13a7845fff28bcedebcea5d5c936f4bac1eef4e5a6d8832"
+    },
+    {
+      "path": "VoiceInkCore/Sources/VoiceInkCore/DictationProfile.swift",
+      "bytes": 523,
+      "sha256": "4dd73a8fad0bb0838fa5a67d8076797f38fe94756906cd3b81cf504751c4479e"
+    },
+    {
+      "path": "VoiceInkCore/Sources/VoiceInkCore/DictationPolish.swift",
+      "bytes": 5829,
+      "sha256": "d9bcd4848c64432bfb6c7a92ded6255cb37b77ad43c8fe582bf5f4c2820c88a2"
+    },
+    {
+      "path": "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift",
+      "bytes": 37713,
+      "sha256": "af172491a2c5e51f98102d51f80b5951e8d76d04c20a0249f2fa709eff8c628d"
+    },
+    {
+      "path": "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRunProcessor.swift",
+      "bytes": 42111,
+      "sha256": "3899ac38de6c8587e21fa41957c19b8b79ffd9b15b8282a6b60f5cdb81981344"
+    },
+    {
+      "path": "VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift",
+      "bytes": 24670,
+      "sha256": "ead5a0df90449b0f7fbd9cc6573c490a219abb2ce09e4fe13015ec0f19106cde"
+    },
+    {
+      "path": "VoiceInkCore/Tests/VoiceInkCoreTests/DictationProfileRoutingTests.swift",
+      "bytes": 5963,
+      "sha256": "9a8e2f1ae4c8cbde34dd863ac26cb8eaf1cc93df6378709e24239e11cc804058"
+    },
+    {
+      "path": "VoiceInkCore/Tests/VoiceInkCoreTests/VoiceInkCoreCheckRunner.swift",
+      "bytes": 395767,
+      "sha256": "ca138b2d95d4579af1ff5a6d8b92047f64f190e8ed6a74064d3a37e0c526ef34"
+    },
+    {
+      "path": "scripts/run-macos-ci-unit-tests.sh",
+      "bytes": 2975,
+      "sha256": "dce0cac74da7caca17f74a13cfaae8eb291bc9b4f9ce5572c566e89f84299836"
+    },
+    {
+      "path": ".github/workflows/voiceink-writing-actions-check.yml",
+      "bytes": 9156,
+      "sha256": "51414a14b253a0cab9cccdc51b5fc83d5bdcdb089324fe8a105ff63617996587"
+    }
+  ],
+  "method": "git show exact ebf tested head; future correction work excluded"
+}

@@ -1,0 +1,297 @@
+[
+  {
+    "identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+    "status": "Failure",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~PH0ngh6klIX74rEvKYcpSR4_qb59uoyR5Xl_Kfoo_DjK3tzU8Q7VI0AdsXqnUGgzoZlrr1HTIVA5uSqE1VFTfQ==",
+    "decoded_summary_sha256": "4c806e56c559aa75b320ea5a0fdba9c7bbdeb5f1cd496bd62c4712933d507826",
+    "summary": {
+      "duration": "0.045130014419555664",
+      "failureSummaries": [
+        {
+          "_n": "Array"
+        },
+        {
+          "expression": {
+            "sourceCode": "try fixture.records().isEmpty"
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationPolishAudioFileTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "200",
+          "message": "Expectation failed: try fixture.records().isEmpty",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4589903188"
+              },
+              {
+                "addressString": "4589901451"
+              },
+              {
+                "addressString": "4589360731"
+              },
+              {
+                "addressString": "4716538907",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationPolishAudioFileTests.swift",
+                    "lineNumber": "200"
+                  },
+                  "symbolName": "VoiceInkTests.DictationPolishAudioFileTests.retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()"
+                }
+              },
+              {
+                "addressString": "4589668516"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "4589447724"
+              },
+              {
+                "addressString": "4589664728"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "4589004960"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "11029293628"
+              },
+              {
+                "addressString": "4590196548"
+              },
+              {
+                "addressString": "4588933060"
+              },
+              {
+                "addressString": "11029486724"
+              },
+              {
+                "addressString": "11029485740"
+              },
+              {
+                "addressString": "4589882416"
+              },
+              {
+                "addressString": "4589004960"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "11029486724"
+              },
+              {
+                "addressString": "11029485740"
+              },
+              {
+                "addressString": "4589674296"
+              },
+              {
+                "addressString": "4589734632"
+              },
+              {
+                "addressString": "4589661228"
+              },
+              {
+                "addressString": "4588933060"
+              },
+              {
+                "addressString": "4589049872"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "4589723788"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "11029151428"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationPolishAudioFileTests.swift",
+              "lineNumber": "200"
+            }
+          },
+          "timestamp": "2026-10-27T21:56:57.809+0000",
+          "uuid": "F06EE5E8-BC09-4886-BAB9-A9BC74BF61C7"
+        }
+      ],
+      "identifier": "VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+      "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+      "name": "retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+      "testStatus": "Failure"
+    }
+  },
+  {
+    "identifier": "VoiceInkTests/DictationPolishPipelineTests/heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()",
+    "status": "Failure",
+    "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~gMM3xm6FFw33LI_kn_-kXKznxEOa8ZWF7NKAlp28Z3BJu2wRtY_El43tSwRDxsfhbm4hl4V99lJuOf-T5dDfjg==",
+    "decoded_summary_sha256": "b8447bcca6413b128b5646215638489818143e7e0c3c8ebf46403768fc12a97d",
+    "summary": {
+      "duration": "0.05832386016845703",
+      "failureSummaries": [
+        {
+          "_n": "Array"
+        },
+        {
+          "expression": {
+            "sourceCode": "completed.transcriptionState == .completed && completed.dictationProfile == .none",
+            "subexpressions": [
+              {
+                "sourceCode": "completed.transcriptionState == .completed",
+                "value": {
+                  "debugDescription": "true",
+                  "description": "true",
+                  "fullyQualifiedTypeName": "Swift.Bool",
+                  "typeName": "Bool"
+                }
+              },
+              {
+                "sourceCode": "completed.dictationProfile == .none",
+                "value": {
+                  "debugDescription": "false",
+                  "description": "false",
+                  "fullyQualifiedTypeName": "Swift.Bool",
+                  "typeName": "Bool"
+                }
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationPolishPipelineTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "367",
+          "message": "Expectation failed: (completed.transcriptionState == .completed \u2192 true) && (completed.dictationProfile == .none \u2192 false)",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4589903188"
+              },
+              {
+                "addressString": "4589901451"
+              },
+              {
+                "addressString": "4589360731"
+              },
+              {
+                "addressString": "4589365115"
+              },
+              {
+                "addressString": "4716938651",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationPolishPipelineTests.swift",
+                    "lineNumber": "367"
+                  },
+                  "symbolName": "VoiceInkTests.DictationPolishPipelineTests.heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()"
+                }
+              },
+              {
+                "addressString": "4589668516"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "4589447724"
+              },
+              {
+                "addressString": "4589664728"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "4589004960"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "11029293628"
+              },
+              {
+                "addressString": "4590196548"
+              },
+              {
+                "addressString": "4588933060"
+              },
+              {
+                "addressString": "11029486724"
+              },
+              {
+                "addressString": "11029485740"
+              },
+              {
+                "addressString": "4589882416"
+              },
+              {
+                "addressString": "4589004960"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "11029486724"
+              },
+              {
+                "addressString": "11029485740"
+              },
+              {
+                "addressString": "4589674296"
+              },
+              {
+                "addressString": "4589734632"
+              },
+              {
+                "addressString": "4589661228"
+              },
+              {
+                "addressString": "4588933060"
+              },
+              {
+                "addressString": "4589049872"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "4589723788"
+              },
+              {
+                "addressString": "4589009152"
+              },
+              {
+                "addressString": "11029151428"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/DictationPolishPipelineTests.swift",
+              "lineNumber": "367"
+            }
+          },
+          "timestamp": "2026-10-27T21:56:58.854+0000",
+          "uuid": "1BD042AE-820D-4496-B09E-A19D61241C81"
+        }
+      ],
+      "identifier": "VoiceInkTests/DictationPolishPipelineTests/heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()",
+      "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()",
+      "name": "heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()",
+      "testStatus": "Failure"
+    }
+  }
+]

@@ -1,0 +1,104 @@
+{
+  "run_id": 40591876983,
+  "head_sha": "46dd2a13e719cb61e2a2bbf83aa24e7d15a4bf7e",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40591876983",
+  "status": "completed",
+  "conclusion": "success",
+  "classification": "observational-sdk-probe-completed-no-candidate-cleanup-accepted",
+  "artifact_id": 12774143346,
+  "artifact_bytes": 10001,
+  "artifact_sha256": "40931528ef5fff931e422882983f7a8fef96de734053426a771f3c5f800dbf8f",
+  "size_digest_and_all_8_zip_crcs_verified": true,
+  "source_sha256": "85270123b4fdafaf884a9fe119e87b8f613e49d4a4fa60ad28fab207bc60aeeb",
+  "raw_report_sha256": "94424e98f6a89de4f0431aa6e04463762c3677ae92c92f4416b85f84b156b663",
+  "toolchain": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+  "os": "Version 26.6.2 (Build 25G83)",
+  "pid": 1505,
+  "observations": [
+    {
+      "allowsSave": false,
+      "explicitPrivateStoreURL": true,
+      "freshContextCount": 0,
+      "freshContextWordValues": [
+        "saved-word"
+      ],
+      "immediateWriteContextCount": 1,
+      "immediateWriteContextIncludesOwnedObject": false,
+      "isolatedWriteContext": false,
+      "mode": "old-delete",
+      "saveError": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "saveSucceeded": false,
+      "uiBystanderValue": "unsaved-bystander-old-delete",
+      "uiBystanderValueUnchanged": true,
+      "uiContextCount": 0
+    },
+    {
+      "allowsSave": false,
+      "explicitPrivateStoreURL": true,
+      "freshContextCount": 0,
+      "freshContextWordValues": [
+        "saved-word"
+      ],
+      "immediateWriteContextCount": 1,
+      "immediateWriteContextIncludesOwnedObject": false,
+      "isolatedWriteContext": false,
+      "mode": "delete-process-pending",
+      "saveError": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "saveSucceeded": false,
+      "uiBystanderValue": "unsaved-bystander-delete-process-pending",
+      "uiBystanderValueUnchanged": true,
+      "uiContextCount": 0
+    },
+    {
+      "allowsSave": false,
+      "explicitPrivateStoreURL": true,
+      "freshContextCount": 0,
+      "freshContextWordValues": [
+        "saved-word"
+      ],
+      "immediateWriteContextCount": 1,
+      "immediateWriteContextIncludesOwnedObject": false,
+      "isolatedWriteContext": true,
+      "mode": "isolated-write-rollback",
+      "saveError": {
+        "code": 513,
+        "description": "The file couldn\u2019t be saved because you don\u2019t have permission.",
+        "domain": "NSCocoaErrorDomain"
+      },
+      "saveSucceeded": false,
+      "uiBystanderValue": "unsaved-bystander-isolated-write-rollback",
+      "uiBystanderValueUnchanged": true,
+      "uiContextCount": 0
+    }
+  ],
+  "state_changes": {
+    "old-delete": "Owned record remains in inserted and deleted arrays, attached and isDeleted=true after cleanup.",
+    "delete-process-pending": "Owned inserted/deleted arrays clear and model detaches after processPendingChanges; first writer fetch still returns one object.",
+    "isolated-write-rollback": "Private writer inserted/deleted arrays clear and hasChanges=false after rollback; first writer fetch still returns one object. Original UI context keeps unrelated dirty word."
+  },
+  "interpretation": [
+    "Every mode has a fresh private read-only two-model store and actually throws Cocoa513 on save.",
+    "No persisted transcription is observed by fresh-context fetch; disk-corruption or persisted-ghost claims are unsupported.",
+    "All modes fetch writer first, UI second, fresh context third. Baseline and processPending modes alias writer and UI, so the same context returns one then zero on consecutive fetches.",
+    "The isolated mode UI-second zero is confounded by fetch order and does not establish UI-first invisibility.",
+    "processPendingChanges settles the owned model registration but does not establish immediate first-fetch emptiness.",
+    "=== false establishes a different Swift object reference; persistent row identifiers were not captured."
+  ],
+  "next_probe": "Fresh fixtures crossed UI-FIRST/WRITE-FIRST for each cleanup, plus unchanged-word and private-context-lifetime cases, with no SDK state getters between cleanup and the selected first query.",
+  "independent_read_only_audit": "Artifact bytes, source/head/toolchain, all three per-case reports, raw run snapshots, save513 and preservation states independently checked; no discrepancy.",
+  "limits": [
+    "Minimal instrumented SDK schema is mechanism guidance, not the actual 253-record app-suite regression boundary.",
+    "Dirty-word preservation stress differs from the unchanged seeded word in the failing app test.",
+    "State getters before/after cleanup can alter pending-state settlement.",
+    "No app product fix is accepted by this run; app-known-bad ebf and future fixed app must be tested separately.",
+    "No private KVC, destructive reset, app UI, provider authentication, model requests or local runtime execution used."
+  ]
+}

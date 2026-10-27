@@ -1,0 +1,42 @@
+[
+  {
+    "member": "build.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "member": "delete-process-pending.json",
+    "bytes": 9071,
+    "sha256": "c1f3c66018de7b9409555a2e9e36f44d9d5abbd4d12b4d7088f2021f274439ab"
+  },
+  {
+    "member": "environment.txt",
+    "bytes": 351,
+    "sha256": "c364817a47408e7fe66e87ec2a2fad19cacd2c4010c31615a12e8ba0a053d720"
+  },
+  {
+    "member": "isolated-write-rollback.json",
+    "bytes": 6205,
+    "sha256": "a222c875cdc2d967aa851f8248b77f5a7a89444aa83d211a57690da4798591e9"
+  },
+  {
+    "member": "old-delete.json",
+    "bytes": 9959,
+    "sha256": "bf32351d78bb10cb121ae6db1933a00844b450eb3baa2c885970d608148da0ae"
+  },
+  {
+    "member": "report.json",
+    "bytes": 30272,
+    "sha256": "94424e98f6a89de4f0431aa6e04463762c3677ae92c92f4416b85f84b156b663"
+  },
+  {
+    "member": "run.log",
+    "bytes": 44368,
+    "sha256": "9f3abc875bd98435dc6897917f078dded04fed7b119f7ae4487c7af76f154855"
+  },
+  {
+    "member": "source.swift",
+    "bytes": 9358,
+    "sha256": "85270123b4fdafaf884a9fe119e87b8f613e49d4a4fa60ad28fab207bc60aeeb"
+  }
+]

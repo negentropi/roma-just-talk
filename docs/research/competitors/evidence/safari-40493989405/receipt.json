@@ -1,0 +1,10 @@
+{
+  "run_id": 40493989405,
+  "head_sha": "99ff7bdb5efcf152b759993f542d86e85706b8fd",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40493989405",
+  "artifact_id": 12730526426,
+  "artifact_sha256": "cee71808c917f2e71fb6420ac9ee29971012b04434ffb286f1e1d65b74984c8a",
+  "parent_verification": "Rechecked all native production hashes against their exact Git revisions, identical oracle/manifest, lane source/pin receipts, and unchanged executable identities.",
+  "classification": "matched-red-green",
+  "boundary": "Real Safari selection replacement using production native files and real Core/NVIDIA packages. No full app, ASR, provider, physical-input or rich-text proof."
+}

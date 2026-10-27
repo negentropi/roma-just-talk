@@ -31,7 +31,7 @@ The replacement engine passes replacement text to a regex-template API without e
 | `cost` to `$5.00` | `.00` | `$5.00` |
 | `path` to `C:\Temp\$1` | Loses backslashes | `C:\Temp\$1` |
 
-The unchanged extracted engine failed both literal cases. A proposed escaped-template version passed them and retained comma-alternative and CJK controls. Local receipt: `/tmp/rjt-replacement-literal.J1ZLyV`. Production has not been changed by this discovery.
+The unchanged extracted engine failed both literal cases. `a952ff67` now escapes replacement text, with the same production-engine fixture red on the old source and green on the candidate. [Retained receipt](evidence/literal-replacement/receipt.json). Existing comma alternatives and CJK controls passed. Shared core verification passed on `f901c372`; this fixes a prerequisite, not the approved-correction workflow.
 
 The current spaced-script boundary pattern is ASCII-only. Separate probes found `éclair` becoming `éclear` and `Romaé` becoming `RJTé`. Fix those boundaries while retaining deliberate CJK substring matching. Tests must separate these semantics rather than claim universal Unicode behavior.
 

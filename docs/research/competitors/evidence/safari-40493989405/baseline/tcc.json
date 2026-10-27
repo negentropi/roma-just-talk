@@ -1,0 +1,2 @@
+[{"service":"kTCCServiceAccessibility","client":"com.negentropi.RomaJustTalk.WritingTargetProbe","auth_value":2,"requirement":"FADE0C00000000280000000100000008000000142D758A82C8398B95966056B103B6B83232AF5293"},
+{"service":"kTCCServiceScreenCapture","client":"com.negentropi.RomaJustTalk.WritingTargetProbe","auth_value":2,"requirement":"FADE0C00000000280000000100000008000000142D758A82C8398B95966056B103B6B83232AF5293"}]

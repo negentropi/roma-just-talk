@@ -19,6 +19,7 @@ The table below retains the audited baseline states. New Mac work is tracked in 
 - A24–A26: `827845a1` adds distinct recording actions for selected-text editing, translation, and drafting, with independent ordered translation targets and captured destination checks. Read-only answers, contextual replies, web actions, transform review, and undo remain open.
 - Settings backup and reset include the new library, targets, and shortcuts while retaining older backup decoding.
 - Hosted run [40475185945](https://github.com/negentropi/roma-just-talk/actions/runs/40475185945) passed core and full Mac units after earlier runs exposed a UTF-16 bug, pipeline fixture crashes and a test-macro compilation error. Its live step selected zero tests and was rejected. [Run 40479529231](https://github.com/negentropi/roma-just-talk/actions/runs/40479529231) tests the corrected selection driver. Live editor proof, matched regression and UI interactions remain open. Five bounded [prompt/CLI smoke observations](evidence/writing-cli-smoke/summary.md) passed; app-service routing and general provider quality remain unproven.
+- The corrected driver proved TextEdit replacement and drift refusal, while Safari setup and settings launch remained red. A later native comparison reproduced Safari's accepted-write no-op and passed exact selection replacement through the new captured menu-paste route. [Matched receipt](evidence/safari-40493989405/receipt.json). Full app, provider, UI interaction and physical-input boundaries remain separately open.
 
 ## Source owners
 

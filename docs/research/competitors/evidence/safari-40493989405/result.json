@@ -1,0 +1,49 @@
+{
+  "classification": "matched-red-green",
+  "scope": "Native delivery with real Core/NVIDIA dependencies, not full app E2E",
+  "lanes": {
+    "baseline": {
+      "valid": true,
+      "errors": [],
+      "observed": {
+        "accessibilityTrusted": true,
+        "bundleIdentifier": "com.negentropi.RomaJustTalk.WritingTargetProbe",
+        "checks": {
+          "captured-selection-exact": true,
+          "drift-left-original-untouched": true,
+          "selected-range-drift-refused": true
+        },
+        "classification": "invalid-or-failed",
+        "error": "replacementUnconfirmed",
+        "executablePath": "/Users/runner/work/_temp/writing-target-probe/baseline/WritingTargetProbe.app/Contents/MacOS/WritingTargetProbe",
+        "fixtureIssues": [],
+        "phase": "replacement",
+        "processIdentifier": 14301,
+        "scope": "Real native delivery files and Core/NVIDIA packages plus the shared live Safari helper; not full app E2E",
+        "screenCaptureGranted": true
+      }
+    },
+    "candidate": {
+      "valid": true,
+      "errors": [],
+      "observed": {
+        "accessibilityTrusted": true,
+        "bundleIdentifier": "com.negentropi.RomaJustTalk.WritingTargetProbe",
+        "checks": {
+          "captured-selection-exact": true,
+          "drift-left-original-untouched": true,
+          "replacement-exact-prefix-suffix": true,
+          "selected-range-drift-refused": true
+        },
+        "classification": "passed",
+        "error": null,
+        "executablePath": "/Users/runner/work/_temp/writing-target-probe/candidate/WritingTargetProbe.app/Contents/MacOS/WritingTargetProbe",
+        "fixtureIssues": [],
+        "phase": "completed",
+        "processIdentifier": 10115,
+        "scope": "Real native delivery files and Core/NVIDIA packages plus the shared live Safari helper; not full app E2E",
+        "screenCaptureGranted": true
+      }
+    }
+  }
+}

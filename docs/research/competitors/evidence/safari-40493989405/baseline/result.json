@@ -1,0 +1,19 @@
+{
+  "accessibilityTrusted" : true,
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk.WritingTargetProbe",
+  "checks" : {
+    "captured-selection-exact" : true,
+    "drift-left-original-untouched" : true,
+    "selected-range-drift-refused" : true
+  },
+  "classification" : "invalid-or-failed",
+  "error" : "replacementUnconfirmed",
+  "executablePath" : "\/Users\/runner\/work\/_temp\/writing-target-probe\/baseline\/WritingTargetProbe.app\/Contents\/MacOS\/WritingTargetProbe",
+  "fixtureIssues" : [
+
+  ],
+  "phase" : "replacement",
+  "processIdentifier" : 14301,
+  "scope" : "Real native delivery files and Core\/NVIDIA packages plus the shared live Safari helper; not full app E2E",
+  "screenCaptureGranted" : true
+}

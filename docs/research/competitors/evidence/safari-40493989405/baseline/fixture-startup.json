@@ -1,0 +1,42 @@
+{
+  "bundleIdentifier" : "com.apple.Safari",
+  "checkpoint" : "fixture-startup",
+  "documentBudgetMilliseconds" : 20000,
+  "failure" : null,
+  "finalStage" : "ready",
+  "processIdentifier" : 10116,
+  "stages" : [
+    {
+      "sinceOpenMilliseconds" : 47.375875000000178,
+      "stage" : "workspace-open-completed"
+    },
+    {
+      "accepted" : true,
+      "sinceOpenMilliseconds" : 47.585708333315324,
+      "stage" : "application-activation-requested"
+    },
+    {
+      "sinceOpenMilliseconds" : 48.986000000013519,
+      "stage" : "frontmost-identity-observed"
+    },
+    {
+      "documentIsOwnedFile" : false,
+      "existedBeforeOpen" : false,
+      "ownershipMarkerMatched" : true,
+      "sinceOpenMilliseconds" : 566.31912500000681,
+      "stage" : "owned-document-observed",
+      "titleContainsToken" : true
+    },
+    {
+      "sameDocumentWindow" : true,
+      "sinceOpenMilliseconds" : 574.91712500001313,
+      "stage" : "exact-textarea-observed"
+    },
+    {
+      "sinceOpenMilliseconds" : 579.05275000001666,
+      "stage" : "owned-editor-focused"
+    }
+  ],
+  "textareaBudgetMilliseconds" : 5000,
+  "token" : "RJT-Writing-Live-9B048C7E-0087-4AB4-88FB-CD46651F2B51"
+}

@@ -6,12 +6,24 @@ import VoiceInkCore
 
 extension VoiceInkTests {
     @Test func writingProviderChecksRejectMissingMeaning() {
-        #expect(!WritingProviderFixture.japaneseToEnglish.checks("RJT-482").allSatisfy(\.passed))
-        #expect(!WritingProviderFixture.englishToTraditionalChinese.checks("RJT-482").allSatisfy(\.passed))
-        #expect(!WritingProviderFixture.conciseSelection.checks("Atlas Mina Friday 10:30 RJT-482.").allSatisfy(\.passed))
-        #expect(WritingProviderFixture.japaneseToEnglish.checks("Let's meet at the south exit of Taipei Main Station tomorrow at 3 p.m.; the confirmation code is RJT-482.").allSatisfy(\.passed))
-        #expect(WritingProviderFixture.englishToTraditionalChinese.checks("我們明天下午3點在台北車站南出口見面，確認代碼為RJT-482。").allSatisfy(\.passed))
-        #expect(WritingProviderFixture.conciseSelection.checks("Mina, the Atlas review moved to Friday at 10:30 at Taipei Main Station; please use ticket RJT-482 when replying.").allSatisfy(\.passed))
+        let incomplete: [(WritingProviderFixture, String)] = [
+            (.japaneseToEnglish, "RJT-482"),
+            (.englishToTraditionalChinese, "RJT-482"),
+            (.conciseSelection, "Atlas Mina Friday 10:30 RJT-482.")
+        ]
+        for (fixture, output) in incomplete {
+            let accepted = fixture.checks(output).allSatisfy { $0.passed }
+            #expect(!accepted)
+        }
+        let complete: [(WritingProviderFixture, String)] = [
+            (.japaneseToEnglish, "Let's meet at the south exit of Taipei Main Station tomorrow at 3 p.m.; the confirmation code is RJT-482."),
+            (.englishToTraditionalChinese, "我們明天下午3點在台北車站南出口見面，確認代碼為RJT-482。"),
+            (.conciseSelection, "Mina, the Atlas review moved to Friday at 10:30 at Taipei Main Station; please use ticket RJT-482 when replying.")
+        ]
+        for (fixture, output) in complete {
+            let accepted = fixture.checks(output).allSatisfy { $0.passed }
+            #expect(accepted)
+        }
     }
 
     @Test(.enabled(if: WritingProviderEnvironment.isEnabled))

@@ -1,0 +1,338 @@
+{
+  "actualOracleCompiled": true,
+  "actualStoreSeedStarted": false,
+  "archivedBuilds": {
+    "actual-host.app.zip": {
+      "byteIdentityMatchesOriginalSignedTree": true,
+      "bytes": 73749667,
+      "entryCount": 669,
+      "sha256": "db6afed57f2dba9db1a67c5b25fb180a966211806c250279b198eae7bca7f06b"
+    },
+    "actual-tests-0.xctest.zip": {
+      "byteIdentityMatchesOriginalSignedTree": true,
+      "bytes": 4543211,
+      "entryCount": 212,
+      "sha256": "ac12574fb308efe9fccf602756610bd0499eee28564ae05ad04f077d85cd92b5"
+    }
+  },
+  "artifactBytes": 78486045,
+  "artifactID": 12763112453,
+  "artifactSHA256": "9b08ef70f12ce851937455f86d6a9736026047e547685f76c7a4d6ceab6e264e",
+  "canonicalPackageLockSHA256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "canonicalPins": 41,
+  "classification": "predecessor-built-signing-contract-failed-before-seed",
+  "currentReadStarted": false,
+  "failure": {
+    "classification": "invalid-or-failed",
+    "error": "Command failed; inspect /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/adhoc-app.log",
+    "mode": "predecessor"
+  },
+  "frameworkEntryCount": 121,
+  "frozenOracleSHA256": "ad146f0800c148acd6d25e3500f6c7a4f8d3c1e7da887fe9b46642afc99bb5e7",
+  "limits": [
+    "No actual SwiftData seed, reopen, schema runtime, field persistence or migration proof.",
+    "No app test host launched. Build/signature evidence only.",
+    "Remote parser does not replace macOS codesign cryptographic validation. Original runner identity deep/strict check passed before the Hardened Runtime contract failed."
+  ],
+  "oldReopenStarted": false,
+  "packageInventories": {
+    "axswift": {
+      "entries": 25,
+      "files": 25,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "eventsource": {
+      "entries": 19,
+      "files": 19,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "fluidaudio": {
+      "entries": 524,
+      "files": 524,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "grpc-swift-2": {
+      "entries": 441,
+      "files": 433,
+      "gitlinks": [],
+      "symlinks": 8
+    },
+    "grpc-swift-nio-transport": {
+      "entries": 220,
+      "files": 220,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "grpc-swift-protobuf": {
+      "entries": 107,
+      "files": 105,
+      "gitlinks": [],
+      "symlinks": 2
+    },
+    "keysender": {
+      "entries": 9,
+      "files": 9,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "launchatlogin-modern": {
+      "entries": 9,
+      "files": 9,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "llmkit": {
+      "entries": 32,
+      "files": 32,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "mediaremote-adapter": {
+      "entries": 13,
+      "files": 13,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "mlx-audio-swift": {
+      "entries": 434,
+      "files": 434,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "mlx-swift": {
+      "entries": 741,
+      "files": 739,
+      "gitlinks": [
+        {
+          "gitObject": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+          "nestedInventory": {
+            "entries": 883,
+            "files": 883,
+            "gitlinks": [],
+            "symlinks": 0
+          },
+          "path": "Source/Cmlx/mlx",
+          "state": "initialized"
+        },
+        {
+          "gitObject": "0726ca922fc902c4c61ef9c27d94132be418e945",
+          "nestedInventory": {
+            "entries": 126,
+            "files": 126,
+            "gitlinks": [],
+            "symlinks": 0
+          },
+          "path": "Source/Cmlx/mlx-c",
+          "state": "initialized"
+        }
+      ],
+      "symlinks": 0
+    },
+    "mlx-swift-lm": {
+      "entries": 273,
+      "files": 273,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "permissionflow": {
+      "entries": 57,
+      "files": 57,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "selectedtextkit": {
+      "entries": 42,
+      "files": 42,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "sparkle": {
+      "entries": 600,
+      "files": 600,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-algorithms": {
+      "entries": 119,
+      "files": 119,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-asn1": {
+      "entries": 212,
+      "files": 212,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-async-algorithms": {
+      "entries": 208,
+      "files": 206,
+      "gitlinks": [],
+      "symlinks": 2
+    },
+    "swift-atomics": {
+      "entries": 144,
+      "files": 144,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-certificates": {
+      "entries": 365,
+      "files": 365,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-collections": {
+      "entries": 842,
+      "files": 842,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-crypto": {
+      "entries": 1044,
+      "files": 1044,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-http-structured-headers": {
+      "entries": 69,
+      "files": 69,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-http-types": {
+      "entries": 603,
+      "files": 603,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-huggingface": {
+      "entries": 101,
+      "files": 101,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-jinja": {
+      "entries": 37,
+      "files": 37,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-log": {
+      "entries": 144,
+      "files": 144,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-nio": {
+      "entries": 767,
+      "files": 765,
+      "gitlinks": [],
+      "symlinks": 2
+    },
+    "swift-nio-extras": {
+      "entries": 180,
+      "files": 180,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-nio-http2": {
+      "entries": 614,
+      "files": 614,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-nio-ssl": {
+      "entries": 769,
+      "files": 769,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-nio-transport-services": {
+      "entries": 61,
+      "files": 61,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-numerics": {
+      "entries": 70,
+      "files": 70,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-protobuf": {
+      "entries": 2511,
+      "files": 2511,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-service-lifecycle": {
+      "entries": 51,
+      "files": 51,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-syntax": {
+      "entries": 872,
+      "files": 872,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-system": {
+      "entries": 99,
+      "files": 99,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "swift-transformers": {
+      "entries": 95,
+      "files": 95,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "yyjson": {
+      "entries": 903,
+      "files": 903,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "zip": {
+      "entries": 71,
+      "files": 71,
+      "gitlinks": [],
+      "symlinks": 0
+    }
+  },
+  "predecessorBuildSucceeded": true,
+  "runID": 40562833675,
+  "sourceInventories": {
+    "candidate": {
+      "entries": 617,
+      "files": 617,
+      "gitlinks": [],
+      "symlinks": 0
+    },
+    "predecessor": {
+      "entries": 610,
+      "files": 610,
+      "gitlinks": [],
+      "symlinks": 0
+    }
+  },
+  "sourceModelFactoryModuleBridgeEqual": true,
+  "sourceSHA": {
+    "candidate": "488b3d52a5ade477b085f61c4fb7dc06d55a851d",
+    "predecessor": "ebc92f1e60fdabbb9e26b2817f414d154865a9d5"
+  },
+  "whisperInventory": {
+    "entries": 2057,
+    "files": 2057,
+    "gitlinks": [],
+    "symlinks": 0
+  },
+  "whisperSourceRevision": "21ba6d269a02c14309355cb96822db6058d4cf48",
+  "zipCRCValid": true
+}

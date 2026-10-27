@@ -1,0 +1,17 @@
+store-control	Seed and reopen in separate actual predecessor hosts	﻿2026-10-27T18:59:33.4692640Z ##[group]Run bash scripts/run-dictation-store-seed-check.sh predecessor
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T18:59:33.4693210Z ^[[36;1mbash scripts/run-dictation-store-seed-check.sh predecessor^[[0m
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T18:59:33.7283990Z shell: /bin/bash -e {0}
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T18:59:33.7284660Z ##[endgroup]
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T18:59:43.6567730Z Running xcodebuild; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/build.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:24.8196260Z Running ditto; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/archive-host.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:34.5074970Z Running ditto; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/archive-tests-0.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:35.2013390Z Running bash; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/static-app.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.4298280Z Running bash; log /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/adhoc-app.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.4673240Z ad-hoc app is missing Hardened Runtime: /Users/runner/work/_temp/dictation-store-seed-derived-predecessor/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.5272540Z Traceback (most recent call last):
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.5273310Z   File "<stdin>", line 691, in <module>
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.5281290Z   File "<stdin>", line 618, in old_control
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.5283460Z   File "<stdin>", line 614, in build
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.5284790Z   File "<stdin>", line 116, in run
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.5286070Z RuntimeError: Command failed; inspect /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/adhoc-app.log
+store-control	Seed and reopen in separate actual predecessor hosts	2026-10-27T19:08:40.5717910Z ##[error]Process completed with exit code 1.

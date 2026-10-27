@@ -1,0 +1,31 @@
+{
+  "archiveBytes": 78486045,
+  "archiveSHA256": "9b08ef70f12ce851937455f86d6a9736026047e547685f76c7a4d6ceab6e264e",
+  "entryCount": 31,
+  "failure": {
+    "classification": "invalid-or-failed",
+    "error": "Command failed; inspect /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/adhoc-app.log",
+    "mode": "predecessor"
+  },
+  "nativePhaseFiles": [],
+  "packageGitlinks": {
+    "mlx-swift": [
+      {
+        "gitObject": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+        "path": "Source/Cmlx/mlx",
+        "revision": "ce45c52505c8158ea48d2a54e8caae05efd86bfe",
+        "state": "initialized",
+        "trackedSourceCount": 883
+      },
+      {
+        "gitObject": "0726ca922fc902c4c61ef9c27d94132be418e945",
+        "path": "Source/Cmlx/mlx-c",
+        "revision": "0726ca922fc902c4c61ef9c27d94132be418e945",
+        "state": "initialized",
+        "trackedSourceCount": 126
+      }
+    ]
+  },
+  "whisperGitlinks": [],
+  "zipCRCValid": true
+}

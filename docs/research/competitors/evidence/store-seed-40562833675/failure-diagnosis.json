@@ -1,0 +1,9 @@
+{
+  "artifactID": 12763112453,
+  "diagnosis": "Actual build-for-testing succeeded, but its final CodeSign command omitted --options runtime. Archived main Mach-O CodeDirectory has flags0x2 (ad-hoc) with no runtime flag. Guard rejected before the seed host launched. Source project already has ENABLE_HARDENED_RUNTIME=YES; the effective testing build settings still need causal confirmation before choosing an override.",
+  "exactSourceSHA": "488b3d52a5ade477b085f61c4fb7dc06d55a851d",
+  "nativeProof": "Actual old app/oracle build only. No app launch, SwiftData seed, reopen, current read or migration proof.",
+  "remoteArchive": "/data/rjt-writing-check-01a17bef/40562833675/roma.dictation-store-seed-control.zip",
+  "remoteHost": "decentleftover-pf",
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40562833675"
+}

@@ -1,0 +1,5 @@
+{
+  "classification": "invalid-or-failed",
+  "mode": "predecessor",
+  "error": "Command failed; inspect /Users/runner/work/_temp/dictation-store-seed-proof/predecessor-build/adhoc-app.log"
+}

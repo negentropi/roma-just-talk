@@ -1,0 +1,9 @@
+{
+  "run_id": 40501506898,
+  "source_sha": "f1d9d401549931aff0c1384ae6a19120f348e886",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40501506898",
+  "artifact_id": 12733052348,
+  "artifact_sha256": "de1c47f338604d4438fd774166d29c8e0407ae0e7ab62ca4ace673ca3e6fac53",
+  "classification": "passed",
+  "scope": "Stronger exact UTF-8 stdin/request metadata checks passed. Environment text was canonical-equivalent with changed UTF-8 and UTF-16, explicitly recorded. No repeated authenticated or native editor execution."
+}

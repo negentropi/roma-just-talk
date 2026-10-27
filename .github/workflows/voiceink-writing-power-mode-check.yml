@@ -68,7 +68,7 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
-      - name: Matched Power Mode UI regression
+      - name: Matched Power Mode UI regression on pinned products
         run: bash scripts/run-writing-power-mode-regression.sh
 
       - name: Upload regression evidence
@@ -91,5 +91,7 @@ jobs:
             ${{ runner.temp }}/writing-power-mode-proof/*/*/attachments/**
             ${{ runner.temp }}/writing-power-mode-proof/*/*/result.json
             ${{ runner.temp }}/writing-power-mode-proof/contract.json
+            ${{ runner.temp }}/writing-power-mode-proof/*production*.json
+            ${{ runner.temp }}/writing-power-mode-proof/packages/*.json
             ${{ runner.temp }}/writing-power-mode-proof/result.json
           if-no-files-found: warn

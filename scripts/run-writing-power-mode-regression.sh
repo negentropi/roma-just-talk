@@ -12,33 +12,42 @@ fi
 
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo"
-candidate_sha="$(git rev-parse HEAD)"
+driver_sha="$(git rev-parse HEAD)"
+candidate_sha=8d2568169762bad7aee2b077575c37846b6dc3d6
 baseline_sha=98df5fa57fa4b2a928c3b2e2f95b59726d391572
 verified_sha=7459b97b0469832a55b38df7b82753b82e430fdb
 out="$RUNNER_TEMP/writing-power-mode-proof"
 baseline="$RUNNER_TEMP/writing-power-mode-baseline"
+candidate="$RUNNER_TEMP/writing-power-mode-candidate"
 oracle=VoiceInkUITests/WritingPowerModeUITests.swift
 scheme=VoiceInk.xcodeproj/xcshareddata/xcschemes/WritingPowerModeProof.xcscheme
 test ! -e "$out"
 test ! -e "$baseline"
+test ! -e "$candidate"
 mkdir -p "$out"
 phase=source-contract
 trap 'code=$?; if [[ "$code" != 0 ]]; then printf "{\"classification\":\"invalid-or-failed\",\"boundary\":\"%s\",\"exit_code\":%s}\n" "$phase" "$code" > "$out/failure.json"; fi' EXIT
-git fetch --no-tags origin "$baseline_sha" "$verified_sha"
+git fetch --no-tags origin "$baseline_sha" "$candidate_sha" "$verified_sha"
 git worktree add --detach "$baseline" "$baseline_sha"
+git worktree add --detach "$candidate" "$candidate_sha"
+test "$(git -C "$baseline" rev-parse HEAD)" = "$baseline_sha"
+test "$(git -C "$candidate" rev-parse HEAD)" = "$candidate_sha"
 test -f "$repo/$oracle"
 test ! -e "$baseline/$oracle"
+cp "$candidate/$oracle" "$out/candidate-original-oracle.swift"
 cp "$repo/$oracle" "$baseline/$oracle"
+cp "$repo/$oracle" "$candidate/$oracle"
 cmp "$repo/$oracle" "$baseline/$oracle"
+cmp "$repo/$oracle" "$candidate/$oracle"
 resolved=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 phase=canonical-package-contract
-bash "$repo/scripts/run-writing-feature-regression.sh" packages "$out/packages" "$baseline" "$verified_sha" \
+bash "$candidate/scripts/run-writing-feature-regression.sh" packages "$out/packages" "$baseline" "$verified_sha" \
   "$RUNNER_TEMP/writing-power-mode-packages"
-cmp "$repo/$resolved" "$baseline/$resolved"
-cmp "$repo/VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInkUpdaterE2E.xcscheme" \
+cmp "$candidate/$resolved" "$baseline/$resolved"
+cmp "$candidate/VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInkUpdaterE2E.xcscheme" \
   "$baseline/VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInkUpdaterE2E.xcscheme"
 
-python3 - "$repo" "$baseline" "$out" "$baseline_sha" "$candidate_sha" "$verified_sha" <<'PY'
+python3 - "$candidate" "$baseline" "$out" "$baseline_sha" "$candidate_sha" "$verified_sha" "$driver_sha" "$repo" <<'PY'
 import hashlib
 import json
 import subprocess
@@ -47,7 +56,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 candidate, baseline, output = map(Path, sys.argv[1:4])
-baseline_sha, candidate_sha, verified_sha = sys.argv[4:]
+baseline_sha, candidate_sha, verified_sha, driver_sha, driver_path = sys.argv[4:]
 digest = lambda data: hashlib.sha256(data).hexdigest()
 manifests = {}
 for label, root in [("baseline", baseline), ("candidate", candidate)]:
@@ -70,23 +79,26 @@ for label, root in [("baseline", baseline), ("candidate", candidate)]:
     document.write(destination, encoding="utf-8", xml_declaration=True)
 
 oracle = candidate / "VoiceInkUITests/WritingPowerModeUITests.swift"
-contract = {"candidate_sha": candidate_sha, "baseline_sha": baseline_sha, "verified_production_sha": verified_sha, "candidate_production_matches_verified_except_reviewed_lock": True, "canonical_graph_receipt": "packages/canonical-graph-contract.json", "oracle_sha256": digest(oracle.read_bytes()), "scheme_sha256": digest((candidate / "VoiceInk.xcodeproj/xcshareddata/xcschemes/WritingPowerModeProof.xcscheme").read_bytes())}
+driver_oracle = Path(driver_path) / "VoiceInkUITests/WritingPowerModeUITests.swift"
+if oracle.read_bytes() != driver_oracle.read_bytes() or oracle.read_bytes() != (baseline / "VoiceInkUITests/WritingPowerModeUITests.swift").read_bytes():
+    raise SystemExit("Driver, baseline, and pinned candidate must use byte-identical current UI oracles")
+contract = {"driver_sha": driver_sha, "candidate_product_sha": candidate_sha, "baseline_product_sha": baseline_sha, "scope": "pinned candidate product only; current driver HEAD product is not tested", "verified_production_sha": verified_sha, "candidate_production_matches_verified_except_reviewed_lock": True, "canonical_graph_receipt": "packages/canonical-graph-contract.json", "oracle_sha256": digest(oracle.read_bytes()), "candidate_original_oracle_sha256": digest((output / "candidate-original-oracle.swift").read_bytes()), "scheme_sha256": digest((candidate / "VoiceInk.xcodeproj/xcshareddata/xcschemes/WritingPowerModeProof.xcscheme").read_bytes())}
 changed = sorted(path for path in set(manifests["baseline"]) | set(manifests["candidate"]) if manifests["baseline"].get(path) != manifests["candidate"].get(path))
 contract["changed_production_paths"] = changed
 (output / "contract.json").write_text(json.dumps(contract, indent=2) + "\n")
 PY
-cmp "$repo/$scheme" "$baseline/$scheme"
+cmp "$candidate/$scheme" "$baseline/$scheme"
 {
   xcodebuild -version
   swift --version
   sw_vers
   uname -m
-  shasum -a 256 "$repo/$oracle" "$baseline/$oracle" "$repo/$resolved" "$baseline/$resolved"
+  shasum -a 256 "$repo/$oracle" "$baseline/$oracle" "$candidate/$oracle" "$candidate/$resolved" "$baseline/$resolved"
 } > "$out/environment.txt"
 
 names=(testSnippetEditsPreservePowerModeRestoration testTargetChangesPreservePowerModeRestoration)
 for lane in baseline candidate; do
-  checkout="$repo"
+  checkout="$candidate"
   [[ "$lane" != baseline ]] || checkout="$baseline"
   lane_out="$out/$lane"
   derived="$checkout/.power-mode-proof-build"
@@ -191,8 +203,28 @@ done
 
 phase=verdict
 cmp "$repo/$oracle" "$baseline/$oracle"
-cmp "$out/packages/canonical.Package.resolved" "$repo/$resolved"
+cmp "$repo/$oracle" "$candidate/$oracle"
+cmp "$out/packages/canonical.Package.resolved" "$candidate/$resolved"
 cmp "$out/packages/canonical.Package.resolved" "$baseline/$resolved"
+python3 - "$out" "$baseline" "$candidate" <<'PY'
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+output, baseline, candidate = map(Path, sys.argv[1:])
+for label, root in [("baseline", baseline), ("candidate", candidate)]:
+    paths = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z", "--", "VoiceInk", "VoiceInkCore", "VoiceInkNVIDIA", "VoiceInkQwen", "VoiceInk.xcodeproj", "iOS"]).split(b"\0")
+    after = {path.decode(): hashlib.sha256((root / path.decode()).read_bytes()).hexdigest() for path in paths if path}
+    (output / f"{label}-production-after.json").write_text(json.dumps(after, indent=2, sort_keys=True) + "\n")
+    if after != json.loads((output / f"{label}-production.json").read_text()):
+        raise SystemExit(f"{label}: tracked production files changed during the proof")
+    contract = json.loads((output / "contract.json").read_text())
+    for relative, expected in [("VoiceInkUITests/WritingPowerModeUITests.swift", contract["oracle_sha256"]), ("VoiceInk.xcodeproj/xcshareddata/xcschemes/WritingPowerModeProof.xcscheme", contract["scheme_sha256"])]:
+        if hashlib.sha256((root / relative).read_bytes()).hexdigest() != expected:
+            raise SystemExit(f"{label}: current UI oracle or temporary scheme changed during the proof")
+PY
 python3 - "$out" "$repo/$oracle" <<'PY'
 import json
 import re
@@ -275,7 +307,8 @@ for lane in ["baseline", "candidate"]:
         (folder / "result.json").write_text(json.dumps(result, indent=2) + "\n")
         results[lane][name] = result
 valid = all(case["valid"] for lane in results.values() for case in lane.values())
-(root / "result.json").write_text(json.dumps({"classification": "matched-red-green" if valid else "invalid-or-failed", "tests": results}, indent=2) + "\n")
+contract = json.loads((root / "contract.json").read_text())
+(root / "result.json").write_text(json.dumps({"classification": "matched-red-green" if valid else "invalid-or-failed", "driver_sha": contract["driver_sha"], "candidate_product_sha": contract["candidate_product_sha"], "baseline_product_sha": contract["baseline_product_sha"], "scope": contract["scope"], "tests": results}, indent=2) + "\n")
 if not valid:
     raise SystemExit("Power Mode UI regression did not satisfy the matched observation contract")
 PY

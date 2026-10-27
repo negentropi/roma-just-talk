@@ -1,0 +1,47 @@
+{
+  "scope": "Compiler and Swift Testing macro expansion only. Exact throws expressions and messages drawn from LocalCLIServiceTests plus real unmodified Core LocalCLI error enum. Actual fixture/service call bodies replaced by one typed throwing closure; nothing executes and this is not app/Core/API proof.",
+  "test_source_path": "/Users/atalphalnmomhappyhouse/.codex/worktrees/2ebd/VoiceInk/VoiceInkTests/LocalCLIServiceTests.swift",
+  "test_source_sha256": "bf27803af3515a47b08e83dd711e463147880dbf9e01b7fcf211b793c3b1f802",
+  "throws_expressions": [
+    "VoiceInkLocalCLIExecutionError.emptyOutput",
+    "VoiceInkLocalCLIExecutionError.nonZeroExit(status: 23, stderr: \"exact failure\")",
+    "failure",
+    "failure"
+  ],
+  "require_source_lines": [
+    "let pid = try #require(fixture.pid(command), \"The timeout command must have entered its unique script before cancellation.\")",
+    "try #require(becameReady, \"The owned child did not confirm its TERM-ignore handler and input EOF.\")",
+    "try #require(entered, \"The controlled canceled-start task did not reach its gate.\")",
+    "try #require(output == \"warm\", \"The real shell/PATH fixture did not become usable.\")",
+    "return try #require(observed, \"The unique script did not expose its exact running shell process.\")",
+    "let pid = try #require(fixture.pid(command), \"The early-exit child must have entered the unique script.\")"
+  ],
+  "generated_source": "/tmp/rjt-local-cli-macro-shapes.swift",
+  "generated_source_sha256": "6e436541773914d1206f71fe0606bc2c9674d89458f9608507132b63292a98e6",
+  "closure_return_type": "String, matching the real enhance and execute closures",
+  "compiler": "Apple Swift 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4), arm64-apple-macosx26.0",
+  "typechecks": [
+    {
+      "swift_language": "5",
+      "warnings_as_errors": true,
+      "exit_code": 0,
+      "log": "/tmp/rjt-local-cli-macro-shapes.typecheck.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "swift_language": "6",
+      "warnings_as_errors": true,
+      "exit_code": 0,
+      "log": "/tmp/rjt-local-cli-macro-shapes.strict-typecheck.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "required_flags": [
+    "-Xfrontend",
+    "-disable-cross-import-overlays",
+    "-F",
+    "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+    "-plugin-path",
+    "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing"
+  ]
+}

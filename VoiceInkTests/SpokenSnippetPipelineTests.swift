@@ -64,6 +64,7 @@ private final class SpokenSnippetPipelineFixture {
     private let savedPowerMode: PowerModeConfig?
     private let savedSoundEnabled: Bool
     private static let keys = [
+        "VoiceInkDictationProfile",
         "VoiceInkSpokenSnippets",
         VoiceInkUserDefaultsKey.isTextFormattingEnabled,
         VoiceInkUserDefaultsKey.lowercaseTranscription,
@@ -113,6 +114,7 @@ private final class SpokenSnippetPipelineFixture {
         })
         savedPowerMode = PowerModeManager.shared.activeConfiguration
         savedSoundEnabled = SoundManager.shared.isEnabled
+        defaults.set("custom", forKey: "VoiceInkDictationProfile")
         defaults.set(true, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
         defaults.set(true, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
         defaults.set(false, forKey: VoiceInkUserDefaultsKey.removeFillerWords)

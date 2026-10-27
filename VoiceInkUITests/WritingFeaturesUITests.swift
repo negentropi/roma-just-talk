@@ -185,6 +185,53 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(waitUntil { !app.buttons["writingActions.target.\(second.0).select"].exists })
     }
 
+    @MainActor func testDictationProfilePreservesCustomSettingsAndPersists() throws {
+        let (app, ownership) = try prepareApp()
+        let preferences = try WritingFeaturesDictationPreferences()
+        addTeardownBlock {
+            guard ownership.terminateOwnedApplications() else {
+                XCTFail("The owned app did not exit; retained dictation preferences for inspection.")
+                return
+            }
+            XCTAssertTrue(preferences.restore(), "Unable to restore the owned dictation preferences.")
+        }
+        try preferences.install()
+        try launchApp(app, ownership: ownership)
+        openModelSettings(in: app)
+        assertProfile("Custom", storedValue: "custom", preferences: preferences, in: app)
+        assertCustomFormatting(isEnabled: true, preferences: preferences, in: app)
+        attachScreenshot(app, named: "Custom dictation cleanup settings")
+
+        let none = profileChoice("None", in: app)
+        revealModelSettingsControl(none, towardTop: true, in: app)
+        XCTAssertTrue(none.isHittable)
+        none.click()
+        assertProfile("None", storedValue: "none", preferences: preferences, in: app)
+        attachScreenshot(app, named: "None dictation cleanup selected")
+        assertCustomFormatting(isEnabled: false, preferences: preferences, in: app)
+        attachScreenshot(app, named: "None preserves inactive Custom formatting")
+
+        closeModelSettings(in: app)
+        openModelSettings(in: app)
+        assertProfile("None", storedValue: "none", preferences: preferences, in: app)
+        assertCustomFormatting(isEnabled: false, preferences: preferences, in: app)
+
+        app.terminate()
+        try launchApp(app, ownership: ownership)
+        openModelSettings(in: app)
+        assertProfile("None", storedValue: "none", preferences: preferences, in: app)
+        attachScreenshot(app, named: "None dictation cleanup persisted after relaunch")
+        assertCustomFormatting(isEnabled: false, preferences: preferences, in: app)
+
+        let custom = profileChoice("Custom", in: app)
+        revealModelSettingsControl(custom, towardTop: true, in: app)
+        XCTAssertTrue(custom.isHittable)
+        custom.click()
+        assertProfile("Custom", storedValue: "custom", preferences: preferences, in: app)
+        assertCustomFormatting(isEnabled: true, preferences: preferences, in: app)
+        attachScreenshot(app, named: "Custom formatting restored without changing saved values")
+    }
+
     @MainActor private func prepareApp() throws -> (XCUIApplication, WritingFeaturesAppOwnership) {
         let ownership = try WritingFeaturesAppOwnership()
         let dockPreference = try WritingFeaturesDockPreference()
@@ -276,6 +323,82 @@ final class WritingFeaturesUITests: XCTestCase {
         let add = app.buttons["writingActions.target.add"]
         XCTAssertTrue(add.waitForExistence(timeout: 10))
         reveal(add, identifier: "writingActions.target.add", in: app)
+    }
+
+    @MainActor private func openModelSettings(in app: XCUIApplication) {
+        let models = mainWindow(in: app).buttons["models"]
+        XCTAssertTrue(models.waitForExistence(timeout: 10))
+        models.click()
+        let settings = mainWindow(in: app).buttons["models.settings.open"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        reveal(settings, identifier: "models.settings.open", in: app)
+        settings.click()
+        XCTAssertTrue(mainWindow(in: app).buttons["models.settings.close"].waitForExistence(timeout: 5))
+        XCTAssertTrue(profileChoice("Custom", in: app).waitForExistence(timeout: 5))
+        XCTAssertTrue(profileChoice("None", in: app).waitForExistence(timeout: 5))
+    }
+
+    @MainActor private func closeModelSettings(in app: XCUIApplication) {
+        let close = mainWindow(in: app).buttons["models.settings.close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 5))
+        close.click()
+        XCTAssertTrue(waitUntil { !close.exists })
+    }
+
+    @MainActor private func profileChoice(_ title: String, in app: XCUIApplication) -> XCUIElement {
+        mainWindow(in: app).radioButtons[title]
+    }
+
+    @MainActor private func assertProfile(
+        _ title: String,
+        storedValue: String,
+        preferences: WritingFeaturesDictationPreferences,
+        in app: XCUIApplication
+    ) {
+        let choices = mainWindow(in: app).radioButtons.matching(
+            NSPredicate(format: "label IN %@", ["Custom", "None"])
+        )
+        XCTAssertEqual(choices.count, 2, "The cleanup picker did not expose its two native choices.")
+        XCTAssertTrue(waitUntil { String(describing: self.profileChoice(title, in: app).value ?? "") == "1" })
+        let other = title == "Custom" ? "None" : "Custom"
+        XCTAssertEqual(String(describing: profileChoice(other, in: app).value ?? ""), "0")
+        XCTAssertTrue(waitUntil { preferences.profile() == storedValue })
+        XCTAssertTrue(preferences.customSettingsAreUnchanged(), "Changing the profile changed saved Custom settings.")
+    }
+
+    @MainActor private func assertCustomFormatting(
+        isEnabled: Bool,
+        preferences: WritingFeaturesDictationPreferences,
+        in app: XCUIApplication
+    ) {
+        for identifier in [
+            "transcriptionSettings.paragraphBreaks",
+            "transcriptionSettings.lowercase",
+            "transcriptionSettings.appendTrailingSpace"
+        ] {
+            let control = identified(identifier, in: mainWindow(in: app))
+            revealModelSettingsControl(control, in: app)
+            XCTAssertEqual(control.isEnabled, isEnabled, "Unexpected enabled state for \(identifier).")
+            XCTAssertEqual(String(describing: control.value ?? ""), "1", "Saved toggle value changed for \(identifier).")
+        }
+        XCTAssertTrue(preferences.customSettingsAreUnchanged(), "The saved Custom values changed.")
+    }
+
+    @MainActor private func revealModelSettingsControl(
+        _ control: XCUIElement,
+        towardTop: Bool = false,
+        in app: XCUIApplication
+    ) {
+        let scrollers = mainWindow(in: app).scrollViews.containing(.any, identifier: "dictationProfile.picker")
+        XCTAssertTrue(scrollers.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(scrollers.count, 1, "The cleanup controls did not belong to one settings scroller.")
+        let scroller = scrollers.firstMatch
+        for _ in 0..<10 {
+            if control.exists, !control.frame.isEmpty, scroller.frame.contains(control.frame) { return }
+            scroller.scroll(byDeltaX: 0, deltaY: towardTop ? 180 : -180)
+        }
+        XCTAssertTrue(control.exists, "The settings control was not exposed.")
+        XCTAssertTrue(scroller.frame.contains(control.frame), "The settings control was not fully visible after scrolling.")
     }
 
     @MainActor private func mainWindow(in app: XCUIApplication) -> XCUIElement {
@@ -413,7 +536,78 @@ final class WritingFeaturesUITests: XCTestCase {
 
 private enum WritingFeaturesUIError: Error {
     case disposableRunnerRequired, preferenceSyncFailed, appDidNotBecomeForeground, mainWindowDidNotOpen
-    case appAlreadyRunning, appOwnershipUnavailable, settingsMenuUnavailable
+    case appAlreadyRunning, appOwnershipUnavailable, settingsMenuUnavailable, existingPowerModeSession
+}
+
+private final class WritingFeaturesDictationPreferences {
+    private static let bundleIdentifier = "com.negentropi.RomaJustTalk" as CFString
+    private static let profileKey = "VoiceInkDictationProfile"
+    private static let customValues: [String: Any] = [
+        "IsTextFormattingEnabled": true,
+        "LowercaseTranscription": true,
+        "RemoveFillerWords": false,
+        "PunctuationCleanupMode": "removeTrailingPeriod",
+        "RemovePunctuation": false,
+        "AppendTrailingSpace": true
+    ]
+    private static let keys = [profileKey] + customValues.keys.sorted()
+    private let saved: [String: Any]
+
+    init() throws {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else {
+            throw WritingFeaturesUIError.preferenceSyncFailed
+        }
+        guard Self.read("powerModeActiveSession.v1") == nil else {
+            throw WritingFeaturesUIError.existingPowerModeSession
+        }
+        saved = Dictionary(uniqueKeysWithValues: Self.keys.compactMap { key in
+            Self.read(key).map { (key, $0) }
+        })
+    }
+
+    func install() throws {
+        Self.write("custom", for: Self.profileKey)
+        for (key, value) in Self.customValues { Self.write(value, for: key) }
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier),
+              profile() == "custom", customSettingsAreUnchanged() else {
+            throw WritingFeaturesUIError.preferenceSyncFailed
+        }
+    }
+
+    func profile() -> String? {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return nil }
+        return Self.read(Self.profileKey) as? String
+    }
+
+    func customSettingsAreUnchanged() -> Bool {
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        return Self.customValues.allSatisfy { Self.equal($0.value, Self.read($0.key)) }
+    }
+
+    func restore() -> Bool {
+        for key in Self.keys { Self.write(saved[key], for: key) }
+        guard CFPreferencesAppSynchronize(Self.bundleIdentifier) else { return false }
+        return Self.keys.allSatisfy { Self.equal(saved[$0], Self.read($0)) }
+    }
+
+    private static func equal(_ expected: Any?, _ actual: Any?) -> Bool {
+        switch (expected, actual) {
+        case (nil, nil): return true
+        case let (expected?, actual?):
+            return CFGetTypeID(expected as CFTypeRef) == CFGetTypeID(actual as CFTypeRef)
+                && (expected as? NSObject)?.isEqual(actual) == true
+        default: return false
+        }
+    }
+
+    private static func read(_ key: String) -> Any? {
+        CFPreferencesCopyValue(key as CFString, bundleIdentifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+    }
+
+    private static func write(_ value: Any?, for key: String) {
+        CFPreferencesSetValue(key as CFString, value as CFPropertyList?, bundleIdentifier,
+                              kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+    }
 }
 
 private final class WritingFeaturesAppOwnership {

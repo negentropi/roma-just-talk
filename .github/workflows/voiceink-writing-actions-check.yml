@@ -84,7 +84,10 @@ jobs:
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
       - name: Full Mac unit suite with fresh CI permissions
-        run: bash scripts/run-macos-ci-unit-tests.sh
+        run: |
+          defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
+          defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
+          bash scripts/run-macos-ci-unit-tests.sh
 
       - name: Live TextEdit and Safari selection transactions
         run: bash scripts/run-writing-feature-regression.sh live

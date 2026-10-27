@@ -38,8 +38,43 @@ select_tests() {
   selectors=()
   local name
   for name in "$@"; do
-    selectors+=("-only-testing:VoiceInkTests/VoiceInkTests/$name")
+    selectors+=("-only-testing:VoiceInkTests/VoiceInkTests/$name()")
   done
+}
+
+preflight_selected_tests() {
+  local directory="$1" flag
+  mkdir -p "$directory"
+  xcodebuild -help > "$directory/xcodebuild-help.txt" 2>&1 || true
+  for flag in -enumerate-tests -test-enumeration-style -test-enumeration-format -test-enumeration-output-path; do
+    if ! grep -Fq -- "$flag" "$directory/xcodebuild-help.txt"; then
+      echo "The current Xcode does not advertise $flag; selection proof is unavailable." >&2
+      return 1
+    fi
+  done
+  if ! xcodebuild test-without-building "${arguments[@]}" "${selectors[@]}" \
+    -enumerate-tests -test-enumeration-style flat -test-enumeration-format json \
+    -test-enumeration-output-path "$directory/selected-tests.json" > "$directory/enumeration.log" 2>&1; then
+    tail -n 80 "$directory/enumeration.log" >&2
+    return 1
+  fi
+  python3 - "$directory" "${selectors[@]}" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+directory = Path(sys.argv[1])
+expected = [value.removeprefix("-only-testing:") for value in sys.argv[2:]]
+payload = json.loads((directory / "selected-tests.json").read_text())
+if payload.get("errors"):
+    raise SystemExit("Xcode reported test-enumeration errors")
+enabled = [test["identifier"] for plan in payload.get("values", []) for test in plan.get("enabledTests", [])]
+disabled = [test.get("identifier") for plan in payload.get("values", []) for test in plan.get("disabledTests", [])]
+valid = len(enabled) == len(expected) and sorted(enabled) == sorted(expected) and not set(disabled).intersection(expected)
+(directory / "selection-receipt.json").write_text(json.dumps({"requested_identifiers": expected, "enabled_identifiers": enabled, "disabled_identifiers": disabled, "valid": valid}, indent=2) + "\n")
+if not valid:
+    raise SystemExit(f"Exact selected tests did not resolve: expected {expected}, got enabled={enabled}, disabled={disabled}")
+PY
 }
 
 verify_observations() {
@@ -119,6 +154,8 @@ case "$mode" in
     )
     test_arguments "$repo_root" "$debug_dir"
     select_tests "${live_names[@]}"
+    RJT_LIVE_WRITING_TARGET_CHECKS=1 TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS=1 \
+      preflight_selected_tests "$out/selection"
     shasum -a 256 "$debug_app/Contents/MacOS/roma just talk" > "$out/identity-before.txt"
     test_exit=0
     RJT_LIVE_WRITING_TARGET_CHECKS=1 TEST_RUNNER_RJT_LIVE_WRITING_TARGET_CHECKS=1 \
@@ -199,7 +236,7 @@ PY
     } > "$out/contract.txt"
     test_arguments "$baseline" "$baseline/.local-build"
     select_tests "${test_names[@]}"
-    build_selectors=("${selectors[@]}" '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart')
+    build_selectors=("${selectors[@]}" '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()')
     phase=baseline-build
     if ! xcodebuild build-for-testing "${arguments[@]}" "${build_selectors[@]}" \
       -clonedSourcePackagesDirPath "$debug_dir/SourcePackages" \
@@ -208,6 +245,7 @@ PY
       exit 1
     fi
     phase=baseline-tests
+    preflight_selected_tests "$out/baseline-selection"
     baseline_exit=0
     xcodebuild test-without-building "${arguments[@]}" "${selectors[@]}" \
       -resultBundlePath "$out/Baseline.xcresult" > "$out/baseline-tests.log" 2>&1 || baseline_exit=$?
@@ -216,9 +254,11 @@ PY
       exit 1
     fi
     phase=baseline-permission-test
+    selectors=('-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()')
+    preflight_selected_tests "$out/baseline-permission-selection"
     baseline_permission_exit=0
     xcodebuild test-without-building "${arguments[@]}" \
-      '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart' \
+      '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()' \
       -resultBundlePath "$out/BaselinePermission.xcresult" > "$out/baseline-permission.log" 2>&1 || baseline_permission_exit=$?
     if ! verify_permission_observations "$out/baseline-permission.log" known-bad "$baseline_permission_exit" "$out/baseline-permission-result.json"; then
       tail -n 120 "$out/baseline-permission.log" >&2
@@ -226,6 +266,8 @@ PY
     fi
     phase=candidate-tests
     test_arguments "$repo_root" "$debug_dir"
+    select_tests "${test_names[@]}"
+    preflight_selected_tests "$out/candidate-selection"
     candidate_exit=0
     xcodebuild test-without-building "${arguments[@]}" "${selectors[@]}" \
       -resultBundlePath "$out/Candidate.xcresult" > "$out/candidate-tests.log" 2>&1 || candidate_exit=$?
@@ -234,9 +276,11 @@ PY
       exit 1
     fi
     phase=candidate-permission-test
+    selectors=('-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()')
+    preflight_selected_tests "$out/candidate-permission-selection"
     candidate_permission_exit=0
     xcodebuild test-without-building "${arguments[@]}" \
-      '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart' \
+      '-only-testing:VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()' \
       -resultBundlePath "$out/CandidatePermission.xcresult" > "$out/candidate-permission.log" 2>&1 || candidate_permission_exit=$?
     if ! verify_permission_observations "$out/candidate-permission.log" fixed "$candidate_permission_exit" "$out/candidate-permission-result.json"; then
       tail -n 120 "$out/candidate-permission.log" >&2

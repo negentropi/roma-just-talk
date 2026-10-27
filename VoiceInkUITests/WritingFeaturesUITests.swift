@@ -318,15 +318,19 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor private func chooseFile(_ file: URL, in app: XCUIApplication) {
-        XCTAssertTrue(app.buttons["Preview Import"].waitForExistence(timeout: 10))
+        let panel = app.dialogs["open-panel"]
+        XCTAssertTrue(panel.waitForExistence(timeout: 10))
         app.typeKey("g", modifierFlags: [.command, .shift])
-        let path = app.comboBoxes.firstMatch
+        let goTo = panel.sheets["GoToWindow"]
+        XCTAssertTrue(goTo.waitForExistence(timeout: 5))
+        let path = goTo.textFields["PathTextField"]
         XCTAssertTrue(path.waitForExistence(timeout: 5), "The file panel did not expose its Go to Folder field.")
         replaceText(in: path, with: file.path)
         path.typeKey(.return, modifierFlags: [])
-        let preview = app.buttons["Preview Import"]
+        XCTAssertTrue(waitUntil { !goTo.exists }, "The file panel did not finish navigating to the CSV.")
+        let preview = panel.buttons["OKButton"]
         XCTAssertTrue(preview.waitForExistence(timeout: 5))
-        XCTAssertTrue(preview.isEnabled)
+        XCTAssertTrue(waitUntil { preview.isEnabled }, "Preview Import did not enable for the selected CSV.")
         preview.click()
     }
 

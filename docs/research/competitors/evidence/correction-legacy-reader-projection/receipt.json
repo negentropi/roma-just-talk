@@ -1,0 +1,26 @@
+{
+  "classification": "actual-old-matching-engine-projection-only",
+  "source_revision": "846d05df04d5821a7b5dc8588304cb58e3bd8368",
+  "owning_source": "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift",
+  "owning_source_sha256": "07b9eafbd70949b4a0668b2f0038ff0e983352a0fd944b46a8bf508cba6f8005",
+  "probe_sha256": "193435007986fdf6ac7a77c98ccb75a9c276aa36e8dbedcbed6533dca074afbd",
+  "declarations": "Unmodified actual VoiceInkWordReplacementRule and VoiceInkWordReplacementEngine declarations, extracted with brace matching; Foundation only.",
+  "swift_version": "Apple Swift version 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4)\nTarget: arm64-apple-macosx26.0",
+  "exit_code": 0,
+  "input": "Acme approved.",
+  "unsafe_legacy_pair": {
+    "originalText": "Acme, Inc.",
+    "replacementText": "RJT-482"
+  },
+  "unsafe_output": "RJT-482 approved.",
+  "inert_legacy_pair": {
+    "originalText": "",
+    "replacementText": ""
+  },
+  "inert_output": "Acme approved.",
+  "limits": [
+    "Not SwiftData decoding or migration.",
+    "Not CloudKit transport, old-client UI behavior or an older binary opening a newer local store.",
+    "Candidate literal-payload storage and actual saved raw fields remain pending."
+  ]
+}

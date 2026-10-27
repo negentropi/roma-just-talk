@@ -14,7 +14,17 @@ History's existing original variant is processed text for many records. Do not r
 
 Extend `WordReplacement` rather than adding a second learned-rule store. Keep its identity, creation date and enabled state. Add explicit matching kind and optional provenance with approval origin, source transcript UUID and source variant. Validate approval against the captured variant and text revision.
 
-Existing rows retain the documented comma-separated-alternatives contract. New approved corrections represent one literal phrase, including commas. Dictionary's existing enabled-rule cache remains the execution owner; every save, toggle and delete invalidates it.
+Existing rows retain the documented comma-separated-alternatives contract. New approved corrections represent one literal phrase, including commas. The candidate removes the process-wide enabled-rule cache and fetches copied rules from the supplied context for each operation. Light/Clarity keep their captured immutable snapshots; Custom reads its current operation's context. A failed fetch or invalid enabled record never becomes an empty cached library or an implicitly legacy rule.
+
+### Older synced readers
+
+The production dictionary configuration uses private CloudKit; `LOCAL_BUILD` disables it. An older app still reads `originalText` and `replacementText` as comma-alternative rules and ignores added matching-kind fields. Merely excluding literal rules from legacy backup maps is insufficient for that separate persisted-data contract.
+
+New literal rows therefore use optional `literalOriginalText` and `literalReplacementText` payload fields and leave both old text fields exactly empty. Legacy rows retain their existing fields and have no literal payload. The canonical record adapter validates this distinction: unknown kinds, incomplete payloads and mixed representations reject rather than executing as legacy. Four optional kind/provenance fields accompany the two literal payload fields. Existing identity, date and enable columns retain their roles. UI, matching and full-record backup consume the validated canonical pair.
+
+An [actual old-engine probe](evidence/correction-legacy-reader-projection/receipt.json) demonstrates why: placing `Acme, Inc.` in the old source field changes `Acme approved.`; an empty legacy pair preserves it exactly. The probe uses unmodified declarations from the actual tag. It does not establish SwiftData downgrade, older-client UI, CloudKit transport or account sync. Candidate persistence and full-record adapters still need native proof.
+
+Apple requires forward-compatible records and separate production-schema deployment. See [Core Data models for CloudKit](https://developer.apple.com/documentation/coredata/creating-a-core-data-model-for-cloudkit) and [deploying the schema](https://developer.apple.com/documentation/cloudkit/deploying-an-icloud-container-s-schema). No CloudKit schema is changed or promoted by this local implementation task. Verify development-account mixed-version synchronization and deploy the additive fields before an explicitly authorized release.
 
 Approved rules survive source-history deletion. Retain the explicitly saved phrase pair and a UUID reference without a cascading model relationship. If the source disappears, show that it is unavailable. Do not retain an extra full transcript merely for provenance.
 

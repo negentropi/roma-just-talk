@@ -1,0 +1,64 @@
+{
+  "summaries": [
+    {
+      "_n": "Array"
+    },
+    {
+      "name": "Test Scheme Action",
+      "testableSummaries": [
+        {
+          "diagnosticsDirectoryName": "",
+          "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests",
+          "name": "VoiceInkTests",
+          "projectRelativePath": "VoiceInk.xcodeproj",
+          "targetName": "VoiceInkTests",
+          "testKind": "app hosted",
+          "testLanguage": "",
+          "testRegion": "",
+          "tests": [
+            {
+              "identifier": "Selected tests",
+              "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests/Selected%20tests",
+              "name": "Selected tests",
+              "subtests": [
+                {
+                  "identifier": "VoiceInkTests.xctest",
+                  "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests/VoiceInkTests.xctest",
+                  "name": "VoiceInkTests.xctest"
+                }
+              ]
+            },
+            {
+              "duration": "4.658811092376709",
+              "identifier": "VoiceInkTests",
+              "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests/VoiceInkTests",
+              "name": "VoiceInkTests",
+              "subtests": [
+                {
+                  "duration": "4.658811092376709",
+                  "failureSummariesCount": "2",
+                  "identifier": "VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()",
+                  "identifierURL": "test://com.apple.xcode/VoiceInk/VoiceInkTests/VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()",
+                  "name": "liveWritingUndoTextEditRejectsTerminatedProcess()",
+                  "summaryRef": {
+                    "id": "0~03SsqnEv6zsMPDMjlI_EWT8nlB65evCT-X9p4YPxHoycGZWcBxbVKr0MXKGw17iMQ_nZlDnK-sGOvRRfrQ8mrQ==",
+                    "targetType": {
+                      "name": "ActionTestSummary",
+                      "supertype": {
+                        "name": "ActionTestSummaryIdentifiableObject",
+                        "supertype": {
+                          "name": "ActionAbstractTestSummary"
+                        }
+                      }
+                    }
+                  },
+                  "testStatus": "Failure"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

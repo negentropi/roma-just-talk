@@ -1,0 +1,38 @@
+{
+  "canonical_pins": 41,
+  "github_run_id": "40605379029",
+  "limits": [
+    "Product menu/shortcut route is a separate UI gate.",
+    "No ASR, microphone, model/provider-quality or physical-keyboard proof.",
+    "Clipboard fixtures only on the disposable runner; no shared-user clipboard.",
+    "No release or broad editor compatibility claim.",
+    "Accessibility and Microphone are provisioned for the signed app; normal app initialization starts pre-roll. No Automation grant or microphone acceptance claim."
+  ],
+  "lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "oracle_sha256": {
+    "VoiceInkTests/WritingTargetLiveTests.swift": "bcf9e07e90d6e7feeb4a141e97a301ffbca477df8f519ffcb870443acae1a339",
+    "VoiceInkTests/WritingUndoLiveTests.swift": "61b0ea187324b6065c0c44ab33bbabf19590038b963e18f2115f6911ff7b446c"
+  },
+  "phases": {
+    "process": [
+      "liveWritingUndoTextEditRejectsTerminatedProcess"
+    ],
+    "remaining": [
+      "liveWritingUndoTextEditRestoresExactUnicodeSelection",
+      "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference",
+      "liveWritingUndoSafariKeepsNewClipboardGeneration",
+      "liveWritingUndoRefusesTextCaretAndWindowDrift",
+      "liveWritingUndoLatestOwnerAndCancellation"
+    ]
+  },
+  "scope": "Six native WritingActionUndoController cases with real TextEdit/Safari AX targets and disposable clipboard payloads; one built Debug app, two separate closed execution hosts plus independently observed/closed enumeration hosts.",
+  "source_sha": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "tests": [
+    "liveWritingUndoTextEditRejectsTerminatedProcess",
+    "liveWritingUndoTextEditRestoresExactUnicodeSelection",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration",
+    "liveWritingUndoRefusesTextCaretAndWindowDrift",
+    "liveWritingUndoLatestOwnerAndCancellation"
+  ]
+}

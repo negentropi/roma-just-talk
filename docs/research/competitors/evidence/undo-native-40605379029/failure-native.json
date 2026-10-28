@@ -1,0 +1,5 @@
+{
+  "mode": "native",
+  "classification": "invalid-or-failed",
+  "error": "process: Every selected method must pass exactly once; One exact positive passed summary and exit zero are required; Issues, skips, cancellation, crashes and compilation/launch failures cannot pass; liveWritingUndoTextEditRejectsTerminatedProcess: Incomplete or wrong method/schema receipt; liveWritingUndoTextEditRejectsTerminatedProcess: Actual case checks missing or false; liveWritingUndoTextEditRejectsTerminatedProcess: Exact unique actual stage set required"
+}

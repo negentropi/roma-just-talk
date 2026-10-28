@@ -1,0 +1,25 @@
+    
+    /usr/bin/codesign --force --sign - -o runtime --entitlements /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkUITests.build/VoiceInkUITests.xctest.xcent --timestamp\=none --generate-entitlement-der /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest
+
+RegisterExecutionPolicyException /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest (in target 'VoiceInkUITests' from project 'VoiceInk')
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    builtin-RegisterExecutionPolicyException /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest
+
+Touch /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest (in target 'VoiceInkUITests' from project 'VoiceInk')
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    /usr/bin/touch -c /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest
+
+CodeSign /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app (in target 'VoiceInkUITests' from project 'VoiceInk')
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - -o runtime --entitlements /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkUITests.build/VoiceInkUITests.xctest.xcent --timestamp\=none --generate-entitlement-der /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app
+/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app: replacing existing signature
+
+warning: missing creator for mutated node: ('/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/mlx-swift_Cmlx.bundle/Contents/MacOS') (in target 'mlx-swift_Cmlx' from project 'mlx-swift')
+note: Disabling hardened runtime with ad-hoc codesigning. (in target 'VoiceInk' from project 'VoiceInk')
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj: warning: The Copy Bundle Resources build phase contains this target's Info.plist file '/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Info.plist'. (in target 'VoiceInk' from project 'VoiceInk')
+note: Run script build phase 'Verify MLX Metal Resource' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'VoiceInk' from project 'VoiceInk')
+** TEST BUILD SUCCEEDED **
+

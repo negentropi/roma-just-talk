@@ -1,0 +1,21 @@
+{
+  "remoteHost": "root@decentleftover-pf",
+  "remoteRoot": "/data/rjt-writing-check-01a17bef/40617647503",
+  "downloads": [
+    {
+      "kind": "evidence",
+      "bytes": 947991,
+      "sha256": "628255db9ee4de3cdb36ac93f45b064f24a08b9831df3b78bb4c377224ba69d2",
+      "fetchedOnce": true,
+      "allZipCRCsVerified": true
+    },
+    {
+      "kind": "observations",
+      "bytes": 346551,
+      "sha256": "f3dbcb6b1563558e1eeac87a82eeb8a11e50246d0a87879f02498251b7cd4010",
+      "fetchedOnce": true,
+      "allZipCRCsVerified": true
+    }
+  ],
+  "localScope": "Compact observations and decoded receipts only; raw archives stay remote /data."
+}

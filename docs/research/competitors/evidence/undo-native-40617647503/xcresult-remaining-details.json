@@ -1,0 +1,64 @@
+{
+  "run_id": 40617647503,
+  "scope": "live",
+  "aggregate_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~F3JZp9wHDLTn-bzqe4Iq5IEmKlNyFN5RgksGHbQpA0Ha516V0XknJIevoY2Zgb0jd54I0Gk17da7IK9PQpgutw==",
+  "case_details": [
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoTextEditRestoresExactUnicodeSelection()",
+      "status": "Success",
+      "summary_reference": "0~8gbkaOKeLyqruBgIfvV8G9GULynYD90HyMTKRXSm0CPWZ4RsYADW5sk1-sxEdrxRJvjzIf1sbd-tgV_7HmpUIA==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~8gbkaOKeLyqruBgIfvV8G9GULynYD90HyMTKRXSm0CPWZ4RsYADW5sk1-sxEdrxRJvjzIf1sbd-tgV_7HmpUIA==",
+      "decoded_summary_sha256": "6d9ca782567900e6397679fb3e4baa1c974d7048ca98dd4815b56d6ee9562957",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()",
+      "status": "Success",
+      "summary_reference": "0~_0rd4JhX7jPL2KbzWjKDfQQje9TYFeS96Qpw3uBUxqAlC4Poow_6NBKSI1sKKwURagwGkQ4izM38zqcQAQZ9bg==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~_0rd4JhX7jPL2KbzWjKDfQQje9TYFeS96Qpw3uBUxqAlC4Poow_6NBKSI1sKKwURagwGkQ4izM38zqcQAQZ9bg==",
+      "decoded_summary_sha256": "79831db2543beb28d504e15e91de443cc82a3a302e3e6decc9f6d98688eba156",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoSafariKeepsNewClipboardGeneration()",
+      "status": "Success",
+      "summary_reference": "0~SWhFxOQu43teMi49mS_4ppHKbh4gn5-zcGeYJkMLIwYt-TcK0HLVN0qFjmyULg-5IqD3Jualyw5JPYHhcvb0cA==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~SWhFxOQu43teMi49mS_4ppHKbh4gn5-zcGeYJkMLIwYt-TcK0HLVN0qFjmyULg-5IqD3Jualyw5JPYHhcvb0cA==",
+      "decoded_summary_sha256": "59c027db4c8cdfde4bfac1d49d9c5b9cdecda7aa337d89228170e2f39576661f",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoRefusesTextCaretAndWindowDrift()",
+      "status": "Success",
+      "summary_reference": "0~v56GD5ZZxtR4w7xnfAncZ9o_VupujVjIDPcRCaRkqO27JGeOJYG7Hb1RS6jG7jzRR1hg3wZfyAureP93vJEVqQ==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~v56GD5ZZxtR4w7xnfAncZ9o_VupujVjIDPcRCaRkqO27JGeOJYG7Hb1RS6jG7jzRR1hg3wZfyAureP93vJEVqQ==",
+      "decoded_summary_sha256": "0846918c728eefa4ee52c3719bb65fb911f7967eb02e5427a4a3fd7e5e1e5724",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoLatestOwnerAndCancellation()",
+      "status": "Success",
+      "summary_reference": "0~RXf2aeIAbhWwbo1qHv2f9rMGrGyXG92ziJBxSMVx-63fCyWnCvtNMA-i38w5OCHS3JHea_hH2RDj37ahl7aFHQ==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~RXf2aeIAbhWwbo1qHv2f9rMGrGyXG92ziJBxSMVx-63fCyWnCvtNMA-i38w5OCHS3JHea_hH2RDj37ahl7aFHQ==",
+      "decoded_summary_sha256": "5340415e709cba842f3eb44b130db5f04c200f429f8e1df46023ef47842e4b22",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoSafariRejectsNormalizedDecomposedOutput()",
+      "status": "Success",
+      "summary_reference": "0~zLxzDwObcpbcDQ2ihBhLl9x0hBkXTdpXYl1IVWiM3rVs7zh_kGerjO4oAzQXBpmRKHXIXYOPEOo3aEpG7RMBoA==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~zLxzDwObcpbcDQ2ihBhLl9x0hBkXTdpXYl1IVWiM3rVs7zh_kGerjO4oAzQXBpmRKHXIXYOPEOo3aEpG7RMBoA==",
+      "decoded_summary_sha256": "ac5017ee621b8416aec7cefb880993e32c3dc124add36c8020ee0d550ca600e4",
+      "failure_summaries": [],
+      "attachments": []
+    }
+  ],
+  "boundaries": [],
+  "external_ax_reports": [],
+  "poststate_limit": "AX fixtureWindows trees come from before action unless the report explicitly says otherwise. UI boundary reports reflect their named observation phases."
+}

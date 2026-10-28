@@ -1,0 +1,17 @@
+{
+  "app_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+  "bundle_relative_libraries": [
+    "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+    "@rpath/Sparkle.framework/Versions/B/Sparkle",
+    "@rpath/libswiftCompatibilitySpan.dylib"
+  ],
+  "classification": "verified-adhoc-macos-test-host",
+  "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "executable_sha256": "a9707e9af7d61d06b35233c2b3dad568b4594ff395c862c1e86a75931f74dc90",
+  "library_validation_disabled": true,
+  "numeric_code_directory_flags": 2,
+  "raw_code_directory_flags": "0x2(adhoc)",
+  "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+  "signature": "adhoc",
+  "strict_deep_verification_passed": true
+}

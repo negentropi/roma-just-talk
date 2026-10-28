@@ -1,0 +1,91 @@
+{
+  "bundleIdentifier" : "com.apple.Safari",
+  "checkpoint" : "fixture-startup",
+  "documentBudgetMilliseconds" : 20000,
+  "failure" : null,
+  "finalStage" : "ready",
+  "processIdentifier" : 24096,
+  "sourceOriginalUTF16" : [
+    66,
+    101,
+    102,
+    111,
+    114,
+    101,
+    32,
+    55357,
+    56425,
+    55356,
+    57341,
+    8205,
+    55357,
+    56507,
+    32,
+    116,
+    97,
+    114,
+    103,
+    101,
+    116,
+    32,
+    233,
+    32,
+    97,
+    102,
+    116,
+    101,
+    114,
+    32,
+    55358,
+    56785,
+    8205,
+    55357,
+    56960,
+    46,
+    10
+  ],
+  "sourcePassageUTF16" : [
+    116,
+    97,
+    114,
+    103,
+    101,
+    116,
+    32,
+    233
+  ],
+  "stages" : [
+    {
+      "sinceOpenMilliseconds" : 23.974583333369992,
+      "stage" : "workspace-open-completed"
+    },
+    {
+      "accepted" : true,
+      "sinceOpenMilliseconds" : 24.112250000030144,
+      "stage" : "application-activation-requested"
+    },
+    {
+      "sinceOpenMilliseconds" : 24.865791666684345,
+      "stage" : "frontmost-identity-observed"
+    },
+    {
+      "documentIsOwnedFile" : false,
+      "existedBeforeOpen" : false,
+      "ownershipMarkerMatched" : true,
+      "sinceOpenMilliseconds" : 322.63275000002523,
+      "stage" : "owned-document-observed",
+      "titleContainsToken" : false
+    },
+    {
+      "sameDocumentWindow" : true,
+      "sinceOpenMilliseconds" : 331.61362500004543,
+      "stage" : "exact-textarea-observed"
+    },
+    {
+      "sinceOpenMilliseconds" : 340.78216666671324,
+      "stage" : "owned-editor-focused"
+    }
+  ],
+  "textareaBudgetMilliseconds" : 5000,
+  "token" : "RJT-Writing-Live-5716792A-B5F9-4102-84B6-3776F498EB22"
+}

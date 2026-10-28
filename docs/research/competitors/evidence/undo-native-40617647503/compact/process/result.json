@@ -1,0 +1,153 @@
+{
+  "classification": "passed",
+  "enumeration_host_launches": {
+    "discovery": [
+      {
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "mapped_text_paths": [
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+          "/usr/lib/dyld",
+          "/usr/lib/libRPAC.dylib",
+          "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib"
+        ],
+        "observed_live": true,
+        "pid": 22157,
+        "started_at": "Wed Oct 28 02:02:33 2026"
+      }
+    ],
+    "selection": [
+      {
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "mapped_text_paths": [
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+          "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+          "/usr/lib/dyld",
+          "/usr/lib/libRPAC.dylib",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+          "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/stats.store-shm",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+          "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+          "/Library/Preferences/Logging/.plist-cache.34GGBces",
+          "/usr/lib/libobjc-trampolines.dylib",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+          "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/_Testing_Foundation.framework/Versions/A/_Testing_Foundation",
+          "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store-shm",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib",
+          "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/default.store-shm",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+          "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+          "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests",
+          "/usr/share/icu/icudt78l.dat"
+        ],
+        "observed_live": true,
+        "pid": 22452,
+        "started_at": "Wed Oct 28 02:02:43 2026"
+      }
+    ]
+  },
+  "errors": [],
+  "exit_code": 0,
+  "native_host_launch": {
+    "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "mapped_text_paths": [
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/com.negentropi.RomaJustTalk/313162E7-523A-48A5-B464-4816743F92B5-22667-00000003C91405ED/D5AB09BD-A69F-45A7-8D13-B70D8DB8EEA5-22986.profraw",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+      "/usr/lib/dyld",
+      "/usr/lib/libRPAC.dylib",
+      "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+      "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+      "/usr/lib/libobjc-trampolines.dylib",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+      "/Library/Preferences/Logging/.plist-cache.34GGBces",
+      "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/stats.store-shm",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/_Testing_Foundation.framework/Versions/A/_Testing_Foundation",
+      "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store-shm",
+      "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/default.store-shm",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+      "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+      "/System/Library/CoreServices/SystemVersion.bundle/English.lproj/SystemVersion.strings",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+      "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib",
+      "/private/var/db/timezone/tz/2026e.1.0/icutz/icutz44l.dat",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/SystemAppearance.car",
+      "/System/Library/Frameworks/Foundation.framework/Versions/C/Resources/FoundationErrors.loctable",
+      "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+      "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+      "/private/var/db/analyticsd/events.allowlist",
+      "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/Aqua.car",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantLight.car",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantLight.car",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests",
+      "/usr/share/icu/icudt78l.dat",
+      "/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-20971545-v2.csstore"
+    ],
+    "observed_live": true,
+    "pid": 22986,
+    "started_at": "Wed Oct 28 02:02:55 2026"
+  },
+  "observation_sha256": {
+    "liveWritingUndoTextEditRejectsTerminatedProcess.json": "42e78c73826cb03e5230939811644ca951382ccac0c274ba1e30ff8a1b2d4ca6"
+  },
+  "owned_editor_startup_sha256": {
+    "RJT-Writing-Live-107B8487-FFAD-42C7-ADB6-69F0B997D4A6-fixture-startup.json": "7999ce728183573f2e525b11f1452e67f3c56ff304366553a1e878ea6b7211f3",
+    "RJT-Writing-Live-BD79DCFF-C727-4820-9333-62B67769E645-fixture-startup.json": "927c6045e8e7cfa552daea53a0243a7411d40db6f34b97fe1769e4a66fa455d8"
+  },
+  "results": {
+    "liveWritingUndoTextEditRejectsTerminatedProcess": [
+      "passed"
+    ]
+  },
+  "starts": [
+    "liveWritingUndoTextEditRejectsTerminatedProcess"
+  ],
+  "summaries": [
+    [
+      "1",
+      "1",
+      "passed"
+    ]
+  ],
+  "valid": true
+}

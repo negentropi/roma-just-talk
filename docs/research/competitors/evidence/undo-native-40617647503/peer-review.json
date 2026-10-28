@@ -1,0 +1,32 @@
+{
+  "verdict": "CLEAN",
+  "reviewer_model": "gpt-6.1-sol",
+  "reasoning_effort": "medium",
+  "fresh_context": true,
+  "scope": "Independent bounded read-only receipt/source audit. Pure Python checks; no edits, archive refetch, network, native execution or build.",
+  "checked": [
+    "7 exact selected xcresult successes; zero failed/skipped selected cases",
+    "28 full UTF16/range states independently reconstructed from frozen source literals",
+    "5 exact two-item clipboard observations: every format, binary bytes, strings/discriminators and stable read counters",
+    "Forward generation12; new copy13; final restored observation15 with identical new payload",
+    "Latest overlap0.1133149s and source busy hold50ms; private settler entry remains unproven",
+    "NFDrequested/NFCreadback negative: one shorter code unit, unconfirmed replacement, callback1/0, unavailableUndo, same3stageidentity",
+    "657 unchanged source entries; focused hashes matched exact localGit objects at runtime0b60c5e62b84da5888e343dc679eb97b8ec48ef2",
+    "Unchanged app/test identities;9startup/stage identity bindings andcleanup receipts;2execution+4enumeration hostclosures;signature-boundAccessibility/Microphone receipts",
+    "Offline5247checker provenance correctly separate; receipt inspected, purevalidators not rerun byreviewer"
+  ],
+  "limits": [
+    "No ASR/menu/shortcut/physical/release/broadcompatibility proof",
+    "Composition origin unknown",
+    "Safari nonemptypriorwindow preservation unproven",
+    "No independent post-deletionfilesystem receipt"
+  ],
+  "prior_interrupted_review": {
+    "model": "gpt-6.1-sol",
+    "effort": "high",
+    "verdict": "INCOMPLETE",
+    "completed_scope": "README, verification structure, metadata/hashes andfirst240auditorlines only; no acceptanceclaimed"
+  },
+  "verification_sha256": "9c2c3897c0ada3b6c6e103281f754c66f9fcfe81fa9bc81dde22ac6185b146c7",
+  "auditor_sha256": "9a368ba9bf6469759d992590c73f5fed82b07a75d94fe32cd8d485bdc72e2ec7"
+}

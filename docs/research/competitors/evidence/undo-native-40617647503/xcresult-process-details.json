@@ -1,0 +1,19 @@
+{
+  "run_id": 40617647503,
+  "scope": "unit",
+  "aggregate_member": "writing-undo-native-proof/process/Native.xcresult/Data/data.0~sOHoKl7vs9OVfOuf_gV8C3i6XVW1QJKQ09gDy31E9xhNjjDDb64u_M7Hv985qh6JnZNjogG1NPXPZjOYbMjo4w==",
+  "case_details": [
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()",
+      "status": "Success",
+      "summary_reference": "0~iqrZTyzF4UxTH177Xjh_26p1EE-c9XVBZVsrFzIWxvYggfspKNBjohPp_ZqxaJUBLPFvpkrpinx3yfZnuL9kCw==",
+      "summary_member": "writing-undo-native-proof/process/Native.xcresult/Data/data.0~iqrZTyzF4UxTH177Xjh_26p1EE-c9XVBZVsrFzIWxvYggfspKNBjohPp_ZqxaJUBLPFvpkrpinx3yfZnuL9kCw==",
+      "decoded_summary_sha256": "3f8eb2e9e8880a6b0aacc6e1a02e42ef4c8c405ea2544f93d9ac818d21ad59bc",
+      "failure_summaries": [],
+      "attachments": []
+    }
+  ],
+  "boundaries": [],
+  "external_ax_reports": [],
+  "poststate_limit": "AX fixtureWindows trees come from before action unless the report explicitly says otherwise. UI boundary reports reflect their named observation phases."
+}

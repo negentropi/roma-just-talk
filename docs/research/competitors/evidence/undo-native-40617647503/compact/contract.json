@@ -1,0 +1,41 @@
+{
+  "canonical_pins": 41,
+  "github_run_id": "40617647503",
+  "limits": [
+    "Product menu/shortcut route is a separate UI gate.",
+    "No ASR, microphone, model/provider-quality or physical-keyboard proof.",
+    "Clipboard fixtures only on the disposable runner; no shared-user clipboard.",
+    "No release or broad editor compatibility claim.",
+    "Positive Safari cases use NFC fixtures. A separate NFD case must remain unconfirmed when actual output differs in UTF16; this is new candidate acceptance, not a matched comparison with the old six-case oracle.",
+    "Accessibility and Microphone are provisioned for the signed app; normal app initialization starts pre-roll. No Automation grant or microphone acceptance claim."
+  ],
+  "lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "oracle_sha256": {
+    "VoiceInkTests/WritingTargetLiveTests.swift": "5a02613a8269fb08634b8b338249200e25ef590402fcf48cbb4d6671f580d07a",
+    "VoiceInkTests/WritingUndoLiveTests.swift": "782476cdff52b58138418ae85c84274da2a5e2b1860bb20116a8ab50a6a87551"
+  },
+  "phases": {
+    "process": [
+      "liveWritingUndoTextEditRejectsTerminatedProcess"
+    ],
+    "remaining": [
+      "liveWritingUndoTextEditRestoresExactUnicodeSelection",
+      "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference",
+      "liveWritingUndoSafariKeepsNewClipboardGeneration",
+      "liveWritingUndoRefusesTextCaretAndWindowDrift",
+      "liveWritingUndoLatestOwnerAndCancellation",
+      "liveWritingUndoSafariRejectsNormalizedDecomposedOutput"
+    ]
+  },
+  "scope": "Seven native WritingActionUndoController cases: six positive contracts and one strict normalized-output refusal, with real TextEdit/Safari AX targets and disposable clipboard payloads; one built Debug app, two separate closed execution hosts plus independently observed/closed enumeration hosts.",
+  "source_sha": "0b60c5e62b84da5888e343dc679eb97b8ec48ef2",
+  "tests": [
+    "liveWritingUndoTextEditRejectsTerminatedProcess",
+    "liveWritingUndoTextEditRestoresExactUnicodeSelection",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration",
+    "liveWritingUndoRefusesTextCaretAndWindowDrift",
+    "liveWritingUndoLatestOwnerAndCancellation",
+    "liveWritingUndoSafariRejectsNormalizedDecomposedOutput"
+  ]
+}

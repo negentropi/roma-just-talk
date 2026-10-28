@@ -1,0 +1,44 @@
+{
+  "clipboard_preferences": "No clipboard keys in argument domain; tests mutate and restore actual persistent preferences.",
+  "command_line_arguments": [
+    "-CurrentTranscriptionModel",
+    "whisper-large-v3-turbo",
+    "-PrewarmModelOnWake",
+    "NO",
+    "-hasCompletedOnboarding",
+    "YES",
+    "-isAIEnhancementEnabled",
+    "NO",
+    "-IsAudioCleanupEnabled",
+    "NO",
+    "-IsTranscriptionCleanupEnabled",
+    "NO",
+    "-enableAnnouncements",
+    "NO",
+    "-SUEnableAutomaticChecks",
+    "NO"
+  ],
+  "credential_contract": "LOCAL_BUILD uses fresh UserDefaults instead of the saved Keychain; exact Local CLI provider lives only in the isolated persistent plist, never NSArgumentDomain. No provider calls.",
+  "environment": {
+    "GITHUB_ACTIONS": "true",
+    "RJT_LIVE_WRITING_TARGET_CHECKS": "1",
+    "RJT_LIVE_WRITING_TARGET_EVIDENCE": "/Users/runner/work/_temp/writing-undo-native-proof/remaining/editor-observations",
+    "RJT_WRITING_UNDO_EVIDENCE": "/Users/runner/work/_temp/writing-undo-native-proof/remaining/observations",
+    "RJT_WRITING_UNDO_LIVE_CHECKS": "1",
+    "RUNNER_ENVIRONMENT": "github-hosted",
+    "RUNNER_TEMP": "/Users/runner/work/_temp"
+  },
+  "isolated_sha256": "10baecaa61e09bf5e218834576b5d8cb433f2b68a6c82915140a1d8c55b6565d",
+  "original_sha256": "00757f5b2bbc8a8bd0cec58c7333e8b2329251794d048c71c26f065ba9e3ff92",
+  "seed_preferences": {
+    "CurrentTranscriptionModel": "whisper-large-v3-turbo",
+    "IsAudioCleanupEnabled": false,
+    "IsTranscriptionCleanupEnabled": false,
+    "PrewarmModelOnWake": false,
+    "SUEnableAutomaticChecks": false,
+    "enableAnnouncements": false,
+    "hasCompletedOnboarding": true,
+    "isAIEnhancementEnabled": false,
+    "selectedAIProvider": "Local CLI"
+  }
+}

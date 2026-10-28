@@ -1,0 +1,29 @@
+{
+  "runtimeHead": "0b60c5e62b84da5888e343dc679eb97b8ec48ef2",
+  "offlineCheckerCommit": "5247b9b75",
+  "runtimeDriverSHA256": "7d3dc87d117055157064462dab4be06ef67ec1884b7e83d3ed8f8a857670faf4",
+  "offlineDriverSHA256": "90a5b3056cf7512960aced633479b0d81b8e32004088c21ae50acdd5f0970a65",
+  "scope": "Only frozen pure validators re-evaluate actual immutable compact observations. No app execution or replacement of runtime source provenance.",
+  "phases": {
+    "process": {
+      "caseErrors": {
+        "liveWritingUndoTextEditRejectsTerminatedProcess": []
+      },
+      "startupCount": 2,
+      "errors": []
+    },
+    "remaining": {
+      "caseErrors": {
+        "liveWritingUndoLatestOwnerAndCancellation": [],
+        "liveWritingUndoRefusesTextCaretAndWindowDrift": [],
+        "liveWritingUndoSafariKeepsNewClipboardGeneration": [],
+        "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference": [],
+        "liveWritingUndoSafariRejectsNormalizedDecomposedOutput": [],
+        "liveWritingUndoTextEditRestoresExactUnicodeSelection": []
+      },
+      "startupCount": 7,
+      "errors": []
+    }
+  },
+  "valid": true
+}

@@ -1,0 +1,26 @@
+{
+  "classification": "passed",
+  "limits": [
+    "Product menu/shortcut route is a separate UI gate.",
+    "No ASR, microphone, model/provider-quality or physical-keyboard proof.",
+    "Clipboard fixtures only on the disposable runner; no shared-user clipboard.",
+    "No release or broad editor compatibility claim.",
+    "Positive Safari cases use NFC fixtures. A separate NFD case must remain unconfirmed when actual output differs in UTF16; this is new candidate acceptance, not a matched comparison with the old six-case oracle.",
+    "Accessibility and Microphone are provisioned for the signed app; normal app initialization starts pre-roll. No Automation grant or microphone acceptance claim."
+  ],
+  "phases": {
+    "process": "cb1b894847d9750c6d210fff6fb8cc671fa3cde32efcc533c4eac35d65017e5f",
+    "remaining": "b2618d2bc0e95cfe495303ba15cb22d14449c104251131cca568b3b5ec0aa9b0"
+  },
+  "source_sha": "0b60c5e62b84da5888e343dc679eb97b8ec48ef2",
+  "tests": [
+    "liveWritingUndoTextEditRejectsTerminatedProcess",
+    "liveWritingUndoTextEditRestoresExactUnicodeSelection",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration",
+    "liveWritingUndoRefusesTextCaretAndWindowDrift",
+    "liveWritingUndoLatestOwnerAndCancellation",
+    "liveWritingUndoSafariRejectsNormalizedDecomposedOutput"
+  ],
+  "valid": true
+}

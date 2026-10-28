@@ -892,14 +892,18 @@ final class LiveWritingEditor {
         self.editor = editor
         self.previousApplication = previousApplication
         self.previousWindows = previousWindows
+        // Retained handles use the process default between scoped diagnostic reads.
+        for element in [appElement, window, editor] { _ = AXUIElementSetMessagingTimeout(element, 0) }
     }
 
     var value: String? {
         _ = AXUIElementSetMessagingTimeout(editor, 0.1)
+        defer { _ = AXUIElementSetMessagingTimeout(editor, 0) }
         return Self.string(kAXValueAttribute, from: editor)
     }
     var selectedRange: NSRange? {
         _ = AXUIElementSetMessagingTimeout(editor, 0.1)
+        defer { _ = AXUIElementSetMessagingTimeout(editor, 0) }
         return Self.range(from: editor).map { NSRange(location: $0.location, length: $0.length) }
     }
 
@@ -1095,8 +1099,20 @@ final class LiveWritingEditor {
     }
 
     private func focus() async throws {
-        guard Self.elements(kAXWindowsAttribute, from: appElement).contains(where: { CFEqual($0, window) }),
-              Self.identifies(window, token: token) else {
+        var rawWindows: CFTypeRef?
+        let windowsStatus = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &rawWindows)
+        let windows = windowsStatus == .success ? rawWindows as? [AXUIElement] : nil
+        let exactWindowPresent = windows?.contains(where: { CFEqual($0, window) }) == true
+        let tokenMatches = exactWindowPresent && Self.identifies(window, token: token)
+        guard exactWindowPresent, tokenMatches else {
+            recordOperationFailure("focus-ownership-refused", expected: sourceOriginal, ownershipGuard: [
+                "windowReadAXError": windowsStatus.rawValue, "windowReadIsArray": windows != nil,
+                "windowCount": windows?.count ?? -1, "exactWindowPresent": exactWindowPresent,
+                "tokenCheckAttempted": exactWindowPresent, "tokenMatched": tokenMatches,
+                "applicationTerminated": application.isTerminated,
+                "currentApplicationInstanceMatches": NSRunningApplication(processIdentifier: application.processIdentifier)
+                    .map { application.isEqual($0) } == true
+            ])
             throw LiveWritingFailure.failed("The fixture no longer owns its editor window.")
         }
         application.activate(options: [.activateAllWindows])
@@ -1236,6 +1252,7 @@ final class LiveWritingEditor {
 
     private func cleanupState() -> [String: Any] {
         for element in [appElement, window, editor] { _ = AXUIElementSetMessagingTimeout(element, 0.1) }
+        defer { for element in [appElement, window, editor] { _ = AXUIElementSetMessagingTimeout(element, 0) } }
         var raw: CFTypeRef?
         let status = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &raw)
         let windows = status == .success ? raw as? [AXUIElement] : nil
@@ -1283,9 +1300,10 @@ final class LiveWritingEditor {
         } catch { Issue.record("Could not write live writing evidence: \(error)") }
     }
 
-    func recordOperationFailure(_ name: String, expected: String) {
+    func recordOperationFailure(_ name: String, expected: String, ownershipGuard: [String: Any]? = nil) {
         guard let output = Self.evidenceDirectory else { return }
         for element in [appElement, window, editor] { _ = AXUIElementSetMessagingTimeout(element, 0.1) }
+        defer { for element in [appElement, window, editor] { _ = AXUIElementSetMessagingTimeout(element, 0) } }
         let windows = Self.windows(in: appElement)
         let windowPresent = windows?.contains { CFEqual($0, window) } == true
         let editorWindow = Self.element(kAXWindowAttribute, from: editor)
@@ -1295,8 +1313,8 @@ final class LiveWritingEditor {
         let owned = windowPresent && editorWindow.map { CFEqual($0, window) } == true && hasFixtureLabel
         let observedAt = ProcessInfo.processInfo.systemUptime
         let observedDate = ISO8601DateFormatter().string(from: Date())
-        let observed = owned ? value : nil
-        let range = owned ? selectedRange : nil
+        let observed = owned ? Self.string(kAXValueAttribute, from: editor) : nil
+        let range = owned ? Self.range(from: editor) : nil
         let selected = owned ? Self.string(kAXSelectedTextAttribute, from: editor) : nil
         let system = AXUIElementCreateSystemWide()
         let focused = Self.element(kAXFocusedUIElementAttribute, from: system)
@@ -1311,7 +1329,7 @@ final class LiveWritingEditor {
         } else {
             screenshot = "not captured; no new owned fixture window"
         }
-        let receipt: [String: Any] = [
+        var receipt: [String: Any] = [
             "checkpoint": name, "token": token, "bundleIdentifier": kind.bundleIdentifier,
             "processIdentifier": application.processIdentifier, "ownedEditor": owned,
             "windowStillPresent": windowPresent,
@@ -1330,6 +1348,7 @@ final class LiveWritingEditor {
             "frontmostIsExpectedApplication": frontmostIsExpected, "title": title, "document": document,
             "screenshot": screenshot, "systemUptime": observedAt, "date": observedDate
         ]
+        if let ownershipGuard { receipt["ownershipGuard"] = ownershipGuard }
         do {
             try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
             try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])

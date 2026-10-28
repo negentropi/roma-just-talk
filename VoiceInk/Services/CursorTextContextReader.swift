@@ -429,7 +429,7 @@ enum CursorTextContextReader {
         in target: FocusedPasteTarget,
         timeout: TimeInterval
     ) async -> Bool {
-        guard let selectedRange = target.selectedRange else { return false }
+        guard target.text != nil, let selectedRange = target.selectedRange else { return false }
         let deadline = ProcessInfo.processInfo.systemUptime + timeout
         while true {
             if pasteLanded(

@@ -411,21 +411,30 @@ enum CursorTextContextReader {
         )
     }
 
-    /// Returns true once the target shows one more copy of the pasted text than before,
-    /// which means the target app has already read the clipboard.
+    /// Returns true once the target shows the pasted text replacing the selection it had
+    /// before the paste, which means the target app has already read the clipboard.
     @MainActor
     static func waitUntilPasteLands(
         _ pastedText: String,
         in target: FocusedPasteTarget,
         timeout: TimeInterval
     ) async -> Bool {
-        let needle = pastedText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !needle.isEmpty, let textBeforePaste = target.text else { return false }
-        let copiesBeforePaste = textBeforePaste.components(separatedBy: needle).count
+        guard let selectedRange = target.selectedRange else { return false }
+        // A stalled target must not hold the main actor past the restore deadline.
+        AXUIElementSetMessagingTimeout(target.focusedElement, Float(pasteDeliveryObservationDelay))
+        // Web editors may drop a trailing space the transcript ends with.
+        let candidates = Set([pastedText, pastedText.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)])
         let deadline = ProcessInfo.processInfo.systemUptime + timeout
         while true {
-            if let text = textValue(from: target.focusedElement),
-               text.components(separatedBy: needle).count > copiesBeforePaste {
+            let text = textValue(from: target.focusedElement)
+            if candidates.contains(where: {
+                replacementTextWasObserved(
+                    textBeforeInsertion: target.text,
+                    rangeBeforeInsertion: selectedRange,
+                    insertedText: $0,
+                    textAfterInsertion: text
+                )
+            }) {
                 return true
             }
             let remaining = deadline - ProcessInfo.processInfo.systemUptime

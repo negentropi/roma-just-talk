@@ -139,6 +139,7 @@ struct VoiceInkTests {
         )
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
+        configuration.createsNewApplicationInstance = true
         textEdit = try await NSWorkspace.shared.open(
             [document],
             withApplicationAt: textEditURL,

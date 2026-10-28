@@ -103,7 +103,26 @@ struct DiscardedRecordingTests {
         latest.fetchLimit = 1
         #expect(try fixture.context.fetch(latest).map(\.id) == [newer.id])
         #expect(deletions.count == 1)
-        #expect(Set([pending, newer]).filter(TranscriptionHistoryQuery.isLive) == [newer])
+        #expect(TranscriptionHistoryQuery.liveSelection([pending, newer], in: fixture.context) == [newer])
+    }
+}
+
+extension DiscardedRecordingTests {
+    @Test @MainActor func historySelectionDropsOlderRowDeletedByAnotherContext() throws {
+        let fixture = try RecordingFixture()
+        let older = Transcription(text: "older", duration: 1, transcriptionStatus: .completed)
+        let newest = Transcription(text: "newest", duration: 1, transcriptionStatus: .completed)
+        fixture.context.insert(older)
+        fixture.context.insert(newest)
+        try fixture.context.save()
+
+        // Auto-cleanup deletes on a background context; the newest row stays put.
+        let cleanup = ModelContext(fixture.context.container)
+        let olderID = older.id
+        try cleanup.delete(model: Transcription.self, where: #Predicate { $0.id == olderID })
+        try cleanup.save()
+
+        #expect(TranscriptionHistoryQuery.liveSelection([older, newest], in: fixture.context) == [newest])
     }
 }
 

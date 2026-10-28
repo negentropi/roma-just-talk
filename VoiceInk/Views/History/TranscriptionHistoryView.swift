@@ -407,10 +407,11 @@ struct TranscriptionHistoryView: View {
     }
 
     private func dropDeletedSelections() {
-        if let selectedTranscription, !TranscriptionHistoryQuery.isLive(selectedTranscription) {
+        if let selectedTranscription,
+           TranscriptionHistoryQuery.liveSelection([selectedTranscription], in: modelContext).isEmpty {
             self.selectedTranscription = nil
         }
-        selectedTranscriptions = selectedTranscriptions.filter(TranscriptionHistoryQuery.isLive)
+        selectedTranscriptions = TranscriptionHistoryQuery.liveSelection(selectedTranscriptions, in: modelContext)
     }
 
     private func performHistoryRefresh(_ plan: VoiceInkHistoryRefreshPlan) {

@@ -3,9 +3,12 @@ import SwiftData
 import VoiceInkCore
 
 enum TranscriptionHistoryQuery {
-    /// Rows deleted elsewhere (discarded empty results, auto-cleanup) must not stay selected.
-    static func isLive(_ transcription: Transcription) -> Bool {
-        !transcription.isDeleted && transcription.modelContext != nil
+    /// Drops rows deleted by any context (discarded results, auto-cleanup) from a selection.
+    static func liveSelection(_ selection: Set<Transcription>, in context: ModelContext) -> Set<Transcription> {
+        guard !selection.isEmpty,
+              let liveIDs = try? Set(context.fetchIdentifiers(FetchDescriptor<Transcription>()))
+        else { return selection }
+        return selection.filter { liveIDs.contains($0.persistentModelID) }
     }
 
     static func latestIndicatorDescriptor() -> FetchDescriptor<Transcription> {

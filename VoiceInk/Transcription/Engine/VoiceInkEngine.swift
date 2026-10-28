@@ -157,9 +157,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             latencyTraceToken: traceToken
                         )
                         latencyTrace.event("engine.audio_relay.created", token: traceToken)
+                        let permanentURL = VoiceInkStoredAudioFile.recordingFileURL(in: self.recordingsDirectory)
 
                         do {
-                            let permanentURL = VoiceInkStoredAudioFile.recordingFileURL(in: self.recordingsDirectory)
                             self.recordedFile = permanentURL
 
                             self.currentSession?.cancel()
@@ -349,6 +349,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
                         } catch {
                             powerModeConfigTask?.cancel()
+                            // A failed start can leave a partial WAV behind; only a saved row may keep it.
+                            self.discardUnreferencedRecordedAudio(at: permanentURL)
                             guard self.activeRecordingStartID == startID else {
                                 // A cancel already finished this start; shared state may belong to a newer one.
                                 startupAudioRelay.clear()
@@ -800,6 +802,13 @@ class VoiceInkEngine: NSObject, ObservableObject {
         } catch {
             logger.error("Failed to save canceled recording: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    private func discardUnreferencedRecordedAudio(at url: URL) {
+        let storedURL: String? = url.absoluteString
+        let referencing = FetchDescriptor<Transcription>(predicate: #Predicate { $0.audioFileURL == storedURL })
+        guard (try? modelContext.fetchCount(referencing)) == 0 else { return }
+        discardRecordedAudio(at: url)
     }
 
     private func discardRecordedAudio(at url: URL?) {

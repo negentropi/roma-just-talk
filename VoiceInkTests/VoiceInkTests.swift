@@ -177,6 +177,30 @@ struct VoiceInkTests {
         #expect((value as? String)?.contains("dictated text") == true)
     }
 
+    @Test func pasteLandsOnlyWhenTheTargetShowsTheReplacement() {
+        let caret = CFRange(location: 6, length: 0)
+        #expect(CursorTextContextReader.pasteLanded(
+            "dictated text ", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: "Hello dictated text "
+        ))
+        #expect(CursorTextContextReader.pasteLanded(
+            "dictated text ", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: "Hello dictated text"
+        ))
+        #expect(!CursorTextContextReader.pasteLanded(
+            "dictated text", textBeforePaste: "Hello dictated text", selectedRangeBeforePaste: CFRange(location: 6, length: 13),
+            textAfterPaste: "Hello dictated text"
+        ))
+        #expect(!CursorTextContextReader.pasteLanded(
+            "dictated text", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: "Hello x dictated text"
+        ))
+        #expect(!CursorTextContextReader.pasteLanded(
+            "dictated text", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: nil
+        ))
+    }
+
     @Test @MainActor func accessibilityInsertDeliversWithoutTouchingClipboard() async throws {
         let defaults = UserDefaults.standard
         let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")

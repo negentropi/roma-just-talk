@@ -422,25 +422,40 @@ enum CursorTextContextReader {
         guard let selectedRange = target.selectedRange else { return false }
         // A stalled target must not hold the main actor past the restore deadline.
         AXUIElementSetMessagingTimeout(target.focusedElement, Float(pasteDeliveryObservationDelay))
-        // Web editors may drop a trailing space the transcript ends with.
-        let candidates = Set([pastedText, pastedText.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)])
         let deadline = ProcessInfo.processInfo.systemUptime + timeout
         while true {
-            let text = textValue(from: target.focusedElement)
-            if candidates.contains(where: {
-                replacementTextWasObserved(
-                    textBeforeInsertion: target.text,
-                    rangeBeforeInsertion: selectedRange,
-                    insertedText: $0,
-                    textAfterInsertion: text
-                )
-            }) {
+            if pasteLanded(
+                pastedText,
+                textBeforePaste: target.text,
+                selectedRangeBeforePaste: selectedRange,
+                textAfterPaste: textValue(from: target.focusedElement)
+            ) {
                 return true
             }
             let remaining = deadline - ProcessInfo.processInfo.systemUptime
             guard remaining > 0, !Task.isCancelled else { return false }
             try? await Task.sleep(
                 nanoseconds: UInt64(min(remaining, pasteDeliveryObservationDelay) * 1_000_000_000)
+            )
+        }
+    }
+
+    static func pasteLanded(
+        _ pastedText: String,
+        textBeforePaste: String?,
+        selectedRangeBeforePaste: CFRange,
+        textAfterPaste: String?
+    ) -> Bool {
+        // Pasting over an identical selection changes nothing, so it proves no clipboard read.
+        guard let textAfterPaste, textAfterPaste != textBeforePaste else { return false }
+        // Web editors may drop a trailing space the transcript ends with.
+        let trimmedText = pastedText.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
+        return Set([pastedText, trimmedText]).contains {
+            replacementTextWasObserved(
+                textBeforeInsertion: textBeforePaste,
+                rangeBeforeInsertion: selectedRangeBeforePaste,
+                insertedText: $0,
+                textAfterInsertion: textAfterPaste
             )
         }
     }

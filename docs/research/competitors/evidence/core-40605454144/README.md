@@ -6,4 +6,6 @@ The actual artifact's 160 source hashes match the pinned Git blobs. Before/after
 
 One artifact download: 52,044 bytes, SHA-256 `6445a7ea53e331b113a5a2bf2f932c479f12b630dba35a5cd68b4eb3b675c565`; all 11 members pass CRC and remain under [artifact](artifact). The original ZIP remains on the remote server at `/data/rjt-writing-check-01a17bef/core-40605454144/evidence.zip`. [Analyzer](analyze-result.py) independently reads the pinned Git source and raw results; run it from this checkout with Python 3.
 
+The compiled shared display label matches the recorded [Opus source authorship](../undo-ui-source/authorship-and-review.json); [the source binding](core-label-authorship.json) verifies its exact committed bytes.
+
 This is candidate Core compilation and policy/codec evidence. It does not prove app Undo, editor delivery, clipboard behavior, menu/shortcut interactions, iOS runtime, store migration, providers, physical input, a known-bad comparison or a release. The only logged warning is SwiftPM's deprecated `--skip-update` option.

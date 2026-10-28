@@ -25,7 +25,7 @@
     "receipt.json": "54bee63e2a087c078c5a3d04fa7226eda4282050d4ec7daf2b76d40049b0f01d",
     "run.json": "965ef632b5ca01c883f9358f19b6024f6442a6ba362df62eae0af0105dd970ce",
     "artifact.json": "0b8793780d63111fcb1c2cb2af592fc748ae903d462bb6b9ccedfe5868a9efd7",
-    "download-receipt.json": "30edce60be23718b04fff98a8c00b76638dc8f37d601919395cd14117a43e8cc",
-    "README.md": "a1301db636bb837b3cb87139718a573bc9fa6a72c0360b58a59db5cb3af1c268"
-  }
+    "download-receipt.json": "30edce60be23718b04fff98a8c00b76638dc8f37d601919395cd14117a43e8cc"
+  },
+  "readme_scope": "Core audit evidence; later source-authorship link is separately recorded in core-label-authorship.json"
 }

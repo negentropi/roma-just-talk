@@ -1,0 +1,24 @@
+{
+  "scope": "Existing source-authorship receipt bound to the Core source compiled by this run; no UI runtime proof",
+  "head": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "receipt_path": "docs/research/competitors/evidence/undo-ui-source/authorship-and-review.json",
+  "receipt_sha256": "ff51e4151c2de0928c9837772a28c497bd59832c067737b0686443224aa957d4",
+  "core_source_path": "VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift",
+  "core_source_sha256": "c063952868a8068c8af5f14424e49a137bcf893a968016fb1fc66ad72ff09d03",
+  "core_display_label_authorship": {
+    "invocation": "core-display-name-only",
+    "requested_model": "claude-opus-5-5",
+    "reported_assistant_models": [
+      "claude-opus-5-5"
+    ],
+    "raw_jsonl_sha256": "639f27cc5c7571e6e87fa20f2ec1bf0f9ccafc7d559e7dc828aa350d9218a5a2",
+    "result": {
+      "subtype": "success",
+      "is_error": false,
+      "duration_ms": 25941,
+      "total_cost_usd": 0.06408
+    }
+  },
+  "source_only_review": "gpt-6.1-sol",
+  "core_label_scope": "Only displayName switch .undoLastWritingEdit returning Undo Last Writing Edit. Removing that case recovers frozen backend source exactly; independently checked by backend owner."
+}

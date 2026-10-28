@@ -15,7 +15,11 @@
       "round": 1,
       "head": "d5d12e4fe93687a845b91baa49855c393dd4f41d",
       "verdict": "CHANGES",
-      "diff": { "files": 211, "insertions": 52613, "deletions": 1187 },
+      "diff": {
+        "files": 211,
+        "insertions": 52613,
+        "deletions": 1187
+      },
       "findings": [
         {
           "id": "S1",
@@ -33,11 +37,34 @@
       "round": 2,
       "head": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e",
       "verdict": "APPROVE",
-      "diff": { "files": 252, "insertions": 71296, "deletions": 1210 },
+      "diff": {
+        "files": 252,
+        "insertions": 71296,
+        "deletions": 1210
+      },
       "findings": [],
-      "resolved": ["S1"],
+      "resolved": [
+        "S1"
+      ],
       "independentChecks": "All 35 fixture inputs match the archive by content, SHA-256 and Git object identity. Schema fixture loading and metadata-store, correction-store, Local CLI and polish self-tests passed unchanged. Shell syntax and diff checks passed.",
       "limits": "Source approval only. Full Swift canonicalization and fresh candidate Mac/iOS/native gates remain required.",
+      "usage": "Not exposed."
+    },
+    {
+      "round": 3,
+      "head": "2b165a5c960817f2b1ea4d5683c8f64e2109de3b",
+      "verdict": "APPROVE",
+      "diff": {
+        "files": 255,
+        "insertions": 72036,
+        "deletions": 1210
+      },
+      "findings": [],
+      "resolved": [
+        "S1"
+      ],
+      "independentChecks": "PR-review classifier controls and whitespace checks passed; product fixes and matched-proof driver reviewed.",
+      "limits": "New runtime regression comparisons pending CI. Projection plan accepted subject to exact product/resource/project/dependency/compiled-test equality, QA dependency closure and documentation redirects. The unseen projected commit and its CI are not separately certified by this source review.",
       "usage": "Not exposed."
     }
   ],
@@ -53,11 +80,41 @@
     "proof": "Five original missing-input failures reproduced; six available restored-fixture controls passed. Native Swift schema test pending disposable Mac CI. Model digest has a matched en_US.UTF-8 failure and C-collation success on the same 22 paths.",
     "status": "approved"
   },
-  "declinedFindings": [],
+  "declinedFindings": [
+    {
+      "id": "CR4",
+      "reason": "Accepted None/Light/Clarity literal-output contract deliberately bypasses trial prefixes. Supported LOCAL_BUILD packages initialize licensed; non-local trial state remains reachable. Written reply discussion_r4401569730.",
+      "reply": "https://github.com/negentropi/roma-just-talk/pull/30#discussion_r4401569730"
+    }
+  ],
   "finalSourceVerdict": "APPROVE",
-  "sourceReviewCovers": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e and subsequent metadata-only commits with identical behavior files",
+  "sourceReviewCovers": "Product changes at 2b165a5c960817f2b1ea4d5683c8f64e2109de3b; source-identical projection requires independent equality checks and actual PR-head automatic CI.",
   "pushed": true,
   "initialPublicationHead": "520943c54f206dcdc5addc077256a26252f84161",
   "publicationBranch": "codex/rjt-mac-competitor-features-pr-20261028",
-  "mergePolicy": "Full-stop: never merge, enable auto-merge, enter a merge queue or publish a release."
+  "mergePolicy": "Full-stop: never merge, enable auto-merge, enter a merge queue or publish a release.",
+  "botReview": {
+    "sourceHead": "c1f3bb69356aed9abce01c43a4432c894b89c838",
+    "commentsFixed": {
+      "CR1": "71b2abe03",
+      "CR2": "71b2abe03",
+      "CR3": "43a79bc50926b8f21ffa6fe9c80365b92d3be17f",
+      "CR5": "748fc9218",
+      "CR6": "4f0419de2",
+      "CR7": "1928b409c9c62ccf63cc4945763b3ad4eb8bc173",
+      "CR8": "1928b409c9c62ccf63cc4945763b3ad4eb8bc173"
+    },
+    "nitsFixed": "Both persistent-default-domain snapshot findings fixed in 1928b409c.",
+    "declined": {
+      "CR4": "Accepted None/Light/Clarity literal-output contract deliberately bypasses trial prefixes. Supported LOCAL_BUILD packages initialize licensed; non-local trial state remains reachable. Written reply discussion_r4401569730."
+    }
+  },
+  "uiAuthorship": {
+    "scope": "Single strict snippet-mutation read callsite",
+    "model": "claude-opus-5-5",
+    "session": "6d6d1e89-55b9-467f-ab43-ecc6ce883c7f",
+    "costUSD": 0.1279172,
+    "receipt": "/tmp/rjt-pr30-snippets-authorship.json",
+    "note": "Actual first-party Claude CLI output; no UI authored by the parent."
+  }
 }

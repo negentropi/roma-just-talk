@@ -43,15 +43,16 @@ baseline_sha = "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182"
 session_original_sha = "10fc37409284b6c5bc4d60986bfd7b030046c08654c639781061c5b7058c6596"
 session_bridged_sha = "a04c539eb86d85ffb22f9a3fab46ceabbd69c297b8cfd63af8d3257a704b561e"
 bridge_sha = "1b6048e13f973dc7cc8aae5ab13ff90a586396c7e7bffdeadca9a162e4ae2bea"
-bridge_patch = r"""diff --git a/VoiceInk/Services/WritingActionSession.swift b/VoiceInk/Services/WritingActionSession.swift
+bridge_patch = (r"""diff --git a/VoiceInk/Services/WritingActionSession.swift b/VoiceInk/Services/WritingActionSession.swift
 index 9f539f8d..ef4b9daf 100644
 --- a/VoiceInk/Services/WritingActionSession.swift
 +++ b/VoiceInk/Services/WritingActionSession.swift
 @@ -10,6 +10,18 @@ final class WritingActionSession {
      let target: WritingTarget
      let provider: AIEnhancementProviderSnapshot
- 
-+    init(
+"""
+" \n"
+r"""+    init(
 +        kind: VoiceInkWritingActionKind,
 +        targetLanguage: String,
 +        target: WritingTarget,
@@ -66,7 +67,7 @@ index 9f539f8d..ef4b9daf 100644
      init(kind: VoiceInkWritingActionKind, provider: AIEnhancementProviderSnapshot) throws {
          self.kind = kind
          self.provider = provider
-"""
+""")
 baseline = output.parent / "writing-delivery-commit-baseline"
 package_checkouts = repo / ".local-build/SourcePackages"
 bundle_id = "com.negentropi.RomaJustTalk"

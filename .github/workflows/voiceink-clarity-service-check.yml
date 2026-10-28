@@ -1,0 +1,78 @@
+name: Verify Clarity service API
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-clarity-service-check-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clarity-service-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  service:
+    runs-on: macos-26
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the Swift Testing result classifier
+        run: |
+          bash scripts/tests/swiftpm-testing-signature.test.sh --self-test
+          bash scripts/run-clarity-service-check.sh --self-test
+
+      - name: Select installed Xcode 26
+        run: |
+          set -o pipefail
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            swift --version
+            sw_vers
+          } 2>&1 | tee "$RUNNER_TEMP/clarity-service-toolchain.log"
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: clarity-service-macos26-${{ runner.arch }}-${{ hashFiles('VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved', 'VoiceInkCore/Package.swift', 'VoiceInkCore/Package.resolved', 'VoiceInkNVIDIA/Package.swift', 'VoiceInkNVIDIA/Package.resolved') }}
+          restore-keys: core-macos26-${{ runner.arch }}-
+
+      - name: Run all seven actual Clarity provider tests
+        run: |
+          set -o pipefail
+          bash scripts/run-clarity-service-check.sh \
+            2>&1 | tee "$RUNNER_TEMP/clarity-service-driver.log"
+
+      - name: Upload sources, pins and service outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.clarity-service-evidence
+          path: |
+            ${{ runner.temp }}/clarity-service-toolchain.log
+            ${{ runner.temp }}/clarity-service-driver.log
+            ${{ runner.temp }}/clarity-service-check/*.json
+            ${{ runner.temp }}/clarity-service-check/*.txt
+            ${{ runner.temp }}/clarity-service-check/*.log
+            ${{ runner.temp }}/clarity-service-check/*.xml
+            ${{ runner.temp }}/clarity-service-check/attachments/**
+            ${{ runner.temp }}/clarity-service-check/package/Package.swift
+            ${{ runner.temp }}/clarity-service-check/package/Package.resolved
+            ${{ runner.temp }}/clarity-service-check/package/Sources/**
+            ${{ runner.temp }}/clarity-service-check/package/Tests/**
+            ${{ runner.temp }}/swiftpm-testing-signature-check/*.json
+            ${{ runner.temp }}/swiftpm-testing-signature-check/*.txt
+            ${{ runner.temp }}/swiftpm-testing-signature-check/*.log
+            ${{ runner.temp }}/swiftpm-testing-signature-check/package/Package.swift
+            ${{ runner.temp }}/swiftpm-testing-signature-check/package/Tests/**
+          if-no-files-found: error

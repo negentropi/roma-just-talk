@@ -1,0 +1,81 @@
+name: Probe native Safari writing target
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-writing-target-probe-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writing-target-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select the verification Xcode
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          mkdir -p "$RUNNER_TEMP/writing-target-probe-environment"
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            swift --version
+            sw_vers
+          } > "$RUNNER_TEMP/writing-target-probe-environment/environment.txt"
+          /usr/bin/caffeinate -d -i -u -t 2700 </dev/null >/dev/null 2>&1 &
+
+      - name: Prepare immutable native sources and exact package constraints
+        id: prepare
+        run: bash scripts/run-writing-target-probe.sh prepare
+
+      - name: Build and observe candidate native delivery
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        run: bash scripts/run-writing-target-probe.sh run candidate
+
+      - name: Publish candidate observations promptly
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-target-candidate
+          path: |
+            ${{ runner.temp }}/writing-target-probe/candidate/*.json
+            ${{ runner.temp }}/writing-target-probe/candidate/*.log
+            ${{ runner.temp }}/writing-target-probe/candidate/observations/**
+          if-no-files-found: error
+
+      - name: Build and observe the known-bad native delivery
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        run: bash scripts/run-writing-target-probe.sh run baseline
+
+      - name: Require matched failure and success
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        run: bash scripts/run-writing-target-probe.sh verify
+
+      - name: Upload native observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-target-probe
+          path: |
+            ${{ runner.temp }}/writing-target-probe/*.json
+            ${{ runner.temp }}/writing-target-probe/*/*.json
+            ${{ runner.temp }}/writing-target-probe/*/*.txt
+            ${{ runner.temp }}/writing-target-probe/*/*.log
+            ${{ runner.temp }}/writing-target-probe/*/observations/**
+            ${{ runner.temp }}/writing-target-probe/*/package/Package.swift
+            ${{ runner.temp }}/writing-target-probe/*/package/Package.resolved
+            ${{ runner.temp }}/writing-target-probe/*/package/Sources/WritingTargetProbe/**
+            ${{ runner.temp }}/writing-target-probe-environment/**
+          if-no-files-found: error

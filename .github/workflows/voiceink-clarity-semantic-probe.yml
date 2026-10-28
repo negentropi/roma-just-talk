@@ -1,0 +1,79 @@
+name: Build Clarity semantic service probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-clarity-semantic-probe-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clarity-semantic-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the observation classifier without model calls
+        run: bash scripts/run-clarity-semantic-probe.sh --self-test
+
+      - name: Check finite shell stream capture without a model
+        run: bash scripts/run-clarity-semantic-probe.sh --capture-self-test
+
+      - name: Select installed Xcode 26
+        run: |
+          set -o pipefail
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+
+      - name: Prepare exact service sources and semantic inputs
+        run: |
+          bash scripts/run-clarity-semantic-probe.sh prepare
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            swift --version
+            sw_vers
+            uname -m
+          } > "$RUNNER_TEMP/clarity-semantic-probe/toolchain.log" 2>&1
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: clarity-semantic-macos26-${{ runner.arch }}-${{ hashFiles('VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved', 'VoiceInkCore/Package.swift', 'VoiceInkCore/Package.resolved', 'VoiceInkNVIDIA/Package.swift', 'VoiceInkNVIDIA/Package.resolved') }}
+          restore-keys: core-macos26-${{ runner.arch }}-
+
+      - name: Build and sign without executing model calls
+        run: bash scripts/run-clarity-semantic-probe.sh build
+
+      - name: Upload exact source and build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.clarity-semantic-build-evidence
+          path: |
+            ${{ runner.temp }}/clarity-semantic-probe/*.json
+            ${{ runner.temp }}/clarity-semantic-probe/*.txt
+            ${{ runner.temp }}/clarity-semantic-probe/*.log
+            ${{ runner.temp }}/clarity-semantic-probe/generator/writing-local-cli-service-probe/source-contract.json
+            ${{ runner.temp }}/clarity-semantic-probe/generator/writing-local-cli-service-probe/package/Package.swift
+            ${{ runner.temp }}/clarity-semantic-probe/generator/writing-local-cli-service-probe/package/Package.resolved
+            ${{ runner.temp }}/clarity-semantic-probe/generator/writing-local-cli-service-probe/package/Sources/**
+          if-no-files-found: error
+
+      - name: Upload the signed probe for separately authorized execution
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.clarity-semantic-service-probe
+          path: ${{ runner.temp }}/clarity-semantic-probe/signed-probe.tar.gz
+          if-no-files-found: error

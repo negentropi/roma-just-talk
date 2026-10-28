@@ -1,0 +1,14 @@
+{
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "classification" : "passed",
+  "executablePath" : "\/Users\/runner\/work\/_temp\/dictation-metadata-store-derived-candidate\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "fixturePath" : "\/Users\/runner\/work\/_temp\/dictation-metadata-store-proof\/stores\/metadata",
+  "hostPID" : 78888,
+  "normalSupportPath" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk",
+  "phase" : "metadata-write",
+  "scope" : "Actual VoiceInk metadata scalar persistence in the closed predecessor-store clone; no profile activation, provider, audio, CloudKit or UI proof.",
+  "sourcePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/VoiceInkTests\/DictationMetadataStoreLiveTests.swift",
+  "sourceSHA" : "3ada8372711c0d9a484087ea3e3300e4fac0afba",
+  "testName" : "liveDictationMetadataPersistentStoreUpgrade",
+  "version" : 1
+}

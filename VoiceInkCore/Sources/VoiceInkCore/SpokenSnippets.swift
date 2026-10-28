@@ -97,6 +97,14 @@ public struct VoiceInkSpokenSnippetExpansion: Equatable, Sendable {
 
 /// Shared persistence, literal matching and CSV import. No AI is involved in expansion.
 public enum VoiceInkSpokenSnippets {
+    public enum LoadError: Error, Equatable, Sendable, LocalizedError {
+        case unreadableLibrary
+
+        public var errorDescription: String? {
+            "Saved snippets couldn't be read. Restore a valid settings backup before making changes."
+        }
+    }
+
     public static let userDefaultsKey = "VoiceInkSpokenSnippets"
     public static let maximumTriggerCharacters = 60
     public static let maximumContentCharacters = 4_000
@@ -123,10 +131,20 @@ public enum VoiceInkSpokenSnippets {
     }
 
     public static func load(from defaults: UserDefaults = .standard) -> [VoiceInkSpokenSnippet] {
-        guard let data = defaults.data(forKey: userDefaultsKey),
-              let snippets = try? JSONDecoder().decode([VoiceInkSpokenSnippet].self, from: data),
-              let valid = try? validated(snippets) else { return [] }
-        return valid
+        (try? loadForMutation(from: defaults)) ?? []
+    }
+
+    /// A failed read must stop a write, rather than replace saved snippets with a new library.
+    public static func loadForMutation(from defaults: UserDefaults = .standard) throws -> [VoiceInkSpokenSnippet] {
+        guard let stored = defaults.object(forKey: userDefaultsKey) else { return [] }
+        guard let data = stored as? Data else {
+            throw LoadError.unreadableLibrary
+        }
+        do {
+            return try validated(JSONDecoder().decode([VoiceInkSpokenSnippet].self, from: data))
+        } catch {
+            throw LoadError.unreadableLibrary
+        }
     }
 
     /// Validate and encode everything before touching the previous stored library.

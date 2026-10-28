@@ -154,6 +154,75 @@ final class SpokenSnippetsTests: XCTestCase {
         XCTAssertEqual(defaults.data(forKey: VoiceInkSpokenSnippets.userDefaultsKey), malformed)
     }
 
+    func testMutationLoadAcceptsMissingAndValidLibraries() throws {
+        let suite = "VoiceInkCore.SpokenSnippets.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+
+        XCTAssertTrue(try VoiceInkSpokenSnippets.loadForMutation(from: defaults).isEmpty)
+        XCTAssertNil(defaults.object(forKey: VoiceInkSpokenSnippets.userDefaultsKey))
+        let snippet = VoiceInkSpokenSnippet(trigger: "  my\t link  ", content: " first\nCafe\u{301}\r\nlast \n", enabled: false)
+        try VoiceInkSpokenSnippets.save([snippet], to: defaults)
+        let stored = defaults.data(forKey: VoiceInkSpokenSnippets.userDefaultsKey)
+
+        let loaded = try VoiceInkSpokenSnippets.loadForMutation(from: defaults)
+        XCTAssertEqual(loaded.count, 1)
+        XCTAssertEqual(loaded.first?.id, snippet.id)
+        XCTAssertEqual(loaded.first?.trigger, "my link")
+        XCTAssertTrue(loaded.first?.content.utf8.elementsEqual(snippet.content.utf8) == true)
+        XCTAssertFalse(try XCTUnwrap(loaded.first).enabled)
+        XCTAssertEqual(defaults.data(forKey: VoiceInkSpokenSnippets.userDefaultsKey), stored)
+    }
+
+    func testMutationLoadRejectsUnreadableLibrariesBeforeReplacingStoredBytes() throws {
+        let suite = "VoiceInkCore.SpokenSnippets.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let existing = VoiceInkSpokenSnippet(trigger: "address", content: "Original")
+        let unreadable = [
+            Data("not JSON".utf8),
+            Data("{}".utf8),
+            try JSONEncoder().encode([VoiceInkSpokenSnippet(trigger: "", content: "Original")]),
+            try JSONEncoder().encode([existing, VoiceInkSpokenSnippet(trigger: "ADDRESS", content: "Duplicate")]),
+            try JSONEncoder().encode([existing, VoiceInkSpokenSnippet(id: existing.id, trigger: "other", content: "Duplicate ID")]),
+        ]
+
+        for stored in unreadable {
+            defaults.set(stored, forKey: VoiceInkSpokenSnippets.userDefaultsKey)
+            do {
+                var library = try VoiceInkSpokenSnippets.loadForMutation(from: defaults)
+                library.append(VoiceInkSpokenSnippet(trigger: "new", content: "Replacement"))
+                try VoiceInkSpokenSnippets.save(library, to: defaults)
+                XCTFail("An unreadable library must prevent a mutation from replacing saved bytes")
+            } catch let issue as VoiceInkSpokenSnippets.LoadError {
+                XCTAssertEqual(issue, .unreadableLibrary)
+            } catch {
+                XCTFail("Unreadable saved snippets must report a library error")
+            }
+            XCTAssertEqual(defaults.data(forKey: VoiceInkSpokenSnippets.userDefaultsKey), stored)
+            XCTAssertTrue(VoiceInkSpokenSnippets.load(from: defaults).isEmpty)
+        }
+    }
+
+    func testMutationLoadRejectsWrongStorageTypeWithoutErasingIt() {
+        let suite = "VoiceInkCore.SpokenSnippets.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let wrongType = "saved data with the wrong preference type"
+        defaults.set(wrongType, forKey: VoiceInkSpokenSnippets.userDefaultsKey)
+
+        do {
+            _ = try VoiceInkSpokenSnippets.loadForMutation(from: defaults)
+            XCTFail("A present unreadable value must not be treated as missing storage")
+        } catch let issue as VoiceInkSpokenSnippets.LoadError {
+            XCTAssertEqual(issue, .unreadableLibrary)
+        } catch {
+            XCTFail("A wrong storage type must report a library error")
+        }
+        XCTAssertEqual(defaults.string(forKey: VoiceInkSpokenSnippets.userDefaultsKey), wrongType)
+        XCTAssertTrue(VoiceInkSpokenSnippets.load(from: defaults).isEmpty)
+    }
+
     func testCSVExportImportRoundTripsCommasQuotesNewlinesAndEnabledState() throws {
         let snippets = [
             VoiceInkSpokenSnippet(trigger: "my address", content: "Floor 2, Room \"A\"\r\nTaipei\n", enabled: false),

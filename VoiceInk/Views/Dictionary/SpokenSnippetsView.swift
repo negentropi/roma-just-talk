@@ -178,8 +178,9 @@ struct SpokenSnippetsView: View {
     }
 
     /// Every write starts from the stored library, so changes made in another window are never lost.
+    /// Uses the strict read: `load()` returns [] for unreadable storage, and saving on top of that would wipe it.
     private func mutate(_ change: (inout [VoiceInkSpokenSnippet]) throws -> Void) throws {
-        var library = VoiceInkSpokenSnippets.load()
+        var library = try VoiceInkSpokenSnippets.loadForMutation()
         try change(&library)
         try VoiceInkSpokenSnippets.save(library)
         snippets = VoiceInkSpokenSnippets.load()

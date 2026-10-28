@@ -95,6 +95,46 @@ jobs:
           set -o pipefail
           swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee "$RUNNER_TEMP/writing-core-checks.log"
 
+      - name: Immutable regression fixture checks
+        if: ${{ !inputs.ui_only }}
+        timeout-minutes: 10
+        shell: bash
+        run: |
+          set -euo pipefail
+          proof="$RUNNER_TEMP/writing-fixture-checks"
+          mkdir -p "$proof"
+          python3 - <<'PY' 2>&1 | tee "$proof/input-manifest.log"
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import wave
+          from pathlib import Path
+          manifest = json.loads(Path('docs/research/competitors/fixtures/historical-inputs-manifest.json').read_text())
+          assert manifest['archiveCommit'] == '99d0ebba40cfcd0f04a1536b4118cabe3a96a075'
+          assert len(manifest['files']) == manifest['inputFileCount'] == 35
+          assert len({row['path'] for row in manifest['files']}) == 35
+          total = 0
+          for row in manifest['files']:
+              data = Path(row['path']).read_bytes()
+              assert len(data) == row['bytes']
+              assert hashlib.sha256(data).hexdigest() == row['sha256']
+              assert subprocess.check_output(['git', 'hash-object', '--stdin'], input=data).decode().strip() == row['gitBlobOID']
+              total += len(data)
+          assert total == manifest['totalInputBytes'] == 541556
+          audio = Path('docs/research/competitors/evidence/none-matched-40532555248/import/input.wav')
+          assert audio.stat().st_size == 165984
+          assert hashlib.sha256(audio.read_bytes()).hexdigest() == 'a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805'
+          with wave.open(str(audio)) as stream:
+              assert (stream.getnchannels(), stream.getsampwidth(), stream.getframerate(), stream.getnframes()) == (1, 2, 16000, 80944)
+          print(json.dumps({'sourceSHA': os.environ['GITHUB_SHA'], 'classification': 'immutable-regression-inputs-verified', 'files': 35, 'bytes': total, 'wavBytes': audio.stat().st_size}, sort_keys=True))
+          PY
+          python3 scripts/tests/dictation-store-schema-canonicalization.test.py 2>&1 | tee "$proof/schema-canonicalization.log"
+          bash scripts/run-dictation-metadata-store-check.sh self-test 2>&1 | tee "$proof/metadata-store.log"
+          bash scripts/run-correction-library-store-check.sh self-test 2>&1 | tee "$proof/correction-library-store.log"
+          bash scripts/run-local-cli-lifetime-check.sh --self-test 2>&1 | tee "$proof/local-cli-lifetime.log"
+          bash scripts/run-dictation-polish-native-check.sh self-test 2>&1 | tee "$proof/dictation-polish.log"
+
       - name: Prepare and verify static Whisper dependencies
         id: dependencies
         run: |
@@ -215,6 +255,7 @@ jobs:
             ${{ runner.temp }}/writing-package-proof/**
             ${{ runner.temp }}/writing-ui-proof/history-seed/**
             ${{ runner.temp }}/writing-core-checks.log
+            ${{ runner.temp }}/writing-fixture-checks/**
             ${{ runner.temp }}/writing-dependency-setup.log
             ${{ runner.temp }}/writing-release-build.log
           if-no-files-found: error

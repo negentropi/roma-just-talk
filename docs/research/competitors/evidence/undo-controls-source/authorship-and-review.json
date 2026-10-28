@@ -1,6 +1,6 @@
 {
   "classification": "source-authorship-and-review-only",
-  "implementation_status": "Round5 intended behavior remains source-approved; compiler-only post-review annotation proven by whole-file inverse/body equivalence. Actual035candidate failed before native build; new complete CI build/runtime pending. Budget5/5 unchanged.",
+  "implementation_status": "Same-loop round6 approved the user-authorized current-control observer and verifier; budget6of7 used, no reset. Latest actual8frun remains failed at old retained AX readback with no Undo case; new native verification pending.",
   "author_cli": {
     "binary": "claude",
     "version": "2.1.310",
@@ -232,6 +232,22 @@
         "duration_ms": 16261,
         "total_cost_usd": 0.0515404
       }
+    },
+    {
+      "invocation": "current-owned-recorder-postcapture-readback",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "medium",
+      "raw_jsonl_sha256": "90bbd6d49bd724760b36b5fa40c06e2ef2c566a962f4b1bfb27ce72a21653c19",
+      "prompt_sha256": "f2e727a92b670c64968294e6425e2f446bf95f53758690a4db40a0f19f24145a",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 160453,
+        "total_cost_usd": 0.6770412000000001
+      }
     }
   ],
   "authorship_scope": {
@@ -241,7 +257,8 @@
       "WritingUndoControlOracle.swift: synchronous diagnostics and per-editor positive fixture calibration only; original native verification remains GPT authored.",
       "WritingUndoControlOracle.swift: observed-control native mouse click helper and three call-site/receipt changes only.",
       "WritingUndoControlOracle.swift: observed native nonreciprocal menu graph calibration; authoritative downward proof and raw non-authoritative upward diagnostics only.",
-      "WritingUndoControlOracle.swift: focused recorder-only native postToPid capture, public typed state/focus proof and immutable diagnostics; removal of all three system-wide timeout setters before round5 freeze."
+      "WritingUndoControlOracle.swift: focused recorder-only native postToPid capture, public typed state/focus proof and immutable diagnostics; removal of all three system-wide timeout setters before round5 freeze.",
+      "WritingUndoControlOracle.swift: current post-capture recorder read-only lookup, exact retained setup-window binding and raw old/new reference facts; pre-input proof JSON/input and global invocation routes preserved."
     ],
     "gpt_authored_native_verification": [
       "scripts/fixtures/WritingUndoControlOracle.swift",
@@ -253,9 +270,9 @@
   },
   "source_sha256": {
     "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
-    "scripts/fixtures/WritingUndoControlOracle.swift": "c5156d4f60fa0766727a575ad343d453edd4e44c95fe1873e0a4479b248b8f14",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "2ecf9fde643940f502278a3996cf7dd68e836c40dc2643e089548b3b5938404f",
     "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
-    "scripts/verify-writing-undo-controls.py": "20f17317ec04ca40d6327594b11b9583b1364d5be89caa81682b8615b89de909",
+    "scripts/verify-writing-undo-controls.py": "427fc7bed22d56072f798ae3b1777286c738b554fa57f9729df62a891bbb279e",
     ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd"
   },
   "clipboard_error_copy": {
@@ -324,7 +341,7 @@
     "Source authoring and pure classifier/syntax checks only; remote runtime and visual acceptance pending. Parent owns CI transport.",
     "Plain-text guarded inverse only; no restart, generic Cmd-Z, rich-format or general editor compatibility claim."
   ],
-  "total_author_cost_usd": 8.1976024,
+  "total_author_cost_usd": 8.8746436,
   "raw_log_policy": "Only model, status, timing, cost and hashes retained; raw JSONL stays outside the repository.",
   "compiler_response_path_correction": {
     "failed_run_id": 40605378801,
@@ -642,5 +659,33 @@
     "mechanical_equivalence": "Only explicit closure parameter/return types; all closure-body bytes and every other Oracle byte unchanged. Inverse substitution restores full round5 source hash.",
     "checks": "NEW-only uncalled SDK expression typecheck passed; no event construction/posting or app. Full candidate CI build/runtime still pending; not semantic regression proof.",
     "review_disposition": "Existing round5 covers unchanged intended behavior; no sixth review and no budget reset. Current whole-file hash was not separately reviewed as exact source."
+  },
+  "postcapture_current_control_calibration": {
+    "runtime_finding_id": "RUNTIME5",
+    "observed_run": 40635627619,
+    "head": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
+    "evidence": "../undo-controls-40635627619/failure-diagnosis.json",
+    "human_authorization": {
+      "verbatim_answer": "Finish both checks (Recommended)",
+      "scope": "Two additional focused review rounds each for History permissions and Undo controls; controls continues rounds6/7, no reset."
+    },
+    "observed": "Full build and exact local public chord save passed. Display-wait retained AX object expired; fresh flat tree and PNG show expected keycaps, but fresh-node PID/window were unretained. No Undo case executed.",
+    "authority": "Exactly one visible current exact-ID AXButton owned by hostPID, exact chord description, AXWindow CFEqual to the pre-input verified setup window; that window remains host-owned, unique and focused with the same key NSWindow/windowNumber. Exact public decoded/effective stored chord and not-cleared state required.",
+    "retained_reference": "Raw role/id/description/window AX errors/presence/string and getPid diagnostic retained; whether the current ref differs is recorded, never required. Old ref never grants identity.",
+    "scope": "Observer/readback only, no input/activation/store write/private handler/retry or product source. Final pre-input proof returns the same JSON plus its verified window reference.",
+    "preserved_source_sha256": {
+      "postChord_postKey": "2784b10baae9f4f74c240e20e63b7b5656510daf856c0184ddd27910c1f2a997",
+      "success_busy_focus_delivery": "82bc3d715629fa22beaaf5b89b6421d9dd9235290895c39ca181b7a85e82722d",
+      "capture_post_pair": "a912efecf970097800842255af454d5615385c223592a19bd60b8e5a300f97f8"
+    },
+    "checks": {
+      "swift_frontend_parse": "passed",
+      "malformed_receipts_rejected": 102,
+      "new_fresh_reference_negative_controls": 16,
+      "metadata_positives": "Expired old ref with complete current identity, and surviving old ref, both accepted only with current PID/window/display/store proof. No native input executed.",
+      "prior_self_checks": "passed",
+      "native_runtime": "pending"
+    },
+    "source_review": "Round6 APPROVE, same actualGPT6.1Sol MEDIUM/fixed6927base/six-path diff, no findings, usage unavailable. User-authorized continuation6of7 used; RUNTIME5 resolved-source/pending-native. No behavior edits after frozen approval."
   }
 }

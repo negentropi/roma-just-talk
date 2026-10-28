@@ -826,6 +826,59 @@ def receipt_errors(value, executable, pid, expected_home):
             and readback.get('recorderDescription') == item.get('displayString')
             and item.get('capturePreInputFile') == 'shortcut-capture-preinput.json',
             'Recorder exact store/idle-display readback or retained pre-input file differs')
+        check(readback.get('displaySource') == 'current-control' and type(readback.get('currentReadbackPolls')) is int
+            and readback['currentReadbackPolls'] > 0, 'Recorder idle display did not come from a fresh read-only lookup')
+        current = readback.get('currentControlReadback', {})
+        check(current.get('schemaVersion') == 1 and current.get('kind') == 'recorder-post-capture-readback'
+            and current.get('readOnly') is True and current.get('postsInput') is False and current.get('hostPID') == pid
+            and current.get('identityAuthority') == 'current-exact-id-host-pid-same-verified-setup-axwindow'
+            and current.get('retainedReferenceUsedForIdentity') is False and current.get('globalTitleFallbackUsed') is False
+            and current.get('expectedDisplay') == item.get('displayString') and current.get('ready') is True
+            and current.get('reasons') == [] and type(current.get('systemUptime')) in (int, float)
+            and math.isfinite(current['systemUptime']) and current['systemUptime'] >= proof['systemUptime'],
+            'Current recorder readback authority/source differs')
+        node = current.get('currentControl', {})
+        check(type(node.get('exactIDCount')) is int and type(node.get('visibleExactIDCount')) is int
+            and node['exactIDCount'] == node['visibleExactIDCount'] == 1 and node.get('present') is True
+            and node.get('identifier') == 'shortcutRecorder.undoLastWritingEdit' and node.get('identifierAXError') == 0
+            and node.get('role') == 'AXButton' and node.get('roleAXError') == 0 and type(node.get('pid')) is int and node['pid'] == pid
+            and node.get('enabled') is True and node.get('enabledAXError') == 0
+            and node.get('description') == item.get('displayString') and node.get('descriptionAXError') == 0
+            and node.get('idleDisplayMatches') is True and node.get('windowAXError') == 0
+            and node.get('windowPresent') is True and node.get('windowSameAsVerifiedSetupAXWindow') is True
+            and type(node.get('currentDiffersFromRetained')) is bool,
+            'Fresh recorder is not the unique owned button/display in the verified pre-input window')
+        window = current.get('verifiedSetupAXWindow', {})
+        check(window.get('role') == 'AXWindow' and window.get('roleAXError') == 0
+            and window.get('title') == 'RJT Undo control check' and window.get('titleAXError') == 0
+            and type(window.get('pid')) is int and window['pid'] == pid and window.get('windowsAXError') == 0
+            and type(window.get('titledCount')) is int and window['titledCount'] == 1
+            and window.get('uniqueSameReference') is True and window.get('focusedWindowAXError') == 0
+            and window.get('focusedWindowIsSetupWindow') is True, 'Verified setup AXWindow changed after capture')
+        appkit = current.get('appKit', {})
+        check(all(appkit.get(key) is True for key in ('isActive', 'isKeyWindow', 'isVisible', 'appKeyWindowIsSetup', 'uniqueSameWindow'))
+            and appkit.get('titledWindowCount') == 1 and appkit.get('frontmostPID') == pid
+            and appkit.get('windowNumber') == appkit.get('expectedWindowNumber') == proof['appKit']['windowNumber'],
+            'Fresh recorder readback is not in the same active native setup window')
+        store = current.get('store', {})
+        check(store.get('effectiveEqualsExpected') is True and store.get('decodedEqualsExpected') is True
+            and store.get('isShortcutCleared') is False, 'Post-capture stored chord changed during fresh lookup')
+        own_state(store.get('ownShortcut', {}), 'post-capture-readback', captured=True)
+        check({key: value for key, value in store.get('ownShortcut', {}).items() if key != 'phase'}
+            == {key: value for key, value in states.get('afterReadback', {}).items() if key != 'phase'},
+            'Fresh lookup and final readback observed different stored bytes')
+        # The old AX object may survive or expire across SwiftUI rendering. Its
+        # raw state describes the transition and never grants current identity.
+        retained = readback.get('retainedReferenceAfterCapture', {})
+        check('getPidPID' in retained and (retained['getPidPID'] is None
+            or type(retained['getPidPID']) is int and retained['getPidPID'] > 0),
+            'Malformed retained-reference PID diagnostic')
+        for key in ('role', 'identifier', 'description', 'window'):
+            observation = retained.get(key, {})
+            check(set(observation) == {'axError', 'present', 'string'}
+                and type(observation.get('axError')) is int and type(observation.get('present')) is bool
+                and (observation.get('string') is None or isinstance(observation['string'], str)),
+                'Malformed retained-reference raw diagnostic: ' + key)
     def snapshot(item, text, selected_range, bundle, focused=True):
         expected = units(text)
         start, length = selected_range['location'], selected_range['length']
@@ -1253,6 +1306,25 @@ def self_test():
                 'focusedElementAXError': 0, 'focusedElementPresent': True, 'focusedElementPID': 42},
             'appKit': {'isActive': True, 'isKeyWindow': True, 'isVisible': True, 'appKeyWindowIsSetup': True,
                 'uniqueSameWindow': True, 'titledWindowCount': 1, 'windowNumber': 1}}
+        current = {'schemaVersion': 1, 'kind': 'recorder-post-capture-readback', 'readOnly': True, 'postsInput': False,
+            'hostPID': 42, 'systemUptime': 101.0, 'identityAuthority': 'current-exact-id-host-pid-same-verified-setup-axwindow',
+            'retainedReferenceUsedForIdentity': False, 'globalTitleFallbackUsed': False, 'expectedDisplay': 'fixture',
+            'ready': True, 'reasons': [],
+            'currentControl': {'exactIDCount': 1, 'visibleExactIDCount': 1, 'present': True,
+                'identifier': 'shortcutRecorder.undoLastWritingEdit', 'identifierAXError': 0,
+                'role': 'AXButton', 'roleAXError': 0, 'pid': 42, 'enabled': True, 'enabledAXError': 0,
+                'description': 'fixture', 'descriptionAXError': 0, 'idleDisplayMatches': True,
+                'windowAXError': 0, 'windowPresent': True, 'windowSameAsVerifiedSetupAXWindow': True,
+                'currentDiffersFromRetained': True},
+            'verifiedSetupAXWindow': {'role': 'AXWindow', 'roleAXError': 0, 'title': 'RJT Undo control check',
+                'titleAXError': 0, 'pid': 42, 'windowsAXError': 0, 'titledCount': 1, 'uniqueSameReference': True,
+                'focusedWindowAXError': 0, 'focusedWindowIsSetupWindow': True},
+            'appKit': {'isActive': True, 'isKeyWindow': True, 'isVisible': True, 'appKeyWindowIsSetup': True,
+                'uniqueSameWindow': True, 'titledWindowCount': 1, 'windowNumber': 1, 'expectedWindowNumber': 1, 'frontmostPID': 42},
+            'store': {'effectiveEqualsExpected': True, 'decodedEqualsExpected': True, 'isShortcutCleared': False,
+                'ownShortcut': state('post-capture-readback', captured=True)}}
+        retained = {'getPidPID': 42, **{key: {'axError': -25202, 'present': False, 'string': None}
+            for key in ('role', 'identifier', 'description', 'window')}}
         return {'captureInput': {'contract': 'focused-recorder-capture-postToPid', 'route': 'CGEvent.postToPid',
             'pattern': 'LiveWritingEditor.key', 'eventSource': 'nil', 'hostPID': 42, 'targetPID': 42,
             'eventTypes': ['keyDown', 'keyUp'], 'eventCount': 2,
@@ -1263,7 +1335,9 @@ def self_test():
             'captureProof': proof, 'capturePreInputFile': 'shortcut-capture-preinput.json', 'conflictBeforeClick': conflict,
             'ownShortcutState': {'beforeClick': state('before-click', fresh=True), 'beforeInput': state('before-input'),
                 'afterReadback': state('after-readback', captured=True)},
-            'readback': {'storeEqualsExpected': True, 'recorderIdleDisplayMatches': True, 'recorderDescription': 'fixture'}}
+            'readback': {'storeEqualsExpected': True, 'recorderIdleDisplayMatches': True, 'recorderDescription': 'fixture',
+                'displaySource': 'current-control', 'currentReadbackPolls': 1,
+                'currentControlReadback': current, 'retainedReferenceAfterCapture': retained}}
     def notice(message):
         return dict(control('undoLastWritingEdit.notice'), expectedMessage=message, label=message)
     def snapshot(text, selected, bundle, token='RJT-Writing-Live-00000000-0000-4000-8000-000000000001', focused=True):
@@ -1323,6 +1397,14 @@ def self_test():
         require(accent in case_replacement.encode('utf-8') and (769 not in units(case_replacement) if safari else 769 in units(case_replacement)),
             'Positive per-editor fixture output uses the wrong scalar bytes')
     require(not receipt_errors(value, '/fixture/app', 42, '/fixture/isolated-user'), 'Valid classifier fixture rejected')
+    retained_still_valid = copy.deepcopy(value)
+    readback = retained_still_valid['shortcut']['readback']
+    readback['currentControlReadback']['currentControl']['currentDiffersFromRetained'] = False
+    readback['retainedReferenceAfterCapture'] = {'getPidPID': 42, **{key: {'axError': 0, 'present': True, 'string': text}
+        for key, text in [('role', 'AXButton'), ('identifier', 'shortcutRecorder.undoLastWritingEdit'),
+            ('description', 'fixture'), ('window', None)]}}
+    require(not receipt_errors(retained_still_valid, '/fixture/app', 42, '/fixture/isolated-user'),
+        'Current owned recorder readback incorrectly requires the old AX reference to expire')
     recorder_capture_binding_self_test(value['shortcut'])
     no_focused_element = copy.deepcopy(value)
     no_focused_element['shortcut']['captureProof']['systemFocus'].update(
@@ -1434,6 +1516,22 @@ def self_test():
         lambda v: v['shortcut']['ownShortcutState']['afterReadback']['effective'].update(keyCode=31),
         lambda v: v['shortcut']['readback'].update(storeEqualsExpected=False),
         lambda v: v['shortcut']['conflictBeforeClick'].update(conflictFree=False),
+        lambda v: v['shortcut']['readback'].pop('currentControlReadback'),
+        lambda v: v['shortcut']['readback'].update(displaySource='retained-control'),
+        lambda v: v['shortcut']['readback']['currentControlReadback'].update(retainedReferenceUsedForIdentity=True),
+        lambda v: v['shortcut']['readback']['currentControlReadback'].update(globalTitleFallbackUsed=True),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['currentControl'].update(exactIDCount=2),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['currentControl'].update(visibleExactIDCount=True),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['currentControl'].update(role='AXStaticText'),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['currentControl'].update(pid=43),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['currentControl'].update(windowSameAsVerifiedSetupAXWindow=False),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['currentControl'].update(windowAXError=-25202),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['currentControl'].update(description='stale label'),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['verifiedSetupAXWindow'].update(pid=43),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['verifiedSetupAXWindow'].update(focusedWindowIsSetupWindow=False),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['appKit'].update(windowNumber=2, expectedWindowNumber=2),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['store'].update(decodedEqualsExpected=False),
+        lambda v: v['shortcut']['readback']['currentControlReadback']['store']['ownShortcut'].update(dataSHA256='2' * 64),
         lambda v: v['cases'][3]['forward']['range'].update(location=v['cases'][3]['forward']['range']['location'] + 1)]
     for mutation in mutations:
         invalid = copy.deepcopy(value)

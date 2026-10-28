@@ -229,7 +229,9 @@ enum WritingUndoControlOracle {
             let eventsExact = down.type == .keyDown && up.type == .keyUp
                 && [down, up].allSatisfy { $0.getIntegerValueField(.keyboardEventKeycode) == Int64(keyCode) && $0.flags == flags }
             try mark("shortcut.capture-final-proof.before")
-            let finalProof = recorderCaptureProof(recorder, window: window, expected: expected, phase: "final-preinput")
+            let (finalProof, verifiedAXWindow) = recorderCaptureProofWithWindow(recorder, window: window, expected: expected,
+                                                                                phase: "final-preinput")
+            let verifiedWindowNumber = window.windowNumber
             let beforeInput = ownShortcutState("before-input", expected: expected)
             var input: [String: Any] = [
                 "contract": "focused-recorder-capture-postToPid", "route": "CGEvent.postToPid",
@@ -242,7 +244,7 @@ enum WritingUndoControlOracle {
                 "finalProofReady": finalProof["ready"] as? Bool == true, "inputPosted": false]
             let preInput: [String: Any] = ["schemaVersion": 1, "kind": "recorder-capture-preinput", "input": input,
                                            "finalProof": finalProof, "ownShortcutBeforeInput": beforeInput]
-            guard eventsExact, finalProof["ready"] as? Bool == true else {
+            guard eventsExact, finalProof["ready"] as? Bool == true, let verifiedAXWindow else {
                 let error = UndoControlCheckFailure("The final recorder capture proof or event shape failed; no input posted.")
                 retainCaptureFailure("capture-final-proof", error, inputPosted: false, facts: preInput)
                 throw error
@@ -256,30 +258,46 @@ enum WritingUndoControlOracle {
             input["inputPosted"] = true
             try mark("shortcut.capture-post.after")
 
+            // Post-capture readback: read-only only. The control may be re-created after capture (the retained
+            // pre-input reference was observed invalid), so the display is read from the CURRENT control bound
+            // to the same verified setup AXWindow. Relookup polls only; no input, retry or shortcut write.
+            var retainedAfterCapture: [String: Any]?
+            var currentReadback: [String: Any] = [:]
+            var currentReadbackPolls = 0
+            var currentControl: AXUIElement?
             do {
                 try mark("shortcut.save-wait.before")
                 try await wait("The real recorder did not save the exact captured chord.") {
                     ShortcutStore.shortcut(for: .undoLastWritingEdit) == expected
                 }
+                try mark("shortcut.retained-reference-facts.before")
+                retainedAfterCapture = rawReferenceFacts(recorder)
                 // A subsequent global chord must reach the registered event tap, not
                 // the setup recorder's local capture monitor.
-                try mark("shortcut.display-wait.before")
-                try await wait("The shortcut recorder stayed in capture mode.") {
-                    self.string(kAXDescriptionAttribute, recorder) == expected.displayString
-                        || self.string(kAXTitleAttribute, recorder) == expected.displayString
-                        || self.string(kAXHelpAttribute, recorder) == expected.displayString
+                try mark("shortcut.current-recorder-readback.before")
+                try await wait("The current recorder control did not prove the saved chord display in the verified setup window.") {
+                    currentReadbackPolls += 1
+                    let readback = self.currentRecorderReadback(expected: expected, window: window,
+                                                                windowNumber: verifiedWindowNumber,
+                                                                verifiedAXWindow: verifiedAXWindow, retained: recorder)
+                    currentReadback = readback.facts
+                    currentControl = readback.control
+                    return readback.control != nil
                 }
+                try require(currentControl != nil && currentReadback["ready"] as? Bool == true,
+                            "The current recorder readback was not proven.")
             } catch {
                 // Read-only post-input diagnostic; the original failure is rethrown unchanged, never retried.
                 retainCaptureFailure("capture-readback", error, inputPosted: true, facts: [
                     "preInput": preInput, "input": input,
                     "ownShortcutAfterReadback": ownShortcutState("after-readback-failure", expected: expected),
-                    "postInputObservation": recorderCaptureProof(recorder, window: window, expected: expected,
-                                                                 phase: "post-input-diagnostic")])
+                    "retainedReferenceAfterCapture": retainedAfterCapture ?? rawReferenceFacts(recorder),
+                    "lastCurrentReadback": currentReadback, "currentReadbackPolls": currentReadbackPolls])
                 throw error
             }
             let afterReadback = ownShortcutState("after-readback", expected: expected)
-            let recorderLabel = string(kAXDescriptionAttribute, recorder)
+            let currentFacts = currentReadback["currentControl"] as? [String: Any] ?? [:]
+            let recorderLabel = currentFacts["description"] as? String
             shortcut = ["recordedViaActualRecorder": true, "keyCode": Int(keyCode),
                         "modifierFlagsRawValue": modifiers.rawValue, "displayString": expected.displayString,
                         "recorderControl": control.merging(["click": recorderClick]) { _, new in new },
@@ -290,7 +308,11 @@ enum WritingUndoControlOracle {
                                              "afterReadback": afterReadback],
                         "readback": ["storeEqualsExpected": ShortcutStore.shortcut(for: .undoLastWritingEdit) == expected,
                                      "recorderDescription": recorderLabel as Any? ?? NSNull(),
-                                     "recorderIdleDisplayMatches": recorderLabel == expected.displayString]]
+                                     "recorderIdleDisplayMatches": recorderLabel == expected.displayString,
+                                     "displaySource": "current-control",
+                                     "currentControlReadback": currentReadback,
+                                     "currentReadbackPolls": currentReadbackPolls,
+                                     "retainedReferenceAfterCapture": retainedAfterCapture as Any? ?? NSNull()]]
             try mark("shortcut.screenshot.before")
             try await screenshot("shortcut-configured")
             try mark("shortcut.hierarchy.before")
@@ -341,6 +363,13 @@ enum WritingUndoControlOracle {
         /// named reason and `ready` is false; nothing is clamped or substituted.
         func recorderCaptureProof(_ recorder: AXUIElement, window: NSWindow, expected: Shortcut,
                                   phase: String) -> [String: Any] {
+            recorderCaptureProofWithWindow(recorder, window: window, expected: expected, phase: phase).facts
+        }
+
+        /// Same proof; also hands back the exact AXWindow reference it verified, so the post-capture readback
+        /// can bind the current control to that same window by CFEqual (never by a global title search).
+        func recorderCaptureProofWithWindow(_ recorder: AXUIElement, window: NSWindow, expected: Shortcut,
+                                            phase: String) -> (facts: [String: Any], axWindow: AXUIElement?) {
             let host = ProcessInfo.processInfo.processIdentifier
             let placeholder = VoiceInkRecordingShortcutPreference.macOSRecorderPresentation.recordingPlaceholderText
             var reasons: [String] = []
@@ -409,7 +438,7 @@ enum WritingUndoControlOracle {
             need(window.isKeyWindow && NSApp.keyWindow === window, "setup NSWindow is not the key window")
             need(frontmostPID == host, "frontmost application is not the host")
 
-            return [
+            return ([
                 "schemaVersion": 1, "kind": "recorder-capture-proof", "phase": phase, "readOnly": true,
                 "inputPosted": false, "hostPID": Int(host), "systemUptime": ProcessInfo.processInfo.systemUptime,
                 "expectedPlaceholder": placeholder, "recorder": recorderFacts, "ownShortcut": own, "conflictCheck": conflict,
@@ -430,7 +459,127 @@ enum WritingUndoControlOracle {
                 "appKit": ["isActive": NSApp.isActive, "windowNumber": window.windowNumber, "isKeyWindow": window.isKeyWindow,
                            "isVisible": window.isVisible, "appKeyWindowIsSetup": NSApp.keyWindow === window,
                            "titledWindowCount": titledNSWindows.count, "uniqueSameWindow": uniqueNSWindow] as [String: Any],
-                "ready": reasons.isEmpty, "reasons": reasons]
+                "ready": reasons.isEmpty, "reasons": reasons], reasons.isEmpty ? axWindow : nil)
+        }
+
+        /// Raw facts of a retained AX reference, AXErrors kept verbatim (an invalid element is a fact, not absence).
+        func rawReferenceFacts(_ node: AXUIElement) -> [String: Any] {
+            var facts: [String: Any] = ["getPidPID": pid(node).map { Int($0) as Any } ?? NSNull()]
+            for (key, name) in [("role", kAXRoleAttribute), ("identifier", kAXIdentifierAttribute),
+                                ("description", kAXDescriptionAttribute), ("window", kAXWindowAttribute)] {
+                let (error, raw) = copy(name, node)
+                facts[key] = ["axError": Int(error.rawValue), "present": raw != nil,
+                              "string": (raw as? String) as Any? ?? NSNull()] as [String: Any]
+            }
+            return facts
+        }
+
+        /// Read-only post-capture readback of the CURRENT recorder control. Never posts, writes or activates.
+        /// Identity authority: exactly one exact-ID control in the host app tree (also exactly one visible),
+        /// AXButton, current host PID, enabled, and its AXWindow CFEqual to the pre-input verified setup AXWindow,
+        /// plus the same unique key NSWindow. The retained pre-input recorder reference only feeds the
+        /// `currentDiffersFromRetained` fact and is never identity. Returns the control only when every fact holds.
+        func currentRecorderReadback(expected: Shortcut, window: NSWindow, windowNumber: Int,
+                                     verifiedAXWindow: AXUIElement,
+                                     retained: AXUIElement) -> (facts: [String: Any], control: AXUIElement?) {
+            let host = ProcessInfo.processInfo.processIdentifier
+            var reasons: [String] = []
+            func need(_ ok: Bool, _ reason: String) { if !ok { reasons.append(reason) } }
+            func pidFact(_ value: pid_t?) -> Any { value.map { Int($0) as Any } ?? NSNull() }
+            func text(_ value: String?) -> Any { value as Any? ?? NSNull() }
+
+            let exact = nodes().filter { string(kAXIdentifierAttribute, $0) == Self.recorderIdentifier }
+            let visible = exact.filter { hasVisibleFrame($0) }
+            need(exact.count == 1 && visible.count == 1, "current recorder is not exactly one visible exact-ID control")
+            let current = exact.count == 1 && visible.count == 1 ? visible[0] : nil
+            var control: [String: Any] = ["exactIDCount": exact.count, "visibleExactIDCount": visible.count,
+                                          "present": current != nil]
+            if let current {
+                let (roleError, roleRaw) = copy(kAXRoleAttribute, current)
+                let (idError, idRaw) = copy(kAXIdentifierAttribute, current)
+                let (descriptionError, descriptionRaw) = copy(kAXDescriptionAttribute, current)
+                let (enabledError, enabledRaw) = copy(kAXEnabledAttribute, current)
+                let (windowError, windowRaw) = copy(kAXWindowAttribute, current)
+                let role = roleRaw as? String
+                let identifier = idRaw as? String
+                let description = descriptionRaw as? String
+                let isEnabled = (enabledRaw as? NSNumber)?.boolValue == true
+                let currentPID = pid(current)
+                let currentWindow = axElement(windowRaw)
+                let sameWindow = currentWindow.map { CFEqual($0, verifiedAXWindow) } ?? false
+                need(roleError == .success && role == "AXButton", "current recorder role is not AXButton")
+                need(idError == .success && identifier == Self.recorderIdentifier, "current recorder identifier differs")
+                need(currentPID == host, "current recorder is not owned by the host PID")
+                need(enabledError == .success && isEnabled, "current recorder is not enabled")
+                need(descriptionError == .success && description == expected.displayString,
+                     "current recorder description is not the expected idle chord display")
+                need(windowError == .success && sameWindow, "current recorder is not in the same verified setup AXWindow")
+                control.merge([
+                    "role": text(role), "roleAXError": Int(roleError.rawValue),
+                    "identifier": text(identifier), "identifierAXError": Int(idError.rawValue),
+                    "pid": pidFact(currentPID), "enabled": isEnabled, "enabledAXError": Int(enabledError.rawValue),
+                    "description": text(description), "descriptionAXError": Int(descriptionError.rawValue),
+                    "title": text(string(kAXTitleAttribute, current)), "help": text(string(kAXHelpAttribute, current)),
+                    "idleDisplayMatches": description == expected.displayString,
+                    "windowAXError": Int(windowError.rawValue), "windowPresent": currentWindow != nil,
+                    "windowSameAsVerifiedSetupAXWindow": sameWindow,
+                    "currentDiffersFromRetained": !CFEqual(current, retained)]) { _, new in new }
+            }
+
+            // The verified pre-input setup AXWindow must still be the host's unique, focused setup window.
+            let (vRoleError, vRoleRaw) = copy(kAXRoleAttribute, verifiedAXWindow)
+            let (vTitleError, vTitleRaw) = copy(kAXTitleAttribute, verifiedAXWindow)
+            let verifiedPID = pid(verifiedAXWindow)
+            let (windowsError, windowsRaw) = copy(kAXWindowsAttribute, app)
+            let titled = (windowsRaw as? [AXUIElement] ?? []).filter { string(kAXTitleAttribute, $0) == Self.setupWindowTitle }
+            let uniqueAXWindow = titled.count == 1 && CFEqual(titled[0], verifiedAXWindow)
+            let (focusedWindowError, focusedWindowRaw) = copy(kAXFocusedWindowAttribute, app)
+            let focusedIsSetup = axElement(focusedWindowRaw).map { CFEqual($0, verifiedAXWindow) } ?? false
+            need(vRoleError == .success && vRoleRaw as? String == "AXWindow" && vTitleError == .success
+                 && vTitleRaw as? String == Self.setupWindowTitle && verifiedPID == host,
+                 "verified setup AXWindow is no longer the owned setup window")
+            need(windowsError == .success && uniqueAXWindow, "verified setup AXWindow is not the unique titled window")
+            need(focusedWindowError == .success && focusedIsSetup, "host focused AX window is not the verified setup window")
+
+            let frontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
+            let titledNSWindows = NSApp.windows.filter { $0.title == Self.setupWindowTitle }
+            let uniqueNSWindow = titledNSWindows.count == 1 && titledNSWindows[0] === window
+            need(NSApp.isActive, "host app is not active")
+            need(uniqueNSWindow && window.isVisible && window.windowNumber == windowNumber,
+                 "setup NSWindow is not the same unique visible window")
+            need(window.isKeyWindow && NSApp.keyWindow === window, "setup NSWindow is not the key window")
+            need(frontmostPID == host, "frontmost application is not the host")
+
+            // Exact public stored value: effective, decoded and not cleared.
+            let state = ShortcutStore.storedState(for: .undoLastWritingEdit)
+            let decoded = state.shortcutData.flatMap { try? JSONDecoder().decode(Shortcut.self, from: $0) }
+            let effective = ShortcutStore.shortcut(for: .undoLastWritingEdit)
+            let cleared = ShortcutStore.isShortcutCleared(for: .undoLastWritingEdit)
+            need(effective == expected && decoded == expected && !cleared,
+                 "public stored shortcut is not exactly the expected chord")
+
+            let ready = reasons.isEmpty && current != nil
+            return ([
+                "schemaVersion": 1, "kind": "recorder-post-capture-readback", "readOnly": true, "postsInput": false,
+                "hostPID": Int(host), "systemUptime": ProcessInfo.processInfo.systemUptime,
+                "identityAuthority": "current-exact-id-host-pid-same-verified-setup-axwindow",
+                "retainedReferenceUsedForIdentity": false, "globalTitleFallbackUsed": false,
+                "expectedDisplay": expected.displayString, "currentControl": control,
+                "verifiedSetupAXWindow": ["roleAXError": Int(vRoleError.rawValue), "role": text(vRoleRaw as? String),
+                                          "titleAXError": Int(vTitleError.rawValue), "title": text(vTitleRaw as? String),
+                                          "pid": pidFact(verifiedPID), "windowsAXError": Int(windowsError.rawValue),
+                                          "titledCount": titled.count, "uniqueSameReference": uniqueAXWindow,
+                                          "focusedWindowAXError": Int(focusedWindowError.rawValue),
+                                          "focusedWindowIsSetupWindow": focusedIsSetup] as [String: Any],
+                "appKit": ["isActive": NSApp.isActive, "windowNumber": window.windowNumber,
+                           "expectedWindowNumber": windowNumber, "isKeyWindow": window.isKeyWindow,
+                           "isVisible": window.isVisible, "appKeyWindowIsSetup": NSApp.keyWindow === window,
+                           "titledWindowCount": titledNSWindows.count, "uniqueSameWindow": uniqueNSWindow,
+                           "frontmostPID": pidFact(frontmostPID)] as [String: Any],
+                "store": ["effectiveEqualsExpected": effective == expected, "decodedEqualsExpected": decoded == expected,
+                          "isShortcutCleared": cleared,
+                          "ownShortcut": ownShortcutState("post-capture-readback", expected: expected)] as [String: Any],
+                "ready": ready, "reasons": reasons], ready ? current : nil)
         }
 
         /// Bounded typed capture diagnostic in its own immutable file; never replaces or retries the failure.

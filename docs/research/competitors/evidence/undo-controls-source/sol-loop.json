@@ -6,7 +6,7 @@
   "reviewer": "/root/explicit_language_choice/controls_click_medium_review",
   "actual_model": "gpt-6.1-sol",
   "effort": "medium",
-  "budget_rounds": 5,
+  "budget_rounds": 7,
   "diff_command": [
     "git",
     "diff",
@@ -122,14 +122,31 @@
       "shortstat": "6 files changed, 4609 insertions(+)",
       "verdict": "APPROVE",
       "usage_status": "Not exposed; not estimated."
+    },
+    {
+      "round": 6,
+      "status": "complete",
+      "scope": "Changed post-capture observer/verifier since8f2e99ead and open RUNTIME5 only; user-authorized continuation, no reset.",
+      "findings": [],
+      "usage": null,
+      "frozen_sha256": {
+        "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
+        "scripts/fixtures/WritingUndoControlOracle.swift": "2ecf9fde643940f502278a3996cf7dd68e836c40dc2643e089548b3b5938404f",
+        "scripts/verify-writing-undo-controls.py": "427fc7bed22d56072f798ae3b1777286c738b554fa57f9729df62a891bbb279e",
+        "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
+        ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd",
+        "docs/research/competitors/evidence/undo-controls-source/authorship-and-review.json": "f1bcfbcf972a18de75091daef23c4a857d86510df3eb2c3232c9fc0b751f97b2"
+      },
+      "diff_sha256": "73767950960c7ca84ba4aa2760a19da9a29ae95dd77fd1d9637491fbe4d77b83",
+      "shortstat": "6 files changed, 4928 insertions(+)",
+      "verdict": "APPROVE",
+      "usage_status": "Not exposed; not estimated."
     }
   ],
   "native_runtime_status": "Actual40635627619 at8f2e99ead: full CI build and222 compiler inputs passed; unavailable menu/dismissal1of3 states passed; local postToPid chord saved exactly with fresh visible keycaps. Display wait failed on expired retained AX reference; fresh-node PID/window unretained. Zero menu/shortcut Undo cases or global Undo dispatch; overall native acceptance failed.",
-  "status": "native-acceptance-failed-awaiting-user-review-budget-decision",
-  "rounds_used": 5,
-  "open_blockers_or_shoulds": [
-    "RUNTIME5"
-  ],
+  "status": "round6-source-approved-native-pending",
+  "rounds_used": 6,
+  "open_blockers_or_shoulds": [],
   "fixed_findings": [
     {
       "id": "SDK1",
@@ -140,10 +157,10 @@
     }
   ],
   "declined_findings": [],
-  "code_diff_shortstat_after_review": "6 files changed, 4609 insertions(+)",
-  "code_diff_sha256_after_review": "c95d119bbd293861b63ee25e34419ab88dfa2f9ea0d456fb075aef18cd0d4f04",
+  "code_diff_shortstat_after_review": "6 files changed, 4928 insertions(+)",
+  "code_diff_sha256_after_review": "73767950960c7ca84ba4aa2760a19da9a29ae95dd77fd1d9637491fbe4d77b83",
   "scoped_files_frozen_through_terminal_verdict": true,
-  "post_review_changes": "After round5 metadata: one actualOpus compiler-only closure type annotation; exact body/all other bytes preserved and full inverse restores reviewed source. No sixth review or budget reset; proof compiler-annotation.json. Current exact source hash differs, intended behavior unchanged.",
+  "post_review_changes": "Round6 approved the user-authorized post-capture observer/verifier behavior delta. After frozen approval only verdict/ledger/authorship metadata changed; no behavior edits. Historical post-round5 compiler-only annotation remains separately recorded.",
   "runtime_findings": [
     {
       "id": "RUNTIME1",
@@ -180,12 +197,12 @@
       "claim": "Exact public local chord save and fresh visible keycaps observed, but post-capture display wait read an expired retained AX reference. Fresh flat tree has one enabled exact-ID AXButton; fresh-node PID/window were not retained. Zero Undo cases.",
       "evidence": "../undo-controls-40635627619/failure-diagnosis.json",
       "proposed_fix": "Read-only reacquire one visible exact-ID AXButton with actual host PID and same verified setup AXWindow; require exact expected public stored value and idle display before global cases. Preserve pre-input proof, input routes, event counts and guards; no new input/retry, shortcut writes, private handlers or product changes.",
-      "applied": false,
-      "outcome": "Open; proposed fix unapplied and unreviewed. User decision pending on two additional focused Sol rounds; existing5of5 used, no sixth approval or reset."
+      "applied": true,
+      "outcome": "Resolved-source / pending-native; same actualSol round6 APPROVE. Current exact-ID host/window/display/store proof required; no new native acceptance yet."
     }
   ],
   "open_native_requirements": [
-    "Fresh post-capture recorder PID/window/display ownership and exact public readback; stale-reference observer fix remains unapplied.",
+    "Actual current post-capture recorder PID/window/display ownership under the round6-approved observer correction; native verification pending.",
     "Four native menu/shortcut cases and remaining busy/focus states, exact editor/range/selection/focus/notice and closed-host proof.",
     "15 actual case/state screenshots and native visual review, plus complete post-run source/signature/TCC receipts."
   ],
@@ -209,26 +226,40 @@
     "closure_body_identical": true,
     "native_runtime_status": "Confirmed by actual40635627619 at8f2e99ead: full CI build succeeded and222 actual compiler inputs verified. Local chord save observed; native acceptance then failed at stale retained AX display readback, with zero Undo cases. Fresh-node PID/window unretained.",
     "skill_basis": "Section4: no new behavior diff or unreviewed behavior; explicit closure types qualify existing intended result type only.",
-    "full_ci_build_evidence": "../undo-controls-40635627619/compiler-transition.json"
+    "full_ci_build_evidence": "../undo-controls-40635627619/compiler-transition.json",
+    "scope": "Historical compiler-only annotation candidate at8f2e99ead; subsequent user-authorized post-capture observer behavior change is tracked in round6, not covered by that annotation equivalence claim."
   },
-  "code_diff_after_review_scope": "Last completed source review, round5; initial3095 snapshot remains in initial_diff_shortstat. Current post-review annotation/authorship metadata snapshot is separate below.",
+  "code_diff_after_review_scope": "Last completed source review, round6. Initial3095 and rounds1\u20135 snapshots remain historical; current post-review verdict metadata is separate.",
   "current_scoped_diff_snapshot": {
     "base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
-    "shortstat": "6 files changed, 4636 insertions(+)",
-    "sha256": "e73c96326fadfb4622faa4afbb91eb5e5da79f516ef221c9b2a2ca1071f1ee85",
-    "scope": "Exact existing six-path diff_command; includes compiler-only closure annotation and post-review authorship metadata. Not a new review; ledger and compiler-annotation.json are outside this original six-path scope."
+    "shortstat": "6 files changed, 4928 insertions(+)",
+    "sha256": "bd86f5d02145a2bde1b4d19d2dce55a1ad3e3e1021b4b10f3d06b2cf7366bde0",
+    "scope": "Exact existing six-path diff_command after round6 verdict metadata; behavior hashes match frozen round6. Ledger and compiler-annotation.json remain outside original six-path scope."
   },
   "pending_user_review_budget_request": {
     "additional_focused_rounds": 2,
-    "status": "pending user decision",
-    "approved": false,
+    "status": "approved by user through broader combined question",
+    "approved": true,
     "skill_basis": "Section5: budget end is not approval; user decides.",
-    "source_behavior_changes_held": true
+    "source_behavior_changes_held": false,
+    "verbatim_user_answer": "Finish both checks (Recommended)",
+    "controls_only_question_status": "superseded"
   },
   "recorded_ci_transport_push": {
     "ref": "ci/rjt-writing-undo-controls-01a17bef-794fa259",
     "head": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
     "scope": "Earlier verified disposable CI transport push only; no normal work-branch push or release claim.",
     "run_id": 40635627619
-  }
+  },
+  "user_authorized_budget_extension": {
+    "from": 5,
+    "to": 7,
+    "additional_focused_rounds_for_controls": 2,
+    "verbatim_user_answer": "Finish both checks (Recommended)",
+    "authorization_scope": "Two additional focused Sol review rounds each for History permissions and Undo controls; this ledger allocates only the Undo controls rounds6 and7.",
+    "authorization_evidence": "Root relayed the human response to the broader combined async question.",
+    "previous_controls_only_question": "Superseded by the answered broader question.",
+    "no_reset": true
+  },
+  "code_diff_shortstat_after_round6": "6 files changed, 4928 insertions(+)"
 }

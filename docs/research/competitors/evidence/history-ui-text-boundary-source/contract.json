@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "known_failed_run": 40613521362,
+  "known_failed_source": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "known_failed_UI_oracle_sha256": "f3c3c1ce016bad6491fcaf60f6877909d4fa16f22ed0a2e45ea77c1914be6110",
+  "candidate_UI_oracle_sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
+  "scope": "QA-only static accessibility representation calibration; no production normalization or data changes. Runtime after change pending.",
+  "retained_actual_failure": "../polish-mac-40613521362/actor-census.json",
+  "boundaries": {
+    "staticAX": "Scoped StaticText canonical glyph equivalence; rawUTF8/UTF16 retained per assertion.",
+    "actualHistoryCopy": "Every History variant and correction source must click actual Copy; exactUTF8/UTF16 +owned pasteboard readback before proceeding.",
+    "editors": "Existing exactUTF8/UTF16 textViews checks unchanged.",
+    "durable": "Existing real-factory nativepostverify allHistory20/Word11+canonicalDTO exact unchanged; no UIred bypass."
+  },
+  "nativeToggle": {
+    "observed_run": 40601421128,
+    "observed_full_identifier": "dictionary.replacement.A2000000-0000-4000-8000-000000000001.enabled",
+    "observed_role": "CheckBox",
+    "observed_value": "1",
+    "observed_frame": [
+      303,
+      643,
+      36,
+      16
+    ],
+    "retained_AX": "../polish-ui-40601421128/diagnosis/testapprovedhistorycorrectionsurvivessourcedeletion-14.txt",
+    "shared_source": "VoiceInk/Views/Dictionary/WordReplacementView.swift",
+    "source_sha256": "dc8ed7f716e9e7db451c30d3defeccca8cee1462118c0ed1637753a14852f67c",
+    "unchanged_vs_observed907": true,
+    "same_presentation_owner": "All sorted replacements, including legacy and approved literal records, use ReplacementRow; no kind-specific toggle role path.",
+    "QA_contract": "Unique exactID; direct or unique child closed roles CheckBox|Switch, enabled,value0|1,nonemptyframe insideidentifiedrow; ordinary reveal/hittable action remains."
+  },
+  "strict_case_count": 8,
+  "original_four_unchanged": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "14c9911f29f6c7b317dc34a9c3ad4c284fba4b2077a61aa3ba6f778f36b34b61",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": "5df0f3cb7b3afa77a71a00743a7aaa6867717dc685ed89efd4d7bd7861c2aea8",
+    "testTranslationTargetsReorderSelectAndPersist": "c07646262a4ca04d144df43362f68261975ba07831bdaacdba25679302d69f06",
+    "testDictationProfilePreservesCustomSettingsAndPersists": "2dbeddbeda7d7d583fb6aa5c5a0ce0421ac1cbfee3772cfbe98061624d5c0ea4"
+  },
+  "changed_method_bodies": {
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+      "before": "fc819e9e9a706c27273a6d1c55cfe11fd6620cdb5381327c23cab636609cc1b7",
+      "after": "cb45d90a55115b71f278011f144764b3f0e6e77180cf037a09aa8922f2c501a3"
+    },
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": {
+      "before": "2d501cc54d19aa1e1a3dc41478dca01b063099dfccd0cbb94d693d0a203f6e0f",
+      "after": "2839e6c4dfc17efb78f073f183e2a9281cada95865c405f46394d34685d0d758"
+    }
+  },
+  "global_exact_text_helper_unchanged": true,
+  "editor_exact_helper_unchanged": true,
+  "NFD_CRLF_emoji_fixtures_unchanged": true,
+  "source_checks": {
+    "swift_frontend_parse": "passed",
+    "git_diff_check": "passed",
+    "independent_review": "CLEAN/APPROVE history_text_boundary_review; runtime pending",
+    "review_report": ".omo/evidence/history-ui-text-boundary-code-review.md"
+  },
+  "limits": [
+    "Actual UI Copy code-unit preservation has not yet executed under this calibration.",
+    "The failed run did not prove product byte loss; it failed before Copy/correction.",
+    "Final UI8/@Query/correction persistence/native postverify/Release acceptance still pending."
+  ]
+}

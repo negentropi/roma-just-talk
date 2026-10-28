@@ -369,19 +369,9 @@ final class WritingFeaturesUITests: XCTestCase {
                     tab.click()
                 }
                 let text = row.staticTexts["history.text." + variant.name]
-                assertExactText(variant.text, in: text)
-                let copy = row.buttons["history.copy." + variant.name]
-                XCTAssertTrue(copy.waitForExistence(timeout: 5))
-                reveal(copy, identifier: "history.row." + fixture.id, in: app)
-                XCTAssertTrue(copy.isEnabled && copy.isHittable)
-                XCTAssertTrue(clipboard.installMarker(), "The pasteboard no longer belonged to this UI case.")
-                let previousChange = NSPasteboard.general.changeCount
-                copy.click()
-                XCTAssertTrue(waitUntil { NSPasteboard.general.changeCount != previousChange })
-                let copied = try XCTUnwrap(NSPasteboard.general.string(forType: .string))
-                XCTAssertEqual(Array(copied.utf8), Array(variant.text.utf8))
-                XCTAssertEqual(Array(copied.utf16), Array(variant.text.utf16))
-                XCTAssertTrue(clipboard.captureOwnedCopy(expected: variant.text))
+                try assertHistoryStaticTextPresentation(variant.text, in: text)
+                try assertExactHistoryCopy(variant.text, variant: variant.name, rowID: fixture.id,
+                                           row: row, clipboard: clipboard, in: app)
                 attachScreenshot(app, named: "History " + fixture.search + " " + variant.name)
             }
         }
@@ -479,7 +469,7 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertEqual(replacementCount(in: app), initialCount + 1)
         _ = assertCorrectionRow(approved.id, enabled: true, sourceState: "source available", in: app)
 
-        let source = openCorrectionSource(fixture, in: app)
+        let source = try openCorrectionSource(fixture, clipboard: clipboard, in: app)
         XCTAssertFalse(app.buttons["history.selection.delete"].exists)
         let selection = identified("history.row." + fixture.id + ".select", in: source)
         let checkbox = try nativeHistoryCheckbox(selection)
@@ -565,14 +555,34 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor private func correctionSwitch(_ id: String, in row: XCUIElement) -> XCUIElement {
-        let control = identified("dictionary.replacement." + id + ".enabled", in: row)
-        XCTAssertTrue(control.waitForExistence(timeout: 5))
-        if control.elementType == .switch { return control }
-        XCTAssertEqual(control.switches.count, 1, "The identified replacement control must contain one native switch.")
-        return control.switches.firstMatch
+        let identifier = "dictionary.replacement." + id + ".enabled"
+        let controls = row.descendants(matching: .any).matching(identifier: identifier)
+        XCTAssertTrue(controls.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(controls.count, 1)
+        let control = controls.firstMatch
+        XCTAssertEqual(control.identifier, identifier)
+        // The same native mini-toggle is exposed as CheckBox on the CI macOS host.
+        let toggle: XCUIElement
+        if control.elementType == .checkBox || control.elementType == .switch {
+            toggle = control
+        } else {
+            let toggles = control.descendants(matching: .any).matching(NSPredicate(
+                format: "elementType == %d OR elementType == %d",
+                XCUIElement.ElementType.checkBox.rawValue, XCUIElement.ElementType.switch.rawValue
+            ))
+            XCTAssertEqual(toggles.count, 1, "The identified replacement must contain one native toggle.")
+            toggle = toggles.firstMatch
+        }
+        XCTAssertTrue(toggle.isEnabled)
+        XCTAssertTrue(["0", "1"].contains(String(describing: toggle.value ?? "")))
+        XCTAssertFalse(toggle.frame.isEmpty)
+        XCTAssertTrue(row.frame.contains(toggle.frame))
+        return toggle
     }
 
-    @MainActor private func openCorrectionSource(_ fixture: CorrectionUIFixture, in app: XCUIApplication) -> XCUIElement {
+    @MainActor private func openCorrectionSource(
+        _ fixture: CorrectionUIFixture, clipboard: WritingFeaturesPasteboardOwnership, in app: XCUIApplication
+    ) throws -> XCUIElement {
         mainWindow(in: app).buttons["past"].click()
         let search = app.textFields["history.search"]
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -590,7 +600,9 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(recognized.waitForExistence(timeout: 5))
         reveal(recognized, identifier: "history.row." + fixture.id, in: app)
         recognized.click()
-        assertExactText(fixture.source, in: row.staticTexts["history.text.recognized"])
+        try assertHistoryStaticTextPresentation(fixture.source, in: row.staticTexts["history.text.recognized"])
+        try assertExactHistoryCopy(fixture.source, variant: "recognized", rowID: fixture.id,
+                                   row: row, clipboard: clipboard, in: app)
         return row
     }
 
@@ -598,7 +610,7 @@ final class WritingFeaturesUITests: XCTestCase {
         _ fixture: CorrectionUIFixture, clipboard: WritingFeaturesPasteboardOwnership,
         verifyCanonicalEdit: Bool = false, in app: XCUIApplication
     ) throws -> (sheet: XCUIElement, id: String, startedAt: TimeInterval) {
-        let row = openCorrectionSource(fixture, in: app)
+        let row = try openCorrectionSource(fixture, clipboard: clipboard, in: app)
         let capture = row.buttons["history.correction.save.recognized"]
         reveal(capture, identifier: "history.row." + fixture.id, in: app)
         XCTAssertTrue(capture.isEnabled && capture.isHittable)
@@ -607,7 +619,7 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(sheets.firstMatch.waitForExistence(timeout: 5))
         XCTAssertEqual(sheets.count, 1)
         let sheet = sheets.firstMatch
-        assertExactText(fixture.source, in: sheet.staticTexts["history.correction.sourceText"])
+        try assertHistoryStaticTextPresentation(fixture.source, in: sheet.staticTexts["history.correction.sourceText"])
         let preview = sheet.buttons["history.correction.previewButton"]
         let approve = sheet.buttons["history.correction.approve"]
         XCTAssertFalse(preview.isEnabled)
@@ -640,7 +652,7 @@ final class WritingFeaturesUITests: XCTestCase {
             let previousID = try metadataUUID("history.correction.preview.record.id", in: sheet)
             XCTAssertEqual(initialOutput, fixture.output)
             XCTAssertNotEqual(Array(initialOutput.utf8), Array(fixture.output.utf8))
-            assertExactText(initialOutput, in: sheet.staticTexts["history.correction.preview.record.replacement"])
+            try assertHistoryStaticTextPresentation(initialOutput, in: sheet.staticTexts["history.correction.preview.record.replacement"])
             revealCorrectionControl(output, towardTop: true, in: sheet)
             pasteLiteralText(fixture.output, into: output, clipboard: clipboard, in: app)
             assertExactEditor(fixture.output, id: "history.correction.output", in: sheet)
@@ -651,8 +663,8 @@ final class WritingFeaturesUITests: XCTestCase {
             XCTAssertTrue(waitUntil { approve.isEnabled })
             XCTAssertNotEqual(try metadataUUID("history.correction.preview.record.id", in: sheet), previousID)
         }
-        assertExactText(fixture.phrase, in: sheet.staticTexts["history.correction.preview.record.original"])
-        assertExactText(fixture.output, in: sheet.staticTexts["history.correction.preview.record.replacement"])
+        try assertHistoryStaticTextPresentation(fixture.phrase, in: sheet.staticTexts["history.correction.preview.record.original"])
+        try assertHistoryStaticTextPresentation(fixture.output, in: sheet.staticTexts["history.correction.preview.record.replacement"])
         for (suffix, expected) in [("kind", "Literal phrase"), ("enabled", "On"),
                                    ("provenance", "From History · Recognized"), ("sourceTranscription", fixture.id)] {
             XCTAssertTrue(containsText(expected, in: identified("history.correction.preview.record." + suffix, in: sheet)))
@@ -830,6 +842,56 @@ final class WritingFeaturesUITests: XCTestCase {
         expand.click()
         XCTAssertTrue(row.staticTexts["history.text.original"].waitForExistence(timeout: 5))
         return row
+    }
+
+    @MainActor private func assertHistoryStaticTextPresentation(_ expected: String, in element: XCUIElement) throws {
+        XCTAssertTrue(element.waitForExistence(timeout: 5))
+        XCTAssertEqual(element.elementType, .staticText)
+        let actual = element.value as? String ?? element.label
+        let receipt: [String: Any] = [
+            "boundary": "static-accessibility-presentation", "identifier": element.identifier,
+            "actualUTF8": Array(actual.utf8), "actualUTF16": Array(actual.utf16),
+            "expectedUTF8": Array(expected.utf8), "expectedUTF16": Array(expected.utf16),
+            "canonicallyEquivalent": actual == expected
+        ]
+        let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: receipt, options: [.sortedKeys]),
+                                       uniformTypeIdentifier: "public.json")
+        attachment.name = "History static AX presentation " + element.identifier
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        // AX StaticText may compose Unicode. Copy/editor/store boundaries still require exact units.
+        XCTAssertEqual(actual, expected, "The scoped History label did not present the expected text.")
+    }
+
+    @MainActor private func assertExactHistoryCopy(
+        _ expected: String, variant: String, rowID: String, row: XCUIElement,
+        clipboard: WritingFeaturesPasteboardOwnership, in app: XCUIApplication
+    ) throws {
+        let copies = row.buttons.matching(identifier: "history.copy." + variant)
+        XCTAssertTrue(copies.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(copies.count, 1)
+        let copy = copies.firstMatch
+        reveal(copy, identifier: "history.row." + rowID, in: app)
+        XCTAssertTrue(copy.isEnabled && copy.isHittable)
+        XCTAssertTrue(clipboard.installMarker(), "The pasteboard no longer belonged to this UI case.")
+        let previousChange = NSPasteboard.general.changeCount
+        copy.click()
+        XCTAssertTrue(waitUntil { NSPasteboard.general.changeCount != previousChange })
+        let copied = try XCTUnwrap(NSPasteboard.general.string(forType: .string))
+        let receipt: [String: Any] = [
+            "boundary": "actual-history-copy", "rowID": rowID, "variant": variant,
+            "actualUTF8": Array(copied.utf8), "actualUTF16": Array(copied.utf16),
+            "expectedUTF8": Array(expected.utf8), "expectedUTF16": Array(expected.utf16),
+            "previousChangeCount": previousChange, "changeCount": NSPasteboard.general.changeCount
+        ]
+        let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: receipt, options: [.sortedKeys]),
+                                       uniformTypeIdentifier: "public.json")
+        attachment.name = "History exact Copy " + rowID + " " + variant
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        XCTAssertEqual(Array(copied.utf8), Array(expected.utf8))
+        XCTAssertEqual(Array(copied.utf16), Array(expected.utf16))
+        XCTAssertTrue(clipboard.captureOwnedCopy(expected: expected))
     }
 
     @MainActor private func assertExactText(_ expected: String, in element: XCUIElement) {

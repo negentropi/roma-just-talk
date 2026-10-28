@@ -91,9 +91,10 @@ public enum VoiceInkStoredAudioFile {
 
     public static func retranscriptionFileURL(
         in recordingsDirectory: URL,
-        id: UUID = UUID()
+        id: UUID = UUID(),
+        fileExtension: String = VoiceInkStoredAudioCodec.wavFileExtension
     ) -> URL {
-        fileURL(forFilename: "retranscribed_\(id.uuidString).wav", in: recordingsDirectory)
+        fileURL(forFilename: "retranscribed_\(id.uuidString).\(fileExtension)", in: recordingsDirectory)
     }
 
     public static func resolvedURL(

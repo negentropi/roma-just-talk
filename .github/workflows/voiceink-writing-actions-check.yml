@@ -1,0 +1,394 @@
+name: Verify Mac writing actions
+run-name: Verify Mac writing actions (${{ inputs.ui_only && 'UI only' || 'full' }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      ui_only:
+        description: Run all eight UI workflows and History persistence checks; full verification still required
+        type: boolean
+        default: false
+      baseline_ref:
+        description: Immutable known-bad snippet pipeline commit
+        required: true
+        default: b4df0b236592fe701e45b249856a4b731e96b104
+        type: string
+      product_ref:
+        description: Immutable feature PR SHA with identical app, tests and dependencies
+        required: false
+        default: ""
+        type: string
+  push:
+    branches:
+      - "ci/rjt-writing-check-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writing-actions-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  macos:
+    runs-on: macos-26
+    timeout-minutes: 160
+    env:
+      BASELINE_REF: ${{ inputs.baseline_ref || 'b4df0b236592fe701e45b249856a4b731e96b104' }}
+      RJT_UI_ONLY: ${{ inputs.ui_only && 'true' || 'false' }}
+      RJT_PR_REVIEW_PRODUCT_REF: ${{ inputs.product_ref || '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Retain the verification scope
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          output = Path(os.environ['RUNNER_TEMP']) / 'writing-proof-snapshot'
+          output.mkdir(parents=True, exist_ok=True)
+          (output / 'verification-mode.json').write_text(json.dumps({
+              'sourceSHA': os.environ['GITHUB_SHA'],
+              'mode': 'ui-only' if os.environ['RJT_UI_ONLY'] == 'true' else 'full',
+              'fullGateRequired': True,
+          }, indent=2) + '\n')
+          PY
+
+      - name: Keep the disposable desktop awake
+        run: |
+          /usr/bin/caffeinate -d -i -u -t 7200 </dev/null >/dev/null 2>&1 &
+          echo "Temporary desktop assertion PID: $!"
+
+      - name: Select Xcode and Metal toolchain
+        shell: bash
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          xcodebuild -version
+          sw_vers
+          swift --version
+          command -v cmake >/dev/null || brew install cmake
+          if ! xcrun metal --version >/dev/null 2>&1; then
+            log="$RUNNER_TEMP/writing-metal-download.log"
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tee "$log"
+            if ! xcrun metal --version >/dev/null 2>&1; then
+              dmg=$(sed -n 's/^Downloaded asset to: //p' "$log" | tail -n 1)
+              test -n "$dmg"
+              hdiutil attach -readonly -nobrowse "$dmg"
+            fi
+          fi
+          xcrun metal --version
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      - name: Verify the canonical package graph before compiling
+        id: packages
+        run: bash scripts/run-writing-feature-regression.sh packages "$RUNNER_TEMP/writing-package-proof"
+
+      - name: Shared core checks
+        if: ${{ !inputs.ui_only }}
+        run: |
+          set -o pipefail
+          swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee "$RUNNER_TEMP/writing-core-checks.log"
+
+      - name: Immutable regression fixture checks
+        if: ${{ !inputs.ui_only }}
+        timeout-minutes: 10
+        shell: bash
+        run: |
+          set -euo pipefail
+          proof="$RUNNER_TEMP/writing-fixture-checks"
+          mkdir -p "$proof"
+          python3 - <<'PY' 2>&1 | tee "$proof/input-manifest.log"
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import wave
+          from pathlib import Path
+          manifest = json.loads(Path('docs/research/competitors/fixtures/historical-inputs-manifest.json').read_text())
+          assert manifest['archiveCommit'] == '99d0ebba40cfcd0f04a1536b4118cabe3a96a075'
+          assert len(manifest['files']) == manifest['inputFileCount'] == 35
+          assert len({row['path'] for row in manifest['files']}) == 35
+          total = 0
+          for row in manifest['files']:
+              data = Path(row['path']).read_bytes()
+              assert len(data) == row['bytes']
+              assert hashlib.sha256(data).hexdigest() == row['sha256']
+              assert subprocess.check_output(['git', 'hash-object', '--stdin'], input=data).decode().strip() == row['gitBlobOID']
+              total += len(data)
+          assert total == manifest['totalInputBytes'] == 541556
+          audio = Path('docs/research/competitors/evidence/none-matched-40532555248/import/input.wav')
+          assert audio.stat().st_size == 165984
+          assert hashlib.sha256(audio.read_bytes()).hexdigest() == 'a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805'
+          with wave.open(str(audio)) as stream:
+              assert (stream.getnchannels(), stream.getsampwidth(), stream.getframerate(), stream.getnframes()) == (1, 2, 16000, 80944)
+          print(json.dumps({'sourceSHA': os.environ['GITHUB_SHA'], 'classification': 'immutable-regression-inputs-verified', 'files': 35, 'bytes': total, 'wavBytes': audio.stat().st_size}, sort_keys=True))
+          PY
+          python3 scripts/tests/dictation-store-schema-canonicalization.test.py 2>&1 | tee "$proof/schema-canonicalization.log"
+          bash scripts/run-dictation-metadata-store-check.sh self-test 2>&1 | tee "$proof/metadata-store.log"
+          bash scripts/run-correction-library-store-check.sh self-test 2>&1 | tee "$proof/correction-library-store.log"
+          bash scripts/run-local-cli-lifetime-check.sh --self-test 2>&1 | tee "$proof/local-cli-lifetime.log"
+          bash scripts/run-dictation-polish-native-check.sh self-test 2>&1 | tee "$proof/dictation-polish.log"
+          bash scripts/run-writing-pr-review-regression.sh self-test 2>&1 | tee "$proof/pr-review-classifiers.log"
+
+      - name: Prepare and verify static Whisper dependencies
+        id: dependencies
+        run: |
+          set -o pipefail
+          make setup 2>&1 | tee "$RUNNER_TEMP/writing-dependency-setup.log"
+
+      - name: Preserve verified dependencies for test retries
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+      - name: Configure the disposable app defaults
+        run: |
+          defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
+          defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
+
+      - name: Full Mac unit suite with fresh CI permissions
+        id: units
+        if: ${{ !inputs.ui_only }}
+        run: |
+          lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          unit_exit=0
+          bash scripts/run-macos-ci-unit-tests.sh || unit_exit=$?
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          exit "$unit_exit"
+
+      - name: Live TextEdit and Safari selection transactions
+        id: live
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        run: bash scripts/run-writing-feature-regression.sh live
+
+      - name: Upload the native check checkpoint
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-live-checkpoint
+          path: |
+            .local-build/onboarding-test-evidence/writing-target-live/*.json
+            .local-build/onboarding-test-evidence/writing-target-live/tests.log
+            .local-build/onboarding-test-evidence/writing-target-live/identity-*.txt
+            .local-build/onboarding-test-evidence/writing-target-live/selection/*.json
+            .local-build/onboarding-test-evidence/writing-target-live/selection/enumeration.log
+          include-hidden-files: true
+          if-no-files-found: warn
+
+      - name: Matched snippet regression
+        id: regression
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        run: bash scripts/run-writing-feature-regression.sh regression "$BASELINE_REF"
+
+      - name: Upload the matched regression checkpoint
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-regression-checkpoint
+          path: |
+            ${{ runner.temp }}/writing-feature-regression/*.json
+            ${{ runner.temp }}/writing-feature-regression/*-tests.log
+            ${{ runner.temp }}/writing-feature-regression/*-permission.log
+            ${{ runner.temp }}/writing-feature-regression/contract.txt
+            ${{ runner.temp }}/writing-feature-regression/*selection/*.json
+            ${{ runner.temp }}/writing-feature-regression/*selection/enumeration.log
+            ${{ runner.temp }}/writing-feature-regression/packages/*.json
+            ${{ runner.temp }}/writing-feature-regression/packages/*strict-resolve.log
+          if-no-files-found: warn
+
+      - name: Writing, snippet and dictation settings UI
+        id: ui
+        if: ${{ !cancelled() && steps.packages.outcome == 'success' && steps.dependencies.outcome == 'success' && (inputs.ui_only || steps.units.outcome == 'success') }}
+        run: bash scripts/run-writing-feature-regression.sh ui
+
+      - name: Retain normal app and UI compiler inputs
+        if: ${{ !cancelled() && steps.ui.outcome == 'success' }}
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          capture="$RUNNER_TEMP/writing-proof-snapshot/normal-compile-inputs"
+          mkdir -p "$capture"
+          git rev-parse HEAD > "$capture/verification-head.txt"
+          printf '%s\n' "${RJT_PR_REVIEW_PRODUCT_REF:-$GITHUB_SHA}" > "$capture/requested-product-ref.txt"
+          git ls-tree -rz HEAD > "$capture/verification-git-tree.zlist"
+          git ls-tree -rz "${RJT_PR_REVIEW_PRODUCT_REF:-$GITHUB_SHA}" > "$capture/product-git-tree.zlist"
+          git diff --binary HEAD > "$capture/worktree.patch"
+          git status --porcelain=v1 -z > "$capture/worktree-status.zlist"
+          git ls-files -z -- VoiceInk VoiceInkCore VoiceInkNVIDIA VoiceInkQwen VoiceInkTests VoiceInkUITests VoiceInk.xcodeproj VoiceInk.xcworkspace iOS Tools Makefile LocalBuild.xcconfig Package.swift | tar -cf "$capture/worktree-product-inputs.tar" --null -T -
+          python3 - "$PWD/.local-build" "$capture" <<'PY'
+          import hashlib, json, os, plistlib, shlex, shutil, stat, subprocess, sys
+          from pathlib import Path
+          derived, output = map(Path, sys.argv[1:])
+          intermediate = derived / 'Build/Intermediates.noindex'
+          lists = list(intermediate.rglob('*.SwiftFileList'))
+          for path in [*lists, *intermediate.rglob('DerivedSources/*.swift'), *(derived / 'Logs/Build').glob('*.xcactivitylog')]:
+              target = output / 'raw-derived' / path.relative_to(derived)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(path, target)
+          packages = derived / 'SourcePackages'
+          shutil.copy2(packages / 'workspace-state.json', output / 'workspace-state.json')
+          shutil.copy2(Path('VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'), output / 'canonical.Package.resolved')
+          references, parse_errors = {}, {}
+          for path in lists:
+              try:
+                  for source in shlex.split(path.read_text()):
+                      if source.endswith('.swift'): references.setdefault(source, []).append(str(path))
+              except (OSError, ValueError) as error: parse_errors[str(path)] = str(error)
+          checkouts = []
+          workspace = json.loads((packages / 'workspace-state.json').read_text())
+          for number, dependency in enumerate(workspace['object']['dependencies']):
+              entry = {'workspaceDependency': dependency, 'compiledSwift': []}
+              checkouts.append(entry)
+              subpath = dependency.get('subpath')
+              if not subpath: entry['captureNote'] = 'No workspace checkout subpath'; continue
+              checkout = packages / 'checkouts' / subpath
+              entry['path'], entry['resolvedPath'] = str(checkout), str(checkout.resolve())
+              if not checkout.resolve().is_relative_to((packages / 'checkouts').resolve()):
+                  entry['captureNote'] = 'Checkout path resolves outside the captured checkouts directory'; continue
+              directory = output / 'package-checkouts' / str(number)
+              directory.mkdir(parents=True, exist_ok=True)
+              commands = {'head': ['rev-parse', 'HEAD'], 'tree': ['rev-parse', 'HEAD^{tree}'], 'status': ['status', '--porcelain=v1', '-z'], 'diff': ['diff', '--binary', 'HEAD'], 'files': ['ls-files', '-z'], 'index': ['ls-files', '--stage', '-z'], 'head-files': ['ls-tree', '-rz', 'HEAD']}
+              entry['commands'] = {}
+              for phase in ['before', 'after']:
+                  for name, arguments in commands.items():
+                      result = subprocess.run(['git', '-C', str(checkout), *arguments], capture_output=True, env=dict(os.environ, GIT_OPTIONAL_LOCKS='0'))
+                      (directory / (phase + '-' + name + '.raw')).write_bytes(result.stdout)
+                      (directory / (phase + '-' + name + '.stderr')).write_bytes(result.stderr)
+                      entry['commands'][phase + '-' + name] = {'exitCode': result.returncode, 'stdout': str((directory / (phase + '-' + name + '.raw')).relative_to(output))}
+                  if phase == 'after': continue
+                  index = {}
+                  for row in (directory / 'before-index.raw').read_bytes().split(b'\0'):
+                      if row:
+                          metadata, name = row.split(b'\t', 1)
+                          index[os.fsdecode(name)] = metadata.decode().split()
+                  for source, owners in references.items():
+                      path = Path(source)
+                      if not path.is_absolute() or not path.is_relative_to(checkout): continue
+                      relative = str(path.relative_to(checkout))
+                      item = {'path': source, 'relativePath': relative, 'fileLists': owners, 'gitIndex': index.get(relative)}
+                      entry['compiledSwift'].append(item)
+                      try:
+                          info = path.lstat()
+                          item['mode'] = oct(stat.S_IMODE(info.st_mode))
+                          if stat.S_ISLNK(info.st_mode):
+                              item['linkTarget'] = os.readlink(path)
+                              data = os.fsencode(item['linkTarget'])
+                          elif stat.S_ISREG(info.st_mode): data = path.read_bytes()
+                          else: item['captureNote'] = 'Nonregular compiled input'; continue
+                          item.update(bytes=len(data), sha256=hashlib.sha256(data).hexdigest(), worktreeGitBlobOID=hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest())
+                      except OSError as error: item['captureError'] = str(error)
+          (output / 'external-compiled-swift-observations.json').write_text(json.dumps({'fileListParseErrors': parse_errors, 'checkouts': checkouts}, indent=2, sort_keys=True) + '\n')
+          binaries = {}
+          for info in (derived / 'Build/Products/Debug').rglob('Contents/Info.plist'):
+              bundle = info.parent.parent
+              if bundle.name not in ['roma just talk.app', 'VoiceInkUITests-Runner.app', 'VoiceInkUITests.xctest']: continue
+              value = plistlib.loads(info.read_bytes())
+              binary = info.parent / 'MacOS' / value['CFBundleExecutable']
+              binaries[str(binary)] = {'sha256': hashlib.sha256(binary.read_bytes()).hexdigest(), 'bundleIdentifier': value.get('CFBundleIdentifier'), 'infoPlistSHA256': hashlib.sha256(info.read_bytes()).hexdigest()}
+              target = output / 'raw-products' / info.relative_to(derived / 'Build/Products')
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(info, target)
+          (output / 'normal-binaries.json').write_text(json.dumps(binaries, indent=2, sort_keys=True) + '\n')
+          PY
+          cp .local-build/onboarding-test-evidence/writing-ui/build.log "$capture/normal-ui-build.log"
+          cp .local-build/onboarding-test-evidence/writing-ui/identity-before.txt "$capture/ui-identity-before.txt"
+          cp .local-build/onboarding-test-evidence/writing-ui/identity-after.txt "$capture/ui-identity-after.txt"
+          xcodebuild -showBuildSettings -json -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination 'platform=macOS' -derivedDataPath "$PWD/.local-build" -xcconfig LocalBuild.xcconfig -clonedSourcePackagesDirPath "$PWD/.local-build/SourcePackages" -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$PWD/VoiceInk/VoiceInk.local.entitlements" 'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD' > "$capture/normal-build-settings.json" 2> "$capture/normal-build-settings-errors.log"
+          git rev-parse HEAD > "$capture/verification-head-after-capture.txt"
+          git diff --binary HEAD > "$capture/worktree-after-capture.patch"
+
+      - name: Matched PR review regressions
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        timeout-minutes: 40
+        run: bash scripts/run-writing-pr-review-regression.sh
+
+      - name: Preserve test evidence before the Release build
+        if: always()
+        run: |
+          snapshot="$RUNNER_TEMP/writing-proof-snapshot"
+          mkdir -p "$snapshot"
+          if [[ -d .local-build/onboarding-test-evidence ]]; then
+            ditto .local-build/onboarding-test-evidence "$snapshot/onboarding-test-evidence"
+          fi
+          git rev-parse HEAD > "$snapshot/source-sha.txt"
+
+      - name: Release build and packaging contracts
+        if: ${{ !inputs.ui_only }}
+        run: |
+          set -o pipefail
+          lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          bash scripts/tests/verify-adhoc-library-validation.test.sh
+          make local CONFIGURATION=Release 2>&1 | tee "$RUNNER_TEMP/writing-release-build.log"
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          app="$HOME/Applications/roma just talk.app"
+          test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
+          codesign --verify --deep --strict "$app"
+          bash scripts/verify-static-whisper-app.sh "$app"
+          bash scripts/verify-adhoc-library-validation.sh "$app"
+          bash scripts/verify-macos-release-instrumentation.sh "$app"
+          mkdir -p .local-build/writing-check-evidence
+          cp "$RUNNER_TEMP/writing-core-checks.log" .local-build/writing-check-evidence/core-checks.log
+          cp "$RUNNER_TEMP/writing-release-build.log" .local-build/writing-check-evidence/release-build.log
+          git rev-parse HEAD > .local-build/writing-check-evidence/source-sha.txt
+          ditto -c -k --keepParent "$app" "$RUNNER_TEMP/roma.just.talk.app.zip"
+          shasum -a 256 "$RUNNER_TEMP/roma.just.talk.app.zip" > .local-build/writing-check-evidence/app-sha256.txt
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-actions-evidence
+          path: |
+            ${{ runner.temp }}/writing-proof-snapshot/**
+            .local-build/writing-check-evidence/**
+            ${{ runner.temp }}/writing-feature-regression/**
+            ${{ runner.temp }}/writing-package-proof/**
+            ${{ runner.temp }}/writing-ui-proof/history-seed/**
+            ${{ runner.temp }}/writing-core-checks.log
+            ${{ runner.temp }}/writing-fixture-checks/**
+            ${{ runner.temp }}/writing-pr-review-proof/**/result.json
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.log
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.json
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.txt
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.sh
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.swift
+            ${{ runner.temp }}/writing-dependency-setup.log
+            ${{ runner.temp }}/writing-release-build.log
+          if-no-files-found: error
+          include-hidden-files: true
+
+      - name: Upload settings screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-actions-screenshots
+          path: |
+            ${{ runner.temp }}/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/**
+            ${{ runner.temp }}/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshot-export.*
+          if-no-files-found: warn
+
+      - name: Upload verified release app
+        if: ${{ success() && !inputs.ui_only }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: ${{ runner.temp }}/roma.just.talk.app.zip
+          if-no-files-found: error

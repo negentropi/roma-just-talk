@@ -1,0 +1,55 @@
+name: Compare literal correction rules
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-literal-rule-check-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: literal-rule-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  literal-rules:
+    runs-on: macos-26
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the result classifier
+        run: bash scripts/run-literal-rule-check.sh --self-test
+
+      - name: Select installed Xcode 26 and fetch the fixed old source
+        run: |
+          set -o pipefail
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          git fetch --no-tags --depth=1 origin 919670ae5b918afbfad6f4d88982a481c1c4b532
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: core-macos26-${{ runner.arch }}-${{ hashFiles('VoiceInkCore/Package.swift', 'VoiceInkCore/Package.resolved', 'VoiceInkNVIDIA/Package.swift', 'VoiceInkNVIDIA/Package.resolved') }}
+
+      - name: Execute every Core check with the same literal oracle
+        run: bash scripts/run-literal-rule-check.sh
+
+      - name: Upload exact sources, pins and complete results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.literal-rule-evidence
+          path: |
+            ${{ runner.temp }}/literal-rule-check/*.json
+            ${{ runner.temp }}/literal-rule-check/*.txt
+            ${{ runner.temp }}/literal-rule-check/*.log
+            ${{ runner.temp }}/literal-rule-check/oracle/*
+          if-no-files-found: error

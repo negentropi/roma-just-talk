@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "actual_reviewer": "gpt-6.1-sol",
+  "effort": "medium",
+  "scope": "Read-only actual raw artifact boundary and real failure PNG; not a new source-review round",
+  "verdict": "CLEAN factual audit; runtime failed",
+  "failure_png_sha256": "bbb414a78a068280d774af574188ffdd9ac8d336d05930d7ca334eaaa6d9b1a5",
+  "dimensions": [
+    1024,
+    768
+  ],
+  "observed": "Open disabled Undo Last Writing Edit status menu, Finder foreground, inactive setup window.",
+  "native_graph": "Unique three-node downward retained-status subtree; item\u2192sameMenu parent succeeds; menu\u2192hostPID AXMenuBar is not retained status item. Exact final parent identity unproven.",
+  "completed_states": 0,
+  "completed_cases": 0,
+  "source_review_rounds_used": 3,
+  "limits": [
+    "No completed state or case; no recorder, global chord, Undo, editor, range, focus or notice proof.",
+    "Menu upward parent role/PID observed, but exact menu-bar object identity beyond role/PID remains unknown.",
+    "No product defect established; no product Undo invocation.",
+    "Monitor identity-change label does not establish PID reuse or precise exit-race timing.",
+    "No candidate mismatch/closure error recorded; missing full post-run source/signature/TCC receipts prevents complete acceptance."
+  ],
+  "usage": null,
+  "usage_status": "Unavailable, not estimated.",
+  "files_sha256": {
+    "README.md": "ce07f958e69d291ae38e0096b79d08156c9ad2e6b496f76ca31ea4e0a26e145b",
+    "artifacts.json": "dde898ca7070f95bdf68eacc871bc8c8954e7fb7634e5c46a83073c42d88ee10",
+    "audit.json": "d7aa62e8e02208a8d62161b51e215d3bb9538bab23a7ae51675337b8acb8a98d",
+    "failure-diagnosis.json": "f8a1bf8cce5e438cf8f1920ef7df303e82b6a60b97c3c78a1be4eea43dad825e",
+    "failure.png": "bbb414a78a068280d774af574188ffdd9ac8d336d05930d7ca334eaaa6d9b1a5",
+    "milestones.json": "f780a29883311bc2dc4c4a22a53c7c03ccc3f1c95b821a4a587621f14942e01c"
+  }
+}

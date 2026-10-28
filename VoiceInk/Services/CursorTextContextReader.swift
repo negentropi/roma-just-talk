@@ -242,22 +242,11 @@ enum CursorTextContextReader {
         preparedContext: PreparedContext? = nil,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> CommandVMenuAttempt {
-        guard AXIsProcessTrusted(),
-              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+        guard let target = currentPasteTarget() else {
             return .unavailable(nil)
         }
-        var processIdentifier = pid_t()
-        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
-              processIdentifier > 0,
-              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
-            return .unavailable(nil)
-        }
-        let target = FocusedPasteTarget(
-            focusedElement: focusedElement,
-            processIdentifier: processIdentifier,
-            text: textValue(from: focusedElement),
-            selectedRange: selectedTextRange(from: focusedElement)
-        )
+        let focusedElement = target.focusedElement
+        let processIdentifier = target.processIdentifier
         let application = AXUIElementCreateApplication(processIdentifier)
 
         if let preparedContext,
@@ -400,6 +389,51 @@ enum CursorTextContextReader {
             post(event)
         }
         return true
+    }
+
+    @MainActor
+    static func currentPasteTarget() -> FocusedPasteTarget? {
+        guard AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+            return nil
+        }
+        var processIdentifier = pid_t()
+        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
+              processIdentifier > 0,
+              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
+            return nil
+        }
+        return FocusedPasteTarget(
+            focusedElement: focusedElement,
+            processIdentifier: processIdentifier,
+            text: textValue(from: focusedElement),
+            selectedRange: selectedTextRange(from: focusedElement)
+        )
+    }
+
+    /// Returns true once the target shows one more copy of the pasted text than before,
+    /// which means the target app has already read the clipboard.
+    @MainActor
+    static func waitUntilPasteLands(
+        _ pastedText: String,
+        in target: FocusedPasteTarget,
+        timeout: TimeInterval
+    ) async -> Bool {
+        let needle = pastedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !needle.isEmpty, let textBeforePaste = target.text else { return false }
+        let copiesBeforePaste = textBeforePaste.components(separatedBy: needle).count
+        let deadline = ProcessInfo.processInfo.systemUptime + timeout
+        while true {
+            if let text = textValue(from: target.focusedElement),
+               text.components(separatedBy: needle).count > copiesBeforePaste {
+                return true
+            }
+            let remaining = deadline - ProcessInfo.processInfo.systemUptime
+            guard remaining > 0, !Task.isCancelled else { return false }
+            try? await Task.sleep(
+                nanoseconds: UInt64(min(remaining, pasteDeliveryObservationDelay) * 1_000_000_000)
+            )
+        }
     }
 
     @MainActor

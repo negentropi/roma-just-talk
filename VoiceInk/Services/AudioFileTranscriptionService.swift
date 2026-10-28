@@ -61,7 +61,10 @@ class AudioTranscriptionService {
             let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
             let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
             
-            let permanentURL = VoiceInkStoredAudioFile.retranscriptionFileURL(in: recordingsDirectory)
+            let permanentURL = VoiceInkStoredAudioFile.retranscriptionFileURL(
+                in: recordingsDirectory,
+                fileExtension: url.pathExtension
+            )
             
             do {
                 try FileManager.default.copyItem(at: url, to: permanentURL)

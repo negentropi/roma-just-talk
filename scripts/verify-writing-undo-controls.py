@@ -25,6 +25,7 @@ lock_sha = 'bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f'
 bundle_id = 'com.negentropi.RomaJustTalk'
 fixture_paths = ['scripts/fixtures/WritingUndoControlHost.swift', 'scripts/fixtures/WritingUndoControlOracle.swift']
 helper_path = 'VoiceInkTests/WritingTargetLiveTests.swift'
+updater_path = 'VoiceInk/VoiceInk.swift'
 driver_paths = ['scripts/run-writing-undo-controls-check.sh', 'scripts/verify-writing-undo-controls.py',
     '.github/workflows/voiceink-writing-undo-controls-check.yml']
 build_roots = ['VoiceInk', 'VoiceInkCore', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj', 'iOS', 'Makefile', 'LocalBuild.xcconfig']
@@ -131,6 +132,38 @@ def static_identity():
     return {str(p.relative_to(framework)): digest(p.read_bytes()) for p in sorted(framework.rglob('*')) if p.is_file()}
 
 
+def production_updater_source(source):
+    """Copy the unchanged top-level UpdaterViewModel out of the excluded app entry file."""
+    # VoiceInk.swift is excluded so the component host owns @main, yet product
+    # menu/settings views still require this real type. Fail closed on any shape change.
+    imports, offset = {}, 0
+    for line in source.splitlines(keepends=True):
+        if not line.startswith(b'import '):
+            break
+        module = line[len(b'import '):].rstrip(b'\n').decode()
+        if module in ('SwiftUI', 'Sparkle'):
+            require(module not in imports, 'Duplicate updater import: ' + module)
+            imports[module] = (offset, offset + len(line))
+        offset += len(line)
+    require(set(imports) == {'SwiftUI', 'Sparkle'}, 'Updater SwiftUI/Sparkle leading imports missing')
+    header = b'class UpdaterViewModel: ObservableObject {\n'
+    declarations = re.findall(rb'\b(?:class|struct|enum|actor|extension|typealias)\s+UpdaterViewModel\b', source)
+    require(len(declarations) == 1 and source.count(b'\n' + header) == 1, 'Updater declaration missing, changed or duplicated')
+    start = source.index(b'\n' + header) + 1
+    # Only a closed prior declaration may precede it; an attribute/comment/#if would be dropped.
+    require(source[:start].rstrip(b'\n').endswith(b'\n}'), 'Updater declaration has an excluded preceding line')
+    end = source.find(b'\n}\n', start)
+    require(end != -1, 'Updater declaration terminator missing')
+    end += len(b'\n}\n')
+    body = source[start + len(header):end - len(b'}\n')]
+    require(all(not line or line.startswith(b'    ') for line in body.split(b'\n')), 'Updater declaration body is malformed')
+    generated = b''.join(source[a:b] for a, b in sorted(imports.values())) + b'\n' + source[start:end]
+    def span(a, b):
+        return {'start': a, 'end': b, 'sha256': digest(source[a:b])}
+    return generated, {'source_sha256': digest(source), 'declaration': span(start, end),
+        'imports': {module: span(*bounds) for module, bounds in imports.items()}, 'generated_sha256': digest(generated)}
+
+
 def generated_sources():
     result = {('VoiceInk/' + Path(path).name): (repo / path).read_bytes() for path in fixture_paths}
     source = (repo / helper_path).read_bytes()
@@ -138,7 +171,31 @@ def generated_sources():
     require(source.count(marker) == 1, 'Editor helper extraction boundary changed')
     # The existing native editor helper remains byte-identical after these imports.
     result['VoiceInk/LiveWritingEditor.swift'] = b'import AppKit\nimport Carbon.HIToolbox\nimport Foundation\n\n' + source[source.index(marker):]
+    result['VoiceInk/WritingUndoProductionUpdater.swift'] = production_updater_source((repo / updater_path).read_bytes())[0]
     return result
+
+
+def updater_source_record():
+    source = (repo / updater_path).read_bytes()
+    generated, provenance = production_updater_source(source)
+    for span in [provenance['declaration'], *provenance['imports'].values()]:
+        span.update(start_line=source[:span['start']].count(b'\n') + 1,
+            end_line=source[:span['end']].count(b'\n'))
+    return generated, dict(provenance, source_path=updater_path, source_bytes=len(source),
+        generated_path='VoiceInk/WritingUndoProductionUpdater.swift')
+
+
+def verify_updater_source():
+    generated, provenance = updater_source_record()
+    require(contract()['production_updater_source'] == provenance, 'Production updater source provenance changed')
+    require(json.loads((output / 'source/production-updater-provenance.json').read_text()) == provenance,
+        'Retained production updater provenance changed')
+    require((output / 'source/VoiceInk.swift').read_bytes() == (repo / updater_path).read_bytes(),
+        'Retained production updater origin changed')
+    require((output / 'source/WritingUndoProductionUpdater.swift').read_bytes() == generated,
+        'Retained derived updater source changed')
+    require((candidate / provenance['generated_path']).read_bytes() == generated,
+        'Compiled derived updater differs from exact production source')
 
 
 def export_candidate():
@@ -1539,11 +1596,107 @@ def self_test():
         require(receipt_errors(invalid, '/fixture/app', 42, '/fixture/isolated-user'), 'Malformed acceptance fixture incorrectly passed')
     print('Undo controls classifier passed: four exact cases and three states; ' + str(len(mutations))
         + ' malformed receipts rejected. No app, clipboard or native interaction executed.')
+    updater_sources_self_test()
     compiler_inputs_self_test()
     host_failure_self_test()
     profile_and_sampling_self_test()
     diagnostic_screen_self_test()
     readiness_observation_self_test()
+
+
+def updater_sources_self_test():
+    historical = git('show', '794fa2595f943ae501bbe3407a9dd1120c678f76:' + driver_paths[1]).decode()
+    functions = [node for node in ast.parse(historical).body if isinstance(node, ast.FunctionDef) and node.name == 'generated_sources']
+    require(len(functions) == 1, 'Historical generated-source function missing/ambiguous')
+    # The failed 29b16 host used these same owning function bytes.
+    require(digest(ast.get_source_segment(historical, functions[0]).encode())
+        == '5f6d37af70f2244d0a85d052c0f0ddce086940c3a3fb79ee0287f08335075097',
+        'Known-bad generated-source function differs from the observed failed build')
+    old_namespace = dict(globals())
+    exec(compile(ast.Module(body=functions, type_ignores=[]), '<794fa259 generated_sources>', 'exec'), old_namespace)
+    product = {path.decode(): (repo / path.decode()).read_bytes()
+        for path in git('ls-files', '-z', '--', 'VoiceInk').split(b'\0')
+        if path and path.endswith(b'.swift') and path.decode() != updater_path}
+    old = dict(product, **old_namespace['generated_sources']())
+    current = dict(product, **generated_sources())
+    declaration_pattern = rb'^class UpdaterViewModel: ObservableObject \{\n'
+    owners = lambda sources: [path for path, data in sources.items() if re.search(declaration_pattern, data, re.M)]
+    require(owners(old) == [], 'Known-bad compiler closure already contains the updater; regression invalid')
+    print('RED observed failed host generated_sources: excluding VoiceInk.swift omits the required production UpdaterViewModel. Source census only; no Swift compiler executed.')
+    generated, provenance = updater_source_record()
+    require(owners(current) == [provenance['generated_path']], 'Candidate must compile exactly one production-derived updater')
+    source = (repo / updater_path).read_bytes()
+    span = provenance['declaration']
+    declaration = source[span['start']:span['end']]
+    require(declaration.startswith(b'class UpdaterViewModel: ObservableObject {\n')
+        and declaration.endswith(b'\n}\n') and b'@main' not in generated, 'Derived updater includes normal-main composition or misses its exact class')
+    require(generated.endswith(declaration) and digest(generated) == provenance['generated_sha256']
+        and digest(declaration) == span['sha256'], 'Derived updater differs from its actual production bytes')
+    imports = []
+    for module, item in sorted(provenance['imports'].items(), key=lambda pair: pair[1]['start']):
+        data = source[item['start']:item['end']]
+        require(data == ('import ' + module + '\n').encode() and digest(data) == item['sha256'], 'Copied updater import differs from production')
+        imports.append(data)
+    require(generated == b''.join(imports) + b'\n' + declaration, 'Derived updater has unproven Swift bytes')
+    require(all(current[path] == data for path, data in old.items()), 'Unrelated compiler source changed during the updater repair')
+    require('EXCLUDED_SOURCE_FILE_NAMES=VoiceInk.swift' in build_arguments(), 'Normal main exclusion must stay unchanged')
+    header = b'class UpdaterViewModel: ObservableObject {\n'
+    invalid_sources = [
+        source.replace(header, b'class OtherUpdaterViewModel: ObservableObject {\n', 1),
+        source + b'\n' + declaration,
+        source[:span['start']] + b'@MainActor\n' + source[span['start']:],
+        source.replace(header, b'final ' + header, 1),
+        source.replace(b'import SwiftUI\n', b'', 1),
+        source.replace(b'import Sparkle\n', b'import Sparkle\nimport Sparkle\n', 1),
+        source[:span['end'] - 2] + source[span['end']:],
+        source[:span['start']] + declaration.replace(b'    init() {\n', b'init() {\n', 1) + source[span['end']:],
+    ]
+    for invalid in invalid_sources:
+        try:
+            production_updater_source(invalid)
+        except RuntimeError:
+            pass
+        else:
+            raise RuntimeError('Unsafe updater extraction boundary accepted')
+    previous = {key: globals()[key] for key in ('output', 'candidate')}
+    with tempfile.TemporaryDirectory(prefix='rjt-undo-updater-provenance-') as directory:
+        globals().update(output=Path(directory), candidate=Path(directory) / 'candidate')
+        try:
+            (output / 'source').mkdir()
+            (candidate / 'VoiceInk').mkdir(parents=True)
+            (output / 'source/VoiceInk.swift').write_bytes(source)
+            (output / 'source/WritingUndoProductionUpdater.swift').write_bytes(generated)
+            (candidate / provenance['generated_path']).write_bytes(generated)
+            write_json(output / 'contract.json', {'production_updater_source': provenance})
+            write_json(output / 'source/production-updater-provenance.json', provenance)
+            verify_updater_source()
+            altered = copy.deepcopy(provenance)
+            altered['declaration']['start'] += 1
+            negative_files = [
+                (output / 'contract.json', json.dumps({'production_updater_source': altered}).encode()),
+                (output / 'source/production-updater-provenance.json', json.dumps(altered).encode()),
+                (output / 'source/VoiceInk.swift', source + b'\n'),
+                (output / 'source/WritingUndoProductionUpdater.swift', generated + b'\n'),
+                (candidate / provenance['generated_path'], generated.replace(b'startingUpdater: true', b'startingUpdater: false')),
+            ]
+            for path, changed in negative_files:
+                original_bytes = path.read_bytes()
+                require(original_bytes != changed, 'Provenance negative did not change the tested input')
+                path.write_bytes(changed)
+                try:
+                    verify_updater_source()
+                except RuntimeError:
+                    pass
+                else:
+                    raise RuntimeError('Changed updater source/provenance accepted')
+                finally:
+                    path.write_bytes(original_bytes)
+            verify_updater_source()
+        finally:
+            globals().update(previous)
+    print('GREEN candidate derived updater: exact production class/import bytes, retained origin and declaration spans, one compiler owner and normal-main exclusion; '
+        + str(len(invalid_sources)) + ' extraction negatives and ' + str(len(negative_files))
+        + ' source/provenance mutations rejected. Metadata only; hosted Swift build/runtime still required.')
 
 
 def compiler_inputs_self_test():
@@ -1561,11 +1714,13 @@ def compiler_inputs_self_test():
         current_globals.update(output=fixture, candidate=fixture / 'candidate', derived=fixture / 'derived')
         old_namespace.update(output=current_globals['output'], candidate=current_globals['candidate'], derived=current_globals['derived'])
         try:
-            source_paths = ['VoiceInk.swift', 'Engine.swift', 'Views/AI Models/Editor.swift', 'WritingUndoControlHost.swift', 'WritingUndoControlOracle.swift']
+            updater = updater_source_record()[0]
+            source_paths = ['VoiceInk.swift', 'Engine.swift', 'Views/AI Models/Editor.swift', 'WritingUndoControlHost.swift',
+                'WritingUndoControlOracle.swift', 'WritingUndoProductionUpdater.swift']
             for relative in source_paths:
                 path = candidate / 'VoiceInk' / relative
                 path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text('// compiler-input fixture only\n')
+                path.write_bytes(updater if relative == 'WritingUndoProductionUpdater.swift' else b'// compiler-input fixture only\n')
             target_temp = derived / 'Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build'
             response = target_temp / 'Objects-normal/arm64/roma just talk.SwiftFileList'
             response.parent.mkdir(parents=True)
@@ -1615,6 +1770,7 @@ def compiler_inputs_self_test():
             write_settings([settings])
             bad_lists = [original_list + shlex.quote(expected_entries[0]) + '\n',
                 '\n'.join(shlex.quote(path) for path in expected_entries[1:]) + '\n',
+                '\n'.join(shlex.quote(path) for path in expected_entries if not path.endswith('/WritingUndoProductionUpdater.swift')) + '\n',
                 original_list + shlex.quote(str(candidate / 'VoiceInk/VoiceInk.swift')) + '\n']
             for value in bad_lists:
                 response.write_text(value)
@@ -1624,7 +1780,7 @@ def compiler_inputs_self_test():
                     pass
                 else:
                     raise RuntimeError('Duplicate/missing/normal-main compiler source accepted')
-            print('Compiler input controls passed: wrong/duplicate target, unsafe/outside path, duplicate architecture/response inode, duplicate/missing source and normal-main inclusion rejected (9 controls). Metadata fixture only; no build/native execution.')
+            print('Compiler input controls passed: wrong/duplicate target, unsafe/outside path, duplicate architecture/response inode, duplicate/missing source, missing production-derived updater and normal-main inclusion rejected (10 controls). Metadata fixture only; no build/native execution.')
         finally:
             current_globals.update(saved)
 
@@ -1947,11 +2103,13 @@ def main():
         helper = (repo / helper_path).read_bytes()
         marker = b'private enum LiveWritingFailure:'
         require(helper.count(marker) == 1, 'Editor helper boundary differs')
+        updater, updater_provenance = updater_source_record()
         write_json(output / 'source-before.json', manifest())
         write_json(output / 'contract.json', {'source_sha': git('rev-parse', 'HEAD').decode().strip(),
             'github_run_id': os.environ['GITHUB_RUN_ID'], 'cases': cases, 'lock_sha256': lock_sha, 'canonical_pins': 41,
             'excluded_source_files': ['VoiceInk.swift'], 'helper_tail_sha256': digest(helper[helper.index(marker):]),
             'generated_sources_sha256': {path: digest(data) for path, data in generated_sources().items()},
+            'production_updater_source': updater_provenance,
             'scope': 'Isolated genuine Undo controls, SwiftUI MenuBarExtra bridge and real configured shortcut into one real engine; actual TextEdit and Safari surfaces.',
             'limits': ['Normal VoiceInkApp composition is excluded; this is component-host acceptance.',
                 'No ASR, microphone, model loading, provider, full recording pipeline or physical keyboard proof.',
@@ -1961,7 +2119,11 @@ def main():
             destination = output / 'source' / Path(path).name
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes((repo / path).read_bytes())
+        (output / 'source/VoiceInk.swift').write_bytes((repo / updater_path).read_bytes())
+        (output / 'source/WritingUndoProductionUpdater.swift').write_bytes(updater)
+        write_json(output / 'source/production-updater-provenance.json', updater_provenance)
         export_candidate()
+        verify_updater_source()
         run(['bash', 'scripts/run-writing-feature-regression.sh', 'packages', str(output / 'packages'), '', '', str(packages)], output / 'packages.log')
         run(['sw_vers'], output / 'sw-vers.txt')
         run(['xcodebuild', '-version'], output / 'xcode-version.txt')
@@ -1972,6 +2134,7 @@ def main():
     require(mode in ('native', 'verify'), 'usage: run-writing-undo-controls-check.sh self-test | prepare | native | verify')
     verify_source()
     verify_candidate()
+    verify_updater_source()
     if mode == 'native':
         package_state, whisper = package_identity(), static_identity()
         write_json(output / 'packages-before.json', package_state)

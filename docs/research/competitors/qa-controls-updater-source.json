@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "classification": "qa-only-production-updater-source-derivation",
+  "base": "29b16e2915638e5760218c22284dd791b98e519b",
+  "observedFailure": {
+    "runID": 40698984950,
+    "buildExitCode": 65,
+    "cause": "Excluding VoiceInk.swift removes the real UpdaterViewModel needed by SettingsView and MenuBarView."
+  },
+  "scope": "Disposable Undo component fixture only. No feature-PR product file, normal-main composition or updater implementation changes.",
+  "authorship": {
+    "route": "actual Claude CLI 2.1.310",
+    "model": "claude-opus-5-5",
+    "provider": "firstParty",
+    "sessionID": "cff74232-c659-4d4d-82cf-162698b23d53",
+    "costUSD": 0.7010076,
+    "resultSHA256": "607b1a11b90ce09ff2e358a3de3c2d1bd8bcd0e1bbc4b127563399a95b974f2c",
+    "authoredScope": "production_updater_source helper and generated_sources integration",
+    "helperSHA256": "ec19cc631166a3ef1ad6709c26129e46320ad77cccd0ae8399ccc83ed02c454e"
+  },
+  "sourceDerivation": {
+    "source_sha256": "9103d9ff39d2bf6f1c994e62b2fef4846845c2d22d259826a201f165bb5e51cd",
+    "declaration": {
+      "start": 21399,
+      "end": 22387,
+      "sha256": "1015a5ca83f74391abfd501961ca401a07ac55f07fb834a4cc7e12e9e3df4b8a",
+      "start_line": 462,
+      "end_line": 488
+    },
+    "imports": {
+      "SwiftUI": {
+        "start": 0,
+        "end": 15,
+        "sha256": "9e8baf3eccae8baa32e86e40f921d26a130ba74c23f0219a7d26edf77c2d5aa0",
+        "start_line": 1,
+        "end_line": 1
+      },
+      "Sparkle": {
+        "start": 32,
+        "end": 47,
+        "sha256": "114b69511acd7278db9fae7d830f567390f32f6bc36866e62953c74b37c79c8d",
+        "start_line": 3,
+        "end_line": 3
+      }
+    },
+    "generated_sha256": "1d3df738371eb4398c86493751fa255b8d852260f4162be01bbd8514c486e2c7",
+    "source_path": "VoiceInk/VoiceInk.swift",
+    "source_bytes": 24485,
+    "generated_path": "VoiceInk/WritingUndoProductionUpdater.swift"
+  },
+  "checks": {
+    "pythonASTParse": "passed",
+    "selfTest": "passed",
+    "selfTestLogSHA256": "e5807e13e344f24ed2b1fa594c282285327271c3906f34d8291b490f4537b31a",
+    "knownBadGeneratorSHA256": "5f6d37af70f2244d0a85d052c0f0ddce086940c3a3fb79ee0287f08335075097",
+    "knownBadGeneratorIdenticalAt": [
+      "794fa2595f943ae501bbe3407a9dd1120c678f76",
+      "29b16e2915638e5760218c22284dd791b98e519b"
+    ],
+    "extractionNegatives": 8,
+    "provenanceNegatives": 5,
+    "compilerInputNegatives": 10,
+    "normalMainExclusion": "VoiceInk.swift unchanged"
+  },
+  "limits": [
+    "Source/metadata classifier proof only; no Swift compiler, app, clipboard or native runtime executed.",
+    "A fresh hosted Mac build and genuine control/runtime checks remain required.",
+    "The copied production updater is a compilation dependency; updater runtime behavior is not tested."
+  ]
+}

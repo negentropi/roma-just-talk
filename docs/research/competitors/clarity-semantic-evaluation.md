@@ -1,6 +1,6 @@
 # Evaluate Clarity through the actual service
 
-Prepared 2026-10-28 Taipei. No Clarity model calls have run for this set. Keep app integration behind the [current Custom/None gate](raw-profile-plan.md). Follow the [accepted Clarity contract](clarity-run-plan-design.md) when the dedicated service method exists.
+Prepared 2026-10-28 Taipei. The authenticated 27-call set ran through the dedicated Clarity service method and passed the separate semantic review. See [Authenticated observations](#authenticated-observations) for the tested route and limits. Follow the [accepted Clarity contract](clarity-run-plan-design.md).
 
 ## Separate generation from grading
 

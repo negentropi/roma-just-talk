@@ -1,0 +1,26 @@
+[
+  {
+    "auth_value": 2,
+    "client": "com.negentropi.RomaJustTalk",
+    "client_type": 0,
+    "database": "/Library/Application Support/com.apple.TCC/TCC.db",
+    "requirement": "FADE0C00000000280000000100000008000000148D3FFB78F3DE214BC0E6816AE5475CF6FB7A09F3",
+    "service": "kTCCServiceAccessibility"
+  },
+  {
+    "auth_value": 2,
+    "client": "com.negentropi.RomaJustTalk",
+    "client_type": 0,
+    "database": "/Library/Application Support/com.apple.TCC/TCC.db",
+    "requirement": "FADE0C00000000280000000100000008000000148D3FFB78F3DE214BC0E6816AE5475CF6FB7A09F3",
+    "service": "kTCCServiceScreenCapture"
+  },
+  {
+    "auth_value": 2,
+    "client": "com.negentropi.RomaJustTalk",
+    "client_type": 0,
+    "database": "/Users/runner/Library/Application Support/com.apple.TCC/TCC.db",
+    "requirement": "FADE0C00000000280000000100000008000000148D3FFB78F3DE214BC0E6816AE5475CF6FB7A09F3",
+    "service": "kTCCServiceScreenCapture"
+  }
+]

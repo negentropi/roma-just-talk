@@ -1,0 +1,12 @@
+{
+  "remote": "https://github.com/negentropi/roma-just-talk.git",
+  "deleted_ref": "refs/heads/ci/rjt-language-selection-probe-c41d72fc-01a17bef",
+  "head_before_deletion": "2ebdfd1772e3f45f9fe1fe4e2787af7fbfc53ea2",
+  "absence_verified": true,
+  "recorded_at": "2026-10-28T02:49:41.853966+00:00",
+  "retained_runs": {
+    "40616190134": "cancelled setup; no native outcome",
+    "40617652407": "success; independently audited component result"
+  },
+  "scope": "Only this task-created disposable CI transport branch deleted; normal branches/releases untouched"
+}

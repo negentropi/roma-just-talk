@@ -1,0 +1,37 @@
+{
+  "classification": "independent-actual-data-audit-clean",
+  "reviewer": "/root/literal_rule_checks/correction_backup_paths",
+  "recorded_at": "2026-10-28T02:49:28.796977+00:00",
+  "run_id": 40617652407,
+  "source_head": "2ebdfd1772e3f45f9fe1fe4e2787af7fbfc53ea2",
+  "actual_review": [
+    "Read existing original observations.zip on remote /data; no new download",
+    "Recomputed retained auditor with only two final Path.write_text calls suppressed",
+    "Separately compared all612 expected source hashes with immutable candidate Git blobs: zero mismatches/missing",
+    "Raw NS/CF preference observations and pinned classifier establish checked-English persistence plus Japanese/English Light controls",
+    "Exact605candidate/221appSwiftinputs/41package trees/signature/TCC/process closure satisfy retained audit"
+  ],
+  "reviewed_file_sha256": {
+    "audit.py": "1b8111dcd6ebdedf6b830a4fcd325d0fb8a51cdec0e18f8ddd8557ca1218e20c",
+    "receipt.json": "dd8b16e3b2018d41de285e0206d7674925178c365afdd8bfe465f3a1bf19b585",
+    "README.md": "4e8f23f2bff31b349668d9a8a113d18adfec9cb1b9ee904d9e2e225be02a17c2",
+    "artifact-members.json": "8cf6134db1635665f720ee29d5928cd21d0e6b1de9b23fb9b678572711a725e7",
+    "git-source-expectations.json": "9eefb7d5a1b51933e5b32886f80455bb13e5701dcac7a08f0967f247430fefbd"
+  },
+  "visual_review": "All seven original screenshots separately inspected by /root/literal_rule_checks; independent data audit did not claim a second screenshot inspection",
+  "earlier_source_review": {
+    "reviewer": "/root/literal_rule_checks/literal_driver_review",
+    "completed_scope": "README and auditor source only; no actual data or visual CLEAN issued"
+  },
+  "limits": [
+    "Component Accessibility path only; no same-value bug established and no production UI fix",
+    "No full Models composition, model loading/usability, ASR/provider, physical-input or release proof",
+    "No artifact app/build logs downloaded; runtime profile retained only on remote"
+  ],
+  "actions": {
+    "file_writes": 0,
+    "builds": 0,
+    "artifact_downloads": 0,
+    "ui_actions": 0
+  }
+}

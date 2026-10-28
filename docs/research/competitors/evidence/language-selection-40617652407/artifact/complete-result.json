@@ -1,0 +1,16 @@
+{
+  "cases": [
+    "same-current-english",
+    "changed-japanese",
+    "changed-english"
+  ],
+  "classification": "passed",
+  "limits": [
+    "Normal app composition excluded; no engine, ASR, inference, model download, provider or physical input.",
+    "Persistent transition is behavioral evidence; no private setter instrumentation or direct call counter.",
+    "A valid primary non-persistence result is a reproduced issue, not invalid test setup."
+  ],
+  "native_receipt_sha256": "c0ff703e1e13da875b185a2fe63ea25616a75e106824f34049ddc3c4c0133a73",
+  "source_sha": "2ebdfd1772e3f45f9fe1fe4e2787af7fbfc53ea2",
+  "valid": true
+}

@@ -1,0 +1,23 @@
+{
+  "classification": "cancelled-test-setup-retry-no-product-result",
+  "run_id": 40616190134,
+  "head": "c41d72fcc83913754206fb7384a20f6be311ddf1",
+  "ref": "ci/rjt-language-selection-probe-c41d72fc-01a17bef",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40616190134",
+  "cancelled_at_recorded_utc": "2026-10-28T01:53:45.881747+00:00",
+  "observed_boundary_before_cancellation": [
+    "Build isolated host and observe current English selection"
+  ],
+  "static_dependencies_succeeded": true,
+  "cache_save_succeeded": true,
+  "reason": "Actual parallel control check showed compiler coverage output in guarded candidate CWD. Stop this remaining build and retry with owned native CWD and explicit LLVM_PROFILE_FILE; product sources unchanged.",
+  "replacement_head": "2ebdfd1772e3f45f9fe1fe4e2787af7fbfc53ea2",
+  "replacement_run": 40617652407,
+  "runtime_result_claimed": false,
+  "artifact_downloads": 0,
+  "known_bad_picker_claim": false,
+  "limits": [
+    "Combined build/native step was in progress at cancellation metadata sample; no native outcome accepted.",
+    "No archive or native outputs fetched."
+  ]
+}

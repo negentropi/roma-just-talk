@@ -1,0 +1,25 @@
+{
+  "canonical_pins": 41,
+  "cases": [
+    "same-current-english",
+    "changed-japanese",
+    "changed-english"
+  ],
+  "excluded_source_files": [
+    "VoiceInk.swift"
+  ],
+  "generated_sources_sha256": {
+    "VoiceInk/LanguageSelectionProbeHost.swift": "1d50719b2fdd357ffd5df275896a2886b912d478d25e2ba75f154db9d18f668b",
+    "VoiceInk/LanguageSelectionProbeOracle.swift": "aaf5b4406eef34ff24a1e39e305cae5a95681be798de2dcb4dbd2afb8c844d0b"
+  },
+  "github_run_id": "40617652407",
+  "language_view_sha256": "a74fb78c6bc4dc38b15d616de8fd93740717ee04fceb5caac2e2e450745616c7",
+  "limits": [
+    "Normal app composition excluded; no engine, ASR, inference, model download, provider or physical input.",
+    "Persistent transition is behavioral evidence; no private setter instrumentation or direct call counter.",
+    "A valid primary non-persistence result is a reproduced issue, not invalid test setup."
+  ],
+  "lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "scope": "Observe same-current English selection through unchanged LanguageSelectionView.full and real model metadata.",
+  "source_sha": "2ebdfd1772e3f45f9fe1fe4e2787af7fbfc53ea2"
+}

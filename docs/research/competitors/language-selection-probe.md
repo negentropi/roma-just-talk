@@ -2,6 +2,10 @@
 
 Question: with English supplied only by registered defaults, does choosing the already displayed **English** item in the real Models language picker persist an explicit English choice? Light cleanup requires that persistent choice. The same-value handler writes it when called; source inspection does not establish SwiftUI Picker dispatch.
 
+## Observed result
+
+The [actual hosted check](evidence/language-selection-40617652407/README.md) passed: after mounting with persistent language absent, selecting the already checked English item saved `en`. Japanese → English controls and fresh Light captures also passed. No production UI change is indicated by this component result. The first setup run was canceled after cache saving; it provides no picker result.
+
 ## Frozen boundary
 
 A separate test-only app entry hosts the unchanged `LanguageSelectionView(displayMode: .full)`. It constructs the real Whisper, FluidAudio and transcription model managers, selects the real registry `ggml-tiny` metadata through `setDefaultTranscriptionModel`, and retains them. No engine, provider request, model refresh, model weights, inference or download. Only the production app entry point is excluded from the disposable compile tree; product sources stay unchanged.

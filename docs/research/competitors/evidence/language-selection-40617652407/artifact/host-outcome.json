@@ -1,0 +1,15 @@
+{
+  "candidate_error": null,
+  "classification": "valid-observation",
+  "closure_error": null,
+  "exit_code": 0,
+  "mapped_host_observed": true,
+  "monitor_error": null,
+  "native_failure": null,
+  "native_issues": [],
+  "observed_completed_cases": [
+    "same-current-english",
+    "changed-japanese",
+    "changed-english"
+  ]
+}

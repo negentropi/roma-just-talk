@@ -1,0 +1,47 @@
+{
+  "classification": "original-screenshots-reviewed",
+  "reviewer": "/root/literal_rule_checks",
+  "run_id": 40617652407,
+  "screenshots": [
+    {
+      "path": "artifact/native/baseline.png",
+      "sha256": "ef19a87ac2d403aee726dc07acc11538329b05ccca11c339e1d4429d3251846c",
+      "observation": "Actual full language component shown in the test-only window with English displayed; no menu open."
+    },
+    {
+      "path": "artifact/native/same-current-english-menu.png",
+      "sha256": "c5533d1b6acc338c61c3d8574896bfbefcbbb7ca1bb670387a4a9c6455d2a611",
+      "observation": "Actual popup open with English visibly checked and highlighted before the one current-English AX action."
+    },
+    {
+      "path": "artifact/native/same-current-english-after.png",
+      "sha256": "3dfa6c7915d552cb6db5958476dcf7df618322f784517d2cbb5feb59aa4fd25d",
+      "observation": "Popup dismissed; English remains displayed. Persistent transition is established by typed domain observations, not pixels alone."
+    },
+    {
+      "path": "artifact/native/changed-japanese-menu.png",
+      "sha256": "9c543f680aa732c5701b75df9310407b840f35922891d3787df01306b2250c9b",
+      "observation": "Menu open showing prior current English. Japanese target lies outside visible menu segment; this frame is not physical click proof."
+    },
+    {
+      "path": "artifact/native/changed-japanese-after.png",
+      "sha256": "d11619e4eeffa1c049272fd04a87ffed954988fe04524238f17d434a0ce769e2",
+      "observation": "Popup dismissed; actual picker displays Japanese."
+    },
+    {
+      "path": "artifact/native/changed-english-menu.png",
+      "sha256": "cc2e9756c96321983a61c6b9f17db25627770880ca156f97de1dd380fc903c80",
+      "observation": "Menu open showing prior current Japanese. English target lies outside visible menu segment; AX/action receipts establish that control."
+    },
+    {
+      "path": "artifact/native/changed-english-after.png",
+      "sha256": "6cec92caeb1043f82526b37714abe2c47c86837906c530335956c33815928cc2",
+      "observation": "Popup dismissed; actual picker displays English again."
+    }
+  ],
+  "limits": [
+    "No screenshot alone establishes persistent preferences or private setter dispatch.",
+    "Two changed-selection target items are off-scroll; the actual Accessibility actions and resulting picker values are separate evidence.",
+    "No physical mouse/keyboard, complete Models page composition or ASR behavior claim."
+  ]
+}

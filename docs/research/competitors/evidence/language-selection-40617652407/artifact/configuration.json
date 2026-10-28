@@ -1,0 +1,17 @@
+{
+  "CFFIXED_USER_HOME": "/Users/runner/work/_temp/language-selection-proof/isolated-user",
+  "LLVM_PROFILE_FILE": "/Users/runner/work/_temp/language-selection-proof/native/profile-%p.profraw",
+  "RJT_LANGUAGE_SELECTION_EVIDENCE": "/Users/runner/work/_temp/language-selection-proof/native",
+  "RJT_LANGUAGE_SELECTION_PROBE": "1",
+  "command_line_arguments": [],
+  "executable_path": "/Users/runner/work/_temp/language-selection-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "scope": "Unchanged language picker component; production entry excluded; no engine, provider, ASR or model loading.",
+  "seed_preferences": {
+    "PrewarmModelOnWake": false,
+    "SUEnableAutomaticChecks": false,
+    "enableAnnouncements": false,
+    "hasCompletedOnboarding": true,
+    "isAIEnhancementEnabled": false
+  },
+  "working_directory": "/Users/runner/work/_temp/language-selection-proof/native"
+}

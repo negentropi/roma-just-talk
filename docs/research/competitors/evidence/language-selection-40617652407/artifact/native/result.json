@@ -1,0 +1,823 @@
+{
+  "baseline" : {
+    "light" : {
+      "capturedLanguage" : {
+        "type" : "missing"
+      },
+      "emptyReplacementRules" : true,
+      "emptySnippets" : true,
+      "input" : "Um, send it tomorrow.",
+      "noEnhancement" : true,
+      "noFallback" : true,
+      "output" : "Um, send it tomorrow.",
+      "preparedText" : "Um, send it tomorrow.",
+      "recognitionText" : "Um, send it tomorrow."
+    },
+    "preferences" : {
+      "argument" : {
+        "type" : "missing"
+      },
+      "cfPersistent" : {
+        "type" : "missing"
+      },
+      "cfSynchronizeSucceeded" : true,
+      "effective" : {
+        "type" : "string",
+        "value" : "en"
+      },
+      "persistent" : {
+        "type" : "missing"
+      },
+      "registered" : {
+        "type" : "string",
+        "value" : "en"
+      }
+    }
+  },
+  "cases" : [
+    {
+      "action" : {
+        "menuBefore" : {
+          "actions" : [
+            "AXCancel"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "boolean",
+              "value" : false
+            },
+            "value" : {
+              "type" : "missing"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 696,
+            "width" : 167,
+            "x" : 362,
+            "y" : 6
+          },
+          "id" : "",
+          "role" : "AXMenu",
+          "title" : "",
+          "titleUIElement" : "English",
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "menuCheckedEvidence" : {
+          "checked" : true,
+          "markChar" : {
+            "type" : "string",
+            "value" : "✓"
+          },
+          "selected" : {
+            "type" : "boolean",
+            "value" : true
+          },
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "menuDismissed" : true,
+        "menuIsPickerDescendant" : true,
+        "menuItemBefore" : {
+          "actions" : [
+            "AXCancel",
+            "AXPress",
+            "AXPick"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : true,
+            "markChar" : {
+              "type" : "string",
+              "value" : "✓"
+            },
+            "selected" : {
+              "type" : "boolean",
+              "value" : true
+            },
+            "value" : {
+              "type" : "missing"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 362,
+            "y" : 298
+          },
+          "id" : "menuAction:",
+          "role" : "AXMenuItem",
+          "title" : "English",
+          "titleUIElement" : "",
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "pickerAfter" : {
+          "actions" : [
+            "AXPress"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "missing"
+            },
+            "value" : {
+              "type" : "string",
+              "value" : "English"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 374,
+            "y" : 298
+          },
+          "id" : "",
+          "role" : "AXPopUpButton",
+          "title" : "",
+          "titleUIElement" : "Select Language",
+          "value" : {
+            "type" : "string",
+            "value" : "English"
+          }
+        },
+        "pickerBefore" : {
+          "actions" : [
+            "AXPress"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "missing"
+            },
+            "value" : {
+              "type" : "string",
+              "value" : "English"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 374,
+            "y" : 298
+          },
+          "id" : "",
+          "role" : "AXPopUpButton",
+          "title" : "",
+          "titleUIElement" : "Select Language",
+          "value" : {
+            "type" : "string",
+            "value" : "English"
+          }
+        },
+        "pressAXError" : 0
+      },
+      "after" : {
+        "light" : {
+          "capturedLanguage" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "emptyReplacementRules" : true,
+          "emptySnippets" : true,
+          "input" : "Um, send it tomorrow.",
+          "noEnhancement" : true,
+          "noFallback" : true,
+          "output" : "send it tomorrow.",
+          "preparedText" : "send it tomorrow.",
+          "recognitionText" : "Um, send it tomorrow."
+        },
+        "preferences" : {
+          "argument" : {
+            "type" : "missing"
+          },
+          "cfPersistent" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "cfSynchronizeSucceeded" : true,
+          "effective" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "persistent" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "registered" : {
+            "type" : "string",
+            "value" : "en"
+          }
+        }
+      },
+      "before" : {
+        "light" : {
+          "capturedLanguage" : {
+            "type" : "missing"
+          },
+          "emptyReplacementRules" : true,
+          "emptySnippets" : true,
+          "input" : "Um, send it tomorrow.",
+          "noEnhancement" : true,
+          "noFallback" : true,
+          "output" : "Um, send it tomorrow.",
+          "preparedText" : "Um, send it tomorrow.",
+          "recognitionText" : "Um, send it tomorrow."
+        },
+        "preferences" : {
+          "argument" : {
+            "type" : "missing"
+          },
+          "cfPersistent" : {
+            "type" : "missing"
+          },
+          "cfSynchronizeSucceeded" : true,
+          "effective" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "persistent" : {
+            "type" : "missing"
+          },
+          "registered" : {
+            "type" : "string",
+            "value" : "en"
+          }
+        }
+      },
+      "completed" : true,
+      "id" : "same-current-english",
+      "passed" : true,
+      "requestedCode" : "en",
+      "requestedLabel" : "English",
+      "wasCurrent" : true
+    },
+    {
+      "action" : {
+        "menuBefore" : {
+          "actions" : [
+            "AXCancel"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "boolean",
+              "value" : false
+            },
+            "value" : {
+              "type" : "missing"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 696,
+            "width" : 167,
+            "x" : 362,
+            "y" : 6
+          },
+          "id" : "",
+          "role" : "AXMenu",
+          "title" : "",
+          "titleUIElement" : "English",
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "menuCheckedEvidence" : {
+          "checked" : false,
+          "markChar" : {
+            "type" : "missing"
+          },
+          "selected" : {
+            "type" : "boolean",
+            "value" : false
+          },
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "menuDismissed" : true,
+        "menuIsPickerDescendant" : true,
+        "menuItemBefore" : {
+          "actions" : [
+            "AXCancel",
+            "AXPress",
+            "AXPick"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "boolean",
+              "value" : false
+            },
+            "value" : {
+              "type" : "missing"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 362,
+            "y" : 754
+          },
+          "id" : "menuAction:",
+          "role" : "AXMenuItem",
+          "title" : "Japanese",
+          "titleUIElement" : "",
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "pickerAfter" : {
+          "actions" : [
+            "AXPress"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "missing"
+            },
+            "value" : {
+              "type" : "string",
+              "value" : "Japanese"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 374,
+            "y" : 298
+          },
+          "id" : "",
+          "role" : "AXPopUpButton",
+          "title" : "",
+          "titleUIElement" : "Select Language",
+          "value" : {
+            "type" : "string",
+            "value" : "Japanese"
+          }
+        },
+        "pickerBefore" : {
+          "actions" : [
+            "AXPress"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "missing"
+            },
+            "value" : {
+              "type" : "string",
+              "value" : "English"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 374,
+            "y" : 298
+          },
+          "id" : "",
+          "role" : "AXPopUpButton",
+          "title" : "",
+          "titleUIElement" : "Select Language",
+          "value" : {
+            "type" : "string",
+            "value" : "English"
+          }
+        },
+        "pressAXError" : 0
+      },
+      "after" : {
+        "light" : {
+          "capturedLanguage" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "emptyReplacementRules" : true,
+          "emptySnippets" : true,
+          "input" : "Um, send it tomorrow.",
+          "noEnhancement" : true,
+          "noFallback" : true,
+          "output" : "Um, send it tomorrow.",
+          "preparedText" : "Um, send it tomorrow.",
+          "recognitionText" : "Um, send it tomorrow."
+        },
+        "preferences" : {
+          "argument" : {
+            "type" : "missing"
+          },
+          "cfPersistent" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "cfSynchronizeSucceeded" : true,
+          "effective" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "persistent" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "registered" : {
+            "type" : "string",
+            "value" : "en"
+          }
+        }
+      },
+      "before" : {
+        "light" : {
+          "capturedLanguage" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "emptyReplacementRules" : true,
+          "emptySnippets" : true,
+          "input" : "Um, send it tomorrow.",
+          "noEnhancement" : true,
+          "noFallback" : true,
+          "output" : "send it tomorrow.",
+          "preparedText" : "send it tomorrow.",
+          "recognitionText" : "Um, send it tomorrow."
+        },
+        "preferences" : {
+          "argument" : {
+            "type" : "missing"
+          },
+          "cfPersistent" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "cfSynchronizeSucceeded" : true,
+          "effective" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "persistent" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "registered" : {
+            "type" : "string",
+            "value" : "en"
+          }
+        }
+      },
+      "completed" : true,
+      "id" : "changed-japanese",
+      "passed" : true,
+      "requestedCode" : "ja",
+      "requestedLabel" : "Japanese",
+      "wasCurrent" : false
+    },
+    {
+      "action" : {
+        "menuBefore" : {
+          "actions" : [
+            "AXCancel"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "boolean",
+              "value" : false
+            },
+            "value" : {
+              "type" : "missing"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 696,
+            "width" : 167,
+            "x" : 362,
+            "y" : 6
+          },
+          "id" : "",
+          "role" : "AXMenu",
+          "title" : "",
+          "titleUIElement" : "Japanese",
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "menuCheckedEvidence" : {
+          "checked" : false,
+          "markChar" : {
+            "type" : "missing"
+          },
+          "selected" : {
+            "type" : "boolean",
+            "value" : false
+          },
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "menuDismissed" : true,
+        "menuIsPickerDescendant" : true,
+        "menuItemBefore" : {
+          "actions" : [
+            "AXCancel",
+            "AXPress",
+            "AXPick"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "boolean",
+              "value" : false
+            },
+            "value" : {
+              "type" : "missing"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 362,
+            "y" : -158
+          },
+          "id" : "menuAction:",
+          "role" : "AXMenuItem",
+          "title" : "English",
+          "titleUIElement" : "",
+          "value" : {
+            "type" : "missing"
+          }
+        },
+        "pickerAfter" : {
+          "actions" : [
+            "AXPress"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "missing"
+            },
+            "value" : {
+              "type" : "string",
+              "value" : "English"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 374,
+            "y" : 298
+          },
+          "id" : "",
+          "role" : "AXPopUpButton",
+          "title" : "",
+          "titleUIElement" : "Select Language",
+          "value" : {
+            "type" : "string",
+            "value" : "English"
+          }
+        },
+        "pickerBefore" : {
+          "actions" : [
+            "AXPress"
+          ],
+          "actionsAXError" : 0,
+          "checked" : {
+            "checked" : false,
+            "markChar" : {
+              "type" : "missing"
+            },
+            "selected" : {
+              "type" : "missing"
+            },
+            "value" : {
+              "type" : "string",
+              "value" : "Japanese"
+            }
+          },
+          "description" : "",
+          "enabled" : true,
+          "frame" : {
+            "height" : 24,
+            "width" : 167,
+            "x" : 374,
+            "y" : 298
+          },
+          "id" : "",
+          "role" : "AXPopUpButton",
+          "title" : "",
+          "titleUIElement" : "Select Language",
+          "value" : {
+            "type" : "string",
+            "value" : "Japanese"
+          }
+        },
+        "pressAXError" : 0
+      },
+      "after" : {
+        "light" : {
+          "capturedLanguage" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "emptyReplacementRules" : true,
+          "emptySnippets" : true,
+          "input" : "Um, send it tomorrow.",
+          "noEnhancement" : true,
+          "noFallback" : true,
+          "output" : "send it tomorrow.",
+          "preparedText" : "send it tomorrow.",
+          "recognitionText" : "Um, send it tomorrow."
+        },
+        "preferences" : {
+          "argument" : {
+            "type" : "missing"
+          },
+          "cfPersistent" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "cfSynchronizeSucceeded" : true,
+          "effective" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "persistent" : {
+            "type" : "string",
+            "value" : "en"
+          },
+          "registered" : {
+            "type" : "string",
+            "value" : "en"
+          }
+        }
+      },
+      "before" : {
+        "light" : {
+          "capturedLanguage" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "emptyReplacementRules" : true,
+          "emptySnippets" : true,
+          "input" : "Um, send it tomorrow.",
+          "noEnhancement" : true,
+          "noFallback" : true,
+          "output" : "Um, send it tomorrow.",
+          "preparedText" : "Um, send it tomorrow.",
+          "recognitionText" : "Um, send it tomorrow."
+        },
+        "preferences" : {
+          "argument" : {
+            "type" : "missing"
+          },
+          "cfPersistent" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "cfSynchronizeSucceeded" : true,
+          "effective" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "persistent" : {
+            "type" : "string",
+            "value" : "ja"
+          },
+          "registered" : {
+            "type" : "string",
+            "value" : "en"
+          }
+        }
+      },
+      "completed" : true,
+      "id" : "changed-english",
+      "passed" : true,
+      "requestedCode" : "en",
+      "requestedLabel" : "English",
+      "wasCurrent" : false
+    }
+  ],
+  "classification" : "passed",
+  "completed" : true,
+  "environment" : {
+    "arguments" : [
+
+    ],
+    "expectedUserHome" : "\/Users\/runner\/work\/_temp\/language-selection-proof\/isolated-user",
+    "hasLanguageArgumentOverride" : false,
+    "homeMatchesExpected" : true,
+    "observedUserHome" : "\/Users\/runner\/work\/_temp\/language-selection-proof\/isolated-user"
+  },
+  "executedCases" : [
+    "same-current-english",
+    "changed-japanese",
+    "changed-english"
+  ],
+  "exitCode" : 0,
+  "failure" : null,
+  "finalModelState" : {
+    "contextAbsent" : true,
+    "modelLoaded" : false
+  },
+  "host" : {
+    "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+    "executablePath" : "\/Users\/runner\/work\/_temp\/language-selection-proof\/derived\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+    "pid" : 27718
+  },
+  "issues" : [
+
+  ],
+  "model" : {
+    "availableModelCount" : 0,
+    "contextAbsent" : true,
+    "englishLabel" : "English",
+    "isMultilingual" : true,
+    "japaneseLabel" : "Japanese",
+    "modelLoaded" : false,
+    "name" : "ggml-tiny",
+    "provider" : "Whisper",
+    "shouldShowPicker" : true
+  },
+  "positiveControlsPassed" : true,
+  "primaryPersisted" : true,
+  "runtimeBounds" : {
+    "ASR" : false,
+    "modelLoaded" : false,
+    "normalAppComposition" : false,
+    "physicalInput" : false,
+    "provider" : false,
+    "unchangedFullView" : true
+  },
+  "runtimeBoundsEvidence" : "Declared source composition; model\/context observations are recorded separately. No inference, provider, engine or synthetic picker is invoked.",
+  "schemaVersion" : 1,
+  "selectedCases" : [
+    "same-current-english",
+    "changed-japanese",
+    "changed-english"
+  ],
+  "setterEvidence" : "No private setter instrumentation; inference is limited to the observed persistent-domain transition through the unchanged picker binding."
+}

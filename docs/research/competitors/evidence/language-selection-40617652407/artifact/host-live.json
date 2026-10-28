@@ -1,0 +1,18 @@
+{
+  "exit_code": 0,
+  "host": {
+    "executable_path": "/Users/runner/work/_temp/language-selection-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "mapped_text_paths": [
+      "/Users/runner/work/_temp/language-selection-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "/Users/runner/work/_temp/language-selection-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+      "/Users/runner/work/_temp/language-selection-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "/usr/lib/dyld"
+    ],
+    "pid": 27718,
+    "started_at": "Wed Oct 28 02:03:24 2026"
+  },
+  "spawned_identity": {
+    "executable_path": "/Users/runner/work/_temp/language-selection-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "started_at": "Wed Oct 28 02:03:24 2026"
+  }
+}

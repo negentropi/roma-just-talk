@@ -1,0 +1,184 @@
+{
+  "classification": "invalid-or-failed",
+  "details": {
+    "artifact-integrity": {
+      "logs": {
+        "artifact_id": 12792588358,
+        "crc_verified_independently": true,
+        "members": 5,
+        "zip_bytes": 228377,
+        "zip_sha256": "ca424b4436414da786f4e7442ffbf4c3103fc46a53ea0acc7728c4eadf319cdf"
+      },
+      "observations": {
+        "artifact_id": 12792688205,
+        "crc_verified_independently": true,
+        "members": 19,
+        "zip_bytes": 125872,
+        "zip_sha256": "e4eea06af9fcccc4c0bafe62cae514053c01694d62cace0fc7b24a4ea24c0790"
+      }
+    },
+    "candidate-mismatch-receipts": {
+      "limit": "No mismatch receipt was retained. Absence alone does not prove the candidate remained unchanged.",
+      "postrun_candidate_fidelity_established_by_absence": false,
+      "reported_candidate_source_mismatch_censuses": 0
+    },
+    "candidate-source-censuses": [],
+    "dependencies": {
+      "canonical_pins": 41,
+      "git_trees_and_recursive_links_recorded": true,
+      "limit": "Tree/link hashes are retained runtime attestations; expected input supplies revisions, not an independent checkout.",
+      "static_whisper_files": 86
+    },
+    "prepared-source": {
+      "candidate_files": 606,
+      "direct_fake_undo_calls": 0,
+      "generated_swift_files": 3,
+      "source_files": 613
+    }
+  },
+  "diagnostics": {
+    "bounded_build_or_native_errors": [
+      {
+        "line": "/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk/WritingUndoControlOracle.swift:224:43: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions",
+        "member": "writing-undo-controls-proof/build.log"
+      },
+      {
+        "line": "** BUILD FAILED **",
+        "member": "writing-undo-controls-proof/build.log"
+      }
+    ],
+    "build_log_observed_boundary": "build-attempted-failed",
+    "candidate_source_mismatches": [],
+    "case_observation_errors": [],
+    "cleanup_failure_is_product_undo_failure": null,
+    "editor_cleanup_issues": [],
+    "external_diagnostic_screens": {
+      "unverified_diagnostic_reason": "Missing observation: host-outcome.json"
+    },
+    "failure_receipts": [
+      {
+        "member": "failure-native.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "Command failed (65): /Users/runner/work/_temp/writing-undo-controls-proof/build.log",
+          "mode": "native"
+        }
+      },
+      {
+        "member": "failure-verify.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "[Errno 2] No such file or directory: '/Users/runner/work/_temp/writing-undo-controls-proof/identity-before.json'",
+          "mode": "verify"
+        }
+      }
+    ],
+    "highest_observed_stage": "build-attempted-failed",
+    "host_outcome": null,
+    "independently_validated_case_observations": [],
+    "independently_validated_partial_states": [],
+    "independently_validated_recorder_capture": null,
+    "launch_diagnostics": {
+      "unverified_diagnostic_reason": "Missing observation: configuration.json"
+    },
+    "native_completed_flag": null,
+    "native_failure_boundary": null,
+    "native_primary_failure": null,
+    "no_completed_cases_promoted_to_success": true,
+    "observed_case_ids": [],
+    "observed_completed_native_cases": 0,
+    "observed_state_ids": [],
+    "other_oracle_issues": [],
+    "partial_state_errors": [],
+    "raw_readiness": {
+      "unverified_diagnostic_reason": "Missing observation: host-live.json"
+    },
+    "recorder_capture_diagnostics": [],
+    "recorder_capture_error": null,
+    "runtime_receipt_present": false,
+    "transport_errors": {}
+  },
+  "errors": [
+    {
+      "reason": "No source-after receipt: prepared source does not establish post-run source fidelity",
+      "stage": "postrun-source"
+    },
+    {
+      "reason": "Missing observation: compile-inputs.json",
+      "stage": "compile"
+    },
+    {
+      "reason": "Missing observation: identity-before.json",
+      "stage": "signature"
+    },
+    {
+      "reason": "Missing observation: tcc-before.json",
+      "stage": "fresh-tcc"
+    },
+    {
+      "reason": "Missing observation: host-live.json",
+      "stage": "host-lifecycle"
+    },
+    {
+      "reason": "Missing observation: configuration.json",
+      "stage": "launch-diagnostics"
+    },
+    {
+      "reason": "Missing observation: host-outcome.json",
+      "stage": "external-diagnostic-screens"
+    },
+    {
+      "reason": "Missing observation: host-live.json",
+      "stage": "raw-readiness-facts"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "public-policy-bootstrap"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "native-controls"
+    },
+    {
+      "reason": "Missing observation: native/textedit-menu-forward.png",
+      "stage": "screenshots"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "result-bindings"
+    },
+    {
+      "reason": "GitHub workflow is not completed successfully on the exact head",
+      "stage": "workflow-run"
+    }
+  ],
+  "limits": [
+    "Offline source/compile/signature/TCC/runtime artifact audit only; no execution or network.",
+    "Signatures, actual compile lists and fresh TCC are retained runtime attestations bound by artifact hashes; absent original binary is not reverified here.",
+    "No shipping app composition/full pipeline/ASR/provider/physical-keyboard/rich-format proof.",
+    "Screenshot semantic review belongs to actual Sol; PNG integrity alone does not verify visual meaning."
+  ],
+  "run_id": 40634301546,
+  "schemaVersion": 1,
+  "source_sha": "0355254815f8fbcf627fe48e7d65987ab36ea32b",
+  "stages": {
+    "artifact-integrity": "passed",
+    "candidate-mismatch-receipts": "passed",
+    "compile": "failed-or-missing",
+    "dependencies": "passed",
+    "external-diagnostic-screens": "failed-or-missing",
+    "fresh-tcc": "failed-or-missing",
+    "host-lifecycle": "failed-or-missing",
+    "launch-diagnostics": "failed-or-missing",
+    "native-controls": "failed-or-missing",
+    "postrun-source": "failed-or-missing",
+    "prepared-source": "passed",
+    "public-policy-bootstrap": "failed-or-missing",
+    "raw-readiness-facts": "failed-or-missing",
+    "result-bindings": "failed-or-missing",
+    "screenshots": "failed-or-missing",
+    "signature": "failed-or-missing",
+    "workflow-run": "failed-or-missing"
+  },
+  "valid": false
+}

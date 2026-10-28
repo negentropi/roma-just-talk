@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "actual_reviewer": "gpt-6.1-sol",
+  "effort": "medium",
+  "scope": "Read-only actual failed-artifact boundary; no hypothetical source-fix review or new round",
+  "verdict": "CLEAN factual audit; build failed",
+  "observed": "Swift type-checking resource diagnostic at Oracle224:43, then xcodebuild65; zero native proof.",
+  "prepared_counts": {
+    "source": 613,
+    "candidate": 606,
+    "canonical_pins": 41
+  },
+  "actual_compiler_inputs_verified": false,
+  "completed_states": 0,
+  "completed_cases": 0,
+  "screenshots": 0,
+  "source_review_rounds_used": 5,
+  "limits": [
+    "Prepared source/candidate census and dependency pins passed; actual compiler input list was not retained/validated.",
+    "No successful build, signature, TCC, host launch, native result, PNG or runtime acceptance.",
+    "Compiler type-inference timeout is the first observed failure; it does not establish a product Undo defect.",
+    "Prior run states and images do not fill this candidate\u2019s absent native proof."
+  ],
+  "usage": null,
+  "usage_status": "Unavailable, not estimated.",
+  "files_sha256": {
+    "README.md": "c28d1ed3e4d2ad42c8e59789b51ae60863dd4a963eb7b209fdf34e3eb60f867c",
+    "artifacts.json": "901757721bc3c8db7e7cbc38a176444d55688325c911a275c448eb95492db531",
+    "audit.json": "683f8c8242d53392d00aa9678cde8a09a90b69f2d22896a5bbea98f6b618dcd4",
+    "failure-diagnosis.json": "f7bf1f402d890a28ba6991ee81afdc7076a2a2989e37d1140b7caf80eef085ea"
+  }
+}

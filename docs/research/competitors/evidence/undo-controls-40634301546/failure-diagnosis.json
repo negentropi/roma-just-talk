@@ -1,0 +1,85 @@
+{
+  "run_id": 40634301546,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40634301546",
+  "head_sha": "0355254815f8fbcf627fe48e7d65987ab36ea32b",
+  "classification": "build-typechecker-expression-failure-before-native",
+  "build_succeeded": false,
+  "xcodebuild_exit_code": 65,
+  "prepared_source_inputs": 613,
+  "prepared_candidate_files": 606,
+  "prepared_manifests_match_git_objects": true,
+  "planned_candidate_swift_inputs": 222,
+  "actual_compiler_input_receipt_available": false,
+  "actual_compiler_input_count_verified": false,
+  "canonical_pins": 41,
+  "build_log_sha256": "1927c6deb7ba3c5ef88b89a3dfc2a3f1a1b3ab3bf765348faedbb9a9d0c2b47a",
+  "oracle_source_sha256": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
+  "source_context": [
+    {
+      "line": 220,
+      "text": "                throw error"
+    },
+    {
+      "line": 221,
+      "text": "            }"
+    },
+    {
+      "line": 222,
+      "text": "            down.flags = flags"
+    },
+    {
+      "line": 223,
+      "text": "            up.flags = flags"
+    },
+    {
+      "line": 224,
+      "text": "            let events: [[String: Any]] = [down, up].map { event in"
+    },
+    {
+      "line": 225,
+      "text": "                [\"type\": event.type == .keyDown ? \"keyDown\" : event.type == .keyUp ? \"keyUp\" : \"unexpected-\\(event.type.rawValue)\","
+    },
+    {
+      "line": 226,
+      "text": "                 \"keyCode\": Int(event.getIntegerValueField(.keyboardEventKeycode)),"
+    },
+    {
+      "line": 227,
+      "text": "                 \"flagsRawValue\": event.flags.rawValue]"
+    },
+    {
+      "line": 228,
+      "text": "            }"
+    },
+    {
+      "line": 229,
+      "text": "            let eventsExact = down.type == .keyDown && up.type == .keyUp"
+    },
+    {
+      "line": 230,
+      "text": "                && [down, up].allSatisfy { $0.getIntegerValueField(.keyboardEventKeycode) == Int64(keyCode) && $0.flags == flags }"
+    },
+    {
+      "line": 231,
+      "text": "            try mark(\"shortcut.capture-final-proof.before\")"
+    }
+  ],
+  "compiler_errors": [
+    "/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk/WritingUndoControlOracle.swift:224:43: error: the compiler is unable to type-check this expression in reasonable time; try breaking up the expression into distinct sub-expressions",
+    "** BUILD FAILED **"
+  ],
+  "native_cases_completed": 0,
+  "state_checks_completed": 0,
+  "signed_host_verified": false,
+  "fresh_tcc_verified": false,
+  "host_launched": false,
+  "screenshots_available": false,
+  "source_review_rounds_used": 5,
+  "no_source_change_or_budget_exception_assumed": true,
+  "claim_limits": [
+    "Prepared source/candidate census and dependency pins passed; actual compiler input list was not retained/validated.",
+    "No successful build, signature, TCC, host launch, native result, PNG or runtime acceptance.",
+    "Compiler type-inference timeout is the first observed failure; it does not establish a product Undo defect.",
+    "Prior run states and images do not fill this candidate\u2019s absent native proof."
+  ]
+}

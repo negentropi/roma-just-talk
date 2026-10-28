@@ -61,6 +61,21 @@ enum HistoryTextVariant: String, CaseIterable, Identifiable {
     }
 }
 
+/// Byte-exact view identity for one rendered variant. `String ==` is canonical equivalence,
+/// so SwiftUI can treat an NFC/NFD-equal variant switch as unchanged input and keep the old
+/// `Text`, Copy and Save Correction actions (CI: Recognized copied Original's bytes). A new
+/// identity forces a fresh subtree, which also resets per-payload state such as the Copy
+/// checkmark. Record identity is already owned by the History row / detail `.id`.
+struct HistoryRenderedTextIdentity: Hashable {
+    let variant: HistoryTextVariant
+    let utf8: [UInt8]
+
+    init(variant: HistoryTextVariant, text: String) {
+        self.variant = variant
+        self.utf8 = Array(text.utf8)
+    }
+}
+
 /// History tab <-> approved-correction provenance. Original is processed text before AI
 /// enhancement; only Recognized is untouched recognizer output.
 extension HistoryTextVariant {

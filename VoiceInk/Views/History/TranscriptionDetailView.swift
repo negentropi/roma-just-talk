@@ -23,14 +23,18 @@ struct TranscriptionDetailView: View {
                     }
 
                     ForEach(HistoryTextVariant.available(for: transcription)) { variant in
+                        let text = variant.text(for: transcription)
+                        // Keyed here, not inside the bubble: its `text` input can compare canonically
+                        // equal, so an NFC/NFD-only change could skip the bubble's body entirely.
                         MessageBubble(
                             variant: variant,
-                            text: variant.text(for: transcription),
+                            text: text,
                             correctionError: correctionErrors[variant],
                             onSaveCorrection: { displayedText in
                                 beginCorrection(variant: variant, displayedText: displayedText)
                             }
                         )
+                        .id(HistoryRenderedTextIdentity(variant: variant, text: text))
                     }
                 }
                 .padding(16)

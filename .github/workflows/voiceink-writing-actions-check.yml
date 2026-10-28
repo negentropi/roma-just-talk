@@ -1,8 +1,13 @@
 name: Verify Mac writing actions
+run-name: Verify Mac writing actions (${{ inputs.ui_only && 'UI only' || 'full' }})
 
 on:
   workflow_dispatch:
     inputs:
+      ui_only:
+        description: Run all eight UI workflows and History persistence checks; full verification still required
+        type: boolean
+        default: false
       baseline_ref:
         description: Immutable known-bad snippet pipeline commit
         required: true
@@ -25,10 +30,26 @@ jobs:
     timeout-minutes: 120
     env:
       BASELINE_REF: ${{ inputs.baseline_ref || 'ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb' }}
+      RJT_UI_ONLY: ${{ inputs.ui_only && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Retain the verification scope
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          output = Path(os.environ['RUNNER_TEMP']) / 'writing-proof-snapshot'
+          output.mkdir(parents=True, exist_ok=True)
+          (output / 'verification-mode.json').write_text(json.dumps({
+              'sourceSHA': os.environ['GITHUB_SHA'],
+              'mode': 'ui-only' if os.environ['RJT_UI_ONLY'] == 'true' else 'full',
+              'fullGateRequired': True,
+          }, indent=2) + '\n')
+          PY
 
       - name: Keep the disposable desktop awake
         run: |
@@ -65,14 +86,17 @@ jobs:
           key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
       - name: Verify the canonical package graph before compiling
+        id: packages
         run: bash scripts/run-writing-feature-regression.sh packages "$RUNNER_TEMP/writing-package-proof"
 
       - name: Shared core checks
+        if: ${{ !inputs.ui_only }}
         run: |
           set -o pipefail
           swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee "$RUNNER_TEMP/writing-core-checks.log"
 
       - name: Prepare and verify static Whisper dependencies
+        id: dependencies
         run: |
           set -o pipefail
           make setup 2>&1 | tee "$RUNNER_TEMP/writing-dependency-setup.log"
@@ -86,11 +110,15 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
-      - name: Full Mac unit suite with fresh CI permissions
-        id: units
+      - name: Configure the disposable app defaults
         run: |
           defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
           defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
+
+      - name: Full Mac unit suite with fresh CI permissions
+        id: units
+        if: ${{ !inputs.ui_only }}
+        run: |
           lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
           cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
           unit_exit=0
@@ -140,7 +168,7 @@ jobs:
 
       - name: Writing, snippet and dictation settings UI
         id: ui
-        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.packages.outcome == 'success' && steps.dependencies.outcome == 'success' && (inputs.ui_only || steps.units.outcome == 'success') }}
         run: bash scripts/run-writing-feature-regression.sh ui
 
       - name: Preserve test evidence before the Release build
@@ -154,6 +182,7 @@ jobs:
           git rev-parse HEAD > "$snapshot/source-sha.txt"
 
       - name: Release build and packaging contracts
+        if: ${{ !inputs.ui_only }}
         run: |
           set -o pipefail
           lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
@@ -202,7 +231,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload verified release app
-        if: success()
+        if: ${{ success() && !inputs.ui_only }}
         uses: actions/upload-artifact@v4
         with:
           name: roma.just.talk.app

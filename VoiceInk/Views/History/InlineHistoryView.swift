@@ -675,34 +675,39 @@ private struct HistoryCardRow: View {
                 }
             }
 
-            ScrollView {
-                Text(verbatim: shownText)
-                    .font(.body)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityIdentifier(shownVariant.textAccessibilityIdentifier)
-            }
-            .frame(maxHeight: 350)
-            .overlay(alignment: .bottomTrailing) {
-                CopyIconButton(textToCopy: shownText)
-                    .accessibilityIdentifier("history.copy.\(shownVariant.rawValue)")
-                    .padding(8)
-            }
-
-            // The service rejects this rendered value if the stored variant changed since.
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                if let correctionError, correctionError.variant == shownVariant {
-                    SaveCorrectionCaptureError(variant: correctionError.variant, message: correctionError.message)
+            // Text, Copy and Save Correction share one byte-exact snapshot identity; the
+            // audio player stays outside so a tab switch doesn't reset playback.
+            VStack(alignment: .leading, spacing: 8) {
+                ScrollView {
+                    Text(verbatim: shownText)
+                        .font(.body)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityIdentifier(shownVariant.textAccessibilityIdentifier)
                 }
-                Spacer(minLength: 0)
-                SaveCorrectionButton(variant: shownVariant) {
-                    if let message = onSaveCorrection(shownVariant, shownText) {
-                        correctionError = (variant: shownVariant, message: message)
-                    } else {
-                        correctionError = nil
+                .frame(maxHeight: 350)
+                .overlay(alignment: .bottomTrailing) {
+                    CopyIconButton(textToCopy: shownText)
+                        .accessibilityIdentifier("history.copy.\(shownVariant.rawValue)")
+                        .padding(8)
+                }
+
+                // The service rejects this rendered value if the stored variant changed since.
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    if let correctionError, correctionError.variant == shownVariant {
+                        SaveCorrectionCaptureError(variant: correctionError.variant, message: correctionError.message)
+                    }
+                    Spacer(minLength: 0)
+                    SaveCorrectionButton(variant: shownVariant) {
+                        if let message = onSaveCorrection(shownVariant, shownText) {
+                            correctionError = (variant: shownVariant, message: message)
+                        } else {
+                            correctionError = nil
+                        }
                     }
                 }
             }
+            .id(HistoryRenderedTextIdentity(variant: shownVariant, text: shownText))
 
             if let url = transcription.storedAudioAvailability().existingURL {
                 Divider()

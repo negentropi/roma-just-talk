@@ -10,6 +10,7 @@
 - Save an approved correction from History as one literal phrase, with a preview, source reference, enable switch and Dictionary editing. Keep complete replacement records in backups and show conflicts before importing.
 - Read replacements from the current operation's store instead of reusing a process-wide dictionary cache.
 - Keep rejected correction and dictionary-import saves from changing the visible library or unrelated unsaved edits.
+- Keep History Copy and Save Correction on the selected text variant's exact text, including canonically equivalent Unicode.
 - Expand History through a native button with keyboard and accessibility labels, keeping selection and playback controls separate.
 
 - Add Light dictation cleanup and Clarity AI cleanup with Natural, Casual and Formal styles. Capture the chosen profile, libraries and Clarity provider when each operation starts; keep Custom settings saved.

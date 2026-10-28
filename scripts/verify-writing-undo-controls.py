@@ -589,6 +589,50 @@ def receipt_errors(value, executable, pid, expected_home):
         check(type(item.get('actionsAXError')) is int
             and isinstance(item.get('actions'), list) and all(isinstance(action, str) for action in item['actions']),
             'AX action diagnostic is malformed: ' + identifier)
+    def menu_identity(proof, target, status=None):
+        check(isinstance(proof, dict), 'Status-owned native menu proof missing')
+        if not isinstance(proof, dict):
+            return
+        check(proof.get('schemaVersion') == 1 and proof.get('kind') == 'native-menu-bridge-identity'
+            and proof.get('contract') == 'status-owned-native-menu-item-title'
+            and proof.get('expectedTitle') == 'Undo Last Writing Edit' and proof.get('expectedRole') == 'AXMenuItem'
+            and proof.get('hostPID') == pid and proof.get('identifierRequired') is False
+            and proof.get('globalSearchUsed') is False and proof.get('textFallbackUsed') is False
+            and proof.get('maxDepth') == 4 and proof.get('maxNodes') == 64
+            and proof.get('proven') is True and proof.get('reason') is None, 'Native menu contract/source/ownership differs')
+        owner, walk, command = (proof.get(k, {}) for k in ('status', 'traversal', 'command'))
+        check(owner.get('pid') == pid and owner.get('role') in ('AXMenuBarItem', 'AXButton')
+            and owner.get('identityContract') in ('identifier', 'fixture-title')
+            and (owner.get('identifier') == 'undoControlHost.statusItem' or owner.get('identityContract') == 'fixture-title')
+            and owner.get('sameRetainedReference') is True and owner.get('parentAXError') == 0
+            and owner.get('parentIsHostExtrasMenuBar') is True and owner.get('extrasMenuBarPresent') is True
+            and owner.get('extrasMenuBarPID') == pid and owner.get('parentRole') == 'AXMenuBar',
+            'Native menu is not under the retained owned extras status item')
+        if status is not None:
+            check(owner.get('identifier') == status.get('id') and owner.get('role') == status.get('role'),
+                'Native menu owner differs from opened status item')
+        check(type(walk.get('discoveredCount')) is int and 1 <= walk['discoveredCount'] <= 64
+            and walk.get('expandedCount') == walk['discoveredCount'] and walk.get('truncated') is False
+            and walk.get('unreadableChildren') == [] and walk.get('exactMatchCount') == 1
+            and proof.get('uniqueMatch') is True, 'Native submenu uniqueness was not proven within its bound')
+        check(command.get('role') == 'AXMenuItem' and command.get('title') == 'Undo Last Writing Edit'
+            and command.get('pid') == pid and command.get('identifier') == target.get('id')
+            and command.get('identifierEmpty') is (target.get('id') == '')
+            and command.get('frame') == target.get('frame') and command.get('enabled') is target.get('enabled'),
+            'Native command differs from actual described menu item')
+        down, up = proof.get('downwardPath', []), proof.get('upwardPath', [])
+        check(isinstance(down, list) and 2 <= len(down) <= 4 and len(up) == len(down)
+            and proof.get('upwardReachesRetainedStatus') is True, 'Native submenu ancestry paths missing')
+        if isinstance(down, list) and 2 <= len(down) <= 4 and len(up) == len(down):
+            check(all(item.get('pid') == pid and item.get('depth') == n
+                and item.get('role') in ('AXMenu', 'AXMenuItem') for n, item in enumerate(down, 1))
+                and down[-1].get('role') == 'AXMenuItem' and down[-1].get('title') == 'Undo Last Writing Edit',
+                'Native downward path is not a host-owned submenu chain')
+            expected_up = list(reversed(down[:-1])) + [dict(owner, depth=0)]
+            check(all(item.get('axError') == 0 and item.get('matchesDownwardPath') is True
+                and item.get('isRetainedStatus') is (n == len(up)) and item.get('pid') == pid
+                and item.get('role') == expected.get('role') and item.get('identifier') == expected.get('identifier')
+                for n, (item, expected) in enumerate(zip(up, expected_up), 1)), 'Native upward path does not reproduce retained status ownership')
     def click(item, target, identifier, roles, checkpoint, status=False):
         check(isinstance(item, dict) and isinstance(target, dict), 'Native mouse input receipt is missing')
         if not isinstance(item, dict) or not isinstance(target, dict):
@@ -603,9 +647,13 @@ def receipt_errors(value, executable, pid, expected_home):
             'Native mouse target/hit process differs from mapped host')
         check(item.get('targetID') == target.get('id') and item.get('targetRole') == target.get('role')
             and item.get('targetRole') in roles, 'Native mouse target identity/role differs from observed control')
-        check(item.get('identityContract') == 'identifier' and item.get('targetID') == identifier
-            or status and item.get('identityContract') == 'fixture-title' and target.get('label') == 'RJT Undo check',
-            'Native mouse target does not satisfy its exact identity contract')
+        native_menu = item.get('identityContract') == 'status-owned-native-menu-item-title' and identifier == 'undoLastWritingEdit.menuCommand'
+        if native_menu:
+            menu_identity(item.get('nativeMenuIdentity'), target)
+        else:
+            check(item.get('identityContract') == 'identifier' and item.get('targetID') == identifier
+                or status and item.get('identityContract') == 'fixture-title' and target.get('label') == 'RJT Undo check',
+                'Native mouse target does not satisfy its exact identity contract')
         def rectangle(raw):
             return isinstance(raw, dict) and set(raw) == {'x', 'y', 'width', 'height'} \
                 and all(type(v) in (int, float) and math.isfinite(v) and abs(v) < 100000 for v in raw.values()) \
@@ -651,16 +699,36 @@ def receipt_errors(value, executable, pid, expected_home):
                 check(readiness.get('observations') == names and readiness.get('finalObservation') == names[-1],
                     'Pre-input readiness observation names/count differ')
     def menu(item, enabled, checkpoint):
-        control(item, 'undoLastWritingEdit.menuCommand', ['AXMenuItem', 'AXButton'], enabled)
+        control(item, item.get('id', ''), ['AXMenuItem'], enabled)
+        check(item.get('label') == 'Undo Last Writing Edit', 'Native menu command title differs')
         check(item.get('kind') == 'product-menu', 'Wrong product menu boundary')
         status = item.get('statusControl', {})
         control(status, status.get('id', ''), ['AXMenuBarItem', 'AXButton'])
         check(status.get('id') == 'undoControlHost.statusItem' or status.get('label') == 'RJT Undo check', 'Wrong actual status control')
+        menu_identity(item.get('nativeMenuIdentity'), item, status)
         click(item.get('statusClick'), status, 'undoControlHost.statusItem', ['AXMenuBarItem', 'AXButton'], 'menu.' + checkpoint + '.status', status=True)
     def notice(item, message):
         check(isinstance(item, dict) and item.get('id') == 'undoLastWritingEdit.notice'
             and item.get('expectedMessage') == message and message in (item.get('label'), item.get('value')),
             'Actual passive notice differs: ' + message)
+    def dismissal(item):
+        check(item.get('kind') == 'native-menu-dismissal' and item.get('contract') == 'same-status-owned-menu-not-displayed'
+            and item.get('escapeEventsPosted') == 2 and item.get('inputRetries') == 0
+            and type(item.get('polls')) is int and item['polls'] > 0 and item.get('statusRetainedFromOpen') is True,
+            'Native menu dismissal transport/owner differs')
+        closure = item.get('closure', {})
+        check(closure.get('hostPID') == pid and closure.get('axErrorTreatedAsClosed') is False
+            and closure.get('hitAXError') == 0 and type(closure.get('hitPID')) is int
+            and closure['hitPID'] > 0 and closure.get('closed') is True and closure.get('reason') is None
+            and closure.get('statusSelected') is not True, 'Native menu dismissal lacks successful read-only closure evidence')
+        if closure.get('evidence') == 'hit-other-process':
+            check(closure.get('hitPID') != pid, 'Menu closure claimed another process with host PID')
+        else:
+            chain = closure.get('hitAncestry', [])
+            check(closure.get('evidence') == 'hit-host-non-menu-element' and closure.get('hitPID') == pid
+                and isinstance(chain, list) and 1 <= len(chain) <= 11 and chain[-1] == 'AXApplication'
+                and not any(role in ('AXMenu', 'AXMenuItem', 'AXMenuBarItem') for role in chain),
+                'Menu closure ancestry still includes a native menu or lacks application owner')
     def snapshot(item, text, selected_range, bundle, focused=True):
         expected = units(text)
         start, length = selected_range['location'], selected_range['length']
@@ -766,7 +834,7 @@ def receipt_errors(value, executable, pid, expected_home):
                 'Product command switched captured process/document')
             if is_menu:
                 menu(item.get('command', {}), True, name + '-menu')
-                click(item['command'].get('activationClick'), item['command'], 'undoLastWritingEdit.menuCommand', ['AXMenuItem', 'AXButton'], 'case.' + name + '.menu-command')
+                click(item['command'].get('activationClick'), item['command'], 'undoLastWritingEdit.menuCommand', ['AXMenuItem'], 'case.' + name + '.menu-command')
             else:
                 check(item.get('command') == {'kind': 'configured-global-shortcut', 'keyCode': 32,
                     'modifierFlagsRawValue': 1835008, 'nativeEventsPosted': 2}, 'Actual registered shortcut invocation differs')
@@ -777,8 +845,10 @@ def receipt_errors(value, executable, pid, expected_home):
         states = value.get('stateChecks', {})
         check(set(states) == {'unavailable', 'busy', 'focusRefusal'} and all(item.get('passed') is True for item in states.values()), 'Three exact control states must pass')
         menu(states['unavailable']['menu'], False, 'unavailable-menu')
+        dismissal(states['unavailable'].get('dismissal', {}))
         busy = states['busy']
         menu(busy['menu'], False, 'busy-menu')
+        dismissal(busy.get('dismissal', {}))
         check(busy.get('recordingStateFixture') == 'busy' and busy.get('capabilityRetained') is True, 'Busy component guard did not retain capability')
         notice(busy.get('notice'), busy_message)
         snapshot(busy.get('observed'), prefix + replacement_shortcut + suffix, exact_range(len(units(prefix + replacement_shortcut)), 0), 'com.apple.TextEdit')
@@ -823,7 +893,12 @@ def verify_readiness_observations(click, checkpoint, pid):
         hashes[name] = digest(raw)
         observed.append(item)
     final = observed[-1]
-    require(final['identity'] == {'attempted': True, 'uniqueCount': 1, 'sameReferenceAsLookup': True}, 'Readiness target identity differs')
+    identity = final['identity']
+    menu_identity = click['identityContract'] == 'status-owned-native-menu-item-title'
+    require(identity.get('attempted') is True and identity.get('uniqueCount') == 1 and identity.get('sameReferenceAsLookup') is True
+        and identity.get('scope') == ('retained-status-subtree' if menu_identity else 'host-owned-nodes'), 'Readiness target identity differs')
+    require(final['nativeMenuIdentity'] == click['nativeMenuIdentity'] if menu_identity
+        else final['nativeMenuIdentity'] == {'attempted': False}, 'Ready native-menu proof differs from actual activation')
     target, frame, display, hit = (final[k] for k in ('target', 'frame', 'displays', 'hitTest'))
     require(target['attempted'] is True and target['enabled'] is True and target['pid'] == pid
         and target['identifier'] == click['targetID'] and target['role'] == click['targetRole']
@@ -954,13 +1029,36 @@ def self_test():
                 'deadlineSeconds': 6, 'intervalMilliseconds': 1000, 'elapsedSeconds': 0.1,
                 'noInputBeforeReady': True, 'finalObservationReady': True, 'observations': [name], 'finalObservation': name}}
     def menu(checkpoint, enabled=True):
-        target = control('undoLastWritingEdit.menuCommand', 'AXMenuItem', enabled)
+        target = dict(control('', 'AXMenuItem', enabled), label='Undo Last Writing Edit')
         status = control('undoControlHost.statusItem', 'AXMenuBarItem')
         result = dict(target, kind='product-menu', statusControl=status, statusClick=click_fixture(status, 'menu.' + checkpoint + '.status'))
+        result['nativeMenuIdentity'] = menu_proof_fixture(target)
         if enabled:
             case = checkpoint.removesuffix('-menu')
             result['activationClick'] = click_fixture(target, 'case.' + case + '.menu-command')
+            result['activationClick'].update(identityContract='status-owned-native-menu-item-title', nativeMenuIdentity=menu_proof_fixture(target))
         return result
+    def menu_proof_fixture(target):
+        owner = {'role': 'AXMenuBarItem', 'identifier': 'undoControlHost.statusItem', 'pid': 42,
+            'identityContract': 'identifier', 'sameRetainedReference': True, 'parentAXError': 0,
+            'parentRole': 'AXMenuBar', 'extrasMenuBarPresent': True, 'extrasMenuBarPID': 42, 'parentIsHostExtrasMenuBar': True}
+        path = [{'role': 'AXMenu', 'identifier': '', 'title': '', 'pid': 42, 'depth': 1},
+            {'role': 'AXMenuItem', 'identifier': target['id'], 'title': 'Undo Last Writing Edit', 'pid': 42, 'depth': 2}]
+        return {'schemaVersion': 1, 'kind': 'native-menu-bridge-identity', 'contract': 'status-owned-native-menu-item-title',
+            'expectedTitle': 'Undo Last Writing Edit', 'expectedRole': 'AXMenuItem', 'hostPID': 42,
+            'identifierRequired': False, 'globalSearchUsed': False, 'textFallbackUsed': False, 'maxDepth': 4, 'maxNodes': 64,
+            'status': owner, 'traversal': {'discoveredCount': 3, 'expandedCount': 3, 'truncated': False,
+                'unreadableChildren': [], 'exactMatchCount': 1, 'otherRoleTitleMatches': 0}, 'uniqueMatch': True,
+            'downwardPath': path, 'upwardPath': [dict(path[0], axError=0, matchesDownwardPath=True, isRetainedStatus=False),
+                dict(owner, depth=0, axError=0, matchesDownwardPath=True, isRetainedStatus=True)],
+            'upwardReachesRetainedStatus': True, 'command': {'role': 'AXMenuItem', 'title': 'Undo Last Writing Edit',
+                'pid': 42, 'identifier': target['id'], 'identifierEmpty': target['id'] == '', 'enabled': target['enabled'],
+                'frame': copy.deepcopy(target['frame'])}, 'proven': True, 'reason': None}
+    def dismissal_fixture():
+        return {'kind': 'native-menu-dismissal', 'contract': 'same-status-owned-menu-not-displayed',
+            'escapeEventsPosted': 2, 'inputRetries': 0, 'polls': 1, 'statusRetainedFromOpen': True,
+            'closure': {'hostPID': 42, 'axErrorTreatedAsClosed': False, 'hitAXError': 0, 'hitPID': 99,
+                'closed': True, 'reason': None, 'statusSelected': False, 'evidence': 'hit-other-process'}}
     def notice(message):
         return dict(control('undoLastWritingEdit.notice'), expectedMessage=message, label=message)
     def snapshot(text, selected, bundle, token='RJT-Writing-Live-00000000-0000-4000-8000-000000000001', focused=True):
@@ -992,9 +1090,9 @@ def self_test():
                 'keyCode': 32, 'modifierFlagsRawValue': 1835008, 'nativeEventsPosted': 2}, 'notice': notice(restored_message),
             'capabilityConsumed': True, 'noticeWasAbsentBeforeCommand': True,
             'screenshots': [name + '-forward.png', name + '-restored.png']})
-    value['stateChecks'] = {'unavailable': {'passed': True, 'menu': menu('unavailable-menu', False)},
+    value['stateChecks'] = {'unavailable': {'passed': True, 'menu': menu('unavailable-menu', False), 'dismissal': dismissal_fixture()},
         'busy': {'passed': True, 'recordingStateFixture': 'busy', 'menu': menu('busy-menu', False), 'notice': notice(busy_message),
-            'observed': copy.deepcopy(value['cases'][1]['forward']), 'capabilityRetained': True},
+            'observed': copy.deepcopy(value['cases'][1]['forward']), 'capabilityRetained': True, 'dismissal': dismissal_fixture()},
         'focusRefusal': {'passed': True, 'capabilityRetired': True, 'differentWindow': True, 'notice': notice(refused_message),
             'sourceAfter': snapshot(prefix + 'Source remains e\u0301 🧪' + suffix, exact_range(len(units(prefix + 'Source remains e\u0301 🧪')), 0), 'com.apple.TextEdit', 'RJT-Writing-Live-00000000-0000-4000-8000-000000000005', focused=False),
             'otherBefore': snapshot(original, selected, 'com.apple.TextEdit', 'RJT-Writing-Live-00000000-0000-4000-8000-000000000006'),
@@ -1086,6 +1184,18 @@ def self_test():
         lambda v: v['shortcut']['recorderControl']['click']['readiness'].update(attemptCount=7),
         lambda v: v['shortcut']['recorderControl']['click']['readiness'].update(finalObservation='../foreign.json'),
         lambda v: v['shortcut']['recorderControl']['click']['readiness'].update(finalObservationReady=False),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity'].update(globalSearchUsed=True),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['status'].update(pid=43),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['status'].update(parentIsHostExtrasMenuBar=False),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['traversal'].update(exactMatchCount=2),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['traversal'].update(truncated=True),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['traversal'].update(unreadableChildren=[{'axError': -1}]),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['upwardPath'][0].update(matchesDownwardPath=False),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['downwardPath'][0].update(pid=43),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['command'].update(title='Undo'),
+        lambda v: v['stateChecks']['unavailable']['dismissal']['closure'].update(hitAXError=-1),
+        lambda v: v['stateChecks']['unavailable']['dismissal']['closure'].update(statusSelected=True),
+        lambda v: v['stateChecks']['busy']['dismissal'].update(inputRetries=1),
         lambda v: v['cases'][3]['forward']['range'].update(location=v['cases'][3]['forward']['range']['location'] + 1)]
     for mutation in mutations:
         invalid = copy.deepcopy(value)
@@ -1426,7 +1536,8 @@ def readiness_observation_self_test():
     final = {'schemaVersion': 1, 'kind': 'native-click-preinput-readiness-observation', 'diagnosticOnly': True,
         'experiment': 'preinput-readiness-calibration', 'checkpoint': 'click.' + checkpoint,
         'attempt': 2, 'maxAttempts': 6, 'inputPosted': False, 'hostPID': 42, 'systemUptime': 102.0, 'ready': True, 'reason': None,
-        'identity': {'attempted': True, 'uniqueCount': 1, 'sameReferenceAsLookup': True},
+        'identity': {'attempted': True, 'uniqueCount': 1, 'sameReferenceAsLookup': True, 'scope': 'host-owned-nodes'},
+        'nativeMenuIdentity': {'attempted': False},
         'target': {'attempted': True, 'enabled': True, 'pid': 42, 'identifier': click['targetID'],
             'role': 'AXButton', 'identityContract': 'identifier'},
         'frame': dict(frame, attempted=True, finitePositive=True, positionRead=True, sizeRead=True,

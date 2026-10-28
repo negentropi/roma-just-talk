@@ -133,9 +133,9 @@ enum WritingUndoControlOracle {
             try require(!owner.engine.writingActionUndoController.isAvailable, "A fresh engine already owns an edit.")
             let unavailable = try await openMenu(expectedEnabled: false, checkpoint: "unavailable-menu")
             try mark("unavailable.dismiss-menu.before")
-            try await dismissMenu()
+            let unavailableDismissal = try await dismissMenu(unavailable.session)
             try mark("unavailable.dismiss-menu.after")
-            states["unavailable"] = ["passed": true, "menu": unavailable]
+            states["unavailable"] = ["passed": true, "menu": unavailable.facts, "dismissal": unavailableDismissal]
             try await configureShortcut()
 
             for (index, id) in selectedCases.enumerated() {
@@ -165,7 +165,7 @@ enum WritingUndoControlOracle {
             let control = try describe(recorder, "shortcut.recorder")
             try mark("shortcut.recorder-press.before")
             let recorderClick = try await click(recorder, "shortcut.recorder", roles: ["AXButton"],
-                                                identifier: "shortcutRecorder.undoLastWritingEdit")
+                                                identity: .identifier("shortcutRecorder.undoLastWritingEdit", fixtureTitle: nil))
             try mark("shortcut.clear-wait.before")
             try await wait("The real recorder did not clear its shortcut for capture.") {
                 ShortcutStore.isShortcutCleared(for: .undoLastWritingEdit)
@@ -267,12 +267,14 @@ enum WritingUndoControlOracle {
                 let opened = try await openMenu(expectedEnabled: true, checkpoint: id + "-menu")
                 // This is the actual product Button through the native menu
                 // bridge. No engine, shared-command or private handler call.
+                // The command is the element openMenu proved under the SAME
+                // retained status item; no global or identifier lookup.
                 try mark("case.\(id).menu-command-lookup.before")
-                let menuCommand = try await unique(identifier: "undoLastWritingEdit.menuCommand")
+                let session = opened.session
                 try mark("case.\(id).menu-command-press.before")
-                let activationClick = try await click(menuCommand, "case.\(id).menu-command", roles: ["AXMenuItem", "AXButton"],
-                                                      identifier: "undoLastWritingEdit.menuCommand")
-                command = opened.merging(["activationClick": activationClick]) { _, new in new }
+                let activationClick = try await click(session.command, "case.\(id).menu-command", roles: ["AXMenuItem"],
+                                                      identity: .statusOwnedMenuItem(status: session.status, title: session.title))
+                command = opened.facts.merging(["activationClick": activationClick]) { _, new in new }
             } else {
                 command = ["kind": "configured-global-shortcut", "keyCode": Int(keyCode),
                            "modifierFlagsRawValue": modifiers.rawValue, "nativeEventsPosted": 2]
@@ -316,7 +318,7 @@ enum WritingUndoControlOracle {
             defer { owner.engine.recordingState = .idle }
             let menu = try await openMenu(expectedEnabled: false, checkpoint: "busy-menu")
             try mark("busy.dismiss-menu.before")
-            try await dismissMenu()
+            let dismissal = try await dismissMenu(menu.session)
             try mark("busy.global-chord.before")
             try postChord()
             try mark("busy.notice-wait.before")
@@ -325,7 +327,7 @@ enum WritingUndoControlOracle {
             let observed = try snapshot(editor)
             try expect(observed, value: result, range: caret)
             try require(owner.engine.writingActionUndoController.isAvailable, "A busy command consumed the native edit.")
-            states["busy"] = ["passed": true, "recordingStateFixture": "busy", "menu": menu,
+            states["busy"] = ["passed": true, "recordingStateFixture": "busy", "menu": menu.facts, "dismissal": dismissal,
                               "notice": feedback, "observed": observed, "capabilityRetained": true]
             try mark("busy.screenshot.before")
             try await screenshot("busy-shortcut-refused")
@@ -404,7 +406,31 @@ enum WritingUndoControlOracle {
             return (attempts, confirmations)
         }
 
-        func openMenu(expectedEnabled: Bool, checkpoint: String) async throws -> [String: Any] {
+        // OBSERVED NSMenuItem IDENTITY CONTRACT (QA-only calibration from native run 40627170433; not a
+        // product fix and no claim that the native pass succeeds). Through the SwiftUI MenuBarExtra ->
+        // NSMenu bridge, the product Button surfaced as an AXMenuItem with the exact product title and an
+        // EMPTY AXIdentifier, so its `.accessibilityIdentifier(menuCommand)` is not observable there. The
+        // command is therefore identified only as: role AXMenuItem, exact `UndoLastWritingEditPresentation.title`,
+        // host PID, the UNIQUE such descendant found by bounded traversal of the SAME retained status item
+        // (itself host-owned with a direct parent equal to the host's own AXExtrasMenuBar), and an upward
+        // AXParent chain identical to the downward path. The actual identifier is recorded, never required
+        // or invented. There is no global, text or identifier fallback; status and recorder contracts are unchanged.
+        static let menuScanMaxDepth = 4
+        static let menuScanMaxNodes = 64
+        static let menuClosureMaxHitAncestors = 10
+
+        /// The retained native menu identity from one proven open; reused for activation and dismissal.
+        struct MenuSession {
+            let status: AXUIElement, menu: AXUIElement, command: AXUIElement
+            let openCenter: CGPoint, title: String, checkpoint: String
+        }
+
+        struct MenuScan {
+            var facts: [String: Any]
+            var command: AXUIElement?, menu: AXUIElement?, frame: CGRect?
+        }
+
+        func openMenu(expectedEnabled: Bool, checkpoint: String) async throws -> (facts: [String: Any], session: MenuSession) {
             try mark("menu.\(checkpoint).status-lookup.before")
             let status = try await waitForElement("The actual status item was unavailable.") { nodes in
                 nodes.filter { node in
@@ -418,17 +444,39 @@ enum WritingUndoControlOracle {
             }
             try mark("menu.\(checkpoint).status-press.before")
             let statusClick = try await click(status, "menu.\(checkpoint).status", roles: ["AXMenuBarItem", "AXButton"],
-                                              identifier: "undoControlHost.statusItem", title: "RJT Undo check")
+                                              identity: .identifier("undoControlHost.statusItem", fixtureTitle: "RJT Undo check"))
             try mark("menu.\(checkpoint).item-lookup.before")
-            let item = try await unique(identifier: "undoLastWritingEdit.menuCommand")
+            let title = UndoLastWritingEditPresentation.title
+            var last = MenuScan(facts: ["attempted": false], command: nil, menu: nil, frame: nil)
+            var polls = 0
             try mark("menu.\(checkpoint).enabled-wait.before")
-            try await wait("The real menu command had the wrong enabled state.") {
-                self.hasVisibleFrame(item) && self.enabled(item) == expectedEnabled
+            do {
+                // Read-only polling of the same retained status reference; no input inside.
+                try await wait("The status-owned menu command was not proven with the expected enabled state.") {
+                    polls += 1
+                    last = self.scanMenuCommand(status: status, title: title)
+                    last.facts["expectedEnabled"] = expectedEnabled
+                    last.facts["polls"] = polls
+                    guard let command = last.command else { return false }
+                    let visible = self.hasVisibleFrame(command), isEnabled = self.enabled(command)
+                    last.facts["visibleFrame"] = visible
+                    last.facts["enabledObserved"] = isEnabled
+                    return visible && isEnabled == expectedEnabled
+                }
+            } catch {
+                retainFailureFacts(last.facts, "menu-identity-\(checkpoint).json")
+                throw UndoControlCheckFailure("\(error) [\(checkpoint): \(last.facts["reason"] as? String ?? "identity proven; visibility or enabled state differed")]")
             }
+            guard let command = last.command, let menu = last.menu, let frame = last.frame else {
+                retainFailureFacts(last.facts, "menu-identity-\(checkpoint).json")
+                throw UndoControlCheckFailure("The status-owned menu command lost its proven identity at \(checkpoint).")
+            }
+            let session = MenuSession(status: status, menu: menu, command: command,
+                                      openCenter: CGPoint(x: frame.midX, y: frame.midY), title: title, checkpoint: checkpoint)
             try mark("menu.\(checkpoint).item-describe.before")
-            let observed = try describe(item, "menu.\(checkpoint).item")
-            try require(["AXMenuItem", "AXButton"].contains(observed["role"] as? String ?? ""),
-                        "The Undo identifier did not identify a native actionable control.")
+            let observed = try describe(command, "menu.\(checkpoint).item")
+            try require(observed["role"] as? String == "AXMenuItem",
+                        "The status-owned Undo command was not a native AXMenuItem.")
             try mark("menu.\(checkpoint).hierarchy.before")
             try dumpHierarchy(checkpoint)
             try mark("menu.\(checkpoint).screenshot.before")
@@ -436,17 +484,237 @@ enum WritingUndoControlOracle {
             try mark("menu.\(checkpoint).status-describe.before")
             let statusControl = try describe(status, "menu.\(checkpoint).status")
             try mark("menu.\(checkpoint).exit")
-            return observed.merging(["kind": "product-menu", "statusControl": statusControl,
-                                    "statusClick": statusClick]) { _, new in new }
+            let facts = observed.merging(["kind": "product-menu", "statusControl": statusControl,
+                                          "statusClick": statusClick, "nativeMenuIdentity": last.facts]) { _, new in new }
+            return (facts, session)
         }
 
-        func dismissMenu() async throws {
-            try postKey(UInt16(kVK_Escape), flags: [])
-            try await wait("The native status menu did not dismiss.") {
-                self.nodes().filter {
-                    self.string(kAXIdentifierAttribute, $0) == "undoLastWritingEdit.menuCommand" && self.hasVisibleFrame($0)
-                }.isEmpty
+        /// Pure read-only bounded scan from the retained status item. Never marks, never posts. Every AX
+        /// read whose error could hide a candidate fails the proof; uniqueness is never assumed past a bound.
+        func scanMenuCommand(status: AXUIElement, title: String) -> MenuScan {
+            let host = ProcessInfo.processInfo.processIdentifier
+            func pidValue(_ value: pid_t?) -> Any { value.map { Int($0) as Any } ?? NSNull() }
+            func summary(_ node: AXUIElement, depth: Int) -> [String: Any] {
+                ["role": string(kAXRoleAttribute, node) ?? "", "identifier": string(kAXIdentifierAttribute, node) ?? "",
+                 "title": string(kAXTitleAttribute, node) as Any? ?? NSNull(), "pid": pidValue(pid(node)), "depth": depth]
             }
+            var facts: [String: Any] = [
+                "schemaVersion": 1, "attempted": true, "kind": "native-menu-bridge-identity",
+                "contract": "status-owned-native-menu-item-title", "expectedTitle": title, "expectedRole": "AXMenuItem",
+                "hostPID": Int(host), "identifierRequired": false, "globalSearchUsed": false, "textFallbackUsed": false,
+                "maxDepth": Self.menuScanMaxDepth, "maxNodes": Self.menuScanMaxNodes, "proven": false]
+            func fail(_ reason: String) -> MenuScan {
+                facts["reason"] = reason
+                return MenuScan(facts: facts, command: nil, menu: nil, frame: nil)
+            }
+
+            // Owner: the same retained status reference, host-owned, directly under the host's AXExtrasMenuBar.
+            let statusRole = string(kAXRoleAttribute, status) ?? ""
+            let statusID = string(kAXIdentifierAttribute, status) ?? ""
+            let statusPID = pid(status)
+            let statusContract = statusID == "undoControlHost.statusItem" ? "identifier"
+                : [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute].contains { string($0, status) == "RJT Undo check" }
+                    ? "fixture-title" : ""
+            let (parentError, parentRaw) = copy(kAXParentAttribute, status)
+            let statusParent = parentRaw.flatMap { CFGetTypeID($0) == AXUIElementGetTypeID() ? ($0 as! AXUIElement) : nil }
+            let extras = element("AXExtrasMenuBar", app)
+            let extrasPID = extras.flatMap { pid($0) }
+            let parentIsExtras = statusParent.map { parent in extras.map { CFEqual($0, parent) } ?? false } ?? false
+            facts["status"] = [
+                "role": statusRole, "identifier": statusID, "pid": pidValue(statusPID), "identityContract": statusContract,
+                "sameRetainedReference": true, "parentAXError": Int(parentError.rawValue),
+                "parentRole": statusParent.flatMap { string(kAXRoleAttribute, $0) } as Any? ?? NSNull(),
+                "extrasMenuBarPresent": extras != nil, "extrasMenuBarPID": pidValue(extrasPID),
+                "parentIsHostExtrasMenuBar": parentIsExtras] as [String: Any]
+            guard statusPID == host, ["AXMenuBarItem", "AXButton"].contains(statusRole), !statusContract.isEmpty else {
+                return fail("retained status item lost its host-owned identity")
+            }
+            guard parentError == .success, parentIsExtras, extrasPID == host else {
+                return fail("retained status item is not a direct child of the host AXExtrasMenuBar")
+            }
+
+            // Bounded breadth-first descendant traversal from that status only.
+            var queue: [(node: AXUIElement, depth: Int, path: [AXUIElement])] = [(status, 0, [])]
+            var index = 0, truncated = false, otherRoleTitleMatches = 0
+            var unreadable: [[String: Any]] = []
+            var matches: [[AXUIElement]] = []
+            while index < queue.count {
+                let (node, depth, path) = queue[index]
+                index += 1
+                _ = AXUIElementSetMessagingTimeout(node, 0.05)
+                let (childError, childRaw) = copy(kAXChildrenAttribute, node)
+                let children: [AXUIElement]
+                switch childError {
+                case .success: children = childRaw as? [AXUIElement] ?? []
+                case .noValue, .attributeUnsupported: children = []
+                default:
+                    unreadable.append(["depth": depth, "axError": Int(childError.rawValue)])
+                    continue
+                }
+                if children.isEmpty { continue }
+                if depth >= Self.menuScanMaxDepth { truncated = true; continue }
+                for child in children {
+                    guard queue.count < Self.menuScanMaxNodes else { truncated = true; break }
+                    if string(kAXTitleAttribute, child) == title {
+                        if string(kAXRoleAttribute, child) == "AXMenuItem" && pid(child) == host {
+                            matches.append(path + [child])
+                        } else {
+                            otherRoleTitleMatches += 1
+                        }
+                    }
+                    queue.append((child, depth + 1, path + [child]))
+                }
+            }
+            facts["traversal"] = ["discoveredCount": queue.count, "expandedCount": index, "truncated": truncated,
+                                  "unreadableChildren": unreadable, "exactMatchCount": matches.count,
+                                  "otherRoleTitleMatches": otherRoleTitleMatches] as [String: Any]
+            facts["uniqueMatch"] = matches.count == 1
+            guard unreadable.isEmpty, !truncated else { return fail("bounded status subtree was not fully readable") }
+            guard matches.count == 1, let path = matches.first, let command = path.last else {
+                return fail("expected exactly one host AXMenuItem with the exact title under the status item")
+            }
+            let downward = path.enumerated().map { summary($0.element, depth: $0.offset + 1) }
+            facts["downwardPath"] = downward
+            let intermediates = path.dropLast()
+            guard let menu = intermediates.last, string(kAXRoleAttribute, menu) == "AXMenu",
+                  intermediates.allSatisfy({ ["AXMenu", "AXMenuItem"].contains(string(kAXRoleAttribute, $0) ?? "")
+                      && pid($0) == host }) else {
+                return fail("downward path is not a host-owned native submenu chain")
+            }
+
+            // Upward AXParent chain must be exactly the downward path back to the same status reference.
+            var upward: [[String: Any]] = []
+            var cursor = command
+            let expectedUp = Array(intermediates.reversed()) + [status]
+            for (level, expected) in expectedUp.enumerated() {
+                let (error, raw) = copy(kAXParentAttribute, cursor)
+                let parent = raw.flatMap { CFGetTypeID($0) == AXUIElementGetTypeID() ? ($0 as! AXUIElement) : nil }
+                var entry: [String: Any] = ["level": level + 1, "axError": Int(error.rawValue)]
+                if let parent { entry.merge(summary(parent, depth: path.count - level - 1)) { _, new in new } }
+                let same = parent.map { CFEqual($0, expected) } ?? false
+                entry["matchesDownwardPath"] = same
+                entry["isRetainedStatus"] = parent.map { CFEqual($0, status) } ?? false
+                upward.append(entry)
+                facts["upwardPath"] = upward
+                guard error == .success, let parent, same else {
+                    return fail("upward ancestry did not reproduce the status-owned submenu path")
+                }
+                cursor = parent
+            }
+            facts["upwardPath"] = upward
+            facts["upwardReachesRetainedStatus"] = true
+
+            var frame: CGRect?
+            if let raw = attribute(kAXPositionAttribute, command), CFGetTypeID(raw) == AXValueGetTypeID(),
+               let rawSize = attribute(kAXSizeAttribute, command), CFGetTypeID(rawSize) == AXValueGetTypeID() {
+                var point = CGPoint.zero, size = CGSize.zero
+                if AXValueGetValue(raw as! AXValue, .cgPoint, &point), AXValueGetValue(rawSize as! AXValue, .cgSize, &size),
+                   point.x.isFinite, point.y.isFinite, size.width.isFinite, size.height.isFinite,
+                   size.width > 0, size.height > 0 {
+                    frame = CGRect(origin: point, size: size)
+                }
+            }
+            let actualID = string(kAXIdentifierAttribute, command) ?? ""
+            facts["command"] = ["role": "AXMenuItem", "title": title, "pid": Int(host), "identifier": actualID,
+                                "identifierEmpty": actualID.isEmpty, "enabled": enabled(command),
+                                "frame": frame.map { rect($0) as Any } ?? NSNull()] as [String: Any]
+            guard frame != nil else { return fail("status-owned command frame was unavailable") }
+            facts["proven"] = true
+            facts["reason"] = NSNull()
+            return MenuScan(facts: facts, command: command, menu: menu, frame: frame)
+        }
+
+        /// One Escape pair, then bounded read-only proof that the SAME retained status menu is no longer
+        /// displayed: a successful system-wide hit test at the command's open-time center must resolve to an
+        /// element outside the retained status/menu/command (another process, or a host element whose fully
+        /// read ancestry reaches the host application without any native menu), and the status item's
+        /// AXSelected must not read true. Any AX error keeps the menu "not proven closed"; no extra input.
+        func dismissMenu(_ session: MenuSession) async throws -> [String: Any] {
+            try postKey(UInt16(kVK_Escape), flags: [])
+            var last: [String: Any] = ["attempted": false]
+            var polls = 0
+            do {
+                try await wait("The native status menu did not dismiss.") {
+                    polls += 1
+                    let (closed, facts) = self.menuClosureObservation(session)
+                    last = facts
+                    return closed
+                }
+            } catch {
+                last["polls"] = polls
+                retainFailureFacts(last, "menu-dismissal-\(session.checkpoint).json")
+                throw UndoControlCheckFailure("\(error) [\(session.checkpoint): \(last["reason"] as? String ?? "unknown")]")
+            }
+            return ["kind": "native-menu-dismissal", "contract": "same-status-owned-menu-not-displayed",
+                    "escapeEventsPosted": 2, "inputRetries": 0, "polls": polls,
+                    "statusRetainedFromOpen": true, "closure": last]
+        }
+
+        func menuClosureObservation(_ s: MenuSession) -> (Bool, [String: Any]) {
+            let host = ProcessInfo.processInfo.processIdentifier
+            var f: [String: Any] = ["schemaVersion": 1, "hostPID": Int(host), "axErrorTreatedAsClosed": false,
+                                    "point": ["x": Double(s.openCenter.x), "y": Double(s.openCenter.y)]]
+            func result(_ closed: Bool, _ reason: String?) -> (Bool, [String: Any]) {
+                f["closed"] = closed
+                f["reason"] = reason as Any? ?? NSNull()
+                return (closed, f)
+            }
+            // Recorded facts on the same status submenu (informational; errors never mean closed).
+            let (childError, childRaw) = copy(kAXChildrenAttribute, s.status)
+            let children = childError == .success ? childRaw as? [AXUIElement] ?? [] : []
+            f["statusChildrenAXError"] = Int(childError.rawValue)
+            f["statusMenuChildCount"] = children.filter { string(kAXRoleAttribute, $0) == "AXMenu" }.count
+            f["retainedMenuStillChild"] = children.contains { CFEqual($0, s.menu) }
+            f["commandVisibleFrame"] = hasVisibleFrame(s.command)
+            let (selectedError, selectedRaw) = copy(kAXSelectedAttribute, s.status)
+            let selected = selectedError == .success ? (selectedRaw as? NSNumber)?.boolValue : nil
+            f["statusSelectedAXError"] = Int(selectedError.rawValue)
+            f["statusSelected"] = selected as Any? ?? NSNull()
+            if selected == true { return result(false, "status item still reports AXSelected") }
+
+            let systemWide = AXUIElementCreateSystemWide()
+            _ = AXUIElementSetMessagingTimeout(systemWide, 1)
+            var hitRef: AXUIElement?
+            let hitError = AXUIElementCopyElementAtPosition(systemWide, Float(s.openCenter.x), Float(s.openCenter.y), &hitRef)
+            f["hitAXError"] = Int(hitError.rawValue)
+            guard hitError == .success, let hit = hitRef else { return result(false, "hit test failed") }
+            guard let hitPID = pid(hit) else { return result(false, "hit element PID unreadable") }
+            f["hitPID"] = Int(hitPID)
+            f["hitRole"] = string(kAXRoleAttribute, hit) ?? ""
+            if hitPID != host {
+                f["evidence"] = "hit-other-process"
+                return result(true, nil)
+            }
+            var node = hit
+            var chain: [String] = []
+            for _ in 0...Self.menuClosureMaxHitAncestors {
+                if CFEqual(node, s.status) || CFEqual(node, s.menu) || CFEqual(node, s.command) {
+                    f["hitAncestry"] = chain
+                    return result(false, "hit test still reaches the retained status menu")
+                }
+                let role = string(kAXRoleAttribute, node) ?? ""
+                chain.append(role)
+                f["hitAncestry"] = chain
+                if ["AXMenu", "AXMenuItem", "AXMenuBarItem"].contains(role) {
+                    return result(false, "hit test reaches a host native menu element")
+                }
+                if CFEqual(node, app) {
+                    f["evidence"] = "hit-host-non-menu-element"
+                    return result(true, nil)
+                }
+                let (error, raw) = copy(kAXParentAttribute, node)
+                guard error == .success, let raw, CFGetTypeID(raw) == AXUIElementGetTypeID() else {
+                    return result(false, "hit ancestry unreadable (\(error.rawValue))")
+                }
+                node = raw as! AXUIElement
+            }
+            return result(false, "hit ancestry exceeded its bound")
+        }
+
+        /// Failure-path diagnostic retention; a write failure is reported and never replaces the original error.
+        func retainFailureFacts(_ facts: [String: Any], _ name: String) {
+            do { try writeJSON(facts, to: owner.output.appendingPathComponent(name)) }
+            catch { fputs("Undo control identity facts not written (\(name)): \(error)\n", stderr) }
         }
 
         func notice(expected: String) async throws -> [String: Any] {
@@ -576,6 +844,16 @@ enum WritingUndoControlOracle {
             let frame: CGRect, center: CGPoint, display: CGDirectDisplayID, bounds: CGRect
             let id: String, role: String, contract: String, depth: Int, policy: String
             let targetWindowPresent: Bool, hitWindowPresent: Bool, windowOwned: Bool, menuAncestor: String
+            let menuIdentity: [String: Any]?
+        }
+
+        /// Click identity contracts. `.identifier` is the unchanged contract for the recorder (strict ID) and
+        /// status item (ID or fixture title) via the global owned-node scan. `.statusOwnedMenuItem` is the
+        /// observed NSMenuItem contract (see `scanMenuCommand`): no identifier, only the exact title,
+        /// AXMenuItem role and host PID as the unique descendant of the SAME retained status item.
+        enum ClickIdentity {
+            case identifier(String, fixtureTitle: String?)
+            case statusOwnedMenuItem(status: AXUIElement, title: String)
         }
 
         /// PRE-INPUT READINESS / CALIBRATION EXPERIMENT (not a confirmed display or root-cause fix).
@@ -596,8 +874,8 @@ enum WritingUndoControlOracle {
         /// and diagnostic write or mark failures propagate. The loop's only await is the not-ready sleep
         /// before the next attempt, so the final observeReadiness, its write, the proof and both posts run
         /// synchronously with no suspension point. Posting is after the loop, at most once, never retried.
-        func click(_ target: AXUIElement, _ checkpoint: String, roles: [String], identifier: String,
-                   title: String? = nil) async throws -> [String: Any] {
+        func click(_ target: AXUIElement, _ checkpoint: String, roles: [String],
+                   identity: ClickIdentity) async throws -> [String: Any] {
             let s = "click." + checkpoint
             let start = ProcessInfo.processInfo.systemUptime
             let deadline = start + Self.readinessDeadlineSeconds
@@ -606,7 +884,7 @@ enum WritingUndoControlOracle {
             var ready: (proof: ClickProof, summary: [String: Any])?
             for attempt in 1...Self.readinessMaxAttempts {
                 let (observation, attemptProof) = try observeReadiness(target, s, attempt: attempt, roles: roles,
-                                                                       identifier: identifier, title: title)
+                                                                       identity: identity)
                 let name = "click-readiness-\(checkpoint)-attempt-\(attempt).json"
                 try marked(s + ".a\(attempt).observation-write") {
                     try writeJSON(observation, to: owner.output.appendingPathComponent(name))
@@ -658,24 +936,34 @@ enum WritingUndoControlOracle {
                     "targetWindowPresent": proof.targetWindowPresent, "hitWindowPresent": proof.hitWindowPresent,
                     "sameWindow": proof.policy == "same-window", "windowOwnedByHost": proof.windowOwned,
                     "nativeMenuAncestry": !proof.menuAncestor.isEmpty, "menuAncestorRole": proof.menuAncestor,
+                    "nativeMenuIdentity": proof.menuIdentity.map { $0 as Any } ?? NSNull(),
                     "readiness": readiness]
         }
 
         /// One read-only pre-input observation. Predicate failures return `nil` proof with the reason and all
         /// facts read so far; sections never reached stay `{"attempted": false}`. Only marks throw.
         func observeReadiness(_ target: AXUIElement, _ s: String, attempt: Int, roles: [String],
-                              identifier: String, title: String?) throws -> ([String: Any], ClickProof?) {
+                              identity: ClickIdentity) throws -> ([String: Any], ClickProof?) {
             let p = s + ".a\(attempt)"
             let host = ProcessInfo.processInfo.processIdentifier
             let unattempted: [String: Any] = ["attempted": false]
+            let expected: [String: Any]
+            switch identity {
+            case let .identifier(identifier, title):
+                expected = ["identifier": identifier, "title": title as Any? ?? NSNull(), "roles": roles,
+                            "contract": "identifier-or-fixture-title", "identifierRequired": title == nil]
+            case let .statusOwnedMenuItem(_, title):
+                expected = ["identifier": NSNull(), "title": title, "roles": roles,
+                            "contract": "status-owned-native-menu-item-title", "identifierRequired": false]
+            }
             var obs: [String: Any] = [
                 "schemaVersion": 1, "kind": "native-click-preinput-readiness-observation", "diagnosticOnly": true,
                 "experiment": "preinput-readiness-calibration", "checkpoint": s, "attempt": attempt,
                 "maxAttempts": Self.readinessMaxAttempts, "inputPosted": false, "hostPID": Int(host),
                 "systemUptime": ProcessInfo.processInfo.systemUptime,
                 "coordinateSpace": "AX global top-left (CG display space); no NSScreen or pixel conversion",
-                "expected": ["identifier": identifier, "title": title as Any? ?? NSNull(), "roles": roles] as [String: Any],
-                "identity": unattempted, "target": unattempted, "frame": unattempted, "provenance": unattempted,
+                "expected": expected, "nativeMenuIdentity": unattempted, "identity": unattempted,
+                "target": unattempted, "frame": unattempted, "provenance": unattempted,
                 "displays": unattempted, "hitTest": unattempted, "window": unattempted, "frameRecheck": unattempted]
             func notReady(_ reason: String) -> ([String: Any], ClickProof?) {
                 obs["ready"] = false
@@ -684,17 +972,30 @@ enum WritingUndoControlOracle {
             }
 
             let labels = [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute]
-            let current = try marked(p + ".unique-scan") {
-                nodes().filter { node in
-                    (string(kAXIdentifierAttribute, node) == identifier
-                        || (title != nil && roles.contains(string(kAXRoleAttribute, node) ?? "")
-                            && labels.contains { string($0, node) == title }))
-                        && hasVisibleFrame(node)
+            let current: [AXUIElement]
+            var menuIdentity: [String: Any]?
+            switch identity {
+            case let .identifier(identifier, title):
+                current = try marked(p + ".unique-scan") {
+                    nodes().filter { node in
+                        (string(kAXIdentifierAttribute, node) == identifier
+                            || (title != nil && roles.contains(string(kAXRoleAttribute, node) ?? "")
+                                && labels.contains { string($0, node) == title }))
+                            && hasVisibleFrame(node)
+                    }
                 }
+            case let .statusOwnedMenuItem(status, title):
+                // Bounded scan of the same retained status subtree only; same 2 records as the global scan.
+                let scan = try marked(p + ".owner-scan") { scanMenuCommand(status: status, title: title) }
+                menuIdentity = scan.facts
+                obs["nativeMenuIdentity"] = scan.facts
+                current = (scan.facts["proven"] as? Bool == true ? scan.command.map { [$0] } ?? [] : [])
+                    .filter { hasVisibleFrame($0) }
             }
             // Same-reference check is recorded, never weakened: a different element is never substituted.
             let sameReference = current.count == 1 && CFEqual(current[0], target)
-            obs["identity"] = ["attempted": true, "uniqueCount": current.count, "sameReferenceAsLookup": sameReference] as [String: Any]
+            obs["identity"] = ["attempted": true, "uniqueCount": current.count, "sameReferenceAsLookup": sameReference,
+                               "scope": menuIdentity == nil ? "host-owned-nodes" : "retained-status-subtree"] as [String: Any]
             guard sameReference else { return notReady("target is not the current unique control") }
 
             var targetFacts: [String: Any] = ["attempted": true]
@@ -707,14 +1008,22 @@ enum WritingUndoControlOracle {
             obs["target"] = targetFacts
             guard roles.contains(role) else { return notReady("unexpected role \(role)") }
             var contract = "identifier"
-            if id != identifier {
-                guard let title else { return notReady("identifier mismatch") }
-                var matched = false
-                for (index, name) in labels.enumerated() where !matched {
-                    matched = try marked(p + ".title.\(index)") { string(name, target) } == title
+            switch identity {
+            case let .identifier(identifier, title):
+                if id != identifier {
+                    guard let title else { return notReady("identifier mismatch") }
+                    var matched = false
+                    for (index, name) in labels.enumerated() where !matched {
+                        matched = try marked(p + ".title.\(index)") { string(name, target) } == title
+                    }
+                    guard matched else { return notReady("neither identifier nor fixture title matched") }
+                    contract = "fixture-title"
                 }
-                guard matched else { return notReady("neither identifier nor fixture title matched") }
-                contract = "fixture-title"
+            case let .statusOwnedMenuItem(_, title):
+                // Native identifier recorded (observed empty), never required; exact AXTitle is mandatory.
+                targetFacts["identifierEmpty"] = id.isEmpty
+                guard role == "AXMenuItem", axTitle == title else { return notReady("exact product menu title mismatch") }
+                contract = "status-owned-native-menu-item-title"
             }
             targetFacts["identityContract"] = contract
             let isEnabled = try marked(p + ".enabled") { enabled(target) }
@@ -859,7 +1168,7 @@ enum WritingUndoControlOracle {
             return (obs, ClickProof(frame: frame, center: center, display: display, bounds: bounds, id: id, role: role,
                                     contract: contract, depth: depth, policy: policy,
                                     targetWindowPresent: targetWindow != nil, hitWindowPresent: hitWindow != nil,
-                                    windowOwned: windowOwned, menuAncestor: menuAncestor))
+                                    windowOwned: windowOwned, menuAncestor: menuAncestor, menuIdentity: menuIdentity))
         }
 
         func marked<T>(_ stage: String, _ body: () throws -> T) throws -> T {
@@ -974,6 +1283,12 @@ enum WritingUndoControlOracle {
         func element(_ name: String, _ node: AXUIElement) -> AXUIElement? {
             guard let raw = attribute(name, node), CFGetTypeID(raw) == AXUIElementGetTypeID() else { return nil }
             return (raw as! AXUIElement)
+        }
+        /// Attribute read that keeps the AXError, for predicates that must never read an error as absence.
+        func copy(_ name: String, _ node: AXUIElement) -> (AXError, CFTypeRef?) {
+            var value: CFTypeRef?
+            let error = AXUIElementCopyAttributeValue(node, name as CFString, &value)
+            return (error, error == .success ? value : nil)
         }
         func attribute(_ name: String, _ node: AXUIElement) -> CFTypeRef? {
             var value: CFTypeRef?

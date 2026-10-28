@@ -65,18 +65,37 @@
       "shortstat": "6 files changed, 3518 insertions(+)",
       "verdict": "APPROVE",
       "usage_status": "Not exposed; not estimated."
+    },
+    {
+      "round": 3,
+      "status": "complete",
+      "scope": "changed code since approved1639 and RUNTIME2 only",
+      "findings": [],
+      "usage": null,
+      "frozen_sha256": {
+        "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
+        "scripts/fixtures/WritingUndoControlOracle.swift": "f576a2d4d7c3e3a6f4452383d96cef1bbdc108fbaf40831cdf2688c05a5a56fb",
+        "scripts/verify-writing-undo-controls.py": "f1dbdf1d56f71ef0e7cf469697d38e52d491f7aead2bb0f0a518bf8785b208a0",
+        "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
+        ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd",
+        "docs/research/competitors/evidence/undo-controls-source/authorship-and-review.json": "878a0e6910565e0719e93214fdfb46728f73fad2300e3b3e51ae5bc585f46134"
+      },
+      "diff_sha256": "94751dc938fc3763c9738c30e16ff9109502095ace75ac6d5676c2e3d07fb886",
+      "shortstat": "6 files changed, 3986 insertions(+)",
+      "verdict": "APPROVE",
+      "usage_status": "Not exposed; not estimated."
     }
   ],
   "native_runtime_status": "pending; previous8fab run stopped in status press helper before any completed case",
-  "status": "approved-source-remote-experiment-pending",
-  "rounds_used": 2,
+  "status": "source-approved-native-still-pending",
+  "rounds_used": 3,
   "open_blockers_or_shoulds": [],
   "fixed_findings": [],
   "declined_findings": [],
   "code_diff_shortstat_after_review": "6 files changed, 3095 insertions(+)",
   "code_diff_sha256_after_review": "24ae35cdfa3a53ea0d564f590b21210dd245ca8fc0d7a6ef6ee7ee56b22ec597",
   "scoped_files_frozen_through_terminal_verdict": true,
-  "post_review_changes": "Only verdict/ledger/authorship metadata updated after terminal round2; no behavior changed.",
+  "post_review_changes": "Verdict/ledger/authorship metadata only after round3; no behavior changes.",
   "runtime_findings": [
     {
       "id": "RUNTIME1",
@@ -84,6 +103,13 @@
       "provenance": "actual run40624443133 exactb2c82ce6e",
       "claim": "Pre-input exact-one-display guard refused; raw rectangles/display/root facts missing, so no cause known.",
       "outcome": "resolved-source / pending-native; raw geometry and bounded pre-input readiness experiment retained, actual cause unproven"
+    },
+    {
+      "id": "RUNTIME2",
+      "severity": "should",
+      "provenance": "actual40627170433 at1639a273c",
+      "claim": "Real opened native AXMenuItem exacttitle exposes emptyidentifier; oldIDselectorcannotfindit.",
+      "outcome": "resolved-source / pending-native; scoped title/role/retained-status native-menu contract implemented with full proof bindings"
     }
   ],
   "open_native_requirements": [
@@ -91,5 +117,6 @@
     "Four native menu/shortcut cases, three states, exact editor/range/selection/focus/notice and closed-host proof.",
     "15 actual case/state screenshots and native visual review."
   ],
-  "code_diff_shortstat_after_round2": "6 files changed, 3518 insertions(+)"
+  "code_diff_shortstat_after_round2": "6 files changed, 3518 insertions(+)",
+  "code_diff_shortstat_after_round3": "6 files changed, 3986 insertions(+)"
 }

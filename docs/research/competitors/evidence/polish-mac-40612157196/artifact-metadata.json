@@ -1,0 +1,12 @@
+{
+  "artifacts": [
+    {
+      "digest": "sha256:f4e5470ca4b8a80bc5dbb6fe1c4156521f5cd474d1711ae3c17bedcd82e4ea60",
+      "expired": false,
+      "id": 12784386004,
+      "name": "roma.writing-actions-evidence",
+      "size_in_bytes": 44013
+    }
+  ],
+  "total_count": 1
+}

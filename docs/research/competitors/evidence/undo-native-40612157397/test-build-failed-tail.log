@@ -1,0 +1,30 @@
+SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Views/EnhancementSettingsView.swift (in target 'VoiceInk' from project 'VoiceInk')
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    
+
+SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Views/LicenseManagementView.swift (in target 'VoiceInk' from project 'VoiceInk')
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    
+
+SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Views/MenuBarView.swift (in target 'VoiceInk' from project 'VoiceInk')
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    
+
+SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Views/MetricsView.swift (in target 'VoiceInk' from project 'VoiceInk')
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    
+
+SwiftDriverJobDiscovery normal arm64 Compiling QwenModelCardView.swift, WhisperModelCardView.swift, AppIconView.swift, CardBackground.swift, CompactHeroSection.swift, CopyIconButton.swift, SaveIconButton.swift, TranscriptionInfoPanel.swift, EnhancementSettingsPanel.swift, FillerWordsSettingsView.swift, FlowLayout.swift, InfoTip.swift, ProBadge.swift, PromptSelectionGrid.swift, SlidingPanel.swift, TrialMessageView.swift, DictionaryQuickAddPanel.swift, DictionarySettingsPanel.swift, DictionarySettingsView.swift, EditReplacementSheet.swift, SpokenSnippetSheets.swift, SpokenSnippetsView.swift, VocabularyView.swift, WordReplacementReviewViews.swift (in target 'VoiceInk' from project 'VoiceInk')
+
+warning: missing creator for mutated node: ('/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/mlx-swift_Cmlx.bundle/Contents/MacOS') (in target 'mlx-swift_Cmlx' from project 'mlx-swift')
+note: Disabling hardened runtime with ad-hoc codesigning. (in target 'VoiceInk' from project 'VoiceInk')
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj: warning: The Copy Bundle Resources build phase contains this target's Info.plist file '/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Info.plist'. (in target 'VoiceInk' from project 'VoiceInk')
+note: Run script build phase 'Verify MLX Metal Resource' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'VoiceInk' from project 'VoiceInk')
+** TEST BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/BackupTypes.swift (in target 'VoiceInk' from project 'VoiceInk')
+	SwiftCompile normal arm64 Compiling\ PowerModeConfig.swift,\ PowerModeConfigView.swift,\ PowerModePopover.swift,\ PowerModeSessionManager.swift,\ PowerModeStateProvider.swift,\ PowerModeView.swift,\ PowerModeViewComponents.swift,\ AIEnhancementService.swift,\ AIService.swift,\ LocalCLIService.swift,\ AnnouncementsService.swift,\ APIKeyManager.swift,\ AudioDeviceManager.swift,\ AudioFileTranscriptionManager.swift,\ AudioFileTranscriptionService.swift,\ BackupImporter.swift,\ BackupTypes.swift,\ CursorTextContextReader.swift,\ CustomVocabularyService.swift,\ DictationPostprocessingPlan.swift,\ DictionaryPersistence.swift,\ DictionaryService.swift,\ HistoryCorrectionApprovalService.swift,\ ImportExportService.swift,\ KeychainService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/PowerMode/PowerModeConfig.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/PowerMode/PowerModeConfigView.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/PowerMode/PowerModePopover.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/PowerMode/PowerModeSessionManager.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/PowerMode/PowerModeStateProvider.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/PowerMode/PowerModeView.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/PowerMode/PowerModeViewComponents.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/AIEnhancement/AIEnhancementService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/AIEnhancement/AIService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/AIEnhancement/LocalCLIService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/AnnouncementsService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/APIKeyManager.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/AudioDeviceManager.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/AudioFileTranscriptionManager.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/AudioFileTranscriptionService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/BackupImporter.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/BackupTypes.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/CursorTextContextReader.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/CustomVocabularyService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/DictationPostprocessingPlan.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/DictionaryPersistence.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/DictionaryService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/HistoryCorrectionApprovalService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/ImportExportService.swift /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/KeychainService.swift (in target 'VoiceInk' from project 'VoiceInk')
+	Building project VoiceInk for testing with scheme VoiceInk
+(3 failures)

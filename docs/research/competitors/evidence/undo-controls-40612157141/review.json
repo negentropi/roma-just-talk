@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "review_model": "gpt-6.1-sol",
+  "review_type": "read-only actual failure evidence and raw retained build log",
+  "result": "clean-with-runtime-limits",
+  "reviewed_files_sha256": {
+    "audit.json": "3349375821052049e60b9465f233ee216caba34b07a11e8f70e42cc9629af630",
+    "README.md": "43b6e7a6d428f8ee838a7f4a5b12338b6184f9ea45e477c6f01a6b54fff70c68",
+    "compiler-error.txt": "f65dcf82e3dbcb5d75d51b4129b6b5926fbba85d2b7cb42390ae51b9960b1440",
+    "failure-diagnosis.json": "42f99fc0c84045922f6d4d7dd8ff49e39e9ca4e10e65094517236d79a8ae58ba",
+    "artifacts.json": "b5ff8b0c002dd0e5076e83c272e9e30d2dd223079c032802fa9e9ed93a090b71"
+  },
+  "independently_checked_raw_build_log_sha256": "d5a06df4c570b193170496b4cc7064d01e74257c8edb2f3e8296fbe6cbcceecc",
+  "observed_compile_errors": 1,
+  "native_completed_cases": 0,
+  "visual_review_performed": false,
+  "reason_no_visual_review": "Compilation failed before host launch; no screenshot exists in either archive.",
+  "review_findings": [],
+  "limits": [
+    "Prepared manifests match the independent expected Git extraction, but no post-build source receipt or actual compiler response-list validation was reached.",
+    "The automated audit terminology is qualified in README and failure-diagnosis; its no-mismatch result does not establish post-build fidelity.",
+    "No Undo control, bootstrap, editor, focus, feedback or cleanup runtime conclusion from this run."
+  ]
+}

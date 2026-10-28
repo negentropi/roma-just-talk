@@ -1,0 +1,5 @@
+{
+  "mode": "verify",
+  "classification": "invalid-or-failed",
+  "error": "[Errno 2] No such file or directory: '/Users/runner/work/_temp/writing-undo-native-proof/identity-before.json'"
+}

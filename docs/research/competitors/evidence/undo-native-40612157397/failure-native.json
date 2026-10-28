@@ -1,0 +1,5 @@
+{
+  "mode": "native",
+  "classification": "invalid-or-failed",
+  "error": "Command failed with exit 65; inspect /Users/runner/work/_temp/writing-undo-native-proof/build.log"
+}

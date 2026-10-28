@@ -1,0 +1,12 @@
+{
+  "run_id": 40612157196,
+  "head": "772f0cae21347a74bdb38f5ef3244a73add0fb8d",
+  "classification": "intentionally-cancelled-no-new-test-acceptance",
+  "reason_source": "Root/Gateowner cancelled during unit build after separate run40612157397 showed same shared BackupTypes73 rows-shadow compiler failure. This receipt does not independently duplicate that build log.",
+  "actual_workflow": "Unit step cancelled; UI/native/matched/Release skipped; always preserve-evidence step succeeded.",
+  "artifacts_listed": 1,
+  "artifact_downloaded": false,
+  "failed_log_downloaded": false,
+  "new_UI_or_unit_pass_claims": 0,
+  "cross_run_compile_owner": "polish_gate_readiness/root existing native log, not re-fetched here."
+}

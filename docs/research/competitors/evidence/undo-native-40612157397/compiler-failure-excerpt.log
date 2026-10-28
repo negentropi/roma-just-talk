@@ -1,0 +1,10 @@
+    cd /Users/runner/work/roma-just-talk/roma-just-talk
+    
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/BackupTypes.swift:73:32: error: cannot reference invalid declaration 'rows'
+                let rows = try rows(
+                               ^
+/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/BackupTypes.swift:67:17: note: 'rows' declared here
+            let rows = try DictionaryPersistence.commit(in: context.container, saveFailure: {
+                ^
+
+SwiftCompile normal arm64 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Services/CursorTextContextReader.swift (in target 'VoiceInk' from project 'VoiceInk')

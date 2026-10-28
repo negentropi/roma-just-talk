@@ -1,0 +1,7 @@
+/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk/Services/BackupTypes.swift:73:32: error: cannot reference invalid declaration 'rows'
+                let rows = try rows(
+                               ^
+/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk/Services/BackupTypes.swift:67:17: note: 'rows' declared here
+            let rows = try DictionaryPersistence.commit(in: context.container, saveFailure: {
+                ^
+

@@ -1,0 +1,48 @@
+{
+  "run_id": 40612157141,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40612157141",
+  "head_sha": "772f0cae21347a74bdb38f5ef3244a73add0fb8d",
+  "github_conclusion": "failure",
+  "classification": "shared-production-compile-failure-before-controls",
+  "first_failure": "/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk/Services/BackupTypes.swift:73:32: error: cannot reference invalid declaration 'rows'",
+  "compiler_diagnostic_excerpt": "/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk/Services/BackupTypes.swift:73:32: error: cannot reference invalid declaration 'rows'\n                let rows = try rows(\n                               ^\n/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk/Services/BackupTypes.swift:67:17: note: 'rows' declared here\n            let rows = try DictionaryPersistence.commit(in: context.container, saveFailure: {\n                ^\n\n",
+  "build": {
+    "succeeded": false,
+    "failed": true,
+    "compile_error_count": 1,
+    "raw_build_log_member": "writing-undo-controls-proof/build.log",
+    "raw_build_log_sha256": "d5a06df4c570b193170496b4cc7064d01e74257c8edb2f3e8296fbe6cbcceecc",
+    "retained_excerpt_sha256": "f65dcf82e3dbcb5d75d51b4129b6b5926fbba85d2b7cb42390ae51b9960b1440"
+  },
+  "prepared_source_matches_independent_git_objects": true,
+  "prepared_source_files": 613,
+  "prepared_candidate_matches_independent_git_objects": true,
+  "prepared_candidate_files": 606,
+  "expected_app_swift_sources": 222,
+  "actual_compiler_source_validation_completed": false,
+  "canonical_pins": 41,
+  "host_launched": false,
+  "signature_verification_executed": false,
+  "fresh_tcc_executed": false,
+  "native_completed_cases": 0,
+  "state_checks_completed": 0,
+  "screenshots": 0,
+  "clipboard_policy_bootstrap_executed": false,
+  "source_after_receipt_present": false,
+  "secondary_verifier_failure": {
+    "mode": "verify",
+    "classification": "invalid-or-failed",
+    "error": "[Errno 2] No such file or directory: '/Users/runner/work/_temp/writing-undo-controls-proof/identity-before.json'"
+  },
+  "scope": "Isolated genuine Undo controls component candidate, original VoiceInk.swift excluded. Native proof did not begin.",
+  "limits": [
+    "Compilation failed in shared production Dictionary backup code before signature/TCC or isolated host launch.",
+    "No menu, configured shortcut, editor restoration, selection, focus or feedback acceptance from this run.",
+    "No screenshot exists in these artifacts, so no actual screenshot review was possible.",
+    "Prepared source fidelity was checked independently; post-build source and actual Swift response-list guards were not reached."
+  ],
+  "automated_audit_interpretation": {
+    "candidate-source-fidelity:passed": "No retained mismatch census exists. Post-build fidelity was not verified because compilation failed before source-after.json. Prepared manifests were checked independently.",
+    "highest_observed_stage:source-prepared": "Highest complete named receipt only. Raw build.log proves compilation was attempted and failed."
+  }
+}

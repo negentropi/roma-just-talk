@@ -1,0 +1,106 @@
+{
+  "run_id": 40612157397,
+  "head_sha": "772f0cae21347a74bdb38f5ef3244a73add0fb8d",
+  "paths": {
+    "scripts/run-writing-undo-native-check.sh": {
+      "exists": true,
+      "bytes": 54820,
+      "sha256": "c4ce797818075eed863dde43cbd618948ee6ffe463f7618cc88972cb313ee66b"
+    },
+    ".github/workflows/voiceink-writing-undo-native-check.yml": {
+      "exists": true,
+      "bytes": 5907,
+      "sha256": "3c64f8bbac3c321c7167a3f9870bb192c958e27e8de207a9efa9abc7f738ed72"
+    },
+    "VoiceInkTests/WritingUndoLiveTests.swift": {
+      "exists": true,
+      "bytes": 28386,
+      "sha256": "6bb7e7decfe0d7889c1337e3d5f9d4bef3b6e1abd7fc1ba574596a990f46d0ca"
+    },
+    "VoiceInkTests/WritingTargetLiveTests.swift": {
+      "exists": true,
+      "bytes": 102345,
+      "sha256": "fd1d9ffc2d833d1b21e977468a68ee2973f788f102ff5d2787a0622973bebf06"
+    },
+    "VoiceInkTests/VoiceInkTests.swift": {
+      "exists": true,
+      "bytes": 71838,
+      "sha256": "9c21e8667e6dc5d9b7546bfda5ae7f4f8f95f08afc3ad69df31aaa828c149395"
+    },
+    "VoiceInk/Services/WritingActionUndoController.swift": {
+      "exists": true,
+      "bytes": 4753,
+      "sha256": "c7d60432cad2dd68bbf9d6f87ac8fb054bd55778afed1df0d223cd69927b7bdc"
+    },
+    "VoiceInk/Services/WritingTarget.swift": {
+      "exists": true,
+      "bytes": 28356,
+      "sha256": "ec5dfd2be81817be0c0ba6041325a2b5117bdbe3d3c9d0878ccb4f73834f4ca2"
+    },
+    "VoiceInk/Services/CursorTextContextReader.swift": {
+      "exists": true,
+      "bytes": 83087,
+      "sha256": "96d45f1c103a5a4be1e57053374c0130fefd80c84adc4d4bd987b4f77bb9cb5d"
+    },
+    "VoiceInk/Paste/CursorPaster.swift": {
+      "exists": true,
+      "bytes": 42232,
+      "sha256": "0954eaa9465d0725278c5f955600ce3338a426d00915d08f6803401319e26342"
+    },
+    "VoiceInk/VoiceInk.swift": {
+      "exists": true,
+      "bytes": 23673,
+      "sha256": "3e80d99bc3c8558b7a73c6ae9bfee68769e3e6f9f77fa31f8cf14fba6827c51c"
+    },
+    "VoiceInk/Services/KeychainService.swift": {
+      "exists": true,
+      "bytes": 5063,
+      "sha256": "78ede0cfc66704712ec972a002c6369fc19aa4620a3d1eb4aad4d845b61b5301"
+    },
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": {
+      "exists": true,
+      "bytes": 11320,
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+    },
+    "scripts/run-writing-feature-regression.sh": {
+      "exists": true,
+      "bytes": 58437,
+      "sha256": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e"
+    },
+    "scripts/verify-adhoc-macos-test-host.sh": {
+      "exists": true,
+      "bytes": 3642,
+      "sha256": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5"
+    },
+    "scripts/verify-static-whisper-xcframework.sh": {
+      "exists": true,
+      "bytes": 1853,
+      "sha256": "325bb8ec708dab070d6639a5efdc40f462ddc2f052c1c38c94737ca744277327"
+    },
+    "scripts/verify-static-whisper-app.sh": {
+      "exists": true,
+      "bytes": 1926,
+      "sha256": "e40475d402148fbde4327619c94ad046de1fb4ff18a3f04228a35534d64e2ad8"
+    },
+    "Makefile": {
+      "exists": true,
+      "bytes": 17343,
+      "sha256": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9"
+    },
+    "LocalBuild.xcconfig": {
+      "exists": true,
+      "bytes": 641,
+      "sha256": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844"
+    },
+    "VoiceInk/Services/BackupTypes.swift": {
+      "exists": true,
+      "bytes": 8312,
+      "sha256": "684a01087f55481d54772aa0d7d5e4de600cc08a4bf823c468a003de9abc3965"
+    },
+    "VoiceInk/Services/DictionaryPersistence.swift": {
+      "exists": true,
+      "bytes": 2951,
+      "sha256": "96ced8455dee409564b29f654da221be362d5f31a09badfca43e1557879b5a6d"
+    }
+  }
+}

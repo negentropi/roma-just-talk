@@ -1,0 +1,5 @@
+{
+  "mode": "native",
+  "classification": "invalid-or-failed",
+  "error": "Native acceptance did not satisfy the exact contract: Issues, skips, cancellation, crashes and launch errors cannot pass"
+}

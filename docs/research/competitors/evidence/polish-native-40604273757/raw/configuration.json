@@ -1,0 +1,41 @@
+{
+  "command_line_arguments": [
+    "-CurrentTranscriptionModel",
+    "whisper-large-v3-turbo",
+    "-PrewarmModelOnWake",
+    "NO",
+    "-hasCompletedOnboarding",
+    "YES",
+    "-isAIEnhancementEnabled",
+    "NO",
+    "-IsAudioCleanupEnabled",
+    "NO",
+    "-IsTranscriptionCleanupEnabled",
+    "NO",
+    "-enableAnnouncements",
+    "NO"
+  ],
+  "credential_contract": "LOCAL_BUILD routes app KeychainService to fresh UserDefaults. Local CLI is selected before AI initialization. Source/configuration assurance, not SecItem tracing.",
+  "environment": {
+    "CFFIXED_USER_HOME": "/Users/runner/work/_temp/dictation-polish-native-proof/isolated-user",
+    "GITHUB_ACTIONS": "true",
+    "RJT_DICTATION_POLISH_AUDIO": "/Users/runner/work/_temp/dictation-polish-native-proof/inputs/input.wav",
+    "RJT_DICTATION_POLISH_EVIDENCE": "/Users/runner/work/_temp/dictation-polish-native-proof/observations",
+    "RJT_DICTATION_POLISH_LIVE_CHECKS": "1",
+    "RJT_DICTATION_POLISH_MODEL": "/Users/runner/work/_temp/dictation-polish-native-proof/inputs/ggml-base.bin",
+    "RJT_LIVE_WRITING_TARGET_EVIDENCE": "/Users/runner/work/_temp/dictation-polish-native-proof/editor-observations",
+    "RUNNER_ENVIRONMENT": "github-hosted"
+  },
+  "isolated_sha256": "7e071d753c46f412267efdd93e1ccb164ae3a155e88269c3c1060a78d126aac4",
+  "original_sha256": "3c39a165ee70e9577b61184b402ce5e2c2e10e8ee1b8d5591f800f965472b8b3",
+  "seed_preferences": {
+    "CurrentTranscriptionModel": "whisper-large-v3-turbo",
+    "IsAudioCleanupEnabled": false,
+    "IsTranscriptionCleanupEnabled": false,
+    "PrewarmModelOnWake": false,
+    "enableAnnouncements": false,
+    "hasCompletedOnboarding": true,
+    "isAIEnhancementEnabled": false,
+    "selectedAIProvider": "Local CLI"
+  }
+}

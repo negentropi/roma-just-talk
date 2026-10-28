@@ -1,0 +1,49 @@
+{
+  "actual_whisper_file_operations": 4,
+  "classification": "invalid-or-failed",
+  "errors": [
+    "Issues, skips, cancellation, crashes and launch errors cannot pass"
+  ],
+  "exit_code": 0,
+  "native_textedit_scenarios": 3,
+  "observation_sha256": {
+    "liveClarityImportQueueUsesRealWhisperRecognition.json": "63403ff92a990fd677dd613ce6a30fb25a5097eb0e401e7c63d452882c4294bb",
+    "liveClarityRetranscriptionUsesRealWhisperRecognition.json": "3d4344fc1e91570a5346d62cbed9c0c9280cf08db066deaf1b19c91b3d09a68e",
+    "liveDictationPolishPipelineDeliversLiteralTextToTextEdit.json": "9ac65c1c45cb5e760377066e7087ce5975408d67b1a5980e9f3db525d61f60d9",
+    "liveLightImportQueueUsesRealWhisperRecognition.json": "d956f1a3de61fd8bd9590fe3bfdf934c84e777d183616e4ca1da97dae6539414",
+    "liveLightRetranscriptionUsesRealWhisperRecognition.json": "a9f9cee592a8db3d4182d10bab8c18f56a1c41b61a9be065ae980e0d23b62391"
+  },
+  "results": {
+    "liveClarityImportQueueUsesRealWhisperRecognition": [
+      "passed"
+    ],
+    "liveClarityRetranscriptionUsesRealWhisperRecognition": [
+      "passed"
+    ],
+    "liveDictationPolishPipelineDeliversLiteralTextToTextEdit": [
+      "passed"
+    ],
+    "liveLightImportQueueUsesRealWhisperRecognition": [
+      "passed"
+    ],
+    "liveLightRetranscriptionUsesRealWhisperRecognition": [
+      "passed"
+    ]
+  },
+  "source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "starts": [
+    "liveLightImportQueueUsesRealWhisperRecognition",
+    "liveClarityImportQueueUsesRealWhisperRecognition",
+    "liveLightRetranscriptionUsesRealWhisperRecognition",
+    "liveClarityRetranscriptionUsesRealWhisperRecognition",
+    "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+  ],
+  "summaries": [
+    [
+      "5",
+      "1",
+      "passed"
+    ]
+  ],
+  "valid": false
+}

@@ -1,0 +1,5 @@
+{
+  "mode": "verify",
+  "classification": "invalid-or-failed",
+  "error": "Retained native acceptance is invalid"
+}

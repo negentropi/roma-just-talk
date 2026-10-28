@@ -1,0 +1,130 @@
+{
+  "classification": "actual-native-boundary-passed-original-workflow-red-from-checker-false-positive",
+  "runID": 40604273757,
+  "sourceSHA": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "originalGitHubConclusion": "failure",
+  "actualTestCount": 5,
+  "actualTestsEachStartedAndPassedOnce": true,
+  "actualNativeExit": 0,
+  "actualTestDurationSeconds": 46.896,
+  "actualWhisperFileOperations": [
+    {
+      "testName": "liveClarityImportQueueUsesRealWhisperRecognition",
+      "recordID": "BCC59F88-46D1-4BDA-82B0-23D8438F427E",
+      "profile": "clarity",
+      "warningCount": 1,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383"
+    },
+    {
+      "testName": "liveClarityRetranscriptionUsesRealWhisperRecognition",
+      "recordID": "ADACAA1C-3070-4316-869C-79C8C88E413D",
+      "profile": "clarity",
+      "warningCount": 0,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+    },
+    {
+      "testName": "liveLightImportQueueUsesRealWhisperRecognition",
+      "recordID": "D945A494-D85A-4A30-A076-8F3E538A9D8F",
+      "profile": "light",
+      "warningCount": 0,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383"
+    },
+    {
+      "testName": "liveLightRetranscriptionUsesRealWhisperRecognition",
+      "recordID": "212850D9-8757-468F-8EA1-683333B23B06",
+      "profile": "light",
+      "warningCount": 0,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+    }
+  ],
+  "actualTextEditScenarios": [
+    {
+      "scenario": "light",
+      "recordID": "76142EFB-4BFA-41E1-AE8F-E1E41AF375FF",
+      "caret": {
+        "length": 0,
+        "location": 54
+      },
+      "warningCount": 0,
+      "actualCLIRequests": 0
+    },
+    {
+      "scenario": "clarity-success",
+      "recordID": "93A3F7C8-65C1-4177-B0A1-E946B622D9D2",
+      "caret": {
+        "length": 0,
+        "location": 59
+      },
+      "warningCount": 0,
+      "actualCLIRequests": 1
+    },
+    {
+      "scenario": "clarity-fallback",
+      "recordID": "AEF5ADD0-C738-4557-83DD-7F59A38635BB",
+      "caret": {
+        "length": 0,
+        "location": 40
+      },
+      "warningCount": 1,
+      "actualCLIRequests": 1
+    }
+  ],
+  "pipelineRecognition": "Fixed synthetic ASR session; actual pipeline, actual Local CLI child and native TextEdit values/caret.",
+  "fileRecognition": "Actual pinned Whisper base and committed synthetic WAV; actual registry superclass dispatch and same loaded context return.",
+  "sameContextComparisons": "Exact UTF-8/UTF-16 raw recognition matched separately stored recognition in all four file cases.",
+  "literalOutput": "Actual NFD, emoji, CRLF, tags, dollars and backslashes preserved in appropriate file/editor results.",
+  "actualCLIChildPIDs": [
+    25171,
+    25469,
+    25570,
+    25580
+  ],
+  "providerLaunchFixedActualSnapshots": 10,
+  "sourceCensus": 647,
+  "sourceMatchesPinnedGit": true,
+  "sourceBeforeAfterEqual": true,
+  "signedAppAndTestIdentityBeforeAfterEqual": true,
+  "actualDebugSignature": {
+    "app_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "399873aa7da2a9061b75d5cf4bae278b8a4c5fd645256b67c2007c87f5b475b4",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "actualCanonicalDependencyPinsBefore": 41,
+  "testHostPID": 24246,
+  "hostClosurePassed": true,
+  "textEditOwnedWindowsClosed": 3,
+  "clipboardGeneration": "Unchanged generation is asserted after each actual direct-AX scenario and at fixture close; numeric generations were not retained separately.",
+  "artifact": {
+    "id": 12780618073,
+    "bytes": 945653,
+    "sha256": "2db7a0bb7a193daf0481b787815f4fbfeea8c0a9a09f9b67ec7fd475ca1241d0",
+    "members": 92,
+    "crcValid": true,
+    "downloads": 1,
+    "path": "/data/rjt-writing-check-01a17bef/40604273757/evidence.zip"
+  },
+  "secondArtifactDownloaded": false,
+  "limits": [
+    "GitHub workflow remains failed; corrected classifier is reapplied to this exact immutable raw log without repeating native execution.",
+    "Synthetic WAV is not human speech or microphone accuracy proof; editor cases use synthetic ASR and deterministic CLI output, not real model quality.",
+    "Fresh ModelContext reads use retained in-memory stores; no crash/relaunch persistence or CloudKit claim.",
+    "Actual app startup attempted pre-roll; no microphone inactivity claim.",
+    "This proves source6394 before pending Undo changes, not later production sources."
+  ]
+}

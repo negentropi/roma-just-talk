@@ -130,7 +130,7 @@ def classify(text, code):
     summaries = re.findall(r'Test run with (\d+) tests? in (\d+) suites? (passed|failed)', text)
     if len(summaries) != 1 or summaries[0][0] != '5' or int(summaries[0][1]) <= 0 or summaries[0][2] != 'passed' or code != 0:
         errors.append('One five-test passed summary and exit zero are required')
-    if re.search(r'\brecorded an issue\b|\bskipped\b|Test session ended prematurely|Testing cancelled|failed to launch|fatal error:|crashed', text, re.I):
+    if re.search(r'\brecorded an issue\b|^\s*(?:[◇✔✘↷]\s+)?Test\s+[^\n]+\bskipped\b|Test session ended prematurely|Testing cancelled|failed to launch|fatal error:|crashed', text, re.I | re.M):
         errors.append('Issues, skips, cancellation, crashes and launch errors cannot pass')
     return {'valid': not errors, 'classification': 'passed' if not errors else 'invalid-or-failed', 'exit_code': code,
         'starts': starts, 'results': results, 'summaries': [list(item) for item in summaries], 'errors': errors}
@@ -482,6 +482,9 @@ def self_test():
         derived, output = original_derived, original_output
     good = ''.join('Test ' + name + '() started.\nTest ' + name + '() passed after 1.0 seconds.\n' for name in cases) + 'Test run with 5 tests in 1 suite passed after 5.0 seconds.\n'
     require(classify(good, 0)['valid'], 'Valid exact-five log rejected')
+    benign_recorder = '2026-10-27 23:57:01.692204+0000 roma just talk[24246:72479] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit\n'
+    require(classify(good + benign_recorder, 0)['valid'], 'Actual benign recorder cleanup was mistaken for a skipped test')
+    require(not classify(good + '↷ Test extra() skipped.\n', 0)['valid'], 'An actual Swift Testing skip was accepted')
     bad = [good.replace(cases[0], 'wrong'), good.replace('with 5 tests', 'with 4 tests'), good.replace('passed after 1.0', 'skipped after 1.0', 1),
         good + 'Test extra() started.\n', good + 'Test ' + cases[0] + '() started.\n', good + 'Test recorded an issue: setup failed\n', good + 'fatal error: crash\n']
     require(all(not classify(value, 0)['valid'] for value in bad) and not classify(good, 65)['valid'], 'Invalid native result accepted')

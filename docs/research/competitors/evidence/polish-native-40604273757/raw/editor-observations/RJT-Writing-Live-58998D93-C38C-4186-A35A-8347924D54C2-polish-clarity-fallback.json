@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "polish-clarity-fallback",
+  "date" : "2026-10-27T23:57:48Z",
+  "expected" : "Before 👩🏽‍💻 Um, Roma confirms this.\r\n after 🧑‍🚀.\n",
+  "observed" : "Before 👩🏽‍💻 Um, Roma confirms this.\r\n after 🧑‍🚀.\n",
+  "processIdentifier" : 25479,
+  "token" : "RJT-Writing-Live-58998D93-C38C-4186-A35A-8347924D54C2"
+}

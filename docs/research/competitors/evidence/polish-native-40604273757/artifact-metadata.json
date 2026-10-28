@@ -1,0 +1,16 @@
+[
+  {
+    "digest": "sha256:2db7a0bb7a193daf0481b787815f4fbfeea8c0a9a09f9b67ec7fd475ca1241d0",
+    "expired": false,
+    "id": 12780618073,
+    "name": "roma.dictation-polish-native-observations",
+    "size_in_bytes": 945653
+  },
+  {
+    "digest": "sha256:d19b31ab76c1c9756425a865754647ce1a95722bbfda647490df21af856f1098",
+    "expired": false,
+    "id": 12780553227,
+    "name": "roma.dictation-polish-native-evidence",
+    "size_in_bytes": 634253
+  }
+]

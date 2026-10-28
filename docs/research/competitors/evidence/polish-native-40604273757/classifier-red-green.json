@@ -1,0 +1,96 @@
+{
+  "classification": "checker-only-reclassification-of-immutable-native-log",
+  "actualRunID": 40604273757,
+  "actualRunSource": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "originalWorkflowConclusion": "failure",
+  "actualNativeExit": 0,
+  "actualTestsLogSHA256": "e4d9adb50841abd15249b1fcd3a56e5e8114b6e7d7aa2c1a59e8f51e0117d782",
+  "originalVerdict": {
+    "valid": false,
+    "classification": "invalid-or-failed",
+    "exit_code": 0,
+    "starts": [
+      "liveLightImportQueueUsesRealWhisperRecognition",
+      "liveClarityImportQueueUsesRealWhisperRecognition",
+      "liveLightRetranscriptionUsesRealWhisperRecognition",
+      "liveClarityRetranscriptionUsesRealWhisperRecognition",
+      "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+    ],
+    "results": {
+      "liveLightImportQueueUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveClarityImportQueueUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveLightRetranscriptionUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveClarityRetranscriptionUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveDictationPolishPipelineDeliversLiteralTextToTextEdit": [
+        "passed"
+      ]
+    },
+    "summaries": [
+      [
+        "5",
+        "1",
+        "passed"
+      ]
+    ],
+    "errors": [
+      "Issues, skips, cancellation, crashes and launch errors cannot pass"
+    ]
+  },
+  "correctedVerdict": {
+    "valid": true,
+    "classification": "passed",
+    "exit_code": 0,
+    "starts": [
+      "liveLightImportQueueUsesRealWhisperRecognition",
+      "liveClarityImportQueueUsesRealWhisperRecognition",
+      "liveLightRetranscriptionUsesRealWhisperRecognition",
+      "liveClarityRetranscriptionUsesRealWhisperRecognition",
+      "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+    ],
+    "results": {
+      "liveLightImportQueueUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveClarityImportQueueUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveLightRetranscriptionUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveClarityRetranscriptionUsesRealWhisperRecognition": [
+        "passed"
+      ],
+      "liveDictationPolishPipelineDeliversLiteralTextToTextEdit": [
+        "passed"
+      ]
+    },
+    "summaries": [
+      [
+        "5",
+        "1",
+        "passed"
+      ]
+    ],
+    "errors": []
+  },
+  "onlyFalsePositiveLines": [
+    "2026-10-27 23:57:01.692204+0000 roma just talk[24246:72479] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit",
+    "2026-10-27 23:57:39.524335+0000 roma just talk[24246:72355] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit",
+    "2026-10-27 23:57:39.524363+0000 roma just talk[24246:72355] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit",
+    "2026-10-27 23:57:43.020408+0000 roma just talk[24246:72355] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit",
+    "2026-10-27 23:57:43.020434+0000 roma just talk[24246:72355] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit"
+  ],
+  "candidateDriverSHA256": "b51b14d0da916b2aa384f548a4ce6d0d6d3e69ef6d52b7a84e1f2f00785e0c83",
+  "limits": [
+    "Original GitHub workflow remains failed. No native execution was repeated.",
+    "This comparison changes only log classification; the independent audit validates actual feature observations separately."
+  ]
+}

@@ -1,0 +1,26 @@
+native	Execute four real Whisper file operations and native TextEdit delivery	﻿2026-10-27T23:47:14.4427910Z ##[group]Run bash scripts/run-dictation-polish-native-check.sh native
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:47:14.4428380Z ^[[36;1mbash scripts/run-dictation-polish-native-check.sh native^[[0m
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:47:14.4501760Z shell: /bin/bash -e {0}
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:47:14.4502040Z ##[endgroup]
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:47:20.2949650Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/build-settings.json
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:47:42.4263020Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/build.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:55:54.3348960Z Running bash; log /Users/runner/work/_temp/dictation-polish-native-proof/static-app.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:56:02.5074360Z Running bash; log /Users/runner/work/_temp/dictation-polish-native-proof/signing.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:56:03.3579510Z Running curl; log /Users/runner/work/_temp/dictation-polish-native-proof/model-download.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:56:09.0616650Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/discovery/enumeration.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:56:34.3821520Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/selection/enumeration.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:56:45.2148650Z Running xcodebuild; log /Users/runner/work/_temp/dictation-polish-native-proof/tests.log
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:58:07.6497270Z Traceback (most recent call last):
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:58:07.6537310Z   File "<stdin>", line 618, in <module>
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:58:07.6538570Z   File "<stdin>", line 45, in require
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:58:07.6539470Z RuntimeError: Native acceptance did not satisfy the exact contract: Issues, skips, cancellation, crashes and launch errors cannot pass
+native	Execute four real Whisper file operations and native TextEdit delivery	2026-10-27T23:58:07.7421570Z ##[error]Process completed with exit code 1.
+native	Recheck frozen source, signed app and native observations	﻿2026-10-27T23:58:07.8576680Z ##[group]Run bash scripts/run-dictation-polish-native-check.sh verify
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:07.8577750Z ^[[36;1mbash scripts/run-dictation-polish-native-check.sh verify^[[0m
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:08.1252700Z shell: /bin/bash -e {0}
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:08.1253230Z ##[endgroup]
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:19.0180260Z Traceback (most recent call last):
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:19.0182860Z   File "<stdin>", line 640, in <module>
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:19.0183220Z   File "<stdin>", line 45, in require
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:19.0183700Z RuntimeError: Retained native acceptance is invalid
+native	Recheck frozen source, signed app and native observations	2026-10-27T23:58:19.0352360Z ##[error]Process completed with exit code 1.

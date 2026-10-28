@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "polish-light",
+  "date" : "2026-10-27T23:57:46Z",
+  "expected" : "Before 👩🏽‍💻 RJT-482 $5 \\path é 🧪 confirms this.\r\n after 🧑‍🚀.\n",
+  "observed" : "Before 👩🏽‍💻 RJT-482 $5 \\path é 🧪 confirms this.\r\n after 🧑‍🚀.\n",
+  "processIdentifier" : 25479,
+  "token" : "RJT-Writing-Live-21B132A6-1A9E-4543-811C-036839CCC6C7"
+}

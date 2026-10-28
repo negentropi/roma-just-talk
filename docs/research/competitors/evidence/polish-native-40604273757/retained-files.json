@@ -1,0 +1,370 @@
+{
+  "build-settings.json": {
+    "bytes": 41217,
+    "sha256": "2299d967c92b526e5c56a31705efad6d58da47274e8da236c503d43393bc5d50"
+  },
+  "contract.json": {
+    "bytes": 1248,
+    "sha256": "c573903059d8aabb3d392233cdb988f3e10b85486daf091f0a34105a2b31db6b"
+  },
+  "configuration.json": {
+    "bytes": 1748,
+    "sha256": "c2f8cf6af4657726a27ae9cad1eb6014c8aec5a0fbb0262bcd696b602f80d76d"
+  },
+  "build-command.json": {
+    "bytes": 1121,
+    "sha256": "996f00063b2b71a50c6a412faace54edc8d07709c702007ead5d6a1dff1f394e"
+  },
+  "discovery/enumeration.log": {
+    "bytes": 11712,
+    "sha256": "f4e91507c5d7f0aa55bd6a4b696552941d707cc7984049f2f07b148c481f1a0f"
+  },
+  "discovery/selected-tests.json": {
+    "bytes": 43307,
+    "sha256": "b3d5fbb06d570535829ae50f120acccd21e785e1cf37bab7e5a50f10f1186f77"
+  },
+  "editor-observations/RJT-Writing-Live-21B132A6-1A9E-4543-811C-036839CCC6C7-cleanup.json": {
+    "bytes": 281,
+    "sha256": "0c288ac3445566d84e22eb3161fad0c76191caeeab6a2d46634b1e5a73b3dfdf"
+  },
+  "editor-observations/RJT-Writing-Live-21B132A6-1A9E-4543-811C-036839CCC6C7-fixture-startup.json": {
+    "bytes": 1185,
+    "sha256": "ee367c64b52710d13b2672566c560b6891e58c3b3f86378a72dd8decb05a2747"
+  },
+  "editor-observations/RJT-Writing-Live-21B132A6-1A9E-4543-811C-036839CCC6C7-polish-light.json": {
+    "bytes": 431,
+    "sha256": "4e973150be71becd578a91dd9b091e0b8d80a4ec10f7c43eb271a97fcde9c13d"
+  },
+  "editor-observations/RJT-Writing-Live-58998D93-C38C-4186-A35A-8347924D54C2-cleanup.json": {
+    "bytes": 281,
+    "sha256": "ca3576f49408dcfb6fabb8241bd09da8a07c952d338074952ef9d2e91d556db7"
+  },
+  "editor-observations/RJT-Writing-Live-58998D93-C38C-4186-A35A-8347924D54C2-fixture-startup.json": {
+    "bytes": 1186,
+    "sha256": "7f91e6bdba69fed8dae7f5bc089accfe3d15f5e6db54dd49144409a5a3238fa0"
+  },
+  "editor-observations/RJT-Writing-Live-58998D93-C38C-4186-A35A-8347924D54C2-polish-clarity-fallback.json": {
+    "bytes": 406,
+    "sha256": "f4571750d56b9f81a4adf2a6c36e36acc3f86f035a65a372ca42d94f2de92bae"
+  },
+  "editor-observations/RJT-Writing-Live-95D227D3-E4F5-4975-BC6D-588113337994-cleanup.json": {
+    "bytes": 281,
+    "sha256": "11576e75625dbc0ecf147a4927f4aa612b0c69576e3539d643eebeb97f940d36"
+  },
+  "editor-observations/RJT-Writing-Live-95D227D3-E4F5-4975-BC6D-588113337994-fixture-startup.json": {
+    "bytes": 1186,
+    "sha256": "ccaa083ae0bd733ff8c693ca9cb631997416dfd6da7473ba520c655e4f05548c"
+  },
+  "editor-observations/RJT-Writing-Live-95D227D3-E4F5-4975-BC6D-588113337994-polish-clarity-success.json": {
+    "bytes": 455,
+    "sha256": "de2f1331abf4cca2688faf93380cac25fefeec8e9115a6b74be06609f1a82e28"
+  },
+  "exit.json": {
+    "bytes": 43,
+    "sha256": "63a8d3bd5f7293cafb4e71ca14e52b4c1621c6d42329b6cdd7afee44d95de041"
+  },
+  "failure-native.json": {
+    "bytes": 199,
+    "sha256": "fa22539cbd472979878444027078644e0430d0622303570c68dc6adccf55faba"
+  },
+  "failure-verify.json": {
+    "bytes": 116,
+    "sha256": "5e18a26e6408b98df9c51cee91ca5879002aa93b57712416833031de2a68de3b"
+  },
+  "host-closed.json": {
+    "bytes": 4324,
+    "sha256": "aebd28464505385ce8334b77527545b45eb1790566d8ae60f9384f847646d068"
+  },
+  "host-live.json": {
+    "bytes": 4018,
+    "sha256": "5a6f67e312b13932990fc0bbd6c02b62bf9a6bdaeec9b8559c7a97dbbf4e1eaf"
+  },
+  "host-requirement.txt": {
+    "bytes": 51,
+    "sha256": "71fa56c5a4ed39bf1fb163e405c0484a260a05abc8dc42ff2c94c49220bf3feb"
+  },
+  "identity-after.json": {
+    "bytes": 94898,
+    "sha256": "8156735b0eb9426088331b8697682c402f5be5920a92fe619a5cd4666a241a0d"
+  },
+  "identity-before.json": {
+    "bytes": 94898,
+    "sha256": "8156735b0eb9426088331b8697682c402f5be5920a92fe619a5cd4666a241a0d"
+  },
+  "inputs/input.wav": {
+    "bytes": 165984,
+    "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+  },
+  "inputs.json": {
+    "bytes": 710,
+    "sha256": "2ae9e5bd7109418bc7753150caa3e827996d5e5a09556d15c5245a60a0fdd530"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition-file-command/calls.txt": {
+    "bytes": 6,
+    "sha256": "3f23d3859ba05cc825f26e23f1a85b9e41a3311fc7bf3cc0848146e753338ea1"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition-file-command/command.sh": {
+    "bytes": 838,
+    "sha256": "9d48c23c812d4fb333493845bda80bd62d5c3c8efbf133833220403cd7c2c4af"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition-file-command/pid.txt": {
+    "bytes": 5,
+    "sha256": "0afb8ff2831a6a21bc0402d9ed5c7c471280add5b71e3daf39df954fb43aa294"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition-file-command/response.json": {
+    "bytes": 63,
+    "sha256": "b063aea747dc97199957b78826cc97afa833b068e48f79f1968c0986e6302f23"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition-file-command/stdin.txt": {
+    "bytes": 1155,
+    "sha256": "a69ac8dbf6643a6cf4e6d2ff0ca3911b5925a7fb45c453fee1535f687a7bb4a4"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition-file-command/system.txt": {
+    "bytes": 953,
+    "sha256": "097dd5fd774eacff94f913ec61047028ee92db9755713b0ba5bb119bff3c7731"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition-file-command/user.txt": {
+    "bytes": 138,
+    "sha256": "416ecdb613648a954a52088415f3e2391adae7e2f2463d637405a8b34c2b3501"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition.json": {
+    "bytes": 3482,
+    "sha256": "63403ff92a990fd677dd613ce6a30fb25a5097eb0e401e7c63d452882c4294bb"
+  },
+  "observations/liveClarityImportQueueUsesRealWhisperRecognition.wav": {
+    "bytes": 165984,
+    "sha256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition-file-command/calls.txt": {
+    "bytes": 6,
+    "sha256": "358702f72f963179cc020a2022fc328b9d7e7601202fa1ae5096a7017ba94a4e"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition-file-command/command.sh": {
+    "bytes": 924,
+    "sha256": "4e3d33d11e94fc78231a0d7a3f0e05370a170598f1fc0c4ab58caac9a8018d6d"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition-file-command/pid.txt": {
+    "bytes": 5,
+    "sha256": "7f2d9fe19028e82642ff84eb544d11bef7301f5b913b5b19de71e2bb5729f655"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition-file-command/response.json": {
+    "bytes": 63,
+    "sha256": "b063aea747dc97199957b78826cc97afa833b068e48f79f1968c0986e6302f23"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition-file-command/stdin.txt": {
+    "bytes": 1155,
+    "sha256": "a69ac8dbf6643a6cf4e6d2ff0ca3911b5925a7fb45c453fee1535f687a7bb4a4"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition-file-command/system.txt": {
+    "bytes": 953,
+    "sha256": "097dd5fd774eacff94f913ec61047028ee92db9755713b0ba5bb119bff3c7731"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition-file-command/user.txt": {
+    "bytes": 138,
+    "sha256": "416ecdb613648a954a52088415f3e2391adae7e2f2463d637405a8b34c2b3501"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition.json": {
+    "bytes": 3487,
+    "sha256": "3d4344fc1e91570a5346d62cbed9c0c9280cf08db066deaf1b19c91b3d09a68e"
+  },
+  "observations/liveClarityRetranscriptionUsesRealWhisperRecognition.wav": {
+    "bytes": 165984,
+    "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-fallback/calls.txt": {
+    "bytes": 6,
+    "sha256": "70753e98e7e6e4904770637528679ca53099d4868451789532f19947074ac52e"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-fallback/command.sh": {
+    "bytes": 858,
+    "sha256": "b3115c92f4f5ec9f342a46f8b190ec84cc2ed5dcbf10b357496f05dc7eef14f7"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-fallback/pid.txt": {
+    "bytes": 5,
+    "sha256": "20460b19e2b7e0e6162fe077117f8e36a2248f79e2dc7f05ab14ba23c173706a"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-fallback/response.json": {
+    "bytes": 63,
+    "sha256": "b063aea747dc97199957b78826cc97afa833b068e48f79f1968c0986e6302f23"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-fallback/stdin.txt": {
+    "bytes": 1101,
+    "sha256": "8fb24a9e6ccd44ca5506296c5fc1aca8ff2d48223ae70ad006e6f8cfc792996a"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-fallback/system.txt": {
+    "bytes": 953,
+    "sha256": "097dd5fd774eacff94f913ec61047028ee92db9755713b0ba5bb119bff3c7731"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-fallback/user.txt": {
+    "bytes": 84,
+    "sha256": "7b8758ca72d5b23f895509c899309a058fbf658fae76b05e52bdab953017b735"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-success/calls.txt": {
+    "bytes": 6,
+    "sha256": "ccb2d44a88f5448ac5db7dc7cd3772fd2deb4af548fcaea7277d3c3803c6c562"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-success/command.sh": {
+    "bytes": 942,
+    "sha256": "c03b4b94a561f34274838dceec5582bc798aab1a7a25d736118ab9d4787c4545"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-success/pid.txt": {
+    "bytes": 5,
+    "sha256": "5b7abb20048965ff617367b88ae40504a8e1dc2e4b82c4d826167388fdf08c20"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-success/response.json": {
+    "bytes": 63,
+    "sha256": "b063aea747dc97199957b78826cc97afa833b068e48f79f1968c0986e6302f23"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-success/system.txt": {
+    "bytes": 953,
+    "sha256": "097dd5fd774eacff94f913ec61047028ee92db9755713b0ba5bb119bff3c7731"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-success/user.txt": {
+    "bytes": 84,
+    "sha256": "7b8758ca72d5b23f895509c899309a058fbf658fae76b05e52bdab953017b735"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit-clarity-success/stdin.txt": {
+    "bytes": 1101,
+    "sha256": "8fb24a9e6ccd44ca5506296c5fc1aca8ff2d48223ae70ad006e6f8cfc792996a"
+  },
+  "observations/liveDictationPolishPipelineDeliversLiteralTextToTextEdit.json": {
+    "bytes": 6368,
+    "sha256": "9ac65c1c45cb5e760377066e7087ce5975408d67b1a5980e9f3db525d61f60d9"
+  },
+  "observations/liveLightImportQueueUsesRealWhisperRecognition.json": {
+    "bytes": 2163,
+    "sha256": "d956f1a3de61fd8bd9590fe3bfdf934c84e777d183616e4ca1da97dae6539414"
+  },
+  "observations/liveLightImportQueueUsesRealWhisperRecognition.wav": {
+    "bytes": 165984,
+    "sha256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383"
+  },
+  "observations/liveLightRetranscriptionUsesRealWhisperRecognition.json": {
+    "bytes": 2169,
+    "sha256": "a9f9cee592a8db3d4182d10bab8c18f56a1c41b61a9be065ae980e0d23b62391"
+  },
+  "observations/liveLightRetranscriptionUsesRealWhisperRecognition.wav": {
+    "bytes": 165984,
+    "sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+  },
+  "observations/setup/liveClarityImportQueueUsesRealWhisperRecognition.json": {
+    "bytes": 896,
+    "sha256": "8e3e6cf1915eaad38b1e54eeb253c7194aaf5913cfa5c16651b1f691e249765e"
+  },
+  "observations/setup/liveClarityRetranscriptionUsesRealWhisperRecognition.json": {
+    "bytes": 900,
+    "sha256": "82d293a3b68724fdc2ffb9850e8be6c0017aa7221c9dff425aafa2cd67d7a9da"
+  },
+  "observations/setup/liveDictationPolishPipelineDeliversLiteralTextToTextEdit.json": {
+    "bytes": 904,
+    "sha256": "846f54a28e0c04bcfdb5ce661b60004688f0cd214b8569ed5a2397720f15afcc"
+  },
+  "observations/setup/liveLightImportQueueUsesRealWhisperRecognition.json": {
+    "bytes": 894,
+    "sha256": "c1ed39185216570542656af0d3821c6d08cd6d424a90bf972f9246bee4e697d1"
+  },
+  "observations/setup/liveLightRetranscriptionUsesRealWhisperRecognition.json": {
+    "bytes": 898,
+    "sha256": "b68e45380059ecf72da13cf6743e886c41bdd39584334d32f5f9a9edcb165d86"
+  },
+  "packages/candidate-strict-resolve.json": {
+    "bytes": 48,
+    "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+  },
+  "packages/canonical.Package.resolved": {
+    "bytes": 11320,
+    "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+  },
+  "packages/canonical-graph-contract.json": {
+    "bytes": 838,
+    "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f"
+  },
+  "resolved-test-host-settings.json": {
+    "bytes": 411,
+    "sha256": "275722e248d8b74a288cfd70e2f2cc3c92753562959f176181796ad2362eaceb"
+  },
+  "packages-before.json": {
+    "bytes": 6824,
+    "sha256": "d2fd7ea4df957a932fd5eb85915aa8a3239c324c17f27cb433d74b96e740adf7"
+  },
+  "selection/enumeration.log": {
+    "bytes": 9826,
+    "sha256": "df8cd853557c6073732826f30178102bbe081028b3964429b1c987f08fb66ddf"
+  },
+  "result.json": {
+    "bytes": 1804,
+    "sha256": "21ca7d00f19854871e836ae3a4dedc389ae9af47c1673f483e404f557e1d55fc"
+  },
+  "selection/receipt.json": {
+    "bytes": 31621,
+    "sha256": "88a73740cb5f0c4ed967d7d90d176d31315eece471af5436a215ddce6c5ae1f6"
+  },
+  "selection/selected-tests.json": {
+    "bytes": 43305,
+    "sha256": "d0e1603b10a33ac5ef83ecf040abc289a7e99622af0dd40fab0a6f74b885fc8a"
+  },
+  "source/WritingTargetLiveTests.swift": {
+    "bytes": 95557,
+    "sha256": "259a0b77b10eb58e20a2f5d6c708afe16822fcdee96c90e5cca26717ed4f751b"
+  },
+  "source/DictationProfileImportLiveTests.swift": {
+    "bytes": 40772,
+    "sha256": "f9ea899d5d565009a545dd3846b22b9d23b143a08092e098f597113f4687ac54"
+  },
+  "source-after.json": {
+    "bytes": 83002,
+    "sha256": "49a26eb4c5ed912b995289b3dfe8cd9d3a23a3323015a9b1c9871cec0bf216cf"
+  },
+  "source-before.json": {
+    "bytes": 83002,
+    "sha256": "49a26eb4c5ed912b995289b3dfe8cd9d3a23a3323015a9b1c9871cec0bf216cf"
+  },
+  "static-whisper-before.json": {
+    "bytes": 11104,
+    "sha256": "b90e912c7f892580e7c18e14626cf3dc54bb90b2c73207c03e2b605fc3bfb2c7"
+  },
+  "sw-vers.txt": {
+    "bytes": 65,
+    "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+  },
+  "swift-version.txt": {
+    "bytes": 128,
+    "sha256": "5fa4b669e41b23b9ad0760253d062493487f93cf5d8ad8c44f0d4fd635137499"
+  },
+  "tcc.json": {
+    "bytes": 440,
+    "sha256": "5286f28d96970c41af77e61e6af2cf8d717572dd2256c68b1e2dccbb7ffd35e5"
+  },
+  "test-host-signature/deep-verification.txt": {
+    "bytes": 6182,
+    "sha256": "71243bf147fb8f9393d818bae2af995ce1562ab3fbd7d305df7c0c6c1f189a2a"
+  },
+  "test-host-signature/entitlements.log": {
+    "bytes": 231,
+    "sha256": "7bdef633129d84f2284094d09832fdf553f1bd5bfed41aac36affa1855a32235"
+  },
+  "test-host-signature/entitlements.plist": {
+    "bytes": 1017,
+    "sha256": "99cb83381cba5abc770fb567deafb883cca077d42909457c808a289ac2f004ab"
+  },
+  "test-host-signature/linked-libraries.txt": {
+    "bytes": 8301,
+    "sha256": "7797badf4499643266556097f3c2a6703a607ee089a400a66fc69d14547692c4"
+  },
+  "test-host-signature/result.json": {
+    "bytes": 1011,
+    "sha256": "04c57ec2e89c7203db4a49115f327cab728490593d0b857125c2d1f46e38303f"
+  },
+  "test-host-signature/signature.txt": {
+    "bytes": 794,
+    "sha256": "a93e91a58606390d7114abc69e5086aa583b953c0f0d36f3014d5bb2d755a338"
+  },
+  "tests.log": {
+    "bytes": 186172,
+    "sha256": "e4d9adb50841abd15249b1fcd3a56e5e8114b6e7d7aa2c1a59e8f51e0117d782"
+  },
+  "xcode-version.txt": {
+    "bytes": 32,
+    "sha256": "18730ed2ae28a2c9cf0c2d5db549033a4f07089331391a7133b7b32187454fa9"
+  }
+}

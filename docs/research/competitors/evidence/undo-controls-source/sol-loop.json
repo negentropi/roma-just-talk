@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "skill": "/Users/atalphalnmomhappyhouse/.codex/skills/sol-loop/SKILL.md",
+  "base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+  "default_branch": "without/no-adhoc-macos-tcc",
+  "reviewer": "/root/explicit_language_choice/controls_click_medium_review",
+  "actual_model": "gpt-6.1-sol",
+  "effort": "medium",
+  "budget_rounds": 3,
+  "diff_command": [
+    "git",
+    "diff",
+    "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+    "--",
+    "scripts/fixtures/WritingUndoControlHost.swift",
+    "scripts/fixtures/WritingUndoControlOracle.swift",
+    "scripts/verify-writing-undo-controls.py",
+    "scripts/run-writing-undo-controls-check.sh",
+    ".github/workflows/voiceink-writing-undo-controls-check.yml",
+    "docs/research/competitors/evidence/undo-controls-source/authorship-and-review.json"
+  ],
+  "scoped_paths": [
+    "scripts/fixtures/WritingUndoControlHost.swift",
+    "scripts/fixtures/WritingUndoControlOracle.swift",
+    "scripts/verify-writing-undo-controls.py",
+    "scripts/run-writing-undo-controls-check.sh",
+    ".github/workflows/voiceink-writing-undo-controls-check.yml",
+    "docs/research/competitors/evidence/undo-controls-source/authorship-and-review.json"
+  ],
+  "initial_diff_sha256": "24ae35cdfa3a53ea0d564f590b21210dd245ca8fc0d7a6ef6ee7ee56b22ec597",
+  "initial_diff_shortstat": "6 files changed, 3095 insertions(+)",
+  "frozen_sha256": {
+    "scripts/fixtures/WritingUndoControlHost.swift": "b1e1a30909b387c538582cb926f91839e537c0931fbea016f49cf0098d9864b7",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "6f3a4900086925833265462fffe65b0240f50c8d97560737397c8a84cbc7c9bd",
+    "scripts/verify-writing-undo-controls.py": "18af6717b03c5587e1e38444af8560094c455d502b558e737d51b68cff5cdeef",
+    "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
+    ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd",
+    "docs/research/competitors/evidence/undo-controls-source/authorship-and-review.json": "958ff93862e64a38fdd53c872423317ba281c2ae0896d54a26e2f3ef6ec97f32"
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "scope": "full scoped base-to-working-tree unit",
+      "status": "complete",
+      "findings": [],
+      "usage": null,
+      "verdict": "APPROVE",
+      "usage_status": "Not exposed by native subagent route; not estimated."
+    }
+  ],
+  "native_runtime_status": "pending; previous8fab run stopped in status press helper before any completed case",
+  "status": "approved",
+  "rounds_used": 1,
+  "open_blockers_or_shoulds": [],
+  "fixed_findings": [],
+  "declined_findings": [],
+  "code_diff_shortstat_after_review": "6 files changed, 3095 insertions(+)",
+  "code_diff_sha256_after_review": "24ae35cdfa3a53ea0d564f590b21210dd245ca8fc0d7a6ef6ee7ee56b22ec597",
+  "scoped_files_frozen_through_terminal_verdict": true,
+  "post_review_changes": "Only verdict/ledger/authorship metadata appended; no behavior changes after approval."
+}

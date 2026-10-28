@@ -1,6 +1,6 @@
 {
   "classification": "source-authorship-and-review-only",
-  "implementation_status": "Four earlier failed runs retained honestly with zero completed control cases. Diagnostic and per-editor positive-fixture source reviewed; corrected native rerun pending.",
+  "implementation_status": "Combined isolated controls source approved by sol-loop in one round; five earlier failed runs retained with zero completed cases. New native mouse transport and remote menu/chord/focus proof remain pending.",
   "author_cli": {
     "binary": "claude",
     "version": "2.1.310",
@@ -91,13 +91,29 @@
         "duration_ms": 14037,
         "total_cost_usd": 0.12185519999999998
       }
+    },
+    {
+      "invocation": "observed-own-control-native-mouse-transport",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "medium",
+      "raw_jsonl_sha256": "ef82445708785350778b9271a530f2426a9dce1e09b99c90bb56e94843840541",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 224950,
+        "total_cost_usd": 0.7844006
+      }
     }
   ],
   "authorship_scope": {
     "actual_claude_opus_5_5": [
       "scripts/fixtures/WritingUndoControlHost.swift",
       "CursorPaster.WritingPasteError enum conformance and four fixed descriptions only",
-      "WritingUndoControlOracle.swift: synchronous diagnostics and per-editor positive fixture calibration only; original native verification remains GPT authored."
+      "WritingUndoControlOracle.swift: synchronous diagnostics and per-editor positive fixture calibration only; original native verification remains GPT authored.",
+      "WritingUndoControlOracle.swift: observed-control native mouse click helper and three call-site/receipt changes only."
     ],
     "gpt_authored_native_verification": [
       "scripts/fixtures/WritingUndoControlOracle.swift",
@@ -109,9 +125,9 @@
   },
   "source_sha256": {
     "scripts/fixtures/WritingUndoControlHost.swift": "b1e1a30909b387c538582cb926f91839e537c0931fbea016f49cf0098d9864b7",
-    "scripts/fixtures/WritingUndoControlOracle.swift": "471fcbbd77402b3363739034fea849210d3fd28f29cfc8ef1fc1528ebf1ff7e9",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "6f3a4900086925833265462fffe65b0240f50c8d97560737397c8a84cbc7c9bd",
     "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
-    "scripts/verify-writing-undo-controls.py": "919fc5bf1c1b06794b3d9fa4f12e6f009a637cc628e0abf3dde0205b909122d5",
+    "scripts/verify-writing-undo-controls.py": "18af6717b03c5587e1e38444af8560094c455d502b558e737d51b68cff5cdeef",
     ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd"
   },
   "clipboard_error_copy": {
@@ -146,8 +162,8 @@
   },
   "source_contract": {
     "host_owner": "One actual engine and its own controller, RecorderUIManager and RecordingShortcutManager; production VoiceInkApp composition excluded only in disposable candidate copy.",
-    "menu": "Unchanged product UndoLastWritingEditMenuButton mounted in actual MenuBarExtra menu style; actual unique AXPress control required.",
-    "shortcut": "Actual ShortcutRecorder capture and global CGEvent chord through the real registered event tap; no private handler or direct Undo command call.",
+    "menu": "Unchanged product UndoLastWritingEditMenuButton in actual MenuBarExtra. Native mouse down/up at a unique AX-observed, PID-owned, display-contained, hit-tested control center; actual menu state/editor result still required.",
+    "shortcut": "Actual ShortcutRecorder clicked via the same observed-control native mouse path; capture and global CGEvent chord through the real registered event tap. No private handler or direct Undo call.",
     "native_editor_helper": "Exact current source tail of WritingTargetLiveTests.swift copied unchanged into the disposable candidate. Separately owned helper supports an explicit test-only passage seed; default NFD bytes remain unchanged.",
     "cases": [
       "textedit-menu",
@@ -168,7 +184,7 @@
     "bash_syntax": "passed",
     "python_source_parse": "passed",
     "workflow_yaml_parse": "passed",
-    "classifier_self_test": "34 malformed receipts rejected, including six coherent NFC/NFD-source/output and range/caret controls; actual bad compiler-path function RED/current GREEN with nine negative path/source controls; two host-exit lanes; actual old source-CWD transport simulated RED/current GREEN and five exact-PID sampling controls.",
+    "classifier_self_test": "50 malformed receipts rejected, including native click geometry/ownership/transport and Unicode/range controls; absent AX action support positive accepted; compiler-path RED/GREEN with nine negative controls, two host-exit lanes, profile-CWD RED/GREEN, five sample controls and six external-screen metadata controls.",
     "git_diff_check": "passed",
     "compiler_response_regression": "Actual known-bad function RED; candidate GREEN on same observed naming fixture; nine invalid target/path/source controls rejected. No build/native execution."
   },
@@ -180,7 +196,7 @@
     "Source authoring and pure classifier/syntax checks only; remote runtime and visual acceptance pending. Parent owns CI transport.",
     "Plain-text guarded inverse only; no restart, generic Cmd-Z, rich-format or general editor compatibility claim."
   ],
-  "total_author_cost_usd": 3.5760924,
+  "total_author_cost_usd": 4.360493,
   "raw_log_policy": "Only model, status, timing, cost and hashes retained; raw JSONL stays outside the repository.",
   "compiler_response_path_correction": {
     "failed_run_id": 40605378801,
@@ -305,6 +321,73 @@
       ],
       "git_diff_check": "passed"
     },
+    "native_runtime_verified": false,
+    "screenshots_reviewed": false
+  },
+  "aborted_invocations": [
+    {
+      "invocation": "native-click-high-effort-resource-stop",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "high",
+      "raw_jsonl_sha256": "689daa3277b3d50ffbcf12fd5c1db2a60ff97ea2221199ce5813f6dc03e282c9",
+      "result": "parent-authorized SIGTERM, exit143; no result/usage emitted",
+      "source_edits_observed": false,
+      "estimated_thinking_tokens_last_observed": 18600,
+      "elapsed_observed": "26m45s",
+      "cost_usd": null,
+      "reason": "Resource choice after seven read-only calls and no edits; same actual model retried at medium effort. Not classified as provider failure."
+    }
+  ],
+  "author_cost_scope": "Sum of completed calls only. One deliberately aborted high-effort call emitted no final cost; its usage and the overall billed total remain unknown.",
+  "native_mouse_transport_correction": {
+    "failed_run_id": 40618717054,
+    "failed_head": "8fab5e9fa8ca1f368516fe2e4bb7974724d95d36",
+    "evidence": "../undo-controls-40618717054/failure-diagnosis.json",
+    "observed_boundary": "All owner/engine/task/Oracle/permission/policy stages returned; status press helper did not return. It performs AX reads before AXPress, so the exact blocked subcall and menu visibility remain unknown.",
+    "before_source_sha256": {
+      "scripts/fixtures/WritingUndoControlOracle.swift": "471fcbbd77402b3363739034fea849210d3fd28f29cfc8ef1fc1528ebf1ff7e9",
+      "scripts/verify-writing-undo-controls.py": "919fc5bf1c1b06794b3d9fa4f12e6f009a637cc628e0abf3dde0205b909122d5"
+    },
+    "after_source_sha256": {
+      "scripts/fixtures/WritingUndoControlOracle.swift": "6f3a4900086925833265462fffe65b0240f50c8d97560737397c8a84cbc7c9bd",
+      "scripts/verify-writing-undo-controls.py": "18af6717b03c5587e1e38444af8560094c455d502b558e737d51b68cff5cdeef"
+    },
+    "actual_opus_scope": "One real native mouse helper and recorder/status/menu activation sites with typed input evidence. Own AXPerformAction path removed; no production changes or fallback.",
+    "load_bearing_native_click_checks": [
+      "Unique observed control identity and role, current PID.",
+      "Finite positive AX geometry contained by one active display; exact frame center.",
+      "System-wide center hit in the same PID, target or bounded descendant ancestry.",
+      "Same owned window, or explicit windowless native-menu ancestry.",
+      "Stable observed frame; both mouse events created before posting exactly two events with no modifiers."
+    ],
+    "ax_actions": "Retained as diagnostic data only. The mouse transport does not require or invoke an AXPress action.",
+    "driver_scope": "Validate click receipt fields against actual observed controls and exact mapped-host PID; retain all original native case/state/text/range/notice/focus guards. Independent bounded screen capture at 15/60 seconds is diagnostic only and never counted among required 15 case screenshots.",
+    "checks": {
+      "malformed_receipts_rejected": 50,
+      "unsupported_ax_actions_positive": "accepted only with complete native mouse ownership/geometry receipts",
+      "external_screen_metadata_controls": [
+        "positive",
+        "foreign PID",
+        "identity changed",
+        "tool timeout",
+        "invalid image",
+        "changed retained PNG"
+      ],
+      "swift_frontend_parse": "passed for Host and Oracle",
+      "python_self_test": "passed",
+      "git_diff_check": "passed"
+    },
+    "informal_oracle_only_review": {
+      "actual_model": "gpt-6.1-sol",
+      "effort": "medium",
+      "verdict": "clean",
+      "oracle_sha256": "6f3a4900086925833265462fffe65b0240f50c8d97560737397c8a84cbc7c9bd",
+      "scope": "SDK signatures, ownership/geometry/window/menu ancestry and paired input events, with no native execution. Does not cover the final driver; combined Sol-loop review is separate."
+    },
+    "combined_sol_loop_status": "APPROVE in 1 round with actual GPT-6.1 Sol on medium, fixed default-branch merge-base6927b4e52040b41b96f2d8fdbc36be6337af59c6; 6 scoped files, 3095 insertions before/after review, no findings; usage unavailable. Source-only, remote native proof pending.",
     "native_runtime_verified": false,
     "screenshots_reviewed": false
   }

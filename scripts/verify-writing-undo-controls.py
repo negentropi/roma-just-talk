@@ -372,6 +372,63 @@ def sample_host(host, checkpoint, elapsed_seconds):
     return result
 
 
+def capture_diagnostic_screen(host, checkpoint, elapsed_seconds):
+    """Independent screen observation; never a replacement for a native case screenshot."""
+    directory = native / ('diagnostic-screen-' + checkpoint)
+    directory.mkdir()
+    path = directory / 'screen.png'
+    expected = {key: host[key] for key in ('started_at', 'executable_path')}
+    before = process_identity(host['pid'])
+    result = {'checkpoint': checkpoint, 'pid': host['pid'], 'expected_identity': expected, 'identity_before': before,
+        'identity_after': None, 'tool': '/usr/sbin/screencapture', 'tool_timeout_seconds': 8, 'tool_exit_code': None,
+        'status': 'identity-refused', 'valid': False, 'observed_elapsed_seconds': elapsed_seconds,
+        'progress_files': progress_files()}
+    if before == expected and expected['executable_path'] in host['mapped_text_paths']:
+        try:
+            tool = subprocess.run(['/usr/sbin/screencapture', '-x', '-t', 'png', str(path)], capture_output=True, timeout=8)
+            (directory / 'tool-stdout.txt').write_bytes(tool.stdout)
+            (directory / 'tool-stderr.txt').write_bytes(tool.stderr)
+            result.update(tool_exit_code=tool.returncode, identity_after=process_identity(host['pid']), status='tool-failed')
+            if result['identity_after'] != expected:
+                result['status'] = 'identity-changed-during-capture'
+            elif tool.returncode == 0 and path.is_file() and not path.is_symlink():
+                data = path.read_bytes()
+                if len(data) >= 33 and data[:8] == b'\x89PNG\r\n\x1a\n' and data[12:16] == b'IHDR' and min(struct.unpack('>II', data[16:24])) > 0:
+                    result.update(status='captured', valid=True, png_bytes=len(data), png_sha256=digest(data))
+        except subprocess.TimeoutExpired as error:
+            (directory / 'tool-stdout.txt').write_bytes(error.stdout or b'')
+            (directory / 'tool-stderr.txt').write_bytes(error.stderr or b'')
+            result.update(status='timeout', identity_after=process_identity(host['pid']))
+        except OSError as error:
+            result.update(status='tool-unavailable', error=str(error), identity_after=process_identity(host['pid']))
+    write_json(directory / 'receipt.json', result)
+    return result
+
+
+def verify_diagnostic_screens(outcome, host):
+    records = outcome['diagnostic_screens']
+    require(isinstance(records, list) and len(records) <= 2
+        and len(records) == len({item['checkpoint'] for item in records}), 'Duplicate/unbounded diagnostic screen captures')
+    expected = {key: host[key] for key in ('started_at', 'executable_path')}
+    for item in records:
+        require(item['checkpoint'] in ('15s', '60s') and item['pid'] == host['pid']
+            and item['expected_identity'] == expected and item['tool'] == '/usr/sbin/screencapture'
+            and item['tool_timeout_seconds'] == 8 and type(item['valid']) is bool
+            and type(item['observed_elapsed_seconds']) in (int, float) and math.isfinite(item['observed_elapsed_seconds'])
+            and item['observed_elapsed_seconds'] >= int(item['checkpoint'][:-1]), 'Diagnostic screen identity/checkpoint invalid')
+        directory = native / ('diagnostic-screen-' + item['checkpoint'])
+        require(item == json.loads((directory / 'receipt.json').read_text()), 'Diagnostic screen receipt changed')
+        if item['valid']:
+            path = directory / 'screen.png'
+            require(item['status'] == 'captured' and item['tool_exit_code'] == 0
+                and item['identity_before'] == item['identity_after'] == expected and not path.is_symlink()
+                and item['png_bytes'] == path.stat().st_size and item['png_sha256'] == digest(path.read_bytes()),
+                'Diagnostic screen tool/identity/retained PNG changed')
+        else:
+            require(item['status'] in ('identity-refused', 'identity-changed-during-capture', 'timeout', 'tool-unavailable', 'tool-failed'),
+                'Invalid diagnostic screen falsely labeled captured')
+
+
 def run_host(host):
     native.mkdir()
     profiles = native / 'profiles'
@@ -405,7 +462,7 @@ def run_host(host):
     observed, launched = None, None
     monitor_error, closure_error, candidate_error = None, None, None
     census_empty, descriptors_closed = None, None
-    samples = []
+    samples, diagnostic_screens = [], []
     with (output / 'host.log').open('xb') as stream:
         process = subprocess.Popen([executable], cwd=native, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
         try:
@@ -432,6 +489,7 @@ def run_host(host):
                 for threshold in (15, 60):
                     checkpoint = str(threshold) + 's'
                     if observed is not None and time.monotonic() - started >= threshold and checkpoint not in [item['checkpoint'] for item in samples]:
+                        diagnostic_screens.append(capture_diagnostic_screen(observed, checkpoint, time.monotonic() - started))
                         samples.append(sample_host(observed, checkpoint, time.monotonic() - started))
                 require(time.monotonic() < deadline, 'Control host exceeded the 180-second diagnostic deadline')
                 time.sleep(0.1)
@@ -478,7 +536,7 @@ def run_host(host):
         'exit_code': process.returncode, 'mapped_host_observed': observed is not None, 'native_failure': native_failure,
         'native_issues': native_issues, 'monitor_error': monitor_error, 'closure_error': closure_error,
         'candidate_error': candidate_error, 'observed_completed_cases': receipt.get('executedCases', []),
-        'progress_files': progress_files(), 'samples': samples,
+        'progress_files': progress_files(), 'samples': samples, 'diagnostic_screens': diagnostic_screens,
         'profile_files': profile_files()})
     if native_failure or native_issues:
         raise RuntimeError('Control host oracle failed (exit ' + str(process.returncode) + '): ' + str(native_failure or native_issues)
@@ -517,7 +575,7 @@ def receipt_errors(value, executable, pid, expected_home):
     def check(condition, message):
         if not condition:
             errors.append(message)
-    def control(item, identifier, roles, enabled=True, actionable=True):
+    def control(item, identifier, roles, enabled=True):
         check(isinstance(item, dict), 'Control is missing')
         if not isinstance(item, dict):
             return
@@ -527,17 +585,64 @@ def receipt_errors(value, executable, pid, expected_home):
         check(isinstance(frame, dict) and set(frame) == {'x', 'y', 'width', 'height'}
             and all(type(v) in (int, float) and abs(v) < 100000 for v in frame.values())
             and frame.get('width', 0) > 0 and frame.get('height', 0) > 0, 'Actual control frame invalid: ' + identifier)
-        check(type(item.get('actionsAXError')) is int and item['actionsAXError'] == 0
+        # Action names describe AX support; native mouse input does not invoke AXPress.
+        check(type(item.get('actionsAXError')) is int
             and isinstance(item.get('actions'), list) and all(isinstance(action, str) for action in item['actions']),
-            'AX action inventory failed: ' + identifier)
-        if actionable:
-            check('AXPress' in item.get('actions', []), 'Control has no genuine AXPress: ' + identifier)
+            'AX action diagnostic is malformed: ' + identifier)
+    def click(item, target, identifier, roles, status=False):
+        check(isinstance(item, dict) and isinstance(target, dict), 'Native mouse input receipt is missing')
+        if not isinstance(item, dict) or not isinstance(target, dict):
+            return
+        check(item.get('kind') == 'native-mouse-click' and item.get('eventTypes') == ['leftMouseDown', 'leftMouseUp']
+            and type(item.get('eventCount')) is int and item['eventCount'] == 2
+            and item.get('tap') == 'cghidEventTap' and type(item.get('clickState')) is int and item['clickState'] == 1
+            and type(item.get('flagsRawValue')) is int and item['flagsRawValue'] == 0,
+            'Native mouse transport/event count differs')
+        check(type(item.get('hostPID')) is int and item['hostPID'] == pid
+            and type(item.get('hitPID')) is int and item['hitPID'] == pid,
+            'Native mouse target/hit process differs from mapped host')
+        check(item.get('targetID') == target.get('id') and item.get('targetRole') == target.get('role')
+            and item.get('targetRole') in roles, 'Native mouse target identity/role differs from observed control')
+        check(item.get('identityContract') == 'identifier' and item.get('targetID') == identifier
+            or status and item.get('identityContract') == 'fixture-title' and target.get('label') == 'RJT Undo check',
+            'Native mouse target does not satisfy its exact identity contract')
+        def rectangle(raw):
+            return isinstance(raw, dict) and set(raw) == {'x', 'y', 'width', 'height'} \
+                and all(type(v) in (int, float) and math.isfinite(v) and abs(v) < 100000 for v in raw.values()) \
+                and raw['width'] > 0 and raw['height'] > 0
+        frame, bounds, point = item.get('targetFrame'), item.get('activeDisplayBounds'), item.get('point')
+        geometry = rectangle(frame) and rectangle(bounds) and isinstance(point, dict) and set(point) == {'x', 'y'} \
+            and all(type(v) in (int, float) and math.isfinite(v) for v in point.values())
+        check(geometry, 'Native mouse frame/display/point geometry invalid')
+        if geometry:
+            check(frame == target.get('frame') and point == {'x': frame['x'] + frame['width'] / 2, 'y': frame['y'] + frame['height'] / 2}
+                and bounds['x'] <= frame['x'] and bounds['y'] <= frame['y']
+                and frame['x'] + frame['width'] <= bounds['x'] + bounds['width']
+                and frame['y'] + frame['height'] <= bounds['y'] + bounds['height'],
+                'Native mouse point is not the exact observed center in its display')
+        check(type(item.get('activeDisplayID')) is int and item['activeDisplayID'] > 0
+            and type(item.get('hitDepth')) is int and 0 <= item['hitDepth'] <= 8,
+            'Native mouse display/hit ancestry observation invalid')
+        check(all(item.get(key) is True for key in ('sameTargetOrDescendant', 'uniqueTarget', 'frameStable',
+            'targetOwnedByHost', 'hitOwnedByHost')), 'Native mouse hit/identity/geometry proof failed')
+        if item.get('windowPolicy') == 'same-window':
+            check(all(item.get(key) is True for key in ('targetWindowPresent', 'hitWindowPresent', 'sameWindow', 'windowOwnedByHost'))
+                and item.get('nativeMenuAncestry') is False and item.get('menuAncestorRole') == '',
+                'Native mouse window ownership differs')
+        elif item.get('windowPolicy') == 'windowless-native-menu':
+            check(all(item.get(key) is False for key in ('targetWindowPresent', 'hitWindowPresent', 'sameWindow', 'windowOwnedByHost'))
+                and item.get('nativeMenuAncestry') is True and item.get('menuAncestorRole') in ('AXMenu', 'AXMenuBar')
+                and item.get('targetRole') in ('AXMenuItem', 'AXMenuBarItem'),
+                'Windowless native mouse control lacks owned menu ancestry')
+        else:
+            check(False, 'Unknown native mouse window ownership policy')
     def menu(item, enabled):
         control(item, 'undoLastWritingEdit.menuCommand', ['AXMenuItem', 'AXButton'], enabled)
         check(item.get('kind') == 'product-menu', 'Wrong product menu boundary')
         status = item.get('statusControl', {})
         control(status, status.get('id', ''), ['AXMenuBarItem', 'AXButton'])
         check(status.get('id') == 'undoControlHost.statusItem' or status.get('label') == 'RJT Undo check', 'Wrong actual status control')
+        click(item.get('statusClick'), status, 'undoControlHost.statusItem', ['AXMenuBarItem', 'AXButton'], status=True)
     def notice(item, message):
         check(isinstance(item, dict) and item.get('id') == 'undoLastWritingEdit.notice'
             and item.get('expectedMessage') == message and message in (item.get('label'), item.get('value')),
@@ -622,6 +727,8 @@ def receipt_errors(value, executable, pid, expected_home):
         check(shortcut.get('recordedViaActualRecorder') is True and shortcut.get('keyCode') == 32
             and shortcut.get('modifierFlagsRawValue') == 1835008 and bool(shortcut.get('displayString')), 'Actual configured recorder chord differs')
         control(shortcut.get('recorderControl'), 'shortcutRecorder.undoLastWritingEdit', ['AXButton'])
+        recorder = shortcut.get('recorderControl', {})
+        click(recorder.get('click'), recorder, 'shortcutRecorder.undoLastWritingEdit', ['AXButton'])
         records = value.get('cases', [])
         check(isinstance(records, list) and [item.get('id') for item in records] == cases, 'Four exact ordered case records required')
         selected = exact_range(len(units(prefix)), len(units(passage)))
@@ -645,6 +752,7 @@ def receipt_errors(value, executable, pid, expected_home):
                 'Product command switched captured process/document')
             if is_menu:
                 menu(item.get('command', {}), True)
+                click(item['command'].get('activationClick'), item['command'], 'undoLastWritingEdit.menuCommand', ['AXMenuItem', 'AXButton'])
             else:
                 check(item.get('command') == {'kind': 'configured-global-shortcut', 'keyCode': 32,
                     'modifierFlagsRawValue': 1835008, 'nativeEventsPosted': 2}, 'Actual registered shortcut invocation differs')
@@ -731,9 +839,26 @@ def self_test():
     def control(identifier, role='AXButton', enabled=True):
         return {'id': identifier, 'role': role, 'enabled': enabled, 'label': '', 'value': '', 'actions': ['AXPress'],
             'actionsAXError': 0, 'frame': {'x': 1, 'y': 2, 'width': 100, 'height': 22}}
+    def click_fixture(target):
+        windowless = target['role'] in ('AXMenuItem', 'AXMenuBarItem')
+        return {'kind': 'native-mouse-click', 'eventTypes': ['leftMouseDown', 'leftMouseUp'], 'eventCount': 2,
+            'tap': 'cghidEventTap', 'clickState': 1, 'flagsRawValue': 0, 'hostPID': 42, 'hitPID': 42,
+            'targetID': target['id'], 'targetRole': target['role'], 'identityContract': 'identifier',
+            'targetFrame': copy.deepcopy(target['frame']), 'point': {'x': 51, 'y': 13},
+            'activeDisplayID': 1, 'activeDisplayBounds': {'x': 0, 'y': 0, 'width': 1024, 'height': 768},
+            'hitDepth': 0, 'sameTargetOrDescendant': True, 'uniqueTarget': True, 'frameStable': True,
+            'targetOwnedByHost': True, 'hitOwnedByHost': True,
+            'windowPolicy': 'windowless-native-menu' if windowless else 'same-window',
+            'targetWindowPresent': not windowless, 'hitWindowPresent': not windowless,
+            'sameWindow': not windowless, 'windowOwnedByHost': not windowless, 'nativeMenuAncestry': windowless,
+            'menuAncestorRole': 'AXMenuBar' if windowless else ''}
     def menu(enabled=True):
-        return dict(control('undoLastWritingEdit.menuCommand', 'AXMenuItem', enabled), kind='product-menu',
-            statusControl=control('undoControlHost.statusItem', 'AXMenuBarItem'))
+        target = control('undoLastWritingEdit.menuCommand', 'AXMenuItem', enabled)
+        status = control('undoControlHost.statusItem', 'AXMenuBarItem')
+        result = dict(target, kind='product-menu', statusControl=status, statusClick=click_fixture(status))
+        if enabled:
+            result['activationClick'] = click_fixture(target)
+        return result
     def notice(message):
         return dict(control('undoLastWritingEdit.notice'), expectedMessage=message, label=message)
     def snapshot(text, selected, bundle, token='RJT-Writing-Live-00000000-0000-4000-8000-000000000001', focused=True):
@@ -742,13 +867,15 @@ def self_test():
             'sameProcess': True, 'sameFocusedEditor': focused, 'sameWindow': True, 'windowPresent': True, 'targetAlive': True,
             'pid': 100, 'bundleIdentifier': bundle, 'token': token, 'usesSystemPaste': bundle == 'com.apple.Safari'}
     selected = exact_range(len(units(prefix)), len(units(passage)))
+    recorder = control('shortcutRecorder.undoLastWritingEdit')
+    recorder['click'] = click_fixture(recorder)
     value = {'schemaVersion': 1, 'completed': True, 'selectedCases': cases, 'executedCases': cases,
         'host': {'pid': 42, 'bundleIdentifier': bundle_id, 'executablePath': '/fixture/app'},
         'runtimeBounds': {'productMenuOrShortcut': True, 'normalAppComposition': False, 'fullPipeline': False, 'ASR': False, 'provider': False},
         'forwardBoundary': 'Real WritingTarget delivery into the sole engine-owned controller',
         'pastePreferences': {'restoreClipboardAfterPaste': True, 'clipboardRestoreDelay': 2.0, 'hasArgumentOverrides': False},
         'issues': [], 'failure': None, 'shortcut': {'recordedViaActualRecorder': True, 'keyCode': 32, 'modifierFlagsRawValue': 1835008,
-            'displayString': 'fixture', 'recorderControl': control('shortcutRecorder.undoLastWritingEdit')}, 'cases': []}
+            'displayString': 'fixture', 'recorderControl': recorder}, 'cases': []}
     for name in cases:
         is_menu = name.endswith('-menu')
         case_original, replacement, case_selected = case_text_fixture(name)
@@ -790,6 +917,15 @@ def self_test():
         require(accent in case_replacement.encode('utf-8') and (769 not in units(case_replacement) if safari else 769 in units(case_replacement)),
             'Positive per-editor fixture output uses the wrong scalar bytes')
     require(not receipt_errors(value, '/fixture/app', 42, '/fixture/isolated-user'), 'Valid classifier fixture rejected')
+    unsupported_actions = copy.deepcopy(value)
+    for target in [unsupported_actions['shortcut']['recorderControl'],
+        *[item['command'] for item in unsupported_actions['cases'] if item['commandKind'] == 'menu'],
+        *[item['menu'] for item in unsupported_actions['stateChecks'].values() if 'menu' in item]]:
+        target.update(actions=[], actionsAXError=-25212)
+        if 'statusControl' in target:
+            target['statusControl'].update(actions=[], actionsAXError=-25212)
+    require(not receipt_errors(unsupported_actions, '/fixture/app', 42, '/fixture/isolated-user'),
+        'Native mouse receipt incorrectly depends on AXPress action-name support')
     def substitute_source(record, index, text):
         # Keep the mutated receipt internally coherent, so rejection tests the
         # known editor fixture boundary rather than contradictory metadata.
@@ -806,7 +942,7 @@ def self_test():
         item['forward'].update(valueUTF16=units(result), range=exact_range(len(units(prefix + text)), 0), selectedTextUTF16=[])
     mutations = [lambda v: v.update(completed=False), lambda v: v['selectedCases'].pop(), lambda v: v['cases'].pop(),
         lambda v: v['host'].update(pid=99), lambda v: v['runtimeBounds'].update(normalAppComposition=True),
-        lambda v: v['shortcut'].update(recordedViaActualRecorder=False), lambda v: v['shortcut']['recorderControl'].update(actions=[]),
+        lambda v: v['shortcut'].update(recordedViaActualRecorder=False), lambda v: v['shortcut']['recorderControl']['click'].update(eventCount=1),
         lambda v: v['cases'][0]['command'].update(role='AXGroup'), lambda v: v['cases'][0]['command'].update(enabled=False),
         lambda v: v['cases'][0].update(forwardAttempts=2), lambda v: v['cases'][0]['restored'].update(valueUTF16=units('wrong')),
         lambda v: v['cases'][1]['forward'].update(valueUTF16=units(prefix + 'Short é 😀' + suffix)),
@@ -828,6 +964,22 @@ def self_test():
         lambda v: substitute_output(v, 2, replacement_menu),
         lambda v: substitute_output(v, 0, 'Longer 👩🏽‍💻 \u00e9\nRJT, 台灣, 🧑‍🚀.'),
         lambda v: v['cases'][2]['before']['range'].update(length=9),
+        lambda v: v['cases'][0]['command']['statusClick'].update(hostPID=43),
+        lambda v: v['cases'][0]['command']['statusClick'].update(hitPID=43),
+        lambda v: v['cases'][0]['command']['statusClick'].update(sameTargetOrDescendant=False),
+        lambda v: v['cases'][0]['command']['statusClick']['point'].update(x=52),
+        lambda v: v['cases'][0]['command']['statusClick']['point'].update(x=float('nan')),
+        lambda v: v['cases'][0]['command']['statusClick']['activeDisplayBounds'].update(width=10),
+        lambda v: v['cases'][0]['command']['statusClick'].update(targetID='foreign'),
+        lambda v: v['cases'][0]['command']['statusClick'].update(uniqueTarget=False),
+        lambda v: v['cases'][0]['command']['statusClick'].update(frameStable=False),
+        lambda v: v['cases'][0]['command']['statusClick'].update(windowPolicy='unknown'),
+        lambda v: v['cases'][0]['command']['activationClick'].update(hitDepth=9),
+        lambda v: v['cases'][0]['command']['activationClick'].update(eventTypes=['leftMouseDown']),
+        lambda v: v['cases'][0]['command']['activationClick'].update(nativeMenuAncestry=False),
+        lambda v: v['cases'][0]['command'].pop('activationClick'),
+        lambda v: v['stateChecks']['unavailable']['menu'].pop('statusClick'),
+        lambda v: v['shortcut']['recorderControl']['click'].update(sameWindow=False),
         lambda v: v['cases'][3]['forward']['range'].update(location=v['cases'][3]['forward']['range']['location'] + 1)]
     for mutation in mutations:
         invalid = copy.deepcopy(value)
@@ -838,6 +990,7 @@ def self_test():
     compiler_inputs_self_test()
     host_failure_self_test()
     profile_and_sampling_self_test()
+    diagnostic_screen_self_test()
 
 
 def compiler_inputs_self_test():
@@ -1109,6 +1262,48 @@ def profile_and_sampling_self_test():
             subprocess.Popen, subprocess.run, time.sleep = popen_before, run_before, sleep_before
 
 
+def diagnostic_screen_self_test():
+    global native, process_identity
+    saved_native, saved_identity, saved_run = native, process_identity, subprocess.run
+    expected = {'started_at': 'Wed Oct 28 02:11:35 2026', 'executable_path': '/fixture/executable'}
+    host = dict(expected, pid=20220, mapped_text_paths=['/fixture/executable'])
+    # Synthetic image header exercises only tool-result classification, never visual proof.
+    image = b'\x89PNG\r\n\x1a\n' + struct.pack('>I', 13) + b'IHDR' + struct.pack('>II', 1, 1) + bytes(9)
+    try:
+        with tempfile.TemporaryDirectory(prefix='rjt-undo-diagnostic-screen-') as directory:
+            for scenario in ('captured', 'foreign', 'changed-during', 'timeout', 'bad-image'):
+                native = Path(directory) / scenario
+                native.mkdir()
+                reads, calls = [], []
+                def identity(_pid):
+                    reads.append(True)
+                    return dict(expected, started_at='another process') if scenario == 'foreign' or scenario == 'changed-during' and len(reads) > 1 else expected
+                def capture(command, **kwargs):
+                    calls.append(command)
+                    if scenario == 'timeout':
+                        raise subprocess.TimeoutExpired(command, kwargs['timeout'], output=b'', stderr=b'fixture timeout')
+                    Path(command[-1]).write_bytes(image if scenario != 'bad-image' else b'not PNG')
+                    class Result:
+                        returncode, stdout, stderr = 0, b'', b''
+                    return Result()
+                process_identity, subprocess.run = identity, capture
+                result = capture_diagnostic_screen(host, '15s', 15.0)
+                require(result['valid'] is (scenario == 'captured'), 'Diagnostic screen validity misclassified')
+                require(bool(calls) is (scenario != 'foreign'), 'Diagnostic capture ran for a foreign PID')
+                verify_diagnostic_screens({'diagnostic_screens': [result]}, host)
+                if scenario == 'captured':
+                    (native / 'diagnostic-screen-15s/screen.png').write_bytes(b'changed')
+                    try:
+                        verify_diagnostic_screens({'diagnostic_screens': [result]}, host)
+                    except RuntimeError:
+                        pass
+                    else:
+                        raise RuntimeError('Changed diagnostic PNG accepted')
+        print('External diagnostic screenshot metadata controls passed: positive, foreign PID, changed identity, timeout, invalid image and changed PNG. No real capture or native process executed.')
+    finally:
+        native, process_identity, subprocess.run = saved_native, saved_identity, saved_run
+
+
 def interrupted(signum, _frame):
     raise RuntimeError('Interrupted by signal ' + str(signum))
 
@@ -1211,6 +1406,7 @@ def main():
         'Retained host outcome contains a failure or incomplete execution')
     require(outcome['progress_files'] == progress_files() and outcome['profile_files'] == profile_files(),
         'Retained progress/profile diagnostic inventory changed')
+    verify_diagnostic_screens(outcome, live['host'])
     require(len(outcome['samples']) == len({item['checkpoint'] for item in outcome['samples']}), 'Duplicate diagnostic sampling checkpoint')
     for item in outcome['samples']:
         expected_identity = {key: live['host'][key] for key in ('started_at', 'executable_path')}

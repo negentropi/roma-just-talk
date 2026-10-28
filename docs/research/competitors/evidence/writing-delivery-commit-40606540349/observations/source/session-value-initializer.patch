@@ -1,0 +1,23 @@
+diff --git a/VoiceInk/Services/WritingActionSession.swift b/VoiceInk/Services/WritingActionSession.swift
+index 9f539f8d..ef4b9daf 100644
+--- a/VoiceInk/Services/WritingActionSession.swift
++++ b/VoiceInk/Services/WritingActionSession.swift
+@@ -10,6 +10,18 @@ final class WritingActionSession {
+     let target: WritingTarget
+     let provider: AIEnhancementProviderSnapshot
+ 
++    init(
++        kind: VoiceInkWritingActionKind,
++        targetLanguage: String,
++        target: WritingTarget,
++        provider: AIEnhancementProviderSnapshot
++    ) {
++        self.kind = kind
++        self.targetLanguage = targetLanguage
++        self.target = target
++        self.provider = provider
++    }
++
+     init(kind: VoiceInkWritingActionKind, provider: AIEnhancementProviderSnapshot) throws {
+         self.kind = kind
+         self.provider = provider

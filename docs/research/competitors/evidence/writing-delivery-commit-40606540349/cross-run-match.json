@@ -1,0 +1,19 @@
+{
+  "classification": "matched-red-green",
+  "baseline_reference_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "baseline_run_source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "candidate_run_source_sha": "af566f88c1c67b0b6c0a1dd3ed0aee2093b8929e",
+  "oracle_sha256": {
+    "VoiceInkTests/WritingActionDeliveryCommitTests.swift": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506",
+    "VoiceInkTests/DictationPolishAudioFileTests.swift": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9"
+  },
+  "tests": [
+    "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata",
+    "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata",
+    "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow"
+  ],
+  "cross_run_graph_toolchain_static_whisper_equal": true,
+  "baseline_expected_issues": 25,
+  "candidate_expected_issues": 0,
+  "scope": "Matched controlled native post-mutation metadata and first-context-query boundary only; no physical input, CloudKit or Undo gesture proof."
+}

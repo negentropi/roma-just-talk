@@ -1,0 +1,5 @@
+{
+  "origin": "git show af566f88c1c67b0b6c0a1dd3ed0aee2093b8929e:.github/workflows/voiceink-writing-delivery-commit-check.yml",
+  "sha256": "94f99638687cafd5b4ce1b91b3b351bbed73884dcb165a5a8ed671b9db69fe03",
+  "note": "The observations upload excludes the hidden .github helper path. Full source census and helper hashes match the pinned Git file; these separately retrieved bytes are not artifact output."
+}

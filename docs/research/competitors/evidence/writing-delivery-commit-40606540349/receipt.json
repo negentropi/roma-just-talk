@@ -1,0 +1,95 @@
+{
+  "run_id": 40606540349,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40606540349",
+  "head_sha": "af566f88c1c67b0b6c0a1dd3ed0aee2093b8929e",
+  "classification": "matched-native-post-delivery-and-first-query-red-green",
+  "baseline_run_id": 40604256480,
+  "baseline_run_source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "baseline_reference_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "artifacts": {
+    "observations": {
+      "id": 12780943900,
+      "bytes": 727126,
+      "sha256": "d2453f1d4563c1fcfb46c4ccbd4750861fb89e4636bcded5486ec1905d788a55",
+      "crc_members": 49,
+      "download_count": 1
+    },
+    "native": {
+      "id": 12780938851,
+      "bytes": 509871,
+      "sha256": "f9be6158036de66d2fbb4320a892554aee3be0b4b13e9bffa2c0bc407126d02b",
+      "crc_members": 51,
+      "download_count": 1
+    }
+  },
+  "source_closure": {
+    "source_head_tracked_files_match_git": 4514,
+    "historical_original_tracked_files_match_git": 3241,
+    "historical_receiver_sources_preserved_except_initializer_bridge": true,
+    "test_instrumentation": {
+      "added_test": "VoiceInkTests/WritingActionDeliveryCommitTests.swift",
+      "production_bridge_only": "VoiceInk/Services/WritingActionSession.swift",
+      "replaced_tracked_test": "VoiceInkTests/DictationPolishAudioFileTests.swift"
+    },
+    "candidate_source_after_matches_before": true,
+    "common_oracle_sha256": {
+      "VoiceInkTests/DictationPolishAudioFileTests.swift": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9",
+      "VoiceInkTests/WritingActionDeliveryCommitTests.swift": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506"
+    },
+    "natural_initializer_bridge_sha256": "1b6048e13f973dc7cc8aae5ab13ff90a586396c7e7bffdeadca9a162e4ae2bea",
+    "canonical_packages": 41,
+    "hidden_helper_bytes_not_in_observation_archive": [
+      ".github/workflows/voiceink-writing-delivery-commit-check.yml"
+    ],
+    "hidden_helper_hashes_equal_pinned_git_and_full_source_census": true
+  },
+  "actual_results": {
+    "native_started": 3,
+    "native_passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "issues": 0,
+    "exit_code": 0,
+    "controlled_read_only_Cocoa513_diagnostics": 1,
+    "strict_fixture_provider_requirements_passed": true,
+    "positive_controls_passed": true,
+    "unchanged_full_app_and_test_bundle_identity": true,
+    "exact_nested_selection_verified": true,
+    "strict_adhoc_debug_signature_verified": true,
+    "fresh_signed_TCC_matches_csreq": true,
+    "isolated_xctestrun_bytes_verified": true,
+    "spaced_provider_absent_from_argv": true
+  },
+  "strict_cross_run_match": {
+    "frozen_comparator_passed": true,
+    "helper_hashes_equal": true,
+    "common_oracles_and_bridge_equal": true,
+    "original_historical_manifest_equal": true,
+    "toolchain_OS_architecture_equal": true,
+    "actual_package_revisions_and_clean_trees_equal": true,
+    "all_static_whisper_files_equal": 86,
+    "seed_preferences_equal": true,
+    "old_and_new_receiver_binaries_differ": true,
+    "old_issues": 25,
+    "candidate_issues": 0
+  },
+  "raw_log_identity": {
+    "build_bytes": 5320914,
+    "build_sha256": "278741b3da30fcd88a1e8d4ab070c8760eb4dce983d322b98f8651e3d8ce64c5",
+    "tests_bytes": 14350,
+    "tests_sha256": "4f782fb34074633efea82c900837d48671c196142770ed31345d3fb42f2bd953"
+  },
+  "cleanup_limit": {
+    "observed_owned_fixture_store_unlink_while_handles_open": true,
+    "diagnostic_lines_retained": 7,
+    "claimed_closed_store_cleanup": false,
+    "scope": "Read-only fixture.close removes its owned temporary directory while its contexts/container remain in scope. Diagnostics follow the boundary assertions; no user store or product corruption claim."
+  },
+  "limits": [
+    "Controlled native app pipeline and SwiftData boundary only",
+    "Fake editor access and synthetic recognition/provider outputs; no physical/editor UI/ASR/model-quality proof",
+    "Candidate-only new persistence success test awaits the full suite",
+    "No future Undo gesture, CloudKit synchronization, or general dictation-profile acceptance claim",
+    "Raw build/xcresult archive remains remote /data; no failed-log fetch needed for this successful diagnostic run"
+  ]
+}

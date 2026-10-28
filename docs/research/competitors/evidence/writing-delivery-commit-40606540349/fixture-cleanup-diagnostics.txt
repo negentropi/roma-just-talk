@@ -1,0 +1,7 @@
+2026-10-28 00:18:32.318231+0000 roma just talk[22439:71547] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113802026-10-28 00:18:32.318650+0000 roma just talk[22439:71427] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 00:18:32.322044+0000 roma just talk[22439:71547] [logging] invalidated open fd: 16 (0x11)
+2026-10-28 00:18:32.318289+0000 roma just talk[22439:71509] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Polish-Audio-8216682B-B28E-4E85-8F3C-0273BCFFAEA2/read-only.store-shm
+2026-10-28 00:18:32.322067+0000 roma just talk[22439:71509] [logging] invalidated open fd: 17 (0x11)
+2026-10-28 00:18:32.318342+0000 roma just talk[22439:71549] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation:✔ Test importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() passed after 0.233 seconds.
+ vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Polish-Audio-8216682B-B28E-4E85-8F3C-0273BCFFAEA2/read-only.store
+2026-10-28 00:18:32.333497+0000 roma just talk[22439:71549] [logging] invalidated open fd: 15 (0x11)

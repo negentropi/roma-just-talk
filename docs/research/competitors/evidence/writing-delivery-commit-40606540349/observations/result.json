@@ -1,0 +1,53 @@
+{
+  "classification": "candidate-passed",
+  "contract_sha256": "219c78012711d951d65e627a47f3492f33bcefaf120bda40e88572b746259505",
+  "cross_run_match_required": "Compare exact common oracle, initializer bridge, original baseline runtime, toolchain, canonical package checkout/tree and static Whisper receipts before claiming matched red/green across these lane runs.",
+  "lane": "candidate",
+  "oracle_sha256": {
+    "VoiceInkTests/DictationPolishAudioFileTests.swift": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9",
+    "VoiceInkTests/WritingActionDeliveryCommitTests.swift": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506"
+  },
+  "result": {
+    "classification": "passed",
+    "errors": [],
+    "exit_code": 0,
+    "failure_sites": [],
+    "issues": [],
+    "lane": "candidate",
+    "summaries": [
+      [
+        "3",
+        "3",
+        "passed"
+      ]
+    ],
+    "tests": {
+      "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    },
+    "valid": true
+  },
+  "scope": "Actual app pipeline post-mutation metadata and importer first-caller-context fetch. Synthetic controlled fixtures; no physical input, Clipboard Undo, CloudKit or runtime review-UI proof.",
+  "source_sha": "af566f88c1c67b0b6c0a1dd3ed0aee2093b8929e",
+  "tests": [
+    "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata",
+    "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata",
+    "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow"
+  ]
+}

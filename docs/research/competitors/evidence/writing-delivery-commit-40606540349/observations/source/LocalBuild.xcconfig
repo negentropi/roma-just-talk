@@ -1,0 +1,15 @@
+// LocalBuild.xcconfig
+// Build configuration for local/unsigned builds (no Apple Developer certificate required).
+// Used by `make local`; pass CONFIGURATION=Release for release packaging.
+
+// Ad-hoc signing (works without a developer account)
+CODE_SIGN_IDENTITY = -
+CODE_SIGN_STYLE = Manual
+DEVELOPMENT_TEAM =
+PROVISIONING_PROFILE_SPECIFIER =
+
+// Entitlements are set via absolute path in the Makefile command line
+// (relative paths break SPM package targets that resolve from their own source root)
+
+// Add LOCAL_BUILD compilation flag so Swift code can use #if LOCAL_BUILD
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD

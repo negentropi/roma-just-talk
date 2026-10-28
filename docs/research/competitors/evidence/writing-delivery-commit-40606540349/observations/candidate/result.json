@@ -1,0 +1,36 @@
+{
+  "classification": "passed",
+  "errors": [],
+  "exit_code": 0,
+  "failure_sites": [],
+  "issues": [],
+  "lane": "candidate",
+  "summaries": [
+    [
+      "3",
+      "3",
+      "passed"
+    ]
+  ],
+  "tests": {
+    "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": true
+}

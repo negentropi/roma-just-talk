@@ -8,7 +8,7 @@
   "selectedModel": "gpt-6.1-sol",
   "selectedReasoningEffort": "medium",
   "usage": "Not exposed; not estimated.",
-  "roundBudget": 3,
+  "roundBudget": 5,
   "diffCommand": "git diff bf9ed37c19f6f381a0bde485da254dbeafb6234f -- . ':!docs/research/competitors/full-stop-pr-readiness.md' ':!docs/research/competitors/full-stop-sol-loop.json'",
   "rounds": [
     {
@@ -66,6 +66,17 @@
       "independentChecks": "PR-review classifier controls and whitespace checks passed; product fixes and matched-proof driver reviewed.",
       "limits": "New runtime regression comparisons pending CI. Projection plan accepted subject to exact product/resource/project/dependency/compiled-test equality, QA dependency closure and documentation redirects. The unseen projected commit and its CI are not separately certified by this source review.",
       "usage": "Not exposed."
+    },
+    {
+      "round": 4,
+      "head": "78f867c7e742c0ed6379873dc0e5b8574592ff16",
+      "qaHead": "0509af36a2136a958ff2c702b42e37f0dca53be0",
+      "verdict": "APPROVE",
+      "findings": [],
+      "scope": "One compiled native fixture file; two QA-only controls extraction/provenance files.",
+      "independentChecks": "QA self-test: 102 receipt, 8 extraction, 5 provenance and 10 compiler-input rejection controls; whitespace checks.",
+      "limits": "Fresh hosted compilation/native acceptance required. Original Safari focus AX status was not retained; timeout-causality red/green not claimed.",
+      "usage": "Not exposed."
     }
   ],
   "openFindings": [],
@@ -88,7 +99,7 @@
     }
   ],
   "finalSourceVerdict": "APPROVE",
-  "sourceReviewCovers": "Product changes at 2b165a5c960817f2b1ea4d5683c8f64e2109de3b; source-identical projection requires independent equality checks and actual PR-head automatic CI.",
+  "sourceReviewCovers": "Product sources at round3 plus the native compiled-fixture timeout-state fix at 78f867c7. QA updater extraction approved at 0509af36. Source-equivalent descendants require independent comparison and fresh CI.",
   "pushed": true,
   "initialPublicationHead": "520943c54f206dcdc5addc077256a26252f84161",
   "publicationBranch": "codex/rjt-mac-competitor-features-pr-20261028",
@@ -127,5 +138,11 @@
     "automaticCI": "Must execute the actual projected PR head.",
     "extendedCI": "Runs on a verification descendant of PR source; actual SHA retained. Exact product trees and normal-app/UI compiler inputs must be independently verified.",
     "sourceReviewLimit": "Round3 approved source and projection conditions; it does not assert execution success on an unseen projected commit."
+  },
+  "budgetExtensionReason": "Actual editor-identity proof was blocked by retained AX timeout state contamination and an isolated controls-host production-type omission. State/permission-boundary findings qualify for the skill extension; no extra source reviewer.",
+  "runtimeFixtureFindings": {
+    "NATIVE1": "Scoped retained-handle timeout overrides; preserve exact window/token checks and record the original AX query error.",
+    "CONTROLS1": "Include the exact production updater declaration/imports in the generated component host; normal application main remains excluded.",
+    "acceptance": "Pending fresh hosted runtime; no failed observation relabelled."
   }
 }

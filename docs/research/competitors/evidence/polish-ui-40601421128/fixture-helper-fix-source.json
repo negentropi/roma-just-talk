@@ -1,0 +1,28 @@
+{
+  "before_source_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "before_file_sha256": "911039b62c26afc614cae29b252dc88105dc133f76a8201698a244470335860f",
+  "candidate_file_sha256": "f3c3c1ce016bad6491fcaf60f6877909d4fa16f22ed0a2e45ea77c1914be6110",
+  "all_eight_bodies_unchanged": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "14c9911f29f6c7b317dc34a9c3ad4c284fba4b2077a61aa3ba6f778f36b34b61",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": "5df0f3cb7b3afa77a71a00743a7aaa6867717dc685ed89efd4d7bd7861c2aea8",
+    "testTranslationTargetsReorderSelectAndPersist": "c07646262a4ca04d144df43362f68261975ba07831bdaacdba25679302d69f06",
+    "testDictationProfilePreservesCustomSettingsAndPersists": "2dbeddbeda7d7d583fb6aa5c5a0ce0421ac1cbfee3772cfbe98061624d5c0ea4",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": "ec685883153f5f3096d441ed3f7c985a521dc393b7eeb2c53b98c424e67815b6",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": "fc819e9e9a706c27273a6d1c55cfe11fd6620cdb5381327c23cab636609cc1b7",
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": "a95ec15b51cdbd66fa6500a5524dddd8234c6f0f06a8fd9e403cb84f3f4e648f",
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": "2d501cc54d19aa1e1a3dc41478dca01b063099dfccd0cbb94d693d0a203f6e0f"
+  },
+  "original_four_unchanged_vs": "31651718c058593719742a220aa85c05827ded7a",
+  "marker_line": 996,
+  "changes": [
+    "Page readiness uses both exact observed TextFields, not conditional empty-draft Add button.",
+    "Scoped text lookup includes native element own String value; exact expected strings unchanged.",
+    "Retains exact captured-cleanup label/value/debugDescription diagnostic on future mismatch."
+  ],
+  "source_checks": {
+    "swift_frontend_parse": "passed",
+    "git_diff_check": "passed",
+    "independent_source_review": "CLEAN profile_ui_fixture_review"
+  },
+  "runtime_after_fix": "pending; no production UI change"
+}

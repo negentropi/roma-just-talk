@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "run_id": 40601421128,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40601421128",
+  "source_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "oracle_sha256": "911039b62c26afc614cae29b252dc88105dc133f76a8201698a244470335860f",
+  "classification": "eight-case-gate-failed",
+  "baseline": {
+    "source_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+    "valid_intended_failure": true,
+    "line": 990,
+    "visible_custom_none_hittable": false,
+    "sole_expected_failure": true,
+    "signed_identity_tcc_process_valid": true,
+    "shortcut_exact_restore": true
+  },
+  "candidate": {
+    "executed_once": 8,
+    "passed": 5,
+    "failed": 3,
+    "tests": {
+      "testApprovedHistoryCorrectionSurvivesSourceDeletion": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilePreservesCustomSettingsAndPersists": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testTranslationTargetsReorderSelectAndPersist": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    },
+    "failures": [
+      {
+        "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "line": 531,
+        "message": "XCTAssertTrue failed",
+        "timestamp": "2026-10-27T23:43:42.185+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "line": 531,
+        "message": "XCTAssertTrue failed",
+        "timestamp": "2026-10-27T23:58:22.580+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "line": 348,
+        "message": "XCTAssertTrue failed",
+        "timestamp": "2026-10-27T23:59:18.363+0000"
+      }
+    ],
+    "original_four_pass": true,
+    "full_profile_style_case_pass": true,
+    "process_path_valid": true,
+    "initial_signed_identity_and_tcc_valid": true,
+    "post_ui_identity": "not retained; driver returned UI exit65 before identity-after.txt; missing receipt is not observed mismatch",
+    "post_ui_tcc": "not read; no post-UI permission stability claim"
+  },
+  "partial_history_proof": [
+    "Real unique native .expand Button exists, lies inside row and responds.",
+    "Legacy Original and Enhanced text and actual clipboard exact UTF8/UTF16 assertions passed.",
+    "Recognized-success row expanded; captured-cleanup ID exists, visible frame displays exact Clarity Formal."
+  ],
+  "not_reached": [
+    "Correction preview/cancel/approve/management and source deletion",
+    "Success/fallback/unknown History variant/copy rendering after current text lookup failure",
+    "Native final T5/W2/V1 read-only verification and correction receipts",
+    "Post-UI identity/signature/TCC comparison"
+  ],
+  "native": {
+    "seed": "passed independent all20History/all11Word+canonicalDTO exact; see independent-native-audit.json",
+    "seed_host_pid": 47147,
+    "seed_saved_counts": {
+      "Transcription": 6,
+      "WordReplacement": 1,
+      "VocabularyWord": 1,
+      "SessionMetric": 0
+    },
+    "seed_host_closed_no_store_descriptors": true,
+    "verify": "blocked, not attempted because UI failed",
+    "native_pair_valid": false
+  },
+  "shortcut_isolation": {
+    "candidate_cases": 8,
+    "candidate_attachments": 36,
+    "baseline_attachments": 4,
+    "keys_per_snapshot": 32,
+    "all_synchronized": true,
+    "before_restored_census_equal": true,
+    "full_typed_restore_assertions": "Pinned CFPreferences/NSObject equality checks passed during every owned-case teardown, including three failed tests and the fatal baseline.",
+    "payload_limit": "Census redacts Data payload bytes to lengths; census equality alone does not independently prove those bytes. Full-value readback is asserted by the source-bound test."
+  },
+  "visuals": {
+    "original_pngs": 27,
+    "derived_original_recording_frames": 2,
+    "sol_review": "bounded CLEAN; all27 original PNGs+2 derived frames individually inspected, hashes matched; see visual-review.json"
+  },
+  "artifact": {
+    "id": 12779769682,
+    "bytes": 263953255,
+    "sha256": "ced5cf7634e22edf69bf2a5be84bb87e36539d5e55cf9358a669a60f6d9c323b",
+    "zip_members": 4189,
+    "all_member_crc_verified": true,
+    "remote_archive": "/data/rjt-writing-check-01a17bef/40601421128/evidence.zip",
+    "full_archive_local": false
+  },
+  "failed_log": {
+    "fetched_once": true,
+    "bytes": 6161,
+    "sha256": "99f90ad769d34755b971517155e48635ed627d269ea4fb5656d96cdcd274ea8a"
+  },
+  "limits": [
+    "No strict8 acceptance; no correction creation/management/source-delete proof.",
+    "Native seed creates synthetic rows through real factory, not ASR/provider/editor delivery.",
+    "Complete captured-label own AX value was not retained at failure; visual text/source match and helper own-value omission support bounded helper fix.",
+    "Startup logs include pre-roll; no claim audio hardware was untouched.",
+    "App/window enabled flags remain diagnostic; actual foreground controls are the test boundary."
+  ],
+  "source_inputs": {
+    "frozen_git_inputs": 26,
+    "runtime_source_inputs_after_checks_ok": 25,
+    "native_phase_inputs": 19,
+    "candidate_product_path_source_hashes_checked": 597,
+    "before_after_product_paths_equal": true
+  },
+  "independent_evidence_review": "CLEAN independent-evidence-review.json"
+}

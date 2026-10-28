@@ -1,0 +1,31 @@
+{
+  "requested_identifiers": [
+    "VoiceInkUITests/WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
+    "VoiceInkUITests/WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing",
+    "VoiceInkUITests/WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist",
+    "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists",
+    "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings",
+    "VoiceInkUITests/WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants",
+    "VoiceInkUITests/WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement",
+    "VoiceInkUITests/WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion"
+  ],
+  "enabled_identifiers": [
+    "VoiceInkUITests/WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion",
+    "VoiceInkUITests/WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing",
+    "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists",
+    "VoiceInkUITests/WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings",
+    "VoiceInkUITests/WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement",
+    "VoiceInkUITests/WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants",
+    "VoiceInkUITests/WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
+    "VoiceInkUITests/WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist"
+  ],
+  "disabled_identifiers": [
+    "VoiceInkUITests/UpdaterE2ETests/testSeamlessBackgroundUpdateInstallsAndRelaunches",
+    "VoiceInkUITests/VoiceInkUITests/testExample",
+    "VoiceInkUITests/VoiceInkUITests/testLaunchPerformance",
+    "VoiceInkUITests/VoiceInkUITestsLaunchTests/testLaunch",
+    "VoiceInkUITests/WritingPowerModeUITests/testSnippetEditsPreservePowerModeRestoration",
+    "VoiceInkUITests/WritingPowerModeUITests/testTargetChangesPreservePowerModeRestoration"
+  ],
+  "valid": true
+}

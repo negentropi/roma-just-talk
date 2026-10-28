@@ -1,0 +1,11 @@
+{
+  "expected_executable": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "processes": [
+    {
+      "pid": 24654,
+      "executable": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk"
+    }
+  ],
+  "observer_completed": true,
+  "sampling_errors": []
+}

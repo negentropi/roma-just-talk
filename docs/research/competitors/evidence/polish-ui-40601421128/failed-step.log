@@ -1,0 +1,38 @@
+ui	Compare the disabled-panel baseline and eight current writing UI cases	﻿2026-10-27T23:21:59.1194010Z ##[group]Run defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.1196280Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo^[[0m
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.1198070Z ^[[36;1mdefaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false^[[0m
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.1199380Z ^[[36;1mshasum -a 256 -c "$RUNNER_TEMP/writing-ui-proof/source-inputs.sha256"^[[0m
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.1200660Z ^[[36;1mbash scripts/run-writing-settings-ui-regression.sh^[[0m
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.1252040Z shell: /bin/bash -e {0}
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.1252490Z ##[endgroup]
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.2324460Z VoiceInkUITests/WritingFeaturesUITests.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.2432240Z VoiceInkTests/DictationHistoryUISeedLiveTests.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.2532080Z VoiceInk/VoiceInk.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.2633620Z VoiceInk/Models/Transcription.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.2735210Z VoiceInk/Models/WordReplacement.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.2843980Z VoiceInk/Models/VocabularyWord.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.2946450Z VoiceInk/Models/SessionMetric.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3050220Z VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3152610Z VoiceInkCore/Sources/VoiceInkCore/WordReplacementLibrary.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3254920Z VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3357130Z VoiceInk/Services/HistoryCorrectionApprovalService.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3459350Z VoiceInk/Services/DictionaryService.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3559680Z VoiceInk/Views/ModelSettingsView.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3662190Z VoiceInk/Views/History/SaveCorrectionSheet.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3762810Z VoiceInk/Views/History/HistoryProcessingViews.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3864200Z VoiceInk/Views/History/InlineHistoryView.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.3966170Z VoiceInk/Views/History/TranscriptionDetailView.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4067320Z VoiceInk/Views/Dictionary/WordReplacementView.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4168270Z VoiceInk/Views/Dictionary/EditReplacementSheet.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4270140Z VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4371360Z scripts/run-writing-settings-ui-regression.sh: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4473910Z scripts/run-writing-feature-regression.sh: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4569780Z .github/workflows/voiceink-writing-ui-check.yml: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4586720Z VoiceInk.xcodeproj/project.pbxproj: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:21:59.4587410Z VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved: OK
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:22:04.9734970Z From https://github.com/negentropi/roma-just-talk
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:22:04.9763210Z  * branch              bdd608cf6111e8d7e88c12678f530318713acf67 -> FETCH_HEAD
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:22:04.9932570Z Preparing worktree (detached HEAD bdd608cf)
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-27T23:22:05.3880180Z HEAD is now at bdd608cf test: scroll the settings Form through visible native controls
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-28T00:03:11.4752850Z swift-driver version: 1.148.6 Matched UI comparison requires intended baseline red, a closed normal-store seed, and eight candidate cases green
+ui	Compare the disabled-panel baseline and eight current writing UI cases	2026-10-28T00:03:11.5337260Z ##[error]Process completed with exit code 1.

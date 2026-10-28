@@ -1,0 +1,34 @@
+{
+  "binaries": [
+    {
+      "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "sha256": "3ebe33d0aa76b1af7d0a7e4f670c29cbf8e8b631f0aa63a3f843a2308e918888"
+    },
+    {
+      "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/MacOS/VoiceInkUITests-Runner",
+      "sha256": "ffff84bd2a08ba2de7af434a47da42a122e773d1d3806da599211701ac7f6f15"
+    },
+    {
+      "path": "/Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests",
+      "sha256": "fdd9511e6986740f95115038af4b5db6ad31b7b906a8f2240b40edd5bd739c95"
+    }
+  ],
+  "signatures": {
+    "app": {
+      "bundle_identifier": "com.negentropi.RomaJustTalk",
+      "cdhash": "e46aa4962357fdd11295a45bfbb5ecae7d9df88e",
+      "signature_sha256": "6f0d5fcc1aae9044cfbecb412f1d9a9734d1813b2c9e6db004b3832f03880421"
+    },
+    "runner": {
+      "bundle_identifier": "com.negentropi.RomaJustTalkUITests.xctrunner",
+      "cdhash": "71458563dee13dc6b61e5a67db444e2b9c15c965",
+      "signature_sha256": "5caa8b1b2ca7a56bbe4c1804b24218ab7e8536a3aab8b1a4bfe1d77bb4d489a5"
+    },
+    "test-bundle": {
+      "bundle_identifier": "com.negentropi.RomaJustTalkUITests",
+      "cdhash": "83de82923c6aa7cc81d1c78a73daa9e90c323231",
+      "signature_sha256": "28955f832e0ade2ed8ca73bfd1c39151958387d4e6cc193a79726adfd88bb409"
+    }
+  },
+  "valid": true
+}

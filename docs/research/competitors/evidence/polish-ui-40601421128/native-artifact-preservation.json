@@ -1,0 +1,13 @@
+{
+  "run_id": 40601421128,
+  "native_seed_xcresult_preserved_members": 51,
+  "native_seed_xcresult_uncompressed_bytes": 310177,
+  "native_seed_log": {
+    "member": "_temp/writing-ui-proof/history-seed/seed/tests.log",
+    "bytes": 26783,
+    "sha256": "c9fc059e58ea56c06781556c5ac6007e5d305c43b3dee56797ab9c4c759e22fe",
+    "crc32": "65b5d32b"
+  },
+  "native_verify": "not attempted; no corresponding raw artifacts expected",
+  "scope": "Full archive retained only remote, digest and all ZIP member CRC checked."
+}

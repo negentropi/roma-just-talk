@@ -1,0 +1,121 @@
+UI verification requires exactly eight known cases once, passed, without skips or extra cases
+    t =    54.55s     Checking `Expect predicate `existsNoRetry == 1` for object StatusItem (First Match)`
+    t =    54.55s         Checking existence of `StatusItem (First Match)`
+    t =    54.56s Get number of matches for: Descendants matching type StatusItem
+    t =    54.67s Click StatusItem (First Match)
+    t =    54.67s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    54.68s     Find the StatusItem (First Match)
+    t =    54.70s     Check for interrupting elements affecting "menuBarIcon" StatusItem
+    t =    54.70s     Synthesize event
+    t =    55.10s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    55.17s Waiting 5.0s for "Settings" MenuItem to exist
+    t =    56.19s     Checking `Expect predicate `existsNoRetry == 1` for object "Settings" MenuItem`
+    t =    56.19s         Checking existence of `"Settings" MenuItem`
+    t =    56.29s Click "Settings" MenuItem
+    t =    56.30s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    56.30s     Find the "Settings" MenuItem
+    t =    56.37s     Check for interrupting elements affecting "menuAction:" MenuItem
+    t =    56.37s     Synthesize event
+    t =    56.37s         Checking existence of `"menuAction:" MenuItem`
+    t =    56.43s         Hover menu item 'Settings'
+    t =    56.43s             Wait for com.negentropi.RomaJustTalk to idle
+    t =    56.43s             Find the "menuAction:" MenuItem
+    t =    56.48s             Check for interrupting elements affecting "menuAction:" MenuItem
+    t =    56.48s             Synthesize event
+    t =    56.69s             Wait for com.negentropi.RomaJustTalk to idle
+    t =    56.70s         Find the "menuAction:" MenuItem
+    t =    57.73s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    57.81s Waiting 15.0s for "com.negentropi.RomaJustTalk.mainWindow" Window to exist
+    t =    58.83s     Checking `Expect predicate `existsNoRetry == 1` for object "com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =    58.83s         Checking existence of `"com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =    58.83s Get number of matches for: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    59.27s Waiting 10.0s for "Dictionary" Button to exist
+    t =    60.29s     Checking `Expect predicate `existsNoRetry == 1` for object "Dictionary" Button`
+    t =    60.29s         Checking existence of `"Dictionary" Button`
+    t =    60.48s Waiting 10.0s for "style" Button to exist
+    t =    61.49s     Checking `Expect predicate `existsNoRetry == 1` for object "style" Button`
+    t =    61.49s         Checking existence of `"style" Button`
+    t =    61.68s Click "style" Button
+    t =    61.68s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    61.68s     Find the "style" Button
+    t =    61.86s     Check for interrupting elements affecting "style" Button
+    t =    61.88s     Synthesize event
+    t =    62.55s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    62.55s Waiting 10.0s for "writingActions.target.add" Button to exist
+    t =    63.57s     Checking `Expect predicate `existsNoRetry == 1` for object "writingActions.target.add" Button`
+    t =    63.57s         Checking existence of `"writingActions.target.add" Button`
+    t =    63.87s Checking existence of `"writingActions.target.add" Button`
+    t =    64.10s Find the "writingActions.target.add" Button
+    t =    64.87s Checking existence of `ScrollView (First Match)`
+    t =    64.97s Scroll ScrollView (First Match) by dx: 0.00, dy: -180.00
+    t =    64.97s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    64.97s     Find the ScrollView (First Match)
+    t =    65.08s     Check for interrupting elements affecting ScrollView
+    t =    65.10s     Synthesize event
+    t =    65.48s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    65.48s Find the "writingActions.target.add" Button
+    t =    66.42s Checking existence of `ScrollView at {{255.0, 83.0}, {732.0, 625.0}}`
+    t =    66.64s Scroll ScrollView at {{255.0, 83.0}, {732.0, 625.0}} by dx: 0.00, dy: -180.00
+    t =    66.64s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    66.64s     Find the ScrollView at {{255.0, 83.0}, {732.0, 625.0}}
+    t =    66.93s     Check for interrupting elements affecting ScrollView
+    t =    66.98s     Synthesize event
+    t =    67.23s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    67.25s Find the "writingActions.target.add" Button
+    t =    67.65s Find the "writingActions.target.add" Button
+    t =    68.14s Find the "writingActions.target.add" Button
+    t =    68.55s Find the "writingActions.target.add" Button
+    t =    69.05s Find the "writingActions.target.add" Button
+    t =    69.38s Find the "writingActions.target.add" Button
+    t =    69.68s Find the "writingActions.target.add" Button
+    t =    70.09s Find the "writingActions.target.fr.select" Button
+    t =    70.42s Find the "writingActions.target.fr.moveUp" Button
+    t =    70.66s Checking existence of `"writingActions.target.de.select" Button`
+    t =    70.90s Find the Target Application 'com.negentropi.RomaJustTalk'
+    t =    71.13s Added attachment named 'Translation target persisted after relaunch'
+    t =    71.13s Checking existence of `"writingActions.target.en.select" Button`
+    t =    71.46s Click "writingActions.target.en.select" Button
+    t =    71.46s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    71.46s     Find the "writingActions.target.en.select" Button
+    t =    71.66s     Check for interrupting elements affecting "writingActions.target.en.select" Button
+    t =    71.68s     Synthesize event
+    t =    72.11s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    72.11s Click "writingActions.target.de.remove" Button
+    t =    72.11s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    72.11s     Find the "writingActions.target.de.remove" Button
+    t =    72.34s     Check for interrupting elements affecting "writingActions.target.de.remove" Button
+    t =    72.36s     Synthesize event
+    t =    72.75s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    72.75s Click "writingActions.target.fr.remove" Button
+    t =    72.75s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    72.75s     Find the "writingActions.target.fr.remove" Button
+    t =    72.96s     Check for interrupting elements affecting "writingActions.target.fr.remove" Button
+    t =    72.98s     Synthesize event
+    t =    73.40s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    73.40s Checking existence of `"writingActions.target.de.select" Button`
+    t =    73.58s Checking existence of `"writingActions.target.fr.select" Button`
+    t =    73.83s Tear Down
+    t =    73.84s     Terminate com.negentropi.RomaJustTalk:87975
+    t =    74.93s     Added attachment named 'UI shortcut preference census restored'
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' passed (74.989 seconds).
+Test Suite 'WritingFeaturesUITests' failed at 2026-10-28 00:02:52.102.
+	 Executed 8 tests, with 3 failures (0 unexpected) in 1171.542 (1171.549) seconds
+Test Suite 'VoiceInkUITests.xctest' failed at 2026-10-28 00:02:52.103.
+	 Executed 8 tests, with 3 failures (0 unexpected) in 1171.542 (1171.550) seconds
+Test Suite 'Selected tests' failed at 2026-10-28 00:02:52.103.
+	 Executed 8 tests, with 3 failures (0 unexpected) in 1171.542 (1171.551) seconds
+2026-10-28 00:02:56.044 xcodebuild[49063:174124] [MT] IDETestOperationsObserverDebug: 1176.002 elapsed -- Testing started completed.
+2026-10-28 00:02:56.044 xcodebuild[49063:174124] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-28 00:02:56.044 xcodebuild[49063:174124] [MT] IDETestOperationsObserverDebug: 1176.002 sec, +1176.002 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult
+
+Failing tests:
+	WritingFeaturesUITests.testApprovedHistoryCorrectionSurvivesSourceDeletion()
+	WritingFeaturesUITests.testHistoryCorrectionPreviewApprovalAndDictionaryManagement()
+	WritingFeaturesUITests.testHistoryPreservesRecognizedFallbackAndLegacyVariants()
+
+** TEST EXECUTE FAILED **
+
+Testing started

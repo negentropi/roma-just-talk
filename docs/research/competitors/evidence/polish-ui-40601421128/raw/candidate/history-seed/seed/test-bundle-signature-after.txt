@@ -1,0 +1,23 @@
+Executable=/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests
+Identifier=com.negentropi.RomaJustTalkTests
+Format=bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=29657 flags=0x2(adhoc) hashes=920+3 location=embedded
+VersionPlatform=1
+VersionMin=918528
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=bffc78e1198c0ae2817968c66312b84a935a549c
+CandidateCDHashFull sha256=bffc78e1198c0ae2817968c66312b84a935a549c3d31585d3b6a1fabad94edd8
+Hash choices=sha256
+CMSDigest=bffc78e1198c0ae2817968c66312b84a935a549c3d31585d3b6a1fabad94edd8
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=6127616
+Executable Segment flags=0x0
+Page size=16384
+CDHash=bffc78e1198c0ae2817968c66312b84a935a549c
+Signature=adhoc
+Info.plist entries=19
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=131
+Internal requirements count=0 size=12

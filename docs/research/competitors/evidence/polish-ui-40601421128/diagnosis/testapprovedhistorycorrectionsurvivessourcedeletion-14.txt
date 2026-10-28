@@ -1,0 +1,427 @@
+Application, 0x9ef1ea6c0, pid: 49516, title: 'roma just talk', Disabled <App element pid: 49516>
+  Window (Main), 0x9ef1e9900, {{37.0, 32.0}, {950.0, 674.0}}, identifier: 'com.negentropi.RomaJustTalk.mainWindow', title: 'Dictionary', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jLAAAAAAAAAA=>
+    Group, 0x9ef1ea440, {{37.0, 32.0}, {950.0, 674.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jLwAAAAAAAAA=>
+      SplitGroup, 0x9ef1eabc0, {{37.0, 32.0}, {950.0, 674.0}}, identifier: 'main-AppWindow-1, SidebarNavigationSplitView', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jPQAAAAAAAAA=>
+        Group, 0x9ef1ea580, {{45.0, 40.0}, {210.0, 658.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jPgAAAAAAAAA=>
+          ScrollView, 0x9ef1ea1c0, {{45.0, 84.0}, {210.0, 614.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTQAAAAAAAAA=>
+            Outline, 0x9ef1eb200, {{44.0, 83.0}, {212.0, 616.0}}, label: 'Sidebar', Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAA=>
+              OutlineRow, 0x9ef1ebe80, {{45.0, 84.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD//////////w==>
+                Cell, 0x9ef704000, {{55.0, 84.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD//////////1IAAAAAAAAA>
+                  Group, 0x9ef704140, {{59.0, 84.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD//////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef704280, {{45.0, 84.0}, {210.0, 52.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD+/////////w==>
+                Cell, 0x9ef7043c0, {{55.0, 84.0}, {190.0, 52.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD+/////////1IAAAAAAAAA>
+                  Image, 0x9ef704500, {{63.0, 95.0}, {30.0, 30.0}}, label: 'AppIcon' <AX element pid: 49516, token: bMEAAAAAAABvY29jWwAAAAAAAAA=>
+                  StaticText, 0x9ef704640, {{103.0, 94.0}, {66.0, 17.0}}, value: roma-just-talk <AX element pid: 49516, token: bMEAAAAAAABvY29jXAAAAAAAAAA=>
+                  StaticText, 0x9ef704780, {{187.0, 104.5}, {20.0, 11.0}}, value: PRO <AX element pid: 49516, token: bMEAAAAAAABvY29jXQAAAAAAAAA=>
+                  StaticText, 0x9ef7048c0, {{103.0, 112.0}, {69.0, 14.0}}, value: speak before hotkey <AX element pid: 49516, token: bMEAAAAAAABvY29jXgAAAAAAAAA=>
+              OutlineRow, 0x9ef704a00, {{45.0, 149.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD9/////////w==>
+                Cell, 0x9ef704b40, {{55.0, 149.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD9/////////1IAAAAAAAAA>
+                  Group, 0x9ef704c80, {{59.0, 149.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD9/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef704dc0, {{45.0, 149.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD8/////////w==>
+                Cell, 0x9ef704f00, {{55.0, 149.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD8/////////1IAAAAAAAAA>
+                  Button, 0x9ef705040, {{63.0, 157.0}, {174.0, 24.0}}, label: 'home' <AX element pid: 49516, token: bMEAAAAAAABvY29jVAAAAAAAAAA=>
+              OutlineRow, 0x9ef705180, {{45.0, 202.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD7/////////w==>
+                Cell, 0x9ef7052c0, {{55.0, 202.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD7/////////1IAAAAAAAAA>
+                  Group, 0x9ef705400, {{59.0, 202.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD7/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef705540, {{45.0, 202.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD6/////////w==>
+                Cell, 0x9ef705680, {{55.0, 202.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD6/////////1IAAAAAAAAA>
+                  Button, 0x9ef7057c0, {{63.0, 210.0}, {174.0, 24.0}}, label: 'manual stt' <AX element pid: 49516, token: bMEAAAAAAABvY29jWAAAAAAAAAA=>
+              OutlineRow, 0x9ef705900, {{45.0, 255.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD5/////////w==>
+                Cell, 0x9ef705a40, {{55.0, 255.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD5/////////1IAAAAAAAAA>
+                  Group, 0x9ef705b80, {{59.0, 255.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD5/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef705cc0, {{45.0, 255.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD4/////////w==>
+                Cell, 0x9ef705e00, {{55.0, 255.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD4/////////1IAAAAAAAAA>
+                  Button, 0x9ef705f40, {{63.0, 263.0}, {174.0, 24.0}}, label: 'past' <AX element pid: 49516, token: bMEAAAAAAABvY29jXwAAAAAAAAA=>
+              OutlineRow, 0x9ef706080, {{45.0, 308.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD3/////////w==>
+                Cell, 0x9ef7061c0, {{55.0, 308.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD3/////////1IAAAAAAAAA>
+                  Group, 0x9ef706300, {{59.0, 308.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD3/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef706440, {{45.0, 308.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD2/////////w==>
+                Cell, 0x9ef706580, {{55.0, 308.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD2/////////1IAAAAAAAAA>
+                  Button, 0x9ef7066c0, {{63.0, 316.0}, {174.0, 24.0}}, label: 'models' <AX element pid: 49516, token: bMEAAAAAAABvY29jVQAAAAAAAAA=>
+              OutlineRow, 0x9ef706800, {{45.0, 361.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD1/////////w==>
+                Cell, 0x9ef706940, {{55.0, 361.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD1/////////1IAAAAAAAAA>
+                  Group, 0x9ef706a80, {{59.0, 361.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD1/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef706bc0, {{45.0, 361.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD0/////////w==>
+                Cell, 0x9ef706d00, {{55.0, 361.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAAD0/////////1IAAAAAAAAA>
+                  Button, 0x9ef706e40, {{63.0, 369.0}, {174.0, 24.0}}, label: 'style' <AX element pid: 49516, token: bMEAAAAAAABvY29jWgAAAAAAAAA=>
+              OutlineRow, 0x9ef706f80, {{45.0, 414.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADz/////////w==>
+                Cell, 0x9ef7070c0, {{55.0, 414.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADz/////////1IAAAAAAAAA>
+                  Group, 0x9ef707200, {{59.0, 414.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADz/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef707340, {{45.0, 414.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADy/////////w==>
+                Cell, 0x9ef707480, {{55.0, 414.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADy/////////1IAAAAAAAAA>
+                  Button, 0x9ef7075c0, {{63.0, 422.0}, {174.0, 24.0}}, label: 'Permissions' <AX element pid: 49516, token: bMEAAAAAAABvY29jUwAAAAAAAAA=>
+              OutlineRow, 0x9ef707700, {{45.0, 467.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADx/////////w==>
+                Cell, 0x9ef707840, {{55.0, 467.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADx/////////1IAAAAAAAAA>
+                  Group, 0x9ef707980, {{59.0, 467.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADx/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef707ac0, {{45.0, 467.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADw/////////w==>
+                Cell, 0x9ef707c00, {{55.0, 467.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADw/////////1IAAAAAAAAA>
+                  Button, 0x9ef707d40, {{63.0, 475.0}, {174.0, 24.0}}, label: 'Audio Input' <AX element pid: 49516, token: bMEAAAAAAABvY29jVwAAAAAAAAA=>
+              OutlineRow, 0x9ef707e80, {{45.0, 520.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADv/////////w==>
+                Cell, 0x9ef708000, {{55.0, 520.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADv/////////1IAAAAAAAAA>
+                  Group, 0x9ef708140, {{59.0, 520.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADv/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef708280, {{45.0, 520.0}, {210.0, 40.0}}, Selected, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADu/////////w==>
+                Cell, 0x9ef7083c0, {{55.0, 520.0}, {190.0, 40.0}}, Keyboard Focused, Selected <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADu/////////1IAAAAAAAAA>
+                  Button, 0x9ef708500, {{63.0, 528.0}, {174.0, 24.0}}, label: 'Dictionary' <AX element pid: 49516, token: bMEAAAAAAABvY29jWQAAAAAAAAA=>
+              OutlineRow, 0x9ef708640, {{45.0, 573.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADt/////////w==>
+                Cell, 0x9ef708780, {{55.0, 573.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADt/////////1IAAAAAAAAA>
+                  Group, 0x9ef7088c0, {{59.0, 573.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADt/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef708a00, {{45.0, 573.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADs/////////w==>
+                Cell, 0x9ef708b40, {{55.0, 573.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADs/////////1IAAAAAAAAA>
+                  Button, 0x9ef708c80, {{63.0, 581.0}, {174.0, 24.0}}, label: 'Settings' <AX element pid: 49516, token: bMEAAAAAAABvY29jYAAAAAAAAAA=>
+              OutlineRow, 0x9ef708dc0, {{45.0, 626.0}, {210.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADr/////////w==>
+                Cell, 0x9ef708f00, {{55.0, 626.0}, {190.0, 0.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADr/////////1IAAAAAAAAA>
+                  Group, 0x9ef709040, {{59.0, 626.0}, {194.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADr/////////1IAAAAAAAAAAAAAAAAAAAA=>
+              OutlineRow, 0x9ef709180, {{45.0, 626.0}, {210.0, 40.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADq/////////w==>
+                Cell, 0x9ef7092c0, {{55.0, 626.0}, {190.0, 40.0}}, Keyboard Focused <AX element pid: 49516, token: bMEAAAAAAABvY29jTgAAAAAAAADq/////////1IAAAAAAAAA>
+                  Button, 0x9ef709400, {{63.0, 634.0}, {174.0, 24.0}}, label: 'VoiceInk Pro', Selected <AX element pid: 49516, token: bMEAAAAAAABvY29jVgAAAAAAAAA=>
+              TableColumn, 0x9ef709540, {{55.0, 84.0}, {190.0, 614.0}}, identifier: 'ListColumn', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jUgAAAAAAAAA=>
+        Splitter, 0x9ef709680, {{255.0, 84.0}, {0.0, 622.0}}, value: 218, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jPwAAAAAAAAA=>
+        Group, 0x9ef7097c0, {{37.0, 32.0}, {950.0, 674.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jQAAAAAAAAAA=>
+          ScrollView, 0x9ef709900, {{255.0, 84.0}, {732.0, 622.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jwwAAAAAAAAA=>
+            Image, 0x9ef709a40, {{607.0, 106.0}, {28.0, 33.0}}, identifier: 'brain.filled.head.profile', label: 'brain.filled.head.profile' <AX element pid: 49516, token: bMEAAAAAAABvY29jxgAAAAAAAAA=>
+            StaticText, 0x9ef709b80, {{525.5, 157.0}, {191.0, 26.0}}, value: Dictionary Settings <AX element pid: 49516, token: bMEAAAAAAABvY29jxwAAAAAAAAA=>
+            StaticText, 0x9ef709cc0, {{385.5, 189.0}, {471.0, 17.0}}, value: Enhance VoiceInk's... <AX element pid: 49516, token: bMEAAAAAAABvY29jyAAAAAAAAAA=>
+            StaticText, 0x9ef709e00, {{287.0, 267.5}, {115.0, 21.0}}, value: Select Section <AX element pid: 49516, token: bMEAAAAAAABvY29jyQAAAAAAAAA=>
+            Button, 0x9ef709f40, {{933.0, 268.0}, {20.0, 20.0}}, identifier: 'dictionary.settings.open', label: 'Dictionary settings' <AX element pid: 49516, token: bMEAAAAAAABvY29jygAAAAAAAAA=>
+            Button, 0x9ef70a080, {{287.0, 310.0}, {212.0, 136.0}}, identifier: 'dictionary.section.wordReplacements', label: 'Word Replacements, Automatically replace specific words/phrases with custom formatted text ', Selected <AX element pid: 49516, token: bMEAAAAAAABvY29jywAAAAAAAAA=>
+            Button, 0x9ef70a1c0, {{515.0, 310.0}, {212.0, 136.0}}, identifier: 'dictionary.section.vocabulary', label: 'Vocabulary, Add words to help VoiceInk recognize them properly' <AX element pid: 49516, token: bMEAAAAAAABvY29jzAAAAAAAAAA=>
+            Button, 0x9ef70a300, {{743.0, 310.0}, {212.0, 136.0}}, identifier: 'dictionary.section.snippets', label: 'Snippets, Say a short phrase to insert saved text exactly.' <AX element pid: 49516, token: bMEAAAAAAABvY29jzQAAAAAAAAA=>
+            Group, 0x9ef70a440, {{303.0, 502.0}, {469.0, 25.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jzgAAAAAAAAA=>
+              StaticText, 0x9ef70a580, {{309.0, 507.0}, {458.0, 15.0}}, value: Define word replac... <AX element pid: 49516, token: bMEAAAAAAABvY29j1wAAAAAAAAA=>
+            TextField, 0x9ef70a6c0, {{302.0, 546.0}, {307.0, 26.0}}, identifier: 'dictionary.replacement.add.original', placeholderValue: 'Original text (use commas for multiple)' <AX element pid: 49516, token: bMEAAAAAAABvY29jzwAAAAAAAAA=>
+            Image, 0x9ef70a800, {{616.0, 555.0}, {10.0, 8.0}}, identifier: 'arrow.right', label: 'Right' <AX element pid: 49516, token: bMEAAAAAAABvY29j0AAAAAAAAAA=>
+            TextField, 0x9ef70a940, {{633.0, 546.0}, {307.0, 26.0}}, identifier: 'dictionary.replacement.add.replacement', placeholderValue: 'Replacement text' <AX element pid: 49516, token: bMEAAAAAAABvY29j0QAAAAAAAAA=>
+            Button, 0x9ef70aa80, {{343.0, 603.3}, {60.0, 15.0}}, label: 'Original' <AX element pid: 49516, token: bMEAAAAAAABvY29j0gAAAAAAAAA=>
+            Image, 0x9ef70abc0, {{634.0, 607.0}, {10.0, 8.0}}, identifier: 'arrow.right', label: 'Right' <AX element pid: 49516, token: bMEAAAAAAABvY29j0wAAAAAAAAA=>
+            Button, 0x9ef70ad00, {{652.0, 603.3}, {76.0, 15.0}}, label: 'Replacement' <AX element pid: 49516, token: bMEAAAAAAABvY29j1AAAAAAAAAA=>
+            ScrollView, 0x9ef70ae40, {{303.0, 627.0}, {636.0, 67.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29j1QAAAAAAAAA=>
+              Other, 0x9ef70af80, {{303.0, 635.0}, {631.0, 51.2}} <AX element pid: 49516, token: bMEAAAAAAABvY29j2AAAAAAAAAA=>
+                Group, 0x9ef70b0c0, {{303.0, 635.0}, {631.0, 51.2}}, identifier: 'dictionary.replacement.A2000000-0000-4000-8000-000000000001' <AX element pid: 49516, token: bMEAAAAAAABvY29j2QAAAAAAAAA=>
+                  CheckBox, 0x9ef70b200, {{303.0, 643.0}, {36.0, 16.0}}, identifier: 'dictionary.replacement.A2000000-0000-4000-8000-000000000001.enabled', label: 'Use replacement', value: 1 <AX element pid: 49516, token: bMEAAAAAAABvY29j2gAAAAAAAAA=>
+                  StaticText, 0x9ef70b340, {{343.0, 643.0}, {127.0, 16.0}}, value: RJT UI library sou... <AX element pid: 49516, token: bMEAAAAAAABvY29j2wAAAAAAAAA=>
+                  Image, 0x9ef70b480, {{634.0, 647.0}, {10.0, 8.0}}, identifier: 'arrow.right', label: 'Right' <AX element pid: 49516, token: bMEAAAAAAABvY29j3AAAAAAAAAA=>
+                  StaticText, 0x9ef70b5c0, {{652.0, 635.0}, {176.0, 32.0}}, value: RJT UI library tar... <AX element pid: 49516, token: bMEAAAAAAABvY29j3QAAAAAAAAA=>
+                  Button, 0x9ef70b700, {{900.0, 645.0}, {13.0, 13.0}}, identifier: 'dictionary.replacement.A2000000-0000-4000-8000-000000000001.edit', label: 'Edit' <AX element pid: 49516, token: bMEAAAAAAABvY29j3gAAAAAAAAA=>
+                  Button, 0x9ef70b840, {{921.0, 645.0}, {13.0, 13.0}}, identifier: 'dictionary.replacement.A2000000-0000-4000-8000-000000000001.delete', label: 'Delete' <AX element pid: 49516, token: bMEAAAAAAABvY29j3wAAAAAAAAA=>
+                  StaticText, 0x9ef70b980, {{342.8, 670.8}, {111.5, 15.5}}, identifier: 'dictionary.replacement.A2000000-0000-4000-8000-000000000001.kind', value: Comma alternatives <AX element pid: 49516, token: bMEAAAAAAABvY29j4AAAAAAAAAA=>
+            ScrollBar, 0x9ef70bac0, {{969.0, 83.0}, {19.0, 606.5}}, value: 0 <AX element pid: 49516, token: bMEAAAAAAABvY29j1gAAAAAAAAA=>
+              ValueIndicator, 0x9ef70bc00, {{973.0, 87.0}, {11.0, 561.0}}, value: 0, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29j1gAAAAAAAAAAAAAAAAAAAA==>
+              IncrementArrow, 0x9ef70bd40, {{970.0, 84.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29j1gAAAAAAAAABAAAAAAAAAA==>
+              DecrementArrow, 0x9ef70be80, {{970.0, 84.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29j1gAAAAAAAAACAAAAAAAAAA==>
+              Button, 0x9ef70c000, {{973.0, 649.0}, {11.0, 36.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29j1gAAAAAAAAADAAAAAAAAAA==>
+              Button, 0x9ef70c140, {{973.0, 87.0}, {11.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29j1gAAAAAAAAAEAAAAAAAAAA==>
+    Toolbar, 0x9ef70c280, {{37.0, 32.0}, {950.0, 52.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jMAAAAAAAAAA=>
+      Button, 0x9ef70c3c0, {{208.0, 32.0}, {47.0, 52.0}}, label: 'Hide Sidebar' <AX element pid: 49516, token: bMEAAAAAAABvY29jOgAAAAAAAAA=>
+    Button, 0x9ef70c500, {{55.0, 50.0}, {16.0, 16.0}}, identifier: '_XCUI:CloseWindow' <AX element pid: 49516, token: bMEAAAAAAABvY29jMQAAAAAAAAA=>
+    Button, 0x9ef70c640, {{101.0, 50.0}, {16.0, 16.0}}, identifier: '_XCUI:ZoomWindow' <AX element pid: 49516, token: bMEAAAAAAABvY29jMgAAAAAAAAA=>
+      Group, 0x9ef70c780, {{102.0, 51.0}, {14.0, 14.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNAAAAAAAAAA=>
+        Group, 0x9ef70c8c0, {{102.0, 51.0}, {14.0, 14.0}}, Disabled <AX element pid: 49535, token: f8EAAGzBAABvY29jKgAAAAAAAAA=>
+    Button, 0x9ef70ca00, {{78.0, 50.0}, {16.0, 16.0}}, identifier: '_XCUI:MinimizeWindow' <AX element pid: 49516, token: bMEAAAAAAABvY29jMwAAAAAAAAA=>
+  MenuBar, 0x9ef70cb40, {{0.0, 0.0}, {1024.0, 30.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jAgAAAAAAAAA=>
+    MenuBarItem, 0x9ef70cc80, {{10.0, 0.0}, {34.0, 30.0}}, title: 'Apple' <AX element pid: 49516, token: bMEAAAAAAABvY29jAgAAAAAAAAAAAAAAAAAAAA==>
+      Menu, 0x9ef70cdc0, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAA=>
+        MenuItem, 0x9ef70cf00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_aboutThisMacRequested:', title: 'About This Mac' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef70d040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_systemInformationRequested:', title: 'System Information' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef70d180, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAACAAAAAAAAAA==>
+        MenuItem, 0x9ef70d2c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_systemSettingsRequested:', title: 'System Settings…, 1 update' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAADAAAAAAAAAA==>
+        MenuItem, 0x9ef70d400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_appStoreRequested:', title: 'App Store' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAEAAAAAAAAAA==>
+        MenuItem, 0x9ef70d540, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAFAAAAAAAAAA==>
+        MenuItem, 0x9ef70d680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentsRequested:', title: 'Recent Items' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAGAAAAAAAAAA==>
+          Menu, 0x9ef70d7c0, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAA=>
+            MenuItem, 0x9ef70d900, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Applications', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef70da40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Installer' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAABAAAAAAAAAA==>
+            MenuItem, 0x9ef70db80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “Installer” in Finder' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAACAAAAAAAAAA==>
+            MenuItem, 0x9ef70dcc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'roma just talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAADAAAAAAAAAA==>
+            MenuItem, 0x9ef70de00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “roma just talk” in Finder' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAEAAAAAAAAAA==>
+            MenuItem, 0x9ef70df40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'roma just talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAFAAAAAAAAAA==>
+            MenuItem, 0x9ef70e080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “roma just talk” in Finder' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAGAAAAAAAAAA==>
+            MenuItem, 0x9ef70e1c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'System Settings' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAHAAAAAAAAAA==>
+            MenuItem, 0x9ef70e300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “System Settings” in Finder' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAIAAAAAAAAAA==>
+            MenuItem, 0x9ef70e440, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAJAAAAAAAAAA==>
+            MenuItem, 0x9ef70e580, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Documents', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAKAAAAAAAAAA==>
+            MenuItem, 0x9ef70e6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'AnkaGuestAddons.pkg' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAALAAAAAAAAAA==>
+            MenuItem, 0x9ef70e800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “AnkaGuestAddons.pkg” in Finder' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAMAAAAAAAAAA==>
+            MenuItem, 0x9ef70e940, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAANAAAAAAAAAA==>
+            MenuItem, 0x9ef70ea80, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Servers', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAOAAAAAAAAAA==>
+            MenuItem, 0x9ef70ebc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Macintosh HD' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAPAAAAAAAAAA==>
+            MenuItem, 0x9ef70ed00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAAQAAAAAAAAAA==>
+            MenuItem, 0x9ef70ee40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_clearRecentItemsRequested:', title: 'Clear Menu' <AX element pid: 49516, token: bMEAAAAAAABvY29jRAAAAAAAAAARAAAAAAAAAA==>
+        MenuItem, 0x9ef70ef80, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAHAAAAAAAAAA==>
+        MenuItem, 0x9ef70f0c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_forceQuitPanelRequested:', title: 'Force Quit…' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAIAAAAAAAAAA==>
+        MenuItem, 0x9ef70f200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_forceQuitRequested:', title: 'Force Quit roma just talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAJAAAAAAAAAA==>
+        MenuItem, 0x9ef70f340, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAKAAAAAAAAAA==>
+        MenuItem, 0x9ef70f480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_sleepRequested:', title: 'Sleep' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAALAAAAAAAAAA==>
+        MenuItem, 0x9ef70f5c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_restartRequested:', title: 'Restart…' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAMAAAAAAAAAA==>
+        MenuItem, 0x9ef70f700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_restartNowRequested:', title: 'Restart' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAANAAAAAAAAAA==>
+        MenuItem, 0x9ef70f840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_shutDownRequested:', title: 'Shut Down…' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAOAAAAAAAAAA==>
+        MenuItem, 0x9ef70f980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_shutDownNowRequested:', title: 'Shut Down' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAPAAAAAAAAAA==>
+        MenuItem, 0x9ef70fac0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAQAAAAAAAAAA==>
+        MenuItem, 0x9ef70fc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_lockScreenRequested:', title: 'Lock Screen' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAARAAAAAAAAAA==>
+        MenuItem, 0x9ef70fd40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_logOutRequested:', title: 'Log Out Anka…' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAASAAAAAAAAAA==>
+        MenuItem, 0x9ef70fe80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_logOutNowRequested:', title: 'Log Out Anka' <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAATAAAAAAAAAA==>
+        MenuItem, 0x9ef718000, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOAAAAAAAAAAUAAAAAAAAAA==>
+    MenuBarItem, 0x9ef718140, {{44.0, 0.0}, {109.0, 30.0}}, title: 'roma just talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jAgAAAAAAAAABAAAAAAAAAA==>
+      Menu, 0x9ef718280, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAA=>
+        MenuItem, 0x9ef7183c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'orderFrontStandardAboutPanel:', title: 'About roma just talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef718500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Check for Updates…' <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef718640, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAACAAAAAAAAAA==>
+        MenuItem, 0x9ef718780, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Services' <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAADAAAAAAAAAA==>
+          Menu, 0x9ef7188c0, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAA=>
+            MenuItem, 0x9ef718a00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Activity Monitor' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef718b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Allocations & Leaks' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAABAAAAAAAAAA==>
+            MenuItem, 0x9ef718c80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'File Activity' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAACAAAAAAAAAA==>
+            MenuItem, 0x9ef718dc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'System Trace' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAADAAAAAAAAAA==>
+            MenuItem, 0x9ef718f00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile Active Application' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAAEAAAAAAAAAA==>
+            MenuItem, 0x9ef719040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile App Under Mouse' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAAFAAAAAAAAAA==>
+            MenuItem, 0x9ef719180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile Entire System' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAAGAAAAAAAAAA==>
+            MenuItem, 0x9ef7192c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Toggle Instruments Recording' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAAHAAAAAAAAAA==>
+            MenuItem, 0x9ef719400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_configureServicesMenu:', title: 'Services Settings…' <AX element pid: 49516, token: bMEAAAAAAABvY29jRwAAAAAAAAAIAAAAAAAAAA==>
+        MenuItem, 0x9ef719540, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAAEAAAAAAAAAA==>
+        MenuItem, 0x9ef719680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'hide:', title: 'Hide roma just talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAAFAAAAAAAAAA==>
+        MenuItem, 0x9ef7197c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'hideOtherApplications:', title: 'Hide Others' <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAAGAAAAAAAAAA==>
+        MenuItem, 0x9ef719900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'unhideAllApplications:', title: 'Show All', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAAHAAAAAAAAAA==>
+        MenuItem, 0x9ef719a40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAAIAAAAAAAAAA==>
+        MenuItem, 0x9ef719b80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'terminate:', title: 'Quit roma just talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jNQAAAAAAAAAJAAAAAAAAAA==>
+    MenuBarItem, 0x9ef719cc0, {{153.0, 0.0}, {44.0, 30.0}}, title: 'Edit' <AX element pid: 49516, token: bMEAAAAAAABvY29jAgAAAAAAAAACAAAAAAAAAA==>
+      Menu, 0x9ef719e00, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAA=>
+        MenuItem, 0x9ef719f40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'undo:', title: 'Undo', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef71a080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'redo:', title: 'Redo', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef71a1c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAACAAAAAAAAAA==>
+        MenuItem, 0x9ef71a300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'cut:', title: 'Cut', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAADAAAAAAAAAA==>
+        MenuItem, 0x9ef71a440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'copy:', title: 'Copy', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAEAAAAAAAAAA==>
+        MenuItem, 0x9ef71a580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'paste:', title: 'Paste', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAFAAAAAAAAAA==>
+        MenuItem, 0x9ef71a6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'delete:', title: 'Delete', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAGAAAAAAAAAA==>
+        MenuItem, 0x9ef71a800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'selectAll:', title: 'Select All', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAHAAAAAAAAAA==>
+        MenuItem, 0x9ef71a940, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAIAAAAAAAAAA==>
+        MenuItem, 0x9ef71aa80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_NSMenuItemAutoFillIdentifier', title: 'AutoFill' <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAJAAAAAAAAAA==>
+          Menu, 0x9ef71abc0, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jxAAAAAAAAAA=>
+            MenuItem, 0x9ef71ad00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromContactsCommand:', title: 'Contact…', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxAAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef71ae40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromPasswordsCommand:', title: 'Passwords…', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxAAAAAAAAAABAAAAAAAAAA==>
+            MenuItem, 0x9ef71af80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromCreditCardsCommand:', title: 'Credit Card…', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxAAAAAAAAAACAAAAAAAAAA==>
+        MenuItem, 0x9ef71b0c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'startDictation:', title: 'Start Dictation…' <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAAKAAAAAAAAAA==>
+        MenuItem, 0x9ef71b200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'orderFrontCharacterPalette:', title: 'Emoji & Symbols' <AX element pid: 49516, token: bMEAAAAAAABvY29jOwAAAAAAAAALAAAAAAAAAA==>
+    MenuBarItem, 0x9ef71b340, {{197.0, 0.0}, {50.0, 30.0}}, title: 'View' <AX element pid: 49516, token: bMEAAAAAAABvY29jAgAAAAAAAAADAAAAAAAAAA==>
+      Menu, 0x9ef71b480, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jOQAAAAAAAAA=>
+        MenuItem, 0x9ef71b5c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'toggleTabBar:', title: 'Show Tab Bar' <AX element pid: 49516, token: bMEAAAAAAABvY29jOQAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef71b700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'toggleTabOverview:', title: 'Show All Tabs' <AX element pid: 49516, token: bMEAAAAAAABvY29jOQAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef71b840, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOQAAAAAAAAACAAAAAAAAAA==>
+        MenuItem, 0x9ef71b980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'toggleFullScreen:', title: 'Enter Full Screen', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jOQAAAAAAAAADAAAAAAAAAA==>
+    MenuBarItem, 0x9ef71bac0, {{247.0, 0.0}, {69.0, 30.0}}, title: 'Window' <AX element pid: 49516, token: bMEAAAAAAABvY29jAgAAAAAAAAAEAAAAAAAAAA==>
+      Menu, 0x9ef71bc00, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAA=>
+        MenuItem, 0x9ef71bd40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performClose:', title: 'Close' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef71be80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'closeAll:', title: 'Close All' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef720000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performMiniaturize:', title: 'Minimize' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAACAAAAAAAAAA==>
+        MenuItem, 0x9ef720140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'miniaturizeAll:', title: 'Minimize All' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAADAAAAAAAAAA==>
+        MenuItem, 0x9ef720280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performZoom:', title: 'Zoom' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAEAAAAAAAAAA==>
+        MenuItem, 0x9ef7203c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'zoomAll:', title: 'Zoom All' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAFAAAAAAAAAA==>
+        MenuItem, 0x9ef720500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomFill:', title: 'Fill' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAGAAAAAAAAAA==>
+        MenuItem, 0x9ef720640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomCenter:', title: 'Center' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAHAAAAAAAAAA==>
+        MenuItem, 0x9ef720780, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAIAAAAAAAAAA==>
+        MenuItem, 0x9ef7208c0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Move & Resize' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAJAAAAAAAAAA==>
+          Menu, 0x9ef720a00, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAA=>
+            MenuItem, 0x9ef720b40, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Halves', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef720c80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeft:', title: 'Left' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAABAAAAAAAAAA==>
+            MenuItem, 0x9ef720dc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRight:', title: 'Right' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAACAAAAAAAAAA==>
+            MenuItem, 0x9ef720f00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTop:', title: 'Top' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAADAAAAAAAAAA==>
+            MenuItem, 0x9ef721040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottom:', title: 'Bottom' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAEAAAAAAAAAA==>
+            MenuItem, 0x9ef721180, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAFAAAAAAAAAA==>
+            MenuItem, 0x9ef7212c0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Quarters', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAGAAAAAAAAAA==>
+            MenuItem, 0x9ef721400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopLeft:', title: 'Top Left' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAHAAAAAAAAAA==>
+            MenuItem, 0x9ef721540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopRight:', title: 'Top Right' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAIAAAAAAAAAA==>
+            MenuItem, 0x9ef721680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomLeft:', title: 'Bottom Left' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAJAAAAAAAAAA==>
+            MenuItem, 0x9ef7217c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomRight:', title: 'Bottom Right' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAKAAAAAAAAAA==>
+            MenuItem, 0x9ef721900, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAALAAAAAAAAAA==>
+            MenuItem, 0x9ef721a40, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Arrange', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAMAAAAAAAAAA==>
+            MenuItem, 0x9ef721b80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeftAndRight:', title: 'Left & Right' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAANAAAAAAAAAA==>
+            MenuItem, 0x9ef721cc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeftThreeUp:', title: 'Left & Quarters' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAOAAAAAAAAAA==>
+            MenuItem, 0x9ef721e00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRightAndLeft:', title: 'Right & Left' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAPAAAAAAAAAA==>
+            MenuItem, 0x9ef721f40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRightThreeUp:', title: 'Right & Quarters' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAQAAAAAAAAAA==>
+            MenuItem, 0x9ef722080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopAndBottom:', title: 'Top & Bottom' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAARAAAAAAAAAA==>
+            MenuItem, 0x9ef7221c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopThreeUp:', title: 'Top & Quarters' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAASAAAAAAAAAA==>
+            MenuItem, 0x9ef722300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomAndTop:', title: 'Bottom & Top' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAATAAAAAAAAAA==>
+            MenuItem, 0x9ef722440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomThreeUp:', title: 'Bottom & Quarters' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAUAAAAAAAAAA==>
+            MenuItem, 0x9ef722580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomQuarters:', title: 'Quarters' <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAVAAAAAAAAAA==>
+            MenuItem, 0x9ef7226c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAWAAAAAAAAAA==>
+            MenuItem, 0x9ef722800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomUntile:', title: 'Return to Previous Size', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jxQAAAAAAAAAXAAAAAAAAAA==>
+        MenuItem, 0x9ef722940, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Full Screen Tile', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAKAAAAAAAAAA==>
+        MenuItem, 0x9ef722a80, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAALAAAAAAAAAA==>
+        MenuItem, 0x9ef722bc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_removeWindowFromStageManagerSet:', title: 'Remove Window from Set', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAMAAAAAAAAAA==>
+        MenuItem, 0x9ef722d00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAANAAAAAAAAAA==>
+        MenuItem, 0x9ef722e40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'arrangeInFront:', title: 'Bring All to Front' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAOAAAAAAAAAA==>
+        MenuItem, 0x9ef722f80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'alternateArrangeInFront:', title: 'Arrange in Front' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAPAAAAAAAAAA==>
+        MenuItem, 0x9ef7230c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAQAAAAAAAAAA==>
+        MenuItem, 0x9ef723200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'selectPreviousTab:', title: 'Show Previous Tab', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAARAAAAAAAAAA==>
+        MenuItem, 0x9ef723340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'selectNextTab:', title: 'Show Next Tab', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAASAAAAAAAAAA==>
+        MenuItem, 0x9ef723480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'moveTabToNewWindow:', title: 'Move Tab to New Window', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAATAAAAAAAAAA==>
+        MenuItem, 0x9ef7235c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'mergeAllWindows:', title: 'Merge All Windows', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAUAAAAAAAAAA==>
+        MenuItem, 0x9ef723700, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAVAAAAAAAAAA==>
+        MenuItem, 0x9ef723840, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAWAAAAAAAAAA==>
+        MenuItem, 0x9ef723980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'makeKeyAndOrderFront:', title: 'Dictionary' <AX element pid: 49516, token: bMEAAAAAAABvY29jNgAAAAAAAAAXAAAAAAAAAA==>
+    MenuBarItem, 0x9ef723ac0, {{316.0, 0.0}, {48.0, 30.0}}, title: 'Help' <AX element pid: 49516, token: bMEAAAAAAABvY29jAgAAAAAAAAAFAAAAAAAAAA==>
+      Menu, 0x9ef723c00, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jYQAAAAAAAAA=>
+        MenuItem, 0x9ef723d40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'searchFieldAction:' <AX element pid: 49516, token: bMEAAAAAAABvY29jYQAAAAAAAAAAAAAAAAAAAA==>
+          SearchField, 0x9ef723e80, {{-1.0, 743.0}, {342.0, 26.0}}, identifier: '_SC_SEARCH_FIELD' <AX element pid: 49516, token: bMEAAAAAAABvY29jYgAAAAAAAAA=>
+          Table, 0x9ef724000, {{-1.0, 762.0}, {362.0, 7.0}}, identifier: '_SC_RESULTS_TABLE', label: 'search result' <AX element pid: 49516, token: bMEAAAAAAABvY29jYwAAAAAAAAA=>
+            TableColumn, 0x9ef724140, {{0.0, 763.0}, {350.0, 5.0}}, identifier: 'Title', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jZAAAAAAAAAA=>
+        MenuItem, 0x9ef724280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'showHelp:', title: 'roma just talk Help' <AX element pid: 49516, token: bMEAAAAAAABvY29jYQAAAAAAAAABAAAAAAAAAA==>
+  TouchBar, 0x9ef7243c0, {{80.0, 0.0}, {685.0, 30.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jLQAAAAAAAAA=>
+  MenuBar, 0x9ef724500, {{754.0, 3.0}, {40.0, 24.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jLgAAAAAAAAA=>
+    StatusItem, 0x9ef724640, {{754.0, 3.0}, {40.0, 24.0}}, title: 'menuBarIcon' <AX element pid: 49516, token: bMEAAAAAAABvY29jLgAAAAAAAAAAAAAAAAAAAA==>
+      Menu, 0x9ef724780, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAA=>
+        MenuItem, 0x9ef7248c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Toggle Recorder' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef724a00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef724b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 38194)', title: 'Transcription Model: Whisper Large v3 Turbo (Groq)' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAACAAAAAAAAAA==>
+          Menu, 0x9ef724c80, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jRQAAAAAAAAA=>
+            MenuItem, 0x9ef724dc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Apple Speech' <AX element pid: 49516, token: bMEAAAAAAABvY29jRQAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef724f00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jRQAAAAAAAAABAAAAAAAAAA==>
+            MenuItem, 0x9ef725040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Manage Models' <AX element pid: 49516, token: bMEAAAAAAABvY29jRQAAAAAAAAACAAAAAAAAAA==>
+        MenuItem, 0x9ef725180, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAADAAAAAAAAAA==>
+        MenuItem, 0x9ef7252c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'AI Enhancement' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAEAAAAAAAAAA==>
+        MenuItem, 0x9ef725400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 37895)', title: 'Prompt: None' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAFAAAAAAAAAA==>
+          Menu, 0x9ef725540, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jSAAAAAAAAAA=>
+            MenuItem, 0x9ef725680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Default' <AX element pid: 49516, token: bMEAAAAAAABvY29jSAAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef7257c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Assistant' <AX element pid: 49516, token: bMEAAAAAAABvY29jSAAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef725900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 37561)', title: 'AI Provider: Local CLI' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAGAAAAAAAAAA==>
+          Menu, 0x9ef725a40, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jSQAAAAAAAAA=>
+            MenuItem, 0x9ef725b80, {{0.0, 768.0}, {0.0, 0.0}}, title: 'No providers connected', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jSQAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef725cc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 37551)', title: 'AI Model: local-cli' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAHAAAAAAAAAA==>
+          Menu, 0x9ef725e00, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jSwAAAAAAAAA=>
+            MenuItem, 0x9ef725f40, {{0.0, 768.0}, {0.0, 0.0}}, title: 'No models available', Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jSwAAAAAAAAAAAAAAAAAAAA==>
+        MenuItem, 0x9ef726080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 37536)', title: 'Language: English' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAIAAAAAAAAAA==>
+          Menu, 0x9ef7261c0, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA=>
+            MenuItem, 0x9ef726300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Auto-detect' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef726440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Afrikaans' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAABAAAAAAAAAA==>
+            MenuItem, 0x9ef726580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Albanian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAACAAAAAAAAAA==>
+            MenuItem, 0x9ef7266c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Amharic' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAADAAAAAAAAAA==>
+            MenuItem, 0x9ef726800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Arabic' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAEAAAAAAAAAA==>
+            MenuItem, 0x9ef726940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Armenian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAFAAAAAAAAAA==>
+            MenuItem, 0x9ef726a80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Assamese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAGAAAAAAAAAA==>
+            MenuItem, 0x9ef726bc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Australian English' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAHAAAAAAAAAA==>
+            MenuItem, 0x9ef726d00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Azerbaijani' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAIAAAAAAAAAA==>
+            MenuItem, 0x9ef726e40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bashkir' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAJAAAAAAAAAA==>
+            MenuItem, 0x9ef726f80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Basque' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAKAAAAAAAAAA==>
+            MenuItem, 0x9ef7270c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Belarusian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAALAAAAAAAAAA==>
+            MenuItem, 0x9ef727200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bengali' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAMAAAAAAAAAA==>
+            MenuItem, 0x9ef727340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bosnian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAANAAAAAAAAAA==>
+            MenuItem, 0x9ef727480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Breton' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAOAAAAAAAAAA==>
+            MenuItem, 0x9ef7275c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'British English' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAPAAAAAAAAAA==>
+            MenuItem, 0x9ef727700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bulgarian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAQAAAAAAAAAA==>
+            MenuItem, 0x9ef727840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Cantonese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAARAAAAAAAAAA==>
+            MenuItem, 0x9ef727980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Catalan' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAASAAAAAAAAAA==>
+            MenuItem, 0x9ef727ac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Chinese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAATAAAAAAAAAA==>
+            MenuItem, 0x9ef727c00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Croatian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAUAAAAAAAAAA==>
+            MenuItem, 0x9ef727d40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Czech' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAVAAAAAAAAAA==>
+            MenuItem, 0x9ef727e80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Danish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAWAAAAAAAAAA==>
+            MenuItem, 0x9ef72c000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Dutch' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAXAAAAAAAAAA==>
+            MenuItem, 0x9ef72c140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'English' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAYAAAAAAAAAA==>
+            MenuItem, 0x9ef72c280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Estonian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAZAAAAAAAAAA==>
+            MenuItem, 0x9ef72c3c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Faroese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAaAAAAAAAAAA==>
+            MenuItem, 0x9ef72c500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Filipino' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAbAAAAAAAAAA==>
+            MenuItem, 0x9ef72c640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Finnish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAcAAAAAAAAAA==>
+            MenuItem, 0x9ef72c780, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'French' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAdAAAAAAAAAA==>
+            MenuItem, 0x9ef72c8c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Galician' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAeAAAAAAAAAA==>
+            MenuItem, 0x9ef72ca00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Georgian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAfAAAAAAAAAA==>
+            MenuItem, 0x9ef72cb40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'German' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAgAAAAAAAAAA==>
+            MenuItem, 0x9ef72cc80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Greek' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAhAAAAAAAAAA==>
+            MenuItem, 0x9ef72cdc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Gujarati' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAiAAAAAAAAAA==>
+            MenuItem, 0x9ef72cf00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Haitian Creole' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAjAAAAAAAAAA==>
+            MenuItem, 0x9ef72d040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hausa' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAkAAAAAAAAAA==>
+            MenuItem, 0x9ef72d180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hawaiian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAlAAAAAAAAAA==>
+            MenuItem, 0x9ef72d2c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hebrew' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAmAAAAAAAAAA==>
+            MenuItem, 0x9ef72d400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hindi' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAnAAAAAAAAAA==>
+            MenuItem, 0x9ef72d540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hungarian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAoAAAAAAAAAA==>
+            MenuItem, 0x9ef72d680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Icelandic' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAApAAAAAAAAAA==>
+            MenuItem, 0x9ef72d7c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Igbo' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAqAAAAAAAAAA==>
+            MenuItem, 0x9ef72d900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Indonesian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAArAAAAAAAAAA==>
+            MenuItem, 0x9ef72da40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Irish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAsAAAAAAAAAA==>
+            MenuItem, 0x9ef72db80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Italian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAtAAAAAAAAAA==>
+            MenuItem, 0x9ef72dcc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Japanese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAuAAAAAAAAAA==>
+            MenuItem, 0x9ef72de00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Javanese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAvAAAAAAAAAA==>
+            MenuItem, 0x9ef72df40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kannada' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAwAAAAAAAAAA==>
+            MenuItem, 0x9ef72e080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kazakh' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAxAAAAAAAAAA==>
+            MenuItem, 0x9ef72e1c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Khmer' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAyAAAAAAAAAA==>
+            MenuItem, 0x9ef72e300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Korean' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAAzAAAAAAAAAA==>
+            MenuItem, 0x9ef72e440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kurdish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA0AAAAAAAAAA==>
+            MenuItem, 0x9ef72e580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kyrgyz' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA1AAAAAAAAAA==>
+            MenuItem, 0x9ef72e6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Lao' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA2AAAAAAAAAA==>
+            MenuItem, 0x9ef72e800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Latin' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA3AAAAAAAAAA==>
+            MenuItem, 0x9ef72e940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Latvian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA4AAAAAAAAAA==>
+            MenuItem, 0x9ef72ea80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Lingala' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA5AAAAAAAAAA==>
+            MenuItem, 0x9ef72ebc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Lithuanian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA6AAAAAAAAAA==>
+            MenuItem, 0x9ef72ed00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Luxembourgish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA7AAAAAAAAAA==>
+            MenuItem, 0x9ef72ee40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Macedonian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA8AAAAAAAAAA==>
+            MenuItem, 0x9ef72ef80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Malagasy' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA9AAAAAAAAAA==>
+            MenuItem, 0x9ef72f0c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Malay' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA+AAAAAAAAAA==>
+            MenuItem, 0x9ef72f200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Malayalam' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAAA/AAAAAAAAAA==>
+            MenuItem, 0x9ef72f340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Maltese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABAAAAAAAAAAA==>
+            MenuItem, 0x9ef72f480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Maori' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABBAAAAAAAAAA==>
+            MenuItem, 0x9ef72f5c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Marathi' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABCAAAAAAAAAA==>
+            MenuItem, 0x9ef72f700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Mongolian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABDAAAAAAAAAA==>
+            MenuItem, 0x9ef72f840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Myanmar' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABEAAAAAAAAAA==>
+            MenuItem, 0x9ef72f980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Nepali' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABFAAAAAAAAAA==>
+            MenuItem, 0x9ef72fac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Norwegian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABGAAAAAAAAAA==>
+            MenuItem, 0x9ef72fc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Norwegian Nynorsk' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABHAAAAAAAAAA==>
+            MenuItem, 0x9ef72fd40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Occitan' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABIAAAAAAAAAA==>
+            MenuItem, 0x9ef72fe80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Odia' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABJAAAAAAAAAA==>
+            MenuItem, 0x9ef738000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Pashto' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABKAAAAAAAAAA==>
+            MenuItem, 0x9ef738140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Persian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABLAAAAAAAAAA==>
+            MenuItem, 0x9ef738280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Polish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABMAAAAAAAAAA==>
+            MenuItem, 0x9ef7383c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Portuguese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABNAAAAAAAAAA==>
+            MenuItem, 0x9ef738500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Punjabi' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABOAAAAAAAAAA==>
+            MenuItem, 0x9ef738640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Romanian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABPAAAAAAAAAA==>
+            MenuItem, 0x9ef738780, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Russian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABQAAAAAAAAAA==>
+            MenuItem, 0x9ef7388c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sanskrit' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABRAAAAAAAAAA==>
+            MenuItem, 0x9ef738a00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Serbian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABSAAAAAAAAAA==>
+            MenuItem, 0x9ef738b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Shona' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABTAAAAAAAAAA==>
+            MenuItem, 0x9ef738c80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sindhi' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABUAAAAAAAAAA==>
+            MenuItem, 0x9ef738dc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sinhala' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABVAAAAAAAAAA==>
+            MenuItem, 0x9ef738f00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Slovak' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABWAAAAAAAAAA==>
+            MenuItem, 0x9ef739040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Slovenian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABXAAAAAAAAAA==>
+            MenuItem, 0x9ef739180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Somali' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABYAAAAAAAAAA==>
+            MenuItem, 0x9ef7392c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Spanish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABZAAAAAAAAAA==>
+            MenuItem, 0x9ef739400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sundanese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABaAAAAAAAAAA==>
+            MenuItem, 0x9ef739540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Swahili' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABbAAAAAAAAAA==>
+            MenuItem, 0x9ef739680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Swedish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABcAAAAAAAAAA==>
+            MenuItem, 0x9ef7397c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Swiss German' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABdAAAAAAAAAA==>
+            MenuItem, 0x9ef739900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tagalog' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABeAAAAAAAAAA==>
+            MenuItem, 0x9ef739a40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tajik' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABfAAAAAAAAAA==>
+            MenuItem, 0x9ef739b80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tamil' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABgAAAAAAAAAA==>
+            MenuItem, 0x9ef739cc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tatar' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABhAAAAAAAAAA==>
+            MenuItem, 0x9ef739e00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Telugu' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABiAAAAAAAAAA==>
+            MenuItem, 0x9ef739f40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Thai' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABjAAAAAAAAAA==>
+            MenuItem, 0x9ef73a080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tibetan' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABkAAAAAAAAAA==>
+            MenuItem, 0x9ef73a1c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Turkish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABlAAAAAAAAAA==>
+            MenuItem, 0x9ef73a300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Turkmen' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABmAAAAAAAAAA==>
+            MenuItem, 0x9ef73a440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Ukrainian' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABnAAAAAAAAAA==>
+            MenuItem, 0x9ef73a580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Urdu' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABoAAAAAAAAAA==>
+            MenuItem, 0x9ef73a6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'US English' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABpAAAAAAAAAA==>
+            MenuItem, 0x9ef73a800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Uzbek' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABqAAAAAAAAAA==>
+            MenuItem, 0x9ef73a940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Vietnamese' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABrAAAAAAAAAA==>
+            MenuItem, 0x9ef73aa80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Welsh' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABsAAAAAAAAAA==>
+            MenuItem, 0x9ef73abc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Wolof' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABtAAAAAAAAAA==>
+            MenuItem, 0x9ef73ad00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Xhosa' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABuAAAAAAAAAA==>
+            MenuItem, 0x9ef73ae40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Yiddish' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABvAAAAAAAAAA==>
+            MenuItem, 0x9ef73af80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Yoruba' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABwAAAAAAAAAA==>
+            MenuItem, 0x9ef73b0c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Zulu' <AX element pid: 49516, token: bMEAAAAAAABvY29jTAAAAAAAAABxAAAAAAAAAA==>
+        MenuItem, 0x9ef73b200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 18941)', title: 'Audio Input' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAJAAAAAAAAAA==>
+          Menu, 0x9ef73b340, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jQQAAAAAAAAA=>
+            MenuItem, 0x9ef73b480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Apple Virtual Sound Device' <AX element pid: 49516, token: bMEAAAAAAABvY29jQQAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef73b5c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Null Audio Device' <AX element pid: 49516, token: bMEAAAAAAABvY29jQQAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef73b700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 43439)', title: 'Additional' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAKAAAAAAAAAA==>
+          Menu, 0x9ef73b840, {{0.0, 768.0}, {0.0, 0.0}} <AX element pid: 49516, token: bMEAAAAAAABvY29jQgAAAAAAAAA=>
+            MenuItem, 0x9ef73b980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Clipboard Context' <AX element pid: 49516, token: bMEAAAAAAABvY29jQgAAAAAAAAAAAAAAAAAAAA==>
+            MenuItem, 0x9ef73bac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Context Awareness' <AX element pid: 49516, token: bMEAAAAAAABvY29jQgAAAAAAAAABAAAAAAAAAA==>
+        MenuItem, 0x9ef73bc00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAALAAAAAAAAAA==>
+        MenuItem, 0x9ef73bd40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Retry Last Transcription' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAMAAAAAAAAAA==>
+        MenuItem, 0x9ef73be80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Copy Last Transcription' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAANAAAAAAAAAA==>
+        MenuItem, 0x9ef740000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'History' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAOAAAAAAAAAA==>
+        MenuItem, 0x9ef740140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Permissions' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAPAAAAAAAAAA==>
+        MenuItem, 0x9ef740280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Settings' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAQAAAAAAAAAA==>
+        MenuItem, 0x9ef7403c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hide Dock Icon' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAARAAAAAAAAAA==>
+        MenuItem, 0x9ef740500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hide Menu Bar Icon' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAASAAAAAAAAAA==>
+        MenuItem, 0x9ef740640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Launch at Login' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAATAAAAAAAAAA==>
+        MenuItem, 0x9ef740780, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAUAAAAAAAAAA==>
+        MenuItem, 0x9ef7408c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Check for Updates' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAVAAAAAAAAAA==>
+        MenuItem, 0x9ef740a00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Help and Support' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAWAAAAAAAAAA==>
+        MenuItem, 0x9ef740b40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAXAAAAAAAAAA==>
+        MenuItem, 0x9ef740c80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Quit roma-just-talk' <AX element pid: 49516, token: bMEAAAAAAABvY29jNwAAAAAAAAAYAAAAAAAAAA==>

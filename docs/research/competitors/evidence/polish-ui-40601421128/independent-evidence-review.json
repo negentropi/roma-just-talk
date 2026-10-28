@@ -1,0 +1,98 @@
+{
+  "acceptance": false,
+  "baseline": {
+    "identity_tcc_process_receipts_valid": true,
+    "marker_line": 990,
+    "sole_intended_failure": true
+  },
+  "candidate": {
+    "cases_executed_once": 8,
+    "driver_exit_code": 65,
+    "failed": 3,
+    "failures": [
+      {
+        "line": 531,
+        "method": "testApprovedHistoryCorrectionSurvivesSourceDeletion"
+      },
+      {
+        "line": 531,
+        "method": "testHistoryCorrectionPreviewApprovalAndDictionaryManagement"
+      },
+      {
+        "line": 348,
+        "method": "testHistoryPreservesRecognizedFallbackAndLegacyVariants"
+      }
+    ],
+    "native_seed_passed": true,
+    "passed": 5,
+    "post_ui_identity": "Missing identity-after.txt receipt, confirmed by FileNotFoundError; no observed binary mismatch.",
+    "post_ui_native_verify": {
+      "attempted": false,
+      "boundary": "ui-tests",
+      "classification": "blocked",
+      "pair": null
+    },
+    "tcc_scope": "Initial and seed exact signed auth_value=2 rows only; no post-UI TCC read or stability proof.",
+    "ui_native_combined_verdicts_preserve_failure": true
+  },
+  "classification": "retained-failed-evidence-consistent",
+  "contradictions": [],
+  "helper_fix": {
+    "all_eight_method_spans_byte_equal_to_tested_source": true,
+    "file_sha256": "f3c3c1ce016bad6491fcaf60f6877909d4fa16f22ed0a2e45ea77c1914be6110",
+    "marker_line": 996,
+    "runtime_after_fix": "unverified"
+  },
+  "independent_peer_review": "Raw driver verdict/classifier partition clean; exact failure locations, blocked verify, missing identity and TCC scope confirmed.",
+  "input_sha256": {
+    "artifact-origins.json": "e9808e0dbf7e8c3f3463f35d4ad8204c3cf1ac56da60a37d89afa63f201362e6",
+    "audit.json": "10fe650c1782f9535ef1cfd6ee0c04a76c630afc5f2d7ad620c6fd95c94b472a",
+    "baseline-shortcut-censuses.json": "7d5bf0135f5c436d0d91df15c55ad4921f40a446af2b2c70989dcccb1fe54c01",
+    "fixture-helper-fix-source.json": "6e1150fbd06bb4f46fa76b92c09e03594c5f0e34510b737156713d8819a17e89",
+    "raw/candidate/native-verdict.json": "4d08f83e6bb15759472b013881502e13b713b84790532589862a72b5ba1e5690",
+    "raw/candidate/tests.log": "07d1c7ded873310360cee021a863ec797d3a020b6276b8886925729320cbcb6f",
+    "raw/candidate/ui-verdict.json": "9cff17f7bded01b2daa63a97e7e4f80e7d3e2b1d5dfd05ac345b038f51bc6a0a",
+    "raw/candidate/verification-verdicts.json": "a718273d0c093645ad5a8d0da8f196136ef8fc24c48456e78d3855aa5379b3d7",
+    "raw/comparison/baseline/result.json": "56f66ac2023d0800d0fb0bc582a516b485dee057a6f90fdef290ef064d97c229",
+    "raw/comparison/candidate-evidence-checks.json": "6d252b7f190fdaf425adc4d5d4c82ea34b1633a07bcaec389b80514ccb8bb4fb",
+    "raw/comparison/candidate-identity.log": "8adaa44d204cf2d3202a832345e776d079bbd168c80ff3f9dd9939145e5e2260",
+    "raw/comparison/contract.json": "7d1ec8076d22582656e4c0ee7ee0d0a842a2831603198b9821f35be6cdf45b05",
+    "shortcut-censuses.json": "105935ddb8660788caf5f54fe3f18fedf0c8303fc7c51023fb5699414d097454",
+    "source-bindings.json": "e9f48f06c92c5d75a3702579c2fbb76678698ed351a08b7aa20f3e34d3ebc20c"
+  },
+  "remaining_acceptance_blockers": [
+    "Three UI cases failed on tested source.",
+    "Post-UI native verification and correction final-state proof were not attempted.",
+    "The helper fix has no runtime result in this evidence set."
+  ],
+  "retained_origin_checks": {
+    "diagnostic_payload_or_frame_sha256_checked": 4,
+    "mismatches": [],
+    "original_screenshot_bytes_sha256_checked": 27,
+    "raw_members_bytes_sha256_crc32_checked": 100,
+    "whole_archive_sha256": "ced5cf7634e22edf69bf2a5be84bb87e36539d5e55cf9358a669a60f6d9c323b",
+    "whole_archive_validation": "Owner provenance retained; this review did not reopen or download the remote archive."
+  },
+  "run_id": 40601421128,
+  "shortcut_checks": {
+    "all_synchronized": true,
+    "baseline_snapshots": 4,
+    "before_restored_census_equal": true,
+    "candidate_cases": 8,
+    "candidate_snapshots": 36,
+    "exact_value_scope": "Pinned runtime restore() compares CF type and NSObject equality for every owned key; no restoration assertion failed. Census Data values are redacted to length, so census equality alone is not independent byte proof.",
+    "fixed_isolation_values_and_cleared_sentinels_valid": true,
+    "keys_per_snapshot": 32,
+    "same_exact_key_set": true
+  },
+  "source_checks": {
+    "candidate_production_before_after_equal": true,
+    "candidate_production_paths_bound_to_git_show": 597,
+    "explicit_inputs_bound_to_git_show": 26,
+    "mismatches": []
+  },
+  "tested_driver_sha256": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e",
+  "tested_oracle_sha256": "911039b62c26afc614cae29b252dc88105dc133f76a8201698a244470335860f",
+  "tested_source_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "version": 1
+}

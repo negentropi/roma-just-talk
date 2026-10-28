@@ -1,0 +1,708 @@
+{
+  "run_id": 40601421128,
+  "artifact_id": 12779769682,
+  "whole_archive_sha256": "ced5cf7634e22edf69bf2a5be84bb87e36539d5e55cf9358a669a60f6d9c323b",
+  "archive_all_member_crc_valid": true,
+  "retained_raw_members": [
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/app-signature-before.txt",
+      "relative": "candidate/app-signature-before.txt",
+      "bytes": 954,
+      "sha256": "ec74fff981dc38f657a204a0fa33bae96631a716a71de58e8ecee826c0be8fa5",
+      "crc32": "9ebb37c3"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/application-processes.json",
+      "relative": "candidate/application-processes.json",
+      "bytes": 2857,
+      "sha256": "e42a31bf7eef79b3c6cebc1e2e2255fc312c9713aa9736cf9c23aeff53fcb5b4",
+      "crc32": "3880322c"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/app-signature-after.txt",
+      "relative": "candidate/history-seed/seed/app-signature-after.txt",
+      "bytes": 954,
+      "sha256": "ec74fff981dc38f657a204a0fa33bae96631a716a71de58e8ecee826c0be8fa5",
+      "crc32": "9ebb37c3"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/failure.json",
+      "relative": "candidate/failure.json",
+      "bytes": 76,
+      "sha256": "c91f94e8bfd30ae4a5bd933ab28b303f2e477801877874da2acde0b1dcadd909",
+      "crc32": "98baab64"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/app-signature-before.txt",
+      "relative": "candidate/history-seed/seed/app-signature-before.txt",
+      "bytes": 954,
+      "sha256": "ec74fff981dc38f657a204a0fa33bae96631a716a71de58e8ecee826c0be8fa5",
+      "crc32": "9ebb37c3"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/closed-write.json",
+      "relative": "candidate/history-seed/seed/closed-write.json",
+      "bytes": 1775,
+      "sha256": "f3eaf3912a55bdb5971210f385bd5a9e1f07694c8a7a83460eed3bfbaf59de63",
+      "crc32": "e74bb585"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-inputs.sha256.json",
+      "relative": "candidate/history-seed/seed/expected-inputs.sha256.json",
+      "bytes": 285,
+      "sha256": "4ca9f2410a65cce0575422923b6faaf81aac720dd9e0db9e0b9ad10452595cb5",
+      "crc32": "383e27f9"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-libraries.json",
+      "relative": "candidate/history-seed/seed/expected-libraries.json",
+      "bytes": 6831,
+      "sha256": "496d5b3ba9fe5eb3052f9fe017c54da2fe2b3540ec89228a979b2844a1fa8760",
+      "crc32": "534aec14"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-microphone-tcc.json",
+      "relative": "candidate/history-seed/seed/expected-microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "aac9cfdf1ec9ceb90a963c1a8422e520a752f9b95c98b7f716570ecc21a0bcac",
+      "crc32": "6bb96e44"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-rows.json",
+      "relative": "candidate/history-seed/seed/expected-rows.json",
+      "bytes": 31384,
+      "sha256": "b9c445ac4e7d255a2f32d879136f7e74793941032f0f7b4729a7d22b3d670363",
+      "crc32": "70509419"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-stats.json",
+      "relative": "candidate/history-seed/seed/expected-stats.json",
+      "bytes": 4,
+      "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05",
+      "crc32": "dfea17aa"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/expected-system-tcc.json",
+      "relative": "candidate/history-seed/seed/expected-system-tcc.json",
+      "bytes": 202,
+      "sha256": "15f63bccee315ff121d55a27c8186dfd1aba6ae52eb111989b0fe8d99f142fda",
+      "crc32": "3f119f2d"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/host-live.json",
+      "relative": "candidate/history-seed/seed/host-live.json",
+      "bytes": 2210,
+      "sha256": "0bb4df8fe6b99139e37b5aafe141e0e418a22ce29113d563628c694c54894dca",
+      "crc32": "1baae68a"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/host-observed.json",
+      "relative": "candidate/history-seed/seed/host-observed.json",
+      "bytes": 480,
+      "sha256": "69ea8f902e3c1febdd79d11128657b4be410afec0daeab1b9a4bb11b81ea8687",
+      "crc32": "c43facf7"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/identity-after.txt",
+      "relative": "candidate/history-seed/seed/identity-after.txt",
+      "bytes": 433,
+      "sha256": "97bf8869dd20359d3a938cba39484aadc5bfe9fb88411eed2e1cb3de1c1f1bd5",
+      "crc32": "a1cf2793"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/identity-before.txt",
+      "relative": "candidate/history-seed/seed/identity-before.txt",
+      "bytes": 433,
+      "sha256": "97bf8869dd20359d3a938cba39484aadc5bfe9fb88411eed2e1cb3de1c1f1bd5",
+      "crc32": "a1cf2793"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/libraries.json",
+      "relative": "candidate/history-seed/seed/libraries.json",
+      "bytes": 6831,
+      "sha256": "496d5b3ba9fe5eb3052f9fe017c54da2fe2b3540ec89228a979b2844a1fa8760",
+      "crc32": "534aec14"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/microphone-tcc-cmp.log",
+      "relative": "candidate/history-seed/seed/microphone-tcc-cmp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crc32": "00000000"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/microphone-tcc-query.log",
+      "relative": "candidate/history-seed/seed/microphone-tcc-query.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crc32": "00000000"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/microphone-tcc.json",
+      "relative": "candidate/history-seed/seed/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "aac9cfdf1ec9ceb90a963c1a8422e520a752f9b95c98b7f716570ecc21a0bcac",
+      "crc32": "6bb96e44"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/observation.json",
+      "relative": "candidate/history-seed/seed/observation.json",
+      "bytes": 1168,
+      "sha256": "8128d5055d7ee8829bf9d4940d6f9fb3c13de6df590f0e0823ba0b1325484e22",
+      "crc32": "44c1e61c"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/result.json",
+      "relative": "candidate/history-seed/seed/result.json",
+      "bytes": 835,
+      "sha256": "1f8170c0d48fd6cc05284be8d87276b795b136459e0d1e1c9707393315bbbeb0",
+      "crc32": "4a75ecd8"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/rows.json",
+      "relative": "candidate/history-seed/seed/rows.json",
+      "bytes": 31384,
+      "sha256": "b9c445ac4e7d255a2f32d879136f7e74793941032f0f7b4729a7d22b3d670363",
+      "crc32": "70509419"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/source-inputs.json",
+      "relative": "candidate/history-seed/seed/source-inputs.json",
+      "bytes": 2428,
+      "sha256": "d3d688ea1ff2a749fbe7c561f76d260ce56aa0fe00a3590f05ff1ade45158d73",
+      "crc32": "336ba6fb"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/stats.json",
+      "relative": "candidate/history-seed/seed/stats.json",
+      "bytes": 4,
+      "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05",
+      "crc32": "dfea17aa"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/store-provenance.json",
+      "relative": "candidate/history-seed/seed/store-provenance.json",
+      "bytes": 2598,
+      "sha256": "2579e7ed96d5ea71fdd0767426779f345a145a134913db77bfc33e8cecb9a779",
+      "crc32": "cca05be2"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/system-tcc-cmp.log",
+      "relative": "candidate/history-seed/seed/system-tcc-cmp.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crc32": "00000000"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/system-tcc-query.log",
+      "relative": "candidate/history-seed/seed/system-tcc-query.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crc32": "00000000"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/tcc-check.json",
+      "relative": "candidate/history-seed/seed/tcc-check.json",
+      "bytes": 2243,
+      "sha256": "04e14b70bb103ec22f5ad85e615aadaa9f7b704167be73d141c4693df568291b",
+      "crc32": "7bef9cee"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/system-tcc.json",
+      "relative": "candidate/history-seed/seed/system-tcc.json",
+      "bytes": 202,
+      "sha256": "15f63bccee315ff121d55a27c8186dfd1aba6ae52eb111989b0fe8d99f142fda",
+      "crc32": "3f119f2d"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/test-bundle-signature-after.txt",
+      "relative": "candidate/history-seed/seed/test-bundle-signature-after.txt",
+      "bytes": 988,
+      "sha256": "475988bd26cf3d27a21d30993b10ec6cf19e2d3a993df9e224c4576b10ab3baf",
+      "crc32": "031ad35f"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/test-bundle-signature-before.txt",
+      "relative": "candidate/history-seed/seed/test-bundle-signature-before.txt",
+      "bytes": 988,
+      "sha256": "475988bd26cf3d27a21d30993b10ec6cf19e2d3a993df9e224c4576b10ab3baf",
+      "crc32": "031ad35f"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/history-seed/seed/tests-excerpt.txt",
+      "relative": "candidate/history-seed/seed/tests-excerpt.txt",
+      "bytes": 177,
+      "sha256": "239859d37a8ce670d2be01e5932363aa5951c04a920ed45f5979c20345c3f3c2",
+      "crc32": "ceb616ed"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/host-requirement.txt",
+      "relative": "candidate/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "cf3b9b4aa32ed723b4a0dc1a63847e8feb35698e84fa8ab9401a8fd862918614",
+      "crc32": "354b961c"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/identity-before.txt",
+      "relative": "candidate/identity-before.txt",
+      "bytes": 659,
+      "sha256": "fe578a4b2b92ca2255198456c4f88100eebb19ed9084e975a0a8057f9dd33667",
+      "crc32": "3cb66201"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/native-verdict.json",
+      "relative": "candidate/native-verdict.json",
+      "bytes": 4102,
+      "sha256": "4d08f83e6bb15759472b013881502e13b713b84790532589862a72b5ba1e5690",
+      "crc32": "5514b91b"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/microphone-tcc.json",
+      "relative": "candidate/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "aac9cfdf1ec9ceb90a963c1a8422e520a752f9b95c98b7f716570ecc21a0bcac",
+      "crc32": "6bb96e44"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/process-verification.json",
+      "relative": "candidate/process-verification.json",
+      "bytes": 3019,
+      "sha256": "ce403bdb3cb2f6bf2ff99b7fafee8fa576a3167b7c77680dd1319f8aea0a283c",
+      "crc32": "8c07837c"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/result.json",
+      "relative": "candidate/result.json",
+      "bytes": 1171,
+      "sha256": "9cff17f7bded01b2daa63a97e7e4f80e7d3e2b1d5dfd05ac345b038f51bc6a0a",
+      "crc32": "20dd230e"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/runner-signature-before.txt",
+      "relative": "candidate/runner-signature-before.txt",
+      "bytes": 980,
+      "sha256": "28d70ad2ab02b6306b59a4ff235a2f7933d830cbeea9136d5273795dde54d23d",
+      "crc32": "bb0766f0"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshot-export.json",
+      "relative": "candidate/screenshot-export.json",
+      "bytes": 1433,
+      "sha256": "8869f4c70e78d33e73e73c63b6029b05b9293e8ee63294e594e5cfc4b0bad11b",
+      "crc32": "61fc1d65"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/screenshot-export.log",
+      "relative": "candidate/screenshot-export.log",
+      "bytes": 21660,
+      "sha256": "dfedda4433c1ea911a0dd649f617a99002caca1f6564495dfa80b3d09ec162ba",
+      "crc32": "ace9b66d"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/selection/selected-tests.json",
+      "relative": "candidate/selection/selected-tests.json",
+      "bytes": 2028,
+      "sha256": "7c9a820e6b59990a02a6462bd4b5837c0b87c6d5918ef9dd82480a82b5d8851e",
+      "crc32": "3fd5f98f"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/selection/selection-receipt.json",
+      "relative": "candidate/selection/selection-receipt.json",
+      "bytes": 2217,
+      "sha256": "e30331d0c0222f50d4f6524c65e208590fff9c9f9d4c413ce90c72bb86d3ec7f",
+      "crc32": "b2118384"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/system-tcc.json",
+      "relative": "candidate/system-tcc.json",
+      "bytes": 202,
+      "sha256": "15f63bccee315ff121d55a27c8186dfd1aba6ae52eb111989b0fe8d99f142fda",
+      "crc32": "3f119f2d"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/tests.log",
+      "relative": "candidate/tests.log",
+      "bytes": 321012,
+      "sha256": "07d1c7ded873310360cee021a863ec797d3a020b6276b8886925729320cbcb6f",
+      "crc32": "101330ff"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/tcc-verification.json",
+      "relative": "candidate/tcc-verification.json",
+      "bytes": 334,
+      "sha256": "949ed70a8c1190ead1e872564f675b5c8260a985d25cd71b5bc8a333cb9bcf12",
+      "crc32": "652c2aef"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/test-bundle-signature-before.txt",
+      "relative": "candidate/test-bundle-signature-before.txt",
+      "bytes": 998,
+      "sha256": "d31b08901e9b42c61da066457d7df9216b2f7c65fc526fa57b5d2baec29e7526",
+      "crc32": "b7ace1b8"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/ui-verdict.json",
+      "relative": "candidate/ui-verdict.json",
+      "bytes": 1171,
+      "sha256": "9cff17f7bded01b2daa63a97e7e4f80e7d3e2b1d5dfd05ac345b038f51bc6a0a",
+      "crc32": "20dd230e"
+    },
+    {
+      "member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/verification-verdicts.json",
+      "relative": "candidate/verification-verdicts.json",
+      "bytes": 5771,
+      "sha256": "a718273d0c093645ad5a8d0da8f196136ef8fc24c48456e78d3855aa5379b3d7",
+      "crc32": "a4baedef"
+    },
+    {
+      "member": "_temp/writing-ui-proof/classifier-self-test.log",
+      "relative": "proof/classifier-self-test.log",
+      "bytes": 1503,
+      "sha256": "a0a353847693762201db1427304469d90fbe2787a36340dad8ef9971a0dd55b6",
+      "crc32": "bfb8d134"
+    },
+    {
+      "member": "_temp/writing-ui-proof/diagnostic-result.json",
+      "relative": "proof/diagnostic-result.json",
+      "bytes": 14509,
+      "sha256": "2622e61f2c79005ea4fed792dcfea5dd2d1882e6125a70119e809a89e0dde831",
+      "crc32": "2e8d7c80"
+    },
+    {
+      "member": "_temp/writing-ui-proof/history-seed/seed/source-inputs.json",
+      "relative": "proof/history-seed/seed/source-inputs.json",
+      "bytes": 2428,
+      "sha256": "d3d688ea1ff2a749fbe7c561f76d260ce56aa0fe00a3590f05ff1ade45158d73",
+      "crc32": "336ba6fb"
+    },
+    {
+      "member": "_temp/writing-ui-proof/history-seed/seed/tests.log",
+      "relative": "proof/history-seed/seed/tests.log",
+      "bytes": 26783,
+      "sha256": "c9fc059e58ea56c06781556c5ac6007e5d305c43b3dee56797ab9c4c759e22fe",
+      "crc32": "65b5d32b"
+    },
+    {
+      "member": "_temp/writing-ui-proof/source-inputs-after.txt",
+      "relative": "proof/source-inputs-after.txt",
+      "bytes": 1299,
+      "sha256": "29509082660ffb3a0b1bdfd25450202ad479fbfcc4f58577377496785601471d",
+      "crc32": "8c77d27a"
+    },
+    {
+      "member": "_temp/writing-ui-proof/source-inputs.sha256",
+      "relative": "proof/source-inputs.sha256",
+      "bytes": 2849,
+      "sha256": "444da54a37c987b77002f1239e1354e077a0e173d471680b4975acdc1f8aa2a3",
+      "crc32": "3d6e7df4"
+    },
+    {
+      "member": "_temp/writing-ui-proof/source-sha.txt",
+      "relative": "proof/source-sha.txt",
+      "bytes": 41,
+      "sha256": "94988e9de10b5f5d493e810d2a592d64ceb896cbe3a15eed9fceaee78b019b34",
+      "crc32": "599b6d94"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/app-signature-after.txt",
+      "relative": "comparison/baseline/app-signature-after.txt",
+      "bytes": 975,
+      "sha256": "6f0d5fcc1aae9044cfbecb412f1d9a9734d1813b2c9e6db004b3832f03880421",
+      "crc32": "cc7a30d5"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/app-signature-before.txt",
+      "relative": "comparison/baseline/app-signature-before.txt",
+      "bytes": 975,
+      "sha256": "6f0d5fcc1aae9044cfbecb412f1d9a9734d1813b2c9e6db004b3832f03880421",
+      "crc32": "cc7a30d5"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/application-processes.json",
+      "relative": "comparison/baseline/application-processes.json",
+      "bytes": 468,
+      "sha256": "2b0e69f4f39347e2e9e8272900e8a0fdf8ec868dc984c9688186a0e2a80849e9",
+      "crc32": "e5569238"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/enumeration.log",
+      "relative": "comparison/baseline/enumeration.log",
+      "bytes": 5744,
+      "sha256": "f5e0d47a3b2c129f214355e2480bc4eda5223f4268fe048677372d64fa3aa272",
+      "crc32": "6ca7b3eb"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/export.log",
+      "relative": "comparison/baseline/export.log",
+      "bytes": 2192,
+      "sha256": "3e088062eb5802ca01bb06981d34cbb0eecb3eacc2c1b3124214c5d3be8c75bf",
+      "crc32": "8598c972"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/host-requirement.txt",
+      "relative": "comparison/baseline/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "30020ee715818609064d661c355d295d94fd1464eb291da19a9ae24482c3ac7d",
+      "crc32": "b23f2a63"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/identity-after.txt",
+      "relative": "comparison/baseline/identity-after.txt",
+      "bytes": 722,
+      "sha256": "35e47976ab3cacdf9e6343d662685d8be1a233d5bbf8402fb0e37d284e564701",
+      "crc32": "6a954e8a"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/identity-before.txt",
+      "relative": "comparison/baseline/identity-before.txt",
+      "bytes": 722,
+      "sha256": "35e47976ab3cacdf9e6343d662685d8be1a233d5bbf8402fb0e37d284e564701",
+      "crc32": "6a954e8a"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/identity-verification.json",
+      "relative": "comparison/baseline/identity-verification.json",
+      "bytes": 1653,
+      "sha256": "9e1f0900256b51189416a3648e57f42ad423f15c55da380be002b506bed9ae45",
+      "crc32": "a20a272a"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/process-verification.json",
+      "relative": "comparison/baseline/process-verification.json",
+      "bytes": 526,
+      "sha256": "b19808255217c5c3ed75b797b135ddb37f0795d3b8710ea5b3157d6ee9de8b0f",
+      "crc32": "c1e56180"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/microphone-tcc.json",
+      "relative": "comparison/baseline/microphone-tcc.json",
+      "bytes": 199,
+      "sha256": "e578feb672ee3094c3314925b16c6da777d69a6cc3d8dfaaa7bb8cb391546973",
+      "crc32": "f9de9834"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/result.json",
+      "relative": "comparison/baseline/result.json",
+      "bytes": 3535,
+      "sha256": "56f66ac2023d0800d0fb0bc582a516b485dee057a6f90fdef290ef064d97c229",
+      "crc32": "6c93fee0"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/runner-signature-after.txt",
+      "relative": "comparison/baseline/runner-signature-after.txt",
+      "bytes": 1001,
+      "sha256": "5caa8b1b2ca7a56bbe4c1804b24218ab7e8536a3aab8b1a4bfe1d77bb4d489a5",
+      "crc32": "9d12675b"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/runner-signature-before.txt",
+      "relative": "comparison/baseline/runner-signature-before.txt",
+      "bytes": 1001,
+      "sha256": "5caa8b1b2ca7a56bbe4c1804b24218ab7e8536a3aab8b1a4bfe1d77bb4d489a5",
+      "crc32": "9d12675b"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/selected-tests.json",
+      "relative": "comparison/baseline/selected-tests.json",
+      "bytes": 2028,
+      "sha256": "03fe2edc893a4343a398c9100d03d8b6dd157741ce9bd16bfe6aa139bde64a74",
+      "crc32": "7ffad341"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/selection-receipt.json",
+      "relative": "comparison/baseline/selection-receipt.json",
+      "bytes": 1472,
+      "sha256": "7a5465cf10e5031e7314bdb56a1f29ba35437a111039eeb08b1c36fc3c4915e8",
+      "crc32": "1b35cf48"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/system-tcc.json",
+      "relative": "comparison/baseline/system-tcc.json",
+      "bytes": 202,
+      "sha256": "6d412df6253d11ded551af94dc9b3faa50c9588e538e80f29257ecc94251eff5",
+      "crc32": "ad76695d"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/test-bundle-signature-after.txt",
+      "relative": "comparison/baseline/test-bundle-signature-after.txt",
+      "bytes": 1019,
+      "sha256": "28955f832e0ade2ed8ca73bfd1c39151958387d4e6cc193a79726adfd88bb409",
+      "crc32": "7749f4fe"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/test-bundle-signature-before.txt",
+      "relative": "comparison/baseline/test-bundle-signature-before.txt",
+      "bytes": 1019,
+      "sha256": "28955f832e0ade2ed8ca73bfd1c39151958387d4e6cc193a79726adfd88bb409",
+      "crc32": "7749f4fe"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/tcc-verification.json",
+      "relative": "comparison/baseline/tcc-verification.json",
+      "bytes": 334,
+      "sha256": "b1ac568e225352adfd77478c9d85b0a6bd97153070d11986591a147670d4daab",
+      "crc32": "98138eb8"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/test-exit.txt",
+      "relative": "comparison/baseline/test-exit.txt",
+      "bytes": 3,
+      "sha256": "979b894f2d91bf199766571d58024f020d1a44a417da5f48e1fa1cdf554a14f5",
+      "crc32": "9d436b98"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline/tests.log",
+      "relative": "comparison/baseline/tests.log",
+      "bytes": 17349,
+      "sha256": "b3b2636cbee3c68fa537ed921efa22d4114735cf1ddceefde2d7ab943b969383",
+      "crc32": "69f8ef88"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline-driver.log",
+      "relative": "comparison/baseline-driver.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crc32": "00000000"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline-packages/candidate-strict-resolve.json",
+      "relative": "comparison/baseline-packages/candidate-strict-resolve.json",
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e",
+      "crc32": "80699e3e"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline-packages/candidate-strict-resolve.log",
+      "relative": "comparison/baseline-packages/candidate-strict-resolve.log",
+      "bytes": 4519,
+      "sha256": "2ed33c84108bc1d9f0bc016ac02ef44947b548c7d5a8539972ab4c6507bfc359",
+      "crc32": "1651c923"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline-packages/canonical-graph-contract.json",
+      "relative": "comparison/baseline-packages/canonical-graph-contract.json",
+      "bytes": 833,
+      "sha256": "4510988966c4438c74d1a06349a56385db25e74597b674819d227329733e263b",
+      "crc32": "e8b2bf83"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline-production-before.json",
+      "relative": "comparison/baseline-production-before.json",
+      "bytes": 75092,
+      "sha256": "a2d7726a2ecb1660126c749d5b07601e670d0abe0f421601066ff2a5f5b62fd8",
+      "crc32": "235e5fb3"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-driver.log",
+      "relative": "comparison/candidate-driver.log",
+      "bytes": 8442,
+      "sha256": "dd776ee0659950224f4aea18344c54d8c50a9f39308af763fd724891af2d7d66",
+      "crc32": "4e7d8e9d"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/baseline-production-after.json",
+      "relative": "comparison/baseline-production-after.json",
+      "bytes": 75092,
+      "sha256": "a2d7726a2ecb1660126c749d5b07601e670d0abe0f421601066ff2a5f5b62fd8",
+      "crc32": "235e5fb3"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-identity.log",
+      "relative": "comparison/candidate-identity.log",
+      "bytes": 849,
+      "sha256": "8adaa44d204cf2d3202a832345e776d079bbd168c80ff3f9dd9939145e5e2260",
+      "crc32": "3eabb90d"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-evidence-checks.json",
+      "relative": "comparison/candidate-evidence-checks.json",
+      "bytes": 50,
+      "sha256": "6d252b7f190fdaf425adc4d5d4c82ea34b1633a07bcaec389b80514ccb8bb4fb",
+      "crc32": "8f0dd2e3"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-packages/candidate-strict-resolve.json",
+      "relative": "comparison/candidate-packages/candidate-strict-resolve.json",
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e",
+      "crc32": "80699e3e"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-packages/candidate-strict-resolve.log",
+      "relative": "comparison/candidate-packages/candidate-strict-resolve.log",
+      "bytes": 4499,
+      "sha256": "a623534833e50282dcfbfd31967a6ea6dc976bd8571b798b8c5f892aa26988e4",
+      "crc32": "970f9df2"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-packages/canonical-graph-contract.json",
+      "relative": "comparison/candidate-packages/canonical-graph-contract.json",
+      "bytes": 838,
+      "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f",
+      "crc32": "e7dd55b7"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-process.log",
+      "relative": "comparison/candidate-process.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crc32": "00000000"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-production-after.json",
+      "relative": "comparison/candidate-production-after.json",
+      "bytes": 76988,
+      "sha256": "b3a255d82cb4f513855a27ed03c82528c5446b725cb2895db53a4deaf1419d61",
+      "crc32": "e7f30af3"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-production-before.json",
+      "relative": "comparison/candidate-production-before.json",
+      "bytes": 76988,
+      "sha256": "b3a255d82cb4f513855a27ed03c82528c5446b725cb2895db53a4deaf1419d61",
+      "crc32": "e7f30af3"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/candidate-tcc.log",
+      "relative": "comparison/candidate-tcc.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "crc32": "00000000"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/contract.json",
+      "relative": "comparison/contract.json",
+      "bytes": 7397,
+      "sha256": "7d1ec8076d22582656e4c0ee7ee0d0a842a2831603198b9821f35be6cdf45b05",
+      "crc32": "1053aa41"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/environment.txt",
+      "relative": "comparison/environment.txt",
+      "bytes": 201,
+      "sha256": "40124b7b1afd765d0a26347b43bfcb326e4d1d368031efe301ac0761d6629948",
+      "crc32": "66098ec7"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/failure.json",
+      "relative": "comparison/failure.json",
+      "bytes": 74,
+      "sha256": "46266bb42c5f937afbc9feec669601fa00b84d4644cd932ec1957ba3c78a03fe",
+      "crc32": "4d8c6082"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/result.json",
+      "relative": "comparison/result.json",
+      "bytes": 12313,
+      "sha256": "8f97862604377172a86ac8d7b80c07930ea58c8fa708dcfb8f63c3ece0238026",
+      "crc32": "f3a34fd0"
+    },
+    {
+      "member": "_temp/writing-settings-ui-regression/source-verification.json",
+      "relative": "comparison/source-verification.json",
+      "bytes": 232,
+      "sha256": "b9d4f53c159175ba5d829d5af883205399d1fb3addb5d8b5bf2b85fb1703e846",
+      "crc32": "88de73e3"
+    }
+  ]
+}

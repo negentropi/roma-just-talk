@@ -1,0 +1,50 @@
+[
+  {
+    "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+    "file": "testapprovedhistorycorrectionsurvivessourcedeletion-14.txt",
+    "filename": "App UI hierarchy for com.negentropi_0_46C909E3-11EC-4637-849B-90CCC9260097.RomaJustTalk",
+    "lifetime": "deleteOnSuccess",
+    "name": "App UI hierarchy for com.negentropi.RomaJustTalk",
+    "payloadRef": {
+      "id": "0~pkgAl3mney2laVMpMefmydMHwrmmLcEwpd4Jl50Gwp8wEd6Birdkxr0-P2u9g4hm5soed8JxHTbfk-Ecwgk9Rg=="
+    },
+    "payloadSize": "73437",
+    "timestamp": "2026-10-27T23:43:42.173+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "944468C0-84FC-4891-ADC8-9287C789784C",
+    "activity_title": "Collecting debug information to assist test failure triage",
+    "zip_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~pkgAl3mney2laVMpMefmydMHwrmmLcEwpd4Jl50Gwp8wEd6Birdkxr0-P2u9g4hm5soed8JxHTbfk-Ecwgk9Rg==",
+    "payload_sha256": "f583bda162fff9c060b15612429aa49b8e301a5627b87e637c32db1fb3d3c2aa"
+  },
+  {
+    "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+    "file": "testhistorycorrectionpreviewapprovalanddictionarymanagement-14.txt",
+    "filename": "App UI hierarchy for com.negentropi_0_02A15B64-83E6-4683-B70A-D556C37C83A0.RomaJustTalk",
+    "lifetime": "deleteOnSuccess",
+    "name": "App UI hierarchy for com.negentropi.RomaJustTalk",
+    "payloadRef": {
+      "id": "0~5niCQ3Y9KGiB_h0m7iJjmNcb9N8l4-rIRS8bLaeCS1SqLSvKdEC9-UH5XDZdYeGJrdD1ufCGp7p2KAcxkjpgPQ=="
+    },
+    "payloadSize": "73437",
+    "timestamp": "2026-10-27T23:58:22.560+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "B09DB8AF-E9E6-4866-8F80-5655FD5D126B",
+    "activity_title": "Collecting debug information to assist test failure triage",
+    "zip_member": "roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~5niCQ3Y9KGiB_h0m7iJjmNcb9N8l4-rIRS8bLaeCS1SqLSvKdEC9-UH5XDZdYeGJrdD1ufCGp7p2KAcxkjpgPQ==",
+    "payload_sha256": "04783529ecb4d92143f2fa48e5c11949b45540bef75bbd542eb5a4cbd1aa44db"
+  },
+  {
+    "file": "dictionary-before-failure-frame.png",
+    "type": "derived single original recording frame; no visual editing",
+    "video_timestamp_seconds": 14.3,
+    "case": "testApprovedHistoryCorrectionSurvivesSourceDeletion",
+    "sha256": "f831893ac09deba462141591a9f388733c3e72d5d84446701234ef8611b38606"
+  },
+  {
+    "file": "history-captured-cleanup-before-failure-frame.png",
+    "type": "derived single original recording frame; no visual editing",
+    "video_timestamp_seconds": 53.5,
+    "case": "testHistoryPreservesRecognizedFallbackAndLegacyVariants",
+    "sha256": "a724dd380cd11e296ef78cda0cd0cc821e8b1bf4251c3ba1be4db9ebb081552e"
+  }
+]

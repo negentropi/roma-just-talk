@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "run_id": 40601421128,
+  "source_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "classification": "seed-proof-valid-post-ui-verification-blocked",
+  "scope": "Independent read-only audit of retained native seed receipts, frozen source, identity, permissions and store closure; no UI or post-UI persistence acceptance.",
+  "artifact": {
+    "id": 12779769682,
+    "whole_archive_sha256": "ced5cf7634e22edf69bf2a5be84bb87e36539d5e55cf9358a669a60f6d9c323b",
+    "archive_rehashed_by_this_audit": false,
+    "new_downloads": false,
+    "selected_native_files_integrity_checked": 69
+  },
+  "source": {
+    "bindings_checked": 26,
+    "native_manifest_files_checked": 19,
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "schema_sha256": "769b1bb7e38512b707b02ffa8b78dcfa11ff6fa99d04788825cfd1a63b274cae",
+    "frozen_original_four_method_bodies_preserved": true
+  },
+  "native_seed": {
+    "selected_method": "VoiceInkTests/VoiceInkTests/liveDictationHistoryUISeed",
+    "passed_once": true,
+    "skipped": false,
+    "hostPID": 47147,
+    "saved_counts": {
+      "SessionMetric": 0,
+      "Transcription": 6,
+      "VocabularyWord": 1,
+      "WordReplacement": 1
+    },
+    "history_records": 6,
+    "history_fields_per_record": 20,
+    "word_replacement_raw_fields": 11,
+    "word_replacement_canonical_record_checked": true,
+    "vocabulary_records": 1,
+    "actual_rows_and_libraries_exact_to_independent_expectations": true,
+    "utf8_utf16_snapshots_valid": true,
+    "seed_stats_matches_captured_baseline": true,
+    "seed_stats_count": 0,
+    "verification_context_has_changes": false,
+    "real_factory_and_three_normal_store_groups": true
+  },
+  "identity_and_closure": {
+    "seed_app_and_native_test_binary_hashes_before_after_equal": true,
+    "seed_app_and_native_test_signatures_before_after_equal": true,
+    "seed_app_hash_matches_UI_initial_app_hash": true,
+    "observed_live_exact_host_and_three_stores": true,
+    "host_exited_before_next_launch": true,
+    "no_normal_store_descriptors_after_exit": true
+  },
+  "permissions": {
+    "accessibility_auth_value": 2,
+    "microphone_auth_value": 2,
+    "native_rows_byte_equal_to_initial_and_expected": true,
+    "rows_bind_to_seed_app_cdhash": "e007ba3292723dc8f86b4355db2cf5b6194f7bbb"
+  },
+  "post_ui": {
+    "verification_blocked": true,
+    "reason": "UI eight-case lane returned 65 after five passes and three failures.",
+    "native_verify_invoked": false,
+    "final_correction_outcomes_proved": false,
+    "final_stats_preservation_proved": false,
+    "candidate_final_identity_receipt_present": false,
+    "identity_classifier_failure": "Missing identity-after.txt after early UI failure; no observed binary mismatch."
+  },
+  "native_receipt_hashes": {
+    "observation.json": {
+      "bytes": 1168,
+      "sha256": "8128d5055d7ee8829bf9d4940d6f9fb3c13de6df590f0e0823ba0b1325484e22"
+    },
+    "result.json": {
+      "bytes": 835,
+      "sha256": "1f8170c0d48fd6cc05284be8d87276b795b136459e0d1e1c9707393315bbbeb0"
+    },
+    "rows.json": {
+      "bytes": 31384,
+      "sha256": "b9c445ac4e7d255a2f32d879136f7e74793941032f0f7b4729a7d22b3d670363"
+    },
+    "expected-rows.json": {
+      "bytes": 31384,
+      "sha256": "b9c445ac4e7d255a2f32d879136f7e74793941032f0f7b4729a7d22b3d670363"
+    },
+    "libraries.json": {
+      "bytes": 6831,
+      "sha256": "496d5b3ba9fe5eb3052f9fe017c54da2fe2b3540ec89228a979b2844a1fa8760"
+    },
+    "expected-libraries.json": {
+      "bytes": 6831,
+      "sha256": "496d5b3ba9fe5eb3052f9fe017c54da2fe2b3540ec89228a979b2844a1fa8760"
+    },
+    "stats.json": {
+      "bytes": 4,
+      "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+    },
+    "expected-stats.json": {
+      "bytes": 4,
+      "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+    },
+    "store-provenance.json": {
+      "bytes": 2598,
+      "sha256": "2579e7ed96d5ea71fdd0767426779f345a145a134913db77bfc33e8cecb9a779"
+    },
+    "source-inputs.json": {
+      "bytes": 2428,
+      "sha256": "d3d688ea1ff2a749fbe7c561f76d260ce56aa0fe00a3590f05ff1ade45158d73"
+    },
+    "schema-raw.json": {
+      "bytes": 21724,
+      "sha256": "769b1bb7e38512b707b02ffa8b78dcfa11ff6fa99d04788825cfd1a63b274cae"
+    },
+    "host-live.json": {
+      "bytes": 2210,
+      "sha256": "0bb4df8fe6b99139e37b5aafe141e0e418a22ce29113d563628c694c54894dca"
+    },
+    "host-observed.json": {
+      "bytes": 480,
+      "sha256": "69ea8f902e3c1febdd79d11128657b4be410afec0daeab1b9a4bb11b81ea8687"
+    },
+    "closed-write.json": {
+      "bytes": 1775,
+      "sha256": "f3eaf3912a55bdb5971210f385bd5a9e1f07694c8a7a83460eed3bfbaf59de63"
+    },
+    "identity-before.txt": {
+      "bytes": 433,
+      "sha256": "97bf8869dd20359d3a938cba39484aadc5bfe9fb88411eed2e1cb3de1c1f1bd5"
+    },
+    "identity-after.txt": {
+      "bytes": 433,
+      "sha256": "97bf8869dd20359d3a938cba39484aadc5bfe9fb88411eed2e1cb3de1c1f1bd5"
+    },
+    "tcc-check.json": {
+      "bytes": 2243,
+      "sha256": "04e14b70bb103ec22f5ad85e615aadaa9f7b704167be73d141c4693df568291b"
+    },
+    "system-tcc.json": {
+      "bytes": 202,
+      "sha256": "15f63bccee315ff121d55a27c8186dfd1aba6ae52eb111989b0fe8d99f142fda"
+    },
+    "microphone-tcc.json": {
+      "bytes": 199,
+      "sha256": "aac9cfdf1ec9ceb90a963c1a8422e520a752f9b95c98b7f716570ecc21a0bcac"
+    }
+  },
+  "limits": [
+    "No native verify phase, final correction outcomes or post-UI storage preservation proof.",
+    "Permission readback during seed is separate from final UI process identity and later permissions.",
+    "Normal hosted app startup logs pre-roll buffering; this audit makes no no-audio-hardware claim.",
+    "Synthetic model fixtures prove initial store input, not ASR, provider processing, editor delivery or Release behavior."
+  ]
+}

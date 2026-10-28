@@ -1,0 +1,74 @@
+{
+  "run_id": 40601421128,
+  "candidate_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "baseline_sha": "bdd608cf6111e8d7e88c12678f530318713acf67",
+  "none_marker_line": 990,
+  "candidate_ui_cases": [
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing",
+    "testTranslationTargetsReorderSelectAndPersist",
+    "testDictationProfilePreservesCustomSettingsAndPersists",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants",
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement",
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion"
+  ],
+  "original_four_body_sha256": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "5c90e7220157d9fc878875de844946384c568a6823130e50fc8fb0e1f63ed0fe",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": "805bcdb0b8197354fee973d51dd349e4cc0ba1a00018b31a63cfe01459e0e5f0",
+    "testTranslationTargetsReorderSelectAndPersist": "feb0d027df8928bcd004273232cc4ca1dabc15bcb6cd9dcfeb60573737a3b436",
+    "testDictationProfilePreservesCustomSettingsAndPersists": "cf265df76faffd08a7524991911edd9cce7599292a07b34a03b904fc5014f7ee"
+  },
+  "original_four_compare_revision": "31651718c058593719742a220aa85c05827ded7a",
+  "style_body_expected_intentional_delta": {
+    "before_sha256": "90bbfb9941a9e5487d898f5a58c53dbbf2d6e3d7fc0505a07b5a410e03a5117e",
+    "after_sha256": "24229d2ec9dc2579e4f808a68d4df4036d6a417181b7a63b8f05a282578f75d4",
+    "reason": "Remove redundant upward scroll of a below-viewport paragraph switch, observed in40594005045."
+  },
+  "inputs_sha256": {
+    ".github/workflows/voiceink-writing-actions-check.yml": "14254f712f90a3561caa767ebe486d4f85aea0579c9c7cf88169cdaf19027d84",
+    ".github/workflows/voiceink-writing-ui-check.yml": "0e5dd9576e6ef5077fd7dd3427706035ba88ef26eea7084e43198c105d847559",
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+    "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+    "VoiceInk/Models/Transcription.swift": "7a33f68bd7235304e195fab40518679e6481a077fe61ea851187b284e481039c",
+    "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+    "VoiceInk/Models/WordReplacement.swift": "034a015173fe1484f20c6fdb13b9bf423686150954fbe7abed8e9cc47e9c7d3d",
+    "VoiceInk/Services/DictionaryService.swift": "fdaf71ac81f25b65484c463db9b606ce85b254b3177c10900aa2df57d98a697e",
+    "VoiceInk/Services/HistoryCorrectionApprovalService.swift": "38f0d97da04b6e3dca2ffca1154c79cb7d7996a81d66a1f453b6410f2a3b0b71",
+    "VoiceInk/Views/Dictionary/EditReplacementSheet.swift": "860a500f862da0d864b6a92d2cdf1a9fb9086b1fdb71af6bf3c0631dc3c7bb4d",
+    "VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift": "6386578bbe5e82af28def8cf6d1c65b28cd021c44f4bc930c940b295dd1a8510",
+    "VoiceInk/Views/Dictionary/WordReplacementView.swift": "dc8ed7f716e9e7db451c30d3defeccca8cee1462118c0ed1637753a14852f67c",
+    "VoiceInk/Views/History/HistoryProcessingViews.swift": "d45fd3e129092b075f67fe21adf4f3745f501ad19234dab5f7ceed5acc879c2f",
+    "VoiceInk/Views/History/InlineHistoryView.swift": "fc360008be4edf053b6b747e44cfb57e157f18ac7a31a1beeb4fa25c4b962ee6",
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift": "542d6bbb5bb1259c5f7abdda8acd680db8aa5992165b1af6ed5a451bd828fd66",
+    "VoiceInk/Views/History/TranscriptionDetailView.swift": "6a6bb8ce375fc6f32a93ad7548bbcf2ff99bf85797b21ffb36324f4c9de11933",
+    "VoiceInk/Views/ModelSettingsView.swift": "18676bf774c7ddd9f5e01d978081ac3989950b9d98c993596b6b37cb83262487",
+    "VoiceInk/VoiceInk.swift": "3e80d99bc3c8558b7a73c6ae9bfee68769e3e6f9f77fa31f8cf14fba6827c51c",
+    "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift": "5ed4974691a8ceeb85c63a4b2f8c8a1357ad223469d3705ce4baca677f2a270d",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift": "af172491a2c5e51f98102d51f80b5951e8d76d04c20a0249f2fa709eff8c628d",
+    "VoiceInkCore/Sources/VoiceInkCore/WordReplacementLibrary.swift": "5eb84b0bf7818dee5e1c6fca95c24b64639432d19280dfb568738a8238a2c64c",
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec",
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "911039b62c26afc614cae29b252dc88105dc133f76a8201698a244470335860f",
+    "scripts/run-writing-feature-regression.sh": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e",
+    "scripts/run-writing-settings-ui-regression.sh": "dc7b6dcb9260867553fa4ddf3731f938227f93fa635e58c6cc3b47dad41c11b8"
+  },
+  "expected_native_semantic_counts": {
+    "seed": {
+      "Transcription": 6,
+      "WordReplacement": 1,
+      "VocabularyWord": 1
+    },
+    "verify": {
+      "Transcription": 5,
+      "WordReplacement": 2,
+      "VocabularyWord": 1
+    },
+    "SessionMetric": "Captured migration-complete baseline, unchanged"
+  },
+  "expected_correction_receipts": [
+    "managed.json",
+    "retained.json"
+  ],
+  "scope": "Frozen source binding for strict8 UI plus real normal-store seed/read-only verification. Runtime pending; no ASR/provider/editor-delivery claim. Undo working-tree changes excluded."
+}

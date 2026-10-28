@@ -1,0 +1,73 @@
+{
+  "valid": true,
+  "sourceSHA": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "phase": "seed",
+  "checks": {
+    "system-tcc.json": {
+      "query_exit_code": 0,
+      "cmp_exit_code": 0,
+      "expected": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014E007BA3292723DC8F86B4355DB2CF5B6194F7BBB"
+        }
+      ],
+      "actual": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014E007BA3292723DC8F86B4355DB2CF5B6194F7BBB"
+        }
+      ],
+      "raw_bytes_equal": true,
+      "expected_signed_grant": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014E007BA3292723DC8F86B4355DB2CF5B6194F7BBB"
+        }
+      ],
+      "valid": true
+    },
+    "microphone-tcc.json": {
+      "query_exit_code": 0,
+      "cmp_exit_code": 0,
+      "expected": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014E007BA3292723DC8F86B4355DB2CF5B6194F7BBB"
+        }
+      ],
+      "actual": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014E007BA3292723DC8F86B4355DB2CF5B6194F7BBB"
+        }
+      ],
+      "raw_bytes_equal": true,
+      "expected_signed_grant": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014E007BA3292723DC8F86B4355DB2CF5B6194F7BBB"
+        }
+      ],
+      "valid": true
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "classifier_fixtures": {
+    "intended": true,
+    "green": false,
+    "wrong-line": false,
+    "wrong-message": false,
+    "mixed-failure": false,
+    "skip": false,
+    "unexpected": false,
+    "wrong-count": false,
+    "duplicate": false,
+    "launch-failure": false,
+    "setup-failure": false,
+    "wrong-exit": false,
+    "missing-observation": false,
+    "interactive-after-opening": false,
+    "duplicate-observation": false,
+    "foreign-sheet": false
+  },
+  "process_fixtures": {
+    "expected": true,
+    "missing": false,
+    "empty": false,
+    "incomplete": false,
+    "sampling-error": false,
+    "candidate-launched-as-baseline": false,
+    "mixed-foreign": false
+  },
+  "eight_case_fixtures": {
+    "eight-passed": true,
+    "seven": false,
+    "nine": false,
+    "skipped": false,
+    "skip-summary": false,
+    "missing-history": false,
+    "missing-managed-correction": false,
+    "missing-retained-correction": false,
+    "duplicate-case": false,
+    "duplicate-run": false,
+    "error": false
+  },
+  "history_seed_fixtures": {
+    "closed-seed-and-verify": true,
+    "missing-verify": false,
+    "wrong-source": false,
+    "same-host": false,
+    "unclosed": false,
+    "write-during-verify": false,
+    "missing-managed": false,
+    "missing-retained": false,
+    "mutated-correction": false,
+    "missing-correction-proof": false,
+    "wrong-final-counts": false,
+    "stats-changed": false,
+    "ui-not-closed": false,
+    "reused-approved-id": false
+  },
+  "valid": true
+}

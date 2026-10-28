@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "run_id": 40601421128,
+  "source_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "review": "actual retained-image inspection",
+  "verdict": "bounded-clean",
+  "actionable_visual_findings": [],
+  "original_images_reviewed": [
+    {
+      "file": "screenshots/csv-current-and-imported-multiline-preview.png",
+      "sha256": "7f2b1c4f7ae918414b6aed3885ae0e878c02a424ea5da1f535106180ccbdab41"
+    },
+    {
+      "file": "screenshots/power-mode-reorder-native-sheet.png",
+      "sha256": "3ac70661e947e440ccbbc549b5e2bb118ccfba25f605def273a0e297436cfcc8"
+    },
+    {
+      "file": "screenshots/power-mode-unsaved-native-sheet.png",
+      "sha256": "98dd731e79bfca83bdec16119f2cff7306b8a347c198dafc81e9bf2fe737279c"
+    },
+    {
+      "file": "screenshots/prompt-editor-unsaved-native-sheet.png",
+      "sha256": "68f52bb5b9435760564248e88016680115b516a7a6a5776610cdd7f9aa8d92a2"
+    },
+    {
+      "file": "screenshots/enhancement-settings-native-sheet.png",
+      "sha256": "65a09d5e742b34aab2ae390452bd307357a5c26f4d233900e401218aa2d4f2a2"
+    },
+    {
+      "file": "screenshots/dictionary-settings-native-sheet.png",
+      "sha256": "d38efe6ab7421f1be503a6477b0dc9263387e1d2171c98876b3e553b500ef910"
+    },
+    {
+      "file": "screenshots/custom-formatting-restored-without-changing-saved-values.png",
+      "sha256": "761ababcad066464b7cf4ffbbe4d8df0dcf2917d919379453bb595b3bc628824"
+    },
+    {
+      "file": "screenshots/none-dictation-cleanup-persisted-after-relaunch.png",
+      "sha256": "5ebbace1f83c8d64980e983ad5c63679c0fd9efbac6fb8a6ba0cb8a4819f76d0"
+    },
+    {
+      "file": "screenshots/none-preserves-inactive-custom-formatting.png",
+      "sha256": "b1a5d192ea4469e10b992c090e2cd51fde3b3e3d3851cb579c15714c2dd11470"
+    },
+    {
+      "file": "screenshots/none-dictation-cleanup-selected.png",
+      "sha256": "61d4690df6ecfda067c4c7ecad0fb7f6ee65cda451ba6f2ded87e8bec3c29ac2"
+    },
+    {
+      "file": "screenshots/custom-dictation-cleanup-settings.png",
+      "sha256": "81dfa4c500a1c1e3b52283d185233aece9eaab4cd3f47a7a503b948031bbe186"
+    },
+    {
+      "file": "screenshots/profile-switching-preserves-the-seeded-vocabulary-library.png",
+      "sha256": "7d7f73898da83d8ead8ab290537cd2d51f174b67e31c87b549d26dbec6516ecc"
+    },
+    {
+      "file": "screenshots/clarity-formal-persisted-after-relaunch.png",
+      "sha256": "465cec1f9493da37e677971fc3d83ef94f8b0d81e59e0a6870db6fb3cfd89059"
+    },
+    {
+      "file": "screenshots/clarity-formal-style.png",
+      "sha256": "f318e7b1fe9ae1ac18ada50e5b23f57db86c5724cc12230ba1ca2e93c9a8959e"
+    },
+    {
+      "file": "screenshots/clarity-casual-style.png",
+      "sha256": "faef3c69683a723ed7a18e6c33cd66090435862dea8aa4e8f0765a8b460daddc"
+    },
+    {
+      "file": "screenshots/clarity-natural-style.png",
+      "sha256": "1645cd8e72e0c0e3c57c52bdc5a63d1548a2c6a2e8a35ebef71ed6131e2f5d9e"
+    },
+    {
+      "file": "screenshots/clarity-profile-and-retained-library-settings.png",
+      "sha256": "1645cd8e72e0c0e3c57c52bdc5a63d1548a2c6a2e8a35ebef71ed6131e2f5d9e"
+    },
+    {
+      "file": "screenshots/light-profile-and-retained-library-settings.png",
+      "sha256": "4a7dd92f483b0026f3d91b72d7ef82f22f9216cc7f4391175d8469c00b1401b7"
+    },
+    {
+      "file": "screenshots/none-profile-and-retained-library-settings.png",
+      "sha256": "db667f144a9016d07dc046840c60602ea8707696d6808f83c4465bdad03f3139"
+    },
+    {
+      "file": "screenshots/profile-switching-preserves-the-seeded-vocabulary-library--57BA9409.png",
+      "sha256": "7e4fd011a130b31c0eb259ab9f0a3538be721704de02ac8e708d339548973dd0"
+    },
+    {
+      "file": "screenshots/history-rjt-history-legacy-enhanced.png",
+      "sha256": "38f260947b5aaef11742eb61fe1244c6a004321fcb68122cfcc608f2b44ce561"
+    },
+    {
+      "file": "screenshots/history-rjt-history-legacy-original.png",
+      "sha256": "c9898dd1f916c701cf3fafbbd084f69a7e12fefed8a9176cea238b7f7534dcbe"
+    },
+    {
+      "file": "screenshots/snippet-deletion-confirmation.png",
+      "sha256": "d427cc4c50d6b74a780ca5608b964df80a83e4afccb81f27ac42dd59e1b39567"
+    },
+    {
+      "file": "screenshots/literal-multiline-snippet-editor.png",
+      "sha256": "b05107715a9896ab1f09426399edfe18c3f7490a56cca5cc50ab61a85e755129"
+    },
+    {
+      "file": "screenshots/spoken-snippets-library.png",
+      "sha256": "28ab2c8fae5d4e7f62fb5f0d86ef7dc5f6d970fd4215001ed30a31aecdfd8401"
+    },
+    {
+      "file": "screenshots/translation-target-persisted-after-relaunch.png",
+      "sha256": "9c3a38a08c194afcc900f74060b93f6d4890c079ff5010454a2dd9aa7d9adf84"
+    },
+    {
+      "file": "screenshots/writing-actions-and-ordered-translation-targets.png",
+      "sha256": "17dd717d3b743b26427972a6b0cb957c5b562d50612704bcbd380ed632f0aaa3"
+    }
+  ],
+  "derived_frames_reviewed": [
+    {
+      "file": "diagnosis/dictionary-before-failure-frame.png",
+      "sha256": "f831893ac09deba462141591a9f388733c3e72d5d84446701234ef8611b38606",
+      "kind": "single original recording frame",
+      "offset_seconds": 14.3
+    },
+    {
+      "file": "diagnosis/history-captured-cleanup-before-failure-frame.png",
+      "sha256": "a724dd380cd11e296ef78cda0cd0cc821e8b1bf4251c3ba1be4db9ebb081552e",
+      "kind": "single original recording frame",
+      "offset_seconds": 53.5
+    }
+  ],
+  "observations": [
+    "No actionable readability, obstruction or layout-bounds defect observed at the captured 1024x768 desktop size.",
+    "None/Custom/Light/Clarity controls, all three style choices, and Formal relaunch screenshot readable and unobstructed.",
+    "Five shared native sheets, CSV comparison, literal snippet editing/deletion and translation-target scenes fit their captured windows.",
+    "Expanded legacy Original and Enhanced scenes show readable tabs, transcript text, copy feedback and Save Correction controls.",
+    "Derived History frame visibly reads Cleanup: Clarity \u00b7 Formal; the image supports visibility, not success of the failed automated text lookup.",
+    "Derived Dictionary frame shows empty draft fields and a readable seeded rule; no correction sheet or approval flow was reached."
+  ],
+  "limits": [
+    "This is an image review, not eight-case acceptance; retained audit classifies this run eight-case-gate-failed.",
+    "Correction cases stopped at their initial Dictionary selector; correction preview, approval, management and source-deletion UI are unproven here.",
+    "History case did not complete remaining variants, fallback and relaunch checks.",
+    "No new runtime, build, download or product-source edit was performed for this review.",
+    "No claim about native post-UI verification, ASR/provider delivery, other display sizes or accessibility event semantics."
+  ]
+}

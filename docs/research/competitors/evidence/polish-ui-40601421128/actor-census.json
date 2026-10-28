@@ -1,0 +1,62 @@
+{
+  "run_id": 40601421128,
+  "source_sha": "907fe27d566a7b4c8de2c7b754015ba2f6994d7f",
+  "baseline": {
+    "valid": true,
+    "expected_failure_line": 990
+  },
+  "candidate": {
+    "cases": 8,
+    "passed": 5,
+    "failed": 3,
+    "each_executed_once": true,
+    "original_four_and_profile_style_case_passed": true
+  },
+  "dictionary": {
+    "failures": [
+      {
+        "case": "testApprovedHistoryCorrectionSurvivesSourceDeletion",
+        "line": 531
+      },
+      {
+        "case": "testHistoryCorrectionPreviewApprovalAndDictionaryManagement",
+        "line": 531
+      }
+    ],
+    "actual_AX": {
+      "section": "Button selected dictionary.section.wordReplacements",
+      "original": "TextField dictionary.replacement.add.original frame302,546,307,26",
+      "replacement": "TextField dictionary.replacement.add.replacement frame633,546,307,26",
+      "add_button_exists": false,
+      "seeded_legacy_row_exists": true,
+      "seeded_enable_role": "CheckBox",
+      "seeded_enable_value": 1
+    },
+    "actual_visual": "Two empty input fields and seeded replacement row visible; no plus button.",
+    "source_contract": "Add button is conditional on draftState.hasDraft; page-ready helper wrongly required an Add button before entering any draft.",
+    "lowest_correction": "Wait for both exact native TextField IDs, retain uniqueness/enabled state; reveal only before actions."
+  },
+  "history": {
+    "failure_line": 348,
+    "real_button_expansion": "Exact unique .expand Button found and clicked; original text appears. Old expansion defect fixed at this boundary.",
+    "legacy": "Original and Enhanced variants both selected and copied exactly before current failure.",
+    "success": "Actual captured-cleanup ID exists; current original recording frame visibly reads Cleanup: Clarity \u00b7 Formal.",
+    "helper_gap": "containsText reads own label and descendants label/value, omits own String value.",
+    "AX_limit": "No complete post-expansion app hierarchy was attached at this assertion. Pre-action snapshots contain only window handles, not the captured label/value. Exact own-value representation is not independently retained.",
+    "lowest_correction": "Read own String value in the already-scoped text helper; retain exact expected text and attach target label/value/type diagnostics on mismatch."
+  },
+  "native_postverify": {
+    "classification": "blocked",
+    "attempted": false,
+    "reason": "Candidate UI failed; driver correctly prevents postverify from masking UI failure."
+  },
+  "artifact": {
+    "id": 12779769682,
+    "bytes": 263953255,
+    "sha256": "ced5cf7634e22edf69bf2a5be84bb87e36539d5e55cf9358a669a60f6d9c323b",
+    "zip_members": 4189,
+    "all_crc_valid": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40601421128/evidence.zip",
+    "local_full_archive": false
+  }
+}

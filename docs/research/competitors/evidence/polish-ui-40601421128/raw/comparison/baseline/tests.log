@@ -1,0 +1,239 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination platform=macOS -parallel-testing-enabled NO -derivedDataPath /Users/runner/work/_temp/writing-settings-ui-baseline/.writing-ui-regression-build -xcconfig /Users/runner/work/_temp/writing-settings-ui-baseline/LocalBuild.xcconfig -clonedSourcePackagesDirPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS=/Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInk/VoiceInk.local.entitlements "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD" "-only-testing:VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists" -resultBundlePath /Users/runner/work/_temp/writing-settings-ui-regression/baseline/UI.xcresult
+
+Build settings from command line:
+    CODE_SIGN_ENTITLEMENTS = /Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInk/VoiceInk.local.entitlements
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    CODE_SIGNING_REQUIRED = NO
+    DEVELOPMENT_TEAM = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Build settings from configuration file '/Users/runner/work/_temp/writing-settings-ui-baseline/LocalBuild.xcconfig':
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGN_STYLE = Manual
+    DEVELOPMENT_TEAM = 
+    PROVISIONING_PROFILE_SPECIFIER = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+  VoiceInkCore: /Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkCore @ local
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  VoiceInkQwen: /Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkQwen @ local
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  VoiceInkNVIDIA: /Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkNVIDIA @ local
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+
+Writing result bundle at path:
+	/Users/runner/work/_temp/writing-settings-ui-regression/baseline/UI.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:f8c544bd5a4ed16497bee0b7b8c8a476f8935f50, name:My Mac }
+{ platform:macOS, arch:x86_64, id:f8c544bd5a4ed16497bee0b7b8c8a476f8935f50, name:My Mac }
+2026-10-27 23:32:11.923064+0000 VoiceInkUITests-Runner[24457:76926] [Default] Running tests...
+Test Suite 'Selected tests' started at 2026-10-27 23:32:12.085.
+Test Suite 'VoiceInkUITests.xctest' started at 2026-10-27 23:32:12.086.
+Test Suite 'WritingFeaturesUITests' started at 2026-10-27 23:32:12.086.
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' started.
+    t =     0.00s Start Test at 2026-10-27 23:32:12.088
+    t =     1.61s Set Up
+    t =     1.67s Added attachment named 'UI shortcut preference census before'
+    t =     1.67s Added attachment named 'UI shortcut preference census isolated'
+    t =     1.68s Open com.negentropi.RomaJustTalk
+    t =     1.68s     Launch com.negentropi.RomaJustTalk
+2026-10-27 23:32:14.536 xcodebuild[23605:73788] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-10-27 23:32:14.536 xcodebuild[23605:73788] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     7.47s         Wait for accessibility to load
+    t =    10.38s         Setting up automation session
+    t =    10.48s         Wait for com.negentropi.RomaJustTalk to idle
+    t =    11.04s Open com.negentropi.RomaJustTalk
+    t =    11.05s     Activate com.negentropi.RomaJustTalk
+    t =    11.07s         Wait for com.negentropi.RomaJustTalk to idle
+    t =    11.11s Wait for com.negentropi.RomaJustTalk to become Running Foreground
+    t =    11.12s Added attachment named 'UI shortcut preference census after-launch'
+    t =    11.13s Waiting 10.0s for StatusItem (First Match) to exist
+    t =    12.14s     Checking `Expect predicate `existsNoRetry == 1` for object StatusItem (First Match)`
+    t =    12.14s         Checking existence of `StatusItem (First Match)`
+    t =    12.22s Get number of matches for: Descendants matching type StatusItem
+    t =    12.81s Click StatusItem (First Match)
+    t =    12.81s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    12.82s     Find the StatusItem (First Match)
+    t =    12.91s     Check for interrupting elements affecting "menuBarIcon" StatusItem
+    t =    12.91s     Synthesize event
+    t =    13.70s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    13.71s Waiting 5.0s for "Settings" MenuItem to exist
+    t =    14.77s     Checking `Expect predicate `existsNoRetry == 1` for object "Settings" MenuItem`
+    t =    14.77s         Checking existence of `"Settings" MenuItem`
+    t =    15.20s Click "Settings" MenuItem
+    t =    15.20s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    15.21s     Find the "Settings" MenuItem
+    t =    15.46s     Check for interrupting elements affecting "menuAction:" MenuItem
+    t =    15.46s     Synthesize event
+    t =    15.47s         Checking existence of `"menuAction:" MenuItem`
+    t =    15.70s         Hover menu item 'Settings'
+    t =    15.70s             Wait for com.negentropi.RomaJustTalk to idle
+    t =    15.70s             Find the "menuAction:" MenuItem
+    t =    15.90s             Check for interrupting elements affecting "menuAction:" MenuItem
+    t =    15.90s             Synthesize event
+    t =    16.19s             Wait for com.negentropi.RomaJustTalk to idle
+    t =    16.20s         Find the "menuAction:" MenuItem
+    t =    17.85s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    18.03s Waiting 15.0s for "com.negentropi.RomaJustTalk.mainWindow" Window to exist
+    t =    19.07s     Checking `Expect predicate `existsNoRetry == 1` for object "com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =    19.07s         Checking existence of `"com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =    19.61s Get number of matches for: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    20.11s Waiting 10.0s for "Dictionary" Button to exist
+    t =    21.14s     Checking `Expect predicate `existsNoRetry == 1` for object "Dictionary" Button`
+    t =    21.14s         Checking existence of `"Dictionary" Button`
+    t =    21.44s Waiting 10.0s for "models" Button to exist
+    t =    22.47s     Checking `Expect predicate `existsNoRetry == 1` for object "models" Button`
+    t =    22.47s         Checking existence of `"models" Button`
+    t =    22.76s Click "models" Button
+    t =    22.76s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    22.76s     Find the "models" Button
+    t =    23.02s     Check for interrupting elements affecting "models" Button
+    t =    23.09s     Synthesize event
+    t =    24.40s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    24.40s Waiting 10.0s for "models.settings.open" Button to exist
+    t =    25.43s     Checking `Expect predicate `existsNoRetry == 1` for object "models.settings.open" Button`
+    t =    25.43s         Checking existence of `"models.settings.open" Button`
+    t =    25.93s Checking existence of `"models.settings.open" Button`
+    t =    26.31s Find the "models.settings.open" Button
+    t =    26.60s Find the "models.settings.open" Button
+    t =    26.99s Find the "models.settings.open" Button
+    t =    27.42s Find the "models.settings.open" Button
+    t =    27.87s Find the "models.settings.open" Button
+    t =    28.32s Find the "models.settings.open" Button
+    t =    28.68s Find the "models.settings.open" Button
+    t =    29.08s Find the "models.settings.open" Button
+    t =    29.46s Find the "models.settings.open" Button
+    t =    29.80s Find the Target Application 'com.negentropi.RomaJustTalk'
+    t =    30.14s Find the Target Application 'com.negentropi.RomaJustTalk'
+    t =    30.46s Checking existence of `"com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =    30.78s Find the "com.negentropi.RomaJustTalk.mainWindow" Window
+    t =    31.09s Find the "com.negentropi.RomaJustTalk.mainWindow" Window
+    t =    31.48s Checking existence of `"models.settings.open" Button`
+    t =    31.78s Find the "models.settings.open" Button
+    t =    32.13s Find the "models.settings.open" Button
+    t =    32.46s Checking existence of `"Recommended" Button`
+    t =    32.78s Find the "Recommended" Button
+    t =    33.16s Find the "Recommended" Button
+    t =    33.54s Checking existence of `ScrollView (First Match)`
+    t =    33.90s Checking existence of `"Custom" RadioButton`
+    t =    34.27s Checking existence of `"None" RadioButton`
+    t =    34.59s Checking existence of `"models.settings.close" Button`
+    t =    34.91s Get number of matches for: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    35.28s Get number of matches for: Descendants matching type Sheet
+    t =    35.52s Added attachment named 'Model settings boundary before-opening'
+    t =    35.52s Requesting snapshot of accessibility hierarchy for app with pid 24654
+    t =    35.92s Requesting snapshot of accessibility hierarchy for app with pid 24654
+    t =    36.26s Added attachment named 'Model settings hierarchy before-opening'
+    t =    36.26s Click "models.settings.open" Button
+    t =    36.26s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    36.26s     Find the "models.settings.open" Button
+    t =    36.62s     Check for interrupting elements affecting "models.settings.open" Button
+    t =    36.68s     Synthesize event
+    t =    37.82s     Wait for com.negentropi.RomaJustTalk to idle
+    t =    37.84s Waiting 5.0s for "models.settings.close" Button to exist
+    t =    38.87s     Checking `Expect predicate `existsNoRetry == 1` for object "models.settings.close" Button`
+    t =    38.87s         Checking existence of `"models.settings.close" Button`
+    t =    39.38s Waiting 5.0s for "Custom" RadioButton to exist
+    t =    40.41s     Checking `Expect predicate `existsNoRetry == 1` for object "Custom" RadioButton`
+    t =    40.41s         Checking existence of `"Custom" RadioButton`
+    t =    40.69s Waiting 5.0s for "None" RadioButton to exist
+    t =    41.71s     Checking `Expect predicate `existsNoRetry == 1` for object "None" RadioButton`
+    t =    41.71s         Checking existence of `"None" RadioButton`
+    t =    41.89s Find the Target Application 'com.negentropi.RomaJustTalk'
+    t =    42.05s Find the Target Application 'com.negentropi.RomaJustTalk'
+    t =    42.21s Checking existence of `"com.negentropi.RomaJustTalk.mainWindow" Window`
+    t =    42.38s Find the "com.negentropi.RomaJustTalk.mainWindow" Window
+    t =    42.57s Find the "com.negentropi.RomaJustTalk.mainWindow" Window
+    t =    42.78s Checking existence of `"models.settings.open" Button`
+    t =    42.98s Find the "models.settings.open" Button
+    t =    43.17s Find the "models.settings.open" Button
+    t =    43.36s Checking existence of `"Recommended" Button`
+    t =    43.55s Find the "Recommended" Button
+    t =    43.74s Find the "Recommended" Button
+    t =    43.93s Checking existence of `ScrollView (First Match)`
+    t =    44.05s Find the ScrollView (First Match)
+    t =    44.17s Find the ScrollView
+    t =    45.15s Checking existence of `"Custom" RadioButton`
+    t =    45.35s Find the "Custom" RadioButton
+    t =    45.53s Find the "dictationProfile.custom" RadioButton
+    t =    45.77s Checking existence of `"None" RadioButton`
+    t =    45.97s Find the "None" RadioButton
+    t =    46.22s Find the "dictationProfile.none" RadioButton
+    t =    46.46s Checking existence of `"models.settings.close" Button`
+    t =    46.69s Find the "models.settings.close" Button
+    t =    46.92s Find the "models.settings.close" Button
+    t =    47.15s Get number of matches for: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+    t =    47.47s Get number of matches for: Descendants matching type Sheet
+    t =    47.63s Added attachment named 'Model settings boundary after-opening'
+    t =    47.63s Requesting snapshot of accessibility hierarchy for app with pid 24654
+    t =    47.90s Requesting snapshot of accessibility hierarchy for app with pid 24654
+    t =    48.24s Added attachment named 'Model settings hierarchy after-opening'
+/Users/runner/work/_temp/writing-settings-ui-baseline/VoiceInkUITests/WritingFeaturesUITests.swift:990: error: -[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists] : XCTAssertTrue failed - Opening model settings disabled the panel or blocked a visible panel control.
+    t =    48.68s Tear Down
+    t =    49.15s     Added attachment named 'UI shortcut preference census restored'
+    t =    49.26s Checking for crash reports corresponding to unexpected termination of com.negentropi.RomaJustTalk
+Test Case '-[VoiceInkUITests.WritingFeaturesUITests testDictationProfilePreservesCustomSettingsAndPersists]' failed (50.307 seconds).
+Test Suite 'WritingFeaturesUITests' failed at 2026-10-27 23:33:02.395.
+	 Executed 1 test, with 1 failure (0 unexpected) in 50.307 (50.309) seconds
+Test Suite 'VoiceInkUITests.xctest' failed at 2026-10-27 23:33:02.396.
+	 Executed 1 test, with 1 failure (0 unexpected) in 50.307 (50.309) seconds
+Test Suite 'Selected tests' failed at 2026-10-27 23:33:02.396.
+	 Executed 1 test, with 1 failure (0 unexpected) in 50.307 (50.311) seconds
+2026-10-27 23:33:06.460 xcodebuild[23605:73788] [MT] IDETestOperationsObserverDebug: 55.864 elapsed -- Testing started completed.
+2026-10-27 23:33:06.460 xcodebuild[23605:73788] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-27 23:33:06.460 xcodebuild[23605:73788] [MT] IDETestOperationsObserverDebug: 55.864 sec, +55.864 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/writing-settings-ui-regression/baseline/UI.xcresult
+
+Failing tests:
+	WritingFeaturesUITests.testDictationProfilePreservesCustomSettingsAndPersists()
+
+** TEST EXECUTE FAILED **
+
+Testing started

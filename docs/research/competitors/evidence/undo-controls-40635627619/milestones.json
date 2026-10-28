@@ -1,0 +1,2792 @@
+[
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 1,
+    "stage": "app.init.entry",
+    "systemUptime": 845.4412372500001,
+    "unixTime": 1793164416.863765
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 2,
+    "stage": "app.init.exit",
+    "systemUptime": 845.4474474166667,
+    "unixTime": 1793164416.8698
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 3,
+    "stage": "owner.launch.entry",
+    "systemUptime": 845.6773938333334,
+    "unixTime": 1793164417.09974
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 4,
+    "stage": "owner.init.entry",
+    "systemUptime": 845.6786582916667,
+    "unixTime": 1793164417.1009722
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 5,
+    "stage": "owner.register-defaults.before",
+    "systemUptime": 845.6791976666667,
+    "unixTime": 1793164417.101505
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 6,
+    "stage": "owner.register-defaults.after",
+    "systemUptime": 845.6812343333334,
+    "unixTime": 1793164417.1035671
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 7,
+    "stage": "owner.schema.before",
+    "systemUptime": 845.6822822083334,
+    "unixTime": 1793164417.104598
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 8,
+    "stage": "owner.schema.after",
+    "systemUptime": 845.688380875,
+    "unixTime": 1793164417.1107101
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 9,
+    "stage": "owner.container.before",
+    "systemUptime": 845.689256375,
+    "unixTime": 1793164417.11157
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 10,
+    "stage": "owner.container.after",
+    "systemUptime": 845.7177676250001,
+    "unixTime": 1793164417.140109
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 11,
+    "stage": "owner.whisper-model-manager.before",
+    "systemUptime": 845.7190377083334,
+    "unixTime": 1793164417.141367
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 12,
+    "stage": "owner.whisper-model-manager.after",
+    "systemUptime": 845.720148,
+    "unixTime": 1793164417.142459
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 13,
+    "stage": "owner.fluid-audio-model-manager.before",
+    "systemUptime": 845.7206490416667,
+    "unixTime": 1793164417.142956
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 14,
+    "stage": "owner.fluid-audio-model-manager.after",
+    "systemUptime": 845.7211921666667,
+    "unixTime": 1793164417.143502
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 15,
+    "stage": "owner.transcription-model-manager.before",
+    "systemUptime": 845.7216236666667,
+    "unixTime": 1793164417.143931
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 16,
+    "stage": "owner.transcription-model-manager.after",
+    "systemUptime": 845.7245337916668,
+    "unixTime": 1793164417.146864
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 17,
+    "stage": "owner.recorder-ui-manager.before",
+    "systemUptime": 845.72516525,
+    "unixTime": 1793164417.1474729
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 18,
+    "stage": "owner.recorder-ui-manager.after",
+    "systemUptime": 845.7257399583334,
+    "unixTime": 1793164417.1480489
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 19,
+    "stage": "owner.engine.before",
+    "systemUptime": 845.7264409583333,
+    "unixTime": 1793164417.148756
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 20,
+    "stage": "owner.engine.after",
+    "systemUptime": 845.955462,
+    "unixTime": 1793164417.377802
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 21,
+    "stage": "owner.configure.before",
+    "systemUptime": 845.9580878333334,
+    "unixTime": 1793164417.380405
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 22,
+    "stage": "owner.configure.after",
+    "systemUptime": 845.959634,
+    "unixTime": 1793164417.381943
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 23,
+    "stage": "owner.shortcut-manager.before",
+    "systemUptime": 845.961895625,
+    "unixTime": 1793164417.384208
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 24,
+    "stage": "owner.shortcut-manager.after",
+    "systemUptime": 845.9729466666668,
+    "unixTime": 1793164417.3952742
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 25,
+    "stage": "owner.init.exit",
+    "systemUptime": 845.97760225,
+    "unixTime": 1793164417.3999119
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 26,
+    "stage": "owner.launch.exit",
+    "systemUptime": 845.9783997500001,
+    "unixTime": 1793164417.400707
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 27,
+    "stage": "app.scene-body.first",
+    "systemUptime": 845.9856089166667,
+    "unixTime": 1793164417.4080381
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 28,
+    "stage": "view.body.first",
+    "systemUptime": 846.9491877083334,
+    "unixTime": 1793164418.371554
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 29,
+    "stage": "view.task.entry",
+    "systemUptime": 847.452039125,
+    "unixTime": 1793164418.874366
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 30,
+    "stage": "view.task.claimed",
+    "systemUptime": 847.4530177500001,
+    "unixTime": 1793164418.875325
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 31,
+    "stage": "oracle.run.entry",
+    "systemUptime": 847.45336925,
+    "unixTime": 1793164418.875675
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 32,
+    "stage": "oracle.check-init.before",
+    "systemUptime": 847.4536022083333,
+    "unixTime": 1793164418.875908
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 33,
+    "stage": "oracle.check-init.after",
+    "systemUptime": 847.4539499166667,
+    "unixTime": 1793164418.876256
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 34,
+    "stage": "execute.preflight.before",
+    "systemUptime": 847.454205375,
+    "unixTime": 1793164418.876511
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 35,
+    "stage": "execute.preflight.accessibility.before",
+    "systemUptime": 847.4544657916667,
+    "unixTime": 1793164418.876771
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 36,
+    "stage": "execute.preflight.accessibility.after",
+    "systemUptime": 847.4588163333334,
+    "unixTime": 1793164418.881143
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 37,
+    "stage": "execute.preflight.listen-event.before",
+    "systemUptime": 847.4598468333334,
+    "unixTime": 1793164418.882162
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 38,
+    "stage": "execute.preflight.listen-event.after",
+    "systemUptime": 847.4664213750001,
+    "unixTime": 1793164418.8887591
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 39,
+    "stage": "execute.preflight.post-event.before",
+    "systemUptime": 847.4672973333334,
+    "unixTime": 1793164418.889604
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 40,
+    "stage": "execute.preflight.post-event.after",
+    "systemUptime": 847.4713483333334,
+    "unixTime": 1793164418.893705
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 41,
+    "stage": "execute.preflight.screen-capture.before",
+    "systemUptime": 847.4725185000001,
+    "unixTime": 1793164418.8948278
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 42,
+    "stage": "execute.preflight.screen-capture.after",
+    "systemUptime": 847.4782010833334,
+    "unixTime": 1793164418.900535
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 43,
+    "stage": "execute.preflight.after",
+    "systemUptime": 847.4793524166668,
+    "unixTime": 1793164418.90166
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 44,
+    "stage": "policy.snapshot-before.before",
+    "systemUptime": 847.4834215000001,
+    "unixTime": 1793164418.905734
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 45,
+    "stage": "policy.snapshot-before.after",
+    "systemUptime": 847.4855762916667,
+    "unixTime": 1793164418.9078999
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 46,
+    "stage": "policy.public-writes.before",
+    "systemUptime": 847.4870592916667,
+    "unixTime": 1793164418.909371
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 47,
+    "stage": "policy.public-writes.after",
+    "systemUptime": 847.4880837083334,
+    "unixTime": 1793164418.9103951
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 48,
+    "stage": "policy.snapshot-after.before",
+    "systemUptime": 847.4886506250001,
+    "unixTime": 1793164418.910962
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 49,
+    "stage": "policy.snapshot-after.after",
+    "systemUptime": 847.4896841666667,
+    "unixTime": 1793164418.911998
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 50,
+    "stage": "menu.unavailable-menu.status-lookup.before",
+    "systemUptime": 847.491416125,
+    "unixTime": 1793164418.913735
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 51,
+    "stage": "menu.unavailable-menu.status-press.before",
+    "systemUptime": 847.8787940416668,
+    "unixTime": 1793164419.301134
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 52,
+    "stage": "click.menu.unavailable-menu.status.a1.unique-scan.before",
+    "systemUptime": 847.8807092916667,
+    "unixTime": 1793164419.303091
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 53,
+    "stage": "click.menu.unavailable-menu.status.a1.unique-scan.after",
+    "systemUptime": 847.89939875,
+    "unixTime": 1793164419.321729
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 54,
+    "stage": "click.menu.unavailable-menu.status.a1.role.before",
+    "systemUptime": 847.9016516666667,
+    "unixTime": 1793164419.323971
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 55,
+    "stage": "click.menu.unavailable-menu.status.a1.role.after",
+    "systemUptime": 847.9048283750001,
+    "unixTime": 1793164419.327139
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 56,
+    "stage": "click.menu.unavailable-menu.status.a1.identifier.before",
+    "systemUptime": 847.9057118750001,
+    "unixTime": 1793164419.3280191
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 57,
+    "stage": "click.menu.unavailable-menu.status.a1.identifier.after",
+    "systemUptime": 847.9064983750001,
+    "unixTime": 1793164419.328825
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 58,
+    "stage": "click.menu.unavailable-menu.status.a1.title-attribute.before",
+    "systemUptime": 847.9085850833334,
+    "unixTime": 1793164419.3309069
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 59,
+    "stage": "click.menu.unavailable-menu.status.a1.title-attribute.after",
+    "systemUptime": 847.9192688333334,
+    "unixTime": 1793164419.341586
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 60,
+    "stage": "click.menu.unavailable-menu.status.a1.enabled.before",
+    "systemUptime": 847.9258123750001,
+    "unixTime": 1793164419.3481221
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 61,
+    "stage": "click.menu.unavailable-menu.status.a1.enabled.after",
+    "systemUptime": 847.929245625,
+    "unixTime": 1793164419.3515859
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 62,
+    "stage": "click.menu.unavailable-menu.status.a1.pid.before",
+    "systemUptime": 847.9305108333334,
+    "unixTime": 1793164419.352828
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 63,
+    "stage": "click.menu.unavailable-menu.status.a1.pid.after",
+    "systemUptime": 847.9322323333333,
+    "unixTime": 1793164419.3545551
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 64,
+    "stage": "click.menu.unavailable-menu.status.a1.frame.position.before",
+    "systemUptime": 847.9334811250001,
+    "unixTime": 1793164419.355804
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 65,
+    "stage": "click.menu.unavailable-menu.status.a1.frame.position.after",
+    "systemUptime": 847.9351599166667,
+    "unixTime": 1793164419.357471
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 66,
+    "stage": "click.menu.unavailable-menu.status.a1.frame.size.before",
+    "systemUptime": 847.9368865,
+    "unixTime": 1793164419.359202
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 67,
+    "stage": "click.menu.unavailable-menu.status.a1.frame.size.after",
+    "systemUptime": 847.9421399583334,
+    "unixTime": 1793164419.364455
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 68,
+    "stage": "click.menu.unavailable-menu.status.a1.root-menu-bar.before",
+    "systemUptime": 847.944119375,
+    "unixTime": 1793164419.36643
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 69,
+    "stage": "click.menu.unavailable-menu.status.a1.root-menu-bar.after",
+    "systemUptime": 847.9467976666667,
+    "unixTime": 1793164419.3691158
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 70,
+    "stage": "click.menu.unavailable-menu.status.a1.root-extras-menu-bar.before",
+    "systemUptime": 847.9476257083334,
+    "unixTime": 1793164419.369934
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 71,
+    "stage": "click.menu.unavailable-menu.status.a1.root-extras-menu-bar.after",
+    "systemUptime": 847.9490613333334,
+    "unixTime": 1793164419.3713698
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 72,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-parent.0.before",
+    "systemUptime": 847.9497389583333,
+    "unixTime": 1793164419.372047
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 73,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-parent.0.after",
+    "systemUptime": 847.9502506250001,
+    "unixTime": 1793164419.3725572
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 74,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-role.0.before",
+    "systemUptime": 847.9508190833334,
+    "unixTime": 1793164419.373127
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 75,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-role.0.after",
+    "systemUptime": 847.9520767083334,
+    "unixTime": 1793164419.374407
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 76,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-identifier.0.before",
+    "systemUptime": 847.9555515833334,
+    "unixTime": 1793164419.377861
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 77,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-identifier.0.after",
+    "systemUptime": 847.957101125,
+    "unixTime": 1793164419.379424
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 78,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-title.0.before",
+    "systemUptime": 847.959371375,
+    "unixTime": 1793164419.381695
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 79,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-title.0.after",
+    "systemUptime": 847.9631372083334,
+    "unixTime": 1793164419.385468
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 80,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-pid.0.before",
+    "systemUptime": 847.9640842916667,
+    "unixTime": 1793164419.386393
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 81,
+    "stage": "click.menu.unavailable-menu.status.a1.provenance-pid.0.after",
+    "systemUptime": 847.9816544166667,
+    "unixTime": 1793164419.403963
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 82,
+    "stage": "click.menu.unavailable-menu.status.a1.displays.before",
+    "systemUptime": 847.9823156666668,
+    "unixTime": 1793164419.404626
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 83,
+    "stage": "click.menu.unavailable-menu.status.a1.displays.after",
+    "systemUptime": 847.9831205416667,
+    "unixTime": 1793164419.4054298
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 84,
+    "stage": "click.menu.unavailable-menu.status.a1.observation-write.before",
+    "systemUptime": 847.983893125,
+    "unixTime": 1793164419.406203
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 85,
+    "stage": "click.menu.unavailable-menu.status.a1.observation-write.after",
+    "systemUptime": 847.985088625,
+    "unixTime": 1793164419.4073992
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 86,
+    "stage": "click.menu.unavailable-menu.status.a2.unique-scan.before",
+    "systemUptime": 849.0009942916668,
+    "unixTime": 1793164420.4233289
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 87,
+    "stage": "click.menu.unavailable-menu.status.a2.unique-scan.after",
+    "systemUptime": 849.1141647916667,
+    "unixTime": 1793164420.5364928
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 88,
+    "stage": "click.menu.unavailable-menu.status.a2.role.before",
+    "systemUptime": 849.1152615416668,
+    "unixTime": 1793164420.537568
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 89,
+    "stage": "click.menu.unavailable-menu.status.a2.role.after",
+    "systemUptime": 849.1157445,
+    "unixTime": 1793164420.538052
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 90,
+    "stage": "click.menu.unavailable-menu.status.a2.identifier.before",
+    "systemUptime": 849.1161728750001,
+    "unixTime": 1793164420.5384789
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 91,
+    "stage": "click.menu.unavailable-menu.status.a2.identifier.after",
+    "systemUptime": 849.1166979166667,
+    "unixTime": 1793164420.539006
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 92,
+    "stage": "click.menu.unavailable-menu.status.a2.title-attribute.before",
+    "systemUptime": 849.1171275833334,
+    "unixTime": 1793164420.539434
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 93,
+    "stage": "click.menu.unavailable-menu.status.a2.title-attribute.after",
+    "systemUptime": 849.11875925,
+    "unixTime": 1793164420.541069
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 94,
+    "stage": "click.menu.unavailable-menu.status.a2.enabled.before",
+    "systemUptime": 849.1208017083334,
+    "unixTime": 1793164420.5431252
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 95,
+    "stage": "click.menu.unavailable-menu.status.a2.enabled.after",
+    "systemUptime": 849.1218281666668,
+    "unixTime": 1793164420.544137
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 96,
+    "stage": "click.menu.unavailable-menu.status.a2.pid.before",
+    "systemUptime": 849.1222300000001,
+    "unixTime": 1793164420.544536
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 97,
+    "stage": "click.menu.unavailable-menu.status.a2.pid.after",
+    "systemUptime": 849.1227209583334,
+    "unixTime": 1793164420.545028
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 98,
+    "stage": "click.menu.unavailable-menu.status.a2.frame.position.before",
+    "systemUptime": 849.1231431666668,
+    "unixTime": 1793164420.545449
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 99,
+    "stage": "click.menu.unavailable-menu.status.a2.frame.position.after",
+    "systemUptime": 849.1239909166667,
+    "unixTime": 1793164420.546298
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 100,
+    "stage": "click.menu.unavailable-menu.status.a2.frame.size.before",
+    "systemUptime": 849.1248615000001,
+    "unixTime": 1793164420.5471768
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 101,
+    "stage": "click.menu.unavailable-menu.status.a2.frame.size.after",
+    "systemUptime": 849.1262616250001,
+    "unixTime": 1793164420.548571
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 102,
+    "stage": "click.menu.unavailable-menu.status.a2.root-menu-bar.before",
+    "systemUptime": 849.126817125,
+    "unixTime": 1793164420.549123
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 103,
+    "stage": "click.menu.unavailable-menu.status.a2.root-menu-bar.after",
+    "systemUptime": 849.1272016666667,
+    "unixTime": 1793164420.5495071
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 104,
+    "stage": "click.menu.unavailable-menu.status.a2.root-extras-menu-bar.before",
+    "systemUptime": 849.1275520833334,
+    "unixTime": 1793164420.549858
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 105,
+    "stage": "click.menu.unavailable-menu.status.a2.root-extras-menu-bar.after",
+    "systemUptime": 849.1279826250001,
+    "unixTime": 1793164420.550288
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 106,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-parent.0.before",
+    "systemUptime": 849.1283980416667,
+    "unixTime": 1793164420.550705
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 107,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-parent.0.after",
+    "systemUptime": 849.1288816666668,
+    "unixTime": 1793164420.551188
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 108,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-role.0.before",
+    "systemUptime": 849.1296863333334,
+    "unixTime": 1793164420.552003
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 109,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-role.0.after",
+    "systemUptime": 849.1308955833334,
+    "unixTime": 1793164420.5532122
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 110,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-identifier.0.before",
+    "systemUptime": 849.131795,
+    "unixTime": 1793164420.554105
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 111,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-identifier.0.after",
+    "systemUptime": 849.1322474583334,
+    "unixTime": 1793164420.554554
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 112,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-title.0.before",
+    "systemUptime": 849.132674875,
+    "unixTime": 1793164420.554981
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 113,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-title.0.after",
+    "systemUptime": 849.1330843750001,
+    "unixTime": 1793164420.55539
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 114,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-pid.0.before",
+    "systemUptime": 849.1334182916668,
+    "unixTime": 1793164420.5557241
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 115,
+    "stage": "click.menu.unavailable-menu.status.a2.provenance-pid.0.after",
+    "systemUptime": 849.1337127500001,
+    "unixTime": 1793164420.5560188
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 116,
+    "stage": "click.menu.unavailable-menu.status.a2.displays.before",
+    "systemUptime": 849.1348176666667,
+    "unixTime": 1793164420.557126
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 117,
+    "stage": "click.menu.unavailable-menu.status.a2.displays.after",
+    "systemUptime": 849.1362090416667,
+    "unixTime": 1793164420.558519
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 118,
+    "stage": "click.menu.unavailable-menu.status.a2.hit-test.before",
+    "systemUptime": 849.1374841666667,
+    "unixTime": 1793164420.559795
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 119,
+    "stage": "click.menu.unavailable-menu.status.a2.hit-test.after",
+    "systemUptime": 849.1405970416668,
+    "unixTime": 1793164420.562923
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 120,
+    "stage": "click.menu.unavailable-menu.status.a2.hit-pid.before",
+    "systemUptime": 849.141334625,
+    "unixTime": 1793164420.563641
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 121,
+    "stage": "click.menu.unavailable-menu.status.a2.hit-pid.after",
+    "systemUptime": 849.1417859583333,
+    "unixTime": 1793164420.564093
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 122,
+    "stage": "click.menu.unavailable-menu.status.a2.target-window.before",
+    "systemUptime": 849.1421755416667,
+    "unixTime": 1793164420.5644832
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 123,
+    "stage": "click.menu.unavailable-menu.status.a2.target-window.after",
+    "systemUptime": 849.142687375,
+    "unixTime": 1793164420.564995
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 124,
+    "stage": "click.menu.unavailable-menu.status.a2.hit-window.before",
+    "systemUptime": 849.1437146666667,
+    "unixTime": 1793164420.566031
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 125,
+    "stage": "click.menu.unavailable-menu.status.a2.hit-window.after",
+    "systemUptime": 849.14427675,
+    "unixTime": 1793164420.566584
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 126,
+    "stage": "click.menu.unavailable-menu.status.a2.menu-ancestor.0.before",
+    "systemUptime": 849.1446691666667,
+    "unixTime": 1793164420.566976
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 127,
+    "stage": "click.menu.unavailable-menu.status.a2.menu-ancestor.0.after",
+    "systemUptime": 849.1451018333333,
+    "unixTime": 1793164420.567408
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 128,
+    "stage": "click.menu.unavailable-menu.status.a2.menu-ancestor-pid.0.before",
+    "systemUptime": 849.145480375,
+    "unixTime": 1793164420.5677872
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 129,
+    "stage": "click.menu.unavailable-menu.status.a2.menu-ancestor-pid.0.after",
+    "systemUptime": 849.1458657083334,
+    "unixTime": 1793164420.568172
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 130,
+    "stage": "click.menu.unavailable-menu.status.a2.menu-ancestor-role.0.before",
+    "systemUptime": 849.1464827083333,
+    "unixTime": 1793164420.56879
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 131,
+    "stage": "click.menu.unavailable-menu.status.a2.menu-ancestor-role.0.after",
+    "systemUptime": 849.146915375,
+    "unixTime": 1793164420.569222
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 132,
+    "stage": "click.menu.unavailable-menu.status.a2.frame-recheck.position.before",
+    "systemUptime": 849.14732475,
+    "unixTime": 1793164420.569631
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 133,
+    "stage": "click.menu.unavailable-menu.status.a2.frame-recheck.position.after",
+    "systemUptime": 849.1481468333334,
+    "unixTime": 1793164420.570455
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 134,
+    "stage": "click.menu.unavailable-menu.status.a2.frame-recheck.size.before",
+    "systemUptime": 849.1486643750001,
+    "unixTime": 1793164420.570973
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 135,
+    "stage": "click.menu.unavailable-menu.status.a2.frame-recheck.size.after",
+    "systemUptime": 849.1500474166667,
+    "unixTime": 1793164420.5723739
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 136,
+    "stage": "click.menu.unavailable-menu.status.a2.observation-write.before",
+    "systemUptime": 849.1514225833333,
+    "unixTime": 1793164420.5737329
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 137,
+    "stage": "click.menu.unavailable-menu.status.a2.observation-write.after",
+    "systemUptime": 849.1526694166668,
+    "unixTime": 1793164420.574981
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 138,
+    "stage": "click.menu.unavailable-menu.status.post.before",
+    "systemUptime": 849.15418,
+    "unixTime": 1793164420.57651
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 139,
+    "stage": "click.menu.unavailable-menu.status.post.after",
+    "systemUptime": 849.1620272916667,
+    "unixTime": 1793164420.584388
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 140,
+    "stage": "menu.unavailable-menu.item-lookup.before",
+    "systemUptime": 849.180931375,
+    "unixTime": 1793164420.603252
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 141,
+    "stage": "menu.unavailable-menu.enabled-wait.before",
+    "systemUptime": 849.1816904583334,
+    "unixTime": 1793164420.603998
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 142,
+    "stage": "menu.unavailable-menu.item-describe.before",
+    "systemUptime": 849.2943561666667,
+    "unixTime": 1793164420.716671
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 143,
+    "stage": "menu.unavailable-menu.item.describe.actions",
+    "systemUptime": 849.3048162916667,
+    "unixTime": 1793164420.727139
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 144,
+    "stage": "menu.unavailable-menu.item.describe.position",
+    "systemUptime": 849.3075949583334,
+    "unixTime": 1793164420.729937
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 145,
+    "stage": "menu.unavailable-menu.item.describe.size",
+    "systemUptime": 849.3091922083333,
+    "unixTime": 1793164420.731501
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 146,
+    "stage": "menu.unavailable-menu.item.describe.identifier",
+    "systemUptime": 849.3100447916668,
+    "unixTime": 1793164420.732353
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 147,
+    "stage": "menu.unavailable-menu.item.describe.role",
+    "systemUptime": 849.3119226250001,
+    "unixTime": 1793164420.734233
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 148,
+    "stage": "menu.unavailable-menu.item.describe.label",
+    "systemUptime": 849.3131645416668,
+    "unixTime": 1793164420.735481
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 149,
+    "stage": "menu.unavailable-menu.item.describe.value",
+    "systemUptime": 849.3155360416667,
+    "unixTime": 1793164420.737856
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 150,
+    "stage": "menu.unavailable-menu.item.describe.enabled",
+    "systemUptime": 849.3178978750001,
+    "unixTime": 1793164420.7402291
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 151,
+    "stage": "menu.unavailable-menu.item.describe.exit",
+    "systemUptime": 849.3217071250001,
+    "unixTime": 1793164420.744034
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 152,
+    "stage": "menu.unavailable-menu.hierarchy.before",
+    "systemUptime": 849.33113225,
+    "unixTime": 1793164420.7534409
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 153,
+    "stage": "menu.unavailable-menu.screenshot.before",
+    "systemUptime": 849.3606122083334,
+    "unixTime": 1793164420.782974
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 154,
+    "stage": "menu.unavailable-menu.status-describe.before",
+    "systemUptime": 849.7870126666667,
+    "unixTime": 1793164421.209382
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 155,
+    "stage": "menu.unavailable-menu.status.describe.actions",
+    "systemUptime": 849.7893821666668,
+    "unixTime": 1793164421.211701
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 156,
+    "stage": "menu.unavailable-menu.status.describe.position",
+    "systemUptime": 849.7916254583333,
+    "unixTime": 1793164421.2139611
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 157,
+    "stage": "menu.unavailable-menu.status.describe.size",
+    "systemUptime": 849.7945829166667,
+    "unixTime": 1793164421.2169251
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 158,
+    "stage": "menu.unavailable-menu.status.describe.identifier",
+    "systemUptime": 849.7983528750001,
+    "unixTime": 1793164421.220694
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 159,
+    "stage": "menu.unavailable-menu.status.describe.role",
+    "systemUptime": 849.8003650416667,
+    "unixTime": 1793164421.222692
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 160,
+    "stage": "menu.unavailable-menu.status.describe.label",
+    "systemUptime": 849.8048051666667,
+    "unixTime": 1793164421.22712
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 161,
+    "stage": "menu.unavailable-menu.status.describe.value",
+    "systemUptime": 849.8098174166668,
+    "unixTime": 1793164421.232136
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 162,
+    "stage": "menu.unavailable-menu.status.describe.enabled",
+    "systemUptime": 849.8111591666667,
+    "unixTime": 1793164421.233467
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 163,
+    "stage": "menu.unavailable-menu.status.describe.exit",
+    "systemUptime": 849.8120522500001,
+    "unixTime": 1793164421.234359
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 164,
+    "stage": "menu.unavailable-menu.exit",
+    "systemUptime": 849.8125696666667,
+    "unixTime": 1793164421.2348762
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 165,
+    "stage": "unavailable.dismiss-menu.before",
+    "systemUptime": 849.81388325,
+    "unixTime": 1793164421.236193
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 166,
+    "stage": "unavailable.dismiss-menu.after",
+    "systemUptime": 850.141542875,
+    "unixTime": 1793164421.563864
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 167,
+    "stage": "shortcut.window-wait.before",
+    "systemUptime": 850.1427143750001,
+    "unixTime": 1793164421.565023
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 168,
+    "stage": "shortcut.activate.before",
+    "systemUptime": 850.1436870416667,
+    "unixTime": 1793164421.566011
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 169,
+    "stage": "shortcut.active-wait.before",
+    "systemUptime": 850.1670421666668,
+    "unixTime": 1793164421.589697
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 170,
+    "stage": "shortcut.recorder-lookup.before",
+    "systemUptime": 850.208837375,
+    "unixTime": 1793164421.631161
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 171,
+    "stage": "shortcut.recorder-describe.before",
+    "systemUptime": 850.2690435416667,
+    "unixTime": 1793164421.691365
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 172,
+    "stage": "shortcut.recorder.describe.actions",
+    "systemUptime": 850.269686125,
+    "unixTime": 1793164421.691993
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 173,
+    "stage": "shortcut.recorder.describe.position",
+    "systemUptime": 850.2705919583334,
+    "unixTime": 1793164421.6929011
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 174,
+    "stage": "shortcut.recorder.describe.size",
+    "systemUptime": 850.2720141666667,
+    "unixTime": 1793164421.6943278
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 175,
+    "stage": "shortcut.recorder.describe.identifier",
+    "systemUptime": 850.2730823750001,
+    "unixTime": 1793164421.6953921
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 176,
+    "stage": "shortcut.recorder.describe.role",
+    "systemUptime": 850.2742470416667,
+    "unixTime": 1793164421.696554
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 177,
+    "stage": "shortcut.recorder.describe.label",
+    "systemUptime": 850.2749952916668,
+    "unixTime": 1793164421.697579
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 178,
+    "stage": "shortcut.recorder.describe.value",
+    "systemUptime": 850.2768512916667,
+    "unixTime": 1793164421.699161
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 179,
+    "stage": "shortcut.recorder.describe.enabled",
+    "systemUptime": 850.2775635833334,
+    "unixTime": 1793164421.699873
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 180,
+    "stage": "shortcut.recorder.describe.exit",
+    "systemUptime": 850.2784159166667,
+    "unixTime": 1793164421.700732
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 181,
+    "stage": "shortcut.state-before-click.before",
+    "systemUptime": 850.2799454166667,
+    "unixTime": 1793164421.70226
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 182,
+    "stage": "shortcut.recorder-press.before",
+    "systemUptime": 850.28196675,
+    "unixTime": 1793164421.704296
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 183,
+    "stage": "click.shortcut.recorder.a1.unique-scan.before",
+    "systemUptime": 850.2826808333334,
+    "unixTime": 1793164421.704999
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 184,
+    "stage": "click.shortcut.recorder.a1.unique-scan.after",
+    "systemUptime": 850.3070593333334,
+    "unixTime": 1793164421.729425
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 185,
+    "stage": "click.shortcut.recorder.a1.role.before",
+    "systemUptime": 850.3081983750001,
+    "unixTime": 1793164421.730535
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 186,
+    "stage": "click.shortcut.recorder.a1.role.after",
+    "systemUptime": 850.3094883333334,
+    "unixTime": 1793164421.731803
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 187,
+    "stage": "click.shortcut.recorder.a1.identifier.before",
+    "systemUptime": 850.3109224166667,
+    "unixTime": 1793164421.733238
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 188,
+    "stage": "click.shortcut.recorder.a1.identifier.after",
+    "systemUptime": 850.3121058333334,
+    "unixTime": 1793164421.7344198
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 189,
+    "stage": "click.shortcut.recorder.a1.title-attribute.before",
+    "systemUptime": 850.3135384583334,
+    "unixTime": 1793164421.735855
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 190,
+    "stage": "click.shortcut.recorder.a1.title-attribute.after",
+    "systemUptime": 850.3147052083334,
+    "unixTime": 1793164421.7370281
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 191,
+    "stage": "click.shortcut.recorder.a1.enabled.before",
+    "systemUptime": 850.3158096666667,
+    "unixTime": 1793164421.738126
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 192,
+    "stage": "click.shortcut.recorder.a1.enabled.after",
+    "systemUptime": 850.316886875,
+    "unixTime": 1793164421.7392
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 193,
+    "stage": "click.shortcut.recorder.a1.pid.before",
+    "systemUptime": 850.3196132500001,
+    "unixTime": 1793164421.741967
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 194,
+    "stage": "click.shortcut.recorder.a1.pid.after",
+    "systemUptime": 850.3209927500001,
+    "unixTime": 1793164421.743312
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 195,
+    "stage": "click.shortcut.recorder.a1.frame.position.before",
+    "systemUptime": 850.3222354166667,
+    "unixTime": 1793164421.744547
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 196,
+    "stage": "click.shortcut.recorder.a1.frame.position.after",
+    "systemUptime": 850.3231067916668,
+    "unixTime": 1793164421.745414
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 197,
+    "stage": "click.shortcut.recorder.a1.frame.size.before",
+    "systemUptime": 850.3236565833333,
+    "unixTime": 1793164421.7459621
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 198,
+    "stage": "click.shortcut.recorder.a1.frame.size.after",
+    "systemUptime": 850.325184375,
+    "unixTime": 1793164421.7475262
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 199,
+    "stage": "click.shortcut.recorder.a1.root-menu-bar.before",
+    "systemUptime": 850.3261922083334,
+    "unixTime": 1793164421.7485042
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 200,
+    "stage": "click.shortcut.recorder.a1.root-menu-bar.after",
+    "systemUptime": 850.3270277916668,
+    "unixTime": 1793164421.749335
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 201,
+    "stage": "click.shortcut.recorder.a1.root-extras-menu-bar.before",
+    "systemUptime": 850.3275436250001,
+    "unixTime": 1793164421.749851
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 202,
+    "stage": "click.shortcut.recorder.a1.root-extras-menu-bar.after",
+    "systemUptime": 850.3280604166667,
+    "unixTime": 1793164421.750368
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 203,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.0.before",
+    "systemUptime": 850.328912875,
+    "unixTime": 1793164421.751229
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 204,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.0.after",
+    "systemUptime": 850.3298632083333,
+    "unixTime": 1793164421.752171
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 205,
+    "stage": "click.shortcut.recorder.a1.provenance-role.0.before",
+    "systemUptime": 850.33028675,
+    "unixTime": 1793164421.752594
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 206,
+    "stage": "click.shortcut.recorder.a1.provenance-role.0.after",
+    "systemUptime": 850.3307176666667,
+    "unixTime": 1793164421.753024
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 207,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.0.before",
+    "systemUptime": 850.33106325,
+    "unixTime": 1793164421.7533689
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 208,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.0.after",
+    "systemUptime": 850.331405,
+    "unixTime": 1793164421.753711
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 209,
+    "stage": "click.shortcut.recorder.a1.provenance-title.0.before",
+    "systemUptime": 850.3318226250001,
+    "unixTime": 1793164421.754129
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 210,
+    "stage": "click.shortcut.recorder.a1.provenance-title.0.after",
+    "systemUptime": 850.3324049583334,
+    "unixTime": 1793164421.754712
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 211,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.0.before",
+    "systemUptime": 850.3327669166667,
+    "unixTime": 1793164421.755072
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 212,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.0.after",
+    "systemUptime": 850.333079,
+    "unixTime": 1793164421.755384
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 213,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.1.before",
+    "systemUptime": 850.3339947083334,
+    "unixTime": 1793164421.756312
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 214,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.1.after",
+    "systemUptime": 850.3382325,
+    "unixTime": 1793164421.76056
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 215,
+    "stage": "click.shortcut.recorder.a1.provenance-role.1.before",
+    "systemUptime": 850.3473671666667,
+    "unixTime": 1793164421.769675
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 216,
+    "stage": "click.shortcut.recorder.a1.provenance-role.1.after",
+    "systemUptime": 850.3487620416668,
+    "unixTime": 1793164421.77107
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 217,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.1.before",
+    "systemUptime": 850.350943625,
+    "unixTime": 1793164421.773252
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 218,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.1.after",
+    "systemUptime": 850.3518814583334,
+    "unixTime": 1793164421.774205
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 219,
+    "stage": "click.shortcut.recorder.a1.provenance-title.1.before",
+    "systemUptime": 850.3537817083334,
+    "unixTime": 1793164421.776097
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 220,
+    "stage": "click.shortcut.recorder.a1.provenance-title.1.after",
+    "systemUptime": 850.36001725,
+    "unixTime": 1793164421.7823272
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 221,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.1.before",
+    "systemUptime": 850.3617240833333,
+    "unixTime": 1793164421.784041
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 222,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.1.after",
+    "systemUptime": 850.3626499583333,
+    "unixTime": 1793164421.784957
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 223,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.2.before",
+    "systemUptime": 850.3669250416667,
+    "unixTime": 1793164421.7892342
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 224,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.2.after",
+    "systemUptime": 850.3683219166667,
+    "unixTime": 1793164421.790635
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 225,
+    "stage": "click.shortcut.recorder.a1.provenance-role.2.before",
+    "systemUptime": 850.3703624583334,
+    "unixTime": 1793164421.79268
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 226,
+    "stage": "click.shortcut.recorder.a1.provenance-role.2.after",
+    "systemUptime": 850.3712414166667,
+    "unixTime": 1793164421.793549
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 227,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.2.before",
+    "systemUptime": 850.3717329583334,
+    "unixTime": 1793164421.79404
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 228,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.2.after",
+    "systemUptime": 850.3721000416667,
+    "unixTime": 1793164421.794406
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 229,
+    "stage": "click.shortcut.recorder.a1.provenance-title.2.before",
+    "systemUptime": 850.3724650833334,
+    "unixTime": 1793164421.7947721
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 230,
+    "stage": "click.shortcut.recorder.a1.provenance-title.2.after",
+    "systemUptime": 850.3728707916667,
+    "unixTime": 1793164421.795182
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 231,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.2.before",
+    "systemUptime": 850.3735187083333,
+    "unixTime": 1793164421.795825
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 232,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.2.after",
+    "systemUptime": 850.3740719583334,
+    "unixTime": 1793164421.79638
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 233,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.3.before",
+    "systemUptime": 850.3745547916667,
+    "unixTime": 1793164421.796863
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 234,
+    "stage": "click.shortcut.recorder.a1.provenance-parent.3.after",
+    "systemUptime": 850.3750122083334,
+    "unixTime": 1793164421.797318
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 235,
+    "stage": "click.shortcut.recorder.a1.provenance-role.3.before",
+    "systemUptime": 850.3753565833334,
+    "unixTime": 1793164421.797662
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 236,
+    "stage": "click.shortcut.recorder.a1.provenance-role.3.after",
+    "systemUptime": 850.3757237083333,
+    "unixTime": 1793164421.79803
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 237,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.3.before",
+    "systemUptime": 850.3763185,
+    "unixTime": 1793164421.798625
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 238,
+    "stage": "click.shortcut.recorder.a1.provenance-identifier.3.after",
+    "systemUptime": 850.3767181666667,
+    "unixTime": 1793164421.799025
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 239,
+    "stage": "click.shortcut.recorder.a1.provenance-title.3.before",
+    "systemUptime": 850.3770126666667,
+    "unixTime": 1793164421.7993178
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 240,
+    "stage": "click.shortcut.recorder.a1.provenance-title.3.after",
+    "systemUptime": 850.377506375,
+    "unixTime": 1793164421.799813
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 241,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.3.before",
+    "systemUptime": 850.3778594583334,
+    "unixTime": 1793164421.8001652
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 242,
+    "stage": "click.shortcut.recorder.a1.provenance-pid.3.after",
+    "systemUptime": 850.3783548333333,
+    "unixTime": 1793164421.800665
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 243,
+    "stage": "click.shortcut.recorder.a1.displays.before",
+    "systemUptime": 850.3788375,
+    "unixTime": 1793164421.8011441
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 244,
+    "stage": "click.shortcut.recorder.a1.displays.after",
+    "systemUptime": 850.3792403333334,
+    "unixTime": 1793164421.801547
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 245,
+    "stage": "click.shortcut.recorder.a1.hit-test.before",
+    "systemUptime": 850.379598875,
+    "unixTime": 1793164421.801906
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 246,
+    "stage": "click.shortcut.recorder.a1.hit-test.after",
+    "systemUptime": 850.3815600416667,
+    "unixTime": 1793164421.8038769
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 247,
+    "stage": "click.shortcut.recorder.a1.hit-pid.before",
+    "systemUptime": 850.3822957083333,
+    "unixTime": 1793164421.804603
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 248,
+    "stage": "click.shortcut.recorder.a1.hit-pid.after",
+    "systemUptime": 850.3829428333333,
+    "unixTime": 1793164421.805249
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 249,
+    "stage": "click.shortcut.recorder.a1.target-window.before",
+    "systemUptime": 850.3833046666667,
+    "unixTime": 1793164421.8056111
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 250,
+    "stage": "click.shortcut.recorder.a1.target-window.after",
+    "systemUptime": 850.3837536666667,
+    "unixTime": 1793164421.806059
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 251,
+    "stage": "click.shortcut.recorder.a1.hit-window.before",
+    "systemUptime": 850.3841275833333,
+    "unixTime": 1793164421.806433
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 252,
+    "stage": "click.shortcut.recorder.a1.hit-window.after",
+    "systemUptime": 850.3864885416667,
+    "unixTime": 1793164421.808797
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 253,
+    "stage": "click.shortcut.recorder.a1.window-pid.before",
+    "systemUptime": 850.3871596250001,
+    "unixTime": 1793164421.8094969
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 254,
+    "stage": "click.shortcut.recorder.a1.window-pid.after",
+    "systemUptime": 850.3877757083334,
+    "unixTime": 1793164421.810086
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 255,
+    "stage": "click.shortcut.recorder.a1.frame-recheck.position.before",
+    "systemUptime": 850.3881379166667,
+    "unixTime": 1793164421.8104448
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 256,
+    "stage": "click.shortcut.recorder.a1.frame-recheck.position.after",
+    "systemUptime": 850.3885506250001,
+    "unixTime": 1793164421.810857
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 257,
+    "stage": "click.shortcut.recorder.a1.frame-recheck.size.before",
+    "systemUptime": 850.3890424166667,
+    "unixTime": 1793164421.811349
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 258,
+    "stage": "click.shortcut.recorder.a1.frame-recheck.size.after",
+    "systemUptime": 850.3898519166668,
+    "unixTime": 1793164421.81216
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 259,
+    "stage": "click.shortcut.recorder.a1.observation-write.before",
+    "systemUptime": 850.39027825,
+    "unixTime": 1793164421.8125858
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 260,
+    "stage": "click.shortcut.recorder.a1.observation-write.after",
+    "systemUptime": 850.3910114583334,
+    "unixTime": 1793164421.813322
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 261,
+    "stage": "click.shortcut.recorder.post.before",
+    "systemUptime": 850.3916018333334,
+    "unixTime": 1793164421.813911
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 262,
+    "stage": "click.shortcut.recorder.post.after",
+    "systemUptime": 850.3925350000001,
+    "unixTime": 1793164421.814852
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 263,
+    "stage": "shortcut.clear-wait.before",
+    "systemUptime": 850.3949022500001,
+    "unixTime": 1793164421.817223
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 264,
+    "stage": "shortcut.capture-readiness.before",
+    "systemUptime": 850.4413746666668,
+    "unixTime": 1793164421.86384
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 265,
+    "stage": "shortcut.capture-events.before",
+    "systemUptime": 850.4690349166667,
+    "unixTime": 1793164421.8913531
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 266,
+    "stage": "shortcut.capture-final-proof.before",
+    "systemUptime": 850.47087575,
+    "unixTime": 1793164421.894285
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 267,
+    "stage": "shortcut.capture-preinput-write.before",
+    "systemUptime": 850.5426085416667,
+    "unixTime": 1793164421.9649282
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 268,
+    "stage": "shortcut.capture-preinput-write.after",
+    "systemUptime": 850.5443835416667,
+    "unixTime": 1793164421.966707
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 269,
+    "stage": "shortcut.capture-post.before",
+    "systemUptime": 850.5451215833334,
+    "unixTime": 1793164421.967437
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 270,
+    "stage": "shortcut.capture-post.after",
+    "systemUptime": 850.546325375,
+    "unixTime": 1793164421.968651
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 271,
+    "stage": "shortcut.save-wait.before",
+    "systemUptime": 850.5471684583334,
+    "unixTime": 1793164421.96948
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 272,
+    "stage": "shortcut.display-wait.before",
+    "systemUptime": 850.6031238333334,
+    "unixTime": 1793164422.025486
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 273,
+    "stage": "oracle.catch.entry",
+    "systemUptime": 856.7596563333334,
+    "unixTime": 1793164428.1820002
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 274,
+    "stage": "oracle.catch.hierarchy.before",
+    "systemUptime": 856.7671255,
+    "unixTime": 1793164428.189437
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 275,
+    "stage": "oracle.catch.hierarchy.after",
+    "systemUptime": 856.7986899583334,
+    "unixTime": 1793164428.221039
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 276,
+    "stage": "oracle.catch.screenshot.before",
+    "systemUptime": 856.8010825833334,
+    "unixTime": 1793164428.223392
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 277,
+    "stage": "oracle.catch.screenshot.after",
+    "systemUptime": 857.2729189166668,
+    "unixTime": 1793164428.6952639
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 278,
+    "stage": "oracle.catch.finish.before",
+    "systemUptime": 857.2737207083334,
+    "unixTime": 1793164428.696028
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 26657,
+    "schemaVersion": 1,
+    "sequence": 279,
+    "stage": "oracle.catch.finish.after",
+    "systemUptime": 857.2753177083334,
+    "unixTime": 1793164428.697661
+  }
+]

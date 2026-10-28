@@ -1,0 +1,18 @@
+{
+  "old_run": 40634301546,
+  "old_head": "0355254815f8fbcf627fe48e7d65987ab36ea32b",
+  "old_boundary": "xcodebuild65 type-inference resource error at Oracle224:43",
+  "new_run": 40635627619,
+  "new_head": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
+  "new_boundary": "Actual full CI BUILD SUCCEEDED and compiler-input receipt222 verified",
+  "prepared_source_delta": {
+    "scripts/fixtures/WritingUndoControlOracle.swift": {
+      "before": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
+      "after": "c5156d4f60fa0766727a575ad343d453edd4e44c95fe1873e0a4479b248b8f14"
+    }
+  },
+  "added_source_paths": [],
+  "removed_source_paths": [],
+  "annotation_equivalence_proof": "../undo-controls-source/compiler-annotation.json",
+  "claim": "Compiler-only CI red-to-green observed; closure body/every other Oracle byte unchanged. No semantic/native regression claim."
+}

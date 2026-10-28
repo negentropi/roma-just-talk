@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "actual_reviewer": "gpt-6.1-sol",
+  "effort": "medium",
+  "scope": "Read-only exact runtime facts and two actual PNGs; not a sixth source review",
+  "verdict": "CLEAN factual audit; native acceptance failed",
+  "failure_png_sha256": "ef5c4da8eacdf470f524a0ed96daacd17e92d7f828589ee4124ce75b2a6eaa68",
+  "unavailable_png_sha256": "3aaf762718476f040062ccdee65af22956d3ede9064617250118a68bf88a4272",
+  "dimensions": [
+    1024,
+    768
+  ],
+  "observed": "Unavailable PNG disabled menu/Finder. Failure PNG active host with captured chord keycaps. Exact public stored value observed; old retained AX reference expired.",
+  "fresh_node_pid_window_verified": false,
+  "completed_states": [
+    "unavailable"
+  ],
+  "completed_cases": 0,
+  "source_review_rounds_used": 5,
+  "limits": [
+    "One of three state checks completed: unavailable menu and dismissal, now under unchanged default process AX policy.",
+    "Exact public local chord save and fresh visible keycaps observed; full capture readback proof is incomplete because fresh-node PID/window was not retained.",
+    "The failure wording stayed in capture mode contradicts actual saved state/fresh visible display; it is the stale-reference assertion text.",
+    "Zero cases, configured global Undo dispatch, editor restoration, selection/focus and result notice proof.",
+    "No candidate/closure/monitor error recorded; no full post-run source/signature/TCC acceptance."
+  ],
+  "usage": null,
+  "usage_status": "Unavailable, not estimated.",
+  "files_sha256": {
+    "README.md": "28aa3714be231b2747b9de8f8ecbe91c66f99c9d21a650231d122c25399f8146",
+    "artifacts.json": "4fe93ba3c462f1dd14911432f983d1516e86f1c8658f1d3e78ba5ea367351b8d",
+    "audit.json": "df47c1a25d5ebd1e2cc18f5831b5ca8cc0bcd08225c13d303d06520d2faf227a",
+    "compiler-transition.json": "c6d88479a745326eb03c7a83880268316ddff4ebd9223e4ce468948c20efb2d3",
+    "failure-diagnosis.json": "1a6b7b64ef723271d239a6696f46a7593a74b2f28b9c58a83d91ada0fde6cd4a",
+    "failure.png": "ef5c4da8eacdf470f524a0ed96daacd17e92d7f828589ee4124ce75b2a6eaa68",
+    "milestones.json": "c03a939230c8a762f855caebdd90cdf5fcf2b61d95ce149e2cb8c330d8d51c80",
+    "unavailable-menu.png": "3aaf762718476f040062ccdee65af22956d3ede9064617250118a68bf88a4272"
+  }
+}

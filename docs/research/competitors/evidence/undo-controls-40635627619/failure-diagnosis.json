@@ -1,0 +1,1520 @@
+{
+  "run_id": 40635627619,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40635627619",
+  "head_sha": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
+  "classification": "build-passed-exact-local-recorder-saved-then-stale-retained-AX-readback",
+  "build_succeeded": true,
+  "prepared_source_inputs": 613,
+  "prepared_candidate_files": 606,
+  "prepared_manifests_match_git_objects": true,
+  "actual_compiler_swift_inputs": 222,
+  "canonical_pins": 41,
+  "signature_before": {
+    "app_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "6b7629a5d0a45db4ab409768f990581928a7aef4d383fa893139b4b7105c5321",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "fresh_tcc_rows_before": 5,
+  "signature_before_exact_executable_hash": true,
+  "fresh_tcc_bound_to_exact_host_csreq": true,
+  "host_live": {
+    "exit_code": 1,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 26657,
+      "started_at": "Wed Oct 28 05:13:36 2026"
+    },
+    "spawned_identity": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "started_at": "Wed Oct 28 05:13:36 2026"
+    }
+  },
+  "host_closed": {
+    "error": null,
+    "exact_executable_census_empty": true,
+    "exact_executable_has_no_open_descriptors": true,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 26657,
+      "started_at": "Wed Oct 28 05:13:36 2026"
+    },
+    "valid": true
+  },
+  "oracle_failure": "The shortcut recorder stayed in capture mode.",
+  "native_cases_completed": 0,
+  "state_checks_completed": 1,
+  "native_mouse_post_pairs": 2,
+  "post_markers": [
+    {
+      "diagnosticOnly": true,
+      "mainThread": true,
+      "pid": 26657,
+      "schemaVersion": 1,
+      "sequence": 138,
+      "stage": "click.menu.unavailable-menu.status.post.before",
+      "systemUptime": 849.15418,
+      "unixTime": 1793164420.57651
+    },
+    {
+      "diagnosticOnly": true,
+      "mainThread": true,
+      "pid": 26657,
+      "schemaVersion": 1,
+      "sequence": 139,
+      "stage": "click.menu.unavailable-menu.status.post.after",
+      "systemUptime": 849.1620272916667,
+      "unixTime": 1793164420.584388
+    },
+    {
+      "diagnosticOnly": true,
+      "mainThread": true,
+      "pid": 26657,
+      "schemaVersion": 1,
+      "sequence": 261,
+      "stage": "click.shortcut.recorder.post.before",
+      "systemUptime": 850.3916018333334,
+      "unixTime": 1793164421.813911
+    },
+    {
+      "diagnosticOnly": true,
+      "mainThread": true,
+      "pid": 26657,
+      "schemaVersion": 1,
+      "sequence": 262,
+      "stage": "click.shortcut.recorder.post.after",
+      "systemUptime": 850.3925350000001,
+      "unixTime": 1793164421.814852
+    }
+  ],
+  "readiness_observations": [
+    {
+      "attempt": 1,
+      "checkpoint": "click.menu.unavailable-menu.status",
+      "coordinateSpace": "AX global top-left (CG display space); no NSScreen or pixel conversion",
+      "diagnosticOnly": true,
+      "displays": {
+        "apiError": 0,
+        "attempted": true,
+        "containingCount": 0,
+        "count": 1,
+        "displays": [
+          {
+            "bounds": {
+              "height": 768,
+              "width": 1024,
+              "x": 0,
+              "y": 0
+            },
+            "containsCenter": false,
+            "containsTarget": false,
+            "id": 1,
+            "intersectsTarget": true
+          }
+        ]
+      },
+      "expected": {
+        "contract": "identifier-or-fixture-title",
+        "identifier": "undoControlHost.statusItem",
+        "identifierRequired": false,
+        "roles": [
+          "AXMenuBarItem",
+          "AXButton"
+        ],
+        "title": "RJT Undo check"
+      },
+      "experiment": "preinput-readiness-calibration",
+      "frame": {
+        "attempted": true,
+        "center": {
+          "x": 16,
+          "y": 768
+        },
+        "finitePositive": true,
+        "height": 24,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "width": 34,
+        "x": -1,
+        "y": 756
+      },
+      "frameRecheck": {
+        "attempted": false
+      },
+      "hitTest": {
+        "attempted": false
+      },
+      "hostPID": 26657,
+      "identity": {
+        "attempted": true,
+        "sameReferenceAsLookup": true,
+        "scope": "host-owned-nodes",
+        "uniqueCount": 1
+      },
+      "inputPosted": false,
+      "kind": "native-click-preinput-readiness-observation",
+      "maxAttempts": 6,
+      "nativeMenuIdentity": {
+        "attempted": false
+      },
+      "provenance": {
+        "ancestors": [
+          {
+            "depth": 1,
+            "identifier": "",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": true,
+            "pid": 26657,
+            "role": "AXMenuBar",
+            "title": ""
+          }
+        ],
+        "appMenuBarPresent": true,
+        "attempted": true,
+        "extrasMenuBarPresent": true,
+        "maxDepth": 4,
+        "rootKind": "extras-menu-bar"
+      },
+      "ready": false,
+      "reason": "frame is not contained in exactly one active display",
+      "schemaVersion": 1,
+      "systemUptime": 847.8806680833334,
+      "target": {
+        "attempted": true,
+        "enabled": true,
+        "identifier": "undoControlHost.statusItem",
+        "identityContract": "identifier",
+        "pid": 26657,
+        "role": "AXMenuBarItem",
+        "title": "Undo"
+      },
+      "window": {
+        "attempted": false
+      }
+    },
+    {
+      "attempt": 2,
+      "checkpoint": "click.menu.unavailable-menu.status",
+      "coordinateSpace": "AX global top-left (CG display space); no NSScreen or pixel conversion",
+      "diagnosticOnly": true,
+      "displays": {
+        "apiError": 0,
+        "attempted": true,
+        "containingCount": 1,
+        "count": 1,
+        "displays": [
+          {
+            "bounds": {
+              "height": 768,
+              "width": 1024,
+              "x": 0,
+              "y": 0
+            },
+            "containsCenter": true,
+            "containsTarget": true,
+            "id": 1,
+            "intersectsTarget": true
+          }
+        ]
+      },
+      "expected": {
+        "contract": "identifier-or-fixture-title",
+        "identifier": "undoControlHost.statusItem",
+        "identifierRequired": false,
+        "roles": [
+          "AXMenuBarItem",
+          "AXButton"
+        ],
+        "title": "RJT Undo check"
+      },
+      "experiment": "preinput-readiness-calibration",
+      "frame": {
+        "attempted": true,
+        "center": {
+          "x": 779,
+          "y": 15
+        },
+        "finitePositive": true,
+        "height": 24,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "width": 34,
+        "x": 762,
+        "y": 3
+      },
+      "frameRecheck": {
+        "attempted": true,
+        "center": {
+          "x": 779,
+          "y": 15
+        },
+        "finitePositive": true,
+        "height": 24,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "stable": true,
+        "width": 34,
+        "x": 762,
+        "y": 3
+      },
+      "hitTest": {
+        "attempted": true,
+        "axError": 0,
+        "depth": 0,
+        "elementPresent": true,
+        "pid": 26657,
+        "point": {
+          "x": 779,
+          "y": 15
+        },
+        "reachedTarget": true
+      },
+      "hostPID": 26657,
+      "identity": {
+        "attempted": true,
+        "sameReferenceAsLookup": true,
+        "scope": "host-owned-nodes",
+        "uniqueCount": 1
+      },
+      "inputPosted": false,
+      "kind": "native-click-preinput-readiness-observation",
+      "maxAttempts": 6,
+      "nativeMenuIdentity": {
+        "attempted": false
+      },
+      "provenance": {
+        "ancestors": [
+          {
+            "depth": 1,
+            "identifier": "",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": true,
+            "pid": 26657,
+            "role": "AXMenuBar",
+            "title": ""
+          }
+        ],
+        "appMenuBarPresent": true,
+        "attempted": true,
+        "extrasMenuBarPresent": true,
+        "maxDepth": 4,
+        "rootKind": "extras-menu-bar"
+      },
+      "ready": true,
+      "reason": null,
+      "schemaVersion": 1,
+      "systemUptime": 849.000971875,
+      "target": {
+        "attempted": true,
+        "enabled": true,
+        "identifier": "undoControlHost.statusItem",
+        "identityContract": "identifier",
+        "pid": 26657,
+        "role": "AXMenuBarItem",
+        "title": "Undo"
+      },
+      "window": {
+        "attempted": true,
+        "hitWindowPresent": false,
+        "menuAncestorRole": "AXMenuBar",
+        "policy": "windowless-native-menu",
+        "targetWindowPresent": false
+      }
+    },
+    {
+      "attempt": 1,
+      "checkpoint": "click.shortcut.recorder",
+      "coordinateSpace": "AX global top-left (CG display space); no NSScreen or pixel conversion",
+      "diagnosticOnly": true,
+      "displays": {
+        "apiError": 0,
+        "attempted": true,
+        "containingCount": 1,
+        "count": 1,
+        "displays": [
+          {
+            "bounds": {
+              "height": 768,
+              "width": 1024,
+              "x": 0,
+              "y": 0
+            },
+            "containsCenter": true,
+            "containsTarget": true,
+            "id": 1,
+            "intersectsTarget": true
+          }
+        ]
+      },
+      "expected": {
+        "contract": "identifier-or-fixture-title",
+        "identifier": "shortcutRecorder.undoLastWritingEdit",
+        "identifierRequired": true,
+        "roles": [
+          "AXButton"
+        ],
+        "title": null
+      },
+      "experiment": "preinput-readiness-calibration",
+      "frame": {
+        "attempted": true,
+        "center": {
+          "x": 802,
+          "y": 215
+        },
+        "finitePositive": true,
+        "height": 27,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "width": 105,
+        "x": 749.5,
+        "y": 201.5
+      },
+      "frameRecheck": {
+        "attempted": true,
+        "center": {
+          "x": 802,
+          "y": 215
+        },
+        "finitePositive": true,
+        "height": 27,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "stable": true,
+        "width": 105,
+        "x": 749.5,
+        "y": 201.5
+      },
+      "hitTest": {
+        "attempted": true,
+        "axError": 0,
+        "depth": 0,
+        "elementPresent": true,
+        "pid": 26657,
+        "point": {
+          "x": 802,
+          "y": 215
+        },
+        "reachedTarget": true
+      },
+      "hostPID": 26657,
+      "identity": {
+        "attempted": true,
+        "sameReferenceAsLookup": true,
+        "scope": "host-owned-nodes",
+        "uniqueCount": 1
+      },
+      "inputPosted": false,
+      "kind": "native-click-preinput-readiness-observation",
+      "maxAttempts": 6,
+      "nativeMenuIdentity": {
+        "attempted": false
+      },
+      "provenance": {
+        "ancestors": [
+          {
+            "depth": 1,
+            "identifier": "",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": false,
+            "pid": 26657,
+            "role": "AXGroup",
+            "title": ""
+          },
+          {
+            "depth": 2,
+            "identifier": "undoControlHost.setup",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": false,
+            "pid": 26657,
+            "role": "AXScrollArea",
+            "title": ""
+          },
+          {
+            "depth": 3,
+            "identifier": "",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": false,
+            "pid": 26657,
+            "role": "AXGroup",
+            "title": ""
+          },
+          {
+            "depth": 4,
+            "identifier": "VoiceInk.(unknown context at $104ff70d0).WritingUndoControlSetupView-1-AppWindow-1",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": false,
+            "pid": 26657,
+            "role": "AXWindow",
+            "title": "RJT Undo control check"
+          }
+        ],
+        "appMenuBarPresent": true,
+        "attempted": true,
+        "extrasMenuBarPresent": true,
+        "maxDepth": 4,
+        "rootKind": "unresolved-within-bound"
+      },
+      "ready": true,
+      "reason": null,
+      "schemaVersion": 1,
+      "systemUptime": 850.2826657916668,
+      "target": {
+        "attempted": true,
+        "enabled": true,
+        "identifier": "shortcutRecorder.undoLastWritingEdit",
+        "identityContract": "identifier",
+        "pid": 26657,
+        "role": "AXButton",
+        "title": null
+      },
+      "window": {
+        "attempted": true,
+        "hitWindowPresent": true,
+        "policy": "same-window",
+        "targetWindowPresent": true,
+        "windowOwnedByHost": true
+      }
+    }
+  ],
+  "recorder_capture_preinput": {
+    "finalProof": {
+      "appKit": {
+        "appKeyWindowIsSetup": true,
+        "isActive": true,
+        "isKeyWindow": true,
+        "isVisible": true,
+        "titledWindowCount": 1,
+        "uniqueSameWindow": true,
+        "windowNumber": 31
+      },
+      "axWindow": {
+        "axError": 0,
+        "focusedWindowAXError": 0,
+        "focusedWindowIsSetupWindow": true,
+        "pid": 26657,
+        "present": true,
+        "role": "AXWindow",
+        "title": "RJT Undo control check",
+        "titledCount": 1,
+        "uniqueSameReference": true,
+        "windowsAXError": 0
+      },
+      "conflictCheck": {
+        "action": "undoLastWritingEdit",
+        "api": "ShortcutValidator.validationError",
+        "conflictFree": true,
+        "expected": {
+          "displayString": "\u2303 + \u2325 + \u2318 + U",
+          "keyCode": 32,
+          "kind": "key",
+          "modifierFlagsRawValue": 1835008
+        },
+        "issue": null
+      },
+      "expectedPlaceholder": "Press shortcut",
+      "hostPID": 26657,
+      "inputPosted": false,
+      "kind": "recorder-capture-proof",
+      "ownShortcut": {
+        "action": "undoLastWritingEdit",
+        "clearedValue": true,
+        "clearedValueKind": "true",
+        "dataPresent": false,
+        "effective": null,
+        "effectiveEqualsExpected": false,
+        "isShortcutCleared": true,
+        "phase": "final-preinput"
+      },
+      "phase": "final-preinput",
+      "readOnly": true,
+      "ready": true,
+      "reasons": [],
+      "recorder": {
+        "description": "Press shortcut",
+        "enabled": true,
+        "help": "Press shortcut",
+        "identifier": "shortcutRecorder.undoLastWritingEdit",
+        "labelIsRecordingPlaceholder": true,
+        "pid": 26657,
+        "role": "AXButton",
+        "sameReferenceAsLookup": true,
+        "title": null,
+        "uniqueCount": 1
+      },
+      "schemaVersion": 1,
+      "systemFocus": {
+        "focusedApplicationAXError": 0,
+        "focusedApplicationPID": 26657,
+        "focusedElementAXError": 0,
+        "focusedElementInSetupWindow": false,
+        "focusedElementIsRecorder": false,
+        "focusedElementPID": 26657,
+        "focusedElementPresent": true,
+        "focusedElementRole": "AXWindow",
+        "frontmostPID": 26657
+      },
+      "systemUptime": 850.5424816666667
+    },
+    "input": {
+      "contract": "focused-recorder-capture-postToPid",
+      "eventCount": 2,
+      "eventFlagsRawValue": 1835008,
+      "events": [
+        {
+          "flagsRawValue": 1835008,
+          "keyCode": 32,
+          "type": "keyDown"
+        },
+        {
+          "flagsRawValue": 1835008,
+          "keyCode": 32,
+          "type": "keyUp"
+        }
+      ],
+      "eventsExact": true,
+      "eventSource": "nil",
+      "eventTypes": [
+        "keyDown",
+        "keyUp"
+      ],
+      "fallbackUsed": false,
+      "finalProofReady": true,
+      "hostPID": 26657,
+      "inputPosted": false,
+      "keyCode": 32,
+      "laterGlobalInvocationRoute": "postChord-cghidEventTap-unchanged",
+      "modifierFlagsRawValue": 1835008,
+      "pattern": "LiveWritingEditor.key",
+      "physicalKeyboard": false,
+      "retryUsed": false,
+      "route": "CGEvent.postToPid",
+      "targetPID": 26657
+    },
+    "kind": "recorder-capture-preinput",
+    "ownShortcutBeforeInput": {
+      "action": "undoLastWritingEdit",
+      "clearedValue": true,
+      "clearedValueKind": "true",
+      "dataPresent": false,
+      "effective": null,
+      "effectiveEqualsExpected": false,
+      "isShortcutCleared": true,
+      "phase": "before-input"
+    },
+    "schemaVersion": 1
+  },
+  "recorder_capture_failure": {
+    "diagnosticOnly": true,
+    "facts": {
+      "input": {
+        "contract": "focused-recorder-capture-postToPid",
+        "eventCount": 2,
+        "eventFlagsRawValue": 1835008,
+        "events": [
+          {
+            "flagsRawValue": 1835008,
+            "keyCode": 32,
+            "type": "keyDown"
+          },
+          {
+            "flagsRawValue": 1835008,
+            "keyCode": 32,
+            "type": "keyUp"
+          }
+        ],
+        "eventsExact": true,
+        "eventSource": "nil",
+        "eventTypes": [
+          "keyDown",
+          "keyUp"
+        ],
+        "fallbackUsed": false,
+        "finalProofReady": true,
+        "hostPID": 26657,
+        "inputPosted": true,
+        "keyCode": 32,
+        "laterGlobalInvocationRoute": "postChord-cghidEventTap-unchanged",
+        "modifierFlagsRawValue": 1835008,
+        "pattern": "LiveWritingEditor.key",
+        "physicalKeyboard": false,
+        "retryUsed": false,
+        "route": "CGEvent.postToPid",
+        "targetPID": 26657
+      },
+      "ownShortcutAfterReadback": {
+        "action": "undoLastWritingEdit",
+        "clearedValue": null,
+        "clearedValueKind": "nil",
+        "dataBytes": 59,
+        "dataPresent": true,
+        "dataSHA256": "75a1d420f30742ac962223b6c84387a8ca6381c8c0d47e0489168cf6594dac68",
+        "decoded": {
+          "displayString": "\u2303 + \u2325 + \u2318 + U",
+          "keyCode": 32,
+          "kind": "key",
+          "modifierFlagsRawValue": 1835008
+        },
+        "decodeSucceeded": true,
+        "effective": {
+          "displayString": "\u2303 + \u2325 + \u2318 + U",
+          "keyCode": 32,
+          "kind": "key",
+          "modifierFlagsRawValue": 1835008
+        },
+        "effectiveEqualsExpected": true,
+        "isShortcutCleared": false,
+        "phase": "after-readback-failure"
+      },
+      "postInputObservation": {
+        "appKit": {
+          "appKeyWindowIsSetup": true,
+          "isActive": true,
+          "isKeyWindow": true,
+          "isVisible": true,
+          "titledWindowCount": 1,
+          "uniqueSameWindow": true,
+          "windowNumber": 31
+        },
+        "axWindow": {
+          "axError": -25202,
+          "focusedWindowAXError": 0,
+          "focusedWindowIsSetupWindow": false,
+          "pid": null,
+          "present": false,
+          "role": null,
+          "title": null,
+          "titledCount": 1,
+          "uniqueSameReference": false,
+          "windowsAXError": 0
+        },
+        "conflictCheck": {
+          "action": "undoLastWritingEdit",
+          "api": "ShortcutValidator.validationError",
+          "conflictFree": true,
+          "expected": {
+            "displayString": "\u2303 + \u2325 + \u2318 + U",
+            "keyCode": 32,
+            "kind": "key",
+            "modifierFlagsRawValue": 1835008
+          },
+          "issue": null
+        },
+        "expectedPlaceholder": "Press shortcut",
+        "hostPID": 26657,
+        "inputPosted": false,
+        "kind": "recorder-capture-proof",
+        "ownShortcut": {
+          "action": "undoLastWritingEdit",
+          "clearedValue": null,
+          "clearedValueKind": "nil",
+          "dataBytes": 59,
+          "dataPresent": true,
+          "dataSHA256": "75a1d420f30742ac962223b6c84387a8ca6381c8c0d47e0489168cf6594dac68",
+          "decoded": {
+            "displayString": "\u2303 + \u2325 + \u2318 + U",
+            "keyCode": 32,
+            "kind": "key",
+            "modifierFlagsRawValue": 1835008
+          },
+          "decodeSucceeded": true,
+          "effective": {
+            "displayString": "\u2303 + \u2325 + \u2318 + U",
+            "keyCode": 32,
+            "kind": "key",
+            "modifierFlagsRawValue": 1835008
+          },
+          "effectiveEqualsExpected": true,
+          "isShortcutCleared": false,
+          "phase": "post-input-diagnostic"
+        },
+        "phase": "post-input-diagnostic",
+        "readOnly": true,
+        "ready": false,
+        "reasons": [
+          "recorder is not the unique same-reference control",
+          "recorder role is not AXButton",
+          "recorder label is not the public recording placeholder",
+          "own shortcut is not in the cleared capture state",
+          "recorder AX window unavailable",
+          "recorder AX window is not the owned setup window",
+          "setup AX window is not unique",
+          "host focused AX window is not the setup window"
+        ],
+        "recorder": {
+          "description": null,
+          "enabled": false,
+          "help": null,
+          "identifier": null,
+          "labelIsRecordingPlaceholder": false,
+          "pid": 26657,
+          "role": null,
+          "sameReferenceAsLookup": false,
+          "title": null,
+          "uniqueCount": 1
+        },
+        "schemaVersion": 1,
+        "systemFocus": {
+          "focusedApplicationAXError": 0,
+          "focusedApplicationPID": 26657,
+          "focusedElementAXError": 0,
+          "focusedElementInSetupWindow": false,
+          "focusedElementIsRecorder": false,
+          "focusedElementPID": 26657,
+          "focusedElementPresent": true,
+          "focusedElementRole": "AXWindow",
+          "frontmostPID": 26657
+        },
+        "systemUptime": 856.754076
+      },
+      "preInput": {
+        "finalProof": {
+          "appKit": {
+            "appKeyWindowIsSetup": true,
+            "isActive": true,
+            "isKeyWindow": true,
+            "isVisible": true,
+            "titledWindowCount": 1,
+            "uniqueSameWindow": true,
+            "windowNumber": 31
+          },
+          "axWindow": {
+            "axError": 0,
+            "focusedWindowAXError": 0,
+            "focusedWindowIsSetupWindow": true,
+            "pid": 26657,
+            "present": true,
+            "role": "AXWindow",
+            "title": "RJT Undo control check",
+            "titledCount": 1,
+            "uniqueSameReference": true,
+            "windowsAXError": 0
+          },
+          "conflictCheck": {
+            "action": "undoLastWritingEdit",
+            "api": "ShortcutValidator.validationError",
+            "conflictFree": true,
+            "expected": {
+              "displayString": "\u2303 + \u2325 + \u2318 + U",
+              "keyCode": 32,
+              "kind": "key",
+              "modifierFlagsRawValue": 1835008
+            },
+            "issue": null
+          },
+          "expectedPlaceholder": "Press shortcut",
+          "hostPID": 26657,
+          "inputPosted": false,
+          "kind": "recorder-capture-proof",
+          "ownShortcut": {
+            "action": "undoLastWritingEdit",
+            "clearedValue": true,
+            "clearedValueKind": "true",
+            "dataPresent": false,
+            "effective": null,
+            "effectiveEqualsExpected": false,
+            "isShortcutCleared": true,
+            "phase": "final-preinput"
+          },
+          "phase": "final-preinput",
+          "readOnly": true,
+          "ready": true,
+          "reasons": [],
+          "recorder": {
+            "description": "Press shortcut",
+            "enabled": true,
+            "help": "Press shortcut",
+            "identifier": "shortcutRecorder.undoLastWritingEdit",
+            "labelIsRecordingPlaceholder": true,
+            "pid": 26657,
+            "role": "AXButton",
+            "sameReferenceAsLookup": true,
+            "title": null,
+            "uniqueCount": 1
+          },
+          "schemaVersion": 1,
+          "systemFocus": {
+            "focusedApplicationAXError": 0,
+            "focusedApplicationPID": 26657,
+            "focusedElementAXError": 0,
+            "focusedElementInSetupWindow": false,
+            "focusedElementIsRecorder": false,
+            "focusedElementPID": 26657,
+            "focusedElementPresent": true,
+            "focusedElementRole": "AXWindow",
+            "frontmostPID": 26657
+          },
+          "systemUptime": 850.5424816666667
+        },
+        "input": {
+          "contract": "focused-recorder-capture-postToPid",
+          "eventCount": 2,
+          "eventFlagsRawValue": 1835008,
+          "events": [
+            {
+              "flagsRawValue": 1835008,
+              "keyCode": 32,
+              "type": "keyDown"
+            },
+            {
+              "flagsRawValue": 1835008,
+              "keyCode": 32,
+              "type": "keyUp"
+            }
+          ],
+          "eventsExact": true,
+          "eventSource": "nil",
+          "eventTypes": [
+            "keyDown",
+            "keyUp"
+          ],
+          "fallbackUsed": false,
+          "finalProofReady": true,
+          "hostPID": 26657,
+          "inputPosted": false,
+          "keyCode": 32,
+          "laterGlobalInvocationRoute": "postChord-cghidEventTap-unchanged",
+          "modifierFlagsRawValue": 1835008,
+          "pattern": "LiveWritingEditor.key",
+          "physicalKeyboard": false,
+          "retryUsed": false,
+          "route": "CGEvent.postToPid",
+          "targetPID": 26657
+        },
+        "kind": "recorder-capture-preinput",
+        "ownShortcutBeforeInput": {
+          "action": "undoLastWritingEdit",
+          "clearedValue": true,
+          "clearedValueKind": "true",
+          "dataPresent": false,
+          "effective": null,
+          "effectiveEqualsExpected": false,
+          "isShortcutCleared": true,
+          "phase": "before-input"
+        },
+        "schemaVersion": 1
+      }
+    },
+    "failure": "The shortcut recorder stayed in capture mode.",
+    "fallbackUsed": false,
+    "inputPosted": true,
+    "kind": "recorder-capture-failure",
+    "retryUsed": false,
+    "schemaVersion": 1,
+    "stage": "capture-readback"
+  },
+  "native_menu_identity": {
+    "attempted": true,
+    "command": {
+      "enabled": false,
+      "frame": {
+        "height": 24,
+        "width": 168,
+        "x": 759,
+        "y": 36
+      },
+      "identifier": "",
+      "identifierEmpty": true,
+      "pid": 26657,
+      "role": "AXMenuItem",
+      "title": "Undo Last Writing Edit"
+    },
+    "contract": "status-owned-native-menu-item-title",
+    "downwardPath": [
+      {
+        "depth": 1,
+        "identifier": "",
+        "pid": 26657,
+        "role": "AXMenu",
+        "title": null
+      },
+      {
+        "depth": 2,
+        "identifier": "",
+        "pid": 26657,
+        "role": "AXMenuItem",
+        "title": "Undo Last Writing Edit"
+      }
+    ],
+    "downwardProof": {
+      "allHostPID": true,
+      "commandRole": "AXMenuItem",
+      "exactTitle": "Undo Last Writing Edit",
+      "fullyReadable": true,
+      "menuRole": "AXMenu",
+      "pathLength": 2,
+      "rootIsRetainedStatus": true,
+      "statusParentIsHostExtrasMenuBar": true,
+      "truncated": false,
+      "uniqueExactMatch": true
+    },
+    "enabledObserved": false,
+    "expectedEnabled": false,
+    "expectedRole": "AXMenuItem",
+    "expectedTitle": "Undo Last Writing Edit",
+    "globalSearchUsed": false,
+    "hostPID": 26657,
+    "identifierRequired": false,
+    "identityAuthority": "retained-status-downward-subtree",
+    "kind": "native-menu-bridge-identity",
+    "maxDepth": 4,
+    "maxNodes": 64,
+    "polls": 2,
+    "proven": true,
+    "reason": null,
+    "schemaVersion": 2,
+    "status": {
+      "extrasMenuBarPID": 26657,
+      "extrasMenuBarPresent": true,
+      "identifier": "undoControlHost.statusItem",
+      "identityContract": "identifier",
+      "parentAXError": 0,
+      "parentIsHostExtrasMenuBar": true,
+      "parentRole": "AXMenuBar",
+      "pid": 26657,
+      "role": "AXMenuBarItem",
+      "sameRetainedReference": true
+    },
+    "textFallbackUsed": false,
+    "traversal": {
+      "discoveredCount": 3,
+      "exactMatchCount": 1,
+      "expandedCount": 3,
+      "otherRoleTitleMatches": 0,
+      "truncated": false,
+      "unreadableChildren": []
+    },
+    "uniqueMatch": true,
+    "upwardParentAuthorizes": false,
+    "upwardParentDiagnostics": {
+      "authorizationCondition": false,
+      "diagnosticOnly": true,
+      "maxLevels": 2,
+      "observations": [
+        {
+          "axError": 0,
+          "depth": 1,
+          "elementPresent": true,
+          "expectedDownwardRole": "AXMenu",
+          "identifier": "",
+          "isRetainedStatus": false,
+          "level": 1,
+          "matchesDownwardPath": true,
+          "pid": 26657,
+          "role": "AXMenu",
+          "title": null
+        },
+        {
+          "axError": 0,
+          "depth": 0,
+          "elementPresent": true,
+          "expectedDownwardRole": "AXMenuBarItem",
+          "identifier": "",
+          "isRetainedStatus": false,
+          "level": 2,
+          "matchesDownwardPath": false,
+          "pid": 26657,
+          "role": "AXMenuBar",
+          "title": null
+        }
+      ],
+      "reachesRetainedStatus": false,
+      "reciprocalToDownwardPath": false
+    },
+    "visibleFrame": true
+  },
+  "result": {
+    "cases": [],
+    "completed": false,
+    "executedCases": [],
+    "failure": "The shortcut recorder stayed in capture mode.",
+    "forwardBoundary": "Real WritingTarget delivery into the sole engine-owned controller",
+    "host": {
+      "bundleIdentifier": "com.negentropi.RomaJustTalk",
+      "executablePath": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "pid": 26657
+    },
+    "issues": [],
+    "pastePreferences": {
+      "clipboardRestoreDelay": 2,
+      "hasArgumentOverrides": false,
+      "restoreClipboardAfterPaste": true
+    },
+    "policyBootstrap": {
+      "after": {
+        "effective": {
+          "clipboardRestoreDelay": 2,
+          "restoreClipboardAfterPaste": true
+        },
+        "persistent": {
+          "clipboardRestoreDelay": {
+            "type": "number",
+            "value": 2
+          },
+          "restoreClipboardAfterPaste": {
+            "type": "boolean",
+            "value": true
+          }
+        },
+        "registered": {
+          "clipboardRestoreDelay": {
+            "type": "number",
+            "value": 2
+          },
+          "restoreClipboardAfterPaste": {
+            "type": "boolean",
+            "value": true
+          }
+        }
+      },
+      "before": {
+        "effective": {
+          "clipboardRestoreDelay": 2,
+          "restoreClipboardAfterPaste": true
+        },
+        "persistent": {
+          "clipboardRestoreDelay": {
+            "type": "missing"
+          },
+          "restoreClipboardAfterPaste": {
+            "type": "missing"
+          }
+        },
+        "registered": {
+          "clipboardRestoreDelay": {
+            "type": "number",
+            "value": 2
+          },
+          "restoreClipboardAfterPaste": {
+            "type": "boolean",
+            "value": true
+          }
+        }
+      },
+      "bundleIdentifier": "com.negentropi.RomaJustTalk",
+      "expectedUserHome": "/Users/runner/work/_temp/writing-undo-controls-proof/isolated-user",
+      "hasArgumentOverrides": false,
+      "homeMatchesExpected": true,
+      "observedUserHome": "/Users/runner/work/_temp/writing-undo-controls-proof/isolated-user",
+      "publicPreferenceAPIsUsed": true,
+      "synchronizeSucceeded": true
+    },
+    "runtimeBounds": {
+      "ASR": false,
+      "fullPipeline": false,
+      "normalAppComposition": false,
+      "productMenuOrShortcut": true,
+      "provider": false
+    },
+    "schemaVersion": 1,
+    "selectedCases": [
+      "textedit-menu",
+      "textedit-shortcut",
+      "safari-menu",
+      "safari-shortcut"
+    ],
+    "shortcut": {},
+    "stateChecks": {
+      "unavailable": {
+        "dismissal": {
+          "closure": {
+            "axErrorTreatedAsClosed": false,
+            "closed": true,
+            "commandVisibleFrame": false,
+            "evidence": "hit-host-non-menu-element",
+            "hitAncestry": [
+              "AXMenuBar",
+              "AXApplication"
+            ],
+            "hitAXError": 0,
+            "hitPID": 26657,
+            "hitRole": "AXMenuBar",
+            "hostPID": 26657,
+            "point": {
+              "x": 843,
+              "y": 48
+            },
+            "reason": null,
+            "retainedMenuStillChild": true,
+            "schemaVersion": 1,
+            "statusChildrenAXError": 0,
+            "statusMenuChildCount": 1,
+            "statusSelected": false,
+            "statusSelectedAXError": 0
+          },
+          "contract": "same-status-owned-menu-not-displayed",
+          "escapeEventsPosted": 2,
+          "inputRetries": 0,
+          "kind": "native-menu-dismissal",
+          "polls": 9,
+          "statusRetainedFromOpen": true
+        },
+        "menu": {
+          "actions": [
+            "AXCancel",
+            "AXPress",
+            "AXPick"
+          ],
+          "actionsAXError": 0,
+          "enabled": false,
+          "frame": {
+            "height": 24,
+            "width": 168,
+            "x": 759,
+            "y": 36
+          },
+          "id": "",
+          "kind": "product-menu",
+          "label": "Undo Last Writing Edit",
+          "nativeMenuIdentity": {
+            "attempted": true,
+            "command": {
+              "enabled": false,
+              "frame": {
+                "height": 24,
+                "width": 168,
+                "x": 759,
+                "y": 36
+              },
+              "identifier": "",
+              "identifierEmpty": true,
+              "pid": 26657,
+              "role": "AXMenuItem",
+              "title": "Undo Last Writing Edit"
+            },
+            "contract": "status-owned-native-menu-item-title",
+            "downwardPath": [
+              {
+                "depth": 1,
+                "identifier": "",
+                "pid": 26657,
+                "role": "AXMenu",
+                "title": null
+              },
+              {
+                "depth": 2,
+                "identifier": "",
+                "pid": 26657,
+                "role": "AXMenuItem",
+                "title": "Undo Last Writing Edit"
+              }
+            ],
+            "downwardProof": {
+              "allHostPID": true,
+              "commandRole": "AXMenuItem",
+              "exactTitle": "Undo Last Writing Edit",
+              "fullyReadable": true,
+              "menuRole": "AXMenu",
+              "pathLength": 2,
+              "rootIsRetainedStatus": true,
+              "statusParentIsHostExtrasMenuBar": true,
+              "truncated": false,
+              "uniqueExactMatch": true
+            },
+            "enabledObserved": false,
+            "expectedEnabled": false,
+            "expectedRole": "AXMenuItem",
+            "expectedTitle": "Undo Last Writing Edit",
+            "globalSearchUsed": false,
+            "hostPID": 26657,
+            "identifierRequired": false,
+            "identityAuthority": "retained-status-downward-subtree",
+            "kind": "native-menu-bridge-identity",
+            "maxDepth": 4,
+            "maxNodes": 64,
+            "polls": 2,
+            "proven": true,
+            "reason": null,
+            "schemaVersion": 2,
+            "status": {
+              "extrasMenuBarPID": 26657,
+              "extrasMenuBarPresent": true,
+              "identifier": "undoControlHost.statusItem",
+              "identityContract": "identifier",
+              "parentAXError": 0,
+              "parentIsHostExtrasMenuBar": true,
+              "parentRole": "AXMenuBar",
+              "pid": 26657,
+              "role": "AXMenuBarItem",
+              "sameRetainedReference": true
+            },
+            "textFallbackUsed": false,
+            "traversal": {
+              "discoveredCount": 3,
+              "exactMatchCount": 1,
+              "expandedCount": 3,
+              "otherRoleTitleMatches": 0,
+              "truncated": false,
+              "unreadableChildren": []
+            },
+            "uniqueMatch": true,
+            "upwardParentAuthorizes": false,
+            "upwardParentDiagnostics": {
+              "authorizationCondition": false,
+              "diagnosticOnly": true,
+              "maxLevels": 2,
+              "observations": [
+                {
+                  "axError": 0,
+                  "depth": 1,
+                  "elementPresent": true,
+                  "expectedDownwardRole": "AXMenu",
+                  "identifier": "",
+                  "isRetainedStatus": false,
+                  "level": 1,
+                  "matchesDownwardPath": true,
+                  "pid": 26657,
+                  "role": "AXMenu",
+                  "title": null
+                },
+                {
+                  "axError": 0,
+                  "depth": 0,
+                  "elementPresent": true,
+                  "expectedDownwardRole": "AXMenuBarItem",
+                  "identifier": "",
+                  "isRetainedStatus": false,
+                  "level": 2,
+                  "matchesDownwardPath": false,
+                  "pid": 26657,
+                  "role": "AXMenuBar",
+                  "title": null
+                }
+              ],
+              "reachesRetainedStatus": false,
+              "reciprocalToDownwardPath": false
+            },
+            "visibleFrame": true
+          },
+          "role": "AXMenuItem",
+          "statusClick": {
+            "activeDisplayBounds": {
+              "height": 768,
+              "width": 1024,
+              "x": 0,
+              "y": 0
+            },
+            "activeDisplayID": 1,
+            "clickState": 1,
+            "eventCount": 2,
+            "eventTypes": [
+              "leftMouseDown",
+              "leftMouseUp"
+            ],
+            "flagsRawValue": 0,
+            "frameStable": true,
+            "hitDepth": 0,
+            "hitOwnedByHost": true,
+            "hitPID": 26657,
+            "hitWindowPresent": false,
+            "hostPID": 26657,
+            "identityContract": "identifier",
+            "kind": "native-mouse-click",
+            "menuAncestorRole": "AXMenuBar",
+            "nativeMenuAncestry": true,
+            "nativeMenuIdentity": null,
+            "point": {
+              "x": 779,
+              "y": 15
+            },
+            "readiness": {
+              "attemptCount": 2,
+              "deadlineSeconds": 6,
+              "elapsedSeconds": 1.2735560416666658,
+              "experiment": "preinput-readiness-calibration",
+              "finalObservation": "click-readiness-menu.unavailable-menu.status-attempt-2.json",
+              "finalObservationReady": true,
+              "intervalMilliseconds": 1000,
+              "maxAttempts": 6,
+              "noInputBeforeReady": true,
+              "observations": [
+                "click-readiness-menu.unavailable-menu.status-attempt-1.json",
+                "click-readiness-menu.unavailable-menu.status-attempt-2.json"
+              ]
+            },
+            "sameTargetOrDescendant": true,
+            "sameWindow": false,
+            "tap": "cghidEventTap",
+            "targetFrame": {
+              "height": 24,
+              "width": 34,
+              "x": 762,
+              "y": 3
+            },
+            "targetID": "undoControlHost.statusItem",
+            "targetOwnedByHost": true,
+            "targetRole": "AXMenuBarItem",
+            "targetWindowPresent": false,
+            "uniqueTarget": true,
+            "windowOwnedByHost": false,
+            "windowPolicy": "windowless-native-menu"
+          },
+          "statusControl": {
+            "actions": [
+              "AXPress"
+            ],
+            "actionsAXError": 0,
+            "enabled": true,
+            "frame": {
+              "height": 24,
+              "width": 34,
+              "x": 762,
+              "y": 3
+            },
+            "id": "undoControlHost.statusItem",
+            "label": "Undo",
+            "role": "AXMenuBarItem",
+            "value": ""
+          },
+          "value": ""
+        },
+        "passed": true
+      }
+    }
+  },
+  "host_outcome": {
+    "candidate_error": null,
+    "classification": "invalid-or-failed",
+    "closure_error": null,
+    "diagnostic_screens": [],
+    "exit_code": 1,
+    "mapped_host_observed": true,
+    "monitor_error": null,
+    "native_failure": "The shortcut recorder stayed in capture mode.",
+    "native_issues": [],
+    "observed_completed_cases": [],
+    "profile_files": {
+      "profiles/undo-controls-26657-3973123513286346596_0.profraw": {
+        "bytes": 14152,
+        "sha256": "5bafaa4bf7153c6755a4a3aa86a239a5fcab4663e13ae396f060bb3d43e2188b"
+      },
+      "profiles/undo-controls-26657-7524554058552373010_0.profraw": {
+        "bytes": 8895872,
+        "sha256": "a205259e1df1a5eb0b280914d0f96a8a07e74343eabc88cec764dbfe661ea795"
+      }
+    },
+    "samples": []
+  },
+  "build_log_sha256": "fdfeef03345e6e220f96aa072397a3d815df3736e959f82524b8338609d5cac0",
+  "raw_hierarchy_sha256": "2a453d94584cd295fe963353219321fb26c608e63a308ff6fe7d582c58c1789b",
+  "raw_hierarchy_nodes": 162,
+  "failure_png_sha256": "ef5c4da8eacdf470f524a0ed96daacd17e92d7f828589ee4124ce75b2a6eaa68",
+  "independently_validated_states": [
+    "unavailable"
+  ],
+  "actual_local_capture_partial_fact": {
+    "input_route": "CGEvent.postToPid",
+    "input_events": 2,
+    "public_stored_data_bytes": 59,
+    "public_stored_data_sha256": "75a1d420f30742ac962223b6c84387a8ca6381c8c0d47e0489168cf6594dac68",
+    "decoded": {
+      "displayString": "\u2303 + \u2325 + \u2318 + U",
+      "keyCode": 32,
+      "kind": "key",
+      "modifierFlagsRawValue": 1835008
+    },
+    "effective": {
+      "displayString": "\u2303 + \u2325 + \u2318 + U",
+      "keyCode": 32,
+      "kind": "key",
+      "modifierFlagsRawValue": 1835008
+    },
+    "clearedValue": null,
+    "isShortcutCleared": false,
+    "effectiveEqualsExpected": true,
+    "full_capture_protocol_accepted": false
+  },
+  "old_retained_reference_after_capture": {
+    "recorder": {
+      "description": null,
+      "enabled": false,
+      "help": null,
+      "identifier": null,
+      "labelIsRecordingPlaceholder": false,
+      "pid": 26657,
+      "role": null,
+      "sameReferenceAsLookup": false,
+      "title": null,
+      "uniqueCount": 1
+    },
+    "axWindow": {
+      "axError": -25202,
+      "focusedWindowAXError": 0,
+      "focusedWindowIsSetupWindow": false,
+      "pid": null,
+      "present": false,
+      "role": null,
+      "title": null,
+      "titledCount": 1,
+      "uniqueSameReference": false,
+      "windowsAXError": 0
+    }
+  },
+  "fresh_current_node_from_flat_tree": {
+    "enabled": true,
+    "id": "shortcutRecorder.undoLastWritingEdit",
+    "label": "\u2303 + \u2325 + \u2318 + U",
+    "role": "AXButton",
+    "title": ""
+  },
+  "fresh_node_ownership_limit": {
+    "pid_recorded": false,
+    "window_recorded": false,
+    "not_inferred_from_old_node_or_system_focus": true
+  },
+  "missing_after_receipts": [
+    "source-after.json",
+    "identity-after.json",
+    "tcc-after.json"
+  ],
+  "unavailable_png_sha256": "3aaf762718476f040062ccdee65af22956d3ede9064617250118a68bf88a4272",
+  "source_review_rounds_used": 5,
+  "dependent_source_change_status": "Held pending user review-budget decision; no new source behavior edits or sixth review.",
+  "smallest_proposed_delta": "After native capture, read-only reacquire ONE visible same-ID AXButton with actual hostPID and same verified setup AXWindow, then require exact expected display and public stored value before global cases. Retain pre/post reference facts; no new input/retry, shortcut writes, private handlers or product changes.",
+  "claim_limits": [
+    "One of three state checks completed: unavailable menu and dismissal, now under unchanged default process AX policy.",
+    "Exact public local chord save and fresh visible keycaps observed; full capture readback proof is incomplete because fresh-node PID/window was not retained.",
+    "The failure wording stayed in capture mode contradicts actual saved state/fresh visible display; it is the stale-reference assertion text.",
+    "Zero cases, configured global Undo dispatch, editor restoration, selection/focus and result notice proof.",
+    "No candidate/closure/monitor error recorded; no full post-run source/signature/TCC acceptance."
+  ]
+}

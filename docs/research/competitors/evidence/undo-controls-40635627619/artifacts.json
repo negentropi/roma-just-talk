@@ -1,0 +1,26 @@
+{
+  "run_id": 40635627619,
+  "head_sha": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
+  "artifacts": [
+    {
+      "id": 12793558601,
+      "name": "roma.writing-undo-controls-observations",
+      "zip_bytes": 4246682,
+      "sha256": "84a1333556fdfd4849457cddc3ede80b7d5bb667a4a58754c8f0906e23db04b1",
+      "download_count": 1,
+      "all_members_crc_verified": true,
+      "remote_archive": "/data/rjt-writing-check-01a17bef/undo-controls-40635627619/observations.zip"
+    },
+    {
+      "id": 12793394198,
+      "name": "roma.writing-undo-controls-logs",
+      "zip_bytes": 234462,
+      "sha256": "6eb19709cf5fbc46f457f8c4f3fc11eb166da86354a199a6fbc33fe8249713de",
+      "download_count": 1,
+      "all_members_crc_verified": true,
+      "remote_archive": "/data/rjt-writing-check-01a17bef/undo-controls-40635627619/logs.zip"
+    }
+  ],
+  "offline_auditor_sha256": "d9a67580d56a825466341e0bc50c4441232ebb2e3571d49aa1bd86ad5eb9af1d",
+  "git_object_expected_facts_sha256": "62019d487329e731a0a9e3ed173339f5582ae47e4545b4fb4a7e6084b21c2c77"
+}

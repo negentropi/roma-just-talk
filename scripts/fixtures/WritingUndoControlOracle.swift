@@ -43,6 +43,7 @@ enum WritingUndoControlOracle {
         var states: [String: Any] = [:]
         var shortcut: [String: Any] = [:]
         var pastePreferences: [String: Any] = [:]
+        var policyBootstrap: [String: Any] = [:]
         let keyCode = UInt16(kVK_ANSI_U)
         let modifiers: NSEvent.ModifierFlags = [.command, .option, .control]
         let originalRange = NSRange(location: LiveWritingEditor.prefix.utf16.count,
@@ -58,12 +59,36 @@ enum WritingUndoControlOracle {
             let argumentDomain = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
             let pasteKeys = [VoiceInkPastePreference.restoreClipboardAfterPasteKey, VoiceInkPastePreference.clipboardRestoreDelayKey]
             let hasArgumentOverrides = pasteKeys.contains { argumentDomain[$0] != nil }
+            let bundleID = Bundle.main.bundleIdentifier ?? ""
+            let expectedHome = ProcessInfo.processInfo.environment["CFFIXED_USER_HOME"] ?? ""
+            try require(bundleID == "com.negentropi.RomaJustTalk" && expectedHome.hasPrefix("/") && !hasArgumentOverrides,
+                        "The controlled preference input requires the exact host and no policy launch overrides.")
+            let before = policySnapshot(bundleID: bundleID)
+            // Configure test-owned inputs through the same public preference APIs
+            // as Settings. A plist placed by another process is not the oracle.
+            VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(VoiceInkPastePreference.defaultRestoreClipboardAfterPaste)
+            VoiceInkPastePreference.saveClipboardRestoreDelay(VoiceInkPastePreference.defaultClipboardRestoreDelay)
+            let synchronized = UserDefaults.standard.synchronize()
+            let after = policySnapshot(bundleID: bundleID)
+            policyBootstrap = ["bundleIdentifier": bundleID, "expectedUserHome": expectedHome,
+                               "observedUserHome": NSHomeDirectory(),
+                               "homeMatchesExpected": URL(fileURLWithPath: NSHomeDirectory()).standardizedFileURL
+                                   == URL(fileURLWithPath: expectedHome).standardizedFileURL,
+                               "publicPreferenceAPIsUsed": true, "synchronizeSucceeded": synchronized,
+                               "hasArgumentOverrides": hasArgumentOverrides, "before": before, "after": after]
             let restore = VoiceInkPastePreference.shouldRestoreClipboardAfterPaste()
             let delay = VoiceInkPastePreference.clipboardRestoreDelay()
             pastePreferences = ["restoreClipboardAfterPaste": restore, "clipboardRestoreDelay": delay,
                                 "hasArgumentOverrides": hasArgumentOverrides]
             try require(restore && delay == 2 && !hasArgumentOverrides,
                         "The controls check requires the actual persistent default clipboard restoration policy.")
+            let persistent = after["persistent"] as? [String: Any]
+            let storedRestore = persistent?[VoiceInkPastePreference.restoreClipboardAfterPasteKey] as? [String: Any]
+            let storedDelay = persistent?[VoiceInkPastePreference.clipboardRestoreDelayKey] as? [String: Any]
+            try require(synchronized && storedRestore?["type"] as? String == "boolean"
+                        && storedRestore?["value"] as? Bool == true && storedDelay?["type"] as? String == "number"
+                        && storedDelay?["value"] as? Double == 2,
+                        "The public preference APIs did not confirm the persistent clipboard policy.")
             try require(!owner.engine.writingActionUndoController.isAvailable, "A fresh engine already owns an edit.")
             let unavailable = try await openMenu(expectedEnabled: false, checkpoint: "unavailable-menu")
             try await dismissMenu()
@@ -110,6 +135,23 @@ enum WritingUndoControlOracle {
                         "recorderControl": control]
             try await screenshot("shortcut-configured")
             try dumpHierarchy("shortcut-configured")
+        }
+
+        func policySnapshot(bundleID: String) -> [String: Any] {
+            let defaults = UserDefaults.standard
+            let persistent = defaults.persistentDomain(forName: bundleID) ?? [:]
+            let registered = defaults.volatileDomain(forName: UserDefaults.registrationDomain)
+            let keys = [VoiceInkPastePreference.restoreClipboardAfterPasteKey, VoiceInkPastePreference.clipboardRestoreDelayKey]
+            func typed(_ raw: Any?) -> [String: Any] {
+                guard let raw else { return ["type": "missing"] }
+                guard let number = raw as? NSNumber else { return ["type": "unsupported"] }
+                if CFGetTypeID(number) == CFBooleanGetTypeID() { return ["type": "boolean", "value": number.boolValue] }
+                return number.doubleValue.isFinite ? ["type": "number", "value": number.doubleValue] : ["type": "nonfinite"]
+            }
+            return ["effective": ["restoreClipboardAfterPaste": VoiceInkPastePreference.shouldRestoreClipboardAfterPaste(),
+                                  "clipboardRestoreDelay": VoiceInkPastePreference.clipboardRestoreDelay()],
+                    "persistent": Dictionary(uniqueKeysWithValues: keys.map { ($0, typed(persistent[$0])) }),
+                    "registered": Dictionary(uniqueKeysWithValues: keys.map { ($0, typed(registered[$0])) })]
         }
 
         func successCase(_ id: String, kind: LiveWritingEditor.Kind) async throws {
@@ -413,6 +455,7 @@ enum WritingUndoControlOracle {
             try writeJSON(["schemaVersion": 1, "completed": completed, "selectedCases": selectedCases,
                            "executedCases": cases.compactMap { $0["id"] }, "cases": cases,
                            "stateChecks": states, "shortcut": shortcut, "host": host, "pastePreferences": pastePreferences,
+                           "policyBootstrap": policyBootstrap,
                            "runtimeBounds": ["productMenuOrShortcut": true, "normalAppComposition": false,
                                              "fullPipeline": false, "ASR": false, "provider": false],
                            "forwardBoundary": "Real WritingTarget delivery into the sole engine-owned controller",

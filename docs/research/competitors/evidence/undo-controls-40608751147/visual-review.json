@@ -1,0 +1,15 @@
+{
+  "requested_model": "gpt-6.1-sol",
+  "actual_model": "gpt-6.1-sol",
+  "status": "setup screenshot reviewed; controls not reached",
+  "screenshot": "failure.png",
+  "sha256": "fd1b5f98fa6c5ffdb5ca6f2cdacbd93675dc9f059aecee48dec87689c2f6017f",
+  "visible": [
+    "Owned setup window within1024x768; title, Undo scope, Nothing to undo, Record and waiting status readable.",
+    "Finder frontmost and inactive setup window visible before the control configuration phase."
+  ],
+  "controls_runtime_verified": false,
+  "limits": [
+    "No opened menu, captured shortcut, external editor, Undo notice, restoration or focus retention shown."
+  ]
+}

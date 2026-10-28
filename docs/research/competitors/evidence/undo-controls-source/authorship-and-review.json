@@ -1,6 +1,6 @@
 {
   "classification": "source-authorship-and-review-only",
-  "implementation_status": "Five acceptance sources reviewed, including bounded compiler-response path correction. Initial CI compiled the app but stopped at the verification-path defect; corrected native rerun pending.",
+  "implementation_status": "Acceptance bootstrap and failure diagnostics source-reviewed; two failed runs retained honestly with zero control cases. Native corrected rerun pending.",
   "author_cli": {
     "binary": "claude",
     "version": "2.1.310",
@@ -35,6 +35,20 @@
         "duration_ms": 51525,
         "total_cost_usd": 0.1989428
       }
+    },
+    {
+      "invocation": "isolated-host-public-registration-domain-defaults",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "60eb83aa40f2f362056375a1602e33ac01263d60bb18fcc9a578c0c38ab4348a",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 51639,
+        "total_cost_usd": 0.18319380000000002
+      }
     }
   ],
   "authorship_scope": {
@@ -51,10 +65,10 @@
     "supplemental_undo_view_copy": "Recorded separately in evidence/undo-ui-source/authorship-and-review.json; not double-counted here."
   },
   "source_sha256": {
-    "scripts/fixtures/WritingUndoControlHost.swift": "38c0e548c2613ee842b2929b0a2aa8cb6fce56b49e3c6b65d5e53b183dc61289",
-    "scripts/fixtures/WritingUndoControlOracle.swift": "a4d87a78ba31077f4cc3b653cfae0947fd41e603bcc6e04d1bb99f4cc2ea9ded",
+    "scripts/fixtures/WritingUndoControlHost.swift": "00045293ee9f3fbf8c7be72f7736e1caaac2a46536cd802e5abd8f41c6add5d2",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "6983dd3aff49fab65e2490948eb00ba2d47977efe6f956e7ebf024ef1be6df97",
     "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
-    "scripts/verify-writing-undo-controls.py": "edb3fabc2065f21aeb3f6f82359d8f3ffe2bd03f1cd11499a96d07b5156ad6dd",
+    "scripts/verify-writing-undo-controls.py": "8fe83b84b8cb756c0c567d356b8d37f5974ed2b67ff64840d2fa8054586ea8f0",
     ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd"
   },
   "clipboard_error_copy": {
@@ -109,7 +123,7 @@
     "bash_syntax": "passed",
     "python_source_parse": "passed",
     "workflow_yaml_parse": "passed",
-    "classifier_self_test": "passed; 22 malformed receipts rejected; creates no native success evidence",
+    "classifier_self_test": "28 malformed receipts rejected, actual bad compiler-path function RED/current GREEN plus nine path/source controls and two simulated host-exit failure lanes.",
     "git_diff_check": "passed",
     "compiler_response_regression": "Actual known-bad function RED; candidate GREEN on same observed naming fixture; nine invalid target/path/source controls rejected. No build/native execution."
   },
@@ -121,7 +135,7 @@
     "Source authoring and pure classifier/syntax checks only; parent owns remote run, screenshot review, commit and CI.",
     "Plain-text guarded inverse only; no restart, generic Cmd-Z, rich-format or general editor compatibility claim."
   ],
-  "total_author_cost_usd": 1.1484408,
+  "total_author_cost_usd": 1.3316346,
   "raw_log_policy": "Only model, status, timing, cost and hashes retained; raw JSONL stays outside the repository.",
   "compiler_response_path_correction": {
     "failed_run_id": 40605378801,
@@ -147,5 +161,46 @@
     "review_status": "clean at both after hashes",
     "reviewed_at_head": "9df3a2cd78d1b8b01a2eb379700fef041b6f10f4",
     "native_limit": "Pure response-path regression proof only. It does not verify controls, TCC, editor restoration, focus or screenshots; corrected CI rerun required."
+  },
+  "preference_bootstrap_correction": {
+    "failed_run_id": 40608751147,
+    "failed_run_head": "56043763898ad253aa9ec04549b61c93a695b389",
+    "failed_run_evidence": "../undo-controls-40608751147/failure-diagnosis.json",
+    "observed_boundary": "Compiler list and build passed; signature helper and fresh permission provisioning passed; exact mapped host exited1 before controls because effective clipboard policy read false/0 with no launch overrides, despite the external seed file declaring true/2. Zero native cases.",
+    "before_source_sha256": {
+      "scripts/fixtures/WritingUndoControlHost.swift": "38c0e548c2613ee842b2929b0a2aa8cb6fce56b49e3c6b65d5e53b183dc61289",
+      "scripts/fixtures/WritingUndoControlOracle.swift": "a4d87a78ba31077f4cc3b653cfae0947fd41e603bcc6e04d1bb99f4cc2ea9ded",
+      "scripts/verify-writing-undo-controls.py": "edb3fabc2065f21aeb3f6f82359d8f3ffe2bd03f1cd11499a96d07b5156ad6dd"
+    },
+    "after_source_sha256": {
+      "scripts/fixtures/WritingUndoControlHost.swift": "00045293ee9f3fbf8c7be72f7736e1caaac2a46536cd802e5abd8f41c6add5d2",
+      "scripts/fixtures/WritingUndoControlOracle.swift": "6983dd3aff49fab65e2490948eb00ba2d47977efe6f956e7ebf024ef1be6df97",
+      "scripts/verify-writing-undo-controls.py": "8fe83b84b8cb756c0c567d356b8d37f5974ed2b67ff64840d2fa8054586ea8f0"
+    },
+    "host_actual_opus_scope": "Only same public AppDefaults.registeredDefaults registration dictionary at owner initialization. Full registration method login-item/migration effects remain excluded; all UI/control code unchanged.",
+    "native_oracle_scope": "Explicit controlled inputs through public clipboard preference setters; strict effective/no-argv/synchronized typed persistent-domain readback. Before/after effective, persistent and registration values are limited to two nonsecret keys, with full bundle and expected/observed home metadata. Home equality is observed, not forced.",
+    "driver_scope": "Preserve primary native failure and real nonzero exit status; retain exact mapped-process and strict closure records; persist full candidate-source hash census and added/removed/changed paths on mismatch, with no ignored source changes. Success requires clean host outcome.",
+    "unresolved_facts": [
+      "Why the external CFFIXED seed file was not reflected in effective preferences was not established.",
+      "The old driver reported candidate source mismatch without retaining changed paths. The new diagnostic captures them; no source-fidelity exception was added."
+    ],
+    "review": {
+      "actual_model": "gpt-6.1-sol",
+      "status": "clean at the three exact after hashes",
+      "native_limit": "Source-only. The corrected bootstrap has not executed natively; no menu, hotkey, editor restoration or focus acceptance."
+    },
+    "checks": {
+      "receipt_rejection_mutations": 28,
+      "actual_bad_compiler_function": "RED on observed metadata fixture; current GREEN",
+      "negative_compiler_controls": 9,
+      "simulated_actual_host_failure_races": 2,
+      "swift_frontend_parse": "passed for Host/Oracle",
+      "python_syntax_and_git_diff_check": "passed"
+    },
+    "failure_screenshot_review": {
+      "actual_model": "gpt-6.1-sol",
+      "sha256": "fd1b5f98fa6c5ffdb5ca6f2cdacbd93675dc9f059aecee48dec87689c2f6017f",
+      "scope": "Only readable setup window before control execution; no controls acceptance."
+    }
   }
 }

@@ -1,0 +1,30 @@
+{
+  "run_id": 40608751147,
+  "head_sha": "56043763898ad253aa9ec04549b61c93a695b389",
+  "remote_host": "decentleftover-pf",
+  "remote_root": "/data/rjt-writing-check-01a17bef/undo-controls-40608751147",
+  "audit_program_sha256": "93ac55f333c05d862cf0db00489b2c84db6dc549b00f0b9f53c6f82877f67e06",
+  "independent_expected_inputs_sha256": "be2486404facd94b8987342916f72188ff36a3a15ffabdefb39b1f462c494244",
+  "artifacts": [
+    {
+      "id": 12782805600,
+      "name": "roma.writing-undo-controls-observations",
+      "zip_bytes": 216444,
+      "github_and_observed_zip_sha256": "8f4a093ad8684bdeb9404f9975b36fa75c4f3eab9d1f39c5d1abeeeb3f1f9f1d",
+      "github_downloads": 1,
+      "all_members_crc_verified": true,
+      "remote_archive": "/data/rjt-writing-check-01a17bef/undo-controls-40608751147/observations.zip",
+      "download_receipt_sha256": "bc7984ea2539cd0f05109e32f4b23fd70e45c4c2a0efb34fbbbd0d2aab7b4e70"
+    },
+    {
+      "id": 12783180165,
+      "name": "roma.writing-undo-controls-logs",
+      "zip_bytes": 234521,
+      "github_and_observed_zip_sha256": "36f5db38452795e3bf5a6c852f0a6f87766068a75d996439a49e481bdfbd42c3",
+      "github_downloads": 1,
+      "all_members_crc_verified": true,
+      "remote_archive": "/data/rjt-writing-check-01a17bef/undo-controls-40608751147/logs.zip",
+      "download_receipt_sha256": "d36e74f0bb7987ffc9cc59976aef9a222da5b9dde6e0c34e25a8781a062640a7"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "run_id": 40608751147,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40608751147",
+  "head_sha": "56043763898ad253aa9ec04549b61c93a695b389",
+  "github_conclusion": "failure",
+  "classification": "host-bootstrap-policy-failure-before-controls",
+  "build": {
+    "succeeded": 1,
+    "compile_errors": 0
+  },
+  "compiled_source_list_validation_passed": true,
+  "actual_compiler_sources": 221,
+  "actual_response_file_settings": {
+    "arm64": "Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/roma just talk.SwiftFileList"
+  },
+  "prepared_source_matches_independent_git_objects": true,
+  "prepared_candidate_matches_independent_git_objects": true,
+  "signature_helper": {
+    "classification": "verified-adhoc-macos-test-host",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true,
+    "library_validation_disabled": true
+  },
+  "fresh_tcc_rows_before": 5,
+  "native_preflights_passed_before_policy_check": true,
+  "exact_mapped_host": {
+    "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "mapped_text_paths": [
+      "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+      "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "/usr/lib/dyld"
+    ],
+    "pid": 37027,
+    "started_at": "Wed Oct 28 00:38:43 2026"
+  },
+  "host_exit_code": 1,
+  "first_native_failure": "The controls check requires the actual persistent default clipboard restoration policy.",
+  "observed_policy": {
+    "clipboardRestoreDelay": 0,
+    "hasArgumentOverrides": false,
+    "restoreClipboardAfterPaste": false
+  },
+  "driver_seeded_policy": {
+    "restoreClipboardAfterPaste": true,
+    "clipboardRestoreDelay": 2.0
+  },
+  "command_line_arguments": [],
+  "native_completed_cases": 0,
+  "state_checks_completed": 0,
+  "editor_cleanup_issues": [],
+  "secondary_driver_failures": [
+    {
+      "mode": "native",
+      "classification": "invalid-or-failed",
+      "error": "Host process identity changed"
+    },
+    {
+      "mode": "verify",
+      "classification": "invalid-or-failed",
+      "error": "Disposable candidate source changed"
+    }
+  ],
+  "source_mismatch_cause": "Unknown: prior driver retained no before/after changed-path census after host exit. New guard remains strict and records that census.",
+  "setup_explanation": "Source inspection confirms isolated host omitted normal registered defaults. Why the externally seeded plist was not observed is not established; the next fixture records typed domain/home evidence and uses public preference APIs as explicit test inputs.",
+  "actual_sol_boundary_review": "gpt-6.1-sol independently reviewed the actual single failure screenshot and native result; setup is readable, no control/field/focus acceptance.",
+  "limits": [
+    "No menu opened, shortcut configured or external editor captured; zero Undo controls executed.",
+    "Fresh permissions/signature/bootstrap observations do not establish native Undo behavior.",
+    "No old-helper cleanup failure occurred in this run; no screenshot from the earlier polish suite was substituted."
+  ]
+}

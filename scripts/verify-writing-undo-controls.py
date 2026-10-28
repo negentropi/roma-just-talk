@@ -5,6 +5,7 @@ import contextlib
 import copy
 import hashlib
 import json
+import math
 import os
 import plistlib
 import re
@@ -170,7 +171,22 @@ def candidate_manifest():
 
 
 def verify_candidate():
-    require(candidate_manifest() == json.loads((output / 'candidate-source.json').read_text()), 'Disposable candidate source changed')
+    before = json.loads((output / 'candidate-source.json').read_text())
+    after = candidate_manifest()
+    if after != before:
+        value = {'classification': 'invalid-or-failed', 'mode': mode, 'cause': 'unknown; hash/path census only',
+            'before': before, 'after': after,
+            'added': {path: after[path] for path in sorted(after.keys() - before.keys())},
+            'removed': {path: before[path] for path in sorted(before.keys() - after.keys())},
+            'changed': {path: {'before': before[path], 'after': after[path]}
+                for path in sorted(before.keys() & after.keys()) if before[path] != after[path]}}
+        path = output / ('candidate-source-mismatch-' + mode + '.json')
+        index = 1
+        while path.exists() and json.loads(path.read_text()) != value:
+            index += 1
+            path = output / ('candidate-source-mismatch-' + mode + '-' + str(index) + '.json')
+        write_json(path, value)
+        raise RuntimeError('Disposable candidate source changed; inspect ' + str(path))
 
 
 def build_arguments():
@@ -322,13 +338,17 @@ def run_host(host):
     executable = host['executable_path']
     require(not host_census(executable), 'Fresh exact host executable already running')
     observed, launched = None, None
+    monitor_error, closure_error, candidate_error = None, None, None
+    census_empty, descriptors_closed = None, None
     with (output / 'host.log').open('xb') as stream:
         process = subprocess.Popen([executable], cwd=candidate, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
         try:
             deadline = time.monotonic() + 900
-            while process.poll() is None:
+            while True:
+                if process.poll() is not None:
+                    break
                 current = process_identity(process.pid)
-                if current is None and process.poll() == 0 and observed is not None:
+                if current is None and process.poll() is not None and observed is not None:
                     break
                 require(current is not None and current['executable_path'] == executable, 'Host process identity changed')
                 if launched is None:
@@ -344,23 +364,57 @@ def run_host(host):
                     raise RuntimeError('Host PID reused')
                 require(time.monotonic() < deadline, 'Control host exceeded bounded deadline')
                 time.sleep(0.1)
-            require(process.returncode == 0 and observed is not None, 'Host failed or no mapped live host observed')
+        except BaseException as error:
+            monitor_error = str(error) or type(error).__name__
         finally:
-            if process.poll() is None:
-                current = process_identity(process.pid)
-                require(launched is not None and current == launched, 'Refusing to terminate unproven or reused spawned-host identity')
-                process.terminate()
-                try:
-                    process.wait(timeout=10)
-                except subprocess.TimeoutExpired:
-                    require(process_identity(process.pid) == current, 'Refusing to kill reused host PID')
-                    process.kill()
-                    process.wait()
+            try:
+                if process.poll() is None:
+                    current = process_identity(process.pid)
+                    if current is not None or process.poll() is None:
+                        require(launched is not None and current == launched, 'Refusing to terminate unproven or reused spawned-host identity')
+                        process.terminate()
+                        try:
+                            process.wait(timeout=10)
+                        except subprocess.TimeoutExpired:
+                            require(process_identity(process.pid) == current, 'Refusing to kill reused host PID')
+                            process.kill()
+                            process.wait()
+                census_empty = not host_census(executable)
+                require(census_empty, 'Exact host executable remains running')
+                result = subprocess.run(['lsof', '-n', '-P', '-Fpn', '--', executable], capture_output=True, text=True)
+                descriptors_closed = result.returncode in (0, 1) and not result.stderr.strip() and not result.stdout.strip()
+                require(descriptors_closed, 'Exact host executable still mapped/open')
+            except BaseException as error:
+                closure_error = str(error) or type(error).__name__
             write_json(output / 'host-live.json', {'host': observed, 'spawned_identity': launched, 'exit_code': process.returncode})
-    require(not host_census(executable), 'Exact host executable remains running')
-    result = subprocess.run(['lsof', '-n', '-P', '-Fpn', '--', executable], capture_output=True, text=True)
-    require(result.returncode in (0, 1) and not result.stderr.strip() and not result.stdout.strip(), 'Exact host executable still mapped/open')
-    write_json(output / 'host-closed.json', {'valid': True, 'host': observed, 'exact_executable_census_empty': True, 'exact_executable_has_no_open_descriptors': True})
+            write_json(output / 'host-closed.json', {'valid': closure_error is None, 'host': observed,
+                'exact_executable_census_empty': census_empty, 'exact_executable_has_no_open_descriptors': descriptors_closed,
+                'error': closure_error})
+    try:
+        verify_candidate()
+    except BaseException as error:
+        candidate_error = str(error) or type(error).__name__
+    receipt_path = native / 'result.json'
+    try:
+        receipt = json.loads(receipt_path.read_text()) if receipt_path.is_file() else {}
+        require(isinstance(receipt, dict), 'Native result must be an object')
+    except (OSError, ValueError, TypeError) as error:
+        receipt = {'failure': 'Unreadable native result: ' + str(error)}
+    native_failure, native_issues = receipt.get('failure'), receipt.get('issues', [])
+    valid = process.returncode == 0 and observed is not None and receipt.get('completed') is True
+    valid = valid and not any((monitor_error, closure_error, candidate_error, native_failure, native_issues))
+    write_json(output / 'host-outcome.json', {'classification': 'passed' if valid else 'invalid-or-failed',
+        'exit_code': process.returncode, 'mapped_host_observed': observed is not None, 'native_failure': native_failure,
+        'native_issues': native_issues, 'monitor_error': monitor_error, 'closure_error': closure_error,
+        'candidate_error': candidate_error, 'observed_completed_cases': receipt.get('executedCases', [])})
+    if native_failure or native_issues:
+        raise RuntimeError('Control host oracle failed (exit ' + str(process.returncode) + '): ' + str(native_failure or native_issues)
+            + '; inspect host-outcome.json for secondary diagnostics')
+    require(process.returncode == 0, 'Control host exited with code ' + str(process.returncode) + '; inspect host.log and host-outcome.json')
+    require(monitor_error is None, 'Control host monitor failed: ' + str(monitor_error))
+    require(observed is not None, 'No mapped live host observed')
+    require(closure_error is None, 'Control host closure failed: ' + str(closure_error))
+    require(candidate_error is None, 'Control host candidate changed: ' + str(candidate_error))
     return observed
 
 
@@ -373,7 +427,7 @@ def exact_range(location, length):
     return {'location': location, 'length': length}
 
 
-def receipt_errors(value, executable, pid):
+def receipt_errors(value, executable, pid, expected_home):
     """Recompute the oracle, including normalization-sensitive text and ranges."""
     errors = []
     def check(condition, message):
@@ -425,6 +479,29 @@ def receipt_errors(value, executable, pid):
         check(item.get('usesSystemPaste') is (bundle == 'com.apple.Safari'), 'Observed native editor route policy differs')
         check(isinstance(item.get('token'), str) and re.fullmatch(r'RJT-Writing-Live-[0-9A-Fa-f-]{36}', item['token']) is not None,
             'Owned editor token missing')
+    def policy_snapshot(item):
+        keys = {'restoreClipboardAfterPaste', 'clipboardRestoreDelay'}
+        check(isinstance(item, dict) and set(item) == {'effective', 'persistent', 'registered'}, 'Policy snapshot must contain only the three bounded observations')
+        if not isinstance(item, dict):
+            return
+        effective = item.get('effective', {})
+        check(set(effective) == keys and type(effective.get('restoreClipboardAfterPaste')) is bool
+            and type(effective.get('clipboardRestoreDelay')) in (int, float) and math.isfinite(effective['clipboardRestoreDelay']),
+            'Effective policy observation must contain exactly two typed finite values')
+        for domain in ('persistent', 'registered'):
+            values = item.get(domain, {})
+            check(isinstance(values, dict) and set(values) == keys, 'Policy domain must contain only the two nonsecret policy keys')
+            for observation in values.values():
+                kind = observation.get('type')
+                if kind in ('missing', 'unsupported', 'nonfinite'):
+                    check(set(observation) == {'type'}, 'Unexpected value in missing/unsupported/nonfinite policy observation')
+                elif kind == 'boolean':
+                    check(set(observation) == {'type', 'value'} and type(observation.get('value')) is bool, 'Malformed typed policy boolean')
+                elif kind == 'number':
+                    check(set(observation) == {'type', 'value'} and type(observation.get('value')) in (int, float)
+                        and math.isfinite(observation['value']), 'Malformed typed policy number')
+                else:
+                    check(False, 'Unknown typed policy observation')
     try:
         check(isinstance(value, dict) and type(value.get('schemaVersion')) is int and value['schemaVersion'] == 1
             and value.get('completed') is True, 'Missing completed schema-1 receipt')
@@ -437,6 +514,26 @@ def receipt_errors(value, executable, pid):
         check(value.get('pastePreferences') == {'restoreClipboardAfterPaste': True, 'clipboardRestoreDelay': 2.0,
             'hasArgumentOverrides': False} and value['pastePreferences']['restoreClipboardAfterPaste'] is True
             and value['pastePreferences']['hasArgumentOverrides'] is False, 'Actual persistent clipboard policy differs')
+        bootstrap = value.get('policyBootstrap', {})
+        check(set(bootstrap) == {'bundleIdentifier', 'expectedUserHome', 'observedUserHome', 'homeMatchesExpected',
+            'publicPreferenceAPIsUsed', 'synchronizeSucceeded', 'hasArgumentOverrides', 'before', 'after'}, 'Policy bootstrap schema differs')
+        check(bootstrap.get('bundleIdentifier') == bundle_id and bootstrap.get('publicPreferenceAPIsUsed') is True
+            and bootstrap.get('synchronizeSucceeded') is True and bootstrap.get('hasArgumentOverrides') is False,
+            'Public preference bootstrap identity/write/readback failed')
+        for key in ('expectedUserHome', 'observedUserHome'):
+            check(isinstance(bootstrap.get(key), str) and Path(bootstrap[key]).is_absolute(), 'Actual policy home observation missing')
+        check(type(bootstrap.get('homeMatchesExpected')) is bool, 'Home-match observation must be boolean')
+        check(bootstrap.get('expectedUserHome') == expected_home, 'Policy bootstrap expected home differs from actual launch environment')
+        for key in ('before', 'after'):
+            policy_snapshot(bootstrap.get(key))
+        after = bootstrap.get('after', {})
+        check(after.get('effective') == {'restoreClipboardAfterPaste': True, 'clipboardRestoreDelay': 2.0}
+            and after.get('effective', {}).get('restoreClipboardAfterPaste') is True, 'Public preference APIs did not establish effective policy')
+        expected_policy = {'restoreClipboardAfterPaste': {'type': 'boolean', 'value': True},
+            'clipboardRestoreDelay': {'type': 'number', 'value': 2.0}}
+        for domain in ('persistent', 'registered'):
+            check(after.get(domain) == expected_policy and after.get(domain, {}).get('restoreClipboardAfterPaste', {}).get('value') is True,
+                'Actual typed ' + domain + ' policy differs after public setter readback')
         shortcut = value.get('shortcut', {})
         check(shortcut.get('recordedViaActualRecorder') is True and shortcut.get('keyCode') == 32
             and shortcut.get('modifierFlagsRawValue') == 1835008 and bool(shortcut.get('displayString')), 'Actual configured recorder chord differs')
@@ -498,7 +595,8 @@ def receipt_errors(value, executable, pid):
 
 def classify_native(host, live):
     value = json.loads((native / 'result.json').read_text())
-    errors = receipt_errors(value, host['executable_path'], live['pid'])
+    configuration = json.loads((output / 'configuration.json').read_text())
+    errors = receipt_errors(value, host['executable_path'], live['pid'], configuration['CFFIXED_USER_HOME'])
     screenshots = [name + suffix for name in cases for suffix in ('-forward.png', '-restored.png')]
     screenshots += ['unavailable-menu.png', 'busy-menu.png', 'busy-shortcut-refused.png', 'shortcut-configured.png',
         'focus-refusal.png', 'textedit-menu-menu.png', 'safari-menu-menu.png']
@@ -587,7 +685,15 @@ def self_test():
             'sourceAfter': snapshot(prefix + 'Source remains e\u0301 🧪' + suffix, exact_range(len(units(prefix + 'Source remains e\u0301 🧪')), 0), 'com.apple.TextEdit', 'RJT-Writing-Live-00000000-0000-4000-8000-000000000005', focused=False),
             'otherBefore': snapshot(original, selected, 'com.apple.TextEdit', 'RJT-Writing-Live-00000000-0000-4000-8000-000000000006'),
             'otherAfter': snapshot(original, selected, 'com.apple.TextEdit', 'RJT-Writing-Live-00000000-0000-4000-8000-000000000006')}}
-    require(not receipt_errors(value, '/fixture/app', 42), 'Valid classifier fixture rejected')
+    policy = {'restoreClipboardAfterPaste': {'type': 'boolean', 'value': True}, 'clipboardRestoreDelay': {'type': 'number', 'value': 2.0}}
+    value['policyBootstrap'] = {'bundleIdentifier': bundle_id, 'expectedUserHome': '/fixture/isolated-user',
+        'observedUserHome': '/Users/fixture', 'homeMatchesExpected': False, 'publicPreferenceAPIsUsed': True,
+        'synchronizeSucceeded': True, 'hasArgumentOverrides': False,
+        'before': {'effective': {'restoreClipboardAfterPaste': True, 'clipboardRestoreDelay': 2.0},
+            'persistent': {key: {'type': 'missing'} for key in policy}, 'registered': copy.deepcopy(policy)},
+        'after': {'effective': {'restoreClipboardAfterPaste': True, 'clipboardRestoreDelay': 2.0},
+            'persistent': copy.deepcopy(policy), 'registered': copy.deepcopy(policy)}}
+    require(not receipt_errors(value, '/fixture/app', 42, '/fixture/isolated-user'), 'Valid classifier fixture rejected')
     mutations = [lambda v: v.update(completed=False), lambda v: v['selectedCases'].pop(), lambda v: v['cases'].pop(),
         lambda v: v['host'].update(pid=99), lambda v: v['runtimeBounds'].update(normalAppComposition=True),
         lambda v: v['shortcut'].update(recordedViaActualRecorder=False), lambda v: v['shortcut']['recorderControl'].update(actions=[]),
@@ -598,16 +704,23 @@ def self_test():
         lambda v: v['cases'][2]['forward'].update(usesSystemPaste=False),
         lambda v: v['cases'][0].update(noticeWasAbsentBeforeCommand=False),
         lambda v: v['pastePreferences'].update(hasArgumentOverrides=True),
+        lambda v: v['policyBootstrap'].update(publicPreferenceAPIsUsed=False),
+        lambda v: v['policyBootstrap']['after']['persistent']['restoreClipboardAfterPaste'].update(type='number'),
+        lambda v: v['policyBootstrap']['after']['persistent'].update(clipboardRestoreDelay={'type': 'missing'}),
+        lambda v: v['policyBootstrap'].update(hasArgumentOverrides=True),
+        lambda v: v['policyBootstrap'].update(expectedUserHome='/different/isolated-user'),
+        lambda v: v['policyBootstrap']['after']['registered'].update(clipboardRestoreDelay={'type': 'number', 'value': 0}),
         lambda v: v['cases'][0]['notice'].update(label='invented'), lambda v: v['stateChecks']['busy'].update(capabilityRetained=False),
         lambda v: v['stateChecks']['focusRefusal'].update(differentWindow=False), lambda v: v['issues'].append('cleanup failed'),
         lambda v: v.update(failure='setup failure')]
     for mutation in mutations:
         invalid = copy.deepcopy(value)
         mutation(invalid)
-        require(receipt_errors(invalid, '/fixture/app', 42), 'Malformed acceptance fixture incorrectly passed')
+        require(receipt_errors(invalid, '/fixture/app', 42, '/fixture/isolated-user'), 'Malformed acceptance fixture incorrectly passed')
     print('Undo controls classifier passed: four exact cases and three states; ' + str(len(mutations))
         + ' malformed receipts rejected. No app, clipboard or native interaction executed.')
     compiler_inputs_self_test()
+    host_failure_self_test()
 
 
 def compiler_inputs_self_test():
@@ -691,6 +804,81 @@ def compiler_inputs_self_test():
             print('Compiler input controls passed: wrong/duplicate target, unsafe/outside path, duplicate architecture/response inode, duplicate/missing source and normal-main inclusion rejected (9 controls). Metadata fixture only; no build/native execution.')
         finally:
             current_globals.update(saved)
+
+
+def host_failure_self_test():
+    # Execute the actual transport loop with process/OS calls replaced, including
+    # the poll→ps→nonzero-exit race observed after the failed setup-policy check.
+    globals_before = {key: globals()[key] for key in ('output', 'native', 'candidate', 'process_identity', 'host_census')}
+    popen_before, run_before, sleep_before = subprocess.Popen, subprocess.run, time.sleep
+    policy_failure = 'The controls check requires the actual persistent default clipboard restoration policy.'
+    with tempfile.TemporaryDirectory(prefix='rjt-undo-host-failure-') as directory:
+        base = Path(directory).resolve()
+        try:
+            for changed in (False, True):
+                lane = base / ('changed' if changed else 'unchanged')
+                lane.mkdir()
+                globals().update(output=lane, native=lane / 'native', candidate=lane / 'candidate')
+                candidate.mkdir()
+                source = candidate / 'owned.swift'
+                source.write_text('// before\n')
+                removed = candidate / 'removed.swift'
+                removed.write_text('// removed\n')
+                write_json(output / 'candidate-source.json', candidate_manifest())
+                executable = str(lane / 'app/Contents/MacOS/roma just talk')
+                identity = {'started_at': 'Wed Oct 28 00:00:00 2026', 'executable_path': executable}
+                state = {'mapped': False, 'ps_reads': 0}
+                class SimulatedHost:
+                    pid = 12345
+                    returncode = None
+                    def __init__(self, *args, **kwargs):
+                        write_json(native / 'result.json', {'completed': False, 'failure': policy_failure, 'issues': [], 'executedCases': []})
+                    def poll(self):
+                        if state['ps_reads'] >= 2:
+                            self.returncode = 1
+                        return self.returncode
+                    def terminate(self):
+                        raise RuntimeError('The completed process must not be terminated')
+                def fake_identity(_pid):
+                    state['ps_reads'] += 1
+                    if state['ps_reads'] == 1:
+                        return identity
+                    if changed:
+                        source.write_text('// changed\n')
+                        removed.unlink()
+                        (candidate / 'added.json').write_text('{}\n')
+                    return None
+                def fake_run(command, **kwargs):
+                    class Result:
+                        returncode, stderr = 0, ''
+                        stdout = 'n' + executable + '\n' if '-d' in command else ''
+                    return Result()
+                globals().update(process_identity=fake_identity, host_census=lambda _executable: [])
+                subprocess.Popen, subprocess.run, time.sleep = SimulatedHost, fake_run, lambda _seconds: None
+                try:
+                    run_host({'executable_path': executable})
+                except RuntimeError as error:
+                    require(policy_failure in str(error) and 'Host process identity changed' not in str(error), 'Transport masked the actual native setup failure')
+                else:
+                    raise RuntimeError('Nonzero native setup failure incorrectly passed')
+                live = json.loads((output / 'host-live.json').read_text())
+                closed = json.loads((output / 'host-closed.json').read_text())
+                outcome = json.loads((output / 'host-outcome.json').read_text())
+                require(live['exit_code'] == 1 and live['host']['pid'] == 12345 and closed['valid'] is True,
+                    'Failed native host lost mapped launch/strict closure evidence')
+                require(outcome['native_failure'] == policy_failure and outcome['monitor_error'] is None
+                    and outcome['observed_completed_cases'] == [], 'Wrong native failure/zero-execution diagnostics')
+                mismatch_paths = list(output.glob('candidate-source-mismatch-*.json'))
+                require(bool(mismatch_paths) == changed and bool(outcome['candidate_error']) == changed, 'Candidate mismatch was hidden or invented')
+                if changed:
+                    mismatch = json.loads(mismatch_paths[0].read_text())
+                    require(set(mismatch['added']) == {'added.json'} and set(mismatch['removed']) == {'removed.swift'}
+                        and set(mismatch['changed']) == {'owned.swift'} and mismatch['before'] != mismatch['after'],
+                        'Candidate before/after hash/path census incomplete')
+            print('Host failure transport controls passed: actual nonzero poll/ps race preserves setup failure, zero cases, mapped identity and strict closure; changed-candidate path/hash census records added/removed/changed (2 simulated transport cases). No native process executed.')
+        finally:
+            globals().update(globals_before)
+            subprocess.Popen, subprocess.run, time.sleep = popen_before, run_before, sleep_before
 
 
 def interrupted(signum, _frame):
@@ -787,7 +975,12 @@ def main():
     require(tcc_rows() == json.loads((output / 'tcc-before.json').read_text()) == json.loads((output / 'tcc-after.json').read_text()), 'Frozen TCC rows changed')
     live = json.loads((output / 'host-live.json').read_text())
     closed = json.loads((output / 'host-closed.json').read_text())
+    outcome = json.loads((output / 'host-outcome.json').read_text())
     require(live['exit_code'] == 0 and closed['valid'] is True and closed['host'] == live['host'], 'Host lifecycle evidence invalid')
+    require(outcome['classification'] == 'passed' and outcome['exit_code'] == 0 and outcome['mapped_host_observed'] is True
+        and outcome['observed_completed_cases'] == cases and outcome['native_issues'] == []
+        and all(outcome[key] is None for key in ('native_failure', 'monitor_error', 'closure_error', 'candidate_error')),
+        'Retained host outcome contains a failure or incomplete execution')
     require(live['spawned_identity'] == {key: live['host'][key] for key in ('started_at', 'executable_path')}, 'Spawned and mapped host identities differ')
     require(closed['exact_executable_census_empty'] is True and closed['exact_executable_has_no_open_descriptors'] is True,
         'Host closure observations invalid')

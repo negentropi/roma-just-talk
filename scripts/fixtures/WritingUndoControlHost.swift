@@ -55,6 +55,10 @@ final class WritingUndoControlHostOwner: ObservableObject {
     private var didClaimOracleRun = false
 
     init(output: URL) throws {
+        // Same registration-domain defaults the excluded VoiceInkApp init registers. Registration only:
+        // persisted values still win, and launch-at-login/migration side effects stay out of this host.
+        UserDefaults.standard.register(defaults: AppDefaults.registeredDefaults)
+
         let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
         func memoryConfiguration(_ name: String, _ models: [any PersistentModel.Type]) -> ModelConfiguration {
             ModelConfiguration(

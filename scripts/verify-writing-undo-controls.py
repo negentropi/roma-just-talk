@@ -751,6 +751,81 @@ def receipt_errors(value, executable, pid, expected_home):
                 and isinstance(chain, list) and 1 <= len(chain) <= 11 and chain[-1] == 'AXApplication'
                 and not any(role in ('AXMenu', 'AXMenuItem', 'AXMenuBarItem') for role in chain),
                 'Menu closure ancestry still includes a native menu or lacks application owner')
+    def recorder_capture(item):
+        expected = {'kind': 'key', 'keyCode': 32, 'modifierFlagsRawValue': 1835008, 'displayString': item.get('displayString')}
+        def own_state(state, phase, captured=False, fresh=False):
+            check(state.get('phase') == phase and state.get('action') == 'undoLastWritingEdit'
+                and state.get('clearedValueKind') == ('nil' if captured or fresh else 'true')
+                and state.get('clearedValue') is (None if captured or fresh else True)
+                and state.get('isShortcutCleared') is (not captured and not fresh)
+                and state.get('dataPresent') is captured and state.get('effectiveEqualsExpected') is captured,
+                'Recorder own stored state differs: ' + phase)
+            if captured:
+                check(state.get('effective') == state.get('decoded') == expected and state.get('decodeSucceeded') is True
+                    and type(state.get('dataBytes')) is int and 0 < state['dataBytes'] <= 65536
+                    and isinstance(state.get('dataSHA256'), str) and re.fullmatch('[a-f0-9]{64}', state['dataSHA256']) is not None,
+                    'Recorder saved state lacks exact public decoded/effective chord')
+            else:
+                check(state.get('effective') is None and not any(key in state for key in ('dataBytes', 'dataSHA256', 'decodeSucceeded', 'decoded')),
+                    'Recorder expected empty state contains hidden or stale data')
+        def no_conflict(state):
+            check(state.get('api') == 'ShortcutValidator.validationError' and state.get('action') == 'undoLastWritingEdit'
+                and state.get('expected') == expected and state.get('conflictFree') is True and state.get('issue') is None,
+                'Recorder expected chord conflicts per public validator')
+        event = item.get('captureInput', {})
+        check(event.get('contract') == 'focused-recorder-capture-postToPid' and event.get('route') == 'CGEvent.postToPid'
+            and event.get('pattern') == 'LiveWritingEditor.key' and event.get('eventSource') == 'nil'
+            and event.get('hostPID') == event.get('targetPID') == pid
+            and event.get('eventTypes') == ['keyDown', 'keyUp'] and event.get('eventCount') == 2
+            and event.get('events') == [{'type': kind, 'keyCode': 32, 'flagsRawValue': 1835008} for kind in ('keyDown', 'keyUp')]
+            and event.get('eventsExact') is True and event.get('keyCode') == 32
+            and event.get('modifierFlagsRawValue') == event.get('eventFlagsRawValue') == 1835008
+            and event.get('fallbackUsed') is False and event.get('retryUsed') is False and event.get('physicalKeyboard') is False
+            and event.get('laterGlobalInvocationRoute') == 'postChord-cghidEventTap-unchanged'
+            and event.get('finalProofReady') is True and event.get('inputPosted') is True,
+            'Recorder capture route/owner/events or no-retry contract differs')
+        proof = item.get('captureProof', {})
+        check(proof.get('schemaVersion') == 1 and proof.get('kind') == 'recorder-capture-proof'
+            and proof.get('phase') == 'final-preinput' and proof.get('readOnly') is True and proof.get('inputPosted') is False
+            and proof.get('hostPID') == pid and proof.get('ready') is True and proof.get('reasons') == []
+            and proof.get('expectedPlaceholder') == 'Press shortcut' and type(proof.get('systemUptime')) in (int, float)
+            and math.isfinite(proof['systemUptime']) and proof['systemUptime'] > 0,
+            'Recorder final pre-input proof missing or not ready')
+        target = proof.get('recorder', {})
+        check(target.get('identifier') == 'shortcutRecorder.undoLastWritingEdit' and target.get('uniqueCount') == 1
+            and target.get('sameReferenceAsLookup') is True and target.get('role') == 'AXButton' and target.get('pid') == pid
+            and target.get('enabled') is True and target.get('description') == 'Press shortcut'
+            and target.get('labelIsRecordingPlaceholder') is True, 'Recorder is not the same actual capture-mode control')
+        window = proof.get('axWindow', {})
+        check(window.get('axError') == window.get('windowsAXError') == window.get('focusedWindowAXError') == 0
+            and window.get('present') is True and window.get('pid') == pid and window.get('role') == 'AXWindow'
+            and window.get('title') == 'RJT Undo control check' and window.get('titledCount') == 1
+            and window.get('uniqueSameReference') is True and window.get('focusedWindowIsSetupWindow') is True,
+            'Recorder capture lacks the unique focused owned AXWindow')
+        focus = proof.get('systemFocus', {})
+        check(focus.get('focusedApplicationAXError') == 0 and focus.get('focusedApplicationPID') == focus.get('frontmostPID') == pid,
+            'Recorder capture lacks actual system focused/foreground host')
+        check(focus.get('focusedElementAXError') == 0 and focus.get('focusedElementPresent') is True and focus.get('focusedElementPID') == pid
+            or focus.get('focusedElementAXError') == -25212 and focus.get('focusedElementPresent') is False and focus.get('focusedElementPID') is None,
+            'Recorder focused element is foreign or has an unhandled AX error')
+        appkit = proof.get('appKit', {})
+        check(all(appkit.get(key) is True for key in ('isActive', 'isKeyWindow', 'isVisible', 'appKeyWindowIsSetup', 'uniqueSameWindow'))
+            and appkit.get('titledWindowCount') == 1 and type(appkit.get('windowNumber')) is int and appkit['windowNumber'] > 0,
+            'Recorder capture lacks actual active/key/unique native setup window')
+        states = item.get('ownShortcutState', {})
+        # A fresh empty action prevents this QA route from concealing a stale
+        # already-registered copy of the same global chord during capture.
+        own_state(states.get('beforeClick', {}), 'before-click', fresh=True)
+        own_state(states.get('beforeInput', {}), 'before-input')
+        own_state(states.get('afterReadback', {}), 'after-readback', captured=True)
+        own_state(proof.get('ownShortcut', {}), 'final-preinput')
+        no_conflict(item.get('conflictBeforeClick', {}))
+        no_conflict(proof.get('conflictCheck', {}))
+        readback = item.get('readback', {})
+        check(readback.get('storeEqualsExpected') is True and readback.get('recorderIdleDisplayMatches') is True
+            and readback.get('recorderDescription') == item.get('displayString')
+            and item.get('capturePreInputFile') == 'shortcut-capture-preinput.json',
+            'Recorder exact store/idle-display readback or retained pre-input file differs')
     def snapshot(item, text, selected_range, bundle, focused=True):
         expected = units(text)
         start, length = selected_range['location'], selected_range['length']
@@ -833,6 +908,7 @@ def receipt_errors(value, executable, pid, expected_home):
         control(shortcut.get('recorderControl'), 'shortcutRecorder.undoLastWritingEdit', ['AXButton'])
         recorder = shortcut.get('recorderControl', {})
         click(recorder.get('click'), recorder, 'shortcutRecorder.undoLastWritingEdit', ['AXButton'], 'shortcut.recorder')
+        recorder_capture(shortcut)
         records = value.get('cases', [])
         check(isinstance(records, list) and [item.get('id') for item in records] == cases, 'Four exact ordered case records required')
         selected = exact_range(len(units(prefix)), len(units(passage)))
@@ -967,6 +1043,64 @@ def verify_readiness_observations(click, checkpoint, pid):
     return hashes
 
 
+def verify_recorder_capture_preinput(shortcut, pid):
+    name = 'shortcut-capture-preinput.json'
+    require(shortcut['capturePreInputFile'] == name, 'Recorder pre-input file differs')
+    path = native / name
+    require(path.is_file() and not path.is_symlink() and path.stat().st_size <= 65536, 'Recorder pre-input evidence missing or unsafe')
+    raw = path.read_bytes()
+    value = json.loads(raw)
+    expected_input = dict(shortcut['captureInput'], inputPosted=False)
+    require(value == {'schemaVersion': 1, 'kind': 'recorder-capture-preinput', 'input': expected_input,
+        'finalProof': shortcut['captureProof'], 'ownShortcutBeforeInput': shortcut['ownShortcutState']['beforeInput']},
+        'Recorder immutable pre-input proof differs from observed capture/readback')
+    progress = [json.loads(p.read_text()) for p in sorted((native / 'progress').glob('*.json'))]
+    def sequence(stage):
+        found = [item for item in progress if item.get('stage') == stage]
+        require(len(found) == 1 and found[0].get('pid') == pid, 'Missing, duplicate or foreign recorder input marker')
+        return found[0]['sequence']
+    require(sequence('shortcut.capture-preinput-write.after') < sequence('shortcut.capture-post.before')
+        < sequence('shortcut.capture-post.after'), 'Recorder input was not posted once after immutable pre-input proof')
+    return {name: digest(raw)}
+
+
+def recorder_capture_binding_self_test(shortcut):
+    global native
+    saved = native
+    try:
+        with tempfile.TemporaryDirectory(prefix='rjt-recorder-capture-binding-') as directory:
+            for scenario in ('positive', 'posted-early', 'foreign-focus', 'changed-state', 'foreign-marker', 'duplicate-post'):
+                native = Path(directory) / scenario
+                native.mkdir()
+                (native / 'progress').mkdir()
+                value = {'schemaVersion': 1, 'kind': 'recorder-capture-preinput',
+                    'input': dict(copy.deepcopy(shortcut['captureInput']), inputPosted=False),
+                    'finalProof': copy.deepcopy(shortcut['captureProof']),
+                    'ownShortcutBeforeInput': copy.deepcopy(shortcut['ownShortcutState']['beforeInput'])}
+                if scenario == 'posted-early':
+                    value['input']['inputPosted'] = True
+                elif scenario == 'foreign-focus':
+                    value['finalProof']['systemFocus']['focusedApplicationPID'] = 43
+                elif scenario == 'changed-state':
+                    value['ownShortcutBeforeInput']['dataPresent'] = True
+                (native / 'shortcut-capture-preinput.json').write_text(json.dumps(value))
+                stages = ['shortcut.capture-preinput-write.after', 'shortcut.capture-post.before', 'shortcut.capture-post.after']
+                if scenario == 'duplicate-post':
+                    stages.append(stages[-1])
+                for number, stage in enumerate(stages, 1):
+                    (native / 'progress' / (str(number) + '.json')).write_text(json.dumps(
+                        {'stage': stage, 'sequence': number, 'pid': 43 if scenario == 'foreign-marker' else 42}))
+                try:
+                    result = verify_recorder_capture_preinput(shortcut, 42)
+                except RuntimeError:
+                    require(scenario != 'positive', 'Valid recorder pre-input binding rejected')
+                else:
+                    require(scenario == 'positive' and len(result) == 1, 'Unsafe recorder pre-input binding accepted')
+        print('Recorder capture file bindings passed: one owned-PID input positive and five early/foreign/changed/duplicate controls. Metadata only; no keyboard input executed.')
+    finally:
+        native = saved
+
+
 def classify_native(host, live):
     value = json.loads((native / 'result.json').read_text())
     configuration = json.loads((output / 'configuration.json').read_text())
@@ -997,6 +1131,10 @@ def classify_native(host, live):
             errors.append('Invalid actual native hierarchy: ' + name)
         hashes[path.name] = digest(path.read_bytes())
     if not errors:
+        try:
+            hashes.update(verify_recorder_capture_preinput(value['shortcut'], live['pid']))
+        except (RuntimeError, OSError, KeyError, TypeError, ValueError) as error:
+            errors.append('Recorder capture evidence failed: ' + str(error))
         clicks = [('shortcut.recorder', value['shortcut']['recorderControl']['click']),
             ('menu.unavailable-menu.status', value['stateChecks']['unavailable']['menu']['statusClick']),
             ('menu.busy-menu.status', value['stateChecks']['busy']['menu']['statusClick'])]
@@ -1091,6 +1229,41 @@ def self_test():
             'escapeEventsPosted': 2, 'inputRetries': 0, 'polls': 1, 'statusRetainedFromOpen': True,
             'closure': {'hostPID': 42, 'axErrorTreatedAsClosed': False, 'hitAXError': 0, 'hitPID': 99,
                 'closed': True, 'reason': None, 'statusSelected': False, 'evidence': 'hit-other-process'}}
+    def capture_fixture():
+        expected = {'kind': 'key', 'keyCode': 32, 'modifierFlagsRawValue': 1835008, 'displayString': 'fixture'}
+        def state(phase, captured=False, fresh=False):
+            result = {'phase': phase, 'action': 'undoLastWritingEdit', 'clearedValue': None if captured or fresh else True,
+                'clearedValueKind': 'nil' if captured or fresh else 'true', 'isShortcutCleared': not captured and not fresh,
+                'dataPresent': captured, 'effective': expected if captured else None, 'effectiveEqualsExpected': captured}
+            if captured:
+                result.update(dataBytes=100, dataSHA256='1' * 64, decodeSucceeded=True, decoded=expected)
+            return result
+        conflict = {'api': 'ShortcutValidator.validationError', 'action': 'undoLastWritingEdit', 'expected': expected,
+            'conflictFree': True, 'issue': None}
+        proof = {'schemaVersion': 1, 'kind': 'recorder-capture-proof', 'phase': 'final-preinput', 'readOnly': True,
+            'inputPosted': False, 'hostPID': 42, 'systemUptime': 100.0, 'expectedPlaceholder': 'Press shortcut',
+            'ready': True, 'reasons': [], 'ownShortcut': state('final-preinput'), 'conflictCheck': conflict,
+            'recorder': {'identifier': 'shortcutRecorder.undoLastWritingEdit', 'uniqueCount': 1,
+                'sameReferenceAsLookup': True, 'role': 'AXButton', 'pid': 42, 'enabled': True,
+                'description': 'Press shortcut', 'labelIsRecordingPlaceholder': True},
+            'axWindow': {'axError': 0, 'windowsAXError': 0, 'focusedWindowAXError': 0, 'present': True, 'pid': 42,
+                'role': 'AXWindow', 'title': 'RJT Undo control check', 'titledCount': 1, 'uniqueSameReference': True,
+                'focusedWindowIsSetupWindow': True},
+            'systemFocus': {'focusedApplicationAXError': 0, 'focusedApplicationPID': 42, 'frontmostPID': 42,
+                'focusedElementAXError': 0, 'focusedElementPresent': True, 'focusedElementPID': 42},
+            'appKit': {'isActive': True, 'isKeyWindow': True, 'isVisible': True, 'appKeyWindowIsSetup': True,
+                'uniqueSameWindow': True, 'titledWindowCount': 1, 'windowNumber': 1}}
+        return {'captureInput': {'contract': 'focused-recorder-capture-postToPid', 'route': 'CGEvent.postToPid',
+            'pattern': 'LiveWritingEditor.key', 'eventSource': 'nil', 'hostPID': 42, 'targetPID': 42,
+            'eventTypes': ['keyDown', 'keyUp'], 'eventCount': 2,
+            'events': [{'type': kind, 'keyCode': 32, 'flagsRawValue': 1835008} for kind in ('keyDown', 'keyUp')],
+            'eventsExact': True, 'keyCode': 32, 'modifierFlagsRawValue': 1835008, 'eventFlagsRawValue': 1835008,
+            'fallbackUsed': False, 'retryUsed': False, 'physicalKeyboard': False,
+            'laterGlobalInvocationRoute': 'postChord-cghidEventTap-unchanged', 'finalProofReady': True, 'inputPosted': True},
+            'captureProof': proof, 'capturePreInputFile': 'shortcut-capture-preinput.json', 'conflictBeforeClick': conflict,
+            'ownShortcutState': {'beforeClick': state('before-click', fresh=True), 'beforeInput': state('before-input'),
+                'afterReadback': state('after-readback', captured=True)},
+            'readback': {'storeEqualsExpected': True, 'recorderIdleDisplayMatches': True, 'recorderDescription': 'fixture'}}
     def notice(message):
         return dict(control('undoLastWritingEdit.notice'), expectedMessage=message, label=message)
     def snapshot(text, selected, bundle, token='RJT-Writing-Live-00000000-0000-4000-8000-000000000001', focused=True):
@@ -1108,6 +1281,7 @@ def self_test():
         'pastePreferences': {'restoreClipboardAfterPaste': True, 'clipboardRestoreDelay': 2.0, 'hasArgumentOverrides': False},
         'issues': [], 'failure': None, 'shortcut': {'recordedViaActualRecorder': True, 'keyCode': 32, 'modifierFlagsRawValue': 1835008,
             'displayString': 'fixture', 'recorderControl': recorder}, 'cases': []}
+    value['shortcut'].update(capture_fixture())
     for name in cases:
         is_menu = name.endswith('-menu')
         case_original, replacement, case_selected = case_text_fixture(name)
@@ -1149,6 +1323,12 @@ def self_test():
         require(accent in case_replacement.encode('utf-8') and (769 not in units(case_replacement) if safari else 769 in units(case_replacement)),
             'Positive per-editor fixture output uses the wrong scalar bytes')
     require(not receipt_errors(value, '/fixture/app', 42, '/fixture/isolated-user'), 'Valid classifier fixture rejected')
+    recorder_capture_binding_self_test(value['shortcut'])
+    no_focused_element = copy.deepcopy(value)
+    no_focused_element['shortcut']['captureProof']['systemFocus'].update(
+        focusedElementAXError=-25212, focusedElementPresent=False, focusedElementPID=None)
+    require(not receipt_errors(no_focused_element, '/fixture/app', 42, '/fixture/isolated-user'),
+        'An app-wide local recorder incorrectly required the focused element to be the recorder itself')
     parent_read_error = copy.deepcopy(value)
     diagnostic = parent_read_error['cases'][0]['command']['nativeMenuIdentity']['upwardParentDiagnostics']
     diagnostic['observations'] = [{'level': 1, 'axError': -25212, 'elementPresent': False,
@@ -1241,6 +1421,19 @@ def self_test():
         lambda v: v['stateChecks']['unavailable']['dismissal']['closure'].update(hitAXError=-1),
         lambda v: v['stateChecks']['unavailable']['dismissal']['closure'].update(statusSelected=True),
         lambda v: v['stateChecks']['busy']['dismissal'].update(inputRetries=1),
+        lambda v: v['shortcut']['captureInput'].update(route='cghidEventTap'),
+        lambda v: v['shortcut']['captureInput'].update(targetPID=43),
+        lambda v: v['shortcut']['captureInput'].update(eventCount=1),
+        lambda v: v['shortcut']['captureInput'].update(retryUsed=True),
+        lambda v: v['shortcut']['captureProof']['recorder'].update(labelIsRecordingPlaceholder=False),
+        lambda v: v['shortcut']['captureProof']['axWindow'].update(focusedWindowIsSetupWindow=False),
+        lambda v: v['shortcut']['captureProof']['systemFocus'].update(focusedApplicationPID=43),
+        lambda v: v['shortcut']['captureProof']['systemFocus'].update(focusedElementPID=43),
+        lambda v: v['shortcut']['captureProof']['appKit'].update(isKeyWindow=False),
+        lambda v: v['shortcut']['ownShortcutState']['beforeClick'].update(dataPresent=True),
+        lambda v: v['shortcut']['ownShortcutState']['afterReadback']['effective'].update(keyCode=31),
+        lambda v: v['shortcut']['readback'].update(storeEqualsExpected=False),
+        lambda v: v['shortcut']['conflictBeforeClick'].update(conflictFree=False),
         lambda v: v['cases'][3]['forward']['range'].update(location=v['cases'][3]['forward']['range']['location'] + 1)]
     for mutation in mutations:
         invalid = copy.deepcopy(value)

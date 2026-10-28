@@ -1,6 +1,6 @@
 {
   "classification": "source-authorship-and-review-only",
-  "implementation_status": "Sol-loop rounds1\u20134 approved the isolated QA source, max budget5 after evidence-backed state/focus/ownership extension. Actual40629369072 opened the status menu but completed zero states/cases. Native nonreciprocal-parent calibration now source-approved; runtime acceptance pending. No behavior edits after round4.",
+  "implementation_status": "Sol-loop rounds1\u20135 approved the isolated QA source with no final findings; budget5/5 used, no reset. Latest actual994run passed unavailable state then failed recorder capture; zero Undo cases. Named local/global input and default global AX policy source now approved, native acceptance pending.",
   "author_cli": {
     "binary": "claude",
     "version": "2.1.310",
@@ -167,6 +167,55 @@
         "duration_ms": 68129,
         "total_cost_usd": 0.3349082
       }
+    },
+    {
+      "invocation": "focused-recorder-native-input-contract",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "medium",
+      "raw_jsonl_sha256": "41d0fe333e2866a15f49322158342112f12080c34d1b5eb6501b433c329919b5",
+      "prompt_sha256": "2527dcb7e5c3e4c7591024d68a1fca4a00949ef593f3cdf20ee424889b5ab289",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 227514,
+        "total_cost_usd": 0.9685458000000001
+      }
+    },
+    {
+      "invocation": "superseded-recorder-systemwide-timeout",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "medium",
+      "raw_jsonl_sha256": "8b9c8858f2138f0dcbdcc3f8bb098ab4ffddeb5071ed7bfb48dcfcd218000bab",
+      "prompt_sha256": "fc916b9a4ecd8a3c2586c2b06b0ec72e8036057c3b3012f3158adb94b8bd916f",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 24329,
+        "total_cost_usd": 0.056074
+      },
+      "disposition": "Wrong system-wide timeout API request; fully superseded and removed before round5 source freeze. Cost retained, no final source effect."
+    },
+    {
+      "invocation": "preserve-default-process-AX-policy",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "medium",
+      "raw_jsonl_sha256": "e3d678c42d3281c8cdd17a419fd460725753116db1ae8f7f6598c5519fa9dabf",
+      "prompt_sha256": "a0640928a52eaee932d51c84d356fd9e79ac8278f44da74229e3e6c77c8909e9",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 20599,
+        "total_cost_usd": 0.049176
+      }
     }
   ],
   "authorship_scope": {
@@ -175,7 +224,8 @@
       "CursorPaster.WritingPasteError enum conformance and four fixed descriptions only",
       "WritingUndoControlOracle.swift: synchronous diagnostics and per-editor positive fixture calibration only; original native verification remains GPT authored.",
       "WritingUndoControlOracle.swift: observed-control native mouse click helper and three call-site/receipt changes only.",
-      "WritingUndoControlOracle.swift: observed native nonreciprocal menu graph calibration; authoritative downward proof and raw non-authoritative upward diagnostics only."
+      "WritingUndoControlOracle.swift: observed native nonreciprocal menu graph calibration; authoritative downward proof and raw non-authoritative upward diagnostics only.",
+      "WritingUndoControlOracle.swift: focused recorder-only native postToPid capture, public typed state/focus proof and immutable diagnostics; removal of all three system-wide timeout setters before round5 freeze."
     ],
     "gpt_authored_native_verification": [
       "scripts/fixtures/WritingUndoControlOracle.swift",
@@ -187,9 +237,9 @@
   },
   "source_sha256": {
     "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
-    "scripts/fixtures/WritingUndoControlOracle.swift": "f867c1be32b47125c06f448118045267e5f73aa26e229593cb91feed53b0ff60",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
     "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
-    "scripts/verify-writing-undo-controls.py": "fe1c3ed8749b36c43f0068f1581911e15d5136e5fbc13832de8c8a31b11fef99",
+    "scripts/verify-writing-undo-controls.py": "20f17317ec04ca40d6327594b11b9583b1364d5be89caa81682b8615b89de909",
     ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd"
   },
   "clipboard_error_copy": {
@@ -225,7 +275,7 @@
   "source_contract": {
     "host_owner": "One actual engine and its own controller, RecorderUIManager and RecordingShortcutManager; production VoiceInkApp composition excluded only in disposable candidate copy.",
     "menu": "Actual product UndoLastWritingEditMenuButton in MenuBarExtra. Exact production title/AXMenuItem/hostPID, fully readable unique bounded downward path under the same retained owned status item/host extras root; actual identifier diagnostic. Upward AXParent graph is raw diagnostic only. Activation still requires a fresh systemwide exact center hit on the same owned target, exact geometry/display and native-menu/window proof.",
-    "shortcut": "Actual ShortcutRecorder clicked via the same observed-control native mouse path; capture and global CGEvent chord through the real registered event tap. No private handler or direct Undo call.",
+    "shortcut": "Actual ShortcutRecorder clicked with original owned mouse proof. Local capture alone uses two CGEvent.postToPid events after actual capture-label/focused-owned-window proof; exact public stored readback and immutable pre-input receipt required. All subsequent configured global Undo invocations keep original postChord/cghidEventTap and real event tap, no direct handlers or QA shortcut writes.",
     "native_editor_helper": "Exact current source tail of WritingTargetLiveTests.swift copied unchanged into the disposable candidate. Separately owned helper supports an explicit test-only passage seed; default NFD bytes remain unchanged.",
     "cases": [
       "textedit-menu",
@@ -258,7 +308,7 @@
     "Source authoring and pure classifier/syntax checks only; remote runtime and visual acceptance pending. Parent owns CI transport.",
     "Plain-text guarded inverse only; no restart, generic Cmd-Z, rich-format or general editor compatibility claim."
   ],
-  "total_author_cost_usd": 7.0722662,
+  "total_author_cost_usd": 8.146062,
   "raw_log_policy": "Only model, status, timing, cost and hashes retained; raw JSONL stays outside the repository.",
   "compiler_response_path_correction": {
     "failed_run_id": 40605378801,
@@ -527,5 +577,43 @@
     },
     "sol_loop": "Round4 APPROVE, same actualGPT6.1Sol medium reviewer and fixed6927base/six-path diff; no findings, usage unavailable. RUNTIME3 resolved-source/pending-native. Budget4of5 used after explicit evidence-backed extension; no reset.",
     "native_runtime_verified": false
+  },
+  "recorder_input_contract_calibration": {
+    "runtime_finding_id": "RUNTIME4",
+    "actual_run_id": 40631248324,
+    "head": "994a98e87161afc31d2086ffe2e6408f78dee397",
+    "evidence": "../undo-controls-40631248324/failure-diagnosis.json",
+    "observed": "Unavailable menu/dismissal passed. Actual recorder AX click passed, clear wait and HID-post routine returned, but exact stored chord not observed; real PNG/AX still Press shortcut. No event-delivery evidence establishes cause. Zero cases.",
+    "named_input_contracts": {
+      "local_capture": "Actual focused recorder, two CGEvent.postToPid events to verified hostPID, after read-only unique AX capture label/owned focused AXWindow/system foreground/native keywindow proof; no retry/fallback.",
+      "global_invocations": "Unchanged cghidEventTap postChord through actual RecordingShortcutManager event tap; native invocation remains required.",
+      "physical_keyboard": false
+    },
+    "public_state": "Only own action typed nil/false/true cleared value, data-presence/hash/decoded/effective chord before click/before input/after readback, public conflict validator and same idle accessibility display. No QA shortcut storage writes. Verifier requires fresh empty initial own action so this route cannot conceal an already registered copy.",
+    "preinput_binding": "Immutable pre-input file holds exact false-inputPosted event metadata/final proof/store state; successful receipt changes only inputPosted and is bound to one post marker pair after file-write.",
+    "global_source_preserved": {
+      "postChord_postKey_sha256": "2784b10baae9f4f74c240e20e63b7b5656510daf856c0184ddd27910c1f2a997",
+      "successCase_busyCheck_focusRefusal_delivery_block_sha256": "82bc3d715629fa22beaaf5b89b6421d9dd9235290895c39ca181b7a85e82722d",
+      "compared_to": "994a98e87161afc31d2086ffe2e6408f78dee397"
+    },
+    "global_tap_source_readback": "ShortcutMonitor suppresses nonmodifier keys only for a matching registered key shortcut; public validator checks stored/reserved/system conflicts. Current failed artifact did not establish HID consumption or another product defect.",
+    "checks": {
+      "classifier_malformed_receipts_rejected": 86,
+      "capture_file_negative_controls": 5,
+      "metadata_positives": "Focused capture and app-wide no-focused-element shapes; no actual input executed.",
+      "all_prior_self_tests": "passed",
+      "swift_frontend_parse": "passed",
+      "git_diff_check": "passed"
+    },
+    "sol_loop": "Round5 APPROVE, same actualGPT6.1Sol MEDIUM reviewer/base6927/six-path diff; no findings, usage unavailable. RUNTIME4 resolved-source/pending-native. Budget5of5 used; no reset.",
+    "native_runtime_verified": false
+  },
+  "default_ax_policy_isolation": {
+    "source_finding_id": "SDK1",
+    "contract": "Official AXUIElement.h389\u2013393: timeout on a system-wide element changes process-global policy; other objects are scoped to that exact object.",
+    "discovered": "Root caught wrong new timeout request before round5; source search also found two earlier Oracle system-wide setters.",
+    "fix": "Actual Opus removed all three, without replacement/reset/temporary global setting. Two remaining Oracle setters are on host-owned descendant nodes; VoiceInk production source contains no timeout setters. Shared native editor helper remains unchanged and uses object-specific budgets.",
+    "historical_limit": "Earlier isolated controls observations were under the earlier QA timeout policy; no native Undo case succeeded or was accepted.",
+    "review_status": "Same actualSol round5 APPROVE; SDK1 resolved-source. Actual default-policy native execution remains pending."
   }
 }

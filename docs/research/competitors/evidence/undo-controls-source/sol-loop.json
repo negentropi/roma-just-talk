@@ -103,18 +103,45 @@
       "shortstat": "6 files changed, 4085 insertions(+)",
       "verdict": "APPROVE",
       "usage_status": "Not exposed; not estimated."
+    },
+    {
+      "round": 5,
+      "status": "complete",
+      "scope": "changed code since994a98e87 and open RUNTIME4 plus SDK1 process-policy isolation only",
+      "findings": [],
+      "usage": null,
+      "frozen_sha256": {
+        "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
+        "scripts/fixtures/WritingUndoControlOracle.swift": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
+        "scripts/verify-writing-undo-controls.py": "20f17317ec04ca40d6327594b11b9583b1364d5be89caa81682b8615b89de909",
+        "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
+        ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd",
+        "docs/research/competitors/evidence/undo-controls-source/authorship-and-review.json": "9abed7df071ecfacc97f76341a9150e2828b93dd39a4e1ac2d685591ba32e367"
+      },
+      "diff_sha256": "c95d119bbd293861b63ee25e34419ab88dfa2f9ea0d456fb075aef18cd0d4f04",
+      "shortstat": "6 files changed, 4609 insertions(+)",
+      "verdict": "APPROVE",
+      "usage_status": "Not exposed; not estimated."
     }
   ],
-  "native_runtime_status": "pending; latest40629369072 real status click opened disabled menu, then reciprocal-parent QA ownership assumption refused with zero cases/states",
+  "native_runtime_status": "pending; latest40631248324 passed unavailable state then recorder exact capture wait failed; zero cases or global Undo dispatch",
   "status": "source-approved-native-still-pending",
-  "rounds_used": 4,
+  "rounds_used": 5,
   "open_blockers_or_shoulds": [],
-  "fixed_findings": [],
+  "fixed_findings": [
+    {
+      "id": "SDK1",
+      "severity": "should",
+      "provenance": "Root SDK contract check before round5",
+      "claim": "System-wide AX timeout setter changes process-global policy, contaminating product capture.",
+      "outcome": "resolved-source; actual Opus removed every Oracle system-wide setter; same actualSol round5 APPROVE"
+    }
+  ],
   "declined_findings": [],
   "code_diff_shortstat_after_review": "6 files changed, 3095 insertions(+)",
   "code_diff_sha256_after_review": "24ae35cdfa3a53ea0d564f590b21210dd245ca8fc0d7a6ef6ee7ee56b22ec597",
   "scoped_files_frozen_through_terminal_verdict": true,
-  "post_review_changes": "Verdict/ledger/authorship metadata only after round4; no behavior changes.",
+  "post_review_changes": "Verdict/ledger/authorship metadata only after round5; no behavior changes.",
   "runtime_findings": [
     {
       "id": "RUNTIME1",
@@ -136,6 +163,13 @@
       "provenance": "actual40629369072 at5ee7c9fee",
       "claim": "Native menu downward subtree is owned/unique, but AXMenu parent returns a host AXMenuBar rather than the retained status AXMenuBarItem. Reciprocal-tree expectation refused before any Undo.",
       "outcome": "resolved-source / pending-native; schema2 downward identity remains strict, nonreciprocal upward graph retained as diagnostics only"
+    },
+    {
+      "id": "RUNTIME4",
+      "severity": "should",
+      "provenance": "actual40631248324 at994a98e87161afc31d2086ffe2e6408f78dee397",
+      "claim": "Unavailable menu and dismissal passed; real recorder click reached capture mode, but exact chord not observed after self-host HID input. No delivery diagnostics establish cause.",
+      "outcome": "resolved-source / pending-native; recorder-only owned-PID capture protocol, exact focused state/readback and unchanged global dispatch remain required"
     }
   ],
   "open_native_requirements": [
@@ -152,5 +186,6 @@
     "reason": "Actual RUNTIME3 exposes native menu open-state and ownership graph asymmetry at the same real control boundary; preserving safe state/focus/ownership acceptance requires a remaining review round. No budget reset.",
     "evidence": "../undo-controls-40629369072/failure-diagnosis.json"
   },
-  "code_diff_shortstat_after_round4": "6 files changed, 4085 insertions(+)"
+  "code_diff_shortstat_after_round4": "6 files changed, 4085 insertions(+)",
+  "code_diff_shortstat_after_round5": "6 files changed, 4609 insertions(+)"
 }

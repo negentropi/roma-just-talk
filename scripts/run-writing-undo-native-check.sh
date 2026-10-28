@@ -514,6 +514,8 @@ def negative_observation_errors(value):
         check(item.get('sourceUTF16') == original and item.get('expectedUTF16') == item.get('observedUTF16') == expected,
             'Negative stage requires literal full-field readback: ' + name)
         check(item.get('range') == item.get('expectedRange') == selected, 'Negative stage range differs: ' + name)
+        check(item.get('pid') == by_stage.get('nfd-before', {}).get('pid')
+            and item.get('token') == by_stage.get('nfd-before', {}).get('token'), 'Negative stages must retain the same owned editor identity')
     diagnostics = extra.get('deliveryDiagnostics', [])
     check(isinstance(diagnostics, list) and len(diagnostics) == 2 and all(isinstance(item, dict) for item in diagnostics),
         'Exactly one before-capture and after-delivery diagnostic required')
@@ -634,12 +636,30 @@ def editor_startup_errors(rows, names):
     tokens = [row.get('token') for row in rows]
     if not all(isinstance(token, str) and token.startswith('RJT-Writing-Live-') for token in tokens) or len(set(tokens)) != len(tokens):
         errors.append('Owned editor startup tokens must be distinct')
+    for token in tokens:
+        try:
+            require(isinstance(token, str) and token.startswith('RJT-Writing-Live-'), 'Missing owned editor token prefix')
+            uuid.UUID(token.removeprefix('RJT-Writing-Live-'))
+        except (ValueError, TypeError, AttributeError, RuntimeError):
+            errors.append('Owned editor startup token must contain an actual UUID')
     counts = {kind: sum(row.get('bundleIdentifier') == kind for row in rows) for kind in expected}
     if counts != expected:
         errors.append('Owned TextEdit/Safari fixture counts differ')
     if any(row.get('checkpoint') != 'fixture-startup' or row.get('finalStage') != 'ready' or row.get('failure') is not None
         or type(row.get('processIdentifier')) is not int or row['processIdentifier'] <= 0 for row in rows):
         errors.append('Every owned editor startup must retain actual ready state and process identity')
+    return errors
+
+
+def editor_identity_errors(startups, observations):
+    by_token = {item.get('token'): item for item in startups}
+    errors = []
+    for item in observations:
+        if 'token' not in item:
+            continue
+        startup = by_token.get(item['token'], {})
+        if item.get('pid') != startup.get('processIdentifier') or item.get('bundleIdentifier') != startup.get('bundleIdentifier'):
+            errors.append('Native editor token, PID and bundle must match its actual owned startup')
     return errors
 
 
@@ -668,8 +688,10 @@ def phase_result(directory, names, host):
     startups = [json.loads(path.read_text()) for path in startup_paths]
     verdict['errors'].extend(editor_startup_errors(startups, names))
     startup_tokens = {row.get('token') for row in startups}
-    observed_tokens = {item.get('token') for path in paths for item in json.loads(path.read_text()).get('observations', []) if 'token' in item}
+    editor_observations = [item for path in paths for item in json.loads(path.read_text()).get('observations', [])]
+    observed_tokens = {item.get('token') for item in editor_observations if 'token' in item}
     require(observed_tokens.issubset(startup_tokens), 'Native observations must refer to actual owned editor startups')
+    verdict['errors'].extend(editor_identity_errors(startups, editor_observations))
     verdict.update({'valid': not verdict['errors'], 'classification': 'passed' if not verdict['errors'] else 'invalid-or-failed',
         'observation_sha256': {path.name: digest(path.read_bytes()) for path in paths}, 'native_host_launch': launches[0],
         'enumeration_host_launches': enumeration_hosts, 'owned_editor_startup_sha256': {path.name: digest(path.read_bytes()) for path in startup_paths}})
@@ -838,6 +860,14 @@ def self_test():
         require(editor_startup_errors(bad, names), 'Unready owned-editor startup accepted')
         bad = copy.deepcopy(rows); bad[0]['bundleIdentifier'] = 'com.foreign.Editor'
         require(editor_startup_errors(bad, names), 'Wrong owned-editor bundle accepted')
+        bad = copy.deepcopy(rows); bad[-1]['token'] = 'RJT-Writing-Live-not-a-uuid'
+        require(editor_startup_errors(bad, names), 'Malformed owned-editor UUID accepted')
+        observations = [{'token': row['token'], 'pid': row['processIdentifier'], 'bundleIdentifier': row['bundleIdentifier']} for row in rows]
+        require(not editor_identity_errors(rows, observations), 'Valid startup/editor identity binding rejected')
+        bad = copy.deepcopy(observations); bad[0]['pid'] += 1
+        require(editor_identity_errors(rows, bad), 'Startup/editor PID mismatch accepted')
+        bad = copy.deepcopy(observations); bad[0]['bundleIdentifier'] = 'com.apple.Safari' if bad[0]['bundleIdentifier'] == 'com.apple.TextEdit' else 'com.apple.TextEdit'
+        require(editor_identity_errors(rows, bad), 'Startup/editor bundle mismatch accepted')
     count = 0
     for name in cases:
         value = {'schemaVersion': 1, 'caseName': name, 'completed': True, 'hostPID': 42, 'hostExecutablePath': '/fixture/app',
@@ -891,6 +921,8 @@ def self_test():
             bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['expectedFullUTF16'] = bad['extra']['negativeObservedFullUTF16']; mutations.append(bad)
             bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['range'] = bad['extra']['negativeRequestedCaret']; mutations.append(bad)
             bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['AXErrors']['value'] = -25204; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['observations'][1]['pid'] += 1; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['observations'][2]['token'] = 'RJT-Writing-Live-' + str(uuid.uuid4()); mutations.append(bad)
         for bad in mutations:
             require(observation_errors(name, bad, '/fixture/app', {42}), 'Broken observation accepted: ' + name)
             count += 1

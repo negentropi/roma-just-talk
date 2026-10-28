@@ -1,0 +1,68 @@
+{
+  "classification": "pure-native-driver-identity-regression-verified",
+  "baseline_commit": "0b60c5e62b84da5888e343dc679eb97b8ec48ef2",
+  "driver_path": "scripts/run-writing-undo-native-check.sh",
+  "baseline_driver_sha256": "7d3dc87d117055157064462dab4be06ef67ec1884b7e83d3ed8f8a857670faf4",
+  "candidate_driver_sha256": "90a5b3056cf7512960aced633479b0d81b8e32004088c21ae50acdd5f0970a65",
+  "valid_protocol_controls_pass_in_both": true,
+  "counterexamples": [
+    {
+      "case": "negative-stage-pid",
+      "old_accepts_invalid": true,
+      "candidate_accepts_invalid": false,
+      "candidate_errors": [
+        "liveWritingUndoSafariRejectsNormalizedDecomposedOutput: Negative stages must retain the same owned editor identity"
+      ]
+    },
+    {
+      "case": "negative-stage-token",
+      "old_accepts_invalid": true,
+      "candidate_accepts_invalid": false,
+      "candidate_errors": [
+        "liveWritingUndoSafariRejectsNormalizedDecomposedOutput: Negative stages must retain the same owned editor identity"
+      ]
+    },
+    {
+      "case": "startup-observation-pid",
+      "old_accepts_invalid": true,
+      "candidate_accepts_invalid": false,
+      "candidate_errors": [
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup"
+      ]
+    },
+    {
+      "case": "startup-observation-bundle",
+      "old_accepts_invalid": true,
+      "candidate_accepts_invalid": false,
+      "candidate_errors": [
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup",
+        "Native editor token, PID and bundle must match its actual owned startup"
+      ]
+    },
+    {
+      "case": "unobserved-startup-uuid",
+      "old_accepts_invalid": true,
+      "candidate_accepts_invalid": false,
+      "candidate_errors": [
+        "Owned editor startup token must contain an actual UUID"
+      ]
+    }
+  ],
+  "counterexample_count": 5,
+  "boundary": "Actual old/candidate pure validators and phase_result execute on isolated JSON files. Host closure and TCC checks are inert stubs solely to isolate editor identity binding.",
+  "limits": [
+    "No app build or launch, Accessibility operation, pasteboard access, native result or provider call.",
+    "This fixes verification false acceptance only; it does not change or rerun the immutable seven-case app artifact."
+  ]
+}

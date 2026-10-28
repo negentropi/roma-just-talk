@@ -392,10 +392,13 @@ enum CursorTextContextReader {
     }
 
     @MainActor
-    static func currentPasteTarget() -> FocusedPasteTarget? {
+    static func currentPasteTarget(messagingTimeout: Float? = nil) -> FocusedPasteTarget? {
         guard AXIsProcessTrusted(),
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
             return nil
+        }
+        if let messagingTimeout {
+            AXUIElementSetMessagingTimeout(focusedElement, messagingTimeout)
         }
         var processIdentifier = pid_t()
         guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
@@ -411,6 +414,13 @@ enum CursorTextContextReader {
         )
     }
 
+    /// Snapshot for detecting when a paste lands. Reads are bounded so a stalled target
+    /// can neither delay the paste nor hold the main actor past the restore deadline.
+    @MainActor
+    static func pasteLandingTarget() -> FocusedPasteTarget? {
+        currentPasteTarget(messagingTimeout: Float(pasteDeliveryObservationDelay))
+    }
+
     /// Returns true once the target shows the pasted text replacing the selection it had
     /// before the paste, which means the target app has already read the clipboard.
     @MainActor
@@ -420,8 +430,6 @@ enum CursorTextContextReader {
         timeout: TimeInterval
     ) async -> Bool {
         guard let selectedRange = target.selectedRange else { return false }
-        // A stalled target must not hold the main actor past the restore deadline.
-        AXUIElementSetMessagingTimeout(target.focusedElement, Float(pasteDeliveryObservationDelay))
         let deadline = ProcessInfo.processInfo.systemUptime + timeout
         while true {
             if pasteLanded(

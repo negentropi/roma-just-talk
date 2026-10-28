@@ -110,7 +110,13 @@ struct VoiceInkTests {
         let restoreDelayValue = defaults.object(forKey: "clipboardRestoreDelay")
         let pasteMethodValue = defaults.object(forKey: VoiceInkPasteMethod.userDefaultsKey)
         let pasteboard = NSPasteboard.general
-        let originalClipboard = pasteboard.string(forType: .string)
+        let originalClipboard = (pasteboard.pasteboardItems ?? []).map { item in
+            let copy = NSPasteboardItem()
+            for type in item.types {
+                if let data = item.data(forType: type) { copy.setData(data, forType: type) }
+            }
+            return copy
+        }
         let document = FileManager.default.temporaryDirectory
             .appendingPathComponent("clipboard-restore-\(UUID().uuidString).txt")
         try "".write(to: document, atomically: true, encoding: .utf8)
@@ -123,9 +129,7 @@ struct VoiceInkTests {
             restoreDefault(restoreDelayValue, forKey: "clipboardRestoreDelay")
             restoreDefault(pasteMethodValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
             pasteboard.clearContents()
-            if let originalClipboard {
-                pasteboard.setString(originalClipboard, forType: .string)
-            }
+            pasteboard.writeObjects(originalClipboard)
         }
 
         defaults.set(true, forKey: "restoreClipboardAfterPaste")

@@ -216,7 +216,7 @@ class CursorPaster {
             return .commandNotPosted
         }
         latencyTrace.end(clipboardWriteSpan, details: "result=success")
-        let restoreTarget = shouldRestoreClipboard ? CursorTextContextReader.currentPasteTarget() : nil
+        let restoreTarget = shouldRestoreClipboard ? CursorTextContextReader.pasteLandingTarget() : nil
 
         let commandSpan = latencyTrace.begin("paste_session.post_command", token: latencyTraceToken)
         let pasteResult = await postPasteCommand(

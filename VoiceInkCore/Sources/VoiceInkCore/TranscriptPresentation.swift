@@ -975,6 +975,10 @@ public enum VoiceInkHistoryRefreshPolicy {
         VoiceInkHistoryRefreshPlan(action: .reload)
     }
 
+    public static func rowsDidDelete() -> VoiceInkHistoryRefreshPlan {
+        VoiceInkHistoryRefreshPlan(action: .reload)
+    }
+
     public static func latestItemDidChange<ID: Equatable>(
         oldID: ID?,
         newID: ID?,

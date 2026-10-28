@@ -79,18 +79,31 @@ struct DiscardedRecordingTests {
         #expect(try fixture.transcriptionCount() == 0)
     }
 
-    @Test @MainActor func historySelectionDropsDeletedRows() throws {
+    @Test @MainActor func emptyResultBehindNewerRowAnnouncesDeletionAndLeavesSelection() async throws {
         let fixture = try RecordingFixture()
-        let kept = Transcription(text: "kept", duration: 1)
-        let discarded = Transcription(text: "", duration: 1)
-        fixture.context.insert(kept)
-        fixture.context.insert(discarded)
+        let session = GatedTextSession(text: "", released: false)
+        fixture.beginRecording(session: session)
+        let stop = Task { await fixture.engine.toggleRecord() }
+        await session.waitUntilTranscribing()
+        let pending = try #require(try fixture.context.fetch(FetchDescriptor<Transcription>()).first)
+        // A newer row (e.g. an imported file) lands while the selected pending row transcribes.
+        let newer = Transcription(text: "imported", duration: 1, transcriptionStatus: .completed)
+        fixture.context.insert(newer)
         try fixture.context.save()
+        let deletions = DeletionCounter()
+        let observer = NotificationCenter.default.addObserver(forName: .transcriptionDeleted, object: nil, queue: nil) { _ in
+            deletions.count += 1
+        }
+        defer { NotificationCenter.default.removeObserver(observer) }
 
-        fixture.context.delete(discarded)
-        try fixture.context.save()
+        session.release()
+        await stop.value
 
-        #expect(Set([kept, discarded]).filter(TranscriptionHistoryQuery.isLive) == [kept])
+        var latest = FetchDescriptor<Transcription>(sortBy: [SortDescriptor(\.timestamp, order: .reverse)])
+        latest.fetchLimit = 1
+        #expect(try fixture.context.fetch(latest).map(\.id) == [newer.id])
+        #expect(deletions.count == 1)
+        #expect(Set([pending, newer]).filter(TranscriptionHistoryQuery.isLive) == [newer])
     }
 }
 
@@ -158,6 +171,8 @@ private extension VoiceInkEngine {
 }
 
 private enum FixtureError: Error { case unusedRuntime }
+
+private final class DeletionCounter: @unchecked Sendable { var count = 0 }
 
 @MainActor private final class GatedTextSession: TranscriptionSession {
     private let text: String

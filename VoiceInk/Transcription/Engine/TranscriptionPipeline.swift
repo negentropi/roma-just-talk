@@ -432,5 +432,6 @@ class TranscriptionPipeline {
         VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(for: audioURL.absoluteString) { message in
             logger.error("\(message, privacy: .public)")
         }
+        NotificationCenter.default.post(name: .transcriptionDeleted, object: nil)
     }
 }

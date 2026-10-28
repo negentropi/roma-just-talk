@@ -27,7 +27,7 @@ concurrency:
 jobs:
   macos:
     runs-on: macos-26
-    timeout-minutes: 120
+    timeout-minutes: 160
     env:
       BASELINE_REF: ${{ inputs.baseline_ref || 'b4df0b236592fe701e45b249856a4b731e96b104' }}
       RJT_UI_ONLY: ${{ inputs.ui_only && 'true' || 'false' }}
@@ -134,6 +134,7 @@ jobs:
           bash scripts/run-correction-library-store-check.sh self-test 2>&1 | tee "$proof/correction-library-store.log"
           bash scripts/run-local-cli-lifetime-check.sh --self-test 2>&1 | tee "$proof/local-cli-lifetime.log"
           bash scripts/run-dictation-polish-native-check.sh self-test 2>&1 | tee "$proof/dictation-polish.log"
+          bash scripts/run-writing-pr-review-regression.sh self-test 2>&1 | tee "$proof/pr-review-classifiers.log"
 
       - name: Prepare and verify static Whisper dependencies
         id: dependencies
@@ -211,6 +212,11 @@ jobs:
         if: ${{ !cancelled() && steps.packages.outcome == 'success' && steps.dependencies.outcome == 'success' && (inputs.ui_only || steps.units.outcome == 'success') }}
         run: bash scripts/run-writing-feature-regression.sh ui
 
+      - name: Matched PR review regressions
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        timeout-minutes: 40
+        run: bash scripts/run-writing-pr-review-regression.sh
+
       - name: Preserve test evidence before the Release build
         if: always()
         run: |
@@ -256,6 +262,12 @@ jobs:
             ${{ runner.temp }}/writing-ui-proof/history-seed/**
             ${{ runner.temp }}/writing-core-checks.log
             ${{ runner.temp }}/writing-fixture-checks/**
+            ${{ runner.temp }}/writing-pr-review-proof/**/result.json
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.log
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.json
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.txt
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.sh
+            ${{ runner.temp }}/writing-pr-review-proof/**/*.swift
             ${{ runner.temp }}/writing-dependency-setup.log
             ${{ runner.temp }}/writing-release-build.log
           if-no-files-found: error

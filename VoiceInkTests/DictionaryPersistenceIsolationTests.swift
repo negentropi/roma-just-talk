@@ -151,9 +151,11 @@ extension VoiceInkTests {
 
         @Test @MainActor func staleHistoryPreviewRejectsAnExternalCodeUnitRevision() throws {
             for withDuplicate in [false, true] {
+                let original = "e\u{301} Hills, Inc"
+                let newer = "é Hills, Inc"
+                try #require(original == newer && !original.utf16.elementsEqual(newer.utf16))
                 let fixture = try DictionaryIsolationFixture()
                 try fixture.expectBystandersRemainUnsaved()
-                let original = "e\u{301} Hills, Inc"
                 let sourceRow = Transcription(text: "processed", duration: 1, recognitionText: original)
                 fixture.library.context.insert(sourceRow)
                 try fixture.library.context.save()
@@ -167,7 +169,6 @@ extension VoiceInkTests {
                 )
                 let writer = fixture.freshContext()
                 let changed = try #require(writer.fetch(FetchDescriptor<Transcription>()).first { $0.id == sourceRow.id })
-                let newer = "é Hills, Inc"
                 changed.recognitionText = newer
                 if withDuplicate {
                     writer.insert(WordReplacement(record: try .init(

@@ -1,0 +1,10 @@
+{
+  "boundary": "Foundation evaluation of exact extracted valid existing Swift test literals, not a product regression",
+  "command": "/usr/bin/swift /tmp/rjt-dictionary-isolation-literal-audit-01a17bef.swift",
+  "exitCode": 0,
+  "testSourceSHA256": "999bb7ca2aa276a257710212d09288fd15ddac1ea3a3a484ee1a53f8ec99a534",
+  "files": {
+    "probe.swift": "e95d1022aca6ff144ce93f51bfcaf3a4f5d1e373c9922d09c9daf550c8045760",
+    "observation.json": "958a75e86c6287aa305b79ec835ea5e0eda468a67ca6eeb0cde0cce3ac71927d"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "actualEditedContainsCRLF" : true,
+  "actualEditedHasDecomposedAcute" : true,
+  "actualEditedHasOneLiteralBackslashBeforeTemp" : true,
+  "actualNewerUTF16" : [
+    233,
+    32,
+    72,
+    105,
+    108,
+    108,
+    115,
+    44,
+    32,
+    73,
+    110,
+    99
+  ],
+  "actualOriginalCanonicalEqual" : true,
+  "actualOriginalUTF16" : [
+    101,
+    769,
+    32,
+    72,
+    105,
+    108,
+    108,
+    115,
+    44,
+    32,
+    73,
+    110,
+    99
+  ],
+  "actualOriginalUTF16Different" : true,
+  "hypotheticalDoubleEscapedCanonicalEqual" : false,
+  "sourceSHA256" : "999bb7ca2aa276a257710212d09288fd15ddac1ea3a3a484ee1a53f8ec99a534"
+}

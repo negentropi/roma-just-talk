@@ -589,7 +589,7 @@ def receipt_errors(value, executable, pid, expected_home):
         check(type(item.get('actionsAXError')) is int
             and isinstance(item.get('actions'), list) and all(isinstance(action, str) for action in item['actions']),
             'AX action diagnostic is malformed: ' + identifier)
-    def click(item, target, identifier, roles, status=False):
+    def click(item, target, identifier, roles, checkpoint, status=False):
         check(isinstance(item, dict) and isinstance(target, dict), 'Native mouse input receipt is missing')
         if not isinstance(item, dict) or not isinstance(target, dict):
             return
@@ -636,13 +636,27 @@ def receipt_errors(value, executable, pid, expected_home):
                 'Windowless native mouse control lacks owned menu ancestry')
         else:
             check(False, 'Unknown native mouse window ownership policy')
-    def menu(item, enabled):
+        readiness = item.get('readiness', {})
+        check(isinstance(readiness, dict), 'Pre-input readiness summary missing')
+        if isinstance(readiness, dict):
+            count = readiness.get('attemptCount')
+            check(readiness.get('experiment') == 'preinput-readiness-calibration'
+                and type(count) is int and 1 <= count <= 6 and readiness.get('maxAttempts') == 6
+                and readiness.get('deadlineSeconds') == 6 and readiness.get('intervalMilliseconds') == 1000
+                and type(readiness.get('elapsedSeconds')) in (int, float) and math.isfinite(readiness['elapsedSeconds'])
+                and readiness['elapsedSeconds'] >= 0 and readiness.get('noInputBeforeReady') is True
+                and readiness.get('finalObservationReady') is True, 'Pre-input readiness bounds/authority invalid')
+            if type(count) is int and 1 <= count <= 6:
+                names = ['click-readiness-' + checkpoint + '-attempt-' + str(n) + '.json' for n in range(1, count + 1)]
+                check(readiness.get('observations') == names and readiness.get('finalObservation') == names[-1],
+                    'Pre-input readiness observation names/count differ')
+    def menu(item, enabled, checkpoint):
         control(item, 'undoLastWritingEdit.menuCommand', ['AXMenuItem', 'AXButton'], enabled)
         check(item.get('kind') == 'product-menu', 'Wrong product menu boundary')
         status = item.get('statusControl', {})
         control(status, status.get('id', ''), ['AXMenuBarItem', 'AXButton'])
         check(status.get('id') == 'undoControlHost.statusItem' or status.get('label') == 'RJT Undo check', 'Wrong actual status control')
-        click(item.get('statusClick'), status, 'undoControlHost.statusItem', ['AXMenuBarItem', 'AXButton'], status=True)
+        click(item.get('statusClick'), status, 'undoControlHost.statusItem', ['AXMenuBarItem', 'AXButton'], 'menu.' + checkpoint + '.status', status=True)
     def notice(item, message):
         check(isinstance(item, dict) and item.get('id') == 'undoLastWritingEdit.notice'
             and item.get('expectedMessage') == message and message in (item.get('label'), item.get('value')),
@@ -728,7 +742,7 @@ def receipt_errors(value, executable, pid, expected_home):
             and shortcut.get('modifierFlagsRawValue') == 1835008 and bool(shortcut.get('displayString')), 'Actual configured recorder chord differs')
         control(shortcut.get('recorderControl'), 'shortcutRecorder.undoLastWritingEdit', ['AXButton'])
         recorder = shortcut.get('recorderControl', {})
-        click(recorder.get('click'), recorder, 'shortcutRecorder.undoLastWritingEdit', ['AXButton'])
+        click(recorder.get('click'), recorder, 'shortcutRecorder.undoLastWritingEdit', ['AXButton'], 'shortcut.recorder')
         records = value.get('cases', [])
         check(isinstance(records, list) and [item.get('id') for item in records] == cases, 'Four exact ordered case records required')
         selected = exact_range(len(units(prefix)), len(units(passage)))
@@ -751,8 +765,8 @@ def receipt_errors(value, executable, pid, expected_home):
             check(len({(item[key]['pid'], item[key]['token']) for key in ('before', 'forward', 'restored')}) == 1,
                 'Product command switched captured process/document')
             if is_menu:
-                menu(item.get('command', {}), True)
-                click(item['command'].get('activationClick'), item['command'], 'undoLastWritingEdit.menuCommand', ['AXMenuItem', 'AXButton'])
+                menu(item.get('command', {}), True, name + '-menu')
+                click(item['command'].get('activationClick'), item['command'], 'undoLastWritingEdit.menuCommand', ['AXMenuItem', 'AXButton'], 'case.' + name + '.menu-command')
             else:
                 check(item.get('command') == {'kind': 'configured-global-shortcut', 'keyCode': 32,
                     'modifierFlagsRawValue': 1835008, 'nativeEventsPosted': 2}, 'Actual registered shortcut invocation differs')
@@ -762,9 +776,9 @@ def receipt_errors(value, executable, pid, expected_home):
                 'Capability consumption or exact capture names differ')
         states = value.get('stateChecks', {})
         check(set(states) == {'unavailable', 'busy', 'focusRefusal'} and all(item.get('passed') is True for item in states.values()), 'Three exact control states must pass')
-        menu(states['unavailable']['menu'], False)
+        menu(states['unavailable']['menu'], False, 'unavailable-menu')
         busy = states['busy']
-        menu(busy['menu'], False)
+        menu(busy['menu'], False, 'busy-menu')
         check(busy.get('recordingStateFixture') == 'busy' and busy.get('capabilityRetained') is True, 'Busy component guard did not retain capability')
         notice(busy.get('notice'), busy_message)
         snapshot(busy.get('observed'), prefix + replacement_shortcut + suffix, exact_range(len(units(prefix + replacement_shortcut)), 0), 'com.apple.TextEdit')
@@ -783,6 +797,77 @@ def receipt_errors(value, executable, pid, expected_home):
     except (TypeError, KeyError, AttributeError, ValueError) as error:
         errors.append('Malformed receipt: ' + str(error))
     return errors
+
+
+def verify_readiness_observations(click, checkpoint, pid):
+    summary = click['readiness']
+    names = summary['observations']
+    expected_names = ['click-readiness-' + checkpoint + '-attempt-' + str(n) + '.json'
+        for n in range(1, summary['attemptCount'] + 1)]
+    require(names == expected_names and summary['finalObservation'] == names[-1], 'Readiness file inventory differs')
+    hashes, observed = {}, []
+    for index, name in enumerate(names, 1):
+        path = native / name
+        require(path.is_file() and not path.is_symlink(), 'Readiness observation missing or symlinked')
+        raw = path.read_bytes()
+        item = json.loads(raw)
+        require(item['schemaVersion'] == 1 and item['kind'] == 'native-click-preinput-readiness-observation'
+            and item['diagnosticOnly'] is True and item['experiment'] == 'preinput-readiness-calibration'
+            and item['checkpoint'] == 'click.' + checkpoint and type(item['attempt']) is int and item['attempt'] == index
+            and item['maxAttempts'] == 6 and item['inputPosted'] is False and type(item['hostPID']) is int and item['hostPID'] == pid
+            and type(item['systemUptime']) in (int, float) and math.isfinite(item['systemUptime']),
+            'Readiness observation source/attempt/input/host binding differs')
+        require(item['ready'] is (index == len(names)), 'Input was retried after a ready observation')
+        require(item['reason'] is None if item['ready'] else isinstance(item['reason'], str) and bool(item['reason']),
+            'Readiness reason does not match its decision')
+        hashes[name] = digest(raw)
+        observed.append(item)
+    final = observed[-1]
+    require(final['identity'] == {'attempted': True, 'uniqueCount': 1, 'sameReferenceAsLookup': True}, 'Readiness target identity differs')
+    target, frame, display, hit = (final[k] for k in ('target', 'frame', 'displays', 'hitTest'))
+    require(target['attempted'] is True and target['enabled'] is True and target['pid'] == pid
+        and target['identifier'] == click['targetID'] and target['role'] == click['targetRole']
+        and target['identityContract'] == click['identityContract'], 'Ready target differs from clicked control')
+    require(all(frame[k] is True for k in ('attempted', 'finitePositive', 'positionRead', 'sizeRead', 'positionDecoded', 'sizeDecoded'))
+        and {k: frame[k] for k in ('x', 'y', 'width', 'height')} == click['targetFrame']
+        and frame['center'] == click['point'], 'Ready AX geometry differs from click')
+    require(display['attempted'] is True and display['apiError'] == 0
+        and type(display['count']) is int and 1 <= display['count'] <= 32
+        and display['count'] == len(display['displays']), 'Ready display API facts invalid')
+    containing = []
+    for candidate_display in display['displays']:
+        bounds = candidate_display['bounds']
+        require(set(bounds) == {'x', 'y', 'width', 'height'} and all(type(v) in (int, float) and math.isfinite(v) for v in bounds.values()),
+            'Retained display rectangle is not finite')
+        target_frame = click['targetFrame']
+        contains = bounds['x'] <= target_frame['x'] and bounds['y'] <= target_frame['y'] \
+            and target_frame['x'] + target_frame['width'] <= bounds['x'] + bounds['width'] \
+            and target_frame['y'] + target_frame['height'] <= bounds['y'] + bounds['height']
+        require(candidate_display['containsTarget'] is contains, 'Display containment observation differs from raw rectangles')
+        if contains:
+            containing.append(candidate_display)
+    require(display['containingCount'] == 1 and len(containing) == 1
+        and containing[0]['id'] == click['activeDisplayID'] and containing[0]['bounds'] == click['activeDisplayBounds'],
+        'Ready control is not contained in exactly the clicked display')
+    require(hit['attempted'] is True and hit['axError'] == 0 and hit['elementPresent'] is True
+        and hit['pid'] == pid and hit['reachedTarget'] is True and hit['depth'] == click['hitDepth'] and hit['point'] == click['point'],
+        'Ready owned hit differs from click')
+    window, recheck = final['window'], final['frameRecheck']
+    require(window['attempted'] is True and window['policy'] == click['windowPolicy']
+        and window['targetWindowPresent'] is click['targetWindowPresent'] and window['hitWindowPresent'] is click['hitWindowPresent']
+        and recheck['attempted'] is True and recheck['finitePositive'] is True and recheck['stable'] is True
+        and {k: recheck[k] for k in ('x', 'y', 'width', 'height')} == click['targetFrame'], 'Ready window/frame recheck differs')
+    require(window.get('windowOwnedByHost') is True if click['windowPolicy'] == 'same-window'
+        else window.get('menuAncestorRole') == click['menuAncestorRole'], 'Ready window/menu ancestry proof differs')
+    stages = [json.loads((native / name).read_text()) for name in progress_files()]
+    def sequence(stage):
+        matches = [item['sequence'] for item in stages if item['stage'] == stage]
+        require(len(matches) == 1, 'Missing/duplicate input or final observation progress marker: ' + stage)
+        return matches[0]
+    require(sequence('click.' + checkpoint + '.a' + str(len(names)) + '.observation-write.after')
+        < sequence('click.' + checkpoint + '.post.before') < sequence('click.' + checkpoint + '.post.after'),
+        'Input was not posted once after its final immutable readiness observation')
+    return hashes
 
 
 def classify_native(host, live):
@@ -815,6 +900,18 @@ def classify_native(host, live):
             errors.append('Invalid actual native hierarchy: ' + name)
         hashes[path.name] = digest(path.read_bytes())
     if not errors:
+        clicks = [('shortcut.recorder', value['shortcut']['recorderControl']['click']),
+            ('menu.unavailable-menu.status', value['stateChecks']['unavailable']['menu']['statusClick']),
+            ('menu.busy-menu.status', value['stateChecks']['busy']['menu']['statusClick'])]
+        for item in value['cases']:
+            if item['commandKind'] == 'menu':
+                clicks += [('menu.' + item['id'] + '-menu.status', item['command']['statusClick']),
+                    ('case.' + item['id'] + '.menu-command', item['command']['activationClick'])]
+        for checkpoint, click in clicks:
+            try:
+                hashes.update(verify_readiness_observations(click, checkpoint, live['pid']))
+            except (RuntimeError, OSError, KeyError, TypeError, ValueError) as error:
+                errors.append('Readiness evidence failed: ' + str(error))
         owned = [item['before'] for item in value['cases']] + [value['stateChecks']['focusRefusal'][key] for key in ('sourceAfter', 'otherAfter')]
         for item in owned:
             for suffix in ('fixture-startup', 'cleanup'):
@@ -839,8 +936,9 @@ def self_test():
     def control(identifier, role='AXButton', enabled=True):
         return {'id': identifier, 'role': role, 'enabled': enabled, 'label': '', 'value': '', 'actions': ['AXPress'],
             'actionsAXError': 0, 'frame': {'x': 1, 'y': 2, 'width': 100, 'height': 22}}
-    def click_fixture(target):
+    def click_fixture(target, checkpoint):
         windowless = target['role'] in ('AXMenuItem', 'AXMenuBarItem')
+        name = 'click-readiness-' + checkpoint + '-attempt-1.json'
         return {'kind': 'native-mouse-click', 'eventTypes': ['leftMouseDown', 'leftMouseUp'], 'eventCount': 2,
             'tap': 'cghidEventTap', 'clickState': 1, 'flagsRawValue': 0, 'hostPID': 42, 'hitPID': 42,
             'targetID': target['id'], 'targetRole': target['role'], 'identityContract': 'identifier',
@@ -851,13 +949,17 @@ def self_test():
             'windowPolicy': 'windowless-native-menu' if windowless else 'same-window',
             'targetWindowPresent': not windowless, 'hitWindowPresent': not windowless,
             'sameWindow': not windowless, 'windowOwnedByHost': not windowless, 'nativeMenuAncestry': windowless,
-            'menuAncestorRole': 'AXMenuBar' if windowless else ''}
-    def menu(enabled=True):
+            'menuAncestorRole': 'AXMenuBar' if windowless else '',
+            'readiness': {'experiment': 'preinput-readiness-calibration', 'attemptCount': 1, 'maxAttempts': 6,
+                'deadlineSeconds': 6, 'intervalMilliseconds': 1000, 'elapsedSeconds': 0.1,
+                'noInputBeforeReady': True, 'finalObservationReady': True, 'observations': [name], 'finalObservation': name}}
+    def menu(checkpoint, enabled=True):
         target = control('undoLastWritingEdit.menuCommand', 'AXMenuItem', enabled)
         status = control('undoControlHost.statusItem', 'AXMenuBarItem')
-        result = dict(target, kind='product-menu', statusControl=status, statusClick=click_fixture(status))
+        result = dict(target, kind='product-menu', statusControl=status, statusClick=click_fixture(status, 'menu.' + checkpoint + '.status'))
         if enabled:
-            result['activationClick'] = click_fixture(target)
+            case = checkpoint.removesuffix('-menu')
+            result['activationClick'] = click_fixture(target, 'case.' + case + '.menu-command')
         return result
     def notice(message):
         return dict(control('undoLastWritingEdit.notice'), expectedMessage=message, label=message)
@@ -868,7 +970,7 @@ def self_test():
             'pid': 100, 'bundleIdentifier': bundle, 'token': token, 'usesSystemPaste': bundle == 'com.apple.Safari'}
     selected = exact_range(len(units(prefix)), len(units(passage)))
     recorder = control('shortcutRecorder.undoLastWritingEdit')
-    recorder['click'] = click_fixture(recorder)
+    recorder['click'] = click_fixture(recorder, 'shortcut.recorder')
     value = {'schemaVersion': 1, 'completed': True, 'selectedCases': cases, 'executedCases': cases,
         'host': {'pid': 42, 'bundleIdentifier': bundle_id, 'executablePath': '/fixture/app'},
         'runtimeBounds': {'productMenuOrShortcut': True, 'normalAppComposition': False, 'fullPipeline': False, 'ASR': False, 'provider': False},
@@ -886,12 +988,12 @@ def self_test():
             'commandKind': 'menu' if is_menu else 'shortcut', 'forwardAttempts': 1, 'forwardConfirmations': 1,
             'originalUTF16': units(case_original), 'resultUTF16': units(result), 'originalRange': case_selected,
             'before': snapshot(case_original, case_selected, bundle, token), 'forward': snapshot(result, exact_range(len(units(prefix + replacement)), 0), bundle, token),
-            'restored': snapshot(case_original, case_selected, bundle, token), 'command': menu() if is_menu else {'kind': 'configured-global-shortcut',
+            'restored': snapshot(case_original, case_selected, bundle, token), 'command': menu(name + '-menu') if is_menu else {'kind': 'configured-global-shortcut',
                 'keyCode': 32, 'modifierFlagsRawValue': 1835008, 'nativeEventsPosted': 2}, 'notice': notice(restored_message),
             'capabilityConsumed': True, 'noticeWasAbsentBeforeCommand': True,
             'screenshots': [name + '-forward.png', name + '-restored.png']})
-    value['stateChecks'] = {'unavailable': {'passed': True, 'menu': menu(False)},
-        'busy': {'passed': True, 'recordingStateFixture': 'busy', 'menu': menu(False), 'notice': notice(busy_message),
+    value['stateChecks'] = {'unavailable': {'passed': True, 'menu': menu('unavailable-menu', False)},
+        'busy': {'passed': True, 'recordingStateFixture': 'busy', 'menu': menu('busy-menu', False), 'notice': notice(busy_message),
             'observed': copy.deepcopy(value['cases'][1]['forward']), 'capabilityRetained': True},
         'focusRefusal': {'passed': True, 'capabilityRetired': True, 'differentWindow': True, 'notice': notice(refused_message),
             'sourceAfter': snapshot(prefix + 'Source remains e\u0301 🧪' + suffix, exact_range(len(units(prefix + 'Source remains e\u0301 🧪')), 0), 'com.apple.TextEdit', 'RJT-Writing-Live-00000000-0000-4000-8000-000000000005', focused=False),
@@ -980,6 +1082,10 @@ def self_test():
         lambda v: v['cases'][0]['command'].pop('activationClick'),
         lambda v: v['stateChecks']['unavailable']['menu'].pop('statusClick'),
         lambda v: v['shortcut']['recorderControl']['click'].update(sameWindow=False),
+        lambda v: v['shortcut']['recorderControl']['click']['readiness'].update(noInputBeforeReady=False),
+        lambda v: v['shortcut']['recorderControl']['click']['readiness'].update(attemptCount=7),
+        lambda v: v['shortcut']['recorderControl']['click']['readiness'].update(finalObservation='../foreign.json'),
+        lambda v: v['shortcut']['recorderControl']['click']['readiness'].update(finalObservationReady=False),
         lambda v: v['cases'][3]['forward']['range'].update(location=v['cases'][3]['forward']['range']['location'] + 1)]
     for mutation in mutations:
         invalid = copy.deepcopy(value)
@@ -991,6 +1097,7 @@ def self_test():
     host_failure_self_test()
     profile_and_sampling_self_test()
     diagnostic_screen_self_test()
+    readiness_observation_self_test()
 
 
 def compiler_inputs_self_test():
@@ -1302,6 +1409,75 @@ def diagnostic_screen_self_test():
         print('External diagnostic screenshot metadata controls passed: positive, foreign PID, changed identity, timeout, invalid image and changed PNG. No real capture or native process executed.')
     finally:
         native, process_identity, subprocess.run = saved_native, saved_identity, saved_run
+
+
+def readiness_observation_self_test():
+    global native
+    saved_native = native
+    checkpoint = 'shortcut.recorder'
+    names = ['click-readiness-' + checkpoint + '-attempt-' + str(n) + '.json' for n in (1, 2)]
+    frame = {'x': 10, 'y': 20, 'width': 100, 'height': 22}
+    point = {'x': 60, 'y': 31}
+    bounds = {'x': 0, 'y': 0, 'width': 1024, 'height': 768}
+    click = {'targetID': 'shortcutRecorder.undoLastWritingEdit', 'targetRole': 'AXButton', 'identityContract': 'identifier',
+        'targetFrame': frame, 'point': point, 'activeDisplayID': 1, 'activeDisplayBounds': bounds, 'hitDepth': 0,
+        'windowPolicy': 'same-window', 'targetWindowPresent': True, 'hitWindowPresent': True,
+        'readiness': {'attemptCount': 2, 'observations': names, 'finalObservation': names[-1]}}
+    final = {'schemaVersion': 1, 'kind': 'native-click-preinput-readiness-observation', 'diagnosticOnly': True,
+        'experiment': 'preinput-readiness-calibration', 'checkpoint': 'click.' + checkpoint,
+        'attempt': 2, 'maxAttempts': 6, 'inputPosted': False, 'hostPID': 42, 'systemUptime': 102.0, 'ready': True, 'reason': None,
+        'identity': {'attempted': True, 'uniqueCount': 1, 'sameReferenceAsLookup': True},
+        'target': {'attempted': True, 'enabled': True, 'pid': 42, 'identifier': click['targetID'],
+            'role': 'AXButton', 'identityContract': 'identifier'},
+        'frame': dict(frame, attempted=True, finitePositive=True, positionRead=True, sizeRead=True,
+            positionDecoded=True, sizeDecoded=True, center=point),
+        'displays': {'attempted': True, 'apiError': 0, 'count': 1, 'containingCount': 1,
+            'displays': [{'id': 1, 'bounds': bounds, 'containsTarget': True}]},
+        'hitTest': {'attempted': True, 'axError': 0, 'elementPresent': True, 'pid': 42,
+            'reachedTarget': True, 'depth': 0, 'point': point},
+        'window': {'attempted': True, 'policy': 'same-window', 'targetWindowPresent': True,
+            'hitWindowPresent': True, 'windowOwnedByHost': True},
+        'frameRecheck': dict(frame, attempted=True, finitePositive=True, stable=True)}
+    first = dict(copy.deepcopy(final), attempt=1, systemUptime=100.0, ready=False, reason='frame not on display')
+    mutations = [lambda items: items[0].update(ready=True, reason=None),
+        lambda items: items[1].update(inputPosted=True), lambda items: items[1]['target'].update(pid=43),
+        lambda items: items[1]['frame'].update(x=11), lambda items: items[1]['displays'].update(containingCount=2),
+        lambda items: items[1]['hitTest'].update(reachedTarget=False),
+        lambda items: items[1]['window'].update(windowOwnedByHost=False)]
+    try:
+        with tempfile.TemporaryDirectory(prefix='rjt-undo-readiness-observation-') as directory:
+            native = Path(directory)
+            (native / 'progress').mkdir()
+            stages = ['click.' + checkpoint + '.a2.observation-write.after',
+                'click.' + checkpoint + '.post.before', 'click.' + checkpoint + '.post.after']
+            for index, stage in enumerate(stages, 1):
+                (native / 'progress' / (str(index).zfill(4) + '.json')).write_text(json.dumps({'stage': stage, 'sequence': index}))
+            def store(items):
+                for name, item in zip(names, items):
+                    (native / name).write_text(json.dumps(item))
+            store([first, final])
+            require(len(verify_readiness_observations(click, checkpoint, 42)) == 2, 'Failed-then-ready read-only observation fixture rejected')
+            for mutate in mutations:
+                items = copy.deepcopy([first, final])
+                mutate(items)
+                store(items)
+                try:
+                    verify_readiness_observations(click, checkpoint, 42)
+                except RuntimeError:
+                    pass
+                else:
+                    raise RuntimeError('Unsafe/readiness-mismatched observation accepted')
+            store([first, final])
+            (native / 'progress' / '0004.json').write_text(json.dumps({'stage': stages[-1], 'sequence': 4}))
+            try:
+                verify_readiness_observations(click, checkpoint, 42)
+            except RuntimeError:
+                pass
+            else:
+                raise RuntimeError('Duplicate mouse input completion accepted')
+        print('Pre-input readiness file bindings passed: failed-then-ready positive, seven ownership/geometry/input negatives and duplicate post rejection. Metadata only; no mouse event or native UI executed.')
+    finally:
+        native = saved_native
 
 
 def interrupted(signum, _frame):

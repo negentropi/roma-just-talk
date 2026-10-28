@@ -57,7 +57,12 @@ enum WritingUndoControlHostProgress {
         var description: String { reason }
     }
 
-    private static let maximumRecords = 1000
+    /// Prior cap 1000 plus the Oracle's pre-input readiness calibration experiment: 7 native clicks per
+    /// run, each now at most 6 read-only attempts x 134 records (67 marked AX/write pairs: 13 target/frame/root,
+    /// 4 ancestors x 5 separately marked parent/role/identifier/title/pid provenance reads, 13 display/hit/window,
+    /// 18 menu ancestry, 2 frame recheck, 1 observation write) + 2 post marks, replacing the former 88
+    /// worst-case click records. Still finite and fail-closed.
+    private static let maximumRecords = 1000 + 7 * (6 * 134 + 2 - 88)
     private static var sequence = 0
     private static var directory: URL?
     private static var firstFailure: String?

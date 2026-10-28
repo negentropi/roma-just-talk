@@ -164,8 +164,8 @@ enum WritingUndoControlOracle {
             try mark("shortcut.recorder-describe.before")
             let control = try describe(recorder, "shortcut.recorder")
             try mark("shortcut.recorder-press.before")
-            let recorderClick = try click(recorder, "shortcut.recorder", roles: ["AXButton"],
-                                          identifier: "shortcutRecorder.undoLastWritingEdit")
+            let recorderClick = try await click(recorder, "shortcut.recorder", roles: ["AXButton"],
+                                                identifier: "shortcutRecorder.undoLastWritingEdit")
             try mark("shortcut.clear-wait.before")
             try await wait("The real recorder did not clear its shortcut for capture.") {
                 ShortcutStore.isShortcutCleared(for: .undoLastWritingEdit)
@@ -270,8 +270,8 @@ enum WritingUndoControlOracle {
                 try mark("case.\(id).menu-command-lookup.before")
                 let menuCommand = try await unique(identifier: "undoLastWritingEdit.menuCommand")
                 try mark("case.\(id).menu-command-press.before")
-                let activationClick = try click(menuCommand, "case.\(id).menu-command", roles: ["AXMenuItem", "AXButton"],
-                                                identifier: "undoLastWritingEdit.menuCommand")
+                let activationClick = try await click(menuCommand, "case.\(id).menu-command", roles: ["AXMenuItem", "AXButton"],
+                                                      identifier: "undoLastWritingEdit.menuCommand")
                 command = opened.merging(["activationClick": activationClick]) { _, new in new }
             } else {
                 command = ["kind": "configured-global-shortcut", "keyCode": Int(keyCode),
@@ -417,8 +417,8 @@ enum WritingUndoControlOracle {
                 }
             }
             try mark("menu.\(checkpoint).status-press.before")
-            let statusClick = try click(status, "menu.\(checkpoint).status", roles: ["AXMenuBarItem", "AXButton"],
-                                        identifier: "undoControlHost.statusItem", title: "RJT Undo check")
+            let statusClick = try await click(status, "menu.\(checkpoint).status", roles: ["AXMenuBarItem", "AXButton"],
+                                              identifier: "undoControlHost.statusItem", title: "RJT Undo check")
             try mark("menu.\(checkpoint).item-lookup.before")
             let item = try await unique(identifier: "undoLastWritingEdit.menuCommand")
             try mark("menu.\(checkpoint).enabled-wait.before")
@@ -571,103 +571,73 @@ enum WritingUndoControlOracle {
                     "actions": actions as? [String] ?? [], "actionsAXError": actionError.rawValue, "frame": frame]
         }
 
-        /// Native input transport for the host's own controls: one genuine left click at the
-        /// observed AX frame center, posted only after the hit-tested element there is proven to
-        /// be this exact control (or its descendant) in this process. No AX actions are performed.
-        /// Every AX call below has its own fixed before/after mark; any ownership doubt throws.
+        /// Read-only facts and the frozen proof from one fully ready pre-input observation.
+        struct ClickProof {
+            let frame: CGRect, center: CGPoint, display: CGDirectDisplayID, bounds: CGRect
+            let id: String, role: String, contract: String, depth: Int, policy: String
+            let targetWindowPresent: Bool, hitWindowPresent: Bool, windowOwned: Bool, menuAncestor: String
+        }
+
+        /// PRE-INPUT READINESS / CALIBRATION EXPERIMENT (not a confirmed display or root-cause fix).
+        /// Native run 40624443133 refused before any input because the status item frame was not in
+        /// exactly one active display, without saving the raw facts. Here each read-only attempt writes
+        /// its raw observation before deciding, and a not-ready attempt may wait boundedly. Every guard
+        /// is unchanged (unique same-reference control, role, identifier/title, enabled, host PID, finite
+        /// AX frame inside exactly one CG display, owned hit-test ancestry, window or native-menu policy,
+        /// stable frame). No clamping, alternate control, AX action, activation or post-input retry.
+        static let readinessMaxAttempts = 6
+        static let readinessDeadlineSeconds: TimeInterval = 6
+        static let readinessIntervalMilliseconds = 1000
+
+        /// Native input transport for the host's own controls: one genuine left click at the observed
+        /// AX frame center (AX global top-left coordinates, the CG display space), posted only after a
+        /// fully ready read-only observation. The read-only readiness loop lives in this same function and
+        /// never posts; each attempt's observation is written as its own immutable file before the decision,
+        /// and diagnostic write or mark failures propagate. The loop's only await is the not-ready sleep
+        /// before the next attempt, so the final observeReadiness, its write, the proof and both posts run
+        /// synchronously with no suspension point. Posting is after the loop, at most once, never retried.
         func click(_ target: AXUIElement, _ checkpoint: String, roles: [String], identifier: String,
-                   title: String? = nil) throws -> [String: Any] {
+                   title: String? = nil) async throws -> [String: Any] {
             let s = "click." + checkpoint
-            let host = ProcessInfo.processInfo.processIdentifier
-            func fail(_ reason: String) -> UndoControlCheckFailure {
-                UndoControlCheckFailure("Native click refused at \(s): \(reason)")
-            }
-            let labels = [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute]
-            let current = try marked(s + ".unique-scan") {
-                nodes().filter { node in
-                    (string(kAXIdentifierAttribute, node) == identifier
-                        || (title != nil && roles.contains(string(kAXRoleAttribute, node) ?? "")
-                            && labels.contains { string($0, node) == title }))
-                        && hasVisibleFrame(node)
+            let start = ProcessInfo.processInfo.systemUptime
+            let deadline = start + Self.readinessDeadlineSeconds
+            var files: [String] = []
+            var lastReason = ""
+            var ready: (proof: ClickProof, summary: [String: Any])?
+            for attempt in 1...Self.readinessMaxAttempts {
+                let (observation, attemptProof) = try observeReadiness(target, s, attempt: attempt, roles: roles,
+                                                                       identifier: identifier, title: title)
+                let name = "click-readiness-\(checkpoint)-attempt-\(attempt).json"
+                try marked(s + ".a\(attempt).observation-write") {
+                    try writeJSON(observation, to: owner.output.appendingPathComponent(name))
                 }
-            }
-            guard current.count == 1, CFEqual(current[0], target) else { throw fail("target is not the current unique control") }
-            let role = try marked(s + ".role") { string(kAXRoleAttribute, target) } ?? ""
-            guard roles.contains(role) else { throw fail("unexpected role \(role)") }
-            let id = try marked(s + ".identifier") { string(kAXIdentifierAttribute, target) } ?? ""
-            var contract = "identifier"
-            if id != identifier {
-                guard let title else { throw fail("identifier mismatch") }
-                var matched = false
-                for (index, name) in labels.enumerated() where !matched {
-                    matched = try marked(s + ".title.\(index)") { string(name, target) } == title
+                files.append(name)
+                if let attemptProof {
+                    ready = (attemptProof, [
+                        "experiment": "preinput-readiness-calibration", "attemptCount": attempt,
+                        "maxAttempts": Self.readinessMaxAttempts, "deadlineSeconds": Self.readinessDeadlineSeconds,
+                        "intervalMilliseconds": Self.readinessIntervalMilliseconds,
+                        "elapsedSeconds": ProcessInfo.processInfo.systemUptime - start,
+                        "noInputBeforeReady": true, "finalObservation": name, "finalObservationReady": true,
+                        "observations": files])
+                    break
                 }
-                guard matched else { throw fail("neither identifier nor fixture title matched") }
-                contract = "fixture-title"
+                lastReason = observation["reason"] as? String ?? "unknown"
+                let nextAt = ProcessInfo.processInfo.systemUptime + Double(Self.readinessIntervalMilliseconds) / 1000
+                if attempt == Self.readinessMaxAttempts || nextAt > deadline { break }
+                try await Task.sleep(for: .milliseconds(Self.readinessIntervalMilliseconds))
             }
-            guard try marked(s + ".enabled", { enabled(target) }) else { throw fail("control is disabled") }
-            guard try marked(s + ".pid", { pid(target) }) == host else { throw fail("target is not owned by the host") }
-            let frame = try axFrame(target, s + ".frame")
-            let center = CGPoint(x: frame.midX, y: frame.midY)
-            guard frame.contains(center) else { throw fail("center outside frame") }
-
-            var displayCount: UInt32 = 0
-            var displays = [CGDirectDisplayID](repeating: 0, count: 32)
-            let displayError = try marked(s + ".displays") { CGGetActiveDisplayList(32, &displays, &displayCount) }
-            guard displayError == .success else { throw fail("active display list unavailable") }
-            let containing = displays.prefix(Int(displayCount)).filter { CGDisplayBounds($0).contains(frame) }
-            guard containing.count == 1, let display = containing.first else {
-                throw fail("frame is not contained in exactly one active display")
+            guard let ready else {
+                throw UndoControlCheckFailure("Native click refused at \(s): \(lastReason) "
+                    + "[pre-input readiness calibration experiment: not ready after \(files.count) read-only attempt(s) "
+                    + "(max \(Self.readinessMaxAttempts), deadline \(Self.readinessDeadlineSeconds)s); no input posted; "
+                    + "observations: \(files.joined(separator: ", "))]")
             }
-            let bounds = CGDisplayBounds(display)
-
-            let systemWide = AXUIElementCreateSystemWide()
-            var hitRef: AXUIElement?
-            let hitError = try marked(s + ".hit-test") { () -> AXError in
-                _ = AXUIElementSetMessagingTimeout(systemWide, 1)
-                return AXUIElementCopyElementAtPosition(systemWide, Float(center.x), Float(center.y), &hitRef)
-            }
-            guard hitError == .success, let hit = hitRef else { throw fail("hit test failed (\(hitError.rawValue))") }
-            let hitPID = try marked(s + ".hit-pid") { pid(hit) }
-            guard hitPID == host else { throw fail("hit element belongs to another process") }
-            var node = hit, depth = 0
-            while !CFEqual(node, target) {
-                guard depth < 8, let parent = try marked(s + ".hit-ancestor.\(depth)", { element(kAXParentAttribute, node) }) else {
-                    throw fail("hit element is not the target or its descendant")
-                }
-                node = parent
-                depth += 1
-            }
-
-            let targetWindow = try marked(s + ".target-window") { element(kAXWindowAttribute, target) }
-            let hitWindow = try marked(s + ".hit-window") { element(kAXWindowAttribute, hit) }
-            var policy = "", windowOwned = false, menuAncestor = ""
-            if let targetWindow, let hitWindow {
-                guard CFEqual(targetWindow, hitWindow) else { throw fail("hit element is in another window") }
-                windowOwned = try marked(s + ".window-pid") { pid(targetWindow) } == host
-                guard windowOwned else { throw fail("window is not owned by the host") }
-                policy = "same-window"
-            } else if targetWindow == nil, hitWindow == nil, ["AXMenuItem", "AXMenuBarItem"].contains(role) {
-                var ancestor = target
-                for level in 0..<6 where menuAncestor.isEmpty {
-                    guard let parent = try marked(s + ".menu-ancestor.\(level)", { element(kAXParentAttribute, ancestor) }),
-                          try marked(s + ".menu-ancestor-pid.\(level)", { pid(parent) }) == host else {
-                        throw fail("windowless control lacks owned native menu ancestry")
-                    }
-                    let parentRole = try marked(s + ".menu-ancestor-role.\(level)") { string(kAXRoleAttribute, parent) } ?? ""
-                    if ["AXMenu", "AXMenuBar"].contains(parentRole) { menuAncestor = parentRole }
-                    ancestor = parent
-                }
-                guard !menuAncestor.isEmpty else { throw fail("windowless control lacks native menu ancestry") }
-                policy = "windowless-native-menu"
-            } else {
-                throw fail("window ownership is ambiguous")
-            }
-            guard try axFrame(target, s + ".frame-recheck") == frame else { throw fail("frame changed before posting") }
-
-            guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: center, mouseButton: .left),
-                  let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: center, mouseButton: .left) else {
-                throw fail("cannot create native mouse events")
+            let (proof, readiness) = ready
+            // Posting phase: synchronous from the final proof to both posts; never retried.
+            guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: proof.center, mouseButton: .left),
+                  let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: proof.center, mouseButton: .left) else {
+                throw UndoControlCheckFailure("Native click refused at \(s): cannot create native mouse events")
             }
             for event in [down, up] {
                 event.flags = []
@@ -677,16 +647,219 @@ enum WritingUndoControlOracle {
             down.post(tap: .cghidEventTap)
             up.post(tap: .cghidEventTap)
             try mark(s + ".post.after")
+            let host = Int(ProcessInfo.processInfo.processIdentifier)
             return ["kind": "native-mouse-click", "eventTypes": ["leftMouseDown", "leftMouseUp"], "eventCount": 2,
                     "tap": "cghidEventTap", "clickState": 1, "flagsRawValue": 0,
-                    "hostPID": Int(host), "targetID": id, "targetRole": role, "identityContract": contract,
-                    "targetFrame": rect(frame), "point": ["x": Double(center.x), "y": Double(center.y)],
-                    "activeDisplayID": Int(display), "activeDisplayBounds": rect(bounds), "hitPID": Int(host),
-                    "hitDepth": depth, "sameTargetOrDescendant": true, "uniqueTarget": true, "frameStable": true,
-                    "targetOwnedByHost": true, "hitOwnedByHost": true, "windowPolicy": policy,
-                    "targetWindowPresent": targetWindow != nil, "hitWindowPresent": hitWindow != nil,
-                    "sameWindow": policy == "same-window", "windowOwnedByHost": windowOwned,
-                    "nativeMenuAncestry": !menuAncestor.isEmpty, "menuAncestorRole": menuAncestor]
+                    "hostPID": host, "targetID": proof.id, "targetRole": proof.role, "identityContract": proof.contract,
+                    "targetFrame": rect(proof.frame), "point": ["x": Double(proof.center.x), "y": Double(proof.center.y)],
+                    "activeDisplayID": Int(proof.display), "activeDisplayBounds": rect(proof.bounds), "hitPID": host,
+                    "hitDepth": proof.depth, "sameTargetOrDescendant": true, "uniqueTarget": true, "frameStable": true,
+                    "targetOwnedByHost": true, "hitOwnedByHost": true, "windowPolicy": proof.policy,
+                    "targetWindowPresent": proof.targetWindowPresent, "hitWindowPresent": proof.hitWindowPresent,
+                    "sameWindow": proof.policy == "same-window", "windowOwnedByHost": proof.windowOwned,
+                    "nativeMenuAncestry": !proof.menuAncestor.isEmpty, "menuAncestorRole": proof.menuAncestor,
+                    "readiness": readiness]
+        }
+
+        /// One read-only pre-input observation. Predicate failures return `nil` proof with the reason and all
+        /// facts read so far; sections never reached stay `{"attempted": false}`. Only marks throw.
+        func observeReadiness(_ target: AXUIElement, _ s: String, attempt: Int, roles: [String],
+                              identifier: String, title: String?) throws -> ([String: Any], ClickProof?) {
+            let p = s + ".a\(attempt)"
+            let host = ProcessInfo.processInfo.processIdentifier
+            let unattempted: [String: Any] = ["attempted": false]
+            var obs: [String: Any] = [
+                "schemaVersion": 1, "kind": "native-click-preinput-readiness-observation", "diagnosticOnly": true,
+                "experiment": "preinput-readiness-calibration", "checkpoint": s, "attempt": attempt,
+                "maxAttempts": Self.readinessMaxAttempts, "inputPosted": false, "hostPID": Int(host),
+                "systemUptime": ProcessInfo.processInfo.systemUptime,
+                "coordinateSpace": "AX global top-left (CG display space); no NSScreen or pixel conversion",
+                "expected": ["identifier": identifier, "title": title as Any? ?? NSNull(), "roles": roles] as [String: Any],
+                "identity": unattempted, "target": unattempted, "frame": unattempted, "provenance": unattempted,
+                "displays": unattempted, "hitTest": unattempted, "window": unattempted, "frameRecheck": unattempted]
+            func notReady(_ reason: String) -> ([String: Any], ClickProof?) {
+                obs["ready"] = false
+                obs["reason"] = reason
+                return (obs, nil)
+            }
+
+            let labels = [kAXTitleAttribute, kAXDescriptionAttribute, kAXHelpAttribute]
+            let current = try marked(p + ".unique-scan") {
+                nodes().filter { node in
+                    (string(kAXIdentifierAttribute, node) == identifier
+                        || (title != nil && roles.contains(string(kAXRoleAttribute, node) ?? "")
+                            && labels.contains { string($0, node) == title }))
+                        && hasVisibleFrame(node)
+                }
+            }
+            // Same-reference check is recorded, never weakened: a different element is never substituted.
+            let sameReference = current.count == 1 && CFEqual(current[0], target)
+            obs["identity"] = ["attempted": true, "uniqueCount": current.count, "sameReferenceAsLookup": sameReference] as [String: Any]
+            guard sameReference else { return notReady("target is not the current unique control") }
+
+            var targetFacts: [String: Any] = ["attempted": true]
+            let role = try marked(p + ".role") { string(kAXRoleAttribute, target) } ?? ""
+            let id = try marked(p + ".identifier") { string(kAXIdentifierAttribute, target) } ?? ""
+            let axTitle = try marked(p + ".title-attribute") { string(kAXTitleAttribute, target) }
+            targetFacts["role"] = role
+            targetFacts["identifier"] = id
+            targetFacts["title"] = axTitle as Any? ?? NSNull()
+            obs["target"] = targetFacts
+            guard roles.contains(role) else { return notReady("unexpected role \(role)") }
+            var contract = "identifier"
+            if id != identifier {
+                guard let title else { return notReady("identifier mismatch") }
+                var matched = false
+                for (index, name) in labels.enumerated() where !matched {
+                    matched = try marked(p + ".title.\(index)") { string(name, target) } == title
+                }
+                guard matched else { return notReady("neither identifier nor fixture title matched") }
+                contract = "fixture-title"
+            }
+            targetFacts["identityContract"] = contract
+            let isEnabled = try marked(p + ".enabled") { enabled(target) }
+            targetFacts["enabled"] = isEnabled
+            obs["target"] = targetFacts
+            guard isEnabled else { return notReady("control is disabled") }
+            let targetPID = try marked(p + ".pid") { pid(target) }
+            targetFacts["pid"] = targetPID.map { Int($0) as Any } ?? NSNull()
+            obs["target"] = targetFacts
+            guard targetPID == host else { return notReady("target is not owned by the host") }
+
+            let (frameOrNil, frameFacts) = try readFrame(target, p + ".frame")
+            obs["frame"] = frameFacts
+            guard let frame = frameOrNil else {
+                return notReady("the actual control frame was unavailable or invalid at \(p).frame")
+            }
+            let center = CGPoint(x: frame.midX, y: frame.midY)
+            guard frame.contains(center) else { return notReady("center outside frame") }
+
+            // Bounded parent provenance distinguishes the app menu bar from AXExtrasMenuBar; facts only.
+            let menuBar = try marked(p + ".root-menu-bar") { element(kAXMenuBarAttribute, app) }
+            let extras = try marked(p + ".root-extras-menu-bar") { element("AXExtrasMenuBar", app) }
+            var chain: [[String: Any]] = []
+            var rootKind = "unresolved-within-bound"
+            var cursor = target
+            for level in 0..<4 {
+                guard let parent = try marked(p + ".provenance-parent.\(level)", { element(kAXParentAttribute, cursor) }) else {
+                    rootKind = "no-parent"
+                    break
+                }
+                let parentRole = try marked(p + ".provenance-role.\(level)") { string(kAXRoleAttribute, parent) } ?? ""
+                let parentID = try marked(p + ".provenance-identifier.\(level)") { string(kAXIdentifierAttribute, parent) } ?? ""
+                let parentTitle = try marked(p + ".provenance-title.\(level)") { string(kAXTitleAttribute, parent) } ?? ""
+                let parentPID = try marked(p + ".provenance-pid.\(level)") { pid(parent) }
+                let isMenuBar = menuBar.map { CFEqual($0, parent) } ?? false
+                let isExtras = extras.map { CFEqual($0, parent) } ?? false
+                let isApp = CFEqual(app, parent)
+                chain.append(["role": parentRole, "identifier": parentID, "title": parentTitle,
+                              "depth": level + 1, "pid": parentPID.map { Int($0) as Any } ?? NSNull(),
+                              "isAppMenuBar": isMenuBar, "isExtrasMenuBar": isExtras, "isApplication": isApp])
+                if isMenuBar { rootKind = "app-menu-bar"; break }
+                if isExtras { rootKind = "extras-menu-bar"; break }
+                if isApp { rootKind = "application"; break }
+                cursor = parent
+            }
+            obs["provenance"] = ["attempted": true, "maxDepth": 4, "appMenuBarPresent": menuBar != nil,
+                                 "extrasMenuBarPresent": extras != nil, "ancestors": chain, "rootKind": rootKind] as [String: Any]
+
+            var displayCount: UInt32 = 0
+            var displays = [CGDirectDisplayID](repeating: 0, count: 32)
+            let displayError = try marked(p + ".displays") { CGGetActiveDisplayList(32, &displays, &displayCount) }
+            var displayFacts: [String: Any] = ["attempted": true, "apiError": Int(displayError.rawValue),
+                                               "count": Int(displayCount)]
+            guard displayError == .success else {
+                obs["displays"] = displayFacts
+                return notReady("active display list unavailable")
+            }
+            let active = Array(displays.prefix(Int(displayCount)))
+            displayFacts["displays"] = active.map { display -> [String: Any] in
+                let bounds = CGDisplayBounds(display)
+                return ["id": Int(display), "bounds": rect(bounds), "containsTarget": bounds.contains(frame),
+                        "containsCenter": bounds.contains(center), "intersectsTarget": bounds.intersects(frame)]
+            }
+            let containing = active.filter { CGDisplayBounds($0).contains(frame) }
+            displayFacts["containingCount"] = containing.count
+            obs["displays"] = displayFacts
+            guard containing.count == 1, let display = containing.first else {
+                return notReady("frame is not contained in exactly one active display")
+            }
+            let bounds = CGDisplayBounds(display)
+
+            let systemWide = AXUIElementCreateSystemWide()
+            var hitRef: AXUIElement?
+            let hitError = try marked(p + ".hit-test") { () -> AXError in
+                _ = AXUIElementSetMessagingTimeout(systemWide, 1)
+                return AXUIElementCopyElementAtPosition(systemWide, Float(center.x), Float(center.y), &hitRef)
+            }
+            var hitFacts: [String: Any] = ["attempted": true, "point": ["x": Double(center.x), "y": Double(center.y)],
+                                           "axError": Int(hitError.rawValue), "elementPresent": hitRef != nil]
+            obs["hitTest"] = hitFacts
+            guard hitError == .success, let hit = hitRef else { return notReady("hit test failed (\(hitError.rawValue))") }
+            let hitPID = try marked(p + ".hit-pid") { pid(hit) }
+            hitFacts["pid"] = hitPID.map { Int($0) as Any } ?? NSNull()
+            obs["hitTest"] = hitFacts
+            guard hitPID == host else { return notReady("hit element belongs to another process") }
+            var node = hit, depth = 0
+            while !CFEqual(node, target) {
+                guard depth < 8, let parent = try marked(p + ".hit-ancestor.\(depth)", { element(kAXParentAttribute, node) }) else {
+                    hitFacts["reachedTarget"] = false
+                    hitFacts["walkedDepth"] = depth
+                    obs["hitTest"] = hitFacts
+                    return notReady("hit element is not the target or its descendant")
+                }
+                node = parent
+                depth += 1
+            }
+            hitFacts["reachedTarget"] = true
+            hitFacts["depth"] = depth
+            obs["hitTest"] = hitFacts
+
+            let targetWindow = try marked(p + ".target-window") { element(kAXWindowAttribute, target) }
+            let hitWindow = try marked(p + ".hit-window") { element(kAXWindowAttribute, hit) }
+            var windowFacts: [String: Any] = ["attempted": true, "targetWindowPresent": targetWindow != nil,
+                                              "hitWindowPresent": hitWindow != nil]
+            obs["window"] = windowFacts
+            var policy = "", windowOwned = false, menuAncestor = ""
+            if let targetWindow, let hitWindow {
+                guard CFEqual(targetWindow, hitWindow) else { return notReady("hit element is in another window") }
+                windowOwned = try marked(p + ".window-pid") { pid(targetWindow) } == host
+                windowFacts["windowOwnedByHost"] = windowOwned
+                obs["window"] = windowFacts
+                guard windowOwned else { return notReady("window is not owned by the host") }
+                policy = "same-window"
+            } else if targetWindow == nil, hitWindow == nil, ["AXMenuItem", "AXMenuBarItem"].contains(role) {
+                var ancestor = target
+                for level in 0..<6 where menuAncestor.isEmpty {
+                    guard let parent = try marked(p + ".menu-ancestor.\(level)", { element(kAXParentAttribute, ancestor) }),
+                          try marked(p + ".menu-ancestor-pid.\(level)", { pid(parent) }) == host else {
+                        return notReady("windowless control lacks owned native menu ancestry")
+                    }
+                    let parentRole = try marked(p + ".menu-ancestor-role.\(level)") { string(kAXRoleAttribute, parent) } ?? ""
+                    if ["AXMenu", "AXMenuBar"].contains(parentRole) { menuAncestor = parentRole }
+                    ancestor = parent
+                }
+                windowFacts["menuAncestorRole"] = menuAncestor
+                obs["window"] = windowFacts
+                guard !menuAncestor.isEmpty else { return notReady("windowless control lacks native menu ancestry") }
+                policy = "windowless-native-menu"
+            } else {
+                return notReady("window ownership is ambiguous")
+            }
+            windowFacts["policy"] = policy
+            obs["window"] = windowFacts
+
+            let (recheck, rawRecheckFacts) = try readFrame(target, p + ".frame-recheck")
+            var recheckFacts = rawRecheckFacts
+            recheckFacts["stable"] = recheck == frame
+            obs["frameRecheck"] = recheckFacts
+            guard recheck == frame else { return notReady("frame changed before posting") }
+            obs["ready"] = true
+            obs["reason"] = NSNull()
+            return (obs, ClickProof(frame: frame, center: center, display: display, bounds: bounds, id: id, role: role,
+                                    contract: contract, depth: depth, policy: policy,
+                                    targetWindowPresent: targetWindow != nil, hitWindowPresent: hitWindow != nil,
+                                    windowOwned: windowOwned, menuAncestor: menuAncestor))
         }
 
         func marked<T>(_ stage: String, _ body: () throws -> T) throws -> T {
@@ -696,18 +869,31 @@ enum WritingUndoControlOracle {
             return value
         }
 
-        func axFrame(_ node: AXUIElement, _ stage: String) throws -> CGRect {
+        /// Raw AX frame facts. Returns a rect only for decodable, finite, positive values; never throws a
+        /// predicate failure (only marks throw). Non-finite raw numbers are kept as strings for JSON.
+        func readFrame(_ node: AXUIElement, _ stage: String) throws -> (CGRect?, [String: Any]) {
             let rawPosition = try marked(stage + ".position") { attribute(kAXPositionAttribute, node) }
             let rawSize = try marked(stage + ".size") { attribute(kAXSizeAttribute, node) }
-            var point = CGPoint(x: CGFloat.nan, y: .nan), size = CGSize.zero
-            guard let rawPosition, let rawSize,
-                  CFGetTypeID(rawPosition) == AXValueGetTypeID(), CFGetTypeID(rawSize) == AXValueGetTypeID(),
-                  AXValueGetValue(rawPosition as! AXValue, .cgPoint, &point), AXValueGetValue(rawSize as! AXValue, .cgSize, &size),
-                  point.x.isFinite, point.y.isFinite, size.width.isFinite, size.height.isFinite,
-                  size.width > 0, size.height > 0 else {
-                throw UndoControlCheckFailure("The actual control frame was unavailable or invalid at \(stage).")
+            var point = CGPoint(x: CGFloat.nan, y: .nan), size = CGSize(width: CGFloat.nan, height: .nan)
+            var positionDecoded = false, sizeDecoded = false
+            if let rawPosition, CFGetTypeID(rawPosition) == AXValueGetTypeID() {
+                positionDecoded = AXValueGetValue(rawPosition as! AXValue, .cgPoint, &point)
             }
-            return CGRect(origin: point, size: size)
+            if let rawSize, CFGetTypeID(rawSize) == AXValueGetTypeID() {
+                sizeDecoded = AXValueGetValue(rawSize as! AXValue, .cgSize, &size)
+            }
+            func number(_ value: CGFloat) -> Any { value.isFinite ? Double(value) : String(describing: Double(value)) }
+            var facts: [String: Any] = ["attempted": true, "positionRead": rawPosition != nil, "sizeRead": rawSize != nil,
+                                        "positionDecoded": positionDecoded, "sizeDecoded": sizeDecoded]
+            if positionDecoded { facts["x"] = number(point.x); facts["y"] = number(point.y) }
+            if sizeDecoded { facts["width"] = number(size.width); facts["height"] = number(size.height) }
+            let valid = positionDecoded && sizeDecoded && point.x.isFinite && point.y.isFinite
+                && size.width.isFinite && size.height.isFinite && size.width > 0 && size.height > 0
+            facts["finitePositive"] = valid
+            guard valid else { return (nil, facts) }
+            let frame = CGRect(origin: point, size: size)
+            facts["center"] = ["x": Double(frame.midX), "y": Double(frame.midY)]
+            return (frame, facts)
         }
 
         func rect(_ value: CGRect) -> [String: Double] {

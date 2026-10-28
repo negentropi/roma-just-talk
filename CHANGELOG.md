@@ -12,6 +12,7 @@
 - Keep rejected correction and dictionary-import saves from changing the visible library or unrelated unsaved edits.
 - Keep History Copy and Save Correction on the selected text variant's exact text, including canonically equivalent Unicode.
 - Fit the Save Correction sheet to the History window so Preview and Approve stay reachable on smaller displays.
+- After approving a correction, show only the saved result instead of the pre-approval “Nothing is saved” note.
 - Expand History through a native button with keyboard and accessibility labels, keeping selection and playback controls separate.
 
 - Add Light dictation cleanup and Clarity AI cleanup with Natural, Casual and Formal styles. Capture the chosen profile, libraries and Clarity provider when each operation starts; keep Custom settings saved.

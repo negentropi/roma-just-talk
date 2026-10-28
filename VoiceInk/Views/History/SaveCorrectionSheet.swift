@@ -293,11 +293,14 @@ struct SaveCorrectionSheet: View {
         VStack(alignment: .leading, spacing: 8) {
             if let current = currentPreview {
                 WordReplacementRecordSummary(
-                    title: "Dictionary entry to save",
+                    title: "Correction preview",
                     record: current.record,
                     identifier: "history.correction.preview.record"
                 )
-                planStatus(current.importPlan)
+                // Pre-approval guidance only; after Approve, outcomeView owns the saved/existing result.
+                if outcome == nil {
+                    planStatus(current.importPlan)
+                }
             } else if preview != nil {
                 Label(
                     "The phrase, match or replacement changed. Preview again before approving.",

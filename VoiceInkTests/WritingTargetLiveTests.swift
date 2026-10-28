@@ -1708,7 +1708,7 @@ final class LiveWritingEditor {
         let url = (raw as? URL) ?? (raw as? String).flatMap(URL.init(string:))
         guard let url else { return "<unavailable>" }
         return url.isFileURL && url.standardizedFileURL == resource.standardizedFileURL
-            ? url.absoluteString : "<unrelated URL redacted>"
+            ? resource.absoluteString : "<unrelated URL redacted>"
     }
 
     private static func captureOwnedWindow(

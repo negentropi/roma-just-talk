@@ -1,0 +1,36 @@
+{
+  "sourcePath": "VoiceInkTests/WritingTargetLiveTests.swift",
+  "oldCommit": "34ca0d29ed1cbb3c3aa0aad4bd09c0b45f42b2d2",
+  "scope": "Real macOS Foundation URL handling; raw AX attribute getter replaced by supplied URL at the same decode/comparison branch. No AX/app/native Undo invocation.",
+  "methodExtraction": {
+    "start": "    private static func scopedURL(",
+    "end": "\n    private static func captureOwnedWindow(",
+    "adaptation": "Replace static method signature and AX attribute getter with func scopedURL(_ raw: Any?, resource: URL). Remaining body unchanged."
+  },
+  "old": {
+    "wholeSourceSHA256": "613c3c6b7811bd8e2ec5870eb2b2389f449c3d41d34feae2c211a1871981ffb7",
+    "originalMethodSHA256": "cb0eb3bd95d525b4fd0f0f12e6cb7c586c435aeb910210ea3a5b1b69d7db1964",
+    "adaptedMethodSHA256": "6d59431641b9d3fe9799f163aada371d5eb336b7294cc0a567b7749568c2380d",
+    "exitCode": 1,
+    "failedCases": 1,
+    "passingCases": 4
+  },
+  "new": {
+    "wholeSourceSHA256": "fd1d9ffc2d833d1b21e977468a68ee2973f788f102ff5d2787a0622973bebf06",
+    "originalMethodSHA256": "c0ce70c3aa9ae7d7f64d7b894c4aa6f7cd009d8e03cc159c86c6d9c9978fedf7",
+    "adaptedMethodSHA256": "83ad10155167c39bc2bfac500ed2c646c8b861c2c4bee5d36e24154a5a531008",
+    "exitCode": 0,
+    "failedCases": 0,
+    "passingCases": 5
+  },
+  "ownedExistingFileBoundary": "The temporary resource and /private/var alias refer to one actual existing file. The proof removed only its created file and directory after execution.",
+  "nativeEvidence": "../undo-native-40609372412/verification.json",
+  "nativeSourceObservation": "The AX document URL emitted /private/var while the owned resource path used /var. The original helper emitted its AX URL only after the typed standardized ownership comparison succeeded.",
+  "initialInvalidProbe": {
+    "reason": "Verbatim remote paths were absent on the local Mac. File existence is a boundary of the observed Foundation standardization behavior. Both old and new therefore failed the alias case before the return expression; this is not regression proof.",
+    "oldExitCode": 1,
+    "newExitCode": 1,
+    "typedOwnedIdentityMatches": false
+  },
+  "review": "Independent read-only reviewer: no actionable finding; ownership comparison and foreign/nonfile/unavailable branches unchanged. No native execution by reviewer."
+}

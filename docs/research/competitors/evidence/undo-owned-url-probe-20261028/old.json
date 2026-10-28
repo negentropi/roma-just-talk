@@ -1,0 +1,41 @@
+{
+  "actualAXURL" : "file:\/\/\/private\/var\/folders\/dr\/ktjn__jx5mz4zr7shy5c670h0000gn\/T\/RJT-Writing-Live-Alias-c32c3m3d\/RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75.txt",
+  "cases" : [
+    {
+      "expected" : "file:\/\/\/var\/folders\/dr\/ktjn__jx5mz4zr7shy5c670h0000gn\/T\/RJT-Writing-Live-Alias-c32c3m3d\/RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75.txt",
+      "name" : "exact-resource",
+      "observed" : "file:\/\/\/var\/folders\/dr\/ktjn__jx5mz4zr7shy5c670h0000gn\/T\/RJT-Writing-Live-Alias-c32c3m3d\/RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75.txt",
+      "passed" : true
+    },
+    {
+      "expected" : "file:\/\/\/var\/folders\/dr\/ktjn__jx5mz4zr7shy5c670h0000gn\/T\/RJT-Writing-Live-Alias-c32c3m3d\/RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75.txt",
+      "name" : "actual-AX-private-var-alias",
+      "observed" : "file:\/\/\/private\/var\/folders\/dr\/ktjn__jx5mz4zr7shy5c670h0000gn\/T\/RJT-Writing-Live-Alias-c32c3m3d\/RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75.txt",
+      "passed" : false
+    },
+    {
+      "expected" : "<unrelated URL redacted>",
+      "name" : "foreign-file",
+      "observed" : "<unrelated URL redacted>",
+      "passed" : true
+    },
+    {
+      "expected" : "<unrelated URL redacted>",
+      "name" : "nonfile",
+      "observed" : "<unrelated URL redacted>",
+      "passed" : true
+    },
+    {
+      "expected" : "<unavailable>",
+      "name" : "unavailable",
+      "observed" : "<unavailable>",
+      "passed" : true
+    }
+  ],
+  "failed" : 1,
+  "mode" : "old",
+  "platform" : "macOS Foundation",
+  "resourceURL" : "file:\/\/\/var\/folders\/dr\/ktjn__jx5mz4zr7shy5c670h0000gn\/T\/RJT-Writing-Live-Alias-c32c3m3d\/RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75.txt",
+  "scope" : "Exact scopedURL body with raw AX getter replaced by supplied observed URL; real Foundation URL implementation. No app or AX operation.",
+  "typedOwnedIdentityMatches" : true
+}

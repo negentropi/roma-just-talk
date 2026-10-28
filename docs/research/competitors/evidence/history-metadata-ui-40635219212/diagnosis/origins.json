@@ -1,0 +1,69 @@
+[
+  {
+    "file": "diagnosis/testapprovedhistorycorrectionsurvivessourcedeletion-64.txt",
+    "bytes": 146,
+    "sha256": "43385c253daa45d04a0881a07accfae9189e7e0af721e508fcd9adffc4d91f13",
+    "original_attachment": {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "file": "testapprovedhistorycorrectionsurvivessourcedeletion-64.txt",
+      "filename": "Debug description for `Alert (First Match)`_0_16CD9AC8-93B1-450F-8535-47B1A3092017.txt",
+      "lifetime": "deleteOnSuccess",
+      "name": "Debug description for `Alert (First Match)`",
+      "payloadRef": {
+        "id": "0~YRWX-Bx3poXFP3LE-UrVNcBeT9gEkbfmBjVW--XmiWuAg0C_B7SWXz-9FywrXb1xD5yDJxrQLg0B8QMp0MOiIQ=="
+      },
+      "payloadSize": "146",
+      "timestamp": "2026-10-28T05:07:20.878+0000",
+      "uniformTypeIdentifier": "public.plain-text",
+      "uuid": "53ED0C8E-D145-4B9F-8869-A2D132E0529E",
+      "activity_title": "Checking `Expect predicate `existsNoRetry == 1` for object Alert (First Match)`",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~YRWX-Bx3poXFP3LE-UrVNcBeT9gEkbfmBjVW--XmiWuAg0C_B7SWXz-9FywrXb1xD5yDJxrQLg0B8QMp0MOiIQ==",
+      "payload_sha256": "43385c253daa45d04a0881a07accfae9189e7e0af721e508fcd9adffc4d91f13"
+    }
+  },
+  {
+    "file": "diagnosis/testapprovedhistorycorrectionsurvivessourcedeletion-69.txt",
+    "bytes": 71861,
+    "sha256": "6039cca36bb1e6330c663bc900dff552e597be27f42bcfad17030474b4174df9",
+    "original_attachment": {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "file": "testapprovedhistorycorrectionsurvivessourcedeletion-69.txt",
+      "filename": "App UI hierarchy for com.negentropi_0_E8766E60-3E63-46FC-856D-4103F368B5C1.RomaJustTalk",
+      "lifetime": "deleteOnSuccess",
+      "name": "App UI hierarchy for com.negentropi.RomaJustTalk",
+      "payloadRef": {
+        "id": "0~03y3lMX7RyRSYP2au2g2Qaudt--EDhZfMMcWyDf01SfNXIsUySpBF-24kB6AlYzB5p1IkIfhvZ83PMtwW6jTeg=="
+      },
+      "payloadSize": "71861",
+      "timestamp": "2026-10-28T05:07:25.159+0000",
+      "uniformTypeIdentifier": "public.plain-text",
+      "uuid": "DB4156EF-7CC6-4F90-B0E9-F510815CAEA6",
+      "activity_title": "Collecting debug information to assist test failure triage",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~03y3lMX7RyRSYP2au2g2Qaudt--EDhZfMMcWyDf01SfNXIsUySpBF-24kB6AlYzB5p1IkIfhvZ83PMtwW6jTeg==",
+      "payload_sha256": "6039cca36bb1e6330c663bc900dff552e597be27f42bcfad17030474b4174df9"
+    }
+  },
+  {
+    "file": "diagnosis/testapprovedhistorycorrectionsurvivessourcedeletion-70.plist",
+    "bytes": 151582,
+    "sha256": "a0f58c5fe151ee0f32faa600980e0a9e7a3ce5681e358b53e3a845bb461880dc",
+    "original_attachment": {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "file": "testapprovedhistorycorrectionsurvivessourcedeletion-70.plist",
+      "filename": "Snapshot_1_E8766E60-3E63-46FC-856D-4103F368B5C1",
+      "inActivityIdentifier": "1",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentLegacySnapshot",
+      "payloadRef": {
+        "id": "0~V3TzssXID8BbT5moTSKjRoL-HZdfkkKQOBuHVGLV9CnHS0wPisouyhsn3uT7gFFTePzRjZpqKcmzrryFrSKd8A=="
+      },
+      "payloadSize": "151582",
+      "timestamp": "2026-10-28T05:07:25.160+0000",
+      "uniformTypeIdentifier": "com.apple.dt.xctest.element-snapshot",
+      "uuid": "09869049-3801-4478-8279-BD2F7432C49E",
+      "activity_title": "Collecting debug information to assist test failure triage",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~V3TzssXID8BbT5moTSKjRoL-HZdfkkKQOBuHVGLV9CnHS0wPisouyhsn3uT7gFFTePzRjZpqKcmzrryFrSKd8A==",
+      "payload_sha256": "a0f58c5fe151ee0f32faa600980e0a9e7a3ce5681e358b53e3a845bb461880dc"
+    }
+  }
+]

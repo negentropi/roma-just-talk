@@ -1,0 +1,198 @@
+{
+  "classification": "passed",
+  "pairs": [
+    {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "identifier": "history.correction.preview.record.id",
+      "UUID": "2B498A48-64C0-4120-AD8A-AAD85B4FD7BE",
+      "before": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 807}, {295, 13}}",
+        "hittable": false,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 2B498A48-64C0-4120-AD8A-AAD85B4FD7BE",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "after": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 487}, {295, 13}}",
+        "hittable": true,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 2B498A48-64C0-4120-AD8A-AAD85B4FD7BE",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "visibleBounds": "{{202, 161}, {620, 430}}"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "identifier": "history.correction.preview.record.id",
+      "UUID": "1C299A64-1125-4062-9CF6-C4FFEA9FA2C4",
+      "before": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 854}, {295, 13}}",
+        "hittable": false,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 1C299A64-1125-4062-9CF6-C4FFEA9FA2C4",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "after": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 534}, {295, 13}}",
+        "hittable": true,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 1C299A64-1125-4062-9CF6-C4FFEA9FA2C4",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "visibleBounds": "{{202, 162}, {620, 430}}"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "identifier": "history.correction.preview.record.id",
+      "UUID": "CDB27A51-48AE-47C6-A3C2-6DCB28445FC4",
+      "before": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 854}, {295, 13}}",
+        "hittable": false,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, CDB27A51-48AE-47C6-A3C2-6DCB28445FC4",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "after": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 534}, {295, 13}}",
+        "hittable": true,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, CDB27A51-48AE-47C6-A3C2-6DCB28445FC4",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "visibleBounds": "{{202, 162}, {620, 430}}"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "identifier": "history.correction.preview.record.id",
+      "UUID": "368840DE-5B24-4967-BAF0-D1DED98F6672",
+      "before": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 727}, {295, 13}}",
+        "hittable": false,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "after": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 567}, {295, 13}}",
+        "hittable": true,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "visibleBounds": "{{202, 162}, {620, 430}}"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "identifier": "history.correction.preview.record.id",
+      "UUID": "368840DE-5B24-4967-BAF0-D1DED98F6672",
+      "before": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 567}, {295, 13}}",
+        "hittable": true,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "after": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{242, 567}, {295, 13}}",
+        "hittable": true,
+        "identifier": "history.correction.preview.record.id",
+        "label": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "role": 1,
+        "stringValue": "",
+        "value": "",
+        "valueType": "__NSCFConstantString"
+      },
+      "visibleBounds": "{{202, 162}, {620, 430}}"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "identifier": "dictionary.replacement.edit.id",
+      "UUID": "368840DE-5B24-4967-BAF0-D1DED98F6672",
+      "before": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{288, 250}, {287, 13}}",
+        "hittable": true,
+        "identifier": "dictionary.replacement.edit.id",
+        "label": "",
+        "role": 48,
+        "stringValue": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "value": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "valueType": "__NSCFString"
+      },
+      "after": {
+        "childCount": 0,
+        "children": [],
+        "enabled": true,
+        "frame": "{{288, 250}, {287, 13}}",
+        "hittable": true,
+        "identifier": "dictionary.replacement.edit.id",
+        "label": "",
+        "role": 48,
+        "stringValue": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "value": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "valueType": "__NSCFString"
+      },
+      "visibleBounds": "{{272, 83}, {480, 600}}"
+    }
+  ],
+  "old_reader_mechanism": "PreviewOtherfields exposeemptyStringvalueandcorrectUUIDlabel; oldvalue??label picks empty. EditorStaticTextfieldexposesactualUUIDinvalue. Currenttypedobservationsprovebothpaths; prior49336ownpropertieswereunrecorded."
+}

@@ -1,0 +1,4 @@
+Query chain:
+ →Find: Target Application 'com.negentropi.RomaJustTalk'
+  ↪︎Find: Descendants matching type Alert
+    ↪︎Find: First Match

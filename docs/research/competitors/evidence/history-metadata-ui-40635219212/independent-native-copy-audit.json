@@ -1,0 +1,644 @@
+{
+  "run_id": 40635219212,
+  "source_sha": "004c1cfd61492428c0a5caacf65b2f686de59a14",
+  "mode": "UI only",
+  "verdict": "CLEAN bounded evidence audit; actualCopy11 complete/exact, UI7/8; retained deletion confirmation lookup fails486. No product-green/fullgate claim.",
+  "seed": {
+    "hostPID": 16937,
+    "actual_test_log": "◇ Test liveDictationHistoryUISeed() started.\n✔ Test liveDictationHistoryUISeed() passed after 0.355 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.356 seconds.",
+    "rows": 6,
+    "fields_each": 20,
+    "WordReplacement_raw_fields": 11,
+    "canonical_DTO": true,
+    "VocabularyWord_rows": 1,
+    "stats_baseline": [],
+    "raw_expected_comparisons": {
+      "rows": {
+        "equal": true,
+        "sha256": "159f4aaa1bebe3b9c6c4f533bdfcb9faea91d242a0afaf7d32d3679799923614"
+      },
+      "libraries": {
+        "equal": true,
+        "sha256": "2224424c0d368564471f632dc2e44a657101daed41ea62c101917a25354399fa"
+      },
+      "stats": {
+        "equal": true,
+        "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+      }
+    },
+    "factory": "VoiceInkApp.createPersistentContainer(schema:logger:)",
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "normal_three_configurations": [
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "Transcription"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "default",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "VocabularyWord",
+          "WordReplacement"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "dictionary",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "SessionMetric"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "stats",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      }
+    ],
+    "host_observed_paths_exact": true,
+    "closed_before_UI": true,
+    "host_exited_no_handles": true,
+    "phase_identity_signature_equality": {
+      "identity": {
+        "equal": true,
+        "receipt_sha256": "f2480b37ab901c2d71d357e8335b8cd1f2cd77726ae8993ff20057120b81a068"
+      },
+      "app-signature": {
+        "equal": true,
+        "receipt_sha256": "706d90cb059108c33c06251a77812f147e1b1e4b82f201b592498bf367fdeb69"
+      },
+      "test-bundle-signature": {
+        "equal": true,
+        "receipt_sha256": "7f99aebbe40047a5a42fa850099770b859246d52f9d8bd0112d7e26418cc457d"
+      }
+    },
+    "phase_identities": [
+      "4237335920c26aa4bcf0d4b4a4964633103f509d173a773aaf52a87b2c7da164  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "2ac6185650be7f08a2880cbbda295a84a1b3a1197c54389ce582dbe435ae6a7a  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests"
+    ],
+    "sourcepins_overlap_exact": {
+      "VoiceInk/Views/History/SaveCorrectionSheet.swift": "50e065718ba2bab5270a2b080389856d594b542ab7db4922f72f7a4b09e87c50",
+      "VoiceInk/Views/History/InlineHistoryView.swift": "ea59ba30be0b9199969d7500dc4afa515a6d227b74277aa5b2a5be7bc784d77f",
+      "VoiceInk/Views/History/TranscriptionDetailView.swift": "396d0a9b9f6599f4aecc8268e43de544a7a052ab0e8c05993f95016f402fe9e6",
+      "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec"
+    }
+  },
+  "initial_seed_TCC_raw_equal": true,
+  "TCC": {
+    "system-tcc.json": {
+      "service": "kTCCServiceAccessibility",
+      "client": "com.negentropi.RomaJustTalk",
+      "client_type": 0,
+      "auth_value": 2,
+      "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+    },
+    "microphone-tcc.json": {
+      "service": "kTCCServiceMicrophone",
+      "client": "com.negentropi.RomaJustTalk",
+      "client_type": 0,
+      "auth_value": 2,
+      "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+    }
+  },
+  "Copy": [
+    {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "rowID": "A1000000-0000-4000-8000-000000000006",
+      "variant": "recognized",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        1,
+        2
+      ],
+      "sha256": "4ea637bab2569ca51037dc0b32c712072effb830ce602f7fc63704860602b642"
+    },
+    {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "rowID": "A1000000-0000-4000-8000-000000000006",
+      "variant": "recognized",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        5,
+        6
+      ],
+      "sha256": "3f12333c935ab22dcad5b8cb139781c853c1982d380075f59955f84eafb7090c"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "rowID": "A1000000-0000-4000-8000-000000000005",
+      "variant": "recognized",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        12,
+        13
+      ],
+      "sha256": "39326eb531eb7a67a9728b4cf79972b192692404de1842dc4d18a90f5e2b4da9"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "rowID": "A1000000-0000-4000-8000-000000000005",
+      "variant": "recognized",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        16,
+        17
+      ],
+      "sha256": "fa6483c7e6ba2f6e1a8eff211f0fe4c54d3c5ba21ac6b592e1117e87eccd0b8f"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000001",
+      "variant": "original",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        23,
+        24
+      ],
+      "sha256": "ed8d1d4048c45abaf4424c152303712e3fda054af48c015ca81d7aeb78188acf"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000001",
+      "variant": "enhanced",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        25,
+        26
+      ],
+      "sha256": "14023a5c0754dd9e419499d930b0dd7a73b1b4e2ca05230467e880d9e912a915"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "recognized",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        27,
+        28
+      ],
+      "sha256": "db635c9bf64133a7df9bca677c9f07da4267e56664cb0009d7d6c8909c7b3dcd"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "original",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        29,
+        30
+      ],
+      "sha256": "d2b59f13b3acd7d82239264c909f10a002b5b0e185c3d0ff410eca3257af085f"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "enhanced",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        31,
+        32
+      ],
+      "sha256": "d4234c8c6b05aeae7ea937beee77c103ae0a12c44e41d9cb0339d3eae8ab09ab"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000003",
+      "variant": "original",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        33,
+        34
+      ],
+      "sha256": "ab7d8c5d5262355d6c43cb150d6d8ae570767dab7152fa05a8c5fde1a9dc7d5c"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000004",
+      "variant": "original",
+      "exactUTF8_UTF16": true,
+      "generation": [
+        35,
+        36
+      ],
+      "sha256": "1eb526aea3db517b36c183a48f8cb401423ff272b5d308d35e280f68143c9e94"
+    }
+  ],
+  "StaticText": {
+    "total": 21,
+    "all_raw_UTF8_UTF16_exact_independent_seed_or_declared_fixture": true,
+    "traces": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.text.recognized",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Correction retained\r\nOrbit, Ltd. — Café 👩🏽‍💻\r\n",
+        "sha256": "792485d8c16f7e4a312b10b84dd7de9945c154592c66748f0b550320f758b509"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.sourceText",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Correction retained\r\nOrbit, Ltd. — Café 👩🏽‍💻\r\n",
+        "sha256": "5fd27f0171b7130a9a56677f3c8588c0fe169b2e1231e569ccdadb67c81e4629"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.original",
+        "independent_basis": "declared exact-commit fixture",
+        "exact": true,
+        "actual": "Orbit, Ltd.",
+        "sha256": "75bcf566d7500f96ecd1c0bcabe9e4a51ce29f5de9fb3c9a54a44a83952f7689"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.replacement",
+        "independent_basis": "declared exact-commit fixture",
+        "exact": true,
+        "actual": "  Kept, Café 👩🏽‍💻\r\n  ",
+        "sha256": "8f9ccf43e84a9a6f4bdddaaf14bbf0046883fe3c2a5ee3a76784c9c2b597cadf"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.text.recognized",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Correction retained\r\nOrbit, Ltd. — Café 👩🏽‍💻\r\n",
+        "sha256": "792485d8c16f7e4a312b10b84dd7de9945c154592c66748f0b550320f758b509"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.text.recognized",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "e5159a95f13ed269bd11b2b48180089d4aca041c280a28acd1044f4b0143e1ab"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.sourceText",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "5425043e90f45f951cde907a7f1d862a7a86ed76d5434dab22b46bd3ee8ee9fd"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.original",
+        "independent_basis": "declared exact-commit fixture",
+        "exact": true,
+        "actual": "Acme, Inc.",
+        "sha256": "be54097254438af0583f7f0cdef2b086baaba101557f1dfc4abf3f30e11b2dbc"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.replacement",
+        "independent_basis": "declared exact-commit fixture",
+        "exact": true,
+        "actual": "  RJT, Café 👩🏽‍💻\r\n  ",
+        "sha256": "84ed536aa20ba9df682217b536fbd76a10fa2bd42b0fc9b6a3cb839377b358fb"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.text.recognized",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "e5159a95f13ed269bd11b2b48180089d4aca041c280a28acd1044f4b0143e1ab"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.sourceText",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "5425043e90f45f951cde907a7f1d862a7a86ed76d5434dab22b46bd3ee8ee9fd"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.replacement",
+        "independent_basis": "declared exact-commit fixture",
+        "exact": true,
+        "actual": "  RJT, Café 👩🏽‍💻\r\n  ",
+        "sha256": "8c358fdb7ace15f9060a58d53390b348ed9a80ada78a80f413a757bab06fdf13"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.original",
+        "independent_basis": "declared exact-commit fixture",
+        "exact": true,
+        "actual": "Acme, Inc.",
+        "sha256": "be54097254438af0583f7f0cdef2b086baaba101557f1dfc4abf3f30e11b2dbc"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.replacement",
+        "independent_basis": "declared exact-commit fixture",
+        "exact": true,
+        "actual": "  RJT, Café 👩🏽‍💻\r\n  ",
+        "sha256": "84ed536aa20ba9df682217b536fbd76a10fa2bd42b0fc9b6a3cb839377b358fb"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT History legacy\r\nCafé 👩🏽‍💻\r\n",
+        "sha256": "fe5214324db83f2e0c1b2d1418e554a651ab1ace4636d34cc31d437634686eda"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.enhanced",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT legacy enhanced — 42",
+        "sha256": "75fa0587c739f8cd7acc75e78fb261a3de60e649143cbe8c056bd9634a26b4a6"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.recognized",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT History recognized\r\nCafé 👩🏽‍💻 42\r\n",
+        "sha256": "cd7cf79528ed8599b0a88c8994bb85c12642ec7df6f96048a8c21ff8dcc037ee"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT History recognized\r\nCafé 👩🏽‍💻 42\r\n",
+        "sha256": "478811eec1d3af25aa912105ac1111ff1f31700852a4838a83c90aee9b0b4828"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.enhanced",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT Clarity polished — Café 👩🏽‍💻 42\r\n",
+        "sha256": "1e98f280c721e06e0a38728935a9c005134b2404ce33ecc0e205d531a6285fef"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT History fallback\r\nCafé 👩🏽‍💻\r\n",
+        "sha256": "67f0c5134f98fc92b4f9630c18b3063c1425eecb0cf038bbc5a3bcd0d51076fe"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "independent_basis": "seed",
+        "exact": true,
+        "actual": "RJT History unknown\r\nCafé 👩🏽‍💻\r\n",
+        "sha256": "3e4dd3e517faa301882d8a710f77779bad2eaefd7fcb26863cb303724e623938"
+      }
+    ],
+    "canonical_revision": "Managed temporary NFC preview followed by retained NFD preview; distinct UUID; source test asserts byte-different canonical edit invalidates old approval."
+  },
+  "entry_UUID": {
+    "observations": 12,
+    "pairs": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.id",
+        "uuid": "2B498A48-64C0-4120-AD8A-AAD85B4FD7BE",
+        "role": 1,
+        "valueType": "__NSCFConstantString",
+        "value": "",
+        "label": "ID, 2B498A48-64C0-4120-AD8A-AAD85B4FD7BE",
+        "beforeFrame": "{{242, 807}, {295, 13}}",
+        "afterFrame": "{{242, 487}, {295, 13}}",
+        "uuid_stable": true,
+        "children": 0
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "uuid": "1C299A64-1125-4062-9CF6-C4FFEA9FA2C4",
+        "role": 1,
+        "valueType": "__NSCFConstantString",
+        "value": "",
+        "label": "ID, 1C299A64-1125-4062-9CF6-C4FFEA9FA2C4",
+        "beforeFrame": "{{242, 854}, {295, 13}}",
+        "afterFrame": "{{242, 534}, {295, 13}}",
+        "uuid_stable": true,
+        "children": 0
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "uuid": "CDB27A51-48AE-47C6-A3C2-6DCB28445FC4",
+        "role": 1,
+        "valueType": "__NSCFConstantString",
+        "value": "",
+        "label": "ID, CDB27A51-48AE-47C6-A3C2-6DCB28445FC4",
+        "beforeFrame": "{{242, 854}, {295, 13}}",
+        "afterFrame": "{{242, 534}, {295, 13}}",
+        "uuid_stable": true,
+        "children": 0
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "uuid": "368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "role": 1,
+        "valueType": "__NSCFConstantString",
+        "value": "",
+        "label": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "beforeFrame": "{{242, 727}, {295, 13}}",
+        "afterFrame": "{{242, 567}, {295, 13}}",
+        "uuid_stable": true,
+        "children": 0
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "uuid": "368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "role": 1,
+        "valueType": "__NSCFConstantString",
+        "value": "",
+        "label": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "beforeFrame": "{{242, 567}, {295, 13}}",
+        "afterFrame": "{{242, 567}, {295, 13}}",
+        "uuid_stable": true,
+        "children": 0
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "dictionary.replacement.edit.id",
+        "uuid": "368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "role": 48,
+        "valueType": "__NSCFString",
+        "value": "ID, 368840DE-5B24-4967-BAF0-D1DED98F6672",
+        "label": "",
+        "beforeFrame": "{{288, 250}, {287, 13}}",
+        "afterFrame": "{{288, 250}, {287, 13}}",
+        "uuid_stable": true,
+        "children": 0
+      }
+    ],
+    "precision": "10 preview observations roleOther1 empty own value __NSCFConstantString, UUID in label; 2 dictionary-editor observations roleStaticText48 own string value __NSCFString, empty label. All childCount0.",
+    "canonical_repreview_changes_ID": true,
+    "approved_ID_matches_relaunched_dictionary_editor": true
+  },
+  "managed_case": {
+    "status": "Success",
+    "receipt": {
+      "approvedAt": 1793164809.492015,
+      "caseName": "managed",
+      "completedAt": 1793164910.724362,
+      "original": {
+        "text": "Acme, Inc.",
+        "utf8": [
+          65,
+          99,
+          109,
+          101,
+          44,
+          32,
+          73,
+          110,
+          99,
+          46
+        ],
+        "utf16": [
+          65,
+          99,
+          109,
+          101,
+          44,
+          32,
+          73,
+          110,
+          99,
+          46
+        ]
+      },
+      "outcome": "deleted",
+      "previewedID": "368840DE-5B24-4967-BAF0-D1DED98F6672",
+      "previewStartedAt": 1793164791.568537,
+      "replacement": {
+        "text": "  Edited, Café 👩🏽‍💻\r\n  ",
+        "utf8": [
+          32,
+          32,
+          69,
+          100,
+          105,
+          116,
+          101,
+          100,
+          44,
+          32,
+          67,
+          97,
+          102,
+          101,
+          204,
+          129,
+          32,
+          240,
+          159,
+          145,
+          169,
+          240,
+          159,
+          143,
+          189,
+          226,
+          128,
+          141,
+          240,
+          159,
+          146,
+          187,
+          13,
+          10,
+          32,
+          32
+        ],
+        "utf16": [
+          32,
+          32,
+          69,
+          100,
+          105,
+          116,
+          101,
+          100,
+          44,
+          32,
+          67,
+          97,
+          102,
+          101,
+          769,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          13,
+          10,
+          32,
+          32
+        ]
+      },
+      "sourceSHA": "004c1cfd61492428c0a5caacf65b2f686de59a14",
+      "sourceTranscriptionID": "A1000000-0000-4000-8000-000000000005",
+      "sourceVariant": "recognition",
+      "version": 1
+    },
+    "source_bound_checks": "Cancel/Return no insertion; canonical revision; explicit approve; toggle/edit; relaunch exact text+identity; reenable/delete all reached and passed."
+  },
+  "retained_case": {
+    "failure": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "line": 486,
+        "message": "XCTAssertTrue failed"
+      }
+    ],
+    "before_failure": "Approved, copied source again, selected native checkbox and clicked batch delete.",
+    "native_surface": "Main-window-owned Sheet label alert; one history.delete.confirm and cancel. Test queried app.alerts. Snapshot proves role mismatch; no production deletion defect established.",
+    "diagnosis_path": "/tmp/rjt-polish-ui-selected-40635219212/diagnosis/testapprovedhistorycorrectionsurvivessourcedeletion-69.txt",
+    "diagnosis_lines": "106-110"
+  },
+  "UI": {
+    "statuses": {
+      "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()": "Failure",
+      "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()": "Success",
+      "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()": "Success",
+      "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()": "Success",
+      "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()": "Success",
+      "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()": "Success",
+      "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()": "Success",
+      "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()": "Success"
+    },
+    "each_once": true
+  },
+  "postverify": {
+    "classification": "blocked",
+    "attempted": false
+  },
+  "limits": [
+    "Retained confirm/delete/source-deletion survival and final native store/correction result unproved.",
+    "No post-UI identity/TCC readback; seed equality is phase-bounded.",
+    "UI-only: no ordinary unit/full native6/regression/Release proof.",
+    "Synthetic seed: no ASR/provider/migration/editor delivery proof.",
+    "Archive integrity inherited from sole-fetch owner; no download/build/runtime/subagents/production code review; only this receipt written."
+  ],
+  "audit_findings": []
+}

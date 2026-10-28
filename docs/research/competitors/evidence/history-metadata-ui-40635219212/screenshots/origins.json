@@ -1,0 +1,33 @@
+[
+  {
+    "file": "screenshots/rjt-history-delete-dialog-40635219212.png",
+    "bytes": 139275,
+    "sha256": "c4037cac806d796c4baa21492de2b608fed7d10813d5ace907d2f0a2f134858d",
+    "kind": "Losslessderivedframefromoriginalfailedrecording",
+    "timestamp_seconds": 84.4,
+    "original_xcresult_attachment": {
+      "filename": "kXCTAttachmentScreenRecording_0_68EEEA13-E75D-48DE-89E5-E94527055871.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~YtZoekV-OoUj8dPI5pO9iWNoFHzuI0N4YC7pGlT3_0Iz11EfLKpMUEVOxl6wR644-60S4hys6qt5w_BjJujbFg=="
+      },
+      "payloadSize": "8135676",
+      "timestamp": "2026-10-28T05:05:58.023+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "2FC2F29F-6144-4A88-9DA3-94CFE3F2E195",
+      "activity_title": "Start Test at 2026-10-28 05:05:57.531",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~YtZoekV-OoUj8dPI5pO9iWNoFHzuI0N4YC7pGlT3_0Iz11EfLKpMUEVOxl6wR644-60S4hys6qt5w_BjJujbFg==",
+      "payload_sha256": "d2ec8f909f8faa6b81f9fa9b6cb0d51de23634bed264f2ddf176867b53e77c9b"
+    },
+    "observation": "FullyvisibleDeleteSelectedItemsone-itemconfirmation. NativeSheetownershipfromseparatefullAXsnapshot; pixelsalonearenotroleproof."
+  }
+]

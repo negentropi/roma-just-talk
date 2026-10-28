@@ -1,0 +1,468 @@
+Attributes: Application, 0x8434bdf40, pid: 28401, title: 'roma just talk', Disabled
+Element subtree:
+ →Application, 0x8434bdf40, pid: 28401, title: 'roma just talk', Disabled
+    Window (Main), 0x8434bd7c0, {{37.0, 31.0}, {950.0, 677.0}}, identifier: 'com.negentropi.RomaJustTalk.mainWindow', title: 'models', Disabled
+      Group, 0x8434bf980, {{37.0, 31.0}, {950.0, 677.0}}, Disabled
+        SplitGroup, 0x8434be1c0, {{37.0, 31.0}, {950.0, 677.0}}, identifier: 'main-AppWindow-1, SidebarNavigationSplitView', Disabled
+          Group, 0x8434bebc0, {{45.0, 39.0}, {210.0, 661.0}}, Disabled
+            ScrollView, 0x8434be940, {{45.0, 83.0}, {210.0, 617.0}}, Disabled
+              Outline, 0x8434be800, {{44.0, 82.0}, {212.0, 619.0}}, label: 'Sidebar', Keyboard Focused
+                OutlineRow, 0x8434bed00, {{45.0, 83.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x8434be300, {{55.0, 83.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x8434bf480, {{59.0, 83.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x8434be580, {{45.0, 83.0}, {193.0, 52.0}}, Disabled
+                  Cell, 0x8434bea80, {{55.0, 83.0}, {173.0, 52.0}}, Keyboard Focused
+                    Image, 0x8434bf0c0, {{63.0, 94.0}, {30.0, 30.0}}, label: 'AppIcon'
+                    StaticText, 0x8434bee40, {{103.0, 93.0}, {47.0, 17.0}}, value: roma-just-talk
+                    StaticText, 0x8434bf200, {{170.0, 103.5}, {20.0, 11.0}}, value: PRO
+                    StaticText, 0x8434bf340, {{103.0, 111.0}, {52.0, 14.0}}, value: speak before hotkey
+                OutlineRow, 0x8434bf840, {{45.0, 148.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x8434bf5c0, {{55.0, 148.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x8434bf700, {{59.0, 148.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x8434be080, {{45.0, 148.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x8434bef80, {{55.0, 148.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x8434bfac0, {{63.0, 156.0}, {157.0, 24.0}}, label: 'home'
+                OutlineRow, 0x8434bfc00, {{45.0, 201.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x8434bfd40, {{55.0, 201.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x8434bfe80, {{59.0, 201.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x8434b48c0, {{45.0, 201.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x8434b4780, {{55.0, 201.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x8434b4640, {{63.0, 209.0}, {157.0, 24.0}}, label: 'manual stt'
+                OutlineRow, 0x8434b4500, {{45.0, 254.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x8434b43c0, {{55.0, 254.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x8434b4280, {{59.0, 254.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x8434b4140, {{45.0, 254.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x8434b4000, {{55.0, 254.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x843480280, {{63.0, 262.0}, {157.0, 24.0}}, label: 'past'
+                OutlineRow, 0x843480140, {{45.0, 307.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x843480a00, {{55.0, 307.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x843480c80, {{59.0, 307.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x843480780, {{45.0, 307.0}, {193.0, 40.0}}, Selected, Disabled
+                  Cell, 0x843480640, {{55.0, 307.0}, {173.0, 40.0}}, Keyboard Focused, Selected
+                    Button, 0x843481900, {{63.0, 315.0}, {157.0, 24.0}}, label: 'models'
+                OutlineRow, 0x8434803c0, {{45.0, 360.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x843483200, {{55.0, 360.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x843483480, {{59.0, 360.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x843481a40, {{45.0, 360.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x843483840, {{55.0, 360.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x8434826c0, {{63.0, 368.0}, {157.0, 24.0}}, label: 'style'
+                OutlineRow, 0x8434830c0, {{45.0, 413.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x843482300, {{55.0, 413.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x8434835c0, {{59.0, 413.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x843483700, {{45.0, 413.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x843483c00, {{55.0, 413.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x843483980, {{63.0, 421.0}, {157.0, 24.0}}, label: 'Power Mode'
+                OutlineRow, 0x843482e40, {{45.0, 466.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x843482940, {{55.0, 466.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x843483ac0, {{59.0, 466.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x843483e80, {{45.0, 466.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x843483340, {{55.0, 466.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x843482440, {{63.0, 474.0}, {157.0, 24.0}}, label: 'Permissions'
+                OutlineRow, 0x843482bc0, {{45.0, 519.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x843482d00, {{55.0, 519.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x843482f80, {{59.0, 519.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x843482580, {{45.0, 519.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x843483d40, {{55.0, 519.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x843481b80, {{63.0, 527.0}, {157.0, 24.0}}, label: 'Audio Input'
+                OutlineRow, 0x84349ee40, {{45.0, 572.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x84349d7c0, {{55.0, 572.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x84349d400, {{59.0, 572.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x84349ef80, {{45.0, 572.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x84349f0c0, {{55.0, 572.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x84349ea80, {{63.0, 580.0}, {157.0, 24.0}}, label: 'Dictionary'
+                OutlineRow, 0x84349ebc0, {{45.0, 625.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x84349ed00, {{55.0, 625.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x84349e6c0, {{59.0, 625.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x84349da40, {{45.0, 625.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x84349db80, {{55.0, 625.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x84349e800, {{63.0, 633.0}, {157.0, 24.0}}, label: 'Settings'
+                OutlineRow, 0x84349e940, {{45.0, 678.0}, {193.0, 0.0}}, Disabled
+                  Cell, 0x84349e300, {{55.0, 678.0}, {173.0, 0.0}}, Keyboard Focused
+                    Group, 0x84349e440, {{59.0, 678.0}, {177.0, 0.0}}, Disabled
+                OutlineRow, 0x84349e580, {{45.0, 678.0}, {193.0, 40.0}}, Disabled
+                  Cell, 0x84349df40, {{55.0, 678.0}, {173.0, 40.0}}, Keyboard Focused
+                    Button, 0x84349e080, {{63.0, 686.0}, {157.0, 24.0}}, label: 'VoiceInk Pro', Selected
+                TableColumn, 0x84349e1c0, {{55.0, 83.0}, {173.0, 645.0}}, identifier: 'ListColumn', Disabled
+              ScrollBar, 0x84349de00, {{237.0, 82.0}, {19.0, 609.5}}, value: 0
+                ValueIndicator, 0x84349d680, {{241.0, 86.0}, {11.0, 577.0}}, value: 0, Disabled
+                IncrementArrow, 0x84349d540, {{238.0, 83.0}, {0.0, 0.0}}, Disabled
+                DecrementArrow, 0x84349dcc0, {{238.0, 83.0}, {0.0, 0.0}}, Disabled
+                Button, 0x84349d900, {{241.0, 663.0}, {11.0, 24.0}}, Disabled
+                Button, 0x84349d040, {{241.0, 86.0}, {11.0, 0.0}}, Disabled
+          Splitter, 0x84349d180, {{255.0, 83.0}, {0.0, 625.0}}, value: 218, Disabled
+          Group, 0x84349d2c0, {{37.0, 31.0}, {950.0, 677.0}}, Disabled
+            ScrollView, 0x84349cc80, {{255.0, 83.0}, {732.0, 625.0}}, Disabled
+              StaticText, 0x84349cdc0, {{311.0, 139.0}, {90.0, 16.0}}, value: Default Model
+              StaticText, 0x84349cf00, {{311.0, 163.0}, {253.0, 21.0}}, value: Whisper Large v3 T...
+              StaticText, 0x84349c8c0, {{311.0, 240.0}, {153.0, 16.0}}, value: Transcription Lang...
+              StaticText, 0x84349ca00, {{311.0, 276.0}, {102.0, 16.0}}, value: Select Language
+              PopUpButton, 0x84349cb40, {{420.0, 271.0}, {169.0, 26.0}}, value: English
+              StaticText, 0x84349c500, {{311.0, 304.0}, {458.0, 13.0}}, value: This model support...
+              Button, 0x84349c640, {{311.0, 379.0}, {133.0, 33.0}}, label: 'Recommended'
+              Button, 0x84349c780, {{456.0, 379.0}, {68.0, 33.0}}, label: 'Local'
+              Button, 0x84349c140, {{536.0, 379.0}, {71.0, 33.0}}, label: 'Cloud'
+              Button, 0x84349c280, {{619.0, 379.0}, {84.0, 33.0}}, label: 'Custom'
+              Button, 0x84349c3c0, {{870.0, 373.0}, {44.0, 44.0}}, identifier: 'models.settings.open', label: 'Model Settings'
+              StaticText, 0x84349c000, {{327.0, 461.0}, {91.0, 16.0}}, value: Base (English)
+              Button, 0x844138000, {{797.0, 461.0}, {101.0, 27.0}}, label: 'Download'
+              StaticText, 0x844138f00, {{328.0, 483.0}, {86.0, 14.0}}, value: English-only
+              StaticText, 0x844139180, {{427.0, 483.1}, {62.0, 14.0}}, value: 142 MB
+              StaticText, 0x84413b200, {{501.0, 483.1}, {35.0, 14.0}}, value: Speed
+              StaticText, 0x844139b80, {{581.0, 483.6}, {19.0, 13.0}}, value: 8.5
+              StaticText, 0x84413aa80, {{612.0, 483.1}, {51.0, 14.0}}, value: Accuracy
+              StaticText, 0x84413be80, {{708.0, 483.6}, {19.0, 13.0}}, value: 7.5
+              StaticText, 0x844139900, {{327.0, 507.1}, {409.0, 14.0}}, value: Base model optimiz...
+              StaticText, 0x84413b700, {{327.0, 565.1}, {77.0, 16.0}}, value: Parakeet V2
+              Button, 0x844139a40, {{797.0, 565.0}, {101.0, 27.0}}, label: 'Download'
+              StaticText, 0x84413a440, {{328.0, 587.1}, {86.0, 14.0}}, value: English-only
+              StaticText, 0x844139680, {{427.0, 587.2}, {63.0, 14.0}}, value: 474 MB
+              StaticText, 0x8441383c0, {{502.0, 587.2}, {34.0, 14.0}}, value: Speed
+              StaticText, 0x844139e00, {{581.0, 587.7}, {19.0, 13.0}}, value: 9.9
+              StaticText, 0x84413a800, {{612.0, 587.2}, {49.0, 14.0}}, value: Accuracy
+              StaticText, 0x8441392c0, {{706.0, 587.7}, {19.0, 13.0}}, value: 9.4
+              StaticText, 0x84413abc0, {{327.0, 611.2}, {432.0, 14.0}}, value: NVIDIA's Parakeet ...
+              StaticText, 0x84413b340, {{327.0, 675.2}, {174.0, 16.0}}, value: Large v3 Turbo (Qu...
+              Button, 0x844139cc0, {{797.0, 675.0}, {101.0, 27.0}}, label: 'Download'
+              StaticText, 0x844138500, {{328.0, 697.2}, {81.0, 14.0}}, value: Multilingual
+              StaticText, 0x84349b0c0, {{422.0, 697.3}, {63.0, 14.0}}, value: 547 MB
+              StaticText, 0x84349b480, {{497.0, 697.3}, {35.0, 14.0}}, value: Speed
+              StaticText, 0x84349ae40, {{577.0, 697.8}, {19.0, 13.0}}, value: 7.5
+              StaticText, 0x84349b840, {{608.0, 697.3}, {51.0, 14.0}}, value: Accuracy
+              StaticText, 0x84349bac0, {{704.0, 697.8}, {19.0, 13.0}}, value: 9.5
+              StaticText, 0x84349b700, {{327.0, 721.4}, {376.0, 14.0}}, value: Quantized version ...
+              StaticText, 0x84349af80, {{327.0, 779.4}, {196.0, 16.0}}, value: Whisper Large v3 T...
+              StaticText, 0x84349b980, {{819.0, 779.4}, {79.0, 15.0}}, value: Default Model
+              StaticText, 0x84349b200, {{328.0, 801.4}, {48.0, 14.0}}, value: Groq
+              StaticText, 0x843486580, {{389.0, 801.4}, {81.0, 14.0}}, value: Multilingual
+              StaticText, 0x8434861c0, {{482.0, 801.4}, {35.0, 14.0}}, value: Speed
+              StaticText, 0x843487c00, {{562.0, 801.9}, {19.0, 13.0}}, value: 6.5
+              StaticText, 0x843486940, {{593.0, 801.4}, {51.0, 14.0}}, value: Accuracy
+              StaticText, 0x843485f40, {{689.0, 801.9}, {19.0, 13.0}}, value: 9.5
+              StaticText, 0x843486080, {{327.0, 825.5}, {363.0, 14.0}}, value: Whisper Large v3 T...
+              ScrollBar, 0x843485e00, {{969.0, 82.0}, {19.0, 609.5}}, value: 0
+                ValueIndicator, 0x843487700, {{973.0, 86.0}, {11.0, 462.0}}, value: 0, Disabled
+                IncrementArrow, 0x843486d00, {{970.0, 83.0}, {0.0, 0.0}}, Disabled
+                DecrementArrow, 0x8434875c0, {{970.0, 83.0}, {0.0, 0.0}}, Disabled
+                Button, 0x843487ac0, {{973.0, 549.0}, {11.0, 138.0}}, Disabled
+                Button, 0x8434852c0, {{973.0, 86.0}, {11.0, 0.0}}, Disabled
+      Toolbar, 0x843487d40, {{37.0, 31.0}, {950.0, 52.0}}, Disabled
+        Button, 0x843487340, {{208.0, 31.0}, {47.0, 52.0}}, label: 'Hide Sidebar'
+      Button, 0x843484f00, {{55.0, 49.0}, {16.0, 16.0}}, identifier: '_XCUI:CloseWindow'
+      Button, 0x843486a80, {{101.0, 49.0}, {16.0, 16.0}}, identifier: '_XCUI:ZoomWindow'
+        Group, 0x843486800, {{102.0, 50.0}, {14.0, 14.0}}, Disabled
+          Group, 0x843487480, {{102.0, 50.0}, {14.0, 14.0}}, Disabled
+      Button, 0x843486bc0, {{78.0, 49.0}, {16.0, 16.0}}, identifier: '_XCUI:MinimizeWindow'
+    MenuBar, 0x843486440, {{0.0, 0.0}, {1024.0, 30.0}}
+      MenuBarItem, 0x843487980, {{10.0, 0.0}, {34.0, 30.0}}, title: 'Apple'
+        Menu, 0x843485540, {{0.0, 768.0}, {0.0, 0.0}}
+          MenuItem, 0x843487e80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_aboutThisMacRequested:', title: 'About This Mac'
+          MenuItem, 0x844a09b80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_systemInformationRequested:', title: 'System Information'
+          MenuItem, 0x844a0a080, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x844a0af80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_systemSettingsRequested:', title: 'System Settings…, 1 update'
+          MenuItem, 0x844a0ad00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_appStoreRequested:', title: 'App Store'
+          MenuItem, 0x844a09900, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x844a0aa80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentsRequested:', title: 'Recent Items'
+            Menu, 0x844a0a580, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x844a0a1c0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Applications', Disabled
+              MenuItem, 0x844a0bc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Installer'
+              MenuItem, 0x844a0b980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “Installer” in Finder'
+              MenuItem, 0x844a0ae40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'roma just talk'
+              MenuItem, 0x844a0be80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “roma just talk” in Finder'
+              MenuItem, 0x844a0b840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'System Settings'
+              MenuItem, 0x844a0b200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “System Settings” in Finder'
+              MenuItem, 0x844a0a940, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+              MenuItem, 0x844a0bac0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Documents', Disabled
+              MenuItem, 0x844a09e00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'AnkaGuestAddons.pkg'
+              MenuItem, 0x844a0a300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Show “AnkaGuestAddons.pkg” in Finder'
+              MenuItem, 0x844a0b700, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+              MenuItem, 0x844a0b480, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Servers', Disabled
+              MenuItem, 0x844a0b340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_recentItemRequested:', title: 'Macintosh HD'
+              MenuItem, 0x8434a03c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+              MenuItem, 0x8434a2800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_clearRecentItemsRequested:', title: 'Clear Menu'
+          MenuItem, 0x8434a0140, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8434a0640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_forceQuitPanelRequested:', title: 'Force Quit…'
+          MenuItem, 0x8434a2580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_forceQuitRequested:', title: 'Force Quit roma just talk'
+          MenuItem, 0x8434a0000, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8434a0280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_sleepRequested:', title: 'Sleep'
+          MenuItem, 0x8434a1e00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_restartRequested:', title: 'Restart…'
+          MenuItem, 0x8434a0500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_restartNowRequested:', title: 'Restart'
+          MenuItem, 0x8434a12c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_shutDownRequested:', title: 'Shut Down…'
+          MenuItem, 0x843d6e940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_shutDownNowRequested:', title: 'Shut Down'
+          MenuItem, 0x843d6ebc0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843d6f0c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_lockScreenRequested:', title: 'Lock Screen'
+          MenuItem, 0x843d6f340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_logOutRequested:', title: 'Log Out Anka…'
+          MenuItem, 0x843d6e440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_logOutNowRequested:', title: 'Log Out Anka'
+          MenuItem, 0x843d6f5c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+      MenuBarItem, 0x843d6e6c0, {{44.0, 0.0}, {109.0, 30.0}}, title: 'roma just talk'
+        Menu, 0x843d6f480, {{0.0, 768.0}, {0.0, 0.0}}
+          MenuItem, 0x843d6fe80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'orderFrontStandardAboutPanel:', title: 'About roma just talk'
+          MenuItem, 0x843d6fd40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Check for Updates…'
+          MenuItem, 0x843d6ee40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843d6fac0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Services'
+            Menu, 0x843d6f200, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x843d6f700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Activity Monitor'
+              MenuItem, 0x843d6f840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Allocations & Leaks'
+              MenuItem, 0x843d6ea80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'File Activity'
+              MenuItem, 0x843d6fc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'System Trace'
+              MenuItem, 0x843d6ed00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile Active Application'
+              MenuItem, 0x843d6f980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile App Under Mouse'
+              MenuItem, 0x843d6e800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Time Profile Entire System'
+              MenuItem, 0x843d6ef80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_processRequest:', title: 'Toggle Instruments Recording'
+              MenuItem, 0x8447b0c80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_configureServicesMenu:', title: 'Services Settings…'
+          MenuItem, 0x8447b21c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8447b3480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'hide:', title: 'Hide roma just talk'
+          MenuItem, 0x8447b0b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'hideOtherApplications:', title: 'Hide Others'
+          MenuItem, 0x8447b2940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'unhideAllApplications:', title: 'Show All', Disabled
+          MenuItem, 0x8447b1a40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8447b0a00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'terminate:', title: 'Quit roma just talk'
+      MenuBarItem, 0x8447b2440, {{153.0, 0.0}, {44.0, 30.0}}, title: 'Edit'
+        Menu, 0x8447b2300, {{0.0, 768.0}, {0.0, 0.0}}
+          MenuItem, 0x8447b2bc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'undo:', title: 'Undo', Disabled
+          MenuItem, 0x8447b1180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'redo:', title: 'Redo', Disabled
+          MenuItem, 0x8447b0780, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8447b2f80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'cut:', title: 'Cut', Disabled
+          MenuItem, 0x8447b2e40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'copy:', title: 'Copy', Disabled
+          MenuItem, 0x8447b0640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'paste:', title: 'Paste', Disabled
+          MenuItem, 0x8447b1cc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'delete:', title: 'Delete', Disabled
+          MenuItem, 0x8447b35c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'selectAll:', title: 'Select All', Disabled
+          MenuItem, 0x8447b30c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8447b2080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_NSMenuItemAutoFillIdentifier', title: 'AutoFill'
+            Menu, 0x8447b12c0, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x8447b1040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromContactsCommand:', title: 'Contact…', Disabled
+              MenuItem, 0x8447b3ac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromPasswordsCommand:', title: 'Passwords…', Disabled
+              MenuItem, 0x8447b1680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_handleInsertFromCreditCardsCommand:', title: 'Credit Card…', Disabled
+          MenuItem, 0x8447b03c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'startDictation:', title: 'Start Dictation…'
+          MenuItem, 0x8447b0000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'orderFrontCharacterPalette:', title: 'Emoji & Symbols'
+      MenuBarItem, 0x8447b3d40, {{197.0, 0.0}, {50.0, 30.0}}, title: 'View'
+        Menu, 0x8447b1900, {{0.0, 768.0}, {0.0, 0.0}}
+          MenuItem, 0x8447b3e80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'toggleTabBar:', title: 'Show Tab Bar'
+          MenuItem, 0x8447b1540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'toggleTabOverview:', title: 'Show All Tabs'
+          MenuItem, 0x8447b1f40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8447b0280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'toggleFullScreen:', title: 'Enter Full Screen', Disabled
+      MenuBarItem, 0x8447b0dc0, {{247.0, 0.0}, {69.0, 30.0}}, title: 'Window'
+        Menu, 0x8447b2d00, {{0.0, 768.0}, {0.0, 0.0}}
+          MenuItem, 0x8447b1b80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performClose:', title: 'Close'
+          MenuItem, 0x8447b1e00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'closeAll:', title: 'Close All'
+          MenuItem, 0x8447b17c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performMiniaturize:', title: 'Minimize'
+          MenuItem, 0x84447c780, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'miniaturizeAll:', title: 'Minimize All'
+          MenuItem, 0x84447d900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'performZoom:', title: 'Zoom'
+          MenuItem, 0x84447ee40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'zoomAll:', title: 'Zoom All'
+          MenuItem, 0x84447c500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomFill:', title: 'Fill'
+          MenuItem, 0x84447ea80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomCenter:', title: 'Center'
+          MenuItem, 0x84447e080, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x84447fe80, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Move & Resize'
+            Menu, 0x84447fd40, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x84447d7c0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Halves', Disabled
+              MenuItem, 0x84447df40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeft:', title: 'Left'
+              MenuItem, 0x84447cdc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRight:', title: 'Right'
+              MenuItem, 0x84447f700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTop:', title: 'Top'
+              MenuItem, 0x84447e940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottom:', title: 'Bottom'
+              MenuItem, 0x84447db80, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+              MenuItem, 0x84447ed00, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Quarters', Disabled
+              MenuItem, 0x84447d680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopLeft:', title: 'Top Left'
+              MenuItem, 0x84447e1c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopRight:', title: 'Top Right'
+              MenuItem, 0x84447fc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomLeft:', title: 'Bottom Left'
+              MenuItem, 0x84447cc80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomRight:', title: 'Bottom Right'
+              MenuItem, 0x84447da40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+              MenuItem, 0x84447ebc0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Arrange', Disabled
+              MenuItem, 0x84447f980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeftAndRight:', title: 'Left & Right'
+              MenuItem, 0x84447d400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomLeftThreeUp:', title: 'Left & Quarters'
+              MenuItem, 0x84447cb40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRightAndLeft:', title: 'Right & Left'
+              MenuItem, 0x84447e440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomRightThreeUp:', title: 'Right & Quarters'
+              MenuItem, 0x84447d180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopAndBottom:', title: 'Top & Bottom'
+              MenuItem, 0x84447f340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomTopThreeUp:', title: 'Top & Quarters'
+              MenuItem, 0x84447e300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomAndTop:', title: 'Bottom & Top'
+              MenuItem, 0x84447f480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomBottomThreeUp:', title: 'Bottom & Quarters'
+              MenuItem, 0x84447f5c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomQuarters:', title: 'Quarters'
+              MenuItem, 0x84447c640, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+              MenuItem, 0x84447e6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_zoomUntile:', title: 'Return to Previous Size', Disabled
+          MenuItem, 0x84447e580, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Full Screen Tile', Disabled
+          MenuItem, 0x843478280, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8434783c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: '_removeWindowFromStageManagerSet:', title: 'Remove Window from Set', Disabled
+          MenuItem, 0x843479680, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843478b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'arrangeInFront:', title: 'Bring All to Front'
+          MenuItem, 0x84347a440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'alternateArrangeInFront:', title: 'Arrange in Front'
+          MenuItem, 0x8434788c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843478780, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'selectPreviousTab:', title: 'Show Previous Tab', Disabled
+          MenuItem, 0x84347a6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'selectNextTab:', title: 'Show Next Tab', Disabled
+          MenuItem, 0x843478000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'moveTabToNewWindow:', title: 'Move Tab to New Window', Disabled
+          MenuItem, 0x843478c80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'mergeAllWindows:', title: 'Merge All Windows', Disabled
+          MenuItem, 0x843478a00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x84347b0c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843478140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'makeKeyAndOrderFront:', title: 'models'
+      MenuBarItem, 0x843478500, {{316.0, 0.0}, {48.0, 30.0}}, title: 'Help'
+        Menu, 0x843478640, {{0.0, 768.0}, {0.0, 0.0}}
+          MenuItem, 0x8445a1a40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'searchFieldAction:'
+            SearchField, 0x8445a1b80, {{-1.0, 743.0}, {342.0, 26.0}}, identifier: '_SC_SEARCH_FIELD'
+            Table, 0x8445a2800, {{-1.0, 762.0}, {362.0, 7.0}}, identifier: '_SC_RESULTS_TABLE', label: 'search result'
+              TableColumn, 0x8445a3e80, {{0.0, 763.0}, {350.0, 5.0}}, identifier: 'Title', Disabled
+          MenuItem, 0x8445a3ac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'showHelp:', title: 'roma just talk Help'
+    TouchBar, 0x8445a2300, {{80.0, 0.0}, {685.0, 30.0}}, Disabled
+    MenuBar, 0x8447370c0, {{756.0, 3.0}, {40.0, 24.0}}
+      StatusItem, 0x844735900, {{756.0, 3.0}, {40.0, 24.0}}, title: 'menuBarIcon'
+        Menu, 0x844736080, {{0.0, 768.0}, {0.0, 0.0}}
+          MenuItem, 0x844736d00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Toggle Recorder'
+          MenuItem, 0x844736e40, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x844734000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 23392)', title: 'Transcription Model: Whisper Large v3 Turbo (Groq)'
+            Menu, 0x844736300, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x8434a8dc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Apple Speech'
+              MenuItem, 0x8434a9040, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+              MenuItem, 0x8434a8b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Manage Models'
+          MenuItem, 0x8434a7c00, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x8434a7e80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'AI Enhancement'
+          MenuItem, 0x8434a75c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 23093)', title: 'Prompt: None'
+            Menu, 0x8434a7700, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x8434a7ac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Default'
+              MenuItem, 0x8434b3ac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Assistant'
+          MenuItem, 0x8434b2440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 22759)', title: 'AI Provider: Local CLI'
+            Menu, 0x8434b0280, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x8434b0dc0, {{0.0, 768.0}, {0.0, 0.0}}, title: 'No providers connected', Disabled
+          MenuItem, 0x8434b0140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 22749)', title: 'AI Model: local-cli'
+            Menu, 0x8434b2a80, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x8434b0000, {{0.0, 768.0}, {0.0, 0.0}}, title: 'No models available', Disabled
+          MenuItem, 0x8434b1f40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 22734)', title: 'Language: English'
+            Menu, 0x8434b2d00, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x8434b3480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Auto-detect'
+              MenuItem, 0x843414a00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Afrikaans'
+              MenuItem, 0x843414b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Albanian'
+              MenuItem, 0x843414140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Amharic'
+              MenuItem, 0x8434148c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Arabic'
+              MenuItem, 0x843414280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Armenian'
+              MenuItem, 0x843414640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Assamese'
+              MenuItem, 0x843414780, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Australian English'
+              MenuItem, 0x8434bb340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Azerbaijani'
+              MenuItem, 0x8434bbac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bashkir'
+              MenuItem, 0x8434bbc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Basque'
+              MenuItem, 0x8434b9f40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Belarusian'
+              MenuItem, 0x8434ba580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bengali'
+              MenuItem, 0x8434bb0c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bosnian'
+              MenuItem, 0x84346ad00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Breton'
+              MenuItem, 0x843469f40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'British English'
+              MenuItem, 0x84346a300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Bulgarian'
+              MenuItem, 0x84346bd40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Cantonese'
+              MenuItem, 0x84346aa80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Catalan'
+              MenuItem, 0x84346bc00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Chinese'
+              MenuItem, 0x84346a1c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Croatian'
+              MenuItem, 0x84346a6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Czech'
+              MenuItem, 0x84346a800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Danish'
+              MenuItem, 0x84346be80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Dutch'
+              MenuItem, 0x84346a580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'English'
+              MenuItem, 0x84346b200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Estonian'
+              MenuItem, 0x84346b700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Faroese'
+              MenuItem, 0x84346ae40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Filipino'
+              MenuItem, 0x84346abc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Finnish'
+              MenuItem, 0x84347e6c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'French'
+              MenuItem, 0x84347e940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Galician'
+              MenuItem, 0x84347fac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Georgian'
+              MenuItem, 0x84347d400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'German'
+              MenuItem, 0x84347d2c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Greek'
+              MenuItem, 0x84347d540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Gujarati'
+              MenuItem, 0x84347cdc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Haitian Creole'
+              MenuItem, 0x84347c8c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hausa'
+              MenuItem, 0x84347d180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hawaiian'
+              MenuItem, 0x84347d040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hebrew'
+              MenuItem, 0x84347ca00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hindi'
+              MenuItem, 0x843474000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hungarian'
+              MenuItem, 0x843474140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Icelandic'
+              MenuItem, 0x843474280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Igbo'
+              MenuItem, 0x8434743c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Indonesian'
+              MenuItem, 0x843474500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Irish'
+              MenuItem, 0x843474640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Italian'
+              MenuItem, 0x843474780, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Japanese'
+              MenuItem, 0x8434748c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Javanese'
+              MenuItem, 0x843474a00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kannada'
+              MenuItem, 0x843474b40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kazakh'
+              MenuItem, 0x843474c80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Khmer'
+              MenuItem, 0x843474dc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Korean'
+              MenuItem, 0x843474f00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kurdish'
+              MenuItem, 0x843475040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Kyrgyz'
+              MenuItem, 0x843475180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Lao'
+              MenuItem, 0x8434752c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Latin'
+              MenuItem, 0x843475400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Latvian'
+              MenuItem, 0x843475540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Lingala'
+              MenuItem, 0x843475680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Lithuanian'
+              MenuItem, 0x8434757c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Luxembourgish'
+              MenuItem, 0x843475900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Macedonian'
+              MenuItem, 0x843475a40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Malagasy'
+              MenuItem, 0x843475b80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Malay'
+              MenuItem, 0x843475cc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Malayalam'
+              MenuItem, 0x843475e00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Maltese'
+              MenuItem, 0x843475f40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Maori'
+              MenuItem, 0x843476080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Marathi'
+              MenuItem, 0x8434761c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Mongolian'
+              MenuItem, 0x843476300, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Myanmar'
+              MenuItem, 0x843476440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Nepali'
+              MenuItem, 0x843476580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Norwegian'
+              MenuItem, 0x8434766c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Norwegian Nynorsk'
+              MenuItem, 0x843476800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Occitan'
+              MenuItem, 0x843476940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Odia'
+              MenuItem, 0x843476a80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Pashto'
+              MenuItem, 0x843476bc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Persian'
+              MenuItem, 0x843476d00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Polish'
+              MenuItem, 0x843476e40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Portuguese'
+              MenuItem, 0x843476f80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Punjabi'
+              MenuItem, 0x8434770c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Romanian'
+              MenuItem, 0x843477200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Russian'
+              MenuItem, 0x843477340, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sanskrit'
+              MenuItem, 0x843477480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Serbian'
+              MenuItem, 0x8434775c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Shona'
+              MenuItem, 0x843477700, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sindhi'
+              MenuItem, 0x843477840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sinhala'
+              MenuItem, 0x843477980, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Slovak'
+              MenuItem, 0x843477ac0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Slovenian'
+              MenuItem, 0x843477c00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Somali'
+              MenuItem, 0x843477d40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Spanish'
+              MenuItem, 0x843477e80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Sundanese'
+              MenuItem, 0x843ffc000, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Swahili'
+              MenuItem, 0x843ffc140, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Swedish'
+              MenuItem, 0x843ffc280, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Swiss German'
+              MenuItem, 0x843ffc3c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tagalog'
+              MenuItem, 0x843ffc500, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tajik'
+              MenuItem, 0x843ffc640, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tamil'
+              MenuItem, 0x843ffc780, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tatar'
+              MenuItem, 0x843ffc8c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Telugu'
+              MenuItem, 0x843ffca00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Thai'
+              MenuItem, 0x843ffcb40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Tibetan'
+              MenuItem, 0x843ffcc80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Turkish'
+              MenuItem, 0x843ffcdc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Turkmen'
+              MenuItem, 0x843ffcf00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Ukrainian'
+              MenuItem, 0x843ffd040, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Urdu'
+              MenuItem, 0x843ffd180, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'US English'
+              MenuItem, 0x843ffd2c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Uzbek'
+              MenuItem, 0x843ffd400, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Vietnamese'
+              MenuItem, 0x843ffd540, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Welsh'
+              MenuItem, 0x843ffd680, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Wolof'
+              MenuItem, 0x843ffd7c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Xhosa'
+              MenuItem, 0x843ffd900, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Yiddish'
+              MenuItem, 0x843ffda40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Yoruba'
+              MenuItem, 0x843ffdb80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Zulu'
+          MenuItem, 0x843ffdcc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 4139)', title: 'Audio Input'
+            Menu, 0x843ffde00, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x843ffdf40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Apple Virtual Sound Device'
+              MenuItem, 0x843ffe080, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Null Audio Device'
+          MenuItem, 0x843ffe1c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'ID(id: 24119)', title: 'Additional'
+            Menu, 0x843ffe300, {{0.0, 768.0}, {0.0, 0.0}}
+              MenuItem, 0x843ffe440, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Clipboard Context'
+              MenuItem, 0x843ffe580, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Context Awareness'
+          MenuItem, 0x843ffe6c0, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843ffe800, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Retry Last Transcription'
+          MenuItem, 0x843ffe940, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Copy Last Transcription'
+          MenuItem, 0x843ffea80, {{0.0, 768.0}, {0.0, 0.0}}, title: 'Undo Last Writing Edit', Disabled
+          MenuItem, 0x843ffebc0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'History'
+          MenuItem, 0x843ffed00, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Permissions'
+          MenuItem, 0x843ffee40, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Settings'
+          MenuItem, 0x843ffef80, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hide Dock Icon'
+          MenuItem, 0x843fff0c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Hide Menu Bar Icon'
+          MenuItem, 0x843fff200, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Launch at Login'
+          MenuItem, 0x843fff340, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843fff480, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Check for Updates'
+          MenuItem, 0x843fff5c0, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Help and Support'
+          MenuItem, 0x843fff700, {{0.0, 768.0}, {0.0, 0.0}}, Disabled
+          MenuItem, 0x843fff840, {{0.0, 768.0}, {0.0, 0.0}}, identifier: 'menuAction:', title: 'Quit roma-just-talk'
+Path to element:
+ →Application, 0x8434bdf40, pid: 28401, title: 'roma just talk', Disabled
+Query chain:
+ →Find: Target Application 'com.negentropi.RomaJustTalk'
+  Output: {
+    Application, 0x843fff980, pid: 28401, title: 'roma just talk', Disabled
+  }

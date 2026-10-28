@@ -1,0 +1,76 @@
+{
+  "run": 40635219212,
+  "source_sha": "004c1cfd61492428c0a5caacf65b2f686de59a14",
+  "mode": "UI-only",
+  "classification": "managed-correction-green-retained-confirmation-role-calibration-needed",
+  "UI": {
+    "once": 8,
+    "passed": 7,
+    "failed": 1,
+    "failure_line": 486,
+    "failure": "app.alerts.firstMatchnotfound;actualnativeSheetexists"
+  },
+  "Copy": {
+    "observed": 11,
+    "required": 11,
+    "all_UTF8_UTF16_independent_seed_exact": true,
+    "complete": true
+  },
+  "StaticText": {
+    "observed": 21,
+    "all_UTF8_UTF16_independent_seed_or_declared_fixture_exact": true
+  },
+  "metadataUUID": {
+    "native_observations": 12,
+    "pairs": 6,
+    "one_exact_field_per_observation": true,
+    "pair_identities_stable": true,
+    "preview_fields": "Other1;emptyStringvalue+IDUUIDlabel;children0;nativeviewportexposure",
+    "editor_fields": "StaticText48;IDUUIDinownvalue;emptylabel",
+    "canonical_repreview_newUUID": "proved;managedreceiptIDandeditorrelaunchmatch",
+    "no_global_or_store_lookup": true
+  },
+  "managed_case": "PASSED:previewcancel/noinsertion;NFCtoNFDapprovalinvalidation/repreview;explicitapprove;disablededit/relaunch/reenable/delete;receiptretained",
+  "retained_case": "Approvedandsourcecopiedagain,checkboxselected,batchdeleteclicked. ActualconfirmationSheetvisible;notconfirmed. Sourcerowdeletion/provenancesurvival/unproved.",
+  "native_confirmation": {
+    "owning_window": "com.negentropi.RomaJustTalk.mainWindow",
+    "role": "Sheet",
+    "label": "alert",
+    "frame": [
+      382,
+      299,
+      260,
+      138
+    ],
+    "confirm": "history.delete.confirm",
+    "cancel": "history.delete.cancel",
+    "hierarchy_lines": "106-110",
+    "actual_AppPID": 18401,
+    "product_defect_observed": false
+  },
+  "native_History": {
+    "seedPassed": true,
+    "seedPID": 16937,
+    "normal3stores": true,
+    "factory_body": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "closedBeforeUI": true,
+    "postverify": "blocked/notattemptedonUIred"
+  },
+  "independent_audit": "independent-native-copy-audit.json",
+  "artifact": {
+    "id": 12794451993,
+    "bytes": 231457769,
+    "sha256": "1206ac48f7d054852f631f59b55b24525f712816e0daf46e01ea0b8888f02eb9",
+    "members": 2518,
+    "allCRCverified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40635219212/evidence.zip",
+    "fullZIPlocal": false,
+    "duplicateScreenshotZIP": "notfetched"
+  },
+  "limits": [
+    "No8casegreen/nativepost/Releasefullgateclaim.",
+    "UI-onlyskippedCore/ordinaryunit/native6/matched/Release.",
+    "Currentnativecensusdoesnotretroactivelyinventprior49336ownpropertyvalues.",
+    "NoVoiceOvernavigationorprovider/ASRproof."
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "review_model": "gpt-6.1-sol",
+  "review_type": "read-only actual compact evidence, retained raw archive and frozen source review",
+  "result": "clean-with-runtime-limits",
+  "reviewed_files_sha256": {
+    "audit.json": "baa0ab856d52b42a0ef4e2cde08548aad9f2356c68594398d3817086942563bb",
+    "milestones.json": "908848c29d688f3c0bd84d0a8148c399fea0b75f397b39441ef224dcda111f07",
+    "README.md": "a39ba02c046ed2bfb53a6d725390f394fa0727ef3726a91af4861d9c9b592eff",
+    "failure-diagnosis.json": "bab1ba73ba3ada0165e1afca00cd4409462a48f4fddebf6ae285d912f5e5cb4f",
+    "artifacts.json": "2e462045dc4a9fb75909e4e50a382e59ed8380c59e9e056b657c299664adc463"
+  },
+  "confirmed_progress_records": 51,
+  "first_unreturned_boundary": "press(status) helper; exact synchronous AX subcall unproven",
+  "observed_native_cases": 0,
+  "visual_review_performed": false,
+  "stack_review_performed": false,
+  "limits": [
+    "No screenshot exists. Both sampler attempts timed out and no sample text exists.",
+    "All owner/engine initialization and Oracle stages through status lookup returned, but no native case or state completed.",
+    "No root cause, menu visibility, engine defect or product Undo acceptance is inferred."
+  ],
+  "findings": []
+}

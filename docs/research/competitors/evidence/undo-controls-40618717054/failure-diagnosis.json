@@ -1,0 +1,179 @@
+{
+  "run_id": 40618717054,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40618717054",
+  "head_sha": "8fab5e9fa8ca1f368516fe2e4bb7974724d95d36",
+  "github_conclusion": "failure",
+  "classification": "synchronous-own-status-control-press-path-timeout-before-native-cases",
+  "build": {
+    "succeeded": true,
+    "compile_errors": 0,
+    "raw_log_member": "writing-undo-controls-proof/build.log",
+    "raw_log_sha256": "6e15b8dabef75881d3efb7e2b8dee12ece71515b8de3575a4baf8e1ef5fc5d0f"
+  },
+  "prepared_source_inputs": 613,
+  "prepared_candidate_files": 606,
+  "prepared_manifests_match_git_objects": true,
+  "actual_compiler_swift_inputs": 222,
+  "actual_response_guard_passed": true,
+  "canonical_pins": 41,
+  "signature_before": {
+    "app_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "15cf95ea72a8ce867728bce4e6e2258645a8212b277db06b16c62202b0ade591",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "fresh_tcc_rows_before": 5,
+  "mapped_host": {
+    "exit_code": -15,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 20220,
+      "started_at": "Wed Oct 28 02:11:35 2026"
+    },
+    "spawned_identity": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "started_at": "Wed Oct 28 02:11:35 2026"
+    }
+  },
+  "closed_host": {
+    "error": null,
+    "exact_executable_census_empty": true,
+    "exact_executable_has_no_open_descriptors": true,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 20220,
+      "started_at": "Wed Oct 28 02:11:35 2026"
+    },
+    "valid": true
+  },
+  "progress_count": 51,
+  "first_checkpoint": {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 20220,
+    "schemaVersion": 1,
+    "sequence": 1,
+    "stage": "app.init.entry",
+    "systemUptime": 606.0563398333334,
+    "unixTime": 1793153495.444662
+  },
+  "last_checkpoint": {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 20220,
+    "schemaVersion": 1,
+    "sequence": 51,
+    "stage": "menu.unavailable-menu.status-press.before",
+    "systemUptime": 607.5917850416668,
+    "unixTime": 1793153496.979949
+  },
+  "returned_boundaries": [
+    "app.init",
+    "owner registration/schema/container",
+    "Whisper/FluidAudio/Transcription model managers",
+    "RecorderUIManager",
+    "VoiceInkEngine",
+    "Recorder configure",
+    "RecordingShortcutManager",
+    "owner.launch",
+    "view body/task",
+    "Oracle initialization",
+    "four permission preflights",
+    "typed policy snapshot/public writes/synchronize/snapshot",
+    "unique actual status-item lookup"
+  ],
+  "first_unreturned_source_boundary": "press(status) helper after menu.unavailable-menu.status-press.before; helper performs AX description/action/frame/enabled reads before synchronous own-control AXPress. Exact blocked subcall is unproven.",
+  "policy_claim": "Execution passed the policy requires before status-item lookup, but actual typed values remain unretained because result.json was not written.",
+  "host_outcome_summary": {
+    "classification": "invalid-or-failed",
+    "candidate_error": null,
+    "closure_error": null,
+    "exit_code": -15,
+    "mapped_host_observed": true,
+    "monitor_error": "Control host exceeded the 180-second diagnostic deadline",
+    "native_failure": null,
+    "native_issues": [],
+    "observed_completed_cases": [],
+    "profile_files": {}
+  },
+  "configuration": {
+    "working_directory": "/Users/runner/work/_temp/writing-undo-controls-proof/native",
+    "LLVM_PROFILE_FILE": "/Users/runner/work/_temp/writing-undo-controls-proof/native/profiles/undo-controls-%p-%m.profraw",
+    "host_timeout_seconds": 180,
+    "coverage_policy": "Compiler instrumentation preserved; raw profiles stay outside frozen source/compiler inputs."
+  },
+  "samples": [
+    {
+      "checkpoint": "15s",
+      "pid": 20220,
+      "status": "timeout",
+      "valid": false,
+      "identity_before": {
+        "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "started_at": "Wed Oct 28 02:11:35 2026"
+      },
+      "identity_after": {
+        "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "started_at": "Wed Oct 28 02:11:35 2026"
+      },
+      "observed_elapsed_seconds": 15.120561041999963,
+      "tool_timeout_seconds": 8,
+      "sample_file_present": false,
+      "stderr": "Sampling process 20220 for 1 second with 1 millisecond of run time between samples\nSampling completed, processing symbols...\n",
+      "receipt_sha256": "00bf38f9cdcba6ad7a3cd469aa9658a72b103d99d420a0043aa1f919e6f161cb"
+    },
+    {
+      "checkpoint": "60s",
+      "pid": 20220,
+      "status": "timeout",
+      "valid": false,
+      "identity_before": {
+        "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "started_at": "Wed Oct 28 02:11:35 2026"
+      },
+      "identity_after": {
+        "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "started_at": "Wed Oct 28 02:11:35 2026"
+      },
+      "observed_elapsed_seconds": 60.137647625,
+      "tool_timeout_seconds": 8,
+      "sample_file_present": false,
+      "stderr": "Sampling process 20220 for 1 second with 1 millisecond of run time between samples\n",
+      "receipt_sha256": "ff419d78b0ec4ecb07c2818ff0d7d88a39431108af02f5c38e622e611ba4dab8"
+    }
+  ],
+  "native_completed_cases": 0,
+  "state_checks_completed": 0,
+  "screenshots": 0,
+  "source_census_claim": "No candidate mismatch or candidate_error was recorded after termination. Runtime output directory and LLVM profile path were external to candidate. No source-after receipt was reached.",
+  "limits": [
+    "No exact blocked C subcall, IPC deadlock, menu-open state or engine defect is proven.",
+    "Both process samples timed out and contain no retained stack text. Completion text from one sampler is not a valid trace.",
+    "No native result, case/state completion, configured chord, Undo command, editor restoration, range, notice, focus or visual acceptance.",
+    "No post-run source, identity or TCC receipts.",
+    "External diagnostic screen capture was absent in this immutable run; no screenshot can be reviewed."
+  ]
+}

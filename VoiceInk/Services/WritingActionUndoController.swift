@@ -41,6 +41,7 @@ final class WritingActionUndoController: NSObject, ObservableObject {
     }
 
     func isCurrentDelivery(_ id: DeliveryID) -> Bool { activeDelivery == id }
+    func isCurrentDelivery(for transcriptionID: UUID) -> Bool { activeDelivery?.transcriptionID == transcriptionID }
     func isLatestDelivery(_ id: DeliveryID) -> Bool { latestDeliveryID == id }
 
     func willAttemptDelivery(_ id: DeliveryID) throws {

@@ -67,7 +67,10 @@ class LastTranscriptionService: ObservableObject {
             preference: .original
         )
 
-        paste(textToPaste, transcriptionID: lastTranscription.id, controller: writingActionUndoController)
+        paste(
+            textToPaste, transcriptionID: lastTranscription.id, controller: writingActionUndoController,
+            replacingTranscriptionID: excludedID
+        )
     }
     
     @MainActor
@@ -88,7 +91,17 @@ class LastTranscriptionService: ObservableObject {
     }
 
     @MainActor
-    private static func paste(_ text: String, transcriptionID: UUID, controller: WritingActionUndoController) {
+    private static func paste(
+        _ text: String,
+        transcriptionID: UUID,
+        controller: WritingActionUndoController,
+        replacingTranscriptionID: UUID? = nil
+    ) {
+        // Empty-tap fallback hands off its own pipeline delivery; manual history paste cannot supersede another owner.
+        if controller.isBusy {
+            guard let replacingTranscriptionID,
+                  controller.isCurrentDelivery(for: replacingTranscriptionID) else { return }
+        }
         let deliveryID = controller.beginDelivery(transcriptionID: transcriptionID)
         Task { @MainActor in
             var outcome: WritingTarget.DeliveryOutcome = .notAttempted(CancellationError())

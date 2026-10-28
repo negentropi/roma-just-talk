@@ -1,6 +1,8 @@
 import AppKit
 import Foundation
+import SwiftData
 import Testing
+import VoiceInkCore
 @testable import VoiceInk
 
 extension VoiceInkTests {
@@ -302,6 +304,80 @@ extension VoiceInkTests {
             #expect(!controller.isBusy)
         }
 
+        @Test @MainActor func pasteLastWhileDeliveryIsBusyPreservesOwnerAndStillPastesWhenIdle() async throws {
+            for choice in LastWritingPasteFixture.Choice.allCases {
+                let fixture = try LastWritingPasteFixture()
+                defer { fixture.close() }
+                let controller = WritingActionUndoController()
+                defer { controller.retireForExternalMutation() }
+                let activeID = controller.beginDelivery(transcriptionID: UUID())
+
+                fixture.paste(choice, controller: controller)
+                let preservedOwner = controller.isCurrentDelivery(activeID)
+                #expect(preservedOwner, "Paste Last must not replace the active delivery owner")
+                if !preservedOwner { try await fixture.waitUntilIdle(controller) }
+                #expect(fixture.insertedText.isEmpty, "Paste Last must not replace the active delivery owner")
+
+                controller.finishDelivery(.notAttempted(CancellationError()), for: activeID)
+                #expect(!controller.isBusy)
+                fixture.insertedText.removeAll()
+                fixture.paste(choice, controller: controller)
+                try await fixture.waitUntilIdle(controller)
+                let expected: String
+                switch choice {
+                case .original: expected = fixture.record.text
+                case .enhanced: expected = try #require(fixture.record.enhancedText)
+                case .excludingCompletedResult: expected = fixture.olderRecord.text
+                }
+                #expect(fixture.insertedText == [expected])
+            }
+        }
+
+        @Test @MainActor func pasteLastDuringUndoDoesNotReplaceItsOwnerOrInterruptRestoration() async throws {
+            for choice in LastWritingPasteFixture.Choice.allCases {
+                let fixture = try LastWritingPasteFixture()
+                defer { fixture.close() }
+                let access = UndoWritingAccess()
+                let controller = WritingActionUndoController()
+                defer { controller.retireForExternalMutation() }
+                _ = try await deliver("new", using: access, controller: controller)
+                var invokedPaste = false
+                access.afterRangeMutation = {
+                    guard !invokedPaste else { return }
+                    invokedPaste = true
+                    fixture.paste(choice, controller: controller)
+                }
+
+                let outcome = await controller.undo()
+                try await fixture.waitUntilIdle(controller)
+                #expect(invokedPaste)
+                #expect(
+                    outcome.didRestoreText && access.value == "prefix old suffix"
+                        && access.range == NSRange(location: 7, length: 3)
+                        && access.textAttempts == 2 && fixture.insertedText.isEmpty,
+                    "Paste Last must not interrupt an active Undo"
+                )
+            }
+        }
+
+        @Test @MainActor func emptyTapFallbackKeepsItsOwnedDeliveryHandoff() async throws {
+            let fixture = try LastWritingPasteFixture()
+            defer { fixture.close() }
+            let controller = WritingActionUndoController()
+            defer { controller.retireForExternalMutation(); SpecialShortcutEmptyTranscriptionFallback.clear() }
+            let empty = Transcription(text: "", duration: 0, transcriptionStatus: .completed)
+            fixture.context.insert(empty)
+            let activeID = controller.beginDelivery(transcriptionID: empty.id)
+            SpecialShortcutEmptyTranscriptionFallback.scheduleFallback()
+
+            #expect(SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(
+                for: empty, modelContext: fixture.context, writingActionUndoController: controller
+            ))
+            #expect(!controller.isCurrentDelivery(activeID))
+            try await fixture.waitUntilIdle(controller)
+            #expect(fixture.insertedText == [fixture.record.text])
+        }
+
         @Test @MainActor func queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery() {
             let controller = WritingActionUndoController()
             let first = controller.beginDelivery(transcriptionID: UUID())
@@ -344,6 +420,74 @@ extension VoiceInkTests {
             )
             controller.finishDelivery(outcome, for: id)
             return outcome
+        }
+    }
+}
+
+@MainActor
+private final class LastWritingPasteFixture {
+    enum Choice: CaseIterable { case original, enhanced, excludingCompletedResult }
+    let container: ModelContainer
+    let context: ModelContext
+    let record: Transcription
+    let olderRecord: Transcription
+    var insertedText: [String] = []
+    private let savedDefaults: [String: Any]
+    private static let keys = [
+        VoiceInkPasteMethod.userDefaultsKey, VoiceInkPasteMethod.legacyAppleScriptPasteKey,
+        VoiceInkPastePreference.restoreClipboardAfterPasteKey
+    ]
+
+    init() throws {
+        let defaults = UserDefaults.standard
+        let domain = Bundle.main.bundleIdentifier.flatMap { defaults.persistentDomain(forName: $0) } ?? [:]
+        savedDefaults = Dictionary(uniqueKeysWithValues: Self.keys.compactMap { key in domain[key].map { (key, $0) } })
+        let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
+        container = try ModelContainer(for: schema, configurations: [
+            ModelConfiguration("LastWritingPaste-\(UUID().uuidString)", schema: schema,
+                isStoredInMemoryOnly: true, groupContainer: .none, cloudKitDatabase: .none)
+        ])
+        context = ModelContext(container)
+        record = Transcription(text: "123 🧪\r\n尾", duration: 1, enhancedText: "456 👩🏽‍💻\r\n行", transcriptionStatus: .completed)
+        olderRecord = Transcription(text: "789 🧪\r\n先", duration: 1, transcriptionStatus: .completed)
+        olderRecord.timestamp = record.timestamp.addingTimeInterval(-10)
+        context.insert(record)
+        context.insert(olderRecord)
+        try context.save()
+        VoiceInkPasteMethod.setCurrent(.standard)
+        defaults.set(false, forKey: VoiceInkPastePreference.restoreClipboardAfterPasteKey)
+        CursorPaster.configureAccessibilityTextInserterForTesting { [weak self] text, _ in
+            self?.insertedText.append(text)
+            return .inserted
+        }
+    }
+
+    func paste(_ choice: Choice, controller: WritingActionUndoController) {
+        switch choice {
+        case .original:
+            LastTranscriptionService.pasteLastTranscription(from: context, writingActionUndoController: controller)
+        case .enhanced:
+            LastTranscriptionService.pasteLastEnhancement(from: context, writingActionUndoController: controller)
+        case .excludingCompletedResult:
+            LastTranscriptionService.pasteLastTranscription(
+                from: context, writingActionUndoController: controller, excluding: record.id
+            )
+        }
+    }
+
+    func waitUntilIdle(_ controller: WritingActionUndoController) async throws {
+        for _ in 0..<1_000 {
+            if !controller.isBusy { return }
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        Issue.record("The controlled history paste did not finish")
+    }
+
+    func close() {
+        CursorPaster.configureAccessibilityTextInserterForTesting()
+        for key in Self.keys {
+            if let value = savedDefaults[key] { UserDefaults.standard.set(value, forKey: key) }
+            else { UserDefaults.standard.removeObject(forKey: key) }
         }
     }
 }

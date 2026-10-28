@@ -1,0 +1,17 @@
+{
+  "ref": "ci/rjt-recording-finalizer-01a17bef",
+  "run_id": 40604292885,
+  "selected_function_hash_range": "Exact bytes from func keyword through matching closing brace, inclusive; differs from earlier oracle-bridge hash range",
+  "selected_function_signature_and_body_sha256": {
+    "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": "c619e6934cc9324445065ed59a98f191119b18d39f39d11aefcdba520edf0d8f",
+    "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": "115ec6e02008746191189b45b5f5a8d3d116e8d4db5e116a83260cb4be8dcfb5"
+  },
+  "source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "source_sha256": {
+    "VoiceInk/Transcription/Engine/VoiceInkEngine.swift": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c",
+    "VoiceInkTests/DictationPolishPipelineTests.swift": "5a51d639ac380bb3b0a4dcc2d7f8a9e97a1a6c94b96809df3f2fe68248fc0a43",
+    "scripts/fixtures/recording-finalizers-before-guard.patch": "69b305908f75d26af44697cc6a0023f75725ffe780bacc2c094c0a06d91d2233",
+    "scripts/run-recording-finalizer-regression.sh": "d9a362f5fca706f3355ce673401dcde9fd95c0ee303cf43a48db58cc28c677dc",
+    "scripts/verify-adhoc-macos-test-host.sh": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "actual_baseline_context_generation_values": [
+    "CD198590-8F65-4AFF-A786-0490842EC921",
+    "F2192C60-3C34-4E56-B620-2386ED29037F"
+  ],
+  "actual_baseline_extra_clear_counts": [
+    {
+      "expected": 1,
+      "observed": 2
+    },
+    {
+      "expected": 0,
+      "observed": 1
+    }
+  ],
+  "candidate_context_generation_preserved": "Both exact marker/count assertions passed; candidate UUID values are not separately printed",
+  "candidate_engine_sha256": "eeb60b103e4c270935f8cac05d1734b0bfcfc6bc047601d47da908dbf8a8dd3c",
+  "classification": "verified-native-matched-red-green",
+  "clean_shared_package_pins": 41,
+  "data_fetch": {
+    "all_zip_crcs_verified": true,
+    "failed_log_fetched": false,
+    "github_sha256_verified": true,
+    "native_artifact_downloaded": false,
+    "native_artifact_id": 12780369763,
+    "native_compressed_bytes": 94370526,
+    "observations_artifact_id": 12780564663,
+    "observations_compressed_bytes": 840667,
+    "observations_fetched_once": true
+  },
+  "exact_three_guard_fixture_reproduced": true,
+  "lanes": {
+    "baseline": {
+      "code_and_signature_unchanged": true,
+      "disable_library_validation": true,
+      "exact_selection": true,
+      "exit_code": 65,
+      "fresh_tcc_matches_actual_host": true,
+      "isolated_seed_provider": "Local CLI",
+      "issues": [
+        "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:432:17: Expectation failed: (fixture.enhancement.capturedContextMarker \u2192 nil) == (context \u2192 CD198590-8F65-4AFF-A786-0490842EC921)",
+        "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:433:17: Expectation failed: (fixture.enhancement.clearContextCalls \u2192 2) == (clears \u2192 1)",
+        "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:468:17: Expectation failed: (fixture.enhancement.capturedContextMarker \u2192 nil) == (context \u2192 F2192C60-3C34-4E56-B620-2386ED29037F)",
+        "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:469:17: Expectation failed: (fixture.enhancement.clearContextCalls \u2192 1) == (clears \u2192 0)"
+      ],
+      "local_build_actual_setting": true,
+      "pre_ownership_setup_guard_completed": true,
+      "provider_argument_omitted": true,
+      "public_bootstrap_values_separately_logged": false,
+      "raw_signature_flags": "0x2(adhoc)",
+      "source_unchanged": true,
+      "strict_deep_signature_verified": true,
+      "test_results": {
+        "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        },
+        "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "failed"
+          ],
+          "starts": 1
+        }
+      }
+    },
+    "candidate": {
+      "code_and_signature_unchanged": true,
+      "disable_library_validation": true,
+      "exact_selection": true,
+      "exit_code": 0,
+      "fresh_tcc_matches_actual_host": true,
+      "isolated_seed_provider": "Local CLI",
+      "issues": [],
+      "local_build_actual_setting": true,
+      "pre_ownership_setup_guard_completed": true,
+      "provider_argument_omitted": true,
+      "public_bootstrap_values_separately_logged": false,
+      "raw_signature_flags": "0x2(adhoc)",
+      "source_unchanged": true,
+      "strict_deep_signature_verified": true,
+      "test_results": {
+        "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "passed"
+          ],
+          "starts": 1
+        },
+        "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+          "results": [
+            "passed"
+          ],
+          "starts": 1
+        }
+      }
+    }
+  },
+  "limits": [
+    "Controlled recorder/registry in actual signed disposable app host; no physical microphone or keyboard proof.",
+    "Context spies prove generation preservation and extra-clear regression; no real clipboard/screen context read.",
+    "Provider initialization guard completed; separate public provider bootstrap telemetry is not emitted by these two cases.",
+    "Global PowerMode restore-after-await and shared ASR resource cleanup races remain outside this proof.",
+    "Future uncommitted Undo integration is excluded from this source SHA and requires its own full acceptance.",
+    "Only compact logs/source/receipts were downloaded; raw xcresult, built app, xctestrun and actual seed plist were not independently reopened."
+  ],
+  "only_changed_tracked_path": "VoiceInk/Transcription/Engine/VoiceInkEngine.swift",
+  "oracle_sha256": "5a51d639ac380bb3b0a4dcc2d7f8a9e97a1a6c94b96809df3f2fe68248fc0a43",
+  "reconstructed_baseline_engine_sha256": "4f9723565f85e6ae9ea7b7ae1ebb6b539626f95533d0fb44cc4cd8120c545a0f",
+  "run_id": 40604292885,
+  "same_oracle_source_both_lanes": true,
+  "shared_static_whisper_file_count": 86,
+  "source_closure_entries": 4253,
+  "source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "strict_classifier_reexecuted_on_raw_logs": true,
+  "task_owned_source_restored": true
+}

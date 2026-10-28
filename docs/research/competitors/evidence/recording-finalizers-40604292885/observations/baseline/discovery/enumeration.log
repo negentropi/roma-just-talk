@@ -1,0 +1,73 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -xctestrun /Users/runner/work/_temp/recording-finalizer-proof/baseline/isolated.xctestrun -destination platform=macOS -parallel-testing-enabled NO -enumerate-tests -test-enumeration-style flat -test-enumeration-format json -test-enumeration-output-path /Users/runner/work/_temp/recording-finalizer-proof/baseline/discovery/selected-tests.json
+
+2026-10-27 23:56:06.925 xcodebuild[22243:70098] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 23:56:06.935 xcodebuild[22243:70098] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64e, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:arm64, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:x86_64, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Mac Catalyst, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:DriverKit, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Designed for [iPad,iPhone], id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:bb45a7e19710602a6d55c0816a62e436e368473d, name:My Mac }
+2026-10-27 23:56:11.206 xcodebuild[22243:70098] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 23:56:11.707 xcodebuild[22243:70098] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 23:56:12.863372+0000 roma just talk[22293:70404] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0xa5ea85960> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-27 23:56:13.016231+0000 roma just talk[22293:70404] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:56:13.017110+0000 roma just talk[22293:70404] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-27 23:56:13.017191+0000 roma just talk[22293:70404] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-27 23:56:13.017933+0000 roma just talk[22293:70404] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-27 23:56:13.017945+0000 roma just talk[22293:70404] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-27 23:56:13.024504+0000 roma just talk[22293:70446] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:13.025721+0000 roma just talk[22293:70445] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:13.025743+0000 roma just talk[22293:70445] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:13.025030+0000 roma just talk[22293:70446] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:13.026264+0000 roma just talk[22293:70488] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:13.026554+0000 roma just talk[22293:70488] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:13.026275+0000 roma just talk[22293:70490] [SessionMetricMigrationService] Completed stats migration with 0 session metric(s)
+2026-10-27 23:56:13.029131+0000 roma just talk[22293:70489] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-27 23:56:13.030286+0000 roma just talk[22293:70490] [Connection] Will NOT re-try to establish the connection
+2026-10-27 23:56:13.030525+0000 roma just talk[22293:70445] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:13.030605+0000 roma just talk[22293:70445] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:56:14.118773+0000 roma just talk[22293:70404] [AudioDeviceManager] 🎙️ Current device unavailable, selecting new device...
+2026-10-27 23:56:14.119869+0000 roma just talk[22293:70404] [AudioDeviceManager] 🎙️ Auto-selecting new device: Apple Virtual Sound Device
+2026-10-27 23:56:14.131003+0000 roma just talk[22293:70404] [RecorderUIManager] Resetting recording state on launch
+2026-10-27 23:56:14.131393+0000 roma just talk[22293:70404] [Recorder] stopRecording called
+2026-10-27 23:56:14.131683+0000 roma just talk[22293:70404] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 23:56:14.131711+0000 roma just talk[22293:70404] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-27 23:56:14.131795+0000 roma just talk[22293:70404] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-27 23:56:14.902524+0000 roma just talk[22293:70404] [ContentView] ContentView appeared
+2026-10-27 23:56:14.945913+0000 roma just talk[22293:70404] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:56:14.946304+0000 roma just talk[22293:70404] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-27 23:56:14.946363+0000 roma just talk[22293:70404] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-27 23:56:15.084005+0000 roma just talk[22293:70404] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-27 23:56:15.256658+0000 roma just talk[22293:70404] [ShortcutMonitor] installEventTap: installed
+2026-10-27 23:56:15.258004+0000 roma just talk[22293:70404] [WindowManager] configureWindow: registering main window
+2026-10-27 23:56:15.485003+0000 roma just talk[22293:70404] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 23:56:15.490027+0000 roma just talk[22293:70490] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 23:56:15.490113+0000 roma just talk[22293:70490] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-27 23:56:15.490603+0000 roma just talk[22293:70490] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-27 23:56:15.490638+0000 roma just talk[22293:70490] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-27 23:56:15.490795+0000 roma just talk[22293:70490] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-27 23:56:15.663477+0000 roma just talk[22293:70490] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-27 23:56:15.663500+0000 roma just talk[22293:70490] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-27 23:56:15.667821+0000 roma just talk[22293:70490] [carc] Reporter disconnected. { function=sendMessage, reporterID=95747705929729 }
+2026-10-27 23:56:15.708670+0000 roma just talk[22293:70490] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-27 23:56:15.708708+0000 roma just talk[22293:70490] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-27 23:56:15.708756+0000 roma just talk[22293:70490] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-27 23:56:15.785446+0000 roma just talk[22293:70404] [Recorder] startPreRollBuffering: active on deviceID=87
+2026-10-27 23:56:15.785523+0000 roma just talk[22293:70404] [Recorder] startPreRollBuffering: active on deviceID=87
+2026-10-27 23:56:17.289401+0000 roma just talk[22293:70404] [Sparkle] The app has an EdDSA public key, but there is no EdDSA signature in the appcast, so the appcast will be rejected.
+2026-10-27 23:56:17.294928+0000 roma just talk[22293:70404] [Sparkle] Error: The update feed is improperly signed and could not be validated. Please try again later or contact the app developer. (null) (URL (null))
+2026-10-27 23:56:17.295006+0000 roma just talk[22293:70404] [Sparkle] Error: The app has an EdDSA public key, but there is no EdDSA signature in the appcast, so the appcast will be rejected. (null) (URL (null))
+2026-10-27 23:56:17.329154+0000 roma just talk[22293:70446] [tcp] tcp_input [C1.1.1.1:3] flags=[R] seq=1522081827, ack=0, win=0 state=CLOSED rcv_nxt=1522081827, snd_una=3744101785
+
+Test session results, code coverage, and logs:
+	/Users/runner/Library/Developer/Xcode/DerivedData/VoiceInk-almclvvmdusntnbwtkpdtsjfkkog/Logs/Test/Test-VoiceInk-2026.10.27_23-56-06-+0000.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+

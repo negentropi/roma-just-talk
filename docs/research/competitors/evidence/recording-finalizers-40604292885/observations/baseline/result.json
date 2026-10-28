@@ -1,0 +1,40 @@
+{
+  "classification": "intended-context-clear-failures",
+  "errors": [],
+  "exit_code": 65,
+  "failure_lines": [
+    432,
+    433,
+    468,
+    469
+  ],
+  "issues": [
+    "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:432:17: Expectation failed: (fixture.enhancement.capturedContextMarker \u2192 nil) == (context \u2192 CD198590-8F65-4AFF-A786-0490842EC921)",
+    "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:433:17: Expectation failed: (fixture.enhancement.clearContextCalls \u2192 2) == (clears \u2192 1)",
+    "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:468:17: Expectation failed: (fixture.enhancement.capturedContextMarker \u2192 nil) == (context \u2192 F2192C60-3C34-4E56-B620-2386ED29037F)",
+    "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:469:17: Expectation failed: (fixture.enhancement.clearContextCalls \u2192 1) == (clears \u2192 0)"
+  ],
+  "lane": "baseline",
+  "summaries": [
+    [
+      "2",
+      "2",
+      "failed"
+    ]
+  ],
+  "tests": {
+    "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    }
+  },
+  "valid": true
+}

@@ -1,0 +1,81 @@
+{
+  "baseline": {
+    "classification": "intended-context-clear-failures",
+    "errors": [],
+    "exit_code": 65,
+    "failure_lines": [
+      432,
+      433,
+      468,
+      469
+    ],
+    "issues": [
+      "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:432:17: Expectation failed: (fixture.enhancement.capturedContextMarker \u2192 nil) == (context \u2192 CD198590-8F65-4AFF-A786-0490842EC921)",
+      "\u2718 Test heldCancellationCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:433:17: Expectation failed: (fixture.enhancement.clearContextCalls \u2192 2) == (clears \u2192 1)",
+      "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:468:17: Expectation failed: (fixture.enhancement.capturedContextMarker \u2192 nil) == (context \u2192 F2192C60-3C34-4E56-B620-2386ED29037F)",
+      "\u2718 Test resetCleanupCannotClearContextCapturedByANewerAcceptedRun() recorded an issue at DictationPolishPipelineTests.swift:469:17: Expectation failed: (fixture.enhancement.clearContextCalls \u2192 1) == (clears \u2192 0)"
+    ],
+    "lane": "baseline",
+    "summaries": [
+      [
+        "2",
+        "2",
+        "failed"
+      ]
+    ],
+    "tests": {
+      "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      }
+    },
+    "valid": true
+  },
+  "candidate": {
+    "classification": "passed",
+    "errors": [],
+    "exit_code": 0,
+    "failure_lines": [],
+    "issues": [],
+    "lane": "candidate",
+    "summaries": [
+      [
+        "2",
+        "2",
+        "passed"
+      ]
+    ],
+    "tests": {
+      "heldCancellationCannotClearContextCapturedByANewerAcceptedRun": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "resetCleanupCannotClearContextCapturedByANewerAcceptedRun": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    },
+    "valid": true
+  },
+  "classification": "matched-red-green",
+  "contract_sha256": "491c814ec953f0a7fe062c781ddebec27d0e852c98389b505ceef6b9f4e8be8b",
+  "oracle_sha256": "5a51d639ac380bb3b0a4dcc2d7f8a9e97a1a6c94b96809df3f2fe68248fc0a43",
+  "scope": "Actual native app-hosted unit execution with controlled recorder/registry and context marker, not microphone, physical input, real clipboard context, provider semantics or full global Mode/ASR cleanup proof.",
+  "source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "tests": [
+    "heldCancellationCannotClearContextCapturedByANewerAcceptedRun",
+    "resetCleanupCannotClearContextCapturedByANewerAcceptedRun"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "actual_classifier_reexecuted": true,
+  "actual_two_methods_started_once_each_per_lane": true,
+  "baseline_exact_four_intended_issues": true,
+  "candidate_two_passes_zero_issues": true,
+  "classification": "independent-compact-evidence-audit-passed",
+  "code_signature_source_package_static_dependency_receipts_consistent": true,
+  "common_oracle_sha256": "5a51d639ac380bb3b0a4dcc2d7f8a9e97a1a6c94b96809df3f2fe68248fc0a43",
+  "findings": [],
+  "limits": "Compact logs, source snapshots and receipts audited. Raw xcresult/app/xctestrun/seed plist not independently reopened; no microphone, physical input, real context or global Mode/ASR claim.",
+  "native_artifact_downloaded": false,
+  "reviewer_task": "/root/polish_recording_integration/finalizer_driver_review",
+  "run_id": 40604292885,
+  "source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "three_guard_only_source_difference_verified": true
+}

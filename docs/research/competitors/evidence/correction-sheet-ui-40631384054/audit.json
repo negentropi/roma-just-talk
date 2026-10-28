@@ -1,0 +1,92 @@
+{
+  "run": 40631384054,
+  "source_sha": "49336a35f96c03bac10ccbee8643395e1fbc0587",
+  "mode": "UI-only",
+  "classification": "preview-footer-regression-green-metadata-reader-unresolved",
+  "UI": {
+    "once": 8,
+    "passed": 6,
+    "failed": 2,
+    "failures": [
+      {
+        "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "line": 725,
+        "message": "XCTAssertEqual failed: (\"0\") is not equal to (\"1\") - The actual preview did not expose one entry identity.",
+        "timestamp": "2026-10-28T04:26:36.864+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "line": 725,
+        "message": "XCTAssertEqual failed: (\"0\") is not equal to (\"1\") - The actual preview did not expose one entry identity.",
+        "timestamp": "2026-10-28T04:38:09.522+0000"
+      }
+    ],
+    "entire700oracle_unchanged": true
+  },
+  "Copy": {
+    "observed": 9,
+    "all_UTF8_UTF16_independent_seed_exact": true,
+    "required_complete": 11,
+    "complete": false
+  },
+  "StaticText": {
+    "pairedHistory9": "exactindependentseed",
+    "capturedSource2": "exactindependentseed",
+    "previewOriginalReplacement4": "exactindependentfixtureliterals",
+    "proof": "independent-native-copy-audit.json"
+  },
+  "footer": {
+    "known_bad_run": 40626673160,
+    "known_bad_source": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e",
+    "bad_line": 648,
+    "candidate_same_oracle": true,
+    "candidate_preview_clicked": true,
+    "candidate_approve_enabled": true,
+    "visible_sheet_pixels": {
+      "top": 89,
+      "bottom": 649,
+      "screen": [
+        1024,
+        768
+      ]
+    },
+    "derived_frames": "screenshots/origins.json",
+    "limits": "Inline/mainHistoryactual; Detailuses source-reviewed samehelper butno separate Detailruntimeclaim."
+  },
+  "metadata": {
+    "failure_line": 725,
+    "observed": "exactidentifiedfieldexists;preferredownstringregex0; no rawownlabel/value/type snapshot retained.",
+    "source_row_contract": "TwoTextHStack.children.combine;IDonHStack; noexplicitaccessibilityValue.",
+    "cause": "unproved; currentFormmetadataoffviewport. QAcalibrationseparatefromproductionfix.",
+    "no_fabrication": "NoOSnormalizationclaim, no global/sourceTranscript/storeUUIDfallback."
+  },
+  "nativeHistory": {
+    "seedPassed": true,
+    "PID": 25485,
+    "normalFactory": true,
+    "closedBeforeUI": true,
+    "postverify": "blocked/notattemptedonUIred"
+  },
+  "shortcut_censuses": {
+    "cases": 8,
+    "snapshots": 37,
+    "all_before_restored_equal": true,
+    "all_synchronized": true
+  },
+  "artifact": {
+    "id": 12791889377,
+    "bytes": 154524157,
+    "sha256": "f10e059a56f8ec97fb2d3c302ab4aa4494ca9e662b42bfd39723af1bb137a376",
+    "members": 2330,
+    "allCRCverified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40631384054/evidence.zip",
+    "fullZIPlocal": false,
+    "duplicateScreenshotZIP": "notfetched"
+  },
+  "scope_limits": [
+    "No full8UI/nativepostacceptance.",
+    "UI-onlyskippedCore/ordinaryunit/native6/matched/Release.",
+    "NoASR/provider/editor-deliveryproof fromsyntheticnormalstoreseed.",
+    "Newmetadatareaderhasdifferentwholefileoracle; Copy/footerknown-greenboundariesprecedethatcalibration."
+  ]
+}

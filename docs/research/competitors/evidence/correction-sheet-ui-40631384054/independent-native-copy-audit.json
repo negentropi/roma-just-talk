@@ -1,0 +1,304 @@
+{
+  "run_id": 40631384054,
+  "source_sha": "49336a35f96c03bac10ccbee8643395e1fbc0587",
+  "mode": "UI only",
+  "verdict": "CLEAN bounded evidence audit; UI FAILED6/8, Copy9/required11 exact; metadataUUID725 matches0.",
+  "seed": {
+    "hostPID": 25485,
+    "actual_PASS_log": "◇ Test liveDictationHistoryUISeed() started.\n✔ Test liveDictationHistoryUISeed() passed after 0.353 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.354 seconds.",
+    "rows": 6,
+    "fields_each": 20,
+    "WordReplacement_raw_fields": 11,
+    "canonical_DTO": true,
+    "VocabularyWord_rows": 1,
+    "stats_baseline": [],
+    "independent_expected_bytes": {
+      "rows": {
+        "equal": true,
+        "sha256": "f45e4fb2ef7be3871d70020c545207094cb9a8d18bdc14afb3e3a25ec8a394f4"
+      },
+      "libraries": {
+        "equal": true,
+        "sha256": "67ed21622428b90b1d846c85f287717719f00b08406c18bd870873cb4cd5d982"
+      },
+      "stats": {
+        "equal": true,
+        "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+      }
+    },
+    "factory": "VoiceInkApp.createPersistentContainer(schema:logger:)",
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "normal_configurations": [
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "Transcription"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "default",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "VocabularyWord",
+          "WordReplacement"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "dictionary",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "SessionMetric"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "stats",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      }
+    ],
+    "host_observed_exact_normal_paths": true,
+    "host_exited_no_store_descriptors": true,
+    "closed_before_UI": true,
+    "phase_identity_and_signature_equality": {
+      "identity": {
+        "equal": true,
+        "receipt_sha256": "284b93132c8895a4d9be37b7788c1d595a929fb5e2fa7a96b72813721a2c3180"
+      },
+      "app-signature": {
+        "equal": true,
+        "receipt_sha256": "e055c6a3e0bb8339f24c76618ad3f422abb362c54305243e5f385db074f76b6b"
+      },
+      "test-bundle-signature": {
+        "equal": true,
+        "receipt_sha256": "7f99aebbe40047a5a42fa850099770b859246d52f9d8bd0112d7e26418cc457d"
+      }
+    },
+    "identity": [
+      "16411414c634ad6c5959c456a194d87cf74ff03f731d60ab42ec0d684d7e35d9  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "2ac6185650be7f08a2880cbbda295a84a1b3a1197c54389ce582dbe435ae6a7a  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests"
+    ],
+    "source_SHA": "49336a35f96c03bac10ccbee8643395e1fbc0587",
+    "source_preflight_overlap_exact": {
+      "VoiceInk/Views/History/SaveCorrectionSheet.swift": "50e065718ba2bab5270a2b080389856d594b542ab7db4922f72f7a4b09e87c50",
+      "VoiceInk/Views/History/InlineHistoryView.swift": "ea59ba30be0b9199969d7500dc4afa515a6d227b74277aa5b2a5be7bc784d77f",
+      "VoiceInk/Views/History/TranscriptionDetailView.swift": "396d0a9b9f6599f4aecc8268e43de544a7a052ab0e8c05993f95016f402fe9e6",
+      "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec"
+    }
+  },
+  "TCC": {
+    "initial_seed_expected_raw_bytes_equal": true,
+    "rows": {
+      "system-tcc.json": {
+        "service": "kTCCServiceAccessibility",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C00000000280000000100000008000000144A4F72C59B98267A6D41BBE5210055B566BCFBDD"
+      },
+      "microphone-tcc.json": {
+        "service": "kTCCServiceMicrophone",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C00000000280000000100000008000000144A4F72C59B98267A6D41BBE5210055B566BCFBDD"
+      }
+    }
+  },
+  "Copy": [
+    {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "rowID": "A1000000-0000-4000-8000-000000000006",
+      "variant": "recognized",
+      "seed_field": "recognitionText",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        1,
+        2
+      ],
+      "attachment_sha256": "4ea637bab2569ca51037dc0b32c712072effb830ce602f7fc63704860602b642"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "rowID": "A1000000-0000-4000-8000-000000000005",
+      "variant": "recognized",
+      "seed_field": "recognitionText",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        10,
+        11
+      ],
+      "attachment_sha256": "ba879433d27f810228d2211fb8a2540476e5b41a68e5498a0f49a2d50545b6e7"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000001",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        15,
+        16
+      ],
+      "attachment_sha256": "c4249a8cda8ab655a1b1a975efce5521ce49b7c919a2d4c1e438ee2bca2da938"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000001",
+      "variant": "enhanced",
+      "seed_field": "enhancedText",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        17,
+        18
+      ],
+      "attachment_sha256": "35ec416f6a94860837287fa810d4f013ac3528f5c14ea8f52c9fa839c29c5978"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "recognized",
+      "seed_field": "recognitionText",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        19,
+        20
+      ],
+      "attachment_sha256": "1d98f581cb3ca093eb17ab4de8c8ca59a2590c017131d2729b130615633adcb1"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        21,
+        22
+      ],
+      "attachment_sha256": "2ade1caa700e41faad5e454b8ecee17ad8b5b887b55e72de06ebe3e32aa13df5"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "enhanced",
+      "seed_field": "enhancedText",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        23,
+        24
+      ],
+      "attachment_sha256": "caf3a945213771783bedf2a28ddf2a66aab9cefe61e35437e3796966c40e0fb4"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000003",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        25,
+        26
+      ],
+      "attachment_sha256": "22fcba73fe8c365068476216ab606dac54a194d56a02413f268140e842ba9683"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000004",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "generation": [
+        27,
+        28
+      ],
+      "attachment_sha256": "73c75e2514b2b60bdee5e4af1456c67dfafaf7336e3f7a36644ef12e79c1dcd1"
+    }
+  ],
+  "StaticText_AX": {
+    "pairedCopy9_exact_independent_seed_UTF8_UTF16": true,
+    "total": 15,
+    "separate_captured_source2_and_preview4": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.sourceText",
+        "independent_seed_exact": true
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.original",
+        "source_fixture_literal_exact": true,
+        "value": "Orbit, Ltd."
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.replacement",
+        "source_fixture_literal_exact": true,
+        "value": "  Kept, Café 👩🏽‍💻\r\n  "
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.sourceText",
+        "independent_seed_exact": true
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.original",
+        "source_fixture_literal_exact": true,
+        "value": "Acme, Inc."
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.replacement",
+        "source_fixture_literal_exact": true,
+        "value": "  RJT, Café 👩🏽‍💻\r\n  "
+      }
+    ]
+  },
+  "UI": {
+    "states": {
+      "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()": "Failure",
+      "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()": "Success",
+      "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()": "Success",
+      "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()": "Success",
+      "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()": "Failure",
+      "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()": "Success",
+      "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()": "Success",
+      "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()": "Success"
+    },
+    "all8_started_once": true,
+    "failures": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "line": 725,
+        "message": "XCTAssertEqual failed: (\"0\") is not equal to (\"1\") - The actual preview did not expose one entry identity."
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "line": 725,
+        "message": "XCTAssertEqual failed: (\"0\") is not equal to (\"1\") - The actual preview did not expose one entry identity."
+      }
+    ],
+    "Preview_clicks_logged": 2,
+    "reached": "Both correction paths pass Preview.isHittable, click Preview, and reach approve.isEnabled before metadataUUID fails, corroborated by exact source control flow and raw tests log.",
+    "unproved_cause": "No own metadata value/label/type snapshot. Cannot infer emptyString or specific accessibility cause from zero regex matches."
+  },
+  "postverify": {
+    "classification": "blocked",
+    "attempted": false
+  },
+  "limits": [
+    "Copy7 History+1managed+1retained exact; required11 incomplete; separate6 static fields are not Copy actions.",
+    "Approval/persistence/final store/correction result not proved.",
+    "No post-UI identity/TCC; phase receipts do not establish after-UI stability.",
+    "UI-only: no ordinaryunit/full native6/regression/Release claim.",
+    "Synthetic seed: no ASR/provider/migration/editor-delivery claim.",
+    "Archive integrity inherited from sole-fetch owner; not repeated.",
+    "Read-only evidence inspection with one owned receipt write; no production code review/download/build/runtime."
+  ],
+  "audit_findings": []
+}

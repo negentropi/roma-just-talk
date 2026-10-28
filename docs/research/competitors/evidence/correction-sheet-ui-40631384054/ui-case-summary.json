@@ -1,0 +1,67 @@
+{
+  "tests": {
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testDictationProfilePreservesCustomSettingsAndPersists": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testTranslationTargetsReorderSelectAndPersist": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    }
+  },
+  "failures": [
+    {
+      "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "line": 725,
+      "message": "XCTAssertEqual failed: (\"0\") is not equal to (\"1\") - The actual preview did not expose one entry identity.",
+      "timestamp": "2026-10-28T04:26:36.864+0000"
+    },
+    {
+      "test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "line": 725,
+      "message": "XCTAssertEqual failed: (\"0\") is not equal to (\"1\") - The actual preview did not expose one entry identity.",
+      "timestamp": "2026-10-28T04:38:09.522+0000"
+    }
+  ],
+  "decoder_source_sha256": "08e4eeb5b97c914e06b34c52332c0fe07c1a16c99a4d3d88916002fe8238ecc3"
+}

@@ -1,0 +1,64 @@
+[
+  {
+    "file": "screenshots/rjt-correction-retained-preview-40631384054.png",
+    "bytes": 178944,
+    "sha256": "a02c77a8b6d327f3e3b2d02758f9688b71c66f70f523c8b78a0a587d0310406e",
+    "source_kind": "Lossless derived frame from original failed recording, not original screenshot.",
+    "timestamp_seconds": 45.8,
+    "original_xcresult_attachment": {
+      "filename": "kXCTAttachmentScreenRecording_0_AE48A3E4-47B4-45DA-8582-A26085C0DA38.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~B4JTvSbbs905USaeMELla8somSHs75cbZEAcK_95HP5WmHqmrwIo4u2XL0Bn_EkSvXtOhaGD6bNWImp2z0v-8A=="
+      },
+      "payloadSize": "4930010",
+      "timestamp": "2026-10-28T04:25:50.766+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "C38FEDC1-DC15-46CF-BB38-6C3BADB59F34",
+      "activity_title": "Start Test at 2026-10-28 04:25:50.211",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~B4JTvSbbs905USaeMELla8somSHs75cbZEAcK_95HP5WmHqmrwIo4u2XL0Bn_EkSvXtOhaGD6bNWImp2z0v-8A==",
+      "payload_sha256": "22f2ff3e891a224be04ba155314cdaf34a8a0eea0751fb6cba3887a760736098"
+    },
+    "observed": "Native sheet top89/bottom649; visible Cancel/Preview/blueApprove aboveDock. Form summary/ID belowviewport; no ownIDAXproperties captured."
+  },
+  {
+    "file": "screenshots/rjt-correction-managed-preview-40631384054.png",
+    "bytes": 181200,
+    "sha256": "80bb82283ab4096bc101eb109a755a1a10b8819c74ef28ffacbad72ad9f64979",
+    "source_kind": "Lossless derived frame from original failed recording, not original screenshot.",
+    "timestamp_seconds": 43.7,
+    "original_xcresult_attachment": {
+      "filename": "kXCTAttachmentScreenRecording_0_889383E5-3CBB-4A7D-BCC5-5E94A2AC4765.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~2QTJSfD28Wh3dzv2V7Z-WylPjIp39f1cCvo3SWDxw3RzAdCyMTi2rLYqD7OVRQNvpyMtTX0wNQwDL1bvvMXTfQ=="
+      },
+      "payloadSize": "4600245",
+      "timestamp": "2026-10-28T04:37:25.190+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "905D4E93-5403-4715-BBB8-A4ACD1E35962",
+      "activity_title": "Start Test at 2026-10-28 04:37:25.096",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~2QTJSfD28Wh3dzv2V7Z-WylPjIp39f1cCvo3SWDxw3RzAdCyMTi2rLYqD7OVRQNvpyMtTX0wNQwDL1bvvMXTfQ==",
+      "payload_sha256": "3dd749146a60bcb40bbdb442a7a65f76726843568a42a14840b1aa148604959d"
+    },
+    "observed": "Native sheet top89/bottom649; visible Cancel/Preview/blueApprove aboveDock. Form summary/ID belowviewport; no ownIDAXproperties captured."
+  }
+]

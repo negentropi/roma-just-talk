@@ -1,0 +1,3 @@
+16411414c634ad6c5959c456a194d87cf74ff03f731d60ab42ec0d684d7e35d9  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
+18e904e017edd964a59607ae399c3867a44ff58f1d51d66d09b66f0f0bbd5207  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/MacOS/VoiceInkUITests-Runner
+c620e366cb034e070f717e5e923977dcd0d2e01d0a43bf48e37c80bf8ab24495  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PlugIns/VoiceInkUITests.xctest/Contents/MacOS/VoiceInkUITests

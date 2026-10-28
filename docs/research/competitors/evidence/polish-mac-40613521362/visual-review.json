@@ -1,0 +1,205 @@
+{
+  "classification": "bounded-visual-clean",
+  "reviewer": "gpt-6.1-sol",
+  "run_id": 40613521362,
+  "head_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "original_png_count": 27,
+  "derived_frame_count": 3,
+  "all_image_hashes_match_retained_manifests": true,
+  "images": [
+    {
+      "file": "screenshots/csv-current-and-imported-multiline-preview.png",
+      "sha256": "5afc54b0091ae3484a77d79524d7a4285e6bad69cf764f99fe0c6131566742fc",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/power-mode-reorder-native-sheet.png",
+      "sha256": "5afaefaaab2b4b4ff098fb44afcf7e01581b18dbcca2027bb1e60164187e1739",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/power-mode-unsaved-native-sheet.png",
+      "sha256": "1803f58a66150af53208ed59b8c559516f29b3076ee75679fd202ea1c7ad54ff",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/prompt-editor-unsaved-native-sheet.png",
+      "sha256": "8bcb4a8309826fbc1a25ec8d49b756e125aa4adc7be07e6c1806fe814c9ecff7",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/enhancement-settings-native-sheet.png",
+      "sha256": "aff1d30bd3afd98eff300a93a492a3e08da9e07c6fbb1c39fced01b0a011a220",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/dictionary-settings-native-sheet.png",
+      "sha256": "6b18a58dcc57e610471ded9c33148b21d2cfa74d4daedadb328ccd6390920364",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/custom-formatting-restored-without-changing-saved-values.png",
+      "sha256": "999ba75c9fd0f65c1035162639e7d896909271243f4bda25a27a198828a3a98c",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/none-dictation-cleanup-persisted-after-relaunch.png",
+      "sha256": "4400495f4690c52c95d510e0ff69d4f1a6476a6a2049107f50abea85892f012d",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/none-preserves-inactive-custom-formatting.png",
+      "sha256": "cf5393c19a81f9f87ad847300c1c335a484f38cd13f0e8f77289bbbc3fd077b2",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/none-dictation-cleanup-selected.png",
+      "sha256": "fb2c8078a5f0531e857fa2e8cdc12f237937cdd5d65ba1b0869d019b249db8fa",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/custom-dictation-cleanup-settings.png",
+      "sha256": "eebde18443caa8d47558161d18d02f50c534d7a290caa4792905e40ff4a04559",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/profile-switching-preserves-the-seeded-vocabulary-library.png",
+      "sha256": "70c46b940bf24c80c5ea845fd6beb0984b4cca69846aec2fae9eda09cf652256",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/clarity-formal-persisted-after-relaunch.png",
+      "sha256": "43c37856ed23d7502157bf6975e5d41ec18b74191a379499b3b0e83caedefd35",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/clarity-formal-style.png",
+      "sha256": "e393771a39346da2d26615ddebaab8659896a9d57311000d23cf120b1be2dad2",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/clarity-casual-style.png",
+      "sha256": "0e0687639e926d6f52a59ee7c1237408c1968a441980794b81feff0273dbdc4c",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/clarity-natural-style.png",
+      "sha256": "14efa40e9fb57bc806486c1d0d2e99f880a0cde9710f171d676c60cd70954cc0",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/clarity-profile-and-retained-library-settings.png",
+      "sha256": "14efa40e9fb57bc806486c1d0d2e99f880a0cde9710f171d676c60cd70954cc0",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/light-profile-and-retained-library-settings.png",
+      "sha256": "956206b216748cf33a3202619182750fb18526b57021575be261e6ff066554ff",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/none-profile-and-retained-library-settings.png",
+      "sha256": "b9b442728b1a8e47984479fef1f42752d51b73210d965576593d8b66914dd780",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/profile-switching-preserves-the-seeded-vocabulary-library--769319A3.png",
+      "sha256": "3c406f93a579b40da2cf1ff6ddb0de22b33c576a0591446d7ac11ddec1da3742",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/history-rjt-history-legacy-enhanced.png",
+      "sha256": "bd01896bb0e9f19bfabfaf443bd7c788c1d3efb069938eb1e56767ff2a39bfc3",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/history-rjt-history-legacy-original.png",
+      "sha256": "e77646d84004e6ab5bef21cec7dadfb68202c2eb09d5333d27445253f03d7d21",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/snippet-deletion-confirmation.png",
+      "sha256": "ef39c0109fa083de977abd1b8b1ffecf7b051cdf0be6d371b2c1914e70998c7b",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/literal-multiline-snippet-editor.png",
+      "sha256": "7ebf9ec56fb8b64e45109db8fc0ebd7c5c46054af38402feaf855df2a8093ff1",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/spoken-snippets-library.png",
+      "sha256": "09b8aaa9df57937f303035c5521271c4f4004005851e66ddbdc6aa98ba3e578c",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/translation-target-persisted-after-relaunch.png",
+      "sha256": "4c2b4b2991eb75a387caf24a36d9042c7f7c9ce2ce59fab8e1de4d9f445cdf06",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "screenshots/writing-actions-and-ordered-translation-targets.png",
+      "sha256": "0a107410e98a68d51e79af6c58afe78958bbf06dc83e830f89fa14c9aef0a039",
+      "origin": "original screenshot",
+      "reviewed_individually": true
+    },
+    {
+      "file": "diagnosis/testapproved-before-AX-failure.png",
+      "sha256": "d65848d4fc6a64dc784d60f45a37b902ca16c3e120ce4aeb20a44c45d3060798",
+      "origin": "single original recording frame",
+      "reviewed_individually": true
+    },
+    {
+      "file": "diagnosis/testhistorycorrection-before-AX-failure.png",
+      "sha256": "254cd822077178cbf75a4c3316e769830dd2a9a06573571f583845f26fa1e829",
+      "origin": "single original recording frame",
+      "reviewed_individually": true
+    },
+    {
+      "file": "diagnosis/testhistorypreserves-before-AX-failure.png",
+      "sha256": "6f50676e7a70f9e8f3c621db73d0437df4b66d9e29c4496ba71cd715c9a3c15b",
+      "origin": "single original recording frame",
+      "reviewed_individually": true
+    }
+  ],
+  "observations": [
+    "All 30 images individually inspected. No actionable clipping, overlap, obstruction or unreadable active controls in the captured surfaces. Scroll viewport boundaries and single-line field horizontal clipping are expected in these captures.",
+    "None/Light inactive Custom formatting and Clarity controls are visibly disabled; explanatory copy and retained selections remain legible. Natural/Casual/Formal selected states and Formal relaunch capture are distinct and readable.",
+    "Shared native sheets, CSV multiline comparison, snippet editor/delete alert, vocabulary library and translation target controls stay within visible bounds. Empty Power Mode reorder sheet shows no seeded rows and an unobstructed close button.",
+    "History legacy Original/Enhanced and derived current Original/Recognized views are readable. Cleanup: Custom and Cleanup: Clarity \u00b7 Formal labels are visible; collapsed row and expanded controls remain unobstructed."
+  ],
+  "findings": [],
+  "limits": [
+    "Visual glyphs do not prove NFC/NFD bytes. No exact-text equivalence inferred from images.",
+    "All three History/correction cases stopped at AXStaticText NFC/NFD mismatch before the relevant Copy/correction capture; no complete History/correction sheet/approval/source-deletion acceptance.",
+    "Screenshot titles describing persistence require runtime receipts; images alone show only captured states.",
+    "No Undo control, external-editor restore/focus, native-post, physical-input, ASR/provider, full eight-case gate or release acceptance.",
+    "No app execution, downloads, source edits or screenshot manipulation performed for this review. Only this visual-review.json receipt written."
+  ]
+}

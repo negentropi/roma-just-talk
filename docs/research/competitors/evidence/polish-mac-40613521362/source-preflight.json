@@ -1,0 +1,103 @@
+{
+  "run_id": 40613521362,
+  "candidate_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "known_failed_full_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "inputs": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": {
+      "sha256": "f3c3c1ce016bad6491fcaf60f6877909d4fa16f22ed0a2e45ea77c1914be6110",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": {
+      "sha256": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "scripts/run-writing-feature-regression.sh": {
+      "sha256": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "scripts/run-writing-settings-ui-regression.sh": {
+      "sha256": "dc7b6dcb9260867553fa4ddf3731f938227f93fa635e58c6cc3b47dad41c11b8",
+      "unchanged_vs_failed_full4b501": true
+    },
+    ".github/workflows/voiceink-writing-actions-check.yml": {
+      "sha256": "14254f712f90a3561caa767ebe486d4f85aea0579c9c7cf88169cdaf19027d84",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInkTests/HistoryCorrectionApprovalTests.swift": {
+      "sha256": "017b18990d4c7df0205ae56bba8400fc579f05be5a658502741ba4b837472f5a",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInkTests/WordReplacementLibraryAdapterTests.swift": {
+      "sha256": "539dda87d29f35ab95a8a5e099c9a9a2435295bbb39e020961f33709bf72e201",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInkTests/WordReplacementBackupAdapterTests.swift": {
+      "sha256": "3d0c6a1c1cd56d8704637587f889f47bbf66324fe648caec1728c342e4004c69",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk/Services/DictionaryService.swift": {
+      "sha256": "9e22d94ff4e3c5ad86bd782205d7f00349d3b40fd44211619f41e21437682d6a",
+      "unchanged_vs_failed_full4b501": false
+    },
+    "VoiceInk/Services/HistoryCorrectionApprovalService.swift": {
+      "sha256": "751e137c2019eff9339fea588605c7b24ef3adf0aeb4d830605129495b6374b0",
+      "unchanged_vs_failed_full4b501": false
+    },
+    "VoiceInk/Models/WordReplacement.swift": {
+      "sha256": "034a015173fe1484f20c6fdb13b9bf423686150954fbe7abed8e9cc47e9c7d3d",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk/Views/History/InlineHistoryView.swift": {
+      "sha256": "fc360008be4edf053b6b747e44cfb57e157f18ac7a31a1beeb4fa25c4b962ee6",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift": {
+      "sha256": "542d6bbb5bb1259c5f7abdda8acd680db8aa5992165b1af6ed5a451bd828fd66",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk/Views/Dictionary/WordReplacementView.swift": {
+      "sha256": "dc8ed7f716e9e7db451c30d3defeccca8cee1462118c0ed1637753a14852f67c",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk/Views/Dictionary/EditReplacementSheet.swift": {
+      "sha256": "860a500f862da0d864b6a92d2cdf1a9fb9086b1fdb71af6bf3c0631dc3c7bb4d",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk/VoiceInk.swift": {
+      "sha256": "3e80d99bc3c8558b7a73c6ae9bfee68769e3e6f9f77fa31f8cf14fba6827c51c",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk.xcodeproj/project.pbxproj": {
+      "sha256": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": {
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+      "unchanged_vs_failed_full4b501": true
+    },
+    "VoiceInk/Services/BackupTypes.swift": {
+      "sha256": "4b854ab2a1f50a9c65ec1481e01c0cbeb934d246743504e01fe196c56f6b2813",
+      "unchanged_vs_failed_full4b501": false
+    },
+    "VoiceInkTests/DictionaryPersistenceIsolationTests.swift": {
+      "sha256": "397479bcd868fd8448862b9316c897b5577c263683006c4920cfdc873bd61153",
+      "changed_vs_cancelled772": true
+    }
+  },
+  "strict_ui_case_names": [
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing",
+    "testTranslationTargetsReorderSelectAndPersist",
+    "testDictationProfilePreservesCustomSettingsAndPersists",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants",
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement",
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion"
+  ],
+  "baseline_marker_line": 996,
+  "known3_failing_whole_test_files_unchanged": true,
+  "eight_scenarios_byte_unchanged": true,
+  "native_seed_whole_file_unchanged": true,
+  "source_only": "Native UI8/@Query/persistence acceptance pending actual run; no inference from SDK/source.",
+  "new_guard": "DictionaryPersistenceIsolationTests contains explicit canonically-equivalent NFD literal guard; actual runtime pending."
+}

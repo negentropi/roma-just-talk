@@ -1,0 +1,24 @@
+{
+  "actions" : {
+    "closeCommandRequests" : 1
+  },
+  "applicationTerminated" : false,
+  "bundleApplicationCount" : 1,
+  "bundleIdentifier" : "com.apple.Safari",
+  "checkpoint" : "closed",
+  "confirmedSavedUTF16" : null,
+  "currentApplicationInstanceMatches" : true,
+  "exactWindowPresent" : false,
+  "failure" : null,
+  "ownedDocumentURLMatches" : false,
+  "ownsFocusedWindow" : false,
+  "previousWindowCount" : 0,
+  "previousWindowsPreserved" : true,
+  "processIdentifier" : 33633,
+  "systemUptime" : 1098.1156169166668,
+  "token" : "RJT-Writing-Live-E4EB7056-73B5-4EF9-9F68-59E1A978BF2C",
+  "tokenWindowCount" : 0,
+  "windowCount" : 0,
+  "windowReadAXError" : 0,
+  "windowReadIsArray" : true
+}

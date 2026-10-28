@@ -1,0 +1,177 @@
+{
+  "run_id": 40613521362,
+  "source_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "verdict": "CLEAN within bounded native/seed/pre-UI identity/TCC scope; whole run remains UI FAILED",
+  "method": "Original selected receipts and raw logs; byte comparison independently recomputed. Existing decoded native xcresult details read via root@decentleftover-pf; no archive/API fetch/build/runtime/source edits.",
+  "native6": {
+    "tests": {
+      "liveWritingTargetTextEditPreservesUnicodeOutsideSelection": "passed",
+      "liveWritingTargetTextEditRefusesRangeTextAndFocusDrift": "passed",
+      "liveWritingTargetSafariTextareaReplacesOnlySelection": "passed",
+      "liveWritingActionPipelineUsesLocalCLIAndRetainsFailure": "passed",
+      "liveWritingStartupContextRespectsOwnerAfterCancellation": "passed",
+      "liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges": "passed"
+    },
+    "original_xcresult_details": "/data/rjt-writing-check-01a17bef/40613521362/live-details/details.json",
+    "actual_named_Success_records": 6,
+    "failure_summaries": 0,
+    "console_each_start_and_pass_once": true,
+    "suite": "6 tests / 1 suite / 18.486 seconds",
+    "app_hash_before_after_equal": true,
+    "app_sha256": "960fc0dc716d99fd2fceeb8ebcb4f443f7155c6e9ca18e4fecc5b73009f7aadb",
+    "exact_UTF8_delivery_and_drift_proof_files": [
+      "RJT-Writing-Live-1EDB5E47-7DD1-4BAF-A99A-5E20EC73256E-textedit-replacement.json",
+      "RJT-Writing-Live-6C3FB947-0109-4A3C-8C8E-9451519CBE7C-pipeline-failure-delivery.json",
+      "RJT-Writing-Live-A8376D7A-DB1D-4CF2-97A1-2152579514F8-pipeline-success-delivery.json",
+      "RJT-Writing-Live-E4EB7056-73B5-4EF9-9F68-59E1A978BF2C-safari-replacement.json",
+      "RJT-Writing-Live-EC2D3E2C-9142-4D58-9FDB-A2ED8A1B9BC9-textedit-focus-drift.json",
+      "RJT-Writing-Live-EC2D3E2C-9142-4D58-9FDB-A2ED8A1B9BC9-textedit-range-drift.json",
+      "RJT-Writing-Live-EC2D3E2C-9142-4D58-9FDB-A2ED8A1B9BC9-textedit-text-drift.json"
+    ],
+    "owned_fixture_cleanup": [
+      {
+        "token": "RJT-Writing-Live-103E3567-83EC-4583-961F-E7768BAC8E15",
+        "bundle": "com.apple.TextEdit",
+        "previous_windows": 0,
+        "preserved": true
+      },
+      {
+        "token": "RJT-Writing-Live-1EDB5E47-7DD1-4BAF-A99A-5E20EC73256E",
+        "bundle": "com.apple.TextEdit",
+        "previous_windows": 0,
+        "preserved": true
+      },
+      {
+        "token": "RJT-Writing-Live-6C3FB947-0109-4A3C-8C8E-9451519CBE7C",
+        "bundle": "com.apple.Safari",
+        "previous_windows": 0,
+        "preserved": true
+      },
+      {
+        "token": "RJT-Writing-Live-A8376D7A-DB1D-4CF2-97A1-2152579514F8",
+        "bundle": "com.apple.Safari",
+        "previous_windows": 0,
+        "preserved": true
+      },
+      {
+        "token": "RJT-Writing-Live-BED76066-4F72-4006-AFFB-D828C478D3A8",
+        "bundle": "com.apple.TextEdit",
+        "previous_windows": 1,
+        "preserved": true
+      },
+      {
+        "token": "RJT-Writing-Live-E4EB7056-73B5-4EF9-9F68-59E1A978BF2C",
+        "bundle": "com.apple.Safari",
+        "previous_windows": 0,
+        "preserved": true
+      },
+      {
+        "token": "RJT-Writing-Live-EC2D3E2C-9142-4D58-9FDB-A2ED8A1B9BC9",
+        "bundle": "com.apple.TextEdit",
+        "previous_windows": 0,
+        "preserved": true
+      }
+    ],
+    "pipeline": "Real LocalCLI child processes 33900/33961 and Safari delivery; completed success plus deliberate failed status retained instruction. Fixed synthetic recognizer text/CLI output; retained in-memory history store.",
+    "context": "Original startup ownership and profile snapshot JSON: actual recorder/audio file creation; gated model loader/context-call spies. None capture retains 0 reads after flip; Custom capture retains 1 screen/clipboard read after flip. No model weights/transcription/OS context-read proof."
+  },
+  "history_seed": {
+    "test": "liveDictationHistoryUISeed",
+    "actual_console": "one start / one PASS 0.699s; suite one test 0.700s",
+    "host_pid": 64097,
+    "rows": 6,
+    "fields_each": 20,
+    "word_replacement_raw_fields": 11,
+    "canonical_DTO": true,
+    "vocabulary_rows": 1,
+    "stats_baseline": [],
+    "independent_byte_comparisons": {
+      "rows": {
+        "raw_bytes_equal": true,
+        "sha256": "0cb3689a8161cfaa840491aad09356efc72432c74599f98bd4feaa59f9cfd02f"
+      },
+      "libraries": {
+        "raw_bytes_equal": true,
+        "sha256": "b7cb4a2448a599c6e550e98d6b20d1feb33ea0a582b260ea09d8bf8127510d23"
+      },
+      "stats": {
+        "raw_bytes_equal": true,
+        "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+      }
+    },
+    "factory": "VoiceInkApp.createPersistentContainer(schema:logger:)",
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "normal_persistent_configurations": [
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "Transcription"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "default",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "VocabularyWord",
+          "WordReplacement"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "dictionary",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "SessionMetric"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "stats",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      }
+    ],
+    "host_observed_three_normal_store_paths": [
+      "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+      "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+      "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+    ],
+    "closed_before_UI": true,
+    "host_exited_no_open_store_descriptors": true,
+    "phase_app_and_test_bundle_identity_before_after_equal": true,
+    "app_sha256": "960fc0dc716d99fd2fceeb8ebcb4f443f7155c6e9ca18e4fecc5b73009f7aadb"
+  },
+  "TCC": {
+    "system-tcc.json": {
+      "initial_seed_expected_raw_equal": true,
+      "row": {
+        "service": "kTCCServiceAccessibility",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+      }
+    },
+    "microphone-tcc.json": {
+      "initial_seed_expected_raw_equal": true,
+      "row": {
+        "service": "kTCCServiceMicrophone",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+      }
+    }
+  },
+  "preserved_limits": [
+    "UI 5 passed / 3 failed at StaticText AX UTF8 line 838, NFC versus NFD canonical equivalents; actual Copy and correction actions not reached.",
+    "Post-UI native verification BLOCKED, not attempted. Seed phase false post-UI fields are not failed verification results.",
+    "Missing post-UI identity and raw TCC; no stability claim after UI.",
+    "Synthetic normal-store seeding does not prove ASR/provider behavior, correction approval/durability, final T5/W2/V1 state, or migration.",
+    "Full archive SHA/8568 CRC verification inherited from top audit; not repeated; no whole artifact/source/unit re-audit."
+  ],
+  "findings": []
+}

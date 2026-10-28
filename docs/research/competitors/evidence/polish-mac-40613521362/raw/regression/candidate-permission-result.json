@@ -1,0 +1,11 @@
+{
+  "expectation": "fixed",
+  "classification": "deferred-permission-callback",
+  "exit_code": 0,
+  "test": {
+    "permissionWaitReservesOneRecordingStart": [
+      "passed"
+    ]
+  },
+  "diagnostics": {}
+}

@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "run_id": 40613521362,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40613521362",
+  "source_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "classification": "full-mac-unit-native-regression-green-ui-failed",
+  "Core_checks": 1758,
+  "canonical_package_pins": 41,
+  "strict_resolve_exit_code": 0,
+  "static_Whisper_dependency": "7slicesverified",
+  "units": {
+    "unique_SwiftTesting_method_IDs": 329,
+    "unique_success": 299,
+    "gated_skipped": 30,
+    "failures": 0,
+    "XCTest_separate_success": 9,
+    "xcresult_summary_records": 340,
+    "summary_success": 310,
+    "summary_skipped": 30,
+    "summary_failures": 0,
+    "count_limit": "Two parameterized methods produce repeated summary identifiers;340is not a count of distinct physical invocations.",
+    "known3_unchanged_failures_now_green": true,
+    "strict44_selected": "All44oneconcreteSuccess/noissues; see unit-failure-checkpoint owned by gate reviewer.",
+    "raw_329_console_summary": "not fetched;329derivedfromactualxcresultuniqueIDs, not an invented console line."
+  },
+  "native6": {
+    "classification": "passed",
+    "tests": {
+      "liveWritingTargetTextEditPreservesUnicodeOutsideSelection": "passed",
+      "liveWritingTargetTextEditRefusesRangeTextAndFocusDrift": "passed",
+      "liveWritingTargetSafariTextareaReplacesOnlySelection": "passed",
+      "liveWritingActionPipelineUsesLocalCLIAndRetainsFailure": "passed",
+      "liveWritingStartupContextRespectsOwnerAfterCancellation": "passed",
+      "liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges": "passed"
+    },
+    "actual_suite_log": "6tests1suitepassed18.486seconds",
+    "identity_before_after_equal": true,
+    "scope": "Actual dedicated TextEdit/Safari/context cases; separate from ordinary gated unit entries."
+  },
+  "matched_snippet_regression": {
+    "classification": "matched-red-green",
+    "scope": [
+      "literal-snippets",
+      "deferred-permission-callback"
+    ],
+    "stale_startup_catch": "candidate-only coverage",
+    "candidate": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+    "baseline": "ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb"
+  },
+  "candidate_UI": {
+    "oracle_sha256": "f3c3c1ce016bad6491fcaf60f6877909d4fa16f22ed0a2e45ea77c1914be6110",
+    "executed_once": 8,
+    "passed": 5,
+    "failed": 3,
+    "tests": {
+      "testApprovedHistoryCorrectionSurvivesSourceDeletion": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilePreservesCustomSettingsAndPersists": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testTranslationTargetsReorderSelectAndPersist": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    },
+    "failures": [
+      {
+        "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "line": 838,
+        "message": "XCTAssertEqual failed: (\"[82, 74, 84, 32, 67, 111, 114, 114, 101, 99, 116, 105, 111, 110, 32, 114, 101, 116, 97, 105, 110, 101, 100, 13, 10, 79, 114, 98, 105, 116, 44, 32, 76, 116, 100, 46, 32, 226, 128, 148, 32, 67, 97, 102, 195, 169, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 13, 10]\") is not equal to (\"[82, 74, 84, 32, 67, 111, 114, 114, 101, 99, 116, 105, 111, 110, 32, 114, 101, 116, 97, 105, 110, 101, 100, 13, 10, 79, 114, 98, 105, 116, 44, 32, 76, 116, 100, 46, 32, 226, 128, 148, 32, 67, 97, 102, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 13, 10]\")",
+        "timestamp": "2026-10-28T01:40:42.067+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "line": 838,
+        "message": "XCTAssertEqual failed: (\"[82, 74, 84, 32, 67, 111, 114, 114, 101, 99, 116, 105, 111, 110, 32, 109, 97, 110, 97, 103, 101, 100, 13, 10, 65, 99, 109, 101, 44, 32, 73, 110, 99, 46, 32, 109, 101, 101, 116, 115, 32, 65, 99, 109, 101, 44, 32, 73, 110, 99, 46, 32, 226, 128, 148, 32, 67, 97, 102, 195, 169, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 13, 10]\") is not equal to (\"[82, 74, 84, 32, 67, 111, 114, 114, 101, 99, 116, 105, 111, 110, 32, 109, 97, 110, 97, 103, 101, 100, 13, 10, 65, 99, 109, 101, 44, 32, 73, 110, 99, 46, 32, 109, 101, 101, 116, 115, 32, 65, 99, 109, 101, 44, 32, 73, 110, 99, 46, 32, 226, 128, 148, 32, 67, 97, 102, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 13, 10]\")",
+        "timestamp": "2026-10-28T01:50:10.024+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "line": 838,
+        "message": "XCTAssertEqual failed: (\"[82, 74, 84, 32, 72, 105, 115, 116, 111, 114, 121, 32, 114, 101, 99, 111, 103, 110, 105, 122, 101, 100, 13, 10, 67, 97, 102, 195, 169, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 194, 160, 52, 50, 13, 10]\") is not equal to (\"[82, 74, 84, 32, 72, 105, 115, 116, 111, 114, 121, 32, 114, 101, 99, 111, 103, 110, 105, 122, 101, 100, 13, 10, 67, 97, 102, 101, 204, 129, 32, 240, 159, 145, 169, 240, 159, 143, 189, 226, 128, 141, 240, 159, 146, 187, 194, 160, 52, 50, 13, 10]\")",
+        "timestamp": "2026-10-28T01:51:04.039+0000"
+      }
+    ],
+    "original4_and_fullprofile_style_pass": true,
+    "previous_helper_fixes": "Dictionary empty-input readiness and capturedCleanup own-value text lookup passed.",
+    "before_failure": "Recognized variant selected; its StaticText AX NFC differs from declared NFD. Actual Copy/correction capture not reached.",
+    "actual_Copy_data_loss": "not established by AX value mismatch; exact Copy becomes mandatory in next QAcalibration.",
+    "post_UI_identity": "missing because UIred returns65 before normal after receipt; no observed mismatch claim",
+    "post_UI_TCC": "not read; no permission stability claim after UI."
+  },
+  "native_History": {
+    "seed": "passed;6T20fields/W1raw11+canonical/V1/statbaseline saved and readback exact",
+    "hostPID": 64097,
+    "seed_closed_before_UI": true,
+    "verify": "blocked, not attempted becauseUIred",
+    "final_T5_W2_V1_result": "unproved; no correction actions reached"
+  },
+  "shortcut_isolation": {
+    "candidate_cases": 8,
+    "snapshots": 36,
+    "keys": 32,
+    "all_synchronized": true,
+    "before_restored_census_equal": true,
+    "Data_payload_limit": "Census redacts Data bytes to length; source-bound exactCF/NSObject restoration assertions passed, not independent Data payload readback from census."
+  },
+  "visuals": {
+    "original_PNGs": 27,
+    "derived_recording_frames": 3,
+    "Sol_review": "boundedCLEAN visual-review.json; glyphs do not prove Unicode code units."
+  },
+  "Release": "skipped afterUIred; no Release app packaged/published",
+  "artifact": {
+    "id": 12785663146,
+    "bytes": 347646820,
+    "sha256": "a0d58b7d7c0471ac0d740a09013e2045ba0504b8dd3f21094a5cf21a8238f15b",
+    "members": 8568,
+    "all_zip_crc_verified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40613521362/evidence.zip",
+    "full_archive_local": false,
+    "duplicate_screenshots_artifact": "not downloaded; originals extracted fromfullarchive"
+  },
+  "failed_step_log": {
+    "fetched_once": true,
+    "bytes": 18691,
+    "sha256": "a3135afd37a47c2a821c3230bfa333182f57d04375d5d27bda7260ead3ba41e5"
+  },
+  "limits": [
+    "Strict8UIandpostUIHistory/correctionverificationnotaccepted.",
+    "No actual Copy normalization/loss claim from failed StaticTextAX presentation.",
+    "No production UI changes authored in this diagnosis.",
+    "SyntheticHistoryseedthroughrealfactoryisnotASR/provider/editor-deliveryproof.",
+    "Release and product publication notrun."
+  ],
+  "source_toolchain_comparison": {
+    "comparison_failed_run": 40607608894,
+    "same_actual_SDK": "macosx26.5",
+    "same_actual_OS": "26.6.2 (25G83)",
+    "same_target_architecture": "arm64",
+    "same_virtual_hardware": "Apple M1 (Virtual), VirtualMac2,1,7168MB",
+    "same_sources": "Gatekeeper compares unchanged workflow/driver/project/scheme/locks and three whole failing tests; current backend isolatedwriter differs asintended.",
+    "Xcode_binary_version": "Current actual regression contract readback: Xcode26.6 Build17F113; old full compiled with Xcode_26.6.app/macOS26.5SDK; exactbinaryhash notretained.",
+    "raw_TCC": "Initial/seed auth2/csreq exact receipts separate from ordinaryunitSQL grant source; no postUIrowreadback afterUIred.",
+    "actual_current_readback": "raw/regression/contract.txt"
+  },
+  "QA_followup": {
+    "commit": "700cde9be5867b8c0c625cc95ee9ac7cf141720a",
+    "candidate_UI_sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
+    "source_peer": "CLEAN/APPROVE; runtimepending",
+    "boundary": "StaticAXcanonicalpresentation+rawunits; actualHistoryCopyexactUTF8/16 beforeall3flows/correction; literaleditors/nativepoststrict.",
+    "native_toggle": "Sameidentifiedrow nativeCheckBox|Switch closedroles, exactID/unique/value0|1/enabled/frameguards.",
+    "no_product_change": true
+  },
+  "independent_reviews": {
+    "native_seed_TCC": "CLEAN bounded independent-native-audit.json freshSolMEDIUM",
+    "unit44_known3_red_green": "CLEAN unit-failure-checkpoint/independent-review.md",
+    "visual": "BOUNDED CLEAN visual-review.json27originalPNG+3derivedframes",
+    "QA_source_followup": "CLEAN/APPROVE focusedhistory_text_boundary_review plusoriginalsourcepeer, commit700cde9"
+  }
+}

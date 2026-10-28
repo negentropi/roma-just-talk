@@ -1,0 +1,142 @@
+{
+  "scope": "Observed SDK, destination OS and architecture facts from both original unit xcresult invocations; no Xcode binary version readback retained",
+  "matched": true,
+  "observations": [
+    {
+      "run_id": 40607608894,
+      "original_decoded_invocation_path": "/data/rjt-writing-check-01a17bef/40607608894/unit-invocation.json",
+      "original_decoded_invocation_sha256": "2035f7758a632f7c9c564dc3aa901554ddc44923925696c445ffd95765c06269",
+      "facts": {
+        "target_architecture": "arm64",
+        "sdk_identifier": "macosx26.5",
+        "sdk_version": "26.5",
+        "os_version_with_build": "26.6.2 (25G83)",
+        "cpu_kind": "Apple M1 (Virtual)",
+        "model_code": "VirtualMac2,1",
+        "ram_megabytes": "7168",
+        "native_architecture": "arm64e"
+      },
+      "source_run_destination": {
+        "displayName": "My Mac",
+        "localComputerRecord": {
+          "busSpeedInMHz": "0",
+          "cpuCount": "1",
+          "cpuKind": "Apple M1 (Virtual)",
+          "cpuSpeedInMHz": "0",
+          "identifier": "4f0ed6843c82b236f6d63472ff3b4636d0d0e8b0",
+          "isConcreteDevice": "true",
+          "logicalCPUCoresPerPackage": "3",
+          "modelCode": "VirtualMac2,1",
+          "modelName": "Apple Virtual Machine 1",
+          "modelUTI": "com.apple.virtual-machine",
+          "name": "My Mac",
+          "nativeArchitecture": "arm64e",
+          "operatingSystemVersion": "26.6.2",
+          "operatingSystemVersionWithBuildNumber": "26.6.2 (25G83)",
+          "physicalCPUCoresPerPackage": "3",
+          "platformRecord": {
+            "identifier": "com.apple.platform.macosx",
+            "userDescription": "macOS"
+          },
+          "ramSizeInMegabytes": "7168"
+        },
+        "targetArchitecture": "arm64",
+        "targetDeviceRecord": {
+          "busSpeedInMHz": "0",
+          "cpuCount": "1",
+          "cpuKind": "Apple M1 (Virtual)",
+          "cpuSpeedInMHz": "0",
+          "identifier": "4f0ed6843c82b236f6d63472ff3b4636d0d0e8b0",
+          "isConcreteDevice": "true",
+          "logicalCPUCoresPerPackage": "3",
+          "modelCode": "VirtualMac2,1",
+          "modelName": "Apple Virtual Machine 1",
+          "modelUTI": "com.apple.virtual-machine",
+          "name": "My Mac",
+          "nativeArchitecture": "arm64e",
+          "operatingSystemVersion": "26.6.2",
+          "operatingSystemVersionWithBuildNumber": "26.6.2 (25G83)",
+          "physicalCPUCoresPerPackage": "3",
+          "platformRecord": {
+            "identifier": "com.apple.platform.macosx",
+            "userDescription": "macOS"
+          },
+          "ramSizeInMegabytes": "7168"
+        },
+        "targetSDKRecord": {
+          "identifier": "macosx26.5",
+          "name": "macOS 26.5",
+          "operatingSystemVersion": "26.5"
+        }
+      }
+    },
+    {
+      "run_id": 40613521362,
+      "original_decoded_invocation_path": "/data/rjt-writing-check-01a17bef/40613521362/unit-invocation.json",
+      "original_decoded_invocation_sha256": "4ca17ee90bb28b9a5b3150716bbf864e974b8307be9587605669f375bc90b02e",
+      "facts": {
+        "target_architecture": "arm64",
+        "sdk_identifier": "macosx26.5",
+        "sdk_version": "26.5",
+        "os_version_with_build": "26.6.2 (25G83)",
+        "cpu_kind": "Apple M1 (Virtual)",
+        "model_code": "VirtualMac2,1",
+        "ram_megabytes": "7168",
+        "native_architecture": "arm64e"
+      },
+      "source_run_destination": {
+        "displayName": "My Mac",
+        "localComputerRecord": {
+          "busSpeedInMHz": "0",
+          "cpuCount": "1",
+          "cpuKind": "Apple M1 (Virtual)",
+          "cpuSpeedInMHz": "0",
+          "identifier": "2c6245859299130c20bd9a47c615e9988625c4b6",
+          "isConcreteDevice": "true",
+          "logicalCPUCoresPerPackage": "3",
+          "modelCode": "VirtualMac2,1",
+          "modelName": "Apple Virtual Machine 1",
+          "modelUTI": "com.apple.virtual-machine",
+          "name": "My Mac",
+          "nativeArchitecture": "arm64e",
+          "operatingSystemVersion": "26.6.2",
+          "operatingSystemVersionWithBuildNumber": "26.6.2 (25G83)",
+          "physicalCPUCoresPerPackage": "3",
+          "platformRecord": {
+            "identifier": "com.apple.platform.macosx",
+            "userDescription": "macOS"
+          },
+          "ramSizeInMegabytes": "7168"
+        },
+        "targetArchitecture": "arm64",
+        "targetDeviceRecord": {
+          "busSpeedInMHz": "0",
+          "cpuCount": "1",
+          "cpuKind": "Apple M1 (Virtual)",
+          "cpuSpeedInMHz": "0",
+          "identifier": "2c6245859299130c20bd9a47c615e9988625c4b6",
+          "isConcreteDevice": "true",
+          "logicalCPUCoresPerPackage": "3",
+          "modelCode": "VirtualMac2,1",
+          "modelName": "Apple Virtual Machine 1",
+          "modelUTI": "com.apple.virtual-machine",
+          "name": "My Mac",
+          "nativeArchitecture": "arm64e",
+          "operatingSystemVersion": "26.6.2",
+          "operatingSystemVersionWithBuildNumber": "26.6.2 (25G83)",
+          "physicalCPUCoresPerPackage": "3",
+          "platformRecord": {
+            "identifier": "com.apple.platform.macosx",
+            "userDescription": "macOS"
+          },
+          "ramSizeInMegabytes": "7168"
+        },
+        "targetSDKRecord": {
+          "identifier": "macosx26.5",
+          "name": "macOS 26.5",
+          "operatingSystemVersion": "26.5"
+        }
+      }
+    }
+  ]
+}

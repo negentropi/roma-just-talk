@@ -1,0 +1,250 @@
+{
+  "run_id": 40613521362,
+  "head_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "decoded_source_sha256": "c0941f976ac2af5c6ae8892ed6dadccb8d9404823d89fa5f2f18cfc64f85e405",
+  "overlap_with_44_selected_census": 7,
+  "groups": {
+    "WordReplacementLibraryAdapterTests": [
+      {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/storedKindsAndProvenanceRoundTripWithoutReinterpretingUnknownData()",
+        "status": "Success",
+        "summary_reference": "0~tTH8BpzwKWdsprzMnQH4-7tAOMuFGkZaRjWhqjEQfiJyXgP0u-5ASpku2EGvqnBmebHgaq03Cb9wv89Z4MjaOA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~tTH8BpzwKWdsprzMnQH4-7tAOMuFGkZaRjWhqjEQfiJyXgP0u-5ASpku2EGvqnBmebHgaq03Cb9wv89Z4MjaOA==",
+        "decoded_summary_sha256": "e2bf461eb0b49dc31facafca6e73f200a2b60879377c7a4f069f9f9c9ae1a546",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/successfulMutationsAreVisibleToTheNextOperation()",
+        "status": "Success",
+        "summary_reference": "0~s9lLfGVnDVPh__eolWlpdOGJy9W3FG29bRD2fCIC2M-NYJvuzdgVXVZ-Y36dziClOeMAWlpdHNmeYnfr--McgA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~s9lLfGVnDVPh__eolWlpdOGJy9W3FG29bRD2fCIC2M-NYJvuzdgVXVZ-Y36dziClOeMAWlpdHNmeYnfr--McgA==",
+        "decoded_summary_sha256": "0ec6865950ddb8028c36b10b9232b0fea16181c0cab7d51bef0611209be6f304",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/literalEditKeepsExactStringsIdentityKindAndProvenance()",
+        "status": "Success",
+        "summary_reference": "0~_f67UzaiyL_itFMQOC1seu7pGq8WURpfzcLHAPeyslPJG3z91kwEojHjmjxWI8sbm-qptKjGWooGR4A4V13fcA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~_f67UzaiyL_itFMQOC1seu7pGq8WURpfzcLHAPeyslPJG3z91kwEojHjmjxWI8sbm-qptKjGWooGR4A4V13fcA==",
+        "decoded_summary_sha256": "f24353dca104890d8dad193cba957310cc75d38911aaa4ff0f379c91cc9b3aeb",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/unknownEnabledRulesFailClosedAndLaterCallsReadCurrentData()",
+        "status": "Success",
+        "summary_reference": "0~4Sks9baAyGD2oLypbuDYEG2dDk8HQ8k3Hs2j4YgjHnV9lx-3a0kjOj0lqOx6dVYxDqoiN71CKU1KQ7JL5dx4Wg==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~4Sks9baAyGD2oLypbuDYEG2dDk8HQ8k3Hs2j4YgjHnV9lx-3a0kjOj0lqOx6dVYxDqoiN71CKU1KQ7JL5dx4Wg==",
+        "decoded_summary_sha256": "bfced6b2d1bbef6ab45346523f86dd2cdb3cf9bc7a2fd1803e5accc1e41fe7ef",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/editConflictsExposeCompleteRecordsAndChangeNothing()",
+        "status": "Success",
+        "summary_reference": "0~HIIlP97Nr4P2oU7XvT1Wb3Uh9ZhqVZ24anOsA7Wez_Qr4wmsv_NF5-vZW6hTA8ySvEM1VHBmtQsg90cXTxxvqA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~HIIlP97Nr4P2oU7XvT1Wb3Uh9ZhqVZ24anOsA7Wez_Qr4wmsv_NF5-vZW6hTA8ySvEM1VHBmtQsg90cXTxxvqA==",
+        "decoded_summary_sha256": "5c9390da5a7d1d2c9fd2877833ba200c5ec21f0b5b0e6a1290f3c69ba2058320",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry()",
+        "status": "Success",
+        "summary_reference": "0~vnBZuC1tDWLOPKc_nM8GVRUToaNKM5cSdml9FsIFQd1AL-G8Tt-cCr-PbgIcdj7HQXwGEzQi0d4H4EAdI4keeA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~vnBZuC1tDWLOPKc_nM8GVRUToaNKM5cSdml9FsIFQd1AL-G8Tt-cCr-PbgIcdj7HQXwGEzQi0d4H4EAdI4keeA==",
+        "decoded_summary_sha256": "b87b06cbc88fd75d7c512a03243725e2672ab1f5f30c3ea19564d4dfee438de9",
+        "failure_summaries": []
+      }
+    ],
+    "HistoryCorrectionApprovalTests": [
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/captureBindsTheDisplayedVariantAndExactRevision()",
+        "status": "Success",
+        "summary_reference": "0~BIaNuxLAXEWhNuVxvjvHa_uaYz9rdYtG9Gnkh_QKh5QqbMcBHOlCMWF9ttKbz_7U9oz2zKQ7rxrea0CF45pA3w==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~BIaNuxLAXEWhNuVxvjvHa_uaYz9rdYtG9Gnkh_QKh5QqbMcBHOlCMWF9ttKbz_7U9oz2zKQ7rxrea0CF45pA3w==",
+        "decoded_summary_sha256": "e5cd8bc74e2d2ec159ee5710da587c0aeb4b2e8aabd793f82954dbf320470b6a",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/occurrencesRetainExactSpellingAndAllOverlappingChoices()",
+        "status": "Success",
+        "summary_reference": "0~RG0VNhon1z4GA9FPngXhrjvKUrqcZIXis60c3M5MT7Wo9znYd818uEuH4tww3K_8p_YrynlbmuJhJTWdwRnCpA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~RG0VNhon1z4GA9FPngXhrjvKUrqcZIXis60c3M5MT7Wo9znYd818uEuH4tww3K_8p_YrynlbmuJhJTWdwRnCpA==",
+        "decoded_summary_sha256": "f12f93f25e763ac7ca674f5a30e0288d241aa6ebc9c51b00604ec2a2efba9077",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/reviewDoesNotMutateAndApprovedLiteralSurvivesHistoryDeletion()",
+        "status": "Success",
+        "summary_reference": "0~DOv-BeLRjxiLPPS1DLa8bM4Vjw3SFlesmp3zNdr_hAkR7i_wp0I6ZXDuQGabum0SaJPS6hRRyDO1laRV1igosg==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~DOv-BeLRjxiLPPS1DLa8bM4Vjw3SFlesmp3zNdr_hAkR7i_wp0I6ZXDuQGabum0SaJPS6hRRyDO1laRV1igosg==",
+        "decoded_summary_sha256": "cfb78de257b711767cf728768d1c6e6edb6a4acaef13ea88b6f0a3dc6473d927",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/invalidRangesAndBlankPairsCannotCreateAnApproval()",
+        "status": "Success",
+        "summary_reference": "0~6fk5zbwHz6OkvgEcf4IIkwaydowtZ2dLL6TBua4maY2kr4CfGWkL3n_Or7ADpzqV6lhYUdKD4iCPuyqEm8frhQ==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~6fk5zbwHz6OkvgEcf4IIkwaydowtZ2dLL6TBua4maY2kr4CfGWkL3n_Or7ADpzqV6lhYUdKD4iCPuyqEm8frhQ==",
+        "decoded_summary_sha256": "bd165ede4b3e17875b113a796d1635245dd06bf91c80cb999b033461b4146180",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/approvalRevalidatesFullRevisionVariantAndSourceExistence()",
+        "status": "Success",
+        "summary_reference": "0~Ija9avdJZX_SJrM2Tiztwv_LzUjywyCNBTXH-abh8NYhVg-MhILKv0cUs_AEi0Fc4K35y6W2_CJuAtWE8vyMZg==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~Ija9avdJZX_SJrM2Tiztwv_LzUjywyCNBTXH-abh8NYhVg-MhILKv0cUs_AEi0Fc4K35y6W2_CJuAtWE8vyMZg==",
+        "decoded_summary_sha256": "ea2401fadcbef71dee1b6743466fe6d90e21224cd7de96d78110ccb8f0ea1001",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/approvalRechecksNewConflictsAndDuplicatesWithoutOverwritingOrEnabling()",
+        "status": "Success",
+        "summary_reference": "0~lhVtEn3R093fS0s1V-OqOaVa-OKXTGo74Z1d_EActLg-Am_ZUqQZE98P_AJpkgwTpzf27PeUbTD8NmKkW-Pntw==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~lhVtEn3R093fS0s1V-OqOaVa-OKXTGo74Z1d_EActLg-Am_ZUqQZE98P_AJpkgwTpzf27PeUbTD8NmKkW-Pntw==",
+        "decoded_summary_sha256": "ff04518f5bc4dff8938b25f8eb3591fea81bf31a4f35660a960c0b572eea757c",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits()",
+        "status": "Success",
+        "summary_reference": "0~ADi9jLxjD2I8bXRe0l9JWIadDq8Z237z6-EsNsGN-6w4O8FpDZnm0pe-dCwdN6IPuOq5BR1HBtGRJ0lkrx_A_w==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~ADi9jLxjD2I8bXRe0l9JWIadDq8Z237z6-EsNsGN-6w4O8FpDZnm0pe-dCwdN6IPuOq5BR1HBtGRJ0lkrx_A_w==",
+        "decoded_summary_sha256": "6eab6a8306effb7a11894c26af514f8df1ac46d5608e9dd04d8f83c1e5e2778b",
+        "failure_summaries": []
+      }
+    ],
+    "DictionaryContextFreshnessTests": [
+      {
+        "identifier": "VoiceInkTests/DictionaryContextFreshnessTests/applyingAnotherStoreNeverReusesThePreviousStoresRules()",
+        "status": "Success",
+        "summary_reference": "0~jsEHOIjqmRB9rDzZCqPDdHC87F7_3-GvbR1D926H_eGTYeyy9UmWfpYQ89lKnUbrzLTejW4KfwRMnGVKEoJggA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~jsEHOIjqmRB9rDzZCqPDdHC87F7_3-GvbR1D926H_eGTYeyy9UmWfpYQ89lKnUbrzLTejW4KfwRMnGVKEoJggA==",
+        "decoded_summary_sha256": "b8c7f8d8376839e7a18db2b9f679149925a306d71699ffefba1f86b68167ec94",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/DictionaryContextFreshnessTests/aFreshContextReadsChangesSavedByAnotherContext()",
+        "status": "Success",
+        "summary_reference": "0~0mvh2t15KjFtvE0b2GIKFlpwoX7RcBGaQgzMujcaXLh0q91vmpw8gAJ0e8iWbcbsRJVMaf3XZxHauOe7NPBpOw==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~0mvh2t15KjFtvE0b2GIKFlpwoX7RcBGaQgzMujcaXLh0q91vmpw8gAJ0e8iWbcbsRJVMaf3XZxHauOe7NPBpOw==",
+        "decoded_summary_sha256": "7df4cbe39789c2f3cd2adef68a19ce17b0d061ad13486b85c3a014102daf8ec9",
+        "failure_summaries": []
+      }
+    ],
+    "WordReplacementBackupAdapterTests": [
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/fullBackupRoundTripsExactIdentityKindEnabledStateAndProvenance()",
+        "status": "Success",
+        "summary_reference": "0~jvTM-cWeZiQpurRhL6hOMdlQYIzQ3YKwYPqHi4TxX_hRUqtFEnw3YxOHHULICa-1tILii4pZR3OoMwo-EI8TKw==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~jvTM-cWeZiQpurRhL6hOMdlQYIzQ3YKwYPqHi4TxX_hRUqtFEnw3YxOHHULICa-1tILii4pZR3OoMwo-EI8TKw==",
+        "decoded_summary_sha256": "26da53b2ab935939347a7c70173ba96b4fa0550f47233e6ab14d270833f83b9a",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/presentEmptyFullLibraryWinsOverLegacyMapAndStillImportsVocabulary()",
+        "status": "Success",
+        "summary_reference": "0~a7kOxwd-uMixOktpM7hTwadZ85zqZf4EbjrhuYA-qrH7kfFZ1gN4IPo6dO_FdsZ434FpMFEYMHz91YplLwCWwg==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~a7kOxwd-uMixOktpM7hTwadZ85zqZf4EbjrhuYA-qrH7kfFZ1gN4IPo6dO_FdsZ434FpMFEYMHz91YplLwCWwg==",
+        "decoded_summary_sha256": "552c1e29bf55d96492b7c81af3c293e4286d19eeac09a4b27cff21c259707466",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/fullLibraryConflictsBlockAllReplacementAndVocabularyInsertions()",
+        "status": "Success",
+        "summary_reference": "0~qhq6cL4jf2TT8kJK_7iFvOWWNXAUBgBV3MO3Mkd0ntZ6qYIgnZ0rzXGJTdpS4301T3Qwa4qANla8J56SHuH20Q==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~qhq6cL4jf2TT8kJK_7iFvOWWNXAUBgBV3MO3Mkd0ntZ6qYIgnZ0rzXGJTdpS4301T3Qwa4qANla8J56SHuH20Q==",
+        "decoded_summary_sha256": "67665646a7f44f81345956bccd8c72ce2d656449cc1d45c0f7f2d1b787a4ef05",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/preparedImportRechecksNewConflictsBeforeWritingAnything()",
+        "status": "Success",
+        "summary_reference": "0~RCfCcfIpMOQOUSV8R8l9tKs5WiQpYKw4DdNZWZR9FDWA4geli-Id_MU6blNTHxVlSdHAdvaI6Hd-sInFOfa8VA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~RCfCcfIpMOQOUSV8R8l9tKs5WiQpYKw4DdNZWZR9FDWA4geli-Id_MU6blNTHxVlSdHAdvaI6Hd-sInFOfa8VA==",
+        "decoded_summary_sha256": "a11e43504e20b63fa3374c276641442736b248a2644d2ebd17fece89ebcdd423",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/repeatedFullImportIsIdempotentAndSuccessfulImportAffectsTheNextOperation()",
+        "status": "Success",
+        "summary_reference": "0~hu2VqkPMUufgKKFGuvI6-83iGkJZFcarA_zXr2do2usQHvop3bwG9lL9VTzFA6p2mKv78gJfXtKYh1hYl1Kmlw==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~hu2VqkPMUufgKKFGuvI6-83iGkJZFcarA_zXr2do2usQHvop3bwG9lL9VTzFA6p2mKv78gJfXtKYh1hYl1Kmlw==",
+        "decoded_summary_sha256": "8b4d4c1dcab1ac58e5b1cae3f9e69b04ea2d2946cfa5763c1b438a7ed3961399",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/legacyMapOnlyImportPreservesAdditiveTrimAndCommaContract()",
+        "status": "Success",
+        "summary_reference": "0~yyBuKzgVfH_n7ENUFS12BVbRPP9az0II7fo7xY6XDKRQVTflUiroOChAFJXUGZRpd9yW4-oZtp2ZXLiXvp5XoA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~yyBuKzgVfH_n7ENUFS12BVbRPP9az0II7fo7xY6XDKRQVTflUiroOChAFJXUGZRpd9yW4-oZtp2ZXLiXvp5XoA==",
+        "decoded_summary_sha256": "a2056bb08e0b74464f27e8d284262e65abc8f4910901a38a9d8e586a7cb87a96",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/legacyMapImportUsesCanonicalNamesOfLiteralRowsWithoutOverwritingThem()",
+        "status": "Success",
+        "summary_reference": "0~htKcsuvuPApH70sNmc613b0liBU-sd1LWK2sMxc4K6tYHlrxDRijqLz5ZoyrQJOI8LPDm8XLBT7etscpbXXurg==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~htKcsuvuPApH70sNmc613b0liBU-sd1LWK2sMxc4K6tYHlrxDRijqLz5ZoyrQJOI8LPDm8XLBT7etscpbXXurg==",
+        "decoded_summary_sha256": "c320e13110aea8cc5a2b93dd3ecb79e1a49535ff3db067d69edaf6f9c64f8f78",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/unsupportedStoredKindCannotSilentlyDisappearIntoLegacyExport()",
+        "status": "Success",
+        "summary_reference": "0~fKLZ0N8Wc-QrKigDyE29e7MtDk5dTmvuJbjv_aptJ3XjOD6zR0Qb-b2cXQ5Cs3QQ30s93_jYQl0woZLIGbs3mA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~fKLZ0N8Wc-QrKigDyE29e7MtDk5dTmvuJbjv_aptJ3XjOD6zR0Qb-b2cXQ5Cs3QQ30s93_jYQl0woZLIGbs3mA==",
+        "decoded_summary_sha256": "0453629f53ad660e626709e7fd9a140fe86cf65e6df7c54e3c560306b2805987",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/malformedFullPayloadRejectsBeforeAnyDictionaryMutation()",
+        "status": "Success",
+        "summary_reference": "0~Xmm-vr0D8PxbZJBRBc0lRK3Xffs8O28BxD55fMB6mymw8qKrMlgEK5k1nIA5LO-sxBr5VuMNpwPLBPq5-MG4wQ==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~Xmm-vr0D8PxbZJBRBc0lRK3Xffs8O28BxD55fMB6mymw8qKrMlgEK5k1nIA5LO-sxBr5VuMNpwPLBPq5-MG4wQ==",
+        "decoded_summary_sha256": "67494310c17591c29be196f2d07cea85c876b6889a8ebe30ee6697ca69a808f9",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits()",
+        "status": "Success",
+        "summary_reference": "0~XXgUDg-Sy-M1l_u2b6P7wpgNCVhL-V4MpFGzu6USTlf-vor6z3DZ49XRlC6OJfQRUg5DtTTm3MWCnb92am94wA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~XXgUDg-Sy-M1l_u2b6P7wpgNCVhL-V4MpFGzu6USTlf-vor6z3DZ49XRlC6OJfQRUg5DtTTm3MWCnb92am94wA==",
+        "decoded_summary_sha256": "4c0371e7648eead4508e1f7ef15b3735d4d1e479318f71b135c2c9dcf6eb31a8",
+        "failure_summaries": []
+      }
+    ],
+    "DictionaryPersistenceIsolationTests": [
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/successfulRuleMutationsRefreshTheRegisteredRowWithoutSavingBystanders()",
+        "status": "Success",
+        "summary_reference": "0~V4ayMYZQJfMB1t8QOtz9LQOLlCuHlfGvf85EQcr-VTOo42GtUYZgwI1RMZ5ABpY5kK5A9KUO2Ubh4QTtB_ICnA==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~V4ayMYZQJfMB1t8QOtz9LQOLlCuHlfGvf85EQcr-VTOo42GtUYZgwI1RMZ5ABpY5kK5A9KUO2Ubh4QTtB_ICnA==",
+        "decoded_summary_sha256": "851cc2871164d970f9cc25a91e5691eafea7dc95a9f0b3e6e85a793ff019fde3",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/approvalAndBulkImportCommitExactRecordsWithoutSavingBystanders()",
+        "status": "Success",
+        "summary_reference": "0~ffzzxF6HpDInmGyeZvIRIMbuzF7ODFcg0a_knau1rkxVDQtwiOBobVUNDN6IYkghzxp69-JZpD_ohrDsO0qM0Q==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~ffzzxF6HpDInmGyeZvIRIMbuzF7ODFcg0a_knau1rkxVDQtwiOBobVUNDN6IYkghzxp69-JZpD_ohrDsO0qM0Q==",
+        "decoded_summary_sha256": "b079d1358c56b4b02aabcd0004d8143c69db7698a23185ea8db5c18119f10e55",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/staleExpectedRuleCannotOverwriteAnExternalCommittedRevision()",
+        "status": "Success",
+        "summary_reference": "0~ZCdQfvftMyiFkBiaE4ceZA2Buu6nJt8mmIZ3ap6ZUzjCXUr4GQTP7xhvXVEdFb8-tthXVGn_PpOFtkjef_Jukg==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~ZCdQfvftMyiFkBiaE4ceZA2Buu6nJt8mmIZ3ap6ZUzjCXUr4GQTP7xhvXVEdFb8-tthXVGn_PpOFtkjef_Jukg==",
+        "decoded_summary_sha256": "d830dea46f77bb6c78d157a5f185df6ec8d24018daeada11d9c47be0df849e5f",
+        "failure_summaries": []
+      },
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/staleHistoryPreviewRejectsAnExternalCodeUnitRevision()",
+        "status": "Success",
+        "summary_reference": "0~GkTHmnfMH3JzG9d1PFjLigHbVcBFNtA3HrdytfW4kDNm1Y7s2CbV4bQfOKD26o0QAtvgl2BJFMivkEddIU854g==",
+        "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~GkTHmnfMH3JzG9d1PFjLigHbVcBFNtA3HrdytfW4kDNm1Y7s2CbV4bQfOKD26o0QAtvgl2BJFMivkEddIU854g==",
+        "decoded_summary_sha256": "f6bc06816452f10e16131b65ec70fabd06d9ee2917a2c47cadb869ac9920bf61",
+        "failure_summaries": []
+      }
+    ]
+  }
+}

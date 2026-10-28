@@ -1,0 +1,39 @@
+{
+  "baseline_run": 40607608894,
+  "candidate_run": 40613521362,
+  "SDK_equal": true,
+  "SDK": {
+    "identifier": "macosx26.5",
+    "name": "macOS 26.5",
+    "operatingSystemVersion": "26.5"
+  },
+  "targetArchitecture_equal": true,
+  "targetArchitecture": "arm64",
+  "hardware": {
+    "operatingSystemVersionWithBuildNumber": {
+      "baseline": "26.6.2 (25G83)",
+      "candidate": "26.6.2 (25G83)",
+      "equal": true
+    },
+    "cpuKind": {
+      "baseline": "Apple M1 (Virtual)",
+      "candidate": "Apple M1 (Virtual)",
+      "equal": true
+    },
+    "modelCode": {
+      "baseline": "VirtualMac2,1",
+      "candidate": "VirtualMac2,1",
+      "equal": true
+    },
+    "ramSizeInMegabytes": {
+      "baseline": "7168",
+      "candidate": "7168",
+      "equal": true
+    },
+    "nativeArchitecture": {
+      "baseline": "arm64e",
+      "candidate": "arm64e",
+      "equal": true
+    }
+  }
+}

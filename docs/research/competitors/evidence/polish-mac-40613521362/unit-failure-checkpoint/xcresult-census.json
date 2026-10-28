@@ -1,0 +1,737 @@
+{
+  "run_id": 40613521362,
+  "head_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "boundary": "Concrete decoded xcresult case records, not raw console start counts",
+  "candidate_decoded_sha256": "c0941f976ac2af5c6ae8892ed6dadccb8d9404823d89fa5f2f18cfc64f85e405",
+  "baseline_result_sha256": "3b19c78dbc355e18100121e2bbf40c78c1940a56f41a53f008795254d5af139e",
+  "groups": {
+    "VoiceInkTests/WritingActionUndoTests.swift": [
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~ie4QAhAMs_v20SG59tCtA39ExQysyhIHeGldDFaAOT3lioby-5041leVj6nW25-EmybXgOXA4kK_cD-VCqDpZw==",
+        "decoded_summary_sha256": "b0ff0630552a40db02cf4e281c674961d875150d6f50ff34b2517147b1484f8f",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~-9gqHr4FvAgeBuwgPCwLcBM0-8mYnStmn4iiN3ahNugwC_NG-osZFdpr8SDw_o2jHzXTiaTT03Ifx7y61pgdGA==",
+          "decoded_summary_sha256": "b0e1d47be167cf72336ba4d8ae92cc6b0618d131a276b1dc8868b69facd0fa95",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~aMt1WID-HhsE2FLuvZCfU9UwWSqJAdFmVMe8b50OdKahZXWM99dsWHX8vuD8CRPYvJNnyJl0DRQHHwAVDY_KNw==",
+        "decoded_summary_sha256": "bcbaf95650536ba32e1cff9ddcd07313c24148a24133a41f98d56ff13b6e5d9e",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~_sGti1-Z5Lg8B-FhbZv1GVkECKI8Ubcfm2UVMIYW2SKdLY3QXVQeQK9Y1T7UBWrlqN7UITFqQ3l7WpqEvLZl0g==",
+          "decoded_summary_sha256": "b7aa79e78376839f76e1fb67459e42cb7823d2cd095ac896f8d2a1848acf4e8a",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~ho_flK_5Q9GKRuCClZsa2CAJ33kei5QBg2BwVPK4SXC5MkawJFlxr-KBwcdfP5lkmA3HWQUNWFy1w8hUShvkGQ==",
+        "decoded_summary_sha256": "a27527692357fa9ca08c1b23ca39bd6847956ddbba85522cfa6ccffc5aac5a38",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~EIGTT3A4wNQKxiQYBzeRZqSr9fUuMUQqCzxeosGYs6eTW3tDrbWCCm9mJPfkaQ22Gzw0kQ68AVJ-D9611gaJ0w==",
+          "decoded_summary_sha256": "c550deff9f63bf421704743226b4dd49ae83f4b5cbc36296e06bb572f03cdd84",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~rJb-dX3y8pVOQenytu6OzNb9hauyIkEngzhHZYLEiPhAPHiK59Q7C-vhRJ6nZja1yw5_Ihk6J7IJkMnSD7nNww==",
+        "decoded_summary_sha256": "d4a0b980c48e1df060b5f89e0fd0bd0b18517b65f20029baea066efcfb18599d",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~F8dXbUOHMs4l8OHqJKPodX02sCczyarZZu_VJVyalT2YHmtpk1JaVUJFGqzwvaU_qAzUVmGVRMAZRhLaWLSUCQ==",
+          "decoded_summary_sha256": "6971b4e230e4ba2687f9c316fb268c8252a8f1a1975ada7d3c4cace12a70fa4b",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~Lm2hkRLS-oSp6BUVbfrHdau2k_SO_8mp-3NY5RWI_JejC6JvOt_VmvirX2AclsQ0EHcNFspFOlKVEeppbkNj9A==",
+        "decoded_summary_sha256": "67178e8b8a9d8eb5333d8bf0480816a39360c6fafc2daee808213efd26dad60c",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~EnvYBUwzQDfSCEnc1Cz1FuWbO9oDB1xctdKMbKEoGI2HxJDr28YerhaHtjOb0jdi0pc-lMwophOsa5MCwjH1jg==",
+          "decoded_summary_sha256": "8a78d7e9a382e09d02bf4eb5e36f7fb20b2879757052e351529275a6bc7ba3b7",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~oj02g2rN68Mj63hvRg3HBeBUVmbhlvMbKq6CvtxqA983Fjp6hAKTP4NrkkDDjH8vBxgEPBl2z1yHJyEiT_MLSw==",
+        "decoded_summary_sha256": "9e09cf2a6493f4d59d2016cf532156540a5ed263c330c04a5094d9dd40640471",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~dzGlIOi8MT8VzkK97zA_MUXHlU4uGduUdgnVeDYi8dfUqg8iS7-7jcFxsoKnEkBUBIu-PTGUi3wZ57T2XWkCgA==",
+          "decoded_summary_sha256": "1666711b716423c6a699b0357907b224e01c36a51bcdc5da3992271752777ac4",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~anyU2Kh6PRFahyDa3mzMUNwsrAf7N5dmveddF5BDYUCfqrMOd5OIOe8GSGkN7lAJkGdPXcfw2QM4B8kN2mGhhQ==",
+        "decoded_summary_sha256": "b8a64c51ccbc7a29a4f60b4c749174eb11b35f798df5321143e4742ae8724c05",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~5uxnFgNc3Ei3HXp6w6xaA9eqAHpP3ZacfcdGIH8_oiDVLCWW_MaRSzGH98qwJLc5UMz8GCTOGjfo944suJfznA==",
+          "decoded_summary_sha256": "d9ff1699e7de31c09dc3c0f2f854a8c8ddda53027991cc661816985f792aa37a",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~J2vVhKHc975yMcrCls7jypd6sF9O7OFkNn1pWCjdXOSWj0b5jCGdO9urUfDRUHEYWm_HhXZSyw9HCb4A3DajXg==",
+        "decoded_summary_sha256": "318a8775e9036671ba6038c4878952e135d18cc5faee62138b1077ff801f312d",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~YLqTQwHtGSSfPYhhVfyfnkiCtrl36kBOTKo35t5hradDebLD9AxsWgPOj4kqyQ_EHm3obvxlHJH7opF_Y-L3MA==",
+          "decoded_summary_sha256": "021a100cf681a6919a9e310caadda0f0d6daeb383b297d04434eea65cf82c45b",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~nCTrTMs1vva0kAz1N9BWu-VlnxZa5IVr0B-0OuvhiSzCONFSTbwFbdrBQmziSvYR4T7Ydr3FVg9zmj7Aup5Emw==",
+        "decoded_summary_sha256": "db0e6276a8b3f2562f21bc86aa42696260bb35c0260ce0e48171916b478c0adc",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~mxRRmj8SeGvyHBKUFqz22FGBKBGXnNhDcHKQ9caczmAHRACRi_-383aPfk4vN7eep2ksRGFCWzqwBQcYz-sqqQ==",
+          "decoded_summary_sha256": "1f55649c84aa6af77c22a89dab6e3fbfeda255c74ac4a0269598e9771f18fde5",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~HYS8Y4QuipxulPcngwCCnU36o_nIyqqxOZk0zQNs-tUyanmWFQrgfsYDj8d0_6_h6GX9WXfcnnavMUVNkbWAHQ==",
+        "decoded_summary_sha256": "f15197c3dd4f8e0450fc95083baec3b717979e05e9948b5e1f33cb9d17c70988",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~2wvBUKsOQUaMrvSKpUgcFqUUWxzydrHQcefP_z9A5x5o2dk17C_po65WTzd6aoeMk9KDPCUyiE8pwVMd2vb_ww==",
+          "decoded_summary_sha256": "d33db060e1e6f89341d8305e9fc4bd3ec6b26fc5fcc89c585242e1b7535129b2",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~D5OrKdCz_H0GoL2QXxLyb8mtivyGNiUY6DcI4Zixz8x8QWvLHE0CA_EdrsxNL3NSqThj6pVIhRKajBvXqRKVCg==",
+        "decoded_summary_sha256": "f3d73e0f7e88e4d48671fdfea3e352d8bcf1a03f103a0d03c7397cd1593d85c9",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~YPsH1iiacNbYVPCcGEv3P16Zgrv38k7OO-ODR3LpM4yg90HSdlD7QSewstiWsbnLVTe_eE-59_guviTq4z-ZOQ==",
+          "decoded_summary_sha256": "ab59a93e4dff70ab38de049e006f9aea7342d36b99867138cf85e8ca6116c0a8",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~-X_2dQZrodXma5HeF_oIaH0kZkubT9CkLSJlxIhJs2kxitUucd8lHJD9_kHqhCNt1K7EX_Yp-VacAGZLCr8saA==",
+        "decoded_summary_sha256": "1c7640d6d426a29ce886f239f253cc64f38fe50493041349a8d548bcf0eac22c",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~DlMGIXQkLJw4ii1NgGMlYwbFpOLVShJm-ctgzphFAVEFm3mUfgunqjz5GibegT7PnGKotuO91yRwTCqzJs9epg==",
+          "decoded_summary_sha256": "fc115cabd62126701919b0e42ba37d73c4e8970644221a1ec9609ab58b1eeead",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~e9eyUnIPkfWkE2Nqk23KviiRcUIRM-ocVS-Q7Cl0OJ5qDkDjZOlr_v6nKJLfPvTbR1Cf7s8CjzNJCFQz1EcI2g==",
+        "decoded_summary_sha256": "fed63f5cb01bde681e41fec747a9fed775a8e73127eee8cda0f278494509e6bd",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~u4KeAPGltQWlnO4EF5gxcOUxFrfvWj4nNDNpySnq5ZXFDLOLaTyzANPBD39ge--op7lfjWyZBmlKwJS5dOxEjQ==",
+          "decoded_summary_sha256": "fc455f1fd5c78deb64d9096c42dc3eee0d581017de928b34da6956e7a3a34f47",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~bgpSa1FYbQwE3JxUInv_uON75ZVNrhU8IoYeWACxoZnJSg9UOK-JGYBuN6fMT3jB0Fa-w2X5jpXsYtoDkP93sg==",
+        "decoded_summary_sha256": "938563a79d7d310d3e07f0867823f64429db1e5cc7aa420d740f89ca8d0c5141",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~NymkxQAli3U9ITqm4krtZ-p1_I0YSAA8c8FmsUpTF7GgTFdZqZEdzzPIz95ckJDMgkSLZVdN2mi5N0RbRq7W3g==",
+          "decoded_summary_sha256": "26ff3516c77dc31ea89f9df90df55c26259ea66a44b0b6c6af3bb47e5e1734ce",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~qs3FwAwS5yxEAzHvvcjU_fVVuisr1wKYnUEKemOMde_1hy4N4whtgYcBvi7k7S-iZMAbn0UZzHPGCfUTdAOkVw==",
+        "decoded_summary_sha256": "e7201f4dea62694f1949fa140206b0610b2849fbd9dd266b170dc3ac439768e7",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~7OGzImLo5dOKyX5ZsVIktY1WCQjUlPmBmITCEPISakItodLoWB8IUd7BpDPnZnKeMWe0ACQcWJ-9Sg-djDEgwg==",
+          "decoded_summary_sha256": "eb2b50cb769da7ca574472987be246b1e10e7028f72e8ba24770788b0d3f2baf",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~mvqUW7DhhR9odBFi9FIMmtohwglUZlndv2XiTQUy_HewADDqCbvILfkPDTGcietMqeeLGodA1EbI6QkZro9n0g==",
+        "decoded_summary_sha256": "d682f9d862bdb23bed2b503be53775a0e1def0b03e4a852d19992601ad20b57f",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~-yxPANRY_j8POM5lWI4xYEMfDAEO4JHcrVBOFPyg3WBk9nLau8_sUN0R_g1xZFGQKJg6vN2wTEl-NHDM-MiNpg==",
+          "decoded_summary_sha256": "8131f61945a9489098986852590938cd6fab842443a4cbcfd12375e0e757eccf",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~oWz8qoO33VQSIbFMlzhWifeDVt1d-8u91_bsBJ5pnbVtx-MhDOozTn8Ybr9sV2T7gk9DZSVD6jnVElXh8J7kgQ==",
+        "decoded_summary_sha256": "6e9234b5ce6316929846be45c53384227c23471ba996fe3ea4b2599f733ec253",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~sVfFr8YEGEQ8ALW8351Qb4UhRxJdnpveoxCwscK4D7i02WXBWhMKdGeCN5gsYpdGyXaX0HaNUOsAVIwQjZzp4A==",
+          "decoded_summary_sha256": "1b454c932f106d7f22f6878757d06b12399275e39ca03413cb8710d22b445a33",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~NyzxLpZyV-y2vp3zs4c4YLyWyxLgJhvgAtfDluQ7zVkNtHjZlFylkANxUW2_CTzX3m891FFCP0aXn-AnpN6lFQ==",
+        "decoded_summary_sha256": "f0d7ce1a29bfa9236e92314500cf9950b0eb5d350f7c3285a8cd46b881d9a5aa",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~GqpjCvqz12Mg0r2QM2_-F5I9UbG8i2kdszxrUePDGp3ivOmq_TFPR4J4uxEAPy2fJlsYNglkLDAm-3PdM_FTKw==",
+          "decoded_summary_sha256": "0d54bd280b1dfba9ef2303f9c4c506992012476e245ad9ac1ac9cbad185d0297",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~lZek--V1n0J0-QAaACynQxxjjwNleg_y4ZqW2fUQwNyw3gHNXJaD3uePTwEHBYbFDx82k-qBFD8bxD9249UqaQ==",
+        "decoded_summary_sha256": "b374a42c4bac596fdc86bbe0605d1922da59d46c1afd6517cd8f162fcbff5209",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~Ue6A9fSwpiksfY2J-2gvQq6H1DzM77infQZz88_Sfw0SqDmnipL5-jz5zQ0TuVW-MJY9O0H36eWeaqbw3XaELA==",
+          "decoded_summary_sha256": "f42d0c22a451ea7e7192adc26b73a12295f33f9aabab8b2c052c3dbf63ddbaf8",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoTests/refusedKeyboardAuthorizationBalancesCommandWithoutPostingV()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~KmTBxViWTxA9h2r0kC-ilmOu-owB2b8oDSu5To2eEtdLpHKIvrNQYdho_c1sVJD34MTB_LcxhoUgjoCZfozBOw==",
+        "decoded_summary_sha256": "24f422a0f9b571a31f76257bec748d231775cc3e08ed4fbaf33d3dd73c942e7c",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoTests/refusedKeyboardAuthorizationBalancesCommandWithoutPostingV()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~F4sfpEEtxhzMgodgzu0upqT1rSqI7r-6r5oeViZqk_KGFsQOJAjJygOFqlh5LXsCdbgTH3s2Nc2XTZvIA_4A_w==",
+          "decoded_summary_sha256": "27ba8dceaebf28507f102e4f2b58116514efd0de027f317e484ca6849e2bed42",
+          "issues": []
+        }
+      }
+    ],
+    "VoiceInkTests/WritingActionUndoPipelineTests.swift": [
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~K9cxMBjvq1raEO_HU42t7kbXg6_TeT8lFcv2wSNaFYNa2w_MTtiA1I0DbphoxQ1XdBFsJ3z_7GXVBIXgyA6qzQ==",
+        "decoded_summary_sha256": "e1f7ea3decbf4da15a346a46260b425476db07b79f26910d3278445f9b0a2460",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~3Lnx7hjnzg15rLCVlPr_yfdeeL9sTZfQCJEkO1mA8aT-jLEt_hpTvu-tXDatHJSZWkLaa2BIuYhmvq2dW9FE5w==",
+          "decoded_summary_sha256": "9da08a9ebf7867c51cf76e7d3ab86a694f8ebb94f297ba1ae31019b58c267998",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~2r3VYf7W3wCiLhOwahQGN7g9TD20CM5JXE7Dh0uyyteQ25p4-ZkECKIIs3e5Ihvlg83VRR6-kX36zsirX0fUEg==",
+        "decoded_summary_sha256": "0d7499a670adfdf02ddfdf1aa20e48f0d218ae64564e2a134c59e3311c3d4958",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~pVb67InxYRJFTJ-AaK3x4aWgSCUk_zcT00P49ZE7a2FdMSM7Hr1B4uP8okxcd2AvB4Esv0TfjpiK4CRoPCNrnA==",
+          "decoded_summary_sha256": "5586090f93608a2462762c2617d3fc5ea1976ff090bf0eab8b0b35c77b2e9c02",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~JJx7HgCmZLeyrib0qfYSFesmREj8ECrNm7N0plqMHiFQCwHD5n-Yloe6yC6xLOrl6DYYhGFXlb5liIDYL6w05Q==",
+        "decoded_summary_sha256": "344b8e789ce2d997ca69e7706d4ddb0d2778353d81448771fa8c78bb0696f8e5",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~5NOVZtDXVR4wIjJ_uldVRwyOa7-U0Z7F6NFV20ueDKaIsk6ovCmMId9Px_qdTKRjoqqusYmid8tS3g8m0-GVXg==",
+          "decoded_summary_sha256": "45debb1f4dd5d7d510526dd98a549fc308896bc9db9195b4d6eb4861e258fad7",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~sf6PvJrYSveuOchSrTQQ-_ZcfvNPQuLFvdKOaWhyuY_5LvxIeche5e9kJqmjcw4_CRpMnROID3DqNQg4hRAscw==",
+        "decoded_summary_sha256": "f299d54a7fa7211ed8c50b4bf655658243a605a13055592230c9c63d4b800297",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~4_FHSF5vnXFJoJGrD-ykfFmkwEIYmA0ysxYin3_yj3-BtnwoIi5RcqiQvJ9ec_3wkP4y9PlbrfaMgKL-T2my0w==",
+          "decoded_summary_sha256": "0e1b72bc7172f3a63ad248ff88d5aabe663597fc663efde6d94ffb02bf41943b",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~sk6fBC-4tWv-JUkh_N0bg7on8yzxkGJSp8Nxv6rK1YbvtdvmsfquOL4XsZRipn7Fhkx7oHq3z9LrE8Ub09-gKw==",
+        "decoded_summary_sha256": "93bdf491cf0113299aeaad8876f28c8c316cc3160d5536fe93d68382c5b09fac",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~kKflPZhB4arkasfUaOW-Nq3IfVJTqUjVBenmsB64SQHPHQ1GA_Yw-RT2jV8-RRk5r0LFKkVX_lAKdIULkyIESA==",
+          "decoded_summary_sha256": "c17a54784a02771e4f3c1185983cd3375e5048758038a4b04c3d5e7d416ad0dc",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~7dd_k0CkCUtlwuhIVtK8s5h7faxzTQbAArSK_6F4g_sUr8dQYA8U6W8y_46H-UwDTFn8Uxt_dJfT0ocjeIAgug==",
+        "decoded_summary_sha256": "55f1cf9010f1dbd1c703f39b580a6cae0f037b32ce73d37613c00d6e97ff7657",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~tGTXmx5KqiD7iGOntiwRih7wVqGnJMVuKpP8cH4rHwniLELRk5polqgXi0awCDvARrUTp-dMVVWyPvWwnz6d9g==",
+          "decoded_summary_sha256": "69af53d3595ede1f599c44f62a8e816d2346c215445e2fc6a8b423f8497431f7",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~IoKb1KO6r1uet3r6DXlt3wtHP27Bh1-jdQ3N8yKvPwXlfryPW1bnGC0fKCAfh_XDN831S_INfTzzNhBGypniUw==",
+        "decoded_summary_sha256": "e7a95a7ae8851beb47c76756a9ad89a6ff0f98fef44d0e60540f603675b7a015",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~OdOdjU0zKqLXhAuK49_0vTLTClMWTbs7RK_7aFTTQWqhKjYwjRaD5meEdRSqSEOT5MU55M4qgWmrIfSLjVj9Ng==",
+          "decoded_summary_sha256": "52b7eea6cc5ba01ff83cb13e7a7266580dab87b8d3cf25c36e8352a8399dc08e",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~BZcTLdSl8vxXg2bhfvaEKF3WPOv34X89IeJ2aZN24tONdVxRuQV-fZQT_haCMqEp3FOBEjlcpApk7tAzZOKB5g==",
+        "decoded_summary_sha256": "d25c06d22cbaa5c8b016e9ffa49c2e0fc698323b71b3aa038a1c83b3ad40ac19",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/WritingActionUndoPipelineTests/delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~z9Q1QBxFm-0uvxGt8AIEFnQtetQ_7SsljrK6OFq2MXk0trnhua6SYqQ9qeglLTppeFaFiQsKIor4MrMKlItvag==",
+          "decoded_summary_sha256": "0a44bb32c1f2560c92ba29ac4fd95030dbc1bd3de3344fb6894f00cf1aadd86b",
+          "issues": []
+        }
+      }
+    ],
+    "VoiceInkTests/ClipboardRestorationOwnershipTests.swift": [
+      {
+        "identifier": "ClipboardRestorationOwnershipTests/unresolvedMenuPreparationRejectsACompetingClipboardWrite()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~Mzj6So2u0ItdJV_wzZMTYGDS2FYse_zCpd3q-pXCQ-N5kaxizWffOPcO4Tlw48cVAyHFO1gQ2S9HWLS9qddpDA==",
+        "decoded_summary_sha256": "d0f5f835b48bc154f68f75fb7de746903ed4d6b888e45d7eb41a3059d46264fd",
+        "issues": [],
+        "baseline": {
+          "identifier": "ClipboardRestorationOwnershipTests/unresolvedMenuPreparationRejectsACompetingClipboardWrite()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~iS6mnbYLmNW_G8j1nXARwV7LTM_Gcj0N2APkk8EoCxjsnTbMsxvYomKGy1OQLZp8sU0fj_80y9_sZ3WnwJiLWw==",
+          "decoded_summary_sha256": "f51e4e95f31072544cfecfc39be7c66be3f021e4a31044bd65bb76398c1aed51",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "ClipboardRestorationOwnershipTests/cancelingANewWaiterDoesNotCancelTheEarlierRestoration()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~FXMXLhzP74mDr3D9qlkUcTe0KHP_VzGgE7gPP0uJipKB-tzejKNfxfXh4GpfQPgf1100TdyVSxHohyPusj3Zng==",
+        "decoded_summary_sha256": "f0ea6df62c0af7b435619ef9bec0bb4714428a69fc3a66d7b5617315e440d7b0",
+        "issues": [],
+        "baseline": {
+          "identifier": "ClipboardRestorationOwnershipTests/cancelingANewWaiterDoesNotCancelTheEarlierRestoration()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~UpDjtCKg8P6mDvaOHOb2UjFIQkFGSrY1slLAwiIxayQWATVTV2F_xCyj25_IQJbUDJ9n0gUfaxQVtP2w6I_BIA==",
+          "decoded_summary_sha256": "c0cea33c1256a876daa495d74db76fdf8319c109546d125176994b84c5b75703",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "ClipboardRestorationOwnershipTests/cancellationDuringDeliveryObservationStillCommitsExactReadback()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~s-M97B6OJ4LuHLAG7EwCntraPN-pyOIA6IdCRjtRiTfZGmfvz-ZMs1nGYeAtfo-7bg9C601nT_f9n1PGiAABrw==",
+        "decoded_summary_sha256": "d8e8fb4c9c8403585b45e6825df761c6394e74e236bf526c6262dab127d61018",
+        "issues": [],
+        "baseline": {
+          "identifier": "ClipboardRestorationOwnershipTests/cancellationDuringDeliveryObservationStillCommitsExactReadback()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~ZA4axEuuGPo1-VbwxlMTgSQJZCzv6uCywjapZA2itGUJ5OzG4cevDADbOSkvfBiasatympHYJChvCoOI0nsMNA==",
+          "decoded_summary_sha256": "20987a24eb77a1b390cf1acdce849e67be72ef890b1ca95b428bb19ed0a6d98c",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "ClipboardRestorationOwnershipTests/confirmedCallbackPrecedesImmediateRestorationAndFiresOnce()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~jRWs9JC-5oivhy1s2XjZpH-ZPjcCQn2UYtCN8_6wkuju1bRgpbTG5QsiPfI5hsxBoK3V2QqibZmgfT23jSonZA==",
+        "decoded_summary_sha256": "74ae0a7b4d453adce21090b0d5c41a987d481c44e0370a1e764eb2cf87d02a4f",
+        "issues": [],
+        "baseline": {
+          "identifier": "ClipboardRestorationOwnershipTests/confirmedCallbackPrecedesImmediateRestorationAndFiresOnce()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~K5CKnqtf7U0CDatIifesyQLuhJPuAWEIdVwaSf1zHUqoTTvhKviEWXkpdjGCFiyCugNjeQR89EtUdup1dlDggQ==",
+          "decoded_summary_sha256": "8b216a4cbcbb5e464118ae738df7451842397f640425d668e6540e350d597bd5",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "ClipboardRestorationOwnershipTests/unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~8jcdw6enrSdoJkiTtaGcR7p_fkZHCRu6M9rprEakdYm6i4BRPMKSZHfWVB8WzP5Lq6nhRW5eGT_fM4p3N-bCgA==",
+        "decoded_summary_sha256": "bbf82cfb324a0333ddef9ffcea9094f2accbd0bdb9ab9afa7d4bf199da9e787e",
+        "issues": [],
+        "baseline": {
+          "identifier": "ClipboardRestorationOwnershipTests/unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~vxRHpIE9XFXiBW1z51isM1NxffjOaQt_WZgUewLT8RA_LXRc6gfkpl6kK7iPUb3a7L10pP08DMZiJnCtdd03Yw==",
+          "decoded_summary_sha256": "c043d0ef3b4545d093c8c440759683d4b35f5dc2f1d1ff496536d85ad26cf3a3",
+          "issues": []
+        }
+      }
+    ],
+    "VoiceInkTests/ShortcutBackupTests.swift": [
+      {
+        "identifier": "VoiceInkTests/ShortcutBackupTests/explicitModernKindRejectsMalformedDataEvenWithLegacyKeys()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~IHh6MUO1a2UbDVADO-fOgva4dDHEcL2HeleVA515kpL8X1EdOWBbhMItMv8OVRg5CVJI4hshONqQ3KnDX-jjgg==",
+        "decoded_summary_sha256": "79313e9d2b1a7b8ad2bd2e352162ff5e9fc2e74ec45262d6ca0fcf22da8e390a",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/ShortcutBackupTests/explicitModernKindRejectsMalformedDataEvenWithLegacyKeys()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~oQBpuyoc396gzjJXyq-h5ALJfJuv4uWt2VGncVXUSC_0r9amFUQOMbAMOSUpmhSDmRQorg5036wIPi0k8HQ7pQ==",
+          "decoded_summary_sha256": "4e382a715d9ab76526ac7126f470846d485376466f1ce2093f341112db0dc746",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/ShortcutBackupTests/missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~h1QIMThjEFLUPIRL2bLoxcOgp9uMG8JSZyYbpkV4vZH7w11cA2iTWlstwqDOAVXuMwYrLJPIyVE95ROgZtOuWw==",
+        "decoded_summary_sha256": "ed3b212aaf009269112074ab0e895a0630ee66ec52f2670787e4fd849581c910",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/ShortcutBackupTests/missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~Pb7eLd8NFtUREz36o39ggDkeMV4mbzltdj6Nv2p556HyyaRejG4VLTEAr14jnWz9Jhq8-0pU-GMhYqKTj8J1yQ==",
+          "decoded_summary_sha256": "18443f586ff700f9172a62ecae2757539acc6c7bb7d57895860485f8b1d85889",
+          "issues": []
+        }
+      },
+      {
+        "identifier": "VoiceInkTests/ShortcutBackupTests/missingKindStillRequiresAValidLegacyCarbonPayload()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~Qls4tPQkwgmHG1Swf5zXBj7mqe0TSqEaEkShOtkRjfyQivEcPN-krhD1is9AD3NEM-9_9EX3MqGJxJZVZTh5RA==",
+        "decoded_summary_sha256": "25fb758eecb99579cad2b48d1aa1487c426508376dff1050b6f41cf0bd3d0076",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/ShortcutBackupTests/missingKindStillRequiresAValidLegacyCarbonPayload()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~2ketbKI1fuFU3vvPryVXay8QNbGNSGHeU5xNsX5-btrAGdio6yUNopKAAlnEdbwVj_inU1_Xtg7I3lsD0V4YjQ==",
+          "decoded_summary_sha256": "de2c10af2d1fab6c5e37efbb52a499f4f908a84bd5abaac317a979d5ceee878b",
+          "issues": []
+        }
+      }
+    ],
+    "VoiceInkTests/AudioFileTranscriptionPersistenceTests.swift": [
+      {
+        "identifier": "VoiceInkTests/AudioFileTranscriptionPersistenceTests/savingCompletedAudioDoesNotCommitUnrelatedCallerEdits()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~H3D8fm0cncuxxFEInCtaQsAyRLiUAcyZBsEnsxz20ykoJDvYcbaTA6QlViWdprXiA-tPI0bICFfZAQKNCsebxw==",
+        "decoded_summary_sha256": "372dfb5ea7bedb0c0ba32376e8d1d97debf1ae95b55e52fb19c2e707421de0d4",
+        "issues": [],
+        "baseline": {
+          "identifier": "VoiceInkTests/AudioFileTranscriptionPersistenceTests/savingCompletedAudioDoesNotCommitUnrelatedCallerEdits()",
+          "status": "Success",
+          "records": 1,
+          "summary_reference": "0~hKn9nnA9Fe3KUu08sPQ0cvL6rx8oJdnrx-W92VOaJdz2jmkdfPjzR0rFl_6rfYMHgsx1pWm8z53VhCZZ6Sze8g==",
+          "decoded_summary_sha256": "9e9ee293a7ed2355c6a91de936c155c6f2cbf358aebe6058f080e2afbdf6d8f4",
+          "issues": []
+        }
+      }
+    ],
+    "VoiceInkTests/DictionaryPersistenceIsolationTests.swift": [
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/successfulRuleMutationsRefreshTheRegisteredRowWithoutSavingBystanders()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~V4ayMYZQJfMB1t8QOtz9LQOLlCuHlfGvf85EQcr-VTOo42GtUYZgwI1RMZ5ABpY5kK5A9KUO2Ubh4QTtB_ICnA==",
+        "decoded_summary_sha256": "851cc2871164d970f9cc25a91e5691eafea7dc95a9f0b3e6e85a793ff019fde3",
+        "issues": []
+      },
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/approvalAndBulkImportCommitExactRecordsWithoutSavingBystanders()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~ffzzxF6HpDInmGyeZvIRIMbuzF7ODFcg0a_knau1rkxVDQtwiOBobVUNDN6IYkghzxp69-JZpD_ohrDsO0qM0Q==",
+        "decoded_summary_sha256": "b079d1358c56b4b02aabcd0004d8143c69db7698a23185ea8db5c18119f10e55",
+        "issues": []
+      },
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/staleExpectedRuleCannotOverwriteAnExternalCommittedRevision()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~ZCdQfvftMyiFkBiaE4ceZA2Buu6nJt8mmIZ3ap6ZUzjCXUr4GQTP7xhvXVEdFb8-tthXVGn_PpOFtkjef_Jukg==",
+        "decoded_summary_sha256": "d830dea46f77bb6c78d157a5f185df6ec8d24018daeada11d9c47be0df849e5f",
+        "issues": []
+      },
+      {
+        "identifier": "VoiceInkTests/DictionaryPersistenceIsolationTests/staleHistoryPreviewRejectsAnExternalCodeUnitRevision()",
+        "status": "Success",
+        "records": 1,
+        "summary_reference": "0~GkTHmnfMH3JzG9d1PFjLigHbVcBFNtA3HrdytfW4kDNm1Y7s2CbV4bQfOKD26o0QAtvgl2BJFMivkEddIU854g==",
+        "decoded_summary_sha256": "f6bc06816452f10e16131b65ec70fabd06d9ee2917a2c47cadb869ac9920bf61",
+        "issues": []
+      }
+    ]
+  },
+  "former_failures": [
+    {
+      "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits()",
+      "status": "Success",
+      "records": 1,
+      "summary_reference": "0~ADi9jLxjD2I8bXRe0l9JWIadDq8Z237z6-EsNsGN-6w4O8FpDZnm0pe-dCwdN6IPuOq5BR1HBtGRJ0lkrx_A_w==",
+      "decoded_summary_sha256": "6eab6a8306effb7a11894c26af514f8df1ac46d5608e9dd04d8f83c1e5e2778b",
+      "issues": [],
+      "baseline": {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits()",
+        "status": "Failure",
+        "records": 1,
+        "summary_reference": "0~f1SudZvulESX8HNNeXIbcQWx9u_IAhDvmdrJN-Ja15cwafa7OLZGTAogUcA8lJodK5vfqK3FVWBMIdz2VUoe5w==",
+        "decoded_summary_sha256": "4f3cf295bbf5460523649ae466649cd9c92205760ef7f057e5018333bcd75fa7",
+        "issues": [
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/HistoryCorrectionApprovalTests.swift",
+            "line": 214,
+            "message": "Expectation failed: (after.count \u2192 3) == (before.count \u2192 2)",
+            "timestamp": "2026-10-28T00:30:42.274+0000",
+            "uuid": "6C25FDC1-5151-4243-BE3E-B56933BA9EB5"
+          },
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/HistoryCorrectionApprovalTests.swift",
+            "line": 216,
+            "message": "Expectation failed: !(after.contains { $0.id == preview.record.id } \u2192 <not evaluated>)",
+            "timestamp": "2026-10-28T00:30:43.523+0000",
+            "uuid": "F0267C57-3ED1-49EB-9A86-3EC85F90333C"
+          }
+        ]
+      }
+    },
+    {
+      "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits()",
+      "status": "Success",
+      "records": 1,
+      "summary_reference": "0~XXgUDg-Sy-M1l_u2b6P7wpgNCVhL-V4MpFGzu6USTlf-vor6z3DZ49XRlC6OJfQRUg5DtTTm3MWCnb92am94wA==",
+      "decoded_summary_sha256": "4c0371e7648eead4508e1f7ef15b3735d4d1e479318f71b135c2c9dcf6eb31a8",
+      "issues": [],
+      "baseline": {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits()",
+        "status": "Failure",
+        "records": 1,
+        "summary_reference": "0~fRfRylS4CnyPiHXhr-3W0TiK_ILkQVx8pcKyKF6IjyhJDEB4Aw78MaiYy5yHDT7_BC-JgzUVXGZ-uYKgDQgCZw==",
+        "decoded_summary_sha256": "0078d8a2735de363dbb4730d896ad15ad41209aa4c75ad0c793c7af3758008fa",
+        "issues": [
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WordReplacementBackupAdapterTests.swift",
+            "line": 217,
+            "message": "Expectation failed: try context.fetch(FetchDescriptor<WordReplacement>()).count == 1",
+            "timestamp": "2026-10-28T00:30:54.880+0000",
+            "uuid": "EDD7C611-2A21-4ECD-B8B9-351F00DF627E"
+          }
+        ]
+      }
+    },
+    {
+      "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry()",
+      "status": "Success",
+      "records": 1,
+      "summary_reference": "0~vnBZuC1tDWLOPKc_nM8GVRUToaNKM5cSdml9FsIFQd1AL-G8Tt-cCr-PbgIcdj7HQXwGEzQi0d4H4EAdI4keeA==",
+      "decoded_summary_sha256": "b87b06cbc88fd75d7c512a03243725e2672ab1f5f30c3ea19564d4dfee438de9",
+      "issues": [],
+      "baseline": {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry()",
+        "status": "Failure",
+        "records": 1,
+        "summary_reference": "0~fnSE2fDUMIF8B5Ppu6_-stZIU5IB4Gy5Q-XIl6VEVtMhbWSwgKsjmnEiUO_THhE5224g7E75Isrt6iWixvvKJw==",
+        "decoded_summary_sha256": "d83a29f09e826a14b36d1edcdb3b9011bbbfbfc75d9be6fa123cb9bd6de91d15",
+        "issues": [
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WordReplacementLibraryAdapterTests.swift",
+            "line": 185,
+            "message": "Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }",
+            "timestamp": "2026-10-28T00:30:55.013+0000",
+            "uuid": "DD2A295B-5550-4AA4-BB20-E8185C5281BB"
+          },
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WordReplacementLibraryAdapterTests.swift",
+            "line": 185,
+            "message": "Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }",
+            "timestamp": "2026-10-28T00:30:55.018+0000",
+            "uuid": "E4CD0A19-0C84-4B62-BB8C-5B2B431109AE"
+          }
+        ]
+      }
+    }
+  ],
+  "selected_success_count": 44,
+  "new_success_count": 4,
+  "old_positive_success_count": 37,
+  "formerly_failed_success_count": 3
+}

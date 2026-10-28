@@ -1,0 +1,180 @@
+{
+  "sourceSHA": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "valid": false,
+  "driver_exit_code": 65,
+  "boundary": "ui-tests",
+  "ui": {
+    "classification": "invalid-or-failed",
+    "exit_code": 65,
+    "tests": {
+      "testApprovedHistoryCorrectionSurvivesSourceDeletion": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilePreservesCustomSettingsAndPersists": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      },
+      "testTranslationTargetsReorderSelectAndPersist": {
+        "results": [
+          "passed"
+        ],
+        "starts": 1
+      }
+    }
+  },
+  "native": {
+    "sourceSHA": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+    "attempted": false,
+    "classification": "blocked",
+    "boundary": "ui-tests",
+    "driver_exit_code": 65,
+    "phases": {
+      "seed": {
+        "testAttempted": true,
+        "result": {
+          "closedAfterUI": false,
+          "closedBeforeUI": true,
+          "correctionReceiptsUnchanged": false,
+          "corrections": null,
+          "exit_code": 0,
+          "hostPID": 64097,
+          "normalFactoryReused": true,
+          "normalStorePaths": [
+            "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+            "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+            "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+          ],
+          "phase": "seed",
+          "saveCompleted": true,
+          "savedCounts": {
+            "SessionMetric": 0,
+            "Transcription": 6,
+            "VocabularyWord": 1,
+            "WordReplacement": 1
+          },
+          "sourceSHA": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+          "statsUnchanged": false,
+          "testName": "liveDictationHistoryUISeed",
+          "valid": true,
+          "verificationReadOnly": false
+        },
+        "failure": null,
+        "permissions": {
+          "valid": true,
+          "sourceSHA": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+          "phase": "seed",
+          "checks": {
+            "system-tcc.json": {
+              "query_exit_code": 0,
+              "cmp_exit_code": 0,
+              "expected": [
+                {
+                  "service": "kTCCServiceAccessibility",
+                  "client": "com.negentropi.RomaJustTalk",
+                  "client_type": 0,
+                  "auth_value": 2,
+                  "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+                }
+              ],
+              "actual": [
+                {
+                  "service": "kTCCServiceAccessibility",
+                  "client": "com.negentropi.RomaJustTalk",
+                  "client_type": 0,
+                  "auth_value": 2,
+                  "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+                }
+              ],
+              "raw_bytes_equal": true,
+              "expected_signed_grant": [
+                {
+                  "service": "kTCCServiceAccessibility",
+                  "client": "com.negentropi.RomaJustTalk",
+                  "client_type": 0,
+                  "auth_value": 2,
+                  "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+                }
+              ],
+              "valid": true
+            },
+            "microphone-tcc.json": {
+              "query_exit_code": 0,
+              "cmp_exit_code": 0,
+              "expected": [
+                {
+                  "service": "kTCCServiceMicrophone",
+                  "client": "com.negentropi.RomaJustTalk",
+                  "client_type": 0,
+                  "auth_value": 2,
+                  "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+                }
+              ],
+              "actual": [
+                {
+                  "service": "kTCCServiceMicrophone",
+                  "client": "com.negentropi.RomaJustTalk",
+                  "client_type": 0,
+                  "auth_value": 2,
+                  "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+                }
+              ],
+              "raw_bytes_equal": true,
+              "expected_signed_grant": [
+                {
+                  "service": "kTCCServiceMicrophone",
+                  "client": "com.negentropi.RomaJustTalk",
+                  "client_type": 0,
+                  "auth_value": 2,
+                  "csreq": "FADE0C000000002800000001000000080000001479D1902A2C46A640CACD0C8A34B0F87D24A8323B"
+                }
+              ],
+              "valid": true
+            }
+          }
+        }
+      },
+      "verify": {
+        "testAttempted": false,
+        "result": null,
+        "failure": null,
+        "permissions": null
+      }
+    },
+    "pair": null
+  }
+}

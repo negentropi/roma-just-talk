@@ -1,0 +1,58 @@
+{
+  "run_id": 40639673814,
+  "head_sha": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+  "core_exact_registry_pass_count": 1758,
+  "canonical_pin_count": 41,
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "strict_resolution": {
+    "exit_code": 0,
+    "canonical_lock_unchanged": true
+  },
+  "verification_mode": {
+    "sourceSHA": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+    "mode": "full",
+    "fullGateRequired": true
+  },
+  "archive_members": {
+    "_temp/writing-proof-snapshot/source-sha.txt": {
+      "bytes": 41,
+      "sha256": "36965fbd08293df12511630c56ab319a2125c17046621d70e8a87930eed9b5d4"
+    },
+    "_temp/writing-proof-snapshot/verification-mode.json": {
+      "bytes": 108,
+      "sha256": "54570c6dc44ef397b6ef577ce9ae713db4e20dbfeae65409ee1dacff79a3ecbe"
+    },
+    "_temp/writing-feature-regression/contract.txt": {
+      "bytes": 1742,
+      "sha256": "4273417f7d4957b99c5e3ac4a2793e7f85c7b52337c4f37945816fc91b372cd7"
+    },
+    "_temp/writing-package-proof/candidate-strict-resolve.json": {
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e"
+    },
+    "_temp/writing-package-proof/candidate-strict-resolve.log": {
+      "bytes": 11912,
+      "sha256": "6527d7533fa0ff8abd87848bf8d0747fafda5fd9745a26a836433d5c44ead41e"
+    },
+    "_temp/writing-package-proof/canonical-graph-contract.json": {
+      "bytes": 838,
+      "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f"
+    },
+    "_temp/writing-package-proof/canonical.Package.resolved": {
+      "bytes": 11320,
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+    },
+    "_temp/writing-core-checks.log": {
+      "bytes": 209929,
+      "sha256": "4c8fbd7f2bc077536e7db640325a6eb35dbd569b029739449b081b911de924ca"
+    },
+    "_temp/writing-dependency-setup.log": {
+      "bytes": 334,
+      "sha256": "34ccdd96043718159310ec312a3160c4e6c104fd23717602d504dc7dd4915add"
+    }
+  },
+  "release_artifact_absence": {
+    "release_build_logs": [],
+    "release_app_hashes": []
+  }
+}

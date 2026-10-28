@@ -1,0 +1,239 @@
+name: Verify Mac writing actions
+run-name: Verify Mac writing actions (${{ inputs.ui_only && 'UI only' || 'full' }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      ui_only:
+        description: Run all eight UI workflows and History persistence checks; full verification still required
+        type: boolean
+        default: false
+      baseline_ref:
+        description: Immutable known-bad snippet pipeline commit
+        required: true
+        default: ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb
+        type: string
+  push:
+    branches:
+      - "ci/rjt-writing-check-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writing-actions-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  macos:
+    runs-on: macos-26
+    timeout-minutes: 120
+    env:
+      BASELINE_REF: ${{ inputs.baseline_ref || 'ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb' }}
+      RJT_UI_ONLY: ${{ inputs.ui_only && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Retain the verification scope
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          output = Path(os.environ['RUNNER_TEMP']) / 'writing-proof-snapshot'
+          output.mkdir(parents=True, exist_ok=True)
+          (output / 'verification-mode.json').write_text(json.dumps({
+              'sourceSHA': os.environ['GITHUB_SHA'],
+              'mode': 'ui-only' if os.environ['RJT_UI_ONLY'] == 'true' else 'full',
+              'fullGateRequired': True,
+          }, indent=2) + '\n')
+          PY
+
+      - name: Keep the disposable desktop awake
+        run: |
+          /usr/bin/caffeinate -d -i -u -t 7200 </dev/null >/dev/null 2>&1 &
+          echo "Temporary desktop assertion PID: $!"
+
+      - name: Select Xcode and Metal toolchain
+        shell: bash
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          xcodebuild -version
+          sw_vers
+          swift --version
+          command -v cmake >/dev/null || brew install cmake
+          if ! xcrun metal --version >/dev/null 2>&1; then
+            log="$RUNNER_TEMP/writing-metal-download.log"
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tee "$log"
+            if ! xcrun metal --version >/dev/null 2>&1; then
+              dmg=$(sed -n 's/^Downloaded asset to: //p' "$log" | tail -n 1)
+              test -n "$dmg"
+              hdiutil attach -readonly -nobrowse "$dmg"
+            fi
+          fi
+          xcrun metal --version
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      - name: Verify the canonical package graph before compiling
+        id: packages
+        run: bash scripts/run-writing-feature-regression.sh packages "$RUNNER_TEMP/writing-package-proof"
+
+      - name: Shared core checks
+        if: ${{ !inputs.ui_only }}
+        run: |
+          set -o pipefail
+          swift run --package-path VoiceInkCore VoiceInkCoreChecks 2>&1 | tee "$RUNNER_TEMP/writing-core-checks.log"
+
+      - name: Prepare and verify static Whisper dependencies
+        id: dependencies
+        run: |
+          set -o pipefail
+          make setup 2>&1 | tee "$RUNNER_TEMP/writing-dependency-setup.log"
+
+      - name: Preserve verified dependencies for test retries
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+      - name: Configure the disposable app defaults
+        run: |
+          defaults write com.negentropi.RomaJustTalk CurrentTranscriptionModel -string whisper-large-v3-turbo
+          defaults write com.negentropi.RomaJustTalk PrewarmModelOnWake -bool false
+
+      - name: Full Mac unit suite with fresh CI permissions
+        id: units
+        if: ${{ !inputs.ui_only }}
+        run: |
+          lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          unit_exit=0
+          bash scripts/run-macos-ci-unit-tests.sh || unit_exit=$?
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          exit "$unit_exit"
+
+      - name: Live TextEdit and Safari selection transactions
+        id: live
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        run: bash scripts/run-writing-feature-regression.sh live
+
+      - name: Upload the native check checkpoint
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-live-checkpoint
+          path: |
+            .local-build/onboarding-test-evidence/writing-target-live/*.json
+            .local-build/onboarding-test-evidence/writing-target-live/tests.log
+            .local-build/onboarding-test-evidence/writing-target-live/identity-*.txt
+            .local-build/onboarding-test-evidence/writing-target-live/selection/*.json
+            .local-build/onboarding-test-evidence/writing-target-live/selection/enumeration.log
+          include-hidden-files: true
+          if-no-files-found: warn
+
+      - name: Matched snippet regression
+        id: regression
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        run: bash scripts/run-writing-feature-regression.sh regression "$BASELINE_REF"
+
+      - name: Upload the matched regression checkpoint
+        if: ${{ !cancelled() && steps.units.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-regression-checkpoint
+          path: |
+            ${{ runner.temp }}/writing-feature-regression/*.json
+            ${{ runner.temp }}/writing-feature-regression/*-tests.log
+            ${{ runner.temp }}/writing-feature-regression/*-permission.log
+            ${{ runner.temp }}/writing-feature-regression/contract.txt
+            ${{ runner.temp }}/writing-feature-regression/*selection/*.json
+            ${{ runner.temp }}/writing-feature-regression/*selection/enumeration.log
+            ${{ runner.temp }}/writing-feature-regression/packages/*.json
+            ${{ runner.temp }}/writing-feature-regression/packages/*strict-resolve.log
+          if-no-files-found: warn
+
+      - name: Writing, snippet and dictation settings UI
+        id: ui
+        if: ${{ !cancelled() && steps.packages.outcome == 'success' && steps.dependencies.outcome == 'success' && (inputs.ui_only || steps.units.outcome == 'success') }}
+        run: bash scripts/run-writing-feature-regression.sh ui
+
+      - name: Preserve test evidence before the Release build
+        if: always()
+        run: |
+          snapshot="$RUNNER_TEMP/writing-proof-snapshot"
+          mkdir -p "$snapshot"
+          if [[ -d .local-build/onboarding-test-evidence ]]; then
+            ditto .local-build/onboarding-test-evidence "$snapshot/onboarding-test-evidence"
+          fi
+          git rev-parse HEAD > "$snapshot/source-sha.txt"
+
+      - name: Release build and packaging contracts
+        if: ${{ !inputs.ui_only }}
+        run: |
+          set -o pipefail
+          lock=VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          bash scripts/tests/verify-adhoc-library-validation.test.sh
+          make local CONFIGURATION=Release 2>&1 | tee "$RUNNER_TEMP/writing-release-build.log"
+          cmp "$RUNNER_TEMP/writing-package-proof/canonical.Package.resolved" "$lock"
+          app="$HOME/Applications/roma just talk.app"
+          test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk
+          codesign --verify --deep --strict "$app"
+          bash scripts/verify-static-whisper-app.sh "$app"
+          bash scripts/verify-adhoc-library-validation.sh "$app"
+          bash scripts/verify-macos-release-instrumentation.sh "$app"
+          mkdir -p .local-build/writing-check-evidence
+          cp "$RUNNER_TEMP/writing-core-checks.log" .local-build/writing-check-evidence/core-checks.log
+          cp "$RUNNER_TEMP/writing-release-build.log" .local-build/writing-check-evidence/release-build.log
+          git rev-parse HEAD > .local-build/writing-check-evidence/source-sha.txt
+          ditto -c -k --keepParent "$app" "$RUNNER_TEMP/roma.just.talk.app.zip"
+          shasum -a 256 "$RUNNER_TEMP/roma.just.talk.app.zip" > .local-build/writing-check-evidence/app-sha256.txt
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-actions-evidence
+          path: |
+            ${{ runner.temp }}/writing-proof-snapshot/**
+            .local-build/writing-check-evidence/**
+            ${{ runner.temp }}/writing-feature-regression/**
+            ${{ runner.temp }}/writing-package-proof/**
+            ${{ runner.temp }}/writing-ui-proof/history-seed/**
+            ${{ runner.temp }}/writing-core-checks.log
+            ${{ runner.temp }}/writing-dependency-setup.log
+            ${{ runner.temp }}/writing-release-build.log
+          if-no-files-found: error
+          include-hidden-files: true
+
+      - name: Upload settings screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-actions-screenshots
+          path: |
+            ${{ runner.temp }}/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/**
+            ${{ runner.temp }}/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshot-export.*
+          if-no-files-found: warn
+
+      - name: Upload verified release app
+        if: ${{ success() && !inputs.ui_only }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.just.talk.app
+          path: ${{ runner.temp }}/roma.just.talk.app.zip
+          if-no-files-found: error

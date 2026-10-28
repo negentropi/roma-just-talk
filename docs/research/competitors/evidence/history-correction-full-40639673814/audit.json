@@ -1,0 +1,55 @@
+{
+  "run": 40639673814,
+  "source_sha": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+  "mode": "normal-full",
+  "classification": "all8UIgreen-nativepostpermission-preflight-red",
+  "UI": {
+    "once": 8,
+    "passed": 8,
+    "failed": 0,
+    "raw_duration_seconds": 1279.56,
+    "retained_source_deleted_and_relaunch": "passedallbodyassertions",
+    "managed_cancel_canonical_edit_approval_toggle_edit_relaunch_delete": "passedallbodyassertions"
+  },
+  "Copy": "11completeandexactUTF8/16independentseed",
+  "StaticText": "21exactseed/declaredliterals",
+  "native_History": {
+    "seedPID": 53829,
+    "seedPassed": true,
+    "normalFactoryReuse": true,
+    "seed6x20_W11canonical_V1_statsbaseline": true,
+    "closedBeforeUI": true,
+    "ownedAppClosedAfterUI_noStoreHandles": true,
+    "physicalclosure_is_semantic_verification": false,
+    "verifyTestAttempted": false,
+    "verifyBoundary": "native-permissions",
+    "micPreSeed": 2,
+    "micAfterUIBeforeVerify": 0,
+    "sameClientAndCsreq": true,
+    "AXunchanged2": true
+  },
+  "signatureIdentity": "seedbefore/after/verifybeforeAppandnativebundlebyteidentical;UIrunnerafterabsentdueguard",
+  "Core_unit_package_native6_matched": "Seeindependentlyapprovedunit-failure-checkpoint;doNOTderivefromUIrecordcount",
+  "visuals": {
+    "originalPNGs": 43,
+    "review": "visual-review.json",
+    "finding": "Done-onlypreviewstillshowspreapprovalplanStatus;candidatecopy/statefixsourcependingruntime"
+  },
+  "Release": "skipped;noapphash/package/publication",
+  "artifact": {
+    "id": 12796717449,
+    "bytes": 520241647,
+    "sha256": "a8cda4465549a7bdb9a13f82711f8223c66495c6556c48243fa30b9548b72f33",
+    "members": 8665,
+    "allCRCverified": true,
+    "fullZIPlocal": false,
+    "duplicateScreenshotsZIP": "notfetched",
+    "remote_path": "/data/rjt-writing-check-01a17bef/40639673814/evidence.zip"
+  },
+  "limits": [
+    "Finalnormal-storehiddenfield/11fieldsemanticverificationunaccepted:hostneverran.",
+    "Oldpermissiondialogservices/titleunrecorded;implicitdenyobservedbutMiccausalattributionunproved.",
+    "NoVoiceOver/provider/ASR/editor-deliveryclaimfromsyntheticHistoryfixtureUI.",
+    "Fullgateisred;notrelease/published."
+  ]
+}

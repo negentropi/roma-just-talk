@@ -1,0 +1,19 @@
+# Full-run Core, unit and package checkpoint
+
+[Run 40639673814](https://github.com/negentropi/roma-just-talk/actions/runs/40639673814) tested `3f62c6da2fd98361d48305c9c5e0d01bed980f82` in normal `full` mode. Its package, Core, ordinary Mac unit, initial native transaction and matched regression steps passed. The run later failed within the UI/persistence step; Release packaging and its app upload were skipped. This checkpoint records Core, package and unit proof only. The parent folder owns the UI and permission diagnosis.
+
+All 1,758 Core check names appear once as `PASS`, in exactly the pinned runner's registry order. There is no `FAIL` line, and the raw log ends with `Executed 1758 VoiceInkCore checks.` This is an actual execution count rather than a count inferred from source.
+
+The retained canonical lock has all 41 expected complete package pin objects and SHA-256 `bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f`. The actual strict-resolution receipt reports exit zero and an unchanged canonical lock. The graph contract's dependency declaration hashes match the tested head. This proves the retained resolution metadata, not an independent audit of every dependency checkout tree. Dependency preparation verified seven static Whisper XCFramework slices.
+
+The decoded ordinary unit xcresult contains 330 unique Swift Testing identifiers: 299 `Success` and 31 `Skipped`. Nine Onboarding XCTest identifiers all have `Success`. There are 341 summary records and 339 unique identifiers because two parameterized identifiers appear twice. No failure issue message appears. These are xcresult record and identifier counts, not a claim of 341 distinct executions or a retained console aggregate.
+
+All 44 focused cases have exactly one concrete `Success` record and no failure issue. They cover 37 earlier positive cases, four persistence isolation cases, and three correction failure-isolation regressions. All 29 correction cases also pass: six Library adapter, seven History approval, two context freshness, ten backup adapter and four persistence isolation cases. Seven cases overlap the two censuses. The three regression whole files and their shared fixture remain byte-identical to the known-red `4b50179d` source; the pinned focused test files remain unchanged from the earlier successful unit checkpoints.
+
+`unit-results.json` retains the selected concrete records, xcresult member paths and decoded summary hashes. The complete decoded unit JSON remains at `/data/rjt-writing-check-01a17bef/40639673814/unit-details/details.json`, 4,899,031 bytes, SHA-256 `fd12ff0e72ae39db29ee715d4a66e3af2e3321725aa977cd26bd2f1d5167bc86`. The broad owner fetched the workflow ZIP once. This audit read that existing ZIP and decoded result; it fetched no archive or GitHub log.
+
+`raw/` retains the actual Core log, package resolution logs and receipts, mode/head receipts, dependency preparation log and matched-run environment contract. That contract reports Xcode 26.6 build 17F113, macOS 26.6.2 build 25G83, and arm64. `source/` retains 32 selected whole files from the tested head, with sizes and hashes in `source-preflight.json`. The snapshot includes the focused tests, persistence services, gate definitions and Release verifiers. This is a selected source snapshot, not a claim that every application source remained unchanged from earlier runs.
+
+No Release build log or packaged-app hash appears in the artifact. Combined with the skipped Release step, this establishes that this run supplies no Release packaging acceptance. It proves neither a packaged binary inspection, notarization nor installed-app runtime behavior.
+
+Run `python3 audit.py` in this repository to verify the retained source bytes, exact Core pass registry, package receipts, selected unit cases and skipped Release boundary. `extract-from-existing-data.py` documents extraction from the already-retained remote data. Whole-workflow acceptance remains open.

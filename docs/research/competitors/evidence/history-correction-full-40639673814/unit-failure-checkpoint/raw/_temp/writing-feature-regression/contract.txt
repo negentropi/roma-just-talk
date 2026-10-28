@@ -1,0 +1,17 @@
+candidate=3f62c6da2fd98361d48305c9c5e0d01bed980f82
+baseline=ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb
+Xcode 26.6
+Build version 17F113
+ProductName:		macOS
+ProductVersion:		26.6.2
+BuildVersion:		25G83
+arm64
+93906fe3a576722a420fcd3d9694c15f4178a2103853632874d795b71a82367b  /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/SpokenSnippetPipelineTests.swift
+93906fe3a576722a420fcd3d9694c15f4178a2103853632874d795b71a82367b  /Users/runner/work/_temp/writing-feature-baseline/VoiceInkTests/SpokenSnippetPipelineTests.swift
+bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f  /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f  /Users/runner/work/_temp/writing-feature-baseline/VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+6caa4f1051afe7ec7d2c278d69e237263fb5b0f8cd64778aa6d04577d2c38ab2  /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingActionEngineTests.swift
+6caa4f1051afe7ec7d2c278d69e237263fb5b0f8cd64778aa6d04577d2c38ab2  /Users/runner/work/_temp/writing-feature-baseline/VoiceInkTests/WritingActionEngineTests.swift
+0e77b9e53521e786425172bd695e859a6b05cebddb6469c558578b3e49db7b48  /Users/runner/work/_temp/writing-feature-regression/baseline-permission-instrumentation.patch
+10c3e509b4b9d6d5bbaac73909ab99cb3a7288502000aa7e7e0bf28fb334c958  /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Transcription/Engine/TranscriptionPipeline.swift
+1428e3459e4aece9be7e35987e87e57947ce336153adec5ab5710e8b1dbfde88  /Users/runner/work/_temp/writing-feature-baseline/VoiceInk/Transcription/Engine/TranscriptionPipeline.swift

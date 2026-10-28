@@ -1,0 +1,698 @@
+{
+  "scope": "Original screenshot pixels only; no source/code review, app execution, builds, CI calls, network or downloads.",
+  "run_id": 40639673814,
+  "artifact_id": 12796717449,
+  "source_sha_from_screenshot_export": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+  "origin_verification": {
+    "manifest_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof-manifest.json",
+    "manifest_sha256": "16a1b6103e59eb91ada23f0463196812253e8d09ec328c6182bf0ab68ec727bb",
+    "whole_archive_sha256_as_recorded_by_manifest": "a8cda4465549a7bdb9a13f82711f8223c66495c6556c48243fa30b9548b72f33",
+    "archive_rehashed_by_this_review": false,
+    "screenshot_export_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshot-export.json",
+    "screenshot_export_sha256": "f381111c0aac85692b9a910142ee171ac7f0a46d3c179d0b4f4216e635244673",
+    "all_43_export_names_present": true,
+    "all_43_file_hashes_and_sizes_match_manifest": true
+  },
+  "review_method": "Opened each of the 43 original PNG files individually using view_image. No montage, resized derivative, OCR, source inference or rendering substitution used.",
+  "result": "One actionable visible-state wording inconsistency; no observed blocked primary control in the captured viewports.",
+  "findings": [
+    {
+      "id": "V1",
+      "priority": "P2",
+      "title": "Done-only correction preview still instructs user to Approve",
+      "evidence_files": [
+        "candidate/screenshots/4771FE64-6A10-45C9-BEDB-C01187CC678E.png",
+        "candidate/screenshots/54132C9C-1B28-4078-8591-6E37FF7FBF9B.png"
+      ],
+      "observed": "4771FE64 shows Done as the only footer action while the preview still says “Nothing is saved until you choose Approve (⌘↩).” The preapproval 54132C9C capture shows the same instruction with an actual Approve button.",
+      "impact": "User cannot reconcile the visible save instruction with the available Done action; saved state remains ambiguous in the Done-only view.",
+      "requested_change": "In the completed/Done-only state, replace the preapproval instruction with saved-state confirmation or remove it. Capture the resulting Done state.",
+      "limit": "Pixels establish the contradictory wording and absent Approve control. They do not independently establish whether persistence succeeded."
+    }
+  ],
+  "coverage": {
+    "individually_viewed": 43,
+    "original_png_count": 43,
+    "none_light_clarity_natural_casual_formal": "Visible selection states and explanations reviewed.",
+    "history_and_correction": "Recognized/Original/Enhanced, legacy, unknown and fallback cards; correction preview/Done state; Dictionary source-deleted provenance and editor states reviewed.",
+    "shared_sheets": "Model, Enhancement, Dictionary, New Prompt, Add Power Mode and Reorder sheets reviewed.",
+    "snippets_csv_translation": "Snippet list/editor/delete confirmation, CSV duplicate comparison and French current-target controls reviewed.",
+    "native_delete_dialog": "44B9A4CB image is Delete Snippet confirmation; no History delete-dialog PNG observed.",
+    "recording_or_system_permission_prompt": "No recording or system-permission prompt image present in this 43-image set."
+  },
+  "limits": [
+    "Static 1024x768 captures establish only visible layout and wording at these states; no interaction, scrolling reachability, focus behavior, click hitboxes, keyboard shortcuts or accessibility/VoiceOver behavior proven.",
+    "Visible accented/emoji glyphs do not establish exact Unicode bytes, normalization, invisible spaces or preserved newline bytes.",
+    "No provider quality, ASR accuracy, microphone service/dialog behavior, physical dictation, persistence/relaunch transition or full runtime gate conclusion inferred from screenshots. Repeated visible editor/list states are observations, not independent persistence proof.",
+    "Parent-supplied gate context: all eight UI cases reportedly passed, later native preflight microphone TCC=0 failed and Release skipped. That context was not independently validated here and this receipt does not approve the full gate.",
+    "Some scrolled body content is partly outside viewport; visible scrollbars alone do not prove all omitted content reachable. Main captured dialog actions remain bounded.",
+    "Source/export metadata and extracted-file hashes verified locally; original remote artifact origin and archive hash not independently re-fetched."
+  ],
+  "screenshots": [
+    {
+      "review_order": 1,
+      "file": "candidate/screenshots/048C8859-53CE-4670-8B82-065CBDABEBE5.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/048C8859-53CE-4670-8B82-065CBDABEBE5.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/048C8859-53CE-4670-8B82-065CBDABEBE5.png",
+      "sha256": "ec38b9b71d9ba4a3d8833f8ad709a0e6473952ba9118a368dc3534c3c83e94ce",
+      "bytes": 213663,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Save Correction preview with Replace With field and Cancel/Preview/Approve footer. Main field, literal phrase chip and actions readable; lower provenance continues below scroll viewport."
+    },
+    {
+      "review_order": 2,
+      "file": "candidate/screenshots/0BAA6750-E557-4E7C-9B67-D3212232B579.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/0BAA6750-E557-4E7C-9B67-D3212232B579.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/0BAA6750-E557-4E7C-9B67-D3212232B579.png",
+      "sha256": "ba5e194c006386ca3299f0c2774d23e21e1c080a32940582b37c0f341392d3f8",
+      "bytes": 211601,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Save Correction Done-only state. Preview visible; lower provenance/footer explanation outside viewport. Done bounded and readable."
+    },
+    {
+      "review_order": 3,
+      "file": "candidate/screenshots/11F6C168-F16D-449E-AE37-6B12CD478844.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/11F6C168-F16D-449E-AE37-6B12CD478844.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/11F6C168-F16D-449E-AE37-6B12CD478844.png",
+      "sha256": "0a7212814bc4a252054d200d7355c1cc78f34a8a7bd3b58af70f221c2fad572d",
+      "bytes": 126432,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History Enhanced selected; Clarity Formal label and polished text readable. Copy/check feedback, Save Correction and information control inside card."
+    },
+    {
+      "review_order": 4,
+      "file": "candidate/screenshots/1214684E-42EE-4B23-83CE-10894B9F5CFE.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/1214684E-42EE-4B23-83CE-10894B9F5CFE.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/1214684E-42EE-4B23-83CE-10894B9F5CFE.png",
+      "sha256": "8ff4395bb997d90405dbf41eea4f2c1474bd2493d9cfbdc2f0be80cf11c20298",
+      "bytes": 274497,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings Clarity Formal selected. Radio labels, explanation and close control readable; no overlap."
+    },
+    {
+      "review_order": 5,
+      "file": "candidate/screenshots/12490FDB-5D50-4245-92DE-A3CD00FA1C82.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/12490FDB-5D50-4245-92DE-A3CD00FA1C82.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/12490FDB-5D50-4245-92DE-A3CD00FA1C82.png",
+      "sha256": "e3bfcb7800a9f05bd8fcaea9797f53921cbea2a469907cbd4e569b4f357753c3",
+      "bytes": 127118,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History Recognized selected; recognized two-line text, cleanup badge and correction action readable."
+    },
+    {
+      "review_order": 6,
+      "file": "candidate/screenshots/17D3146F-D47C-4A7C-B772-ED51FAA4B536.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/17D3146F-D47C-4A7C-B772-ED51FAA4B536.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/17D3146F-D47C-4A7C-B772-ED51FAA4B536.png",
+      "sha256": "32dc739ed66aeecdd867c71756ae90e8008cded84cba36dd87065a09a97f7bec",
+      "bytes": 250648,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings scrolled to Transcript Formatting and Advanced. Visible controls bounded; upper/lower neighboring content partially outside scroll viewport."
+    },
+    {
+      "review_order": 7,
+      "file": "candidate/screenshots/1F6DF3C5-701E-442B-8946-C8F4A151C383.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/1F6DF3C5-701E-442B-8946-C8F4A151C383.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/1F6DF3C5-701E-442B-8946-C8F4A151C383.png",
+      "sha256": "5f987383a368c3dd48293dd049f3b51fb5aa3df8f327d7b6e3d5c5e971a683e7",
+      "bytes": 176640,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Reorder Power Modes sheet has title and close control, empty body. Screenshot alone cannot distinguish intended empty list from missing content."
+    },
+    {
+      "review_order": 8,
+      "file": "candidate/screenshots/22D93D5D-77B2-4265-A411-21B9326CF714.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/22D93D5D-77B2-4265-A411-21B9326CF714.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/22D93D5D-77B2-4265-A411-21B9326CF714.png",
+      "sha256": "e96610eb50b1bac3fabe703e66cf8dba6458f8212790bd5f797e155114261d3f",
+      "bytes": 252746,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Dictionary Word Replacements shows enabled Orbit entry and orange From History / Recognized / source deleted provenance. Visible entry controls bounded; further rows below viewport."
+    },
+    {
+      "review_order": 9,
+      "file": "candidate/screenshots/298B3150-F2EC-401A-9A7F-D9B6FE9A79C1.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/298B3150-F2EC-401A-9A7F-D9B6FE9A79C1.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/298B3150-F2EC-401A-9A7F-D9B6FE9A79C1.png",
+      "sha256": "b83505a9d415d2b328ff8656b6e5ead79ead08f5b3599a262938ff84f0b99303",
+      "bytes": 224131,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Enhancement Settings context toggles, timeout, shortcuts and close control readable and bounded."
+    },
+    {
+      "review_order": 10,
+      "file": "candidate/screenshots/2A02BF54-E28F-4DA0-9BEF-357A7C6AF5B2.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/2A02BF54-E28F-4DA0-9BEF-357A7C6AF5B2.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/2A02BF54-E28F-4DA0-9BEF-357A7C6AF5B2.png",
+      "sha256": "905c53e471a490c6387c664618ab4d109b133324fe8ca1a3d7cd47d3a0436011",
+      "bytes": 271384,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings None selected; Clarity controls visually disabled and explanatory saved-choice text readable."
+    },
+    {
+      "review_order": 11,
+      "file": "candidate/screenshots/3FF682DB-FFBE-4642-8D27-0BE61E736BA4.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/3FF682DB-FFBE-4642-8D27-0BE61E736BA4.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/3FF682DB-FFBE-4642-8D27-0BE61E736BA4.png",
+      "sha256": "b41d4326d02ffbe29b440d7f43474dab3fa1d888da2b9901954ec1d662978b8c",
+      "bytes": 258975,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Snippets list: long trigger stays on one line; search horizontally scrolled within field. Import/Export/New Snippet controls and first-row controls visible."
+    },
+    {
+      "review_order": 12,
+      "file": "candidate/screenshots/44B9A4CB-94A4-433F-8AD0-1AD07A765C17.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/44B9A4CB-94A4-433F-8AD0-1AD07A765C17.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/44B9A4CB-94A4-433F-8AD0-1AD07A765C17.png",
+      "sha256": "cecf96dafe9a102e0f5b639d5412fd37db7831e51baa95d78a416f169b73bc75",
+      "bytes": 247465,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Delete Snippet confirmation: long trigger wraps across three lines; warning, Delete Snippet and Cancel all fit within dialog. This is the captured native-looking delete dialog, not a History deletion dialog."
+    },
+    {
+      "review_order": 13,
+      "file": "candidate/screenshots/458DEE69-5B26-4993-8264-4CC4D0751959.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/458DEE69-5B26-4993-8264-4CC4D0751959.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/458DEE69-5B26-4993-8264-4CC4D0751959.png",
+      "sha256": "f45c075ed26e057ac072f9ccb3016695df0c1ae353ca828eae4d2043d5db55e0",
+      "bytes": 246210,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Vocabulary section with one saved token; add field and remove control visible. No overlap."
+    },
+    {
+      "review_order": 14,
+      "file": "candidate/screenshots/4771FE64-6A10-45C9-BEDB-C01187CC678E.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/4771FE64-6A10-45C9-BEDB-C01187CC678E.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/4771FE64-6A10-45C9-BEDB-C01187CC678E.png",
+      "sha256": "54f8ef06af73861f91bc18b6045da7d2e038a54f52ea28013b7fd53e535fb293",
+      "bytes": 214897,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Save Correction Done-only state retains preview warning that nothing is saved until Approve; Approve absent. See V1."
+    },
+    {
+      "review_order": 15,
+      "file": "candidate/screenshots/480B78A8-6EEB-4D2C-9B26-43AD61474E1C.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/480B78A8-6EEB-4D2C-9B26-43AD61474E1C.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/480B78A8-6EEB-4D2C-9B26-43AD61474E1C.png",
+      "sha256": "23f7300363cbaa114a4f20eb86b932f8aff7c1fe854f4f94cf9e994a63f72c5a",
+      "bytes": 214566,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Save Correction preview shows literal Acme phrase, replacement and full metadata down to Transcript. Cancel/Preview/Approve visible and separated from scrolled body."
+    },
+    {
+      "review_order": 16,
+      "file": "candidate/screenshots/4CF31AD4-BBE8-48F8-ACED-3476557455B7.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/4CF31AD4-BBE8-48F8-ACED-3476557455B7.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/4CF31AD4-BBE8-48F8-ACED-3476557455B7.png",
+      "sha256": "b584c83bca886e1a15ea32f785fed31def46011fc9056dffbda107ee2ec02683",
+      "bytes": 272957,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings Clarity Formal selected; complete visible explanation and close control bounded."
+    },
+    {
+      "review_order": 17,
+      "file": "candidate/screenshots/5146E344-8B20-4B15-9F72-3F5F0AAC6FA0.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/5146E344-8B20-4B15-9F72-3F5F0AAC6FA0.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/5146E344-8B20-4B15-9F72-3F5F0AAC6FA0.png",
+      "sha256": "6536fdc404b135c1d5a6f279cd0ec89913ddf987cec4058b977da6f3b5d8f738",
+      "bytes": 270834,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings Clarity Natural selected; radio labels and explanation readable; no overlap."
+    },
+    {
+      "review_order": 18,
+      "file": "candidate/screenshots/54132C9C-1B28-4078-8591-6E37FF7FBF9B.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/54132C9C-1B28-4078-8591-6E37FF7FBF9B.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/54132C9C-1B28-4078-8591-6E37FF7FBF9B.png",
+      "sha256": "383b95381ebae0a066682d4985644becd7275d6ae1f2b26a2a791318477c8f6f",
+      "bytes": 217115,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Save Correction preapproval preview: literal Orbit phrase, replacement, metadata and nothing-saved-until-Approve message visible with Cancel/Preview/Approve footer."
+    },
+    {
+      "review_order": 19,
+      "file": "candidate/screenshots/558CC82C-8EF0-49AF-AD6E-F9940C35BAFA.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/558CC82C-8EF0-49AF-AD6E-F9940C35BAFA.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/558CC82C-8EF0-49AF-AD6E-F9940C35BAFA.png",
+      "sha256": "8480f2c6dd3fcc1252823f57891639119cc12426897a78716587ac31418196ef",
+      "bytes": 217966,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "New Prompt sheet: name field horizontally scrolls long value; instructions area, system-template toggle and Cancel/disabled Save Changes remain inside sheet."
+    },
+    {
+      "review_order": 20,
+      "file": "candidate/screenshots/5B5531DA-7687-4589-92A3-C0AA3CE31437.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/5B5531DA-7687-4589-92A3-C0AA3CE31437.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/5B5531DA-7687-4589-92A3-C0AA3CE31437.png",
+      "sha256": "052a0f15474aefc1fa3330e715f3cd137ebeb7fb658e7200ec7d4af4ac1ccde0",
+      "bytes": 252685,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings scrolled to formatting/advanced controls. Complete visible rows fit; next row partly outside lower scroll viewport."
+    },
+    {
+      "review_order": 21,
+      "file": "candidate/screenshots/5B6FB177-976B-4EE8-9116-687181EB158B.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/5B6FB177-976B-4EE8-9116-687181EB158B.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/5B6FB177-976B-4EE8-9116-687181EB158B.png",
+      "sha256": "6d0391cc81690fa8c850bd5df6adac850f761acb602edd41dd2c48c8a8eccf35",
+      "bytes": 122576,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History legacy Enhanced selected; Original/Enhanced tabs and correction action visible; text readable."
+    },
+    {
+      "review_order": 22,
+      "file": "candidate/screenshots/5D60C84E-78B2-428F-B93C-6B5DA13CB05F.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/5D60C84E-78B2-428F-B93C-6B5DA13CB05F.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/5D60C84E-78B2-428F-B93C-6B5DA13CB05F.png",
+      "sha256": "545ea0a11078c310b2968292f720cc1a767aee55818d787a831141d1317e9247",
+      "bytes": 233275,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Edit Word Replacement with Off state and From History / Recognized provenance; original and edited replacement fields, Cancel and Save fully visible."
+    },
+    {
+      "review_order": 23,
+      "file": "candidate/screenshots/5F96B072-BAA1-4180-B9DA-A10AA82D76D5.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/5F96B072-BAA1-4180-B9DA-A10AA82D76D5.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/5F96B072-BAA1-4180-B9DA-A10AA82D76D5.png",
+      "sha256": "661513d9b6f27909b16e860bfc98cf815800b0bca5fe12996597128096a6b258",
+      "bytes": 121747,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History unknown row: text and correction action visible; no version tabs displayed. Pixel observation only."
+    },
+    {
+      "review_order": 24,
+      "file": "candidate/screenshots/6254F7A3-E316-4211-AADE-F98398534748.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/6254F7A3-E316-4211-AADE-F98398534748.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/6254F7A3-E316-4211-AADE-F98398534748.png",
+      "sha256": "eb7bdcab28b9df62f2b5699196a0f6e7d69841e1ca54aae9361dfb050e2cb372",
+      "bytes": 182556,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Style Writing Actions and Translation Target: warning, disabled Record controls, French current target and language reorder/remove controls visible. Footer help partly below viewport."
+    },
+    {
+      "review_order": 25,
+      "file": "candidate/screenshots/6C5551DB-A487-4A53-B2B5-2677B14B14CF.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/6C5551DB-A487-4A53-B2B5-2677B14B14CF.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/6C5551DB-A487-4A53-B2B5-2677B14B14CF.png",
+      "sha256": "6741340b9e8988e1c11338728a2a94b94912abf42c1acb2e9fa976ee0066492c",
+      "bytes": 232864,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Edit Word Replacement with Off state and edited replacement; caret on next line. Fields and header actions bounded."
+    },
+    {
+      "review_order": 26,
+      "file": "candidate/screenshots/72972EFA-A7F0-4135-ADB6-04E4D35538C1.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/72972EFA-A7F0-4135-ADB6-04E4D35538C1.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/72972EFA-A7F0-4135-ADB6-04E4D35538C1.png",
+      "sha256": "c5df437fac172ee0392843efd1e0d13443324444226eb6fa9d177b812a8ba4d1",
+      "bytes": 270422,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings Light selected; readable explanation, disabled Clarity style controls and saved-choice note."
+    },
+    {
+      "review_order": 27,
+      "file": "candidate/screenshots/750BD0CB-8F6F-4BFC-A214-790945C0936C.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/750BD0CB-8F6F-4BFC-A214-790945C0936C.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/750BD0CB-8F6F-4BFC-A214-790945C0936C.png",
+      "sha256": "65c470aeacbfdcbbde0aca73b7d2bf35d28e24a6e2367a2de091edbaab1c9290",
+      "bytes": 234033,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Edit Snippet: long trigger fits, multiline inserted text and counters readable. Use this snippet toggle and Cancel/Save visible within sheet."
+    },
+    {
+      "review_order": 28,
+      "file": "candidate/screenshots/7B7F73A1-DA38-4424-B49D-189A33058328.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/7B7F73A1-DA38-4424-B49D-189A33058328.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/7B7F73A1-DA38-4424-B49D-189A33058328.png",
+      "sha256": "c55d528c635b056f40a47b1614e518280a742617a602aed4e2459f811666a31d",
+      "bytes": 127095,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History Original selected; Recognized/Original/Enhanced tabs, cleanup badge and correction action visible."
+    },
+    {
+      "review_order": 29,
+      "file": "candidate/screenshots/895AE891-2ECE-4399-A705-AA1759847115.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/895AE891-2ECE-4399-A705-AA1759847115.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/895AE891-2ECE-4399-A705-AA1759847115.png",
+      "sha256": "2be8148d220d9b80d73e96b531dd03a447d267369559531853f91519e8aed351",
+      "bytes": 214967,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Dictionary Settings sheet: Quick Add to Dictionary shortcut and close control visible; blank remainder of sheet."
+    },
+    {
+      "review_order": 30,
+      "file": "candidate/screenshots/90C4C1F8-81BB-495A-B043-C189EBAAD03B.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/90C4C1F8-81BB-495A-B043-C189EBAAD03B.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/90C4C1F8-81BB-495A-B043-C189EBAAD03B.png",
+      "sha256": "08e7aab5b9f0bc8a19a7be2fb788be71ffd004643e9a42dd8ac97ac3304dfad7",
+      "bytes": 135360,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History fallback: yellow Clarity cleanup did not finish banner and raw text visible; badge and correction action remain within card."
+    },
+    {
+      "review_order": 31,
+      "file": "candidate/screenshots/9FA229F5-8E4A-46E8-AEF4-052E29CA0CCB.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/9FA229F5-8E4A-46E8-AEF4-052E29CA0CCB.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/9FA229F5-8E4A-46E8-AEF4-052E29CA0CCB.png",
+      "sha256": "d433ddffeb1da435fa744e063cf4ab8ea2f171a399f4da5e60a9c7f438554c82",
+      "bytes": 270031,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings None selected; explanation, disabled styles and saved-choice note readable."
+    },
+    {
+      "review_order": 32,
+      "file": "candidate/screenshots/AAB05DB2-D733-427F-859C-90C9C380B62A.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/AAB05DB2-D733-427F-859C-90C9C380B62A.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/AAB05DB2-D733-427F-859C-90C9C380B62A.png",
+      "sha256": "8271a95435066d5249e7b73480864d29808d9e1ee07e08fe88765ee4a6b1118e",
+      "bytes": 269984,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings None selected; explanation, disabled styles and saved-choice note readable."
+    },
+    {
+      "review_order": 33,
+      "file": "candidate/screenshots/BD4DDCCD-284E-4F4F-899D-86E297E8A0A6.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/BD4DDCCD-284E-4F4F-899D-86E297E8A0A6.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/BD4DDCCD-284E-4F4F-899D-86E297E8A0A6.png",
+      "sha256": "53a941592595fb306cdcbf7c8cdc7909366ad9e1db81582a39ff4b1058fdf7fa",
+      "bytes": 241052,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Import Snippets: expanded duplicate trigger comparison displays library/imported multiline text; three conflict options, Cancel and disabled Import fit in sheet."
+    },
+    {
+      "review_order": 34,
+      "file": "candidate/screenshots/C41163C0-EAFE-4E8B-9E06-20B7D74BE6D0.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/C41163C0-EAFE-4E8B-9E06-20B7D74BE6D0.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/C41163C0-EAFE-4E8B-9E06-20B7D74BE6D0.png",
+      "sha256": "4d69a305b3c572c6f420eb3460909ba7131d85c33951ee500db36f6b56ba5af3",
+      "bytes": 235048,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Edit Word Replacement retained Orbit entry: On state and orange source deleted provenance visible alongside original/replacement fields and Cancel/Save."
+    },
+    {
+      "review_order": 35,
+      "file": "candidate/screenshots/D2CF8374-8648-4832-B80E-679444CC2A54.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/D2CF8374-8648-4832-B80E-679444CC2A54.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D2CF8374-8648-4832-B80E-679444CC2A54.png",
+      "sha256": "ae0d447dc007359c31d8be4636a69e7baf03fb478bacc31903de4ed9467689c7",
+      "bytes": 246494,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Vocabulary section with one saved token; add field and token remove control visible; no overlap."
+    },
+    {
+      "review_order": 36,
+      "file": "candidate/screenshots/D395BC9F-032D-464F-AF73-45824B405350.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/D395BC9F-032D-464F-AF73-45824B405350.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D395BC9F-032D-464F-AF73-45824B405350.png",
+      "sha256": "48b29c9f5a9b18a3d555338e75abede42766afa46bced6ac07f2393994adb637",
+      "bytes": 123886,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History legacy Original selected; Original/Enhanced tabs, two-line text and correction action readable."
+    },
+    {
+      "review_order": 37,
+      "file": "candidate/screenshots/D591A4DF-1B4C-4248-A288-7CDF7023F561.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/D591A4DF-1B4C-4248-A288-7CDF7023F561.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D591A4DF-1B4C-4248-A288-7CDF7023F561.png",
+      "sha256": "6536fdc404b135c1d5a6f279cd0ec89913ddf987cec4058b977da6f3b5d8f738",
+      "bytes": 270834,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings Clarity Natural selected; same SHA as 5146E344 image, independently opened and inspected."
+    },
+    {
+      "review_order": 38,
+      "file": "candidate/screenshots/DA265AD3-EFCF-4492-BA85-AE9A4E5E0145.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/DA265AD3-EFCF-4492-BA85-AE9A4E5E0145.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/DA265AD3-EFCF-4492-BA85-AE9A4E5E0145.png",
+      "sha256": "d2a699a256c8d4052dbb50c31b40b89ca179e934d0a7988f6506569de88135df",
+      "bytes": 182485,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Style Writing Actions and French current target visible; language controls bounded. Bottom help continues below viewport."
+    },
+    {
+      "review_order": 39,
+      "file": "candidate/screenshots/DA3C98D2-0F76-4EB2-9A5F-8D922BC46C77.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/DA3C98D2-0F76-4EB2-9A5F-8D922BC46C77.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/DA3C98D2-0F76-4EB2-9A5F-8D922BC46C77.png",
+      "sha256": "f147474ccfe1a3b67dd5633248c9aa944a4d13f8d373b290f0ebe7bcd4090ef5",
+      "bytes": 127113,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "History Original selected; Recognized/Original/Enhanced tabs and Clarity Formal badge readable."
+    },
+    {
+      "review_order": 40,
+      "file": "candidate/screenshots/ECD1356F-6343-4B55-9D71-A80DCA483C16.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/ECD1356F-6343-4B55-9D71-A80DCA483C16.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/ECD1356F-6343-4B55-9D71-A80DCA483C16.png",
+      "sha256": "59f6e246b2a45fa204909732ce327196aad32497b3552d6c56e7c5f0fca9a0c1",
+      "bytes": 205377,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Add Power Mode sheet: long name horizontally scrolls; application/website controls visible; lower transcription settings continue below viewport. Cancel/Save Changes fixed footer visible."
+    },
+    {
+      "review_order": 41,
+      "file": "candidate/screenshots/EDFB4EC1-B919-4130-BAB0-EB0C30805734.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/EDFB4EC1-B919-4130-BAB0-EB0C30805734.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/EDFB4EC1-B919-4130-BAB0-EB0C30805734.png",
+      "sha256": "1743f7fcd68c588533c933eb95cfed6dd8cdfd297aa37aeeec4473603b48aa9d",
+      "bytes": 271495,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings Clarity Casual selected; style explanation readable and close control visible."
+    },
+    {
+      "review_order": 42,
+      "file": "candidate/screenshots/FD600BC2-9F0D-4C20-8D27-980F32AF505D.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/FD600BC2-9F0D-4C20-8D27-980F32AF505D.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/FD600BC2-9F0D-4C20-8D27-980F32AF505D.png",
+      "sha256": "9309af92ca9a51ace5aa861aa6c585e4758989d67095ac1a0e99db1256134c12",
+      "bytes": 254113,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Model Settings scrolled to None-disabled formatting settings. Saved-for-Custom note and skipped-space explanation readable; VAD remains visibly active."
+    },
+    {
+      "review_order": 43,
+      "file": "candidate/screenshots/FF867149-4267-4ABE-9EF4-94236CC79B4C.png",
+      "original_path": "/tmp/rjt-polish-ui-selected-40639673814/selected-proof/candidate/screenshots/FF867149-4267-4ABE-9EF4-94236CC79B4C.png",
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/FF867149-4267-4ABE-9EF4-94236CC79B4C.png",
+      "sha256": "2ffcac854ad68e77ab91e56c02fbd927e2d5d4e0f0e9ba97ace61528cc325cbc",
+      "bytes": 252747,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "individually_viewed_with": "view_image",
+      "observation": "Dictionary Word Replacements retained Orbit entry with enabled toggle and orange source deleted provenance. Lower rows continue below viewport."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+window id=com.negentropi.RomaJustTalk.mainWindow frame=(37.0, 32.0, 950.0, 677.0)
+sheets=1 id=_NS:87 role=5 label=alert frame=(382.0, 301.0, 260.0, 138.0)
+confirm count=1 label=Delete enabled=true hittable=true frame=(515.0, 394.0, 112.0, 30.0)
+cancel count=1 label=Cancel enabled=true hittable=true frame=(397.0, 394.0, 112.0, 30.0)
+texts=["Delete Selected Items?", "This action cannot be undone. Are you sure you want to delete 1 item?"]

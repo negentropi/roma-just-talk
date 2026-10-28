@@ -1,0 +1,1517 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "DFB99064-7F60-4374-8506-E09F19900FD4.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_4080CCD9-1B7E-4ED0-BAF8-091BC68EC657.json",
+        "timestamp" : 1793167787.958
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "C41163C0-EAFE-4E8B-9E06-20B7D74BE6D0.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Correction remains editable after deleted-source relaunch_0_FDC55D35-5252-45F4-8AA3-AD6D66B883F9.png",
+        "timestamp" : 1793167786.447
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "18BAFDBA-F87B-4D1D-BB51-C3CAFAC0ACEA.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field after-exposure dictionary.replacement.edit_0_D630EA9B-A27E-4BF5-A78E-21061280283D.id",
+        "timestamp" : 1793167786.154
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "67CAF54B-5260-4645-912F-714358A9A3DA.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field before-exposure dictionary.replacement.edit_0_787F3C5B-814E-4B6B-AD9A-150FA0FA966E.id",
+        "timestamp" : 1793167785.516
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "AF178B6B-1A62-4D2B-8B64-DCB119AC19DC.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_829E9303-6C8E-4BDF-81CD-F6C710FB0B48.json",
+        "timestamp" : 1793167758.423
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "22D93D5D-77B2-4265-A411-21B9326CF714.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Saved correction keeps provenance after its History source is deleted_0_EE372516-C4E1-4670-B4CC-CD0B15595FF1.png",
+        "timestamp" : 1793167755.473
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "41734E29-953D-4610-BF1E-067021251287.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History delete confirmation Sheet census_0_4D0AA179-F334-4EC5-B356-B2A933CAA48A.txt",
+        "timestamp" : 1793167743.641
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "F1B93E0F-17F6-4D73-B921-E7CBAC9C9ECB.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000006 recognized_0_993FFE7B-7BA4-441B-83F1-6DEAF7EE6366.json",
+        "timestamp" : 1793167735.998
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9BD2CF0B-4591-429B-8596-EDB776D73905.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_FE747EA0-A7C1-40F8-93AD-663EDFC1AF76.recognized",
+        "timestamp" : 1793167732.71
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "4771FE64-6A10-45C9-BEDB-C01187CC678E.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Correction saved only after explicit approval_0_38E1E9BE-91C6-4A3E-8711-FB43B3E929CC.png",
+        "timestamp" : 1793167707.419
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "54132C9C-1B28-4078-8591-6E37FF7FBF9B.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Explicit History correction preview RJT Correction retained_0_1A86BFC8-203C-4BFA-892E-FFAC99DBBCB5.png",
+        "timestamp" : 1793167705.333
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "ED582521-F707-48BC-8921-E56204826202.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field after-exposure history.correction.preview.record_0_D01A5086-49AD-433D-8570-8F7B89DE141E.id",
+        "timestamp" : 1793167703.476
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "27C29EF9-3F35-4BB2-8B3F-B49CB33D7E7D.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field before-exposure history.correction.preview.record_0_7EE8847F-F5AA-47CB-9492-935156451343.id",
+        "timestamp" : 1793167699.495
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D07C9591-111D-4F29-A98D-CA4E187CB954.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction.preview.record_0_F462B2CE-011C-4FFA-B3ED-5AD525147B1C.replacement",
+        "timestamp" : 1793167695.832
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "BCF80945-9A65-4BB7-A375-FE0EE1A82E86.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction.preview.record_0_05AE63E0-064B-4E06-9A19-D8CC0EB92679.original",
+        "timestamp" : 1793167694.361
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9958D3E9-E2A2-492B-8EAE-F8DD9EFD28D0.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction_0_4A88DB81-E4C3-4587-86C9-5D860A8F3519.sourceText",
+        "timestamp" : 1793167684.208
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "CB27277A-ABBD-483D-9709-C8EFF23FE442.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000006 recognized_0_C959BC1C-F02C-43F5-B27D-A97655909685.json",
+        "timestamp" : 1793167678.616
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9D353848-D498-4B93-BF26-6B8271EBF8ED.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_A96687F7-0D4B-4ED6-848B-722D79B8B77C.recognized",
+        "timestamp" : 1793167673.513
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "C494C28A-545D-4E05-A5D5-E3314B9FCB6F.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_7DA894FE-EB99-45C5-BFB2-84BF78C330F8.json",
+        "timestamp" : 1793167641.19
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "235351BE-92B9-4F9C-A4DD-35DCE5515BFE.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_48C42DC8-7833-4214-8DF6-5D13CF51F2E3.json",
+        "timestamp" : 1793167636.814
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2665D2BC-BFA7-4023-B899-CF23282C9E49.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_7717172C-5D90-4CFC-83E7-DA9F4AA283A6.json",
+        "timestamp" : 1793167636.809
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "F447DEA5-F7C0-4579-9032-0187144B0893.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_53807B95-7BED-4628-A819-5442E6D59299.json",
+        "timestamp" : 1793167915.681
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "BD4DDCCD-284E-4F4F-899D-86E297E8A0A6.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "CSV current and imported multiline preview_0_8BAAEF87-93B3-4EAC-8A7D-4089DBC41283.png",
+        "timestamp" : 1793167874.767
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "F9AF4662-DC0E-436D-AF5D-C5A75F8BFC01.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_70A0D52B-013E-4797-97F9-4DE5EE62D047.json",
+        "timestamp" : 1793167791.874
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "586B9975-A17D-4E08-BC5A-7D4865BD5F80.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_EDADE495-A916-4164-994B-B8E4036CAED6.json",
+        "timestamp" : 1793167789.251
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "7BD61EB1-F2F5-434B-A0F4-515F566ED8E8.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_F3D1F1BB-DDF2-4883-88BC-10D6C70787E0.json",
+        "timestamp" : 1793167789.245
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "08D04F08-29E8-4935-BFFD-9CDB669B35F4.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_AEDADA7E-5D85-42FC-AEB2-81822DE335C5.json",
+        "timestamp" : 1793168152.722
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "1F6DF3C5-701E-442B-8946-C8F4A151C383.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Power Mode reorder native sheet_0_D3960138-E036-4304-A0F3-8B57F9100454.png",
+        "timestamp" : 1793168150.401
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "ECD1356F-6343-4B55-9D71-A80DCA483C16.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Power Mode unsaved native sheet_0_04271FA2-00DC-4417-86C5-05CB23BD666E.png",
+        "timestamp" : 1793168143.462
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "558CC82C-8EF0-49AF-AD6E-F9940C35BAFA.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Prompt editor unsaved native sheet_0_AA5E2ECA-FFF4-4013-9BED-44963CB33E09.png",
+        "timestamp" : 1793168128.424
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "298B3150-F2EC-401A-9A7F-D9B6FE9A79C1.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Enhancement settings native sheet_0_50FC959D-B570-425D-A9EC-F6529A07ADE2.png",
+        "timestamp" : 1793168109.413
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "895AE891-2ECE-4399-A705-AA1759847115.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Dictionary settings native sheet_0_D1A06A51-F709-4B22-94EA-16739C1B8B35.png",
+        "timestamp" : 1793168100.79
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "70DB8ADF-A86B-46F5-80C3-5B93C848D177.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-closing_0_632E42EF-BC5E-41D4-AA0D-247C99389B73.txt",
+        "timestamp" : 1793168092.018
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "626907DC-1774-4133-B02D-C4748458B82E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-closing_0_B177FFAE-8124-41C8-9B46-C66C112C053C.json",
+        "timestamp" : 1793168091.467
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5B5531DA-7687-4589-92A3-C0AA3CE31437.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Custom formatting restored without changing saved values_0_6D94917C-3200-43E8-BF43-91C21840B439.png",
+        "timestamp" : 1793168085.036
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2A02BF54-E28F-4DA0-9BEF-357A7C6AF5B2.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "None dictation cleanup persisted after relaunch_0_CAD54226-1605-4C98-8BA4-4DC32ABD7677.png",
+        "timestamp" : 1793168058.504
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "A696C524-0DDD-4C1D-A40E-BE9A4974386C.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-opening_0_68578D23-D85A-4271-9D88-67630FB540B9.txt",
+        "timestamp" : 1793168057.565
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9E47461A-D889-4182-B1F3-49BE6375B29E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-opening_0_B0449597-1C5C-45BE-8D1C-E3B63AC4E509.json",
+        "timestamp" : 1793168056.694
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "B56507DC-8B70-4EFA-9760-A794C8C48A35.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy before-opening_0_0D281356-8E38-42DF-A0D7-F609407CB4D5.txt",
+        "timestamp" : 1793168045.836
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "3B8288A3-1EAA-4E47-B91D-7F8F4C41D5E3.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary before-opening_0_FC8DEEB1-B03E-4908-8AA8-EC1E6EC4E522.json",
+        "timestamp" : 1793168045.385
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D1D5AFAD-23C7-4B98-8D4A-5B60537CFE59.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_7A8BF85B-0026-4665-B1E6-8103898CAB68.json",
+        "timestamp" : 1793168026.564
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "44430CB0-9DED-452C-A446-D7B4DE44DE48.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-opening_0_F3B22490-D225-477A-AFB1-60573B005EDB.txt",
+        "timestamp" : 1793168014.154
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9DE34180-A971-4FBF-8CAC-93306832D11E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-opening_0_1C8C8538-7D95-495E-829D-B75ABA99E151.json",
+        "timestamp" : 1793168013.45
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "7D4EB4B9-00C3-4966-BCDC-5AB0A331B70B.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy before-opening_0_5FCF091F-A490-4859-BAC2-BCB4802E8547.txt",
+        "timestamp" : 1793168002.803
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8D397AE1-7EC6-49F0-96D4-8503E18B2E2E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary before-opening_0_52DED4FD-4E1F-4334-94F8-C56A4CCB9490.json",
+        "timestamp" : 1793168002.342
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "6498F572-A0B8-4E0D-9059-EA3D2D46DC6E.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-closing_0_6893CF47-A25B-4BE0-B639-B6606A58D506.txt",
+        "timestamp" : 1793167994.112
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "FDD89B70-0BFE-46AF-B2CE-74807167C4D7.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-closing_0_5AC66655-5AC4-4D00-8826-654CBF9F0A72.json",
+        "timestamp" : 1793167993.718
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "FD600BC2-9F0D-4C20-8D27-980F32AF505D.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "None preserves inactive Custom formatting_0_F02DC9DB-72EB-40CF-8E35-46635F970B29.png",
+        "timestamp" : 1793167987.128
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9FA229F5-8E4A-46E8-AEF4-052E29CA0CCB.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "None dictation cleanup selected_0_B445349D-39AB-4A99-BBD7-FDF89491EE24.png",
+        "timestamp" : 1793167977.576
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "17D3146F-D47C-4A7C-B772-ED51FAA4B536.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Custom dictation cleanup settings_0_CF0FDFA1-22EC-4B84-B69B-9DFB04C29E91.png",
+        "timestamp" : 1793167969.712
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9611BD26-CD49-419A-91DB-67BA5275745F.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-background-pointer_0_1BF3C05A-7396-489E-AFED-FF0F216A21E5.txt",
+        "timestamp" : 1793167959.116
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8A8C3C14-F592-4EC6-A73A-F46E26113E50.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-background-pointer_0_CBCDC9FE-7B78-41A1-9C26-FE23129B8F10.json",
+        "timestamp" : 1793167958.594
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "0433C409-27AF-4179-9A5F-E3B496A448AA.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-opening_0_6804657F-1767-4700-9647-224390440F45.txt",
+        "timestamp" : 1793167950.158
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "E37EC6AE-8450-401D-B83F-0107D83D3A51.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-opening_0_C6865F5B-F74E-41B5-AA45-C435E9841E37.json",
+        "timestamp" : 1793167949.167
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "0D965AA0-D809-4C0D-8AEE-C6AE284E11C2.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy before-opening_0_E2E0E600-6E2F-4AD9-BDA9-D5B78E82A85E.txt",
+        "timestamp" : 1793167938.015
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "A11C4272-955F-4E74-8EEC-E96EE01FCBCA.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary before-opening_0_E7533447-0C06-4267-B073-E061036C3C42.json",
+        "timestamp" : 1793167937.498
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "CF3816CC-62D8-4B89-9705-5ACFDA4478F9.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_9735EBDE-1D14-4C33-99CB-CAC28DF4A13F.json",
+        "timestamp" : 1793167920.496
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2D786373-CAC4-4854-BA9C-9D87B3896CEB.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_5E701206-66B4-4086-B907-77A19E678BF8.json",
+        "timestamp" : 1793167917.02
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "61BAC49F-3B62-4C6E-80C0-E06004AF031B.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_0533BD28-CD16-4976-B12C-E795A4B98FB5.json",
+        "timestamp" : 1793167917.015
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "77CEFDD0-CACA-4407-8A98-EA5C8455989C.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_34350380-3E38-408F-A10E-EBDA223DE145.json",
+        "timestamp" : 1793168382.741
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D2CF8374-8648-4832-B80E-679444CC2A54.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Profile switching preserves the seeded vocabulary library_0_134056C6-0BDB-4A7F-A3DA-25D4C5200685.png",
+        "timestamp" : 1793168351.26
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "C712F3AA-B9D8-4ED0-8384-5163BB738F50.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-closing_0_23D8C393-236E-4A55-8E3F-259010CF04A5.txt",
+        "timestamp" : 1793168339.699
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "96D9263B-833F-4F41-94FA-E74179D513DC.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-closing_0_2DF457CF-FC0C-43A3-9AA9-0AB0424502AC.json",
+        "timestamp" : 1793168339.334
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "1214684E-42EE-4B23-83CE-10894B9F5CFE.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Clarity Formal persisted after relaunch_0_230FD9BB-D7CE-4127-B093-7E33AF50732B.png",
+        "timestamp" : 1793168334.496
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "B6CFC7AC-3808-474C-AB6F-6255064FA352.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-opening_0_84C87E6B-D886-4FB6-86C2-AC14EDFE08FE.txt",
+        "timestamp" : 1793168329.748
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5EF0B984-4502-4DAE-8C11-7027CFADA999.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-opening_0_9B1B25D8-D27E-4C8E-9C6C-21F5D7F8D67D.json",
+        "timestamp" : 1793168329.255
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2A39DCDE-2283-4504-AA10-C06098293135.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy before-opening_0_51D9D4BB-B97C-42DD-95BF-4B3E1EC703D8.txt",
+        "timestamp" : 1793168320.94
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8F7293C9-C2A6-44F9-97DF-CB6A0837A46E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary before-opening_0_1F41FAD4-B2D3-42B1-BDC1-8C72ECF05B92.json",
+        "timestamp" : 1793168320.645
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8DBD2CDB-3758-4E3C-A7EF-873863805A81.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_748BF82F-C2C7-4437-AC05-44E786D6BB5C.json",
+        "timestamp" : 1793168307.137
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "88CAB1BC-B96C-49F1-A173-86BD08B6B118.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-opening_0_BC8C83DC-B0EE-4E69-9581-70C98D3F34CC.txt",
+        "timestamp" : 1793168300.335
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D9A6312B-3AB4-4C21-BE07-B2BE43BB140B.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-opening_0_F24D8E77-C36C-4D99-804E-409D2F5C4BA9.json",
+        "timestamp" : 1793168299.88
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8D543784-6AFC-4C02-B4BB-6A408D7CBCB0.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy before-opening_0_1F90057A-1AD4-4DB2-BCF1-E1CDE75EB3AA.txt",
+        "timestamp" : 1793168291.656
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "480CDD6C-CB4A-46A6-A07E-340E3D0CC892.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary before-opening_0_6C55D63D-0B91-404E-A2CB-FD9760B045F3.json",
+        "timestamp" : 1793168291.311
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "A6114EA0-E1E0-4868-82E4-55438E60A934.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-closing_0_1B9792E2-85C4-4464-A314-507D1397A8BD.txt",
+        "timestamp" : 1793168285.009
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "07150B2D-B750-4B01-BD90-E637C79B725B.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-closing_0_417D53A3-C901-431C-8A53-E3AB8344903D.json",
+        "timestamp" : 1793168284.703
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "4CF31AD4-BBE8-48F8-ACED-3476557455B7.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Clarity Formal style_0_16CA051D-7D5E-48AD-9A6F-60D24D6A653A.png",
+        "timestamp" : 1793168252.849
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "EDFB4EC1-B919-4130-BAB0-EB0C30805734.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Clarity Casual style_0_A2050F24-0EF7-4922-9843-BB81C83ABBD0.png",
+        "timestamp" : 1793168247.357
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5146E344-8B20-4B15-9F72-3F5F0AAC6FA0.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Clarity Natural style_0_B4B19487-9619-4F6C-B07C-2542D3B85DE8.png",
+        "timestamp" : 1793168240.98
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D591A4DF-1B4C-4248-A288-7CDF7023F561.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Clarity profile and retained library settings_0_70B97C2F-5624-4ABF-89A8-CA80DF335E70.png",
+        "timestamp" : 1793168235.37
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "72972EFA-A7F0-4135-ADB6-04E4D35538C1.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Light profile and retained library settings_0_607BD9DA-F104-40A2-B343-F2F348A8252F.png",
+        "timestamp" : 1793168228.369
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "AAB05DB2-D733-427F-859C-90C9C380B62A.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "None profile and retained library settings_0_7AE7A9BF-3626-4833-8064-527EDA1ED081.png",
+        "timestamp" : 1793168221.119
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "E826B6E9-8BE5-46FD-88F3-9BCC2FCD34A7.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy after-opening_0_0FA1B988-A5DB-4DF7-9324-29890C052F38.txt",
+        "timestamp" : 1793168208.994
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "A22A7FFE-4825-48F3-8D3B-CC517A978E89.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary after-opening_0_51FC00CD-0DBB-4C80-A77B-7EC5CBD7D1EE.json",
+        "timestamp" : 1793168208.622
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "95325187-B3FF-4210-8443-B6A9CE3732D9.txt",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings hierarchy before-opening_0_9BBE071F-C278-4C43-AA01-FB6F5D262AA4.txt",
+        "timestamp" : 1793168200.639
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "66A85C72-98FC-4BFA-A551-BA38C1D1125B.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Model settings boundary before-opening_0_9BED2206-ECD0-4F4F-847E-BAAAB65456A6.json",
+        "timestamp" : 1793168200.313
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "458DEE69-5B26-4993-8264-4CC4D0751959.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Profile switching preserves the seeded vocabulary library_0_EFA9A36F-F7A4-4C86-BD22-AA66683CDFF7.png",
+        "timestamp" : 1793168175.492
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "8A178C1E-E794-4AFA-BFC1-A0CF2AD3CAB0.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_6E457D85-C753-4664-8561-4F60BBB27F2B.json",
+        "timestamp" : 1793168156.66
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2AC580C3-92E8-4D55-9B31-81968AA85820.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_2447FEAB-B2F6-4251-ACD5-86D808DF7B31.json",
+        "timestamp" : 1793168154.096
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "F02EEDD4-4AF7-4EE3-867F-1A8EFFFAC198.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_4B8E8778-650D-442E-86DA-32813426D0AA.json",
+        "timestamp" : 1793168154.094
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "1658B41E-2EAA-4103-910D-BE201C0EE213.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_0C4FCF69-78CA-42D5-8F02-9DB2BE022826.json",
+        "timestamp" : 1793168605.286
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5D60C84E-78B2-428F-B93C-6B5DA13CB05F.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Edited disabled correction retains identity after relaunch_0_96F7E609-D569-4EF3-B57A-53B853CC8EA0.png",
+        "timestamp" : 1793168586.282
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "CE2BDB9C-4EB1-45F1-BAAF-1779A9B37A8F.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field after-exposure dictionary.replacement.edit_0_887F12A8-8DE6-4305-9E14-B15A68B608AA.id",
+        "timestamp" : 1793168586.008
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "51598E69-8A8E-4A13-8E7F-14D6076086DB.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field before-exposure dictionary.replacement.edit_0_4912EB7B-ED83-4D5A-A35B-4062F3A0649F.id",
+        "timestamp" : 1793168585.341
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "B89CD917-19F3-42CF-AC70-D46E4063ED9C.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_411E65D6-06B6-48DB-8602-F71EE3D731BC.json",
+        "timestamp" : 1793168559.157
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "6C5551DB-A487-4A53-B2B5-2677B14B14CF.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Approved literal correction edited while disabled_0_CA302FB0-EF7B-49DC-B469-13C3B27526E1.png",
+        "timestamp" : 1793168555.632
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "0BAA6750-E557-4E7C-9B67-D3212232B579.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Correction saved only after explicit approval_0_A5ED7EBC-D6FD-49C2-BC04-0EEA825AFC24.png",
+        "timestamp" : 1793168523.292
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "048C8859-53CE-4670-8B82-065CBDABEBE5.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Explicit History correction preview RJT Correction managed_0_27BA216E-6AEE-41D8-9699-3CC94589C906.png",
+        "timestamp" : 1793168521.135
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "97F7915F-9600-4696-89BC-3C3BA009CC32.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field after-exposure history.correction.preview.record_0_308A7FAC-43B8-4A58-9078-CB5B9BC94046.id",
+        "timestamp" : 1793168519.558
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9F19668A-D361-41C2-9F94-E7F65782AD9B.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field before-exposure history.correction.preview.record_0_8DF25644-C9E3-4B88-B31D-94110B8E0688.id",
+        "timestamp" : 1793168515.744
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "145423E5-3A8B-490A-A935-5CE3B105E474.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction.preview.record_0_7103B218-88BC-4433-B5CE-7FB89553F65A.replacement",
+        "timestamp" : 1793168513.694
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "322151DA-100F-4335-A875-25C4857C9C11.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction.preview.record_0_CFB1483E-8D2E-4C78-9278-FDED510270A0.original",
+        "timestamp" : 1793168512.39
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "58070606-BBB1-4202-B45F-57BCDA28B18C.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field after-exposure history.correction.preview.record_0_62CC9370-53B3-41E6-99AC-6DE1227A2F99.id",
+        "timestamp" : 1793168511.102
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "40AD6570-A3FC-4855-B2B4-9414730D5B3C.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field before-exposure history.correction.preview.record_0_91AE0337-73E6-4BFD-9FA3-908382244180.id",
+        "timestamp" : 1793168507.348
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "E24E8AAD-4F8F-415F-81CE-8A21DF1C1301.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction.preview.record_0_445859B6-CCFA-4665-8FE4-B28995D672C0.replacement",
+        "timestamp" : 1793168498.047
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "58EEAC1D-0CA3-4661-B794-6AFF9128D4AC.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field after-exposure history.correction.preview.record_0_6C70BDB9-AAF5-4A18-BACE-48E9FF6C3E44.id",
+        "timestamp" : 1793168496.743
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D1E56E71-36F5-403C-9F68-26E0E8EA5737.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field before-exposure history.correction.preview.record_0_1A7C4EB7-AED0-485A-9722-3C5D4412D8EC.id",
+        "timestamp" : 1793168489.816
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "B2408855-07D3-4E00-9EF4-FDD1081CC0C8.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction_0_3992EFCA-334A-455D-AF24-E09296AF7517.sourceText",
+        "timestamp" : 1793168474.695
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "CA3A143B-0BE3-4475-BA3E-7AF41A6C4E44.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000005 recognized_0_22F4C9E1-3D20-4FE4-848D-29DF8DD45B0F.json",
+        "timestamp" : 1793168468.905
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "904615B9-29C0-4CEE-853C-4246D97F9F6A.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_2F7D0407-3E5E-4F16-901F-2C08ABE8748B.recognized",
+        "timestamp" : 1793168465.388
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "FF867149-4267-4ABE-9EF4-94236CC79B4C.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Correction preview cancelled without adding a Dictionary entry_0_4FCADDB5-D444-4CDE-A25E-67F8E918812B.png",
+        "timestamp" : 1793168452.06
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "480B78A8-6EEB-4D2C-9B26-43AD61474E1C.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Explicit History correction preview RJT Correction managed_0_D6F4CE7F-1860-47C1-ADA8-B1D07CAA257E.png",
+        "timestamp" : 1793168445.007
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5A21703B-A316-4EA5-96CE-CE5A5EF1A96E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field after-exposure history.correction.preview.record_0_68384172-AD0B-4F21-81B4-A3220A9EE19B.id",
+        "timestamp" : 1793168443.459
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "80305248-2E53-4C91-B900-D64B44386A5C.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Entry UUID field before-exposure history.correction.preview.record_0_3A8EC791-D03F-4D6D-A481-C61972D77C5B.id",
+        "timestamp" : 1793168438.264
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "ADBB2B8E-6208-45A9-8D2E-38C0E1A7E449.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction.preview.record_0_6CD2C0BA-F1E7-4193-9581-2CAD4F72E9CA.replacement",
+        "timestamp" : 1793168435.418
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "02844591-431F-4B94-8A0B-13A384399B28.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction.preview.record_0_CC088314-03FF-4DB7-9F2E-90932E69F08D.original",
+        "timestamp" : 1793168434.124
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "B192BC46-6C66-41A7-89C8-8B77EF188890.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.correction_0_87D086ED-DB5A-4852-9D8E-221896C1AF98.sourceText",
+        "timestamp" : 1793168421.239
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D82C6086-115F-4903-8B43-530EEB0D8E0E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000005 recognized_0_13F33D6A-1DBD-4E11-8F4F-EAEE28AA6F19.json",
+        "timestamp" : 1793168415.709
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "A1D78CC5-1904-4CCB-A160-A9237F1F74D3.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_498A258E-7842-443D-A87D-67408803B862.recognized",
+        "timestamp" : 1793168412.175
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "072E23F1-A36D-4DB1-9BF7-CC72AE0010E4.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_319DDB5B-E196-42D2-9B0A-04A8E7D0CB10.json",
+        "timestamp" : 1793168386.109
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "DCBA5AE4-A234-45EF-A8E5-68841B06BEFC.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_18487C63-DB9A-4114-AF95-21061FDAB52C.json",
+        "timestamp" : 1793168383.908
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "804E2666-695D-4121-A87A-34D7E4296D8B.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_5B8A592B-F81A-4739-BE7F-3991531D2D37.json",
+        "timestamp" : 1793168383.903
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "B8D6D835-B0D8-410A-9D55-3084A517D308.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_E12BF009-AAE8-4E74-A5DC-538653117E22.json",
+        "timestamp" : 1793168735.411
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "7B7F73A1-DA38-4424-B49D-189A33058328.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History captured Clarity Formal survives relaunch_0_A6BA3473-7E41-4623-9089-73B977166135.png",
+        "timestamp" : 1793168735.122
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "41DD44D9-5A53-48FA-AB4C-8875CD84A275.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_31D244AB-124E-40B2-B7DD-FE2043ADFF00.json",
+        "timestamp" : 1793168716.132
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5F96B072-BAA1-4180-B9DA-A10AA82D76D5.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History RJT History unknown original_0_42F71264-DE91-4E28-85C8-F48C459893E0.png",
+        "timestamp" : 1793168713.458
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "73D90A22-E371-4A24-9913-A1520D2963B2.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000004 original_0_51FC28DB-867E-4B65-921F-9194810F4510.json",
+        "timestamp" : 1793168713.231
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "27B874FB-B9A7-4DEB-B518-E9F08EA57E21.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_08B0EFE9-AD2A-4580-8E18-358BDC71000B.original",
+        "timestamp" : 1793168709.573
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "90C4C1F8-81BB-495A-B043-C189EBAAD03B.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History RJT History fallback original_0_4D3FD4BC-D1C5-4BCE-9180-B3382DAFCF46.png",
+        "timestamp" : 1793168696.756
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2C58B9E0-6651-40ED-81A6-14236C609D84.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000003 original_0_1EB0ECBA-5845-42B4-AAC7-878A696DD538.json",
+        "timestamp" : 1793168696.576
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "13153302-C25C-4BF0-8094-C6061F11A6A7.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_3B4EDB3C-41AC-418B-A82A-7E24DDB0B178.original",
+        "timestamp" : 1793168693.798
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "11F6C168-F16D-449E-AE37-6B12CD478844.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History RJT History recognized enhanced_0_8195F781-D935-4EBB-A916-A17C9A316D5E.png",
+        "timestamp" : 1793168677.586
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2D8DB8CA-C7F7-4C23-8AA2-B5160C6273D6.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000002 enhanced_0_81B4C065-0690-49CE-A133-A3F3E1B2637B.json",
+        "timestamp" : 1793168677.281
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "21E20961-87DA-49C0-A729-B9157C87028F.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_359EFA49-EBD6-440E-9EB7-56AB28E60423.enhanced",
+        "timestamp" : 1793168672.87
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "DA3C98D2-0F76-4EB2-9A5F-8D922BC46C77.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History RJT History recognized original_0_D3AF99CF-DF90-4E75-B283-AC15AE4C2B76.png",
+        "timestamp" : 1793168668.125
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "AEF90E4B-DD46-4213-8CE8-7D2D716B9D82.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000002 original_0_8F532247-AD65-4195-AF02-EA585350598C.json",
+        "timestamp" : 1793168667.997
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "100153BC-099F-4F0C-84DD-EB1CE2008427.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_D6677627-811B-4E13-A47E-A23B701451A6.original",
+        "timestamp" : 1793168664.958
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "12490FDB-5D50-4245-92DE-A3CD00FA1C82.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History RJT History recognized recognized_0_3003D820-632D-459B-B914-1DAAC8B1DB97.png",
+        "timestamp" : 1793168660.931
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "7264A625-02EF-486F-9D7A-C4FDB409E388.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000002 recognized_0_97D8A98F-36DB-40F6-BC19-8EE57309909F.json",
+        "timestamp" : 1793168660.786
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5916B061-5147-41E0-AFC5-8DEA1078CDD1.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_1917A2A8-F955-4DC1-BB36-D837A6982215.recognized",
+        "timestamp" : 1793168657.798
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "5B6FB177-976B-4EE8-9116-687181EB158B.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History RJT History legacy enhanced_0_4852D683-09EE-4F63-9213-2E0115F29350.png",
+        "timestamp" : 1793168641.751
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D19EC0D7-63E2-42AE-A0C1-DCD80F110925.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000001 enhanced_0_8E4431E6-2983-48A7-83C0-653C66EA834A.json",
+        "timestamp" : 1793168641.592
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "147322CF-69C2-4872-B666-350A5C621A41.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_C2A226D9-77F3-4CD5-B13A-8AD63626577E.enhanced",
+        "timestamp" : 1793168638.29
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D395BC9F-032D-464F-AF73-45824B405350.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History RJT History legacy original_0_57537447-A980-4C62-BADF-1AA4A88379B3.png",
+        "timestamp" : 1793168633.817
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "D440451C-AC37-465F-B3EE-861CE4805ED3.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History exact Copy A1000000-0000-4000-8000-000000000001 original_0_9C389039-0A4C-4435-BFF4-AE8F2527D920.json",
+        "timestamp" : 1793168633.621
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "4EDF7C92-03D4-4727-9757-8033909CB35C.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "History static AX presentation history.text_0_62A5A37B-B5D7-4653-8864-C3946FC1F162.original",
+        "timestamp" : 1793168630.27
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "763FD595-1106-471A-A9BC-877CB158125E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_B31CABB6-581A-46B3-996D-8831571EB8C0.json",
+        "timestamp" : 1793168608.881
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "93B4A927-3E08-4269-A665-609292BDAAD3.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_2716B4A9-CA34-4518-A8A0-2E5657B55076.json",
+        "timestamp" : 1793168606.487
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "2F839215-DE6A-42F7-8997-BB5932273A4D.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_FE82A2B0-CDE4-4708-91C6-456AE0B8A3FA.json",
+        "timestamp" : 1793168606.481
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "F72BA595-D806-4B34-8900-4DE9C016E35D.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_2C1FBF15-5308-4C73-944E-539F641EBC38.json",
+        "timestamp" : 1793168836.029
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "3E1EA7A7-2B59-40C0-8C16-96886871969F.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_7DE90909-2AF9-4EC3-92FB-7FB60EA62C44.json",
+        "timestamp" : 1793168794.993
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "44B9A4CB-94A4-433F-8AD0-1AD07A765C17.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Snippet deletion confirmation_0_D13F024A-E826-4A39-993E-1E4B89FE57CF.png",
+        "timestamp" : 1793168792.178
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "750BD0CB-8F6F-4BFC-A214-790945C0936C.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Literal multiline snippet editor_0_C11C0327-E1CF-4CF5-AF04-14D04FF7709F.png",
+        "timestamp" : 1793168782.731
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "3FF682DB-FFBE-4642-8D27-0BE61E736BA4.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Spoken snippets library_0_2A3DCF22-9D18-44CA-8363-34AD61A49C3E.png",
+        "timestamp" : 1793168774.199
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "9F59DB57-EA79-4474-A834-EBC03A3F20E6.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_5EE5DE6B-D14E-4FCA-A91E-4151C2442588.json",
+        "timestamp" : 1793168738.93
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "CCF35EB9-6726-4C4D-86FA-0192AA0CF692.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_1473F4E1-F729-46BF-AC8C-2F4737F22BB0.json",
+        "timestamp" : 1793168736.646
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "BF70281A-B47E-4ADF-A255-A57F598C5B52.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_FAC742AE-A1AB-498B-A7F6-4EA414F0FD9C.json",
+        "timestamp" : 1793168736.64
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "A3EFF9CF-000E-46E8-ACCF-D37EB2AA9081.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census restored_0_051F9FF2-DBCF-4AEE-B188-16F357A054DE.json",
+        "timestamp" : 1793168915.179
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "6254F7A3-E316-4211-AADE-F98398534748.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Translation target persisted after relaunch_0_35010ACE-D46B-4FA5-8381-B29B2D29A8C5.png",
+        "timestamp" : 1793168911.64
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "4E453400-382A-4FE4-8AC3-11065C4993B4.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_111DFDEE-FCAD-4459-9AF4-FED57B663359.json",
+        "timestamp" : 1793168892.758
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "DA265AD3-EFCF-4492-BA85-AE9A4E5E0145.png",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "Writing actions and ordered translation targets_0_5FD1EA7B-7C3E-484E-940B-E391C05CC6B4.png",
+        "timestamp" : 1793168889.637
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "70092662-062E-4CCC-950C-51FBE1EFC7D0.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census after-launch_0_7CF01836-67A1-4992-96FB-1187BC7E904C.json",
+        "timestamp" : 1793168838.816
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "10F8335C-D320-44E2-A0C6-63892358773E.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census isolated_0_08BE162A-E657-4C71-B89B-657D47B6B7B0.json",
+        "timestamp" : 1793168837.19
+      },
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "950c3b495d709cf9c7ae9a7708139daf5875e602",
+        "deviceName" : "My Mac",
+        "exportedFileName" : "E9DBB96B-F7E7-4569-981C-9FB62E6D1F8D.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "UI shortcut preference census before_0_FB245AC7-772C-4EA1-8B09-58BF2C249688.json",
+        "timestamp" : 1793168837.188
+      }
+    ],
+    "testIdentifier" : "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+    "testIdentifierURL" : "test://com.apple.xcode/VoiceInk/VoiceInkUITests/WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist"
+  }
+]

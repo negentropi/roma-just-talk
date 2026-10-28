@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "cleanup",
+  "date" : "2026-10-28T05:58:13Z",
+  "expected" : "owned surface closed",
+  "observed" : "",
+  "processIdentifier" : 30164,
+  "token" : "RJT-Writing-Live-5D6D1AD7-AE66-4358-A18E-CAFBB8A0A5A0"
+}

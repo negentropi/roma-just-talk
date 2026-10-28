@@ -1,0 +1,9 @@
+macos	Writing, snippet and dictation settings UI	﻿2026-10-28T06:05:12.8160530Z ##[group]Run bash scripts/run-writing-feature-regression.sh ui
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:05:12.8161530Z ^[[36;1mbash scripts/run-writing-feature-regression.sh ui^[[0m
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:05:12.9727130Z shell: /bin/bash -e {0}
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:05:12.9727400Z env:
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:05:12.9727690Z   BASELINE_REF: ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:05:12.9727960Z   RJT_UI_ONLY: false
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:05:12.9728150Z ##[endgroup]
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:29:03.6059290Z Native History permissions must retain both exact auth_value=2 grants for the signed host
+macos	Writing, snippet and dictation settings UI	2026-10-28T06:29:03.7376320Z ##[error]Process completed with exit code 1.

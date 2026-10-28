@@ -1,0 +1,88 @@
+{
+  "checks": {
+    "system-tcc.json": {
+      "query_exit_code": 0,
+      "cmp_exit_code": 0,
+      "expected": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+        }
+      ],
+      "actual": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+        }
+      ],
+      "raw_bytes_equal": true,
+      "expected_signed_grant": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+        }
+      ],
+      "valid": true
+    },
+    "microphone-tcc.json": {
+      "query_exit_code": 0,
+      "cmp_exit_code": 1,
+      "expected": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+        }
+      ],
+      "actual": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 0,
+          "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+        }
+      ],
+      "raw_bytes_equal": false,
+      "expected_signed_grant": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+        }
+      ],
+      "valid": false
+    }
+  },
+  "identity_and_signatures": {
+    "identity": {
+      "equal": true,
+      "sha256": "f2480b37ab901c2d71d357e8335b8cd1f2cd77726ae8993ff20057120b81a068"
+    },
+    "app-signature": {
+      "equal": true,
+      "sha256": "706d90cb059108c33c06251a77812f147e1b1e4b82f201b592498bf367fdeb69"
+    },
+    "test-bundle-signature": {
+      "equal": true,
+      "sha256": "7f99aebbe40047a5a42fa850099770b859246d52f9d8bd0112d7e26418cc457d"
+    }
+  },
+  "phase_limit": "TCCqueriedPREseed,notafterseed,nextbeforeverifyafterUI; cannotattributechangephase.",
+  "actual_handler": "TwoimplicitDontAllowclicksfirstcaset16.15/17.74fromUserNotificationCenter;exacttitle/servicesunretained.",
+  "code_source_input_route": "StartupHALpreRollSourcecapableofinputactivation,notprovenruntimecause.",
+  "no_store_test_failure": "Finalnativehosttestnotattempted;setupguardfailed."
+}

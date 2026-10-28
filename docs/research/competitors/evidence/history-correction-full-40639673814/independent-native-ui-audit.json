@@ -1,0 +1,760 @@
+{
+  "run_id": 40639673814,
+  "source_sha": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+  "mode": "normal-full; this receipt owns only bounded native seed/UI/postguard audit",
+  "verdict": "UI8/8 actualPASS; Copy11 and Static21 exact. Final native semantic verification UNACCEPTED: microphone permission preflight failed; native test NOT attempted.",
+  "seed": {
+    "hostPID": 53829,
+    "actual_PASS_log": "◇ Test liveDictationHistoryUISeed() started.\n✔ Test liveDictationHistoryUISeed() passed after 0.603 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.603 seconds.",
+    "rows": 6,
+    "fields_each": 20,
+    "WordReplacement_raw_fields": 11,
+    "canonical_DTO": true,
+    "VocabularyWord_rows": 1,
+    "stats_baseline": [],
+    "independent_byte_comparisons": {
+      "rows": {
+        "raw_equal": true,
+        "sha256": "98124548c998eebee1df75acf3d11fa022b7dd968151d7b8044952dc6ea1a32c"
+      },
+      "libraries": {
+        "raw_equal": true,
+        "sha256": "adee704a1315bec7f8f993d7b09af6d91e2957d690e671a76a40c59a33ade277"
+      },
+      "stats": {
+        "raw_equal": true,
+        "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+      }
+    },
+    "factory": "VoiceInkApp.createPersistentContainer(schema:logger:)",
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "normal_three_configurations": [
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "Transcription"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "default",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "VocabularyWord",
+          "WordReplacement"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "dictionary",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "SessionMetric"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "stats",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      }
+    ],
+    "host_observed_paths_exact": true,
+    "closed_before_UI": true,
+    "host_exited_no_handles": true,
+    "phase_identity_signature": {
+      "identity": {
+        "seed_before_after_verify_before_equal": true,
+        "receipt_sha256": "f2480b37ab901c2d71d357e8335b8cd1f2cd77726ae8993ff20057120b81a068"
+      },
+      "app-signature": {
+        "seed_before_after_verify_before_equal": true,
+        "receipt_sha256": "706d90cb059108c33c06251a77812f147e1b1e4b82f201b592498bf367fdeb69"
+      },
+      "test-bundle-signature": {
+        "seed_before_after_verify_before_equal": true,
+        "receipt_sha256": "7f99aebbe40047a5a42fa850099770b859246d52f9d8bd0112d7e26418cc457d"
+      }
+    },
+    "phase_identity": [
+      "4237335920c26aa4bcf0d4b4a4964633103f509d173a773aaf52a87b2c7da164  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "2ac6185650be7f08a2880cbbda295a84a1b3a1197c54389ce582dbe435ae6a7a  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests"
+    ],
+    "sourcepins_overlap_exact": {
+      "VoiceInk/Views/History/SaveCorrectionSheet.swift": "50e065718ba2bab5270a2b080389856d594b542ab7db4922f72f7a4b09e87c50",
+      "VoiceInk/Views/History/InlineHistoryView.swift": "ea59ba30be0b9199969d7500dc4afa515a6d227b74277aa5b2a5be7bc784d77f",
+      "VoiceInk/Views/History/TranscriptionDetailView.swift": "396d0a9b9f6599f4aecc8268e43de544a7a052ab0e8c05993f95016f402fe9e6",
+      "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec"
+    }
+  },
+  "after_UI_physical_closure": {
+    "valid": true,
+    "appExecutable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "ownedAppExited": true,
+    "ownedAppPIDs": [],
+    "normalStorePaths": [
+      "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+      "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+      "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+    ],
+    "normalStoresHaveNoOpenDescriptors": true,
+    "checkedBeforeCorrectionFreeze": true
+  },
+  "TCC": {
+    "system-tcc.json": {
+      "initial_and_preseed": {
+        "service": "kTCCServiceAccessibility",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+      },
+      "postUI_preverify": {
+        "service": "kTCCServiceAccessibility",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+      }
+    },
+    "microphone-tcc.json": {
+      "initial_and_preseed": {
+        "service": "kTCCServiceMicrophone",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+      },
+      "postUI_preverify": {
+        "service": "kTCCServiceMicrophone",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 0,
+        "csreq": "FADE0C000000002800000001000000080000001453B66FD80779D8034C981FD98CD87A5FDC209604"
+      }
+    }
+  },
+  "TCC_boundary": "Initial and seed-phase queries are preseed, not postseed. PostUI/preverify mic auth0 vs2; AX2 same; client/type/csreq same. Cannot attribute change to seed/UI/specific interaction.",
+  "UI": {
+    "states": {
+      "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()": "Success",
+      "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()": "Success",
+      "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()": "Success",
+      "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()": "Success",
+      "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()": "Success",
+      "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()": "Success",
+      "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()": "Success",
+      "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()": "Success"
+    },
+    "each_once": true,
+    "suite_seconds": 1279.56,
+    "Copy": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "rowID": "A1000000-0000-4000-8000-000000000006",
+        "variant": "recognized",
+        "seedfield": "recognitionText",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          20,
+          21
+        ],
+        "sha256": "4ab75888df608ee56d0f05bced78e85ebb4a9a1b9340e7b7e8ee0d1dab4e6482"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "rowID": "A1000000-0000-4000-8000-000000000006",
+        "variant": "recognized",
+        "seedfield": "recognitionText",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          24,
+          25
+        ],
+        "sha256": "c6aa704257cde8bbf41025468f71ae03ad0a42b804d0213f75a0f1f6fbebb8fb"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "rowID": "A1000000-0000-4000-8000-000000000005",
+        "variant": "recognized",
+        "seedfield": "recognitionText",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          31,
+          32
+        ],
+        "sha256": "c612ce1a631989c12cfb6621f647e4f1ac2bc35fd7673f1105d747afae530048"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "rowID": "A1000000-0000-4000-8000-000000000005",
+        "variant": "recognized",
+        "seedfield": "recognitionText",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          35,
+          36
+        ],
+        "sha256": "f94280258a1a918c359fbee465b891cec3b4bb3069f2040f5077824016ec2c99"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000001",
+        "variant": "original",
+        "seedfield": "text",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          42,
+          43
+        ],
+        "sha256": "ed8cc01dbccfb8fb788f307b92a9c928cb2cd08377360237486cc2f8d54f8835"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000001",
+        "variant": "enhanced",
+        "seedfield": "enhancedText",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          44,
+          45
+        ],
+        "sha256": "b54dc6fe5a9ffaabd10991b68d326d1c27d21cc8d57609a2836806c551c2431e"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000002",
+        "variant": "recognized",
+        "seedfield": "recognitionText",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          46,
+          47
+        ],
+        "sha256": "c859b2d7f50cb3b4795492687b52a5dbc3fe5d768904b2376206ec8b3fb4533c"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000002",
+        "variant": "original",
+        "seedfield": "text",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          48,
+          49
+        ],
+        "sha256": "8d70fa1f45c077b04a3b7abf0242daefa1ab4a0ba4327b63e068af9a475ece4e"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000002",
+        "variant": "enhanced",
+        "seedfield": "enhancedText",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          50,
+          51
+        ],
+        "sha256": "f5f45dc0acdd24a14cbedf372ce941887e4c598a82b161a7f64e28a753725486"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000003",
+        "variant": "original",
+        "seedfield": "text",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          52,
+          53
+        ],
+        "sha256": "3a0680e754157de152a412138adc06f81490f6577c5c7d18c7ce64e09ab6ded6"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000004",
+        "variant": "original",
+        "seedfield": "text",
+        "UTF8_UTF16_exact": true,
+        "generation": [
+          54,
+          55
+        ],
+        "sha256": "2ab689f58fd410df13addbe66024ca743d275a4c1592ed9ebc88a2df34f42949"
+      }
+    ],
+    "Static21": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.text.recognized",
+        "exact": true,
+        "actual": "RJT Correction retained\r\nOrbit, Ltd. — Café 👩🏽‍💻\r\n",
+        "sha256": "792485d8c16f7e4a312b10b84dd7de9945c154592c66748f0b550320f758b509"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.sourceText",
+        "exact": true,
+        "actual": "RJT Correction retained\r\nOrbit, Ltd. — Café 👩🏽‍💻\r\n",
+        "sha256": "5fd27f0171b7130a9a56677f3c8588c0fe169b2e1231e569ccdadb67c81e4629"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.original",
+        "exact": true,
+        "actual": "Orbit, Ltd.",
+        "sha256": "75bcf566d7500f96ecd1c0bcabe9e4a51ce29f5de9fb3c9a54a44a83952f7689"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.replacement",
+        "exact": true,
+        "actual": "  Kept, Café 👩🏽‍💻\r\n  ",
+        "sha256": "8f9ccf43e84a9a6f4bdddaaf14bbf0046883fe3c2a5ee3a76784c9c2b597cadf"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.text.recognized",
+        "exact": true,
+        "actual": "RJT Correction retained\r\nOrbit, Ltd. — Café 👩🏽‍💻\r\n",
+        "sha256": "792485d8c16f7e4a312b10b84dd7de9945c154592c66748f0b550320f758b509"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.text.recognized",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "e5159a95f13ed269bd11b2b48180089d4aca041c280a28acd1044f4b0143e1ab"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.sourceText",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "5425043e90f45f951cde907a7f1d862a7a86ed76d5434dab22b46bd3ee8ee9fd"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.original",
+        "exact": true,
+        "actual": "Acme, Inc.",
+        "sha256": "be54097254438af0583f7f0cdef2b086baaba101557f1dfc4abf3f30e11b2dbc"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.replacement",
+        "exact": true,
+        "actual": "  RJT, Café 👩🏽‍💻\r\n  ",
+        "sha256": "84ed536aa20ba9df682217b536fbd76a10fa2bd42b0fc9b6a3cb839377b358fb"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.text.recognized",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "e5159a95f13ed269bd11b2b48180089d4aca041c280a28acd1044f4b0143e1ab"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.sourceText",
+        "exact": true,
+        "actual": "RJT Correction managed\r\nAcme, Inc. meets Acme, Inc. — Café 👩🏽‍💻\r\n",
+        "sha256": "5425043e90f45f951cde907a7f1d862a7a86ed76d5434dab22b46bd3ee8ee9fd"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.replacement",
+        "exact": true,
+        "actual": "  RJT, Café 👩🏽‍💻\r\n  ",
+        "sha256": "8c358fdb7ace15f9060a58d53390b348ed9a80ada78a80f413a757bab06fdf13"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.original",
+        "exact": true,
+        "actual": "Acme, Inc.",
+        "sha256": "be54097254438af0583f7f0cdef2b086baaba101557f1dfc4abf3f30e11b2dbc"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.replacement",
+        "exact": true,
+        "actual": "  RJT, Café 👩🏽‍💻\r\n  ",
+        "sha256": "84ed536aa20ba9df682217b536fbd76a10fa2bd42b0fc9b6a3cb839377b358fb"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "exact": true,
+        "actual": "RJT History legacy\r\nCafé 👩🏽‍💻\r\n",
+        "sha256": "fe5214324db83f2e0c1b2d1418e554a651ab1ace4636d34cc31d437634686eda"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.enhanced",
+        "exact": true,
+        "actual": "RJT legacy enhanced — 42",
+        "sha256": "75fa0587c739f8cd7acc75e78fb261a3de60e649143cbe8c056bd9634a26b4a6"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.recognized",
+        "exact": true,
+        "actual": "RJT History recognized\r\nCafé 👩🏽‍💻 42\r\n",
+        "sha256": "cd7cf79528ed8599b0a88c8994bb85c12642ec7df6f96048a8c21ff8dcc037ee"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "exact": true,
+        "actual": "RJT History recognized\r\nCafé 👩🏽‍💻 42\r\n",
+        "sha256": "478811eec1d3af25aa912105ac1111ff1f31700852a4838a83c90aee9b0b4828"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.enhanced",
+        "exact": true,
+        "actual": "RJT Clarity polished — Café 👩🏽‍💻 42\r\n",
+        "sha256": "1e98f280c721e06e0a38728935a9c005134b2404ce33ecc0e205d531a6285fef"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "exact": true,
+        "actual": "RJT History fallback\r\nCafé 👩🏽‍💻\r\n",
+        "sha256": "67f0c5134f98fc92b4f9630c18b3063c1425eecb0cf038bbc5a3bcd0d51076fe"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "identifier": "history.text.original",
+        "exact": true,
+        "actual": "RJT History unknown\r\nCafé 👩🏽‍💻\r\n",
+        "sha256": "3e4dd3e517faa301882d8a710f77779bad2eaefd7fcb26863cb303724e623938"
+      }
+    ],
+    "UUID_pairs": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "history.correction.preview.record.id",
+        "UUID": "8EB9DC0A-94C8-47D3-AE6C-43EE5BB3F4EE",
+        "stable": true,
+        "role": 1,
+        "before_frame": "{{242, 809}, {295, 13}}",
+        "after_frame": "{{242, 489}, {295, 13}}",
+        "own_value": "",
+        "label": "ID, 8EB9DC0A-94C8-47D3-AE6C-43EE5BB3F4EE"
+      },
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "identifier": "dictionary.replacement.edit.id",
+        "UUID": "8EB9DC0A-94C8-47D3-AE6C-43EE5BB3F4EE",
+        "stable": true,
+        "role": 48,
+        "before_frame": "{{288, 250}, {290, 13}}",
+        "after_frame": "{{288, 250}, {290, 13}}",
+        "own_value": "ID, 8EB9DC0A-94C8-47D3-AE6C-43EE5BB3F4EE",
+        "label": ""
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "UUID": "B6AE8743-A43E-49E1-AA43-03A070FE162F",
+        "stable": true,
+        "role": 1,
+        "before_frame": "{{242, 855}, {295, 13}}",
+        "after_frame": "{{242, 535}, {295, 13}}",
+        "own_value": "",
+        "label": "ID, B6AE8743-A43E-49E1-AA43-03A070FE162F"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "UUID": "EB16506C-12CE-441D-832E-C386462DB79A",
+        "stable": true,
+        "role": 1,
+        "before_frame": "{{242, 855}, {295, 13}}",
+        "after_frame": "{{242, 535}, {295, 13}}",
+        "own_value": "",
+        "label": "ID, EB16506C-12CE-441D-832E-C386462DB79A"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "UUID": "70CBC514-DC5A-414B-BE90-9746633AD1FA",
+        "stable": true,
+        "role": 1,
+        "before_frame": "{{242, 728}, {295, 13}}",
+        "after_frame": "{{242, 568}, {295, 13}}",
+        "own_value": "",
+        "label": "ID, 70CBC514-DC5A-414B-BE90-9746633AD1FA"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "history.correction.preview.record.id",
+        "UUID": "70CBC514-DC5A-414B-BE90-9746633AD1FA",
+        "stable": true,
+        "role": 1,
+        "before_frame": "{{242, 568}, {295, 13}}",
+        "after_frame": "{{242, 568}, {295, 13}}",
+        "own_value": "",
+        "label": "ID, 70CBC514-DC5A-414B-BE90-9746633AD1FA"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "identifier": "dictionary.replacement.edit.id",
+        "UUID": "70CBC514-DC5A-414B-BE90-9746633AD1FA",
+        "stable": true,
+        "role": 48,
+        "before_frame": "{{288, 250}, {286, 13}}",
+        "after_frame": "{{288, 250}, {286, 13}}",
+        "own_value": "ID, 70CBC514-DC5A-414B-BE90-9746633AD1FA",
+        "label": ""
+      }
+    ],
+    "native_delete_Sheet_census": "window id=com.negentropi.RomaJustTalk.mainWindow frame=(37.0, 32.0, 950.0, 677.0)\nsheets=1 id=_NS:87 role=5 label=alert frame=(382.0, 301.0, 260.0, 138.0)\nconfirm count=1 label=Delete enabled=true hittable=true frame=(515.0, 394.0, 112.0, 30.0)\ncancel count=1 label=Cancel enabled=true hittable=true frame=(397.0, 394.0, 112.0, 30.0)\ntexts=[\"Delete Selected Items?\", \"This action cannot be undone. Are you sure you want to delete 1 item?\"]",
+    "correction_receipts": {
+      "managed": {
+        "sha256": "2bf71bc725553953f8ac15cc7d837a8a223184b46918cc97a85f9f5f556091bc",
+        "receipt": {
+          "approvedAt": 1793168523.1500611,
+          "caseName": "managed",
+          "completedAt": 1793168604.801198,
+          "original": {
+            "text": "Acme, Inc.",
+            "utf8": [
+              65,
+              99,
+              109,
+              101,
+              44,
+              32,
+              73,
+              110,
+              99,
+              46
+            ],
+            "utf16": [
+              65,
+              99,
+              109,
+              101,
+              44,
+              32,
+              73,
+              110,
+              99,
+              46
+            ]
+          },
+          "outcome": "deleted",
+          "previewedID": "70CBC514-DC5A-414B-BE90-9746633AD1FA",
+          "previewStartedAt": 1793168503.7930431,
+          "replacement": {
+            "text": "  Edited, Café 👩🏽‍💻\r\n  ",
+            "utf8": [
+              32,
+              32,
+              69,
+              100,
+              105,
+              116,
+              101,
+              100,
+              44,
+              32,
+              67,
+              97,
+              102,
+              101,
+              204,
+              129,
+              32,
+              240,
+              159,
+              145,
+              169,
+              240,
+              159,
+              143,
+              189,
+              226,
+              128,
+              141,
+              240,
+              159,
+              146,
+              187,
+              13,
+              10,
+              32,
+              32
+            ],
+            "utf16": [
+              32,
+              32,
+              69,
+              100,
+              105,
+              116,
+              101,
+              100,
+              44,
+              32,
+              67,
+              97,
+              102,
+              101,
+              769,
+              32,
+              55357,
+              56425,
+              55356,
+              57341,
+              8205,
+              55357,
+              56507,
+              13,
+              10,
+              32,
+              32
+            ]
+          },
+          "sourceSHA": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+          "sourceTranscriptionID": "A1000000-0000-4000-8000-000000000005",
+          "sourceVariant": "recognition",
+          "version": 1
+        }
+      },
+      "retained": {
+        "sha256": "4d5f763072920894c5c31dba692aa2e2f64a1470d54146b405d639dd518315c6",
+        "receipt": {
+          "approvedAt": 1793167707.283695,
+          "caseName": "retained",
+          "completedAt": 1793167787.5239391,
+          "original": {
+            "text": "Orbit, Ltd.",
+            "utf8": [
+              79,
+              114,
+              98,
+              105,
+              116,
+              44,
+              32,
+              76,
+              116,
+              100,
+              46
+            ],
+            "utf16": [
+              79,
+              114,
+              98,
+              105,
+              116,
+              44,
+              32,
+              76,
+              116,
+              100,
+              46
+            ]
+          },
+          "outcome": "retained-source-deleted",
+          "previewedID": "8EB9DC0A-94C8-47D3-AE6C-43EE5BB3F4EE",
+          "previewStartedAt": 1793167691.8780298,
+          "replacement": {
+            "text": "  Kept, Café 👩🏽‍💻\r\n  ",
+            "utf8": [
+              32,
+              32,
+              75,
+              101,
+              112,
+              116,
+              44,
+              32,
+              67,
+              97,
+              102,
+              101,
+              204,
+              129,
+              32,
+              240,
+              159,
+              145,
+              169,
+              240,
+              159,
+              143,
+              189,
+              226,
+              128,
+              141,
+              240,
+              159,
+              146,
+              187,
+              13,
+              10,
+              32,
+              32
+            ],
+            "utf16": [
+              32,
+              32,
+              75,
+              101,
+              112,
+              116,
+              44,
+              32,
+              67,
+              97,
+              102,
+              101,
+              769,
+              32,
+              55357,
+              56425,
+              55356,
+              57341,
+              8205,
+              55357,
+              56507,
+              13,
+              10,
+              32,
+              32
+            ]
+          },
+          "sourceSHA": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+          "sourceTranscriptionID": "A1000000-0000-4000-8000-000000000006",
+          "sourceVariant": "recognition",
+          "version": 1
+        }
+      }
+    },
+    "source_bound_passes": "Retained actualconfirm/sourceDeleted provenance/relaunch/edit identity; managed canonicalchange/explicitapprove/toggle/edit/relaunch/delete. Actual8Success corroborates exact-source assertions.",
+    "permission_interruption": "Raw log first case t16.15 and17.74 implicit Don’t Allow via UserNotificationCenter. Dialog actual title/service unretained; no causal microphone claim."
+  },
+  "postverify": {
+    "valid": false,
+    "phase": "verify",
+    "classification": "blocked",
+    "testAttempted": false,
+    "boundary": "native-permissions",
+    "driver_exit_code": 1
+  },
+  "limits": [
+    "Physical after-UI app exit/no store descriptors is closure proof, not final semantic readback.",
+    "Final hidden native all-field/11field correction/stat verification never attempted; UI exact values do not substitute.",
+    "UI runner/app normal after-signature receipt missing due permission guard. Seed/verify-before identity covers app+native bundle only; no runner stability claim.",
+    "Ordinary unit/Core/package/regression readiness owned by separate reviewer, not duplicated here.",
+    "Release skipped; no full-gate/release acceptance.",
+    "Archive integrity inherited from one-fetch owner; no download/build/runtime/subagents or production code review; sole owned receipt write."
+  ],
+  "audit_findings": []
+}

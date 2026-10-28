@@ -72,11 +72,11 @@ jobs:
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ steps.deps-cache.outputs.cache-primary-key }}
 
-      - name: Build once, isolate process termination, then execute remaining five cases
+      - name: Build once, isolate process termination, then execute remaining six cases
         if: ${{ !cancelled() && steps.prepare.outcome == 'success' && steps.dependencies.outcome == 'success' }}
         run: bash scripts/run-writing-undo-native-check.sh native
 
-      - name: Recheck six receipts, closed execution and discovery hosts, frozen signed app
+      - name: Recheck seven receipts, closed execution and discovery hosts, frozen signed app
         if: ${{ !cancelled() && steps.prepare.outcome == 'success' && steps.dependencies.outcome == 'success' }}
         run: bash scripts/run-writing-undo-native-check.sh verify
 

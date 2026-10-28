@@ -38,6 +38,7 @@ oracle_paths = ['VoiceInkTests/WritingUndoLiveTests.swift', 'VoiceInkTests/Writi
 lock_path = 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved'
 lock_sha = 'bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f'
 bundle_id = 'com.negentropi.RomaJustTalk'
+negative_case = 'liveWritingUndoSafariRejectsNormalizedDecomposedOutput'
 cases = [
     'liveWritingUndoTextEditRejectsTerminatedProcess',
     'liveWritingUndoTextEditRestoresExactUnicodeSelection',
@@ -45,6 +46,7 @@ cases = [
     'liveWritingUndoSafariKeepsNewClipboardGeneration',
     'liveWritingUndoRefusesTextCaretAndWindowDrift',
     'liveWritingUndoLatestOwnerAndCancellation',
+    negative_case,
 ]
 phases = {'process': cases[:1], 'remaining': cases[1:]}
 stages = dict(zip(cases, [
@@ -55,6 +57,7 @@ stages = dict(zip(cases, [
     ['forward', 'new-copy', 'restored', 'clipboard'],
     ['caret-forward', 'caret-refused', 'text-forward', 'text-refused', 'window-forward', 'window-refused'],
     ['first-forward', 'second-forward', 'canceled-before-attempt', 'latest-restored', 'second-undo-refused'],
+    ['nfd-before', 'nfd-unconfirmed', 'undo-unavailable'],
 ]))
 case_checks = dict(zip(cases, [
     ['differentApplicationInstance', 'terminatedProcessRejected'],
@@ -63,6 +66,7 @@ case_checks = dict(zip(cases, [
     ['newClipboardGeneration', 'newerCopySurvivedBothRestorationOwners'],
     ['sameProcessDifferentWindow', 'driftNeverRetargetedOrMutated'],
     ['newPendingDeliveryOwnsBusyState', 'leaseOverlapPreservedPreviousCapability', 'onlyLatestRewriteWasUndoable'],
+    ['exactDecomposedOutputRemainedUnconfirmed', 'unconfirmedOutputCannotArmUndo', 'unavailableUndoDidNotMutate'],
 ]))
 clipboard_stages = set(['restore-on-clipboard', 'restore-off-current-copy', 'restore-off-clipboard', 'new-copy', 'clipboard'])
 clipboard_argument_keys = {'restoreClipboardAfterPaste', 'clipboardRestoreDelay', 'pasteMethod', 'useAppleScriptPaste'}
@@ -465,6 +469,87 @@ def valid_clipboard(value):
     return names == [sorted(['public.utf8-plain-text', 'com.negentropi.undo-native.binary']), ['com.negentropi.undo-native.second']]
 
 
+def utf16(text):
+    raw = text.encode('utf-16-le')
+    return [int.from_bytes(raw[index:index + 2], 'little') for index in range(0, len(raw), 2)]
+
+
+def negative_expectations():
+    prefix, suffix = 'Before 👩🏽‍💻 ', ' after 🧑‍🚀.\n'
+    original = utf16(prefix + 'target e\u0301' + suffix)
+    requested = utf16(prefix + 'Unconfirmed e\u0301 😀' + suffix)
+    observed = utf16(prefix + 'Unconfirmed é 😀' + suffix)
+    original_range = {'location': len(utf16(prefix)), 'length': len(utf16('target e\u0301'))}
+    requested_caret = {'location': len(utf16(prefix + 'Unconfirmed e\u0301 😀')), 'length': 0}
+    observed_caret = {'location': len(utf16(prefix + 'Unconfirmed é 😀')), 'length': 0}
+    return original, requested, observed, original_range, requested_caret, observed_caret
+
+
+def negative_observation_errors(value):
+    errors = []
+    def check(condition, message):
+        if not condition:
+            errors.append(negative_case + ': ' + message)
+    original, requested, observed, original_range, requested_caret, observed_caret = negative_expectations()
+    extra = value.get('extra', {})
+    check(isinstance(extra, dict), 'Negative-boundary metadata missing')
+    if not isinstance(extra, dict):
+        return errors
+    check(extra.get('negativeRequestedFullUTF16') == requested and extra.get('negativeObservedFullUTF16') == observed,
+        'Requested NFD and observed NFC code units must match their exact source literals')
+    check(extra.get('negativeRequestedCaret') == requested_caret and extra.get('negativeObservedCaret') == observed_caret,
+        'Normalized output must retain its actual one-code-unit-shorter collapsed caret')
+    check(requested != observed and requested_caret['location'] == observed_caret['location'] + 1,
+        'Negative fixture must exercise distinct UTF16 output')
+    check(extra.get('negativeOutcome') == 'attemptedUnconfirmed' and extra.get('negativeFailure') == 'replacementUnconfirmed',
+        'Normalized output must remain an explicit unconfirmed delivery')
+    check(extra.get('negativeUndoOutcome') == 'unavailable' and type(extra.get('negativeAttemptCallbacksAfterUndo')) is int
+        and extra['negativeAttemptCallbacksAfterUndo'] == 1, 'Unavailable Undo outcome and singular forward callback count required')
+    observations = value.get('observations', [])
+    by_stage = {item.get('name'): item for item in observations if isinstance(item, dict)} if isinstance(observations, list) else {}
+    for name in stages[negative_case]:
+        item = by_stage.get(name, {})
+        expected = original if name == 'nfd-before' else observed
+        selected = original_range if name == 'nfd-before' else observed_caret
+        check(item.get('sourceUTF16') == original and item.get('expectedUTF16') == item.get('observedUTF16') == expected,
+            'Negative stage requires literal full-field readback: ' + name)
+        check(item.get('range') == item.get('expectedRange') == selected, 'Negative stage range differs: ' + name)
+    diagnostics = extra.get('deliveryDiagnostics', [])
+    check(isinstance(diagnostics, list) and len(diagnostics) == 2 and all(isinstance(item, dict) for item in diagnostics),
+        'Exactly one before-capture and after-delivery diagnostic required')
+    if not isinstance(diagnostics, list) or len(diagnostics) != 2 or not all(isinstance(item, dict) for item in diagnostics):
+        return errors
+    check([item.get('phase') for item in diagnostics] == ['before-capture', 'after-delivery'], 'Wrong delivery diagnostic phases')
+    after = diagnostics[1]
+    failure = after.get('failure', {})
+    check(after.get('outcome') == 'attemptedUnconfirmed' and isinstance(failure, dict)
+        and failure.get('type') == 'VoiceInk.WritingTarget.Failure' and failure.get('description') == 'replacementUnconfirmed',
+        'Actual typed delivery failure not retained')
+    for index, item in enumerate(diagnostics):
+        check(item.get('outputUTF16') == utf16('Unconfirmed e\u0301 😀') and item.get('expectedFullUTF16') == requested,
+            'Delivery diagnostic lost the exact requested decomposed output')
+        check(item.get('observedUTF16') == (original if index == 0 else observed)
+            and item.get('range') == (original_range if index == 0 else observed_caret), 'Delivery diagnostic value/range differs')
+        check(type(item.get('attemptCallbacks')) is int and item['attemptCallbacks'] == index
+            and type(item.get('confirmationCallbacks')) is int and item['confirmationCallbacks'] == 0, 'Negative callback counts differ')
+        check(item.get('pid') == by_stage.get('nfd-before', {}).get('pid') and item.get('token') == by_stage.get('nfd-before', {}).get('token')
+            and item.get('bundleIdentifier') == 'com.apple.Safari' and item.get('usesSystemPaste') is True, 'Negative target/route identity differs')
+        check(item.get('applicationTerminated') is False and all(item.get(key) is True for key in
+            ['currentApplicationInstanceMatches', 'sameFrontmostApplication', 'windowPresent', 'sameEditorWindow',
+             'ownsRetainedSurface', 'sameGlobalFocusedEditor', 'globalFocusedElementReturned', 'globalFocusIsAXElement']),
+            'Actual owned target/focus not retained')
+        check(all(type(item.get(key)) is bool for key in ['sameApplicationFocusedEditor', 'sameFocusedWindow']),
+            'Application focus diagnostics missing')
+        ax = item.get('AXErrors', {})
+        check(isinstance(ax, dict) and all(type(ax.get(key)) is int for key in
+            ['windows', 'windowTitle', 'documentURL', 'editorWindow', 'globalFocusedElement', 'applicationFocusedElement',
+             'focusedWindow', 'value', 'selectedRange', 'selectedText']), 'Raw AX error diagnostics incomplete')
+        check(isinstance(ax, dict) and all(type(ax.get(key)) is int and ax[key] == 0 for key in
+            ['windows', 'editorWindow', 'globalFocusedElement', 'value', 'selectedRange']),
+            'Required negative-boundary AX reads did not succeed')
+    return errors
+
+
 def observation_errors(name, value, executable, observed_pids):
     errors = []
     def check(condition, message):
@@ -479,7 +564,10 @@ def observation_errors(name, value, executable, observed_pids):
     required = {'completedStages', 'exactTextObservations', 'exactRangeObservations', 'expectedEditorRoutes', *case_checks[name]}
     check(isinstance(checks, dict) and required.issubset(checks) and all(item is True for item in checks.values()), 'Actual case checks missing or false')
     extra = value.get('extra', {})
-    check(isinstance(extra, dict) and all(type(extra.get(key)) is int and extra[key] == 1 for key in ['latestForwardAttempts', 'latestForwardConfirmations']), 'Actual forward attempt/confirmation must be singular')
+    confirmations = 0 if name == negative_case else 1
+    check(isinstance(extra, dict) and type(extra.get('latestForwardAttempts')) is int and extra['latestForwardAttempts'] == 1
+        and type(extra.get('latestForwardConfirmations')) is int and extra['latestForwardConfirmations'] == confirmations,
+        'Actual forward attempt/confirmation counts differ from this exact case contract')
     observations = value.get('observations', [])
     if not isinstance(observations, list) or not all(isinstance(item, dict) for item in observations):
         return errors + [name + ': Invalid observations']
@@ -521,6 +609,8 @@ def observation_errors(name, value, executable, observed_pids):
         observed = {item['name']: item for item in observations}
         check(observed['process-before'].get('pid') == observed['process-forward'].get('pid') == observed['process-terminated'].get('pid'), 'Original owned process identity differs')
         check(observed['process-before'].get('token') == observed['process-forward'].get('token') == observed['process-terminated'].get('token') != observed['replacement-process-refused'].get('token'), 'Replacement owned window must differ')
+    if name == negative_case:
+        errors.extend(negative_observation_errors(value))
     return errors
 
 
@@ -534,6 +624,23 @@ def closed_launches(directory, host, *, execution):
     require(all(item['observed_live'] is True and item['executable_path'] == host['executable_path'] and host['executable_path'] in item['mapped_text_paths'] and item['started_at'] for item in live['hosts']), 'Actual mapped-code launch evidence missing')
     require(closed['valid'] and all(closed[key] is True for key in ['all_observed_hosts_exited', 'exact_executable_census_empty', 'exact_executable_has_no_open_descriptors']), 'Native host closure missing')
     return live['hosts']
+
+
+def editor_startup_errors(rows, names):
+    expected = {'com.apple.TextEdit': 2, 'com.apple.Safari': 0} if names == cases[:1] else {'com.apple.TextEdit': 3, 'com.apple.Safari': 4}
+    errors = []
+    if not isinstance(rows, list) or len(rows) != sum(expected.values()) or not all(isinstance(row, dict) for row in rows):
+        return ['Exactly two process-phase or seven remaining-phase owned editor startups are required']
+    tokens = [row.get('token') for row in rows]
+    if not all(isinstance(token, str) and token.startswith('RJT-Writing-Live-') for token in tokens) or len(set(tokens)) != len(tokens):
+        errors.append('Owned editor startup tokens must be distinct')
+    counts = {kind: sum(row.get('bundleIdentifier') == kind for row in rows) for kind in expected}
+    if counts != expected:
+        errors.append('Owned TextEdit/Safari fixture counts differ')
+    if any(row.get('checkpoint') != 'fixture-startup' or row.get('finalStage') != 'ready' or row.get('failure') is not None
+        or type(row.get('processIdentifier')) is not int or row['processIdentifier'] <= 0 for row in rows):
+        errors.append('Every owned editor startup must retain actual ready state and process identity')
+    return errors
 
 
 def phase_result(directory, names, host):
@@ -557,9 +664,15 @@ def phase_result(directory, names, host):
         require(not re.search(r'\bTest \w+\(\) started\.', (root / 'enumeration.log').read_text(errors='replace')), 'Retained enumeration executed tests')
     selection = json.loads((directory / 'selection/receipt.json').read_text())
     require(selection['valid'] and selected_identifiers(selection['enabled'], selection['disabled'], names) == selection['requested'] and len(selection['enabled']) == len(names), 'Retained exact selection invalid')
+    startup_paths = sorted((directory / 'editor-observations').glob('*-fixture-startup.json'))
+    startups = [json.loads(path.read_text()) for path in startup_paths]
+    verdict['errors'].extend(editor_startup_errors(startups, names))
+    startup_tokens = {row.get('token') for row in startups}
+    observed_tokens = {item.get('token') for path in paths for item in json.loads(path.read_text()).get('observations', []) if 'token' in item}
+    require(observed_tokens.issubset(startup_tokens), 'Native observations must refer to actual owned editor startups')
     verdict.update({'valid': not verdict['errors'], 'classification': 'passed' if not verdict['errors'] else 'invalid-or-failed',
         'observation_sha256': {path.name: digest(path.read_bytes()) for path in paths}, 'native_host_launch': launches[0],
-        'enumeration_host_launches': enumeration_hosts})
+        'enumeration_host_launches': enumeration_hosts, 'owned_editor_startup_sha256': {path.name: digest(path.read_bytes()) for path in startup_paths}})
     return verdict
 
 
@@ -660,13 +773,44 @@ def configuration_self_test():
             os.environ['RUNNER_TEMP'] = saved_temporary
 
 
+def negative_self_test_fixture(value):
+    original, requested, observed, original_range, requested_caret, observed_caret = negative_expectations()
+    extra = value['extra']
+    extra.update(latestForwardConfirmations=0, negativeRequestedFullUTF16=requested, negativeObservedFullUTF16=observed,
+        negativeRequestedCaret=requested_caret, negativeObservedCaret=observed_caret, negativeOutcome='attemptedUnconfirmed',
+        negativeFailure='replacementUnconfirmed', negativeUndoOutcome='unavailable', negativeAttemptCallbacksAfterUndo=1)
+    for item in value['observations']:
+        before = item['name'] == 'nfd-before'
+        item.update(sourceUTF16=original, expectedUTF16=original if before else observed, observedUTF16=original if before else observed,
+            range=original_range if before else observed_caret, expectedRange=original_range if before else observed_caret)
+    first = value['observations'][0]
+    diagnostics = []
+    for index, phase in enumerate(['before-capture', 'after-delivery']):
+        item = {'phase': phase, 'pid': first['pid'], 'token': first['token'], 'bundleIdentifier': 'com.apple.Safari',
+            'applicationTerminated': False, 'usesSystemPaste': True, 'outputUTF16': utf16('Unconfirmed e\u0301 😀'),
+            'expectedFullUTF16': requested, 'observedUTF16': original if index == 0 else observed,
+            'range': original_range if index == 0 else observed_caret, 'attemptCallbacks': index, 'confirmationCallbacks': 0,
+            **{key: True for key in ['currentApplicationInstanceMatches', 'sameFrontmostApplication', 'windowPresent',
+                'sameEditorWindow', 'ownsRetainedSurface', 'sameGlobalFocusedEditor', 'globalFocusedElementReturned',
+                'globalFocusIsAXElement', 'sameApplicationFocusedEditor', 'sameFocusedWindow']},
+            'AXErrors': {key: 0 for key in ['windows', 'windowTitle', 'documentURL', 'editorWindow', 'globalFocusedElement',
+                'applicationFocusedElement', 'focusedWindow', 'value', 'selectedRange', 'selectedText']}}
+        # Safari does not expose a document URL for this local textarea.
+        item['AXErrors']['documentURL'] = -25212
+        if index:
+            item.update(outcome='attemptedUnconfirmed', failure={'type': 'VoiceInk.WritingTarget.Failure',
+                'description': 'replacementUnconfirmed'})
+        diagnostics.append(item)
+    extra['deliveryDiagnostics'] = diagnostics
+
+
 def self_test():
     good = '\n'.join('Test ' + name + '() started.\nTest ' + name + '() passed after 1 second.' for name in cases)
-    good += '\nTest run with 6 tests in 1 suite passed'
+    good += '\nTest run with ' + str(len(cases)) + ' tests in 1 suite passed'
     require(classify(good, 0, cases)['valid'], 'Valid exact log rejected')
     require(classify(good + '\n[CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit', 0, cases)['valid'], 'Benign app startup skipped message rejected')
     for text, code in [(good, 1), (good.replace(cases[0], cases[1]), 0), (good + '\nTest ' + cases[0] + '() started.', 0),
-                       (good.replace('6 tests', '0 tests'), 0), (good + '\nTesting cancelled', 0),
+                       (good.replace(str(len(cases)) + ' tests', '0 tests'), 0), (good + '\nTesting cancelled', 0),
                        (good.replace('passed after', 'skipped after', 1), 0), (good + '\nrecorded an issue', 0)]:
         require(not classify(text, code, cases)['valid'], 'Malformed result accepted')
     one = 'VoiceInkTests/VoiceInkTests/' + cases[0]
@@ -682,6 +826,18 @@ def self_test():
                        {'type': 'public.utf8-plain-text', 'dataBase64': 'YQ=='}]},
             {'types': [{'type': 'com.negentropi.undo-native.second', 'dataBase64': 'Yg=='}]}]
     require(valid_clipboard(clip) and not valid_clipboard([]), 'Clipboard structural classifier invalid')
+    for phase, names in phases.items():
+        kinds = ['com.apple.TextEdit'] * (2 if phase == 'process' else 3) + ['com.apple.Safari'] * (0 if phase == 'process' else 4)
+        rows = [{'checkpoint': 'fixture-startup', 'finalStage': 'ready', 'failure': None, 'token': 'RJT-Writing-Live-' + str(uuid.uuid4()),
+            'bundleIdentifier': kind, 'processIdentifier': 100 + index} for index, kind in enumerate(kinds)]
+        require(not editor_startup_errors(rows, names), 'Valid owned-editor fixture census rejected')
+        require(editor_startup_errors(rows[:-1], names), 'Missing owned-editor startup accepted')
+        bad = copy.deepcopy(rows); bad[1]['token'] = bad[0]['token']
+        require(editor_startup_errors(bad, names), 'Duplicate owned-editor startup accepted')
+        bad = copy.deepcopy(rows); bad[0]['finalStage'] = 'failed'
+        require(editor_startup_errors(bad, names), 'Unready owned-editor startup accepted')
+        bad = copy.deepcopy(rows); bad[0]['bundleIdentifier'] = 'com.foreign.Editor'
+        require(editor_startup_errors(bad, names), 'Wrong owned-editor bundle accepted')
     count = 0
     for name in cases:
         value = {'schemaVersion': 1, 'caseName': name, 'completed': True, 'hostPID': 42, 'hostExecutablePath': '/fixture/app',
@@ -703,6 +859,8 @@ def self_test():
                         windowPresent=True, expectsFocused=stage != 'window-refused', sameProcess=True, sameFocusedEditor=stage != 'window-refused',
                         usesSystemPaste=name in cases[2:4] + cases[5:], expectedUsesSystemPaste=name in cases[2:4] + cases[5:])
             value['observations'].append(item)
+        if name == negative_case:
+            negative_self_test_fixture(value)
         require(not observation_errors(name, value, '/fixture/app', {42}), 'Valid synthetic protocol fixture rejected: ' + name)
         mutations = []
         bad = copy.deepcopy(value); bad['completed'] = False; mutations.append(bad)
@@ -710,6 +868,7 @@ def self_test():
         bad = copy.deepcopy(value); bad['hostPID'] = 99; mutations.append(bad)
         bad = copy.deepcopy(value); bad['checks'][case_checks[name][0]] = False; mutations.append(bad)
         bad = copy.deepcopy(value); bad['runtimeBounds']['ASR'] = True; mutations.append(bad)
+        bad = copy.deepcopy(value); bad['extra']['latestForwardConfirmations'] = 1 if name == negative_case else 0; mutations.append(bad)
         bad = copy.deepcopy(value); bad['observations'][0]['usesSystemPaste'] = not value['observations'][0]['usesSystemPaste']; mutations.append(bad)
         bad = copy.deepcopy(value); bad['observations'][0]['observedUTF16'] = [66]; mutations.append(bad)
         if any(item['name'] in clipboard_stages for item in value['observations']):
@@ -719,12 +878,25 @@ def self_test():
             bad = copy.deepcopy(value)
             next(item for item in bad['observations'] if item['name'] in clipboard_stages)['clipboardObserved'][0]['types'][0]['dataBase64'] = '!!!'
             mutations.append(bad)
+        if name == negative_case:
+            bad = copy.deepcopy(value); bad['extra']['negativeRequestedFullUTF16'] = bad['extra']['negativeObservedFullUTF16']; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['negativeOutcome'] = 'confirmed'; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['negativeFailure'] = 'permissionDenied'; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['negativeUndoOutcome'] = 'restored'; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['negativeAttemptCallbacksAfterUndo'] = 2; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'].pop(); mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['outcome'] = 'confirmed'; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['failure']['type'] = 'ForeignError'; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['observedUTF16'] = bad['extra']['negativeRequestedFullUTF16']; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['expectedFullUTF16'] = bad['extra']['negativeObservedFullUTF16']; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['range'] = bad['extra']['negativeRequestedCaret']; mutations.append(bad)
+            bad = copy.deepcopy(value); bad['extra']['deliveryDiagnostics'][1]['AXErrors']['value'] = -25204; mutations.append(bad)
         for bad in mutations:
             require(observation_errors(name, bad, '/fixture/app', {42}), 'Broken observation accepted: ' + name)
             count += 1
     recipe_self_test()
     configuration_self_test()
-    print('Undo classifier self-test passed: exact selection, benign startup log, grant-before-enumeration recipe, persistent provider configuration and six receipt protocols; ' + str(count) + ' rejected observation mutations. No app or clipboard execution.')
+    print('Undo classifier self-test passed: exact selection, benign startup log, grant-before-enumeration recipe, persistent provider configuration, nine owned-editor startups and seven receipt protocols including strict normalized-output refusal; ' + str(count) + ' rejected observation mutations. No app or clipboard execution.')
 
 
 def interrupted(signum, _frame):
@@ -748,9 +920,10 @@ try:
         write_json(output / 'contract.json', {'source_sha': git(repo, 'rev-parse', 'HEAD').decode().strip(), 'github_run_id': os.environ['GITHUB_RUN_ID'],
             'oracle_sha256': {path: digest((repo / path).read_bytes()) for path in oracle_paths}, 'tests': cases, 'phases': phases,
             'lock_sha256': lock_sha, 'canonical_pins': 41,
-            'scope': 'Six native WritingActionUndoController cases with real TextEdit/Safari AX targets and disposable clipboard payloads; one built Debug app, two separate closed execution hosts plus independently observed/closed enumeration hosts.',
+            'scope': 'Seven native WritingActionUndoController cases: six positive contracts and one strict normalized-output refusal, with real TextEdit/Safari AX targets and disposable clipboard payloads; one built Debug app, two separate closed execution hosts plus independently observed/closed enumeration hosts.',
             'limits': ['Product menu/shortcut route is a separate UI gate.', 'No ASR, microphone, model/provider-quality or physical-keyboard proof.',
                 'Clipboard fixtures only on the disposable runner; no shared-user clipboard.', 'No release or broad editor compatibility claim.',
+                'Positive Safari cases use NFC fixtures. A separate NFD case must remain unconfirmed when actual output differs in UTF16; this is new candidate acceptance, not a matched comparison with the old six-case oracle.',
                 'Accessibility and Microphone are provisioned for the signed app; normal app initialization starts pre-roll. No Automation grant or microphone acceptance claim.']})
         for path in oracle_paths:
             destination = output / 'source' / Path(path).name
@@ -808,7 +981,7 @@ try:
         result = json.loads((output / 'result.json').read_text())
         require(result['valid'] is True and result['source_sha'] == contract()['source_sha'] and result['tests'] == cases and result['phases'] == {phase: digest((output / phase / 'result.json').read_bytes()) for phase in phases}, 'Full native result binding invalid')
         write_json(output / 'complete-result.json', {'classification': 'passed', 'source_sha': contract()['source_sha'], 'tests': cases,
-            'result_sha256': digest((output / 'result.json').read_bytes()), 'native_cases': 6, 'execution_host_launches': 2, 'limits': contract()['limits']})
+            'result_sha256': digest((output / 'result.json').read_bytes()), 'native_cases': len(cases), 'execution_host_launches': 2, 'limits': contract()['limits']})
     else:
         raise RuntimeError('usage: run-writing-undo-native-check.sh self-test | prepare | native | verify')
 except BaseException as error:

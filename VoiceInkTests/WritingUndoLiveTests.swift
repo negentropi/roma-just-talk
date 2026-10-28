@@ -68,7 +68,7 @@ extension VoiceInkTests {
     @MainActor func liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference() async throws {
         let fixture = try WritingUndoLiveFixture(#function)
         defer { fixture.finishIfIncomplete(); fixture.restorePreferences() }
-        let editor = try await LiveWritingEditor.open(.safari)
+        let editor = try await LiveWritingEditor.open(.safari, passage: "target é")
         defer { editor.close() }
         let controller = WritingActionUndoController()
         for restoreForward in [true, false] {
@@ -76,7 +76,7 @@ extension VoiceInkTests {
             try await editor.selectOriginalPassage()
             let prefix = restoreForward ? "restore-on" : "restore-off"
             let initial = try fixture.writeClipboard("Forward C e\u{301} 🧪", discriminator: prefix)
-            let replacement = "Safari \(prefix) e\u{301}\n😀 literal output"
+            let replacement = "Safari \(prefix) é\n😀 literal output"
             try await fixture.deliver(replacement, to: editor, controller: controller)
             try fixture.observe(prefix + "-forward", editor: editor, expected: fixture.result(replacement), range: fixture.caret(replacement))
             let expectedClipboard: [WritingUndoLiveClipboardItem]
@@ -87,7 +87,7 @@ extension VoiceInkTests {
                 try fixture.observeClipboard(prefix + "-current-copy", expected: expectedClipboard)
             }
             guard case .restored = await controller.undo() else { throw WritingUndoLiveFailure("Native Safari Undo did not restore text and selection.") }
-            try fixture.observe(prefix + "-restored", editor: editor, expected: LiveWritingEditor.original, range: fixture.originalRange)
+            try fixture.observe(prefix + "-restored", editor: editor, expected: editor.sourceOriginal, range: editor.sourceRange)
             try await CursorPaster.settlePendingClipboardRestore()
             try fixture.observeClipboard(prefix + "-clipboard", expected: expectedClipboard)
         }
@@ -100,13 +100,13 @@ extension VoiceInkTests {
     @MainActor func liveWritingUndoSafariKeepsNewClipboardGeneration() async throws {
         let fixture = try WritingUndoLiveFixture(#function)
         defer { fixture.finishIfIncomplete(); fixture.restorePreferences() }
-        let editor = try await LiveWritingEditor.open(.safari)
+        let editor = try await LiveWritingEditor.open(.safari, passage: "target é")
         defer { editor.close() }
         let controller = WritingActionUndoController()
         fixture.setRestore(true)
         try await editor.selectOriginalPassage()
         _ = try fixture.writeClipboard("Older C", discriminator: "old-generation")
-        let replacement = "Safari replacement e\u{301} 😀"
+        let replacement = "Safari replacement é 😀"
         try await fixture.deliver(replacement, to: editor, controller: controller)
         try fixture.observe("forward", editor: editor, expected: fixture.result(replacement), range: fixture.caret(replacement))
         let forwardCount = NSPasteboard.general.changeCount
@@ -114,7 +114,7 @@ extension VoiceInkTests {
         try fixture.check("newClipboardGeneration", NSPasteboard.general.changeCount > forwardCount)
         try fixture.observeClipboard("new-copy", expected: newer)
         guard case .restored = await controller.undo() else { throw WritingUndoLiveFailure("Safari Undo failed after a newer copy.") }
-        try fixture.observe("restored", editor: editor, expected: LiveWritingEditor.original, range: fixture.originalRange)
+        try fixture.observe("restored", editor: editor, expected: editor.sourceOriginal, range: editor.sourceRange)
         try await CursorPaster.settlePendingClipboardRestore()
         try fixture.observeClipboard("clipboard", expected: newer)
         try fixture.check("newerCopySurvivedBothRestorationOwners", true)
@@ -164,7 +164,7 @@ extension VoiceInkTests {
     @MainActor func liveWritingUndoLatestOwnerAndCancellation() async throws {
         let fixture = try WritingUndoLiveFixture(#function)
         defer { fixture.finishIfIncomplete(); fixture.restorePreferences() }
-        let editor = try await LiveWritingEditor.open(.safari)
+        let editor = try await LiveWritingEditor.open(.safari, passage: "target é")
         defer { editor.close() }
         let controller = WritingActionUndoController()
         fixture.setRestore(true)
@@ -175,7 +175,7 @@ extension VoiceInkTests {
         try await CursorPaster.settlePendingClipboardRestore()
         let firstRange = NSRange(location: LiveWritingEditor.prefix.utf16.count, length: first.utf16.count)
         try await editor.select(firstRange)
-        let second = "second, longer e\u{301} 👩🏽‍💻"
+        let second = "second, longer é 👩🏽‍💻"
         try await fixture.deliver(second, to: editor, controller: controller)
         try fixture.observe("second-forward", editor: editor, expected: fixture.result(second), range: fixture.caret(second))
         let pendingLeaseStarted = ProcessInfo.processInfo.systemUptime
@@ -206,6 +206,46 @@ extension VoiceInkTests {
         try fixture.check("onlyLatestRewriteWasUndoable", true)
         try fixture.finish(["first-forward", "second-forward", "canceled-before-attempt", "latest-restored", "second-undo-refused"])
     }
+
+    @Test(.enabled(if: WritingUndoLiveFixture.isEnabled), .timeLimit(.minutes(3)))
+    @MainActor func liveWritingUndoSafariRejectsNormalizedDecomposedOutput() async throws {
+        let fixture = try WritingUndoLiveFixture(#function)
+        defer { fixture.finishIfIncomplete(); fixture.restorePreferences() }
+        let editor = try await LiveWritingEditor.open(.safari)
+        defer { editor.close() }
+        let controller = WritingActionUndoController()
+        try await editor.selectOriginalPassage()
+        try fixture.observe("nfd-before", editor: editor, expected: editor.sourceOriginal, range: editor.sourceRange)
+        let replacement = "Unconfirmed e\u{301} 😀"
+        let observedReplacement = "Unconfirmed é 😀"
+        let attempt = try await fixture.attemptDelivery(replacement, to: editor, controller: controller)
+        guard case .attemptedUnconfirmed(let error) = attempt.outcome,
+              error as? WritingTarget.Failure == .replacementUnconfirmed else {
+            throw WritingUndoLiveFailure("A changed exact-output readback did not remain unconfirmed.")
+        }
+        try #require(attempt.attempts == 1 && attempt.confirmations == 0)
+        let observed = fixture.result(observedReplacement)
+        let observedCaret = fixture.caret(observedReplacement)
+        try #require(!observed.utf16.elementsEqual(fixture.result(replacement).utf16))
+        try #require(fixture.caret(replacement).location == observedCaret.location + 1)
+        try fixture.observe("nfd-unconfirmed", editor: editor, expected: observed, range: observedCaret)
+        try fixture.check("exactDecomposedOutputRemainedUnconfirmed", true)
+        try fixture.check("unconfirmedOutputCannotArmUndo", !controller.isAvailable)
+        guard case .unavailable = await controller.undo() else {
+            throw WritingUndoLiveFailure("Unconfirmed output armed native Undo authority.")
+        }
+        try fixture.observe("undo-unavailable", editor: editor, expected: observed, range: observedCaret)
+        try fixture.check("unavailableUndoDidNotMutate", !controller.isAvailable)
+        fixture.extra["negativeRequestedFullUTF16"] = Array(fixture.result(replacement).utf16).map(Int.init)
+        fixture.extra["negativeObservedFullUTF16"] = Array(observed.utf16).map(Int.init)
+        fixture.extra["negativeRequestedCaret"] = ["location": fixture.caret(replacement).location, "length": 0]
+        fixture.extra["negativeObservedCaret"] = ["location": observedCaret.location, "length": 0]
+        fixture.extra["negativeOutcome"] = "attemptedUnconfirmed"
+        fixture.extra["negativeFailure"] = "replacementUnconfirmed"
+        fixture.extra["negativeUndoOutcome"] = "unavailable"
+        fixture.extra["negativeAttemptCallbacksAfterUndo"] = fixture.forwardAttemptCallbacks
+        try fixture.finish(["nfd-before", "nfd-unconfirmed", "undo-unavailable"])
+    }
 }
 
 private struct WritingUndoLiveFailure: Error, CustomStringConvertible {
@@ -235,6 +275,7 @@ private final class WritingUndoLiveFixture {
     private var observations: [[String: Any]] = []
     private var checks: [String: Bool] = [:]
     private var written = false
+    private(set) var forwardAttemptCallbacks = 0
     var extra: [String: Any] = [:]
     var originalRange: NSRange { NSRange(location: LiveWritingEditor.prefix.utf16.count, length: LiveWritingEditor.passage.utf16.count) }
 
@@ -274,6 +315,14 @@ private final class WritingUndoLiveFixture {
     func caret(_ text: String) -> NSRange { NSRange(location: LiveWritingEditor.prefix.utf16.count + text.utf16.count, length: 0) }
 
     func deliver(_ text: String, to editor: LiveWritingEditor, controller: WritingActionUndoController) async throws {
+        let attempt = try await attemptDelivery(text, to: editor, controller: controller)
+        try #require(attempt.outcome.isConfirmed && attempt.attempts == 1 && attempt.confirmations == 1)
+        try #require(controller.isAvailable, "Native output was confirmed without a coherent Undo receipt.")
+        try await editor.waitForValue(result(text))
+    }
+
+    func attemptDelivery(_ text: String, to editor: LiveWritingEditor, controller: WritingActionUndoController)
+        async throws -> (outcome: WritingTarget.DeliveryOutcome, attempts: Int, confirmations: Int) {
         recordDeliveryDiagnostic("before-capture", editor: editor, output: text)
         let focused = Self.element(kAXFocusedUIElementAttribute, from: AXUIElementCreateSystemWide())
         try #require(focused.map { CFEqual($0, editor.editor) } == true)
@@ -290,7 +339,7 @@ private final class WritingUndoLiveFixture {
         var confirmations = 0
         let outcome = await target.deliver(
             with: text,
-            willAttempt: { attempts += 1; try controller.willAttemptDelivery(id) },
+            willAttempt: { attempts += 1; self.forwardAttemptCallbacks += 1; try controller.willAttemptDelivery(id) },
             onConfirmed: { edit in confirmations += 1; controller.confirmedDelivery(edit, for: id) }
         )
         controller.finishDelivery(outcome, for: id)
@@ -298,9 +347,7 @@ private final class WritingUndoLiveFixture {
         extra["latestForwardConfirmations"] = confirmations
         recordDeliveryDiagnostic("after-delivery", editor: editor, output: text, outcome: outcome,
                                  attempts: attempts, confirmations: confirmations)
-        try #require(outcome.isConfirmed && attempts == 1 && confirmations == 1)
-        try #require(controller.isAvailable, "Native output was confirmed without a coherent Undo receipt.")
-        try await editor.waitForValue(result(text))
+        return (outcome, attempts, confirmations)
     }
 
     private func recordDeliveryDiagnostic(
@@ -394,8 +441,8 @@ private final class WritingUndoLiveFixture {
     func reset(_ editor: LiveWritingEditor) async throws {
         let current = try #require(editor.value)
         try await editor.select(NSRange(location: 0, length: current.utf16.count))
-        try editor.replaceSelection(LiveWritingEditor.original)
-        try await editor.waitForValue(LiveWritingEditor.original)
+        try editor.replaceSelection(editor.sourceOriginal)
+        try await editor.waitForValue(editor.sourceOriginal)
         try await editor.selectOriginalPassage()
     }
 
@@ -414,7 +461,7 @@ private final class WritingUndoLiveFixture {
         let windowPresent = windows.contains { CFEqual($0, editor.window) }
         let usesSystemPaste = CursorTextContextReader.usesSystemPaste(for: editor.editor)
         stage(name, ["pid": Int(editor.application.processIdentifier), "bundleIdentifier": editor.kind.bundleIdentifier,
-            "token": editor.token, "sourceUTF16": Array(LiveWritingEditor.original.utf16).map(Int.init),
+            "token": editor.token, "sourceUTF16": Array(editor.sourceOriginal.utf16).map(Int.init),
             "expectedUTF16": Array(expected.utf16).map(Int.init), "observedUTF16": Array(observed.utf16).map(Int.init),
             "expectedRange": Self.range(range), "range": Self.range(actualRange), "sameProcess": sameProcess,
             "sameFocusedEditor": sameEditor, "sameWindow": sameWindow, "windowPresent": windowPresent,

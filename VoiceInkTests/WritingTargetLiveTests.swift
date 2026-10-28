@@ -854,12 +854,15 @@ final class LiveWritingEditor {
     }
 
     static let prefix = "Before 👩🏽‍💻 "
-    static let passage = "target e\u{301}"
+    nonisolated static let passage = "target e\u{301}"
     static let suffix = " after 🧑‍🚀.\n"
     static var original: String { prefix + passage + suffix }
 
     let token: String
     let kind: Kind
+    let sourcePassage: String
+    var sourceOriginal: String { Self.prefix + sourcePassage + Self.suffix }
+    var sourceRange: NSRange { NSRange(location: Self.prefix.utf16.count, length: sourcePassage.utf16.count) }
     let directory: URL
     let resource: URL
     let application: NSRunningApplication
@@ -874,12 +877,13 @@ final class LiveWritingEditor {
     private var confirmedSavedUTF16: [Int]?
 
     private init(
-        token: String, kind: Kind, directory: URL, resource: URL,
+        token: String, kind: Kind, sourcePassage: String, directory: URL, resource: URL,
         application: NSRunningApplication, window: AXUIElement, editor: AXUIElement,
         previousApplication: NSRunningApplication?, previousWindows: [AXUIElement]
     ) {
         self.token = token
         self.kind = kind
+        self.sourcePassage = sourcePassage
         self.directory = directory
         self.resource = resource
         self.application = application
@@ -899,7 +903,7 @@ final class LiveWritingEditor {
         return Self.range(from: editor).map { NSRange(location: $0.location, length: $0.length) }
     }
 
-    static func open(_ kind: Kind) async throws -> LiveWritingEditor {
+    static func open(_ kind: Kind, passage: String = LiveWritingEditor.passage) async throws -> LiveWritingEditor {
         guard AXIsProcessTrusted() else {
             throw LiveWritingFailure.failed("Live writing checks require Accessibility for the exact test-host signature.")
         }
@@ -918,6 +922,7 @@ final class LiveWritingEditor {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(token, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let resource = directory.appendingPathComponent(token + (kind == .textEdit ? ".txt" : ".html"))
+        let original = prefix + passage + suffix
         let content: String
         if kind == .textEdit {
             content = original
@@ -1014,16 +1019,16 @@ final class LiveWritingEditor {
         } catch {
             recordStartup(
                 token: token, kind: kind, application: application, stages: startupStages,
-                finalStage: startupPhase, failure: String(describing: error)
+                finalStage: startupPhase, failure: String(describing: error), sourcePassage: passage
             )
             recordSetupFailure(
                 kind: kind, token: token, resource: resource, application: application,
-                appElement: appElement, previousWindows: priorWindows
+                appElement: appElement, previousWindows: priorWindows, sourcePassage: passage
             )
             if kind == .safari {
                 await recordSafariReadiness(
                     token: token, resource: resource, application: application,
-                    previousWindows: priorWindows, openStarted: openStarted
+                    previousWindows: priorWindows, openStarted: openStarted, sourcePassage: passage
                 )
             }
             Issue.record("Could not claim the live editor; preserved fixture \(directory.path).")
@@ -1034,7 +1039,7 @@ final class LiveWritingEditor {
             throw LiveWritingFailure.failed("The owned editor disappeared before capture.")
         }
         let fixture = LiveWritingEditor(
-            token: token, kind: kind, directory: directory, resource: resource,
+            token: token, kind: kind, sourcePassage: passage, directory: directory, resource: resource,
             application: application, window: window, editor: editor,
             previousApplication: previous, previousWindows: priorWindows
         )
@@ -1046,13 +1051,13 @@ final class LiveWritingEditor {
             ])
             recordStartup(
                 token: token, kind: kind, application: application, stages: startupStages,
-                finalStage: "ready", failure: nil
+                finalStage: "ready", failure: nil, sourcePassage: passage
             )
             return fixture
         } catch {
             recordStartup(
                 token: token, kind: kind, application: application, stages: startupStages,
-                finalStage: "owned-editor-focus", failure: String(describing: error)
+                finalStage: "owned-editor-focus", failure: String(describing: error), sourcePassage: passage
             )
             fixture.close()
             throw error
@@ -1060,7 +1065,7 @@ final class LiveWritingEditor {
     }
 
     func selectOriginalPassage() async throws {
-        try await select(NSRange(location: Self.prefix.utf16.count, length: Self.passage.utf16.count))
+        try await select(sourceRange)
     }
 
     func select(_ range: NSRange) async throws {
@@ -1314,7 +1319,9 @@ final class LiveWritingEditor {
             "observedUTF16Count": observed?.utf16.count ?? -1, "expectedUTF16Count": expected.utf16.count,
             "exactUTF16Equal": observed?.utf16.elementsEqual(expected.utf16) == true,
             "canonicalEqual": observed == expected,
-            "originalStillPresent": observed?.utf16.elementsEqual(Self.original.utf16) == true,
+            "originalStillPresent": observed?.utf16.elementsEqual(sourceOriginal.utf16) == true,
+            "sourceOriginalUTF16": Array(sourceOriginal.utf16).map(Int.init),
+            "sourceRange": ["location": sourceRange.location, "length": sourceRange.length],
             "prefixPreserved": observed?.utf16.starts(with: Self.prefix.utf16) == true,
             "suffixPreserved": observed.map { Array($0.utf16.suffix(Self.suffix.utf16.count)) == Array(Self.suffix.utf16) } == true,
             "selectedText": selected as Any? ?? NSNull(),
@@ -1339,14 +1346,16 @@ final class LiveWritingEditor {
 
     private static func recordStartup(
         token: String, kind: Kind, application: NSRunningApplication, stages: [[String: Any]],
-        finalStage: String, failure: String?
+        finalStage: String, failure: String?, sourcePassage: String
     ) {
         guard let output = evidenceDirectory else { return }
         let receipt: [String: Any] = [
             "checkpoint": "fixture-startup", "token": token, "bundleIdentifier": kind.bundleIdentifier,
             "processIdentifier": application.processIdentifier,
             "documentBudgetMilliseconds": 20_000, "textareaBudgetMilliseconds": 5_000,
-            "finalStage": finalStage, "failure": failure as Any? ?? NSNull(), "stages": stages
+            "finalStage": finalStage, "failure": failure as Any? ?? NSNull(), "stages": stages,
+            "sourcePassageUTF16": Array(sourcePassage.utf16).map(Int.init),
+            "sourceOriginalUTF16": Array((prefix + sourcePassage + suffix).utf16).map(Int.init)
         ]
         do {
             try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
@@ -1378,14 +1387,14 @@ final class LiveWritingEditor {
 
     private static func recordSetupFailure(
         kind: Kind, token: String, resource: URL, application: NSRunningApplication,
-        appElement: AXUIElement, previousWindows: [AXUIElement]
+        appElement: AXUIElement, previousWindows: [AXUIElement], sourcePassage: String
     ) {
         guard let output = evidenceDirectory else { return }
         _ = AXUIElementSetMessagingTimeout(appElement, 0.2)
         let currentWindows = windows(in: appElement)
         let focused = element(kAXFocusedUIElementAttribute, from: appElement)
         let deadline = Date().addingTimeInterval(5)
-        let focusedMetadata = focused.map { diagnosticNode($0, token: token, resource: resource, deadline: deadline) } ?? [:]
+        let focusedMetadata = focused.map { diagnosticNode($0, token: token, resource: resource, deadline: deadline, sourcePassage: sourcePassage) } ?? [:]
         let focusedWindow = focused.flatMap { element(kAXWindowAttribute, from: $0) }
         var ownedWindows: [AXUIElement] = []
         var summaries: [[String: Any]] = []
@@ -1411,7 +1420,7 @@ final class LiveWritingEditor {
                 var nodes: [[String: Any]] = []
                 for (index, node) in tree.nodes.enumerated() {
                     guard Date() < deadline else { break }
-                    var metadata = diagnosticNode(node, token: token, resource: resource, deadline: deadline)
+                    var metadata = diagnosticNode(node, token: token, resource: resource, deadline: deadline, sourcePassage: sourcePassage)
                     metadata["index"] = index
                     metadata["focused"] = focused.map { CFEqual($0, node) } ?? false
                     nodes.append(metadata)
@@ -1453,7 +1462,7 @@ final class LiveWritingEditor {
 
     private static func recordSafariReadiness(
         token: String, resource: URL, application: NSRunningApplication,
-        previousWindows: [AXUIElement], openStarted: TimeInterval
+        previousWindows: [AXUIElement], openStarted: TimeInterval, sourcePassage: String
     ) async {
         guard let output = evidenceDirectory else { return }
         let started = ProcessInfo.processInfo.systemUptime
@@ -1471,7 +1480,7 @@ final class LiveWritingEditor {
             guard sampledAt < deadline else { break }
             var sample = safariReadinessSample(
                 token: token, resource: resource, application: application,
-                previousWindows: previousWindows, deadline: min(deadline, sampledAt + 1)
+                previousWindows: previousWindows, deadline: min(deadline, sampledAt + 1), sourcePassage: sourcePassage
             )
             let completedAt = ProcessInfo.processInfo.systemUptime
             sample["surveyMilliseconds"] = (sampledAt - started) * 1_000
@@ -1506,8 +1515,9 @@ final class LiveWritingEditor {
 
     private static func safariReadinessSample(
         token: String, resource: URL, application: NSRunningApplication,
-        previousWindows: [AXUIElement], deadline: TimeInterval
+        previousWindows: [AXUIElement], deadline: TimeInterval, sourcePassage: String
     ) -> [String: Any] {
+        let original = prefix + sourcePassage + suffix
         guard !application.isTerminated else {
             return ["applicationTerminated": true, "ownedExactTextAreaObserved": false]
         }
@@ -1637,7 +1647,8 @@ final class LiveWritingEditor {
         }
     }
 
-    private static func diagnosticNode(_ node: AXUIElement, token: String, resource: URL, deadline: Date) -> [String: Any] {
+    private static func diagnosticNode(_ node: AXUIElement, token: String, resource: URL, deadline: Date, sourcePassage: String) -> [String: Any] {
+        let original = prefix + sourcePassage + suffix
         _ = AXUIElementSetMessagingTimeout(node, 0.1)
         func read(_ name: String) -> CFTypeRef? {
             Date() < deadline ? attribute(name, from: node) : nil
@@ -1662,7 +1673,7 @@ final class LiveWritingEditor {
         metadata["valueUTF16Count"] = value?.utf16.count ?? -1
         metadata["expectedUTF16Count"] = original.utf16.count
         metadata["prefixUTF16Count"] = prefix.utf16.count
-        metadata["passageUTF16Count"] = passage.utf16.count
+        metadata["passageUTF16Count"] = sourcePassage.utf16.count
         metadata["suffixUTF16Count"] = suffix.utf16.count
         metadata["exactUTF16Equal"] = value?.utf16.elementsEqual(original.utf16) ?? false
         metadata["canonicalEqual"] = value == original

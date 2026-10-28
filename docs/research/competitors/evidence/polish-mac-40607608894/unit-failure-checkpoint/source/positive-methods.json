@@ -1,0 +1,60 @@
+{
+  "head": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "groups": {
+    "VoiceInkTests/WritingActionUndoTests.swift": [
+      "confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce",
+      "confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation",
+      "confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo",
+      "unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority",
+      "uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange",
+      "rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority",
+      "textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt",
+      "errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition",
+      "cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt",
+      "cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched",
+      "newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup",
+      "newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt",
+      "restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit",
+      "newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration",
+      "uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback",
+      "staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner",
+      "pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority",
+      "authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation",
+      "queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery",
+      "refusedKeyboardAuthorizationBalancesCommandWithoutPostingV"
+    ],
+    "VoiceInkTests/WritingActionUndoPipelineTests.swift": [
+      "confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion",
+      "translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo",
+      "generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable",
+      "supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt",
+      "historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo",
+      "cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput",
+      "taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo",
+      "delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery"
+    ],
+    "VoiceInkTests/ClipboardRestorationOwnershipTests.swift": [
+      "unresolvedMenuPreparationRejectsACompetingClipboardWrite",
+      "cancelingANewWaiterDoesNotCancelTheEarlierRestoration",
+      "cancellationDuringDeliveryObservationStillCommitsExactReadback",
+      "confirmedCallbackPrecedesImmediateRestorationAndFiresOnce",
+      "unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation"
+    ],
+    "VoiceInkTests/ShortcutBackupTests.swift": [
+      "explicitModernKindRejectsMalformedDataEvenWithLegacyKeys",
+      "missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues",
+      "missingKindStillRequiresAValidLegacyCarbonPayload"
+    ],
+    "VoiceInkTests/AudioFileTranscriptionPersistenceTests.swift": [
+      "savingCompletedAudioDoesNotCommitUnrelatedCallerEdits"
+    ]
+  },
+  "expected_group_counts": {
+    "VoiceInkTests/WritingActionUndoTests.swift": 20,
+    "VoiceInkTests/WritingActionUndoPipelineTests.swift": 8,
+    "VoiceInkTests/ClipboardRestorationOwnershipTests.swift": 5,
+    "VoiceInkTests/ShortcutBackupTests.swift": 3,
+    "VoiceInkTests/AudioFileTranscriptionPersistenceTests.swift": 1
+  },
+  "total_methods": 37
+}

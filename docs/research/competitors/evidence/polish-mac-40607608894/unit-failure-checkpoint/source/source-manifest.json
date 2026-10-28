@@ -1,0 +1,87 @@
+{
+  "head": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "whole_files": {
+    "VoiceInkTests/HistoryCorrectionApprovalTests.swift": {
+      "sha256": "017b18990d4c7df0205ae56bba8400fc579f05be5a658502741ba4b837472f5a",
+      "bytes": 14811
+    },
+    "VoiceInkTests/WordReplacementBackupAdapterTests.swift": {
+      "sha256": "3d0c6a1c1cd56d8704637587f889f47bbf66324fe648caec1728c342e4004c69",
+      "bytes": 16399
+    },
+    "VoiceInkTests/WordReplacementLibraryAdapterTests.swift": {
+      "sha256": "539dda87d29f35ab95a8a5e099c9a9a2435295bbb39e020961f33709bf72e201",
+      "bytes": 15883
+    },
+    "VoiceInkTests/WritingActionUndoTests.swift": {
+      "sha256": "edb909fe02670265c786aab991fa1d3eb45444f9de8e4b13814ce8915a4d26ad",
+      "bytes": 22172
+    },
+    "VoiceInkTests/WritingActionUndoPipelineTests.swift": {
+      "sha256": "747d830de46cc52bdb03fad1ca122ebc18cdb3a3fdd653652885965404db1e6d",
+      "bytes": 14571
+    },
+    "VoiceInkTests/ClipboardRestorationOwnershipTests.swift": {
+      "sha256": "7cce4a2f94326bcdbbbc297899fab995e319f69331ad28a456b4112df9d0eb68",
+      "bytes": 8022
+    },
+    "VoiceInkTests/ShortcutBackupTests.swift": {
+      "sha256": "cc6f2f6d30897e60be8d7d3280993f58a2aedc4201f867e2a2f8ae9e39ff44d3",
+      "bytes": 3743
+    },
+    "VoiceInkTests/AudioFileTranscriptionPersistenceTests.swift": {
+      "sha256": "f6747e802abcc84e17176f5735da232da4a06141b56ff0522df421a459cc7343",
+      "bytes": 3550
+    },
+    "VoiceInk/Models/WordReplacement.swift": {
+      "sha256": "034a015173fe1484f20c6fdb13b9bf423686150954fbe7abed8e9cc47e9c7d3d",
+      "bytes": 5251
+    },
+    "VoiceInk/Services/DictionaryService.swift": {
+      "sha256": "fdaf71ac81f25b65484c463db9b606ce85b254b3177c10900aa2df57d98a697e",
+      "bytes": 8137
+    },
+    "VoiceInk/Services/HistoryCorrectionApprovalService.swift": {
+      "sha256": "38f0d97da04b6e3dca2ffca1154c79cb7d7996a81d66a1f453b6410f2a3b0b71",
+      "bytes": 7618
+    },
+    "VoiceInk/Services/BackupTypes.swift": {
+      "sha256": "30c3db6f65e121c5548f32241c3de91dbac9b4f3a1e7790226b347b1f556ee64",
+      "bytes": 7479
+    },
+    "VoiceInk/Services/BackupImporter.swift": {
+      "sha256": "b37c84b2e4e50be758a8451a7edc89b476868166acf32b977a191ba5d3e4c37c",
+      "bytes": 9476
+    },
+    "VoiceInk/Services/ImportExportService.swift": {
+      "sha256": "2f66c4adc8f871f29fdcd0c56d900a889c81abb8d168e00e1d2748a26c2507ee",
+      "bytes": 20456
+    }
+  },
+  "red_method_extractions": {
+    "failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits": {
+      "source": "VoiceInkTests/HistoryCorrectionApprovalTests.swift",
+      "first_line": 188,
+      "last_line": 219,
+      "method_bytes": 2259,
+      "method_sha256": "9c4e152d2ad3fc4aa88484351dfb8fc5417d773b2756ff971f0481839ae4fbf2",
+      "retained_file_sha256": "e21322d0c5a8948fc0b9939f0069d67dc7a51f01b5dcd19f4c78b7a1aa6b6d3c"
+    },
+    "failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits": {
+      "source": "VoiceInkTests/WordReplacementBackupAdapterTests.swift",
+      "first_line": 192,
+      "last_line": 219,
+      "method_bytes": 2026,
+      "method_sha256": "d3e8331f62a3736d431aa3801f03edcbc922c736da6d3c2e94533cf7b17336ac",
+      "retained_file_sha256": "46afc56e128545713e5b4599caed55e00387168aafd2b8b5601c2af2423533fa"
+    },
+    "failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry": {
+      "source": "VoiceInkTests/WordReplacementLibraryAdapterTests.swift",
+      "first_line": 166,
+      "last_line": 192,
+      "method_bytes": 1798,
+      "method_sha256": "ce17c86bc2b6dd7767ccea0779196384749f367c80801a6355debe23f6f9880e",
+      "retained_file_sha256": "5909cf6ed13521f0ea6e739ff766df25e2838b485b309e9183ff63bf075f2038"
+    }
+  }
+}

@@ -1,0 +1,74 @@
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:29.3702800Z ◇ Test unresolvedMenuPreparationRejectsACompetingClipboardWrite() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:29.6433860Z ✔ Test unresolvedMenuPreparationRejectsACompetingClipboardWrite() passed after 0.281 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:29.6456770Z ◇ Test cancelingANewWaiterDoesNotCancelTheEarlierRestoration() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.1530060Z ✔ Test cancelingANewWaiterDoesNotCancelTheEarlierRestoration() passed after 0.508 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.1549380Z ◇ Test cancellationDuringDeliveryObservationStillCommitsExactReadback() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.4192410Z ✔ Test cancellationDuringDeliveryObservationStillCommitsExactReadback() passed after 0.261 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.4351810Z ◇ Test confirmedCallbackPrecedesImmediateRestorationAndFiresOnce() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.4375460Z ✔ Test confirmedCallbackPrecedesImmediateRestorationAndFiresOnce() passed after 0.002 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.4377480Z ◇ Test unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.4406030Z ✔ Test unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation() passed after 0.005 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.9447000Z ◇ Test savingCompletedAudioDoesNotCommitUnrelatedCallerEdits() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:30.9818990Z ✔ Test savingCompletedAudioDoesNotCommitUnrelatedCallerEdits() passed after 0.040 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:52.8394490Z ◇ Test explicitModernKindRejectsMalformedDataEvenWithLegacyKeys() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:52.8562410Z ✔ Test explicitModernKindRejectsMalformedDataEvenWithLegacyKeys() passed after 0.019 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:52.8588580Z ◇ Test missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:52.8696620Z ✔ Test missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues() passed after 0.002 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:52.8720530Z ◇ Test missingKindStillRequiresAValidLegacyCarbonPayload() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:52.8731280Z ✔ Test missingKindStillRequiresAValidLegacyCarbonPayload() passed after 0.004 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.3026530Z ◇ Test confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.3392070Z ✔ Test confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion() passed after 0.053 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.3494030Z ◇ Test translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.3815150Z ✔ Test translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo() passed after 0.114 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.3920730Z ◇ Test generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.4442180Z ✔ Test generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable() passed after 0.109 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.4590060Z ◇ Test supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.5399250Z ✔ Test supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt() passed after 0.102 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.5503860Z ◇ Test historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.8058460Z ✔ Test historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo() passed after 0.091 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.8091610Z ◇ Test cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.8245580Z ✔ Test cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput() passed after 0.068 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.8283760Z ◇ Test taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.8400830Z ✔ Test taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo() passed after 0.063 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.8425060Z ◇ Test delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.1002100Z ✔ Test delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery() passed after 3.299 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.1753030Z ◇ Test confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.1926280Z ✔ Test confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.2225330Z ◇ Test confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.2327660Z ✔ Test confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.2383930Z ◇ Test confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.2572900Z ✔ Test confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo() passed after 0.003 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.2699040Z ◇ Test unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3083680Z ✔ Test unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority() passed after 0.006 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3228010Z ◇ Test uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3460800Z ✔ Test uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange() passed after 0.009 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3587200Z ◇ Test rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3689230Z ✔ Test rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3690370Z ◇ Test textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3794100Z ✔ Test textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt() passed after 0.005 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.3927370Z ◇ Test errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.4039500Z ✔ Test errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.4372710Z ◇ Test cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.4593770Z ✔ Test cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.4783970Z ◇ Test cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.4910470Z ✔ Test cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched() passed after 0.024 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5013630Z ◇ Test newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5083140Z ✔ Test newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5084190Z ◇ Test newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5085050Z ✔ Test newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5086360Z ◇ Test restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5087510Z ✔ Test restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit() passed after 0.150 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5088380Z ◇ Test newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5089560Z ✔ Test newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5090330Z ◇ Test uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5091940Z ✔ Test uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback() passed after 0.013 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5093450Z ◇ Test staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5094200Z ✔ Test staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5095080Z ◇ Test pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5096020Z ✔ Test pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5097110Z ◇ Test authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5099260Z ✔ Test authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation() passed after 0.029 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5100400Z ◇ Test queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5101680Z ✔ Test queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery() passed after 0.001 seconds.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5102700Z ◇ Test refusedKeyboardAuthorizationBalancesCommandWithoutPostingV() started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:59.5103540Z ✔ Test refusedKeyboardAuthorizationBalancesCommandWithoutPostingV() passed after 0.001 seconds.

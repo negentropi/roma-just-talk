@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "run_id": 40607608894,
+  "run_url": "https://github.com/negentropi/roma-just-talk/actions/runs/40607608894",
+  "source_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "classification": "full-mac-gate-failed-before-ui",
+  "prerequisites": {
+    "Core_checks_passed": 1758,
+    "canonical_package_pins": 41,
+    "package_resolution_exit": 0,
+    "canonical_lock_matches_commit": true,
+    "static_Whisper_slices_verified": 7,
+    "Debug_build_for_testing": "passed",
+    "compiler_errors_found": 0
+  },
+  "units": {
+    "raw_SwiftTesting": {
+      "tests": 325,
+      "suites": 34,
+      "issues": 5,
+      "duration_seconds": 31.32
+    },
+    "unique_SwiftTesting_method_statuses": {
+      "Success": 292,
+      "Skipped": 30,
+      "Failure": 3
+    },
+    "separate_XCTest": {
+      "tests": 9,
+      "failures": 0
+    },
+    "xcresult_summary_statuses": {
+      "Success": 303,
+      "Skipped": 30,
+      "Failure": 3
+    },
+    "xcresult_summary_records": 336,
+    "count_reconciliation": "Nine XCTest records are separate. Two parameterized Swift Testing identifiers each have two summary records. The336summary records are not336physical invocations.",
+    "failed_methods": [
+      {
+        "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits()",
+        "status": "Failure",
+        "summary_reference": "0~f1SudZvulESX8HNNeXIbcQWx9u_IAhDvmdrJN-Ja15cwafa7OLZGTAogUcA8lJodK5vfqK3FVWBMIdz2VUoe5w==",
+        "decoded_summary_sha256": "4f3cf295bbf5460523649ae466649cd9c92205760ef7f057e5018333bcd75fa7",
+        "failures": [
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/HistoryCorrectionApprovalTests.swift",
+            "line": 214,
+            "message": "Expectation failed: (after.count \u2192 3) == (before.count \u2192 2)",
+            "timestamp": "2026-10-28T00:30:42.274+0000",
+            "uuid": "6C25FDC1-5151-4243-BE3E-B56933BA9EB5"
+          },
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/HistoryCorrectionApprovalTests.swift",
+            "line": 216,
+            "message": "Expectation failed: !(after.contains { $0.id == preview.record.id } \u2192 <not evaluated>)",
+            "timestamp": "2026-10-28T00:30:43.523+0000",
+            "uuid": "F0267C57-3ED1-49EB-9A86-3EC85F90333C"
+          }
+        ]
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits()",
+        "status": "Failure",
+        "summary_reference": "0~fRfRylS4CnyPiHXhr-3W0TiK_ILkQVx8pcKyKF6IjyhJDEB4Aw78MaiYy5yHDT7_BC-JgzUVXGZ-uYKgDQgCZw==",
+        "decoded_summary_sha256": "0078d8a2735de363dbb4730d896ad15ad41209aa4c75ad0c793c7af3758008fa",
+        "failures": [
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WordReplacementBackupAdapterTests.swift",
+            "line": 217,
+            "message": "Expectation failed: try context.fetch(FetchDescriptor<WordReplacement>()).count == 1",
+            "timestamp": "2026-10-28T00:30:54.880+0000",
+            "uuid": "EDD7C611-2A21-4ECD-B8B9-351F00DF627E"
+          }
+        ]
+      },
+      {
+        "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry()",
+        "status": "Failure",
+        "summary_reference": "0~fnSE2fDUMIF8B5Ppu6_-stZIU5IB4Gy5Q-XIl6VEVtMhbWSwgKsjmnEiUO_THhE5224g7E75Isrt6iWixvvKJw==",
+        "decoded_summary_sha256": "d83a29f09e826a14b36d1edcdb3b9011bbbfbfc75d9be6fa123cb9bd6de91d15",
+        "failures": [
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WordReplacementLibraryAdapterTests.swift",
+            "line": 185,
+            "message": "Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }",
+            "timestamp": "2026-10-28T00:30:55.013+0000",
+            "uuid": "DD2A295B-5550-4AA4-BB20-E8185C5281BB"
+          },
+          {
+            "file": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WordReplacementLibraryAdapterTests.swift",
+            "line": 185,
+            "message": "Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }",
+            "timestamp": "2026-10-28T00:30:55.018+0000",
+            "uuid": "E4CD0A19-0C84-4B62-BB8C-5B2B431109AE"
+          }
+        ]
+      }
+    ],
+    "positive_new_methods": {
+      "count": 37,
+      "group_counts": {
+        "WritingActionUndoTests": 20,
+        "WritingActionUndoPipelineTests": 8,
+        "ClipboardRestorationOwnershipTests": 5,
+        "ShortcutBackupTests": 3,
+        "AudioFileTranscriptionPersistenceTests": 1
+      },
+      "observations": "Each exact method start1/pass1/issues0 from existing raw log; gate owner retains pinned source/method census in unit-failure-checkpoint."
+    },
+    "narrow_failure_proof": "unit-failure-checkpoint/ owned by polish_gate_readiness; no duplicate failed-log download."
+  },
+  "identity": {
+    "app_sha256": "ac83c09815ae2806b096bf4cc5ffee14850c439e7f87498dac638247b02f7b2a",
+    "ExternalAXProbe_sha256": "75364546060b8995540fe38045a70d7c5fa854b3ca17d09dd57f8889c8740c8c",
+    "app_cdhash": "c99ad2cb3fc74cd1389a269f07e8d54d89467655",
+    "before_after_byte_equal": true,
+    "strict_codesign_verification": "Script verifies before TCC grants and after unit execution; no signature-verification failure reported.",
+    "permissions": "Fresh CI grant SQL source-bound to current csreq; actual onboarding externalAX reports trusted. Raw TCC row readbacks are not retained by this full-unit script, so no post-UI/auth2 row-stability claim."
+  },
+  "resources": {
+    "Debug_MLX_metallib_link_step_observed": true,
+    "Debug_Silero_model_copy_step_observed": true,
+    "artifact_does_not_include_built_app": true,
+    "Release_packaging_contract": "skipped; no Release resource/link/signing acceptance"
+  },
+  "skipped_workflow_stages": [
+    "Preserve verified dependencies for test retries",
+    "Live TextEdit and Safari selection transactions",
+    "Upload the native check checkpoint",
+    "Matched snippet regression",
+    "Upload the matched regression checkpoint",
+    "Writing, snippet and dictation settings UI",
+    "Release build and packaging contracts",
+    "Upload verified release app"
+  ],
+  "downstream_limit": "Dedicated live editor checks, matched snippet regression, strict8UI, History native seed/verify and Release were not invoked after unit failure. Ordinary Debug live-method gated skips are not passed native execution.",
+  "onboarding": {
+    "nine_XCTest_passed": true,
+    "original_PNGs_retained": 5,
+    "standard_external_AX_reports": 24,
+    "delayed_native_button_boundary": "helperExit0/pressCount1/actionError0",
+    "scope": "Native onboarding fixtures inside unit suite; distinct from skipped dedicated editor/native6 phase."
+  },
+  "artifact": {
+    "id": 12781379469,
+    "bytes": 107661635,
+    "sha256": "b7080ad80ee4eb0f3288538815f9f50ab16fe18004d1125a15703fdfa326874c",
+    "members": 2586,
+    "all_zip_crc_verified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40607608894/evidence.zip",
+    "full_archive_local": false
+  },
+  "raw_failed_log": {
+    "path": "/data/rjt-full-mac-40607608894/failed.log",
+    "bytes": 15101012,
+    "sha256": "dbc626c9e7cffce26f9026341b55ed783f1b1f6d71df2febf51a911cac9e7e0c",
+    "fetched_by": "polish_gate_readiness once; this audit reused existing bytes"
+  },
+  "independent_review": "independent-unit-audit.json",
+  "limits": [
+    "Unit gate red; no full relevant gate acceptance.",
+    "Source hashes use immutable tested commit, not later working tree or current candidate repairs.",
+    "Five issues belong to three failed methods, not five failed tests.",
+    "No strict8 helper-correction runtime, History correction persistence, native6, ASR/provider/editor-delivery or Release proof from this run."
+  ],
+  "independent_reviews": [
+    "independent-unit-audit.json",
+    "independent-broad-review.json",
+    "unit-failure-checkpoint/independent-review.md"
+  ],
+  "Core_receipt_check": "All1758PASS lines unique, noFAIL line, exact1758terminalsummary."
+}

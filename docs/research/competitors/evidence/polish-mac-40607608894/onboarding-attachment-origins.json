@@ -1,0 +1,644 @@
+[
+  {
+    "case": "OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+    "file": "advanced-choice-rejects-delayed-country.png",
+    "filename": "Advanced choice rejects delayed country_0_76EE3972-3240-41F9-BC4F-AE19477B69E9.png",
+    "lifetime": "keepAlways",
+    "name": "Advanced choice rejects delayed country",
+    "payloadRef": {
+      "id": "0~w2jOpit-zweu2a0sbuX2_uJyNhW1_uC7FNfxmCais7HRJ-z6pcXRebgAky3y1eg2rNDmAqbqgkV9tiyPI-XdFw=="
+    },
+    "payloadSize": "84868",
+    "timestamp": "2026-10-28T00:29:57.849+0000",
+    "uniformTypeIdentifier": "public.png",
+    "uuid": "4033CBDB-244F-4DD4-BBA4-C5BA6672B6CF",
+    "activity_title": "Added attachment named 'Advanced choice rejects delayed country'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~w2jOpit-zweu2a0sbuX2_uJyNhW1_uC7FNfxmCais7HRJ-z6pcXRebgAky3y1eg2rNDmAqbqgkV9tiyPI-XdFw==",
+    "payload_sha256": "a300888ed753e2483e5b7360154f260e4769b92c697c3ebf68ea1b176fe2a908",
+    "retained": "screenshots/advanced-choice-rejects-delayed-country.png"
+  },
+  {
+    "case": "OnboardingRegionViewTests/testContinueConfirmsCachedEnglishAcrossOnboardingReset()",
+    "file": "continue-preserves-english-after-onboarding-reset.png",
+    "filename": "Continue preserves English after onboarding reset_0_8ACD76B9-DFA1-41D0-BDAA-A7B568B526BC.png",
+    "lifetime": "keepAlways",
+    "name": "Continue preserves English after onboarding reset",
+    "payloadRef": {
+      "id": "0~mkTB8w0iHTQhxa3csUHIcrvYrK4UibI1zYgPEtgvSMkLeh1pHM1nraxL035WYE4vSLQQnYg5caRx0VJ57rV63Q=="
+    },
+    "payloadSize": "85778",
+    "timestamp": "2026-10-28T00:30:10.526+0000",
+    "uniformTypeIdentifier": "public.png",
+    "uuid": "B63DFA69-D80A-467B-ABF0-BC0968D32EBC",
+    "activity_title": "Added attachment named 'Continue preserves English after onboarding reset'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~mkTB8w0iHTQhxa3csUHIcrvYrK4UibI1zYgPEtgvSMkLeh1pHM1nraxL035WYE4vSLQQnYg5caRx0VJ57rV63Q==",
+    "payload_sha256": "490e193495226d95151f86d0d2b788f02224acabf52aefa39c6b606b3abe413e",
+    "retained": "screenshots/continue-preserves-english-after-onboarding-reset.png"
+  },
+  {
+    "case": "OnboardingRegionViewTests/testExplicitEnglishAccessibilityActionWinsBeforeTaiwanResponse()",
+    "file": "explicit-english-survives-delayed-taiwan.png",
+    "filename": "Explicit English survives delayed Taiwan_0_60C717B9-6D43-4921-8980-F80C519053E1.png",
+    "lifetime": "keepAlways",
+    "name": "Explicit English survives delayed Taiwan",
+    "payloadRef": {
+      "id": "0~3krWL5QoGdtcaS_WUEnX-eluWq33qdfqGMWLwEZXT0Prsdl47CmenQoO-DXLE2YEOnznvoq09VgV8TzhKdOl8Q=="
+    },
+    "payloadSize": "85974",
+    "timestamp": "2026-10-28T00:30:20.452+0000",
+    "uniformTypeIdentifier": "public.png",
+    "uuid": "403A85DB-F331-4A24-ACD4-8B43C5C0B7DB",
+    "activity_title": "Added attachment named 'Explicit English survives delayed Taiwan'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~3krWL5QoGdtcaS_WUEnX-eluWq33qdfqGMWLwEZXT0Prsdl47CmenQoO-DXLE2YEOnznvoq09VgV8TzhKdOl8Q==",
+    "payload_sha256": "e8f19b207ccc597fdec4a2b8962c34d298e8713a280c436ee1d5897d5fbbfc8f",
+    "retained": "screenshots/explicit-english-survives-delayed-taiwan.png"
+  },
+  {
+    "case": "OnboardingRegionViewTests/testExternalAccessibilityWaitsForOneDelayedNativeButtonAction()",
+    "file": "delayed-native-ax-action-boundary.json",
+    "filename": "Delayed native AX action boundary_0_97B1E973-F611-4E8A-90BF-6F73F0CFA596.json",
+    "lifetime": "keepAlways",
+    "name": "Delayed native AX action boundary",
+    "payloadRef": {
+      "id": "0~8ECcN49UqapQ0XNFMUOyuNcSRBcyzwsMLuzGJAGsKNHKLaTQuYqzhvw7BymwLW6qgRhIqCaYKxxnvP3wDWmttQ=="
+    },
+    "payloadSize": "14481",
+    "timestamp": "2026-10-28T00:30:21.200+0000",
+    "uniformTypeIdentifier": "public.json",
+    "uuid": "D50F6F9D-DF4E-4ACE-A3B6-87FFC71F84E5",
+    "activity_title": "Added attachment named 'Delayed native AX action boundary'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~8ECcN49UqapQ0XNFMUOyuNcSRBcyzwsMLuzGJAGsKNHKLaTQuYqzhvw7BymwLW6qgRhIqCaYKxxnvP3wDWmttQ==",
+    "payload_sha256": "fd608c5793b8297b123480aef95930da1e99a461e71863859b7e00c72b90eb63",
+    "content": {
+      "callbackElapsedSeconds": 0.552195541666606,
+      "configuredCallbackDelaySeconds": 0.55,
+      "helperExitCode": 0,
+      "helperReport": {
+        "actionElapsedSeconds": 0.5548980416666609,
+        "actionError": 0,
+        "actionErrorDescription": "AXError(rawValue: 0)",
+        "actionMatchCount": 1,
+        "actionTimeoutSeconds": 2,
+        "actionTimeoutSetupError": 0,
+        "activeAfter": true,
+        "activeBefore": true,
+        "activeBeforeAction": true,
+        "bundleIdentifier": "com.negentropi.RomaJustTalk",
+        "calls": [
+          {
+            "attribute": "AXFocusedWindow",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "application"
+          },
+          {
+            "attribute": "AXWindows",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "application"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0"
+          },
+          {
+            "errorCode": 0,
+            "operation": "copyAttributeNames",
+            "path": "window/0"
+          },
+          {
+            "attribute": "AXRole",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0"
+          },
+          {
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "operation": "copyActionNames",
+            "path": "window/0"
+          },
+          {
+            "attribute": "AXChildren",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0"
+          },
+          {
+            "errorCode": 0,
+            "operation": "copyAttributeNames",
+            "path": "window/0/0"
+          },
+          {
+            "attribute": "AXRole",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/0"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/0"
+          },
+          {
+            "attribute": "AXIdentifier",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/0"
+          },
+          {
+            "attribute": "AXEnabled",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/0"
+          },
+          {
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "operation": "copyActionNames",
+            "path": "window/0/0"
+          },
+          {
+            "attribute": "AXChildren",
+            "error": "AXError(rawValue: -25212)",
+            "errorCode": -25212,
+            "path": "window/0/0"
+          },
+          {
+            "errorCode": 0,
+            "operation": "copyAttributeNames",
+            "path": "window/0/1"
+          },
+          {
+            "attribute": "AXRole",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/1"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: -25212)",
+            "errorCode": -25212,
+            "path": "window/0/1"
+          },
+          {
+            "attribute": "AXEnabled",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/1"
+          },
+          {
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "operation": "copyActionNames",
+            "path": "window/0/1"
+          },
+          {
+            "attribute": "AXChildren",
+            "error": "AXError(rawValue: -25212)",
+            "errorCode": -25212,
+            "path": "window/0/1"
+          },
+          {
+            "errorCode": 0,
+            "operation": "copyAttributeNames",
+            "path": "window/0/2"
+          },
+          {
+            "attribute": "AXRole",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/2"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: -25212)",
+            "errorCode": -25212,
+            "path": "window/0/2"
+          },
+          {
+            "attribute": "AXEnabled",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/2"
+          },
+          {
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "operation": "copyActionNames",
+            "path": "window/0/2"
+          },
+          {
+            "attribute": "AXChildren",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/2"
+          },
+          {
+            "errorCode": 0,
+            "operation": "copyAttributeNames",
+            "path": "window/0/2/0"
+          },
+          {
+            "attribute": "AXRole",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/2/0"
+          },
+          {
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "operation": "copyActionNames",
+            "path": "window/0/2/0"
+          },
+          {
+            "attribute": "AXChildren",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/2/0"
+          },
+          {
+            "errorCode": 0,
+            "operation": "copyAttributeNames",
+            "path": "window/0/3"
+          },
+          {
+            "attribute": "AXRole",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/3"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: -25212)",
+            "errorCode": -25212,
+            "path": "window/0/3"
+          },
+          {
+            "attribute": "AXEnabled",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/3"
+          },
+          {
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "operation": "copyActionNames",
+            "path": "window/0/3"
+          },
+          {
+            "attribute": "AXChildren",
+            "error": "AXError(rawValue: -25212)",
+            "errorCode": -25212,
+            "path": "window/0/3"
+          },
+          {
+            "errorCode": 0,
+            "operation": "copyAttributeNames",
+            "path": "window/0/4"
+          },
+          {
+            "attribute": "AXRole",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/4"
+          },
+          {
+            "attribute": "AXValue",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/4"
+          },
+          {
+            "attribute": "AXEnabled",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/4"
+          },
+          {
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "operation": "copyActionNames",
+            "path": "window/0/4"
+          },
+          {
+            "attribute": "AXChildren",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/0/4"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "window/1"
+          },
+          {
+            "attribute": "AXWindows",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "beforePress/application"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "beforePress/window"
+          },
+          {
+            "attribute": "AXTitle",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "beforePress/window"
+          },
+          {
+            "attribute": "AXEnabled",
+            "error": "AXError(rawValue: 0)",
+            "errorCode": 0,
+            "path": "beforePress/control"
+          }
+        ],
+        "deadlineExceeded": false,
+        "enabledBeforeAction": true,
+        "fixtureWindowCount": 1,
+        "fixtureWindows": [
+          {
+            "actions": [
+              "AXRaise"
+            ],
+            "AXRole": "AXWindow",
+            "AXTitle": "Roma delayed native AX fixture 27306 ECE91749-FB5F-44F0-81F7-BE8D046C0A06",
+            "children": [
+              {
+                "actions": [
+                  "AXPress"
+                ],
+                "AXEnabled": true,
+                "AXIdentifier": "onboarding-delayed-native-action",
+                "AXRole": "AXButton",
+                "AXTitle": "Run one delayed native action",
+                "path": "window/0/0",
+                "supportedAttributes": [
+                  "AXIdentifier",
+                  "AXEnabled",
+                  "AXFrame",
+                  "AXParent",
+                  "AXSize",
+                  "AXFocused",
+                  "AXRole",
+                  "AXTopLevelUIElement",
+                  "AXHelp",
+                  "AXPosition",
+                  "AXTitle",
+                  "AXWindow",
+                  "AXRoleDescription"
+                ],
+                "timeoutError": 0
+              },
+              {
+                "actions": [
+                  "AXPress"
+                ],
+                "AXEnabled": true,
+                "AXRole": "AXButton",
+                "path": "window/0/1",
+                "supportedAttributes": [
+                  "AXEnabled",
+                  "AXFrame",
+                  "AXParent",
+                  "AXSize",
+                  "AXFocused",
+                  "AXRole",
+                  "AXTopLevelUIElement",
+                  "AXHelp",
+                  "AXPosition",
+                  "AXTitle",
+                  "AXWindow",
+                  "AXRoleDescription",
+                  "AXSubrole",
+                  "AXEdited"
+                ],
+                "timeoutError": 0
+              },
+              {
+                "actions": [
+                  "AXPress",
+                  "AXShowMenu"
+                ],
+                "AXEnabled": false,
+                "AXRole": "AXButton",
+                "children": [
+                  {
+                    "actions": [],
+                    "AXRole": "AXGroup",
+                    "children": [],
+                    "childrenCount": 0,
+                    "path": "window/0/2/0",
+                    "supportedAttributes": [
+                      "AXRole",
+                      "AXHelp",
+                      "AXChildrenInNavigationOrder",
+                      "AXChildren",
+                      "AXWindow",
+                      "AXPosition",
+                      "AXRoleDescription",
+                      "AXSize",
+                      "AXFocused",
+                      "AXFrame",
+                      "AXParent",
+                      "AXTopLevelUIElement"
+                    ],
+                    "timeoutError": 0
+                  }
+                ],
+                "childrenCount": 1,
+                "path": "window/0/2",
+                "supportedAttributes": [
+                  "AXEnabled",
+                  "AXFrame",
+                  "AXParent",
+                  "AXSize",
+                  "AXFocused",
+                  "AXChildren",
+                  "AXRole",
+                  "AXTopLevelUIElement",
+                  "AXHelp",
+                  "AXPosition",
+                  "AXTitle",
+                  "AXWindow",
+                  "AXRoleDescription",
+                  "AXSubrole"
+                ],
+                "timeoutError": 0
+              },
+              {
+                "actions": [
+                  "AXPress"
+                ],
+                "AXEnabled": false,
+                "AXRole": "AXButton",
+                "path": "window/0/3",
+                "supportedAttributes": [
+                  "AXEnabled",
+                  "AXFrame",
+                  "AXParent",
+                  "AXSize",
+                  "AXFocused",
+                  "AXRole",
+                  "AXTopLevelUIElement",
+                  "AXHelp",
+                  "AXPosition",
+                  "AXTitle",
+                  "AXWindow",
+                  "AXRoleDescription",
+                  "AXSubrole"
+                ],
+                "timeoutError": 0
+              },
+              {
+                "actions": [],
+                "AXEnabled": true,
+                "AXRole": "AXStaticText",
+                "AXValue": "Roma delayed native AX fixture 27306 ECE91749-FB5F-44F0-81F7-BE8D046C0A06",
+                "children": [],
+                "childrenCount": 0,
+                "path": "window/0/4",
+                "supportedAttributes": [
+                  "AXFocused",
+                  "AXFrame",
+                  "AXChildrenInNavigationOrder",
+                  "AXSelectedText",
+                  "AXInsertionPointLineNumber",
+                  "AXPosition",
+                  "AXNumberOfCharacters",
+                  "AXEnabled",
+                  "AXPlaceholderValue",
+                  "AXSelectedTextRange",
+                  "AXHelp",
+                  "AXChildren",
+                  "AXRole",
+                  "AXParent",
+                  "AXTopLevelUIElement",
+                  "AXVisibleCharacterRange",
+                  "AXValue",
+                  "AXSize",
+                  "AXRoleDescription",
+                  "AXWindow"
+                ],
+                "timeoutError": 0
+              }
+            ],
+            "childrenCount": 5,
+            "path": "window/0",
+            "supportedAttributes": [
+              "AXFocused",
+              "AXFullScreen",
+              "AXTitle",
+              "AXChildrenInNavigationOrder",
+              "AXFrame",
+              "AXPosition",
+              "AXGrowArea",
+              "AXMinimizeButton",
+              "AXDocument",
+              "AXSections",
+              "AXCloseButton",
+              "AXMain",
+              "AXActivationPoint",
+              "AXFullScreenButton",
+              "AXProxy",
+              "AXDefaultButton",
+              "AXMinimized",
+              "AXChildren",
+              "AXRole",
+              "AXParent",
+              "AXTitleUIElement",
+              "AXCancelButton",
+              "AXModal",
+              "AXSubrole",
+              "AXZoomButton",
+              "AXRoleDescription",
+              "AXSize",
+              "AXToolbarButton"
+            ],
+            "timeoutError": 0
+          }
+        ],
+        "focusedWindowTypeID": 77,
+        "generatedAt": "2026-10-28T00:30:20Z",
+        "helperPID": 28237,
+        "hostPID": 27306,
+        "matchedCount": 1,
+        "matchedPaths": [
+          "window/0/0"
+        ],
+        "matchValue": "onboarding-delayed-native-action",
+        "missingCheckboxDescriptions": [],
+        "mode": "press-id",
+        "nodeCount": 7,
+        "parentPID": 27306,
+        "queryIncomplete": false,
+        "sameWindowBeforeAction": true,
+        "timeoutError": 0,
+        "traversalBounded": false,
+        "trusted": true,
+        "windowCount": 2,
+        "windowTitle": "Roma delayed native AX fixture 27306 ECE91749-FB5F-44F0-81F7-BE8D046C0A06",
+        "windowTitles": [
+          "Roma delayed native AX fixture 27306 ECE91749-FB5F-44F0-81F7-BE8D046C0A06",
+          "roma-just-talk Onboarding"
+        ]
+      },
+      "hostPID": 27306,
+      "pressCount": 1,
+      "targetIdentifier": "onboarding-delayed-native-action",
+      "version": 1,
+      "windowTitle": "Roma delayed native AX fixture 27306 ECE91749-FB5F-44F0-81F7-BE8D046C0A06"
+    },
+    "retained": "raw/delayed-native-ax-action-boundary.json"
+  },
+  {
+    "case": "OnboardingRegionViewTests/testLateTaiwanDraftBlocksCachedEnglishContinueWithoutPersistingIt()",
+    "file": "taiwan-draft-with-cached-english.png",
+    "filename": "Taiwan draft with cached English_0_A851D39E-5BBE-4C4D-9EA8-F46E7C40C619.png",
+    "lifetime": "keepAlways",
+    "name": "Taiwan draft with cached English",
+    "payloadRef": {
+      "id": "0~FOWccPf4jOw7Ec2KCAV2cmQ51NLZETygLpdqI2SpnZ7_2PXTpYYWXMZr0EGlNS1Yy-_alNbuIiCDI0IMHvs1ow=="
+    },
+    "payloadSize": "80397",
+    "timestamp": "2026-10-28T00:30:23.440+0000",
+    "uniformTypeIdentifier": "public.png",
+    "uuid": "25ED8521-3E93-45FA-8E7C-6F21C09D2ED2",
+    "activity_title": "Added attachment named 'Taiwan draft with cached English'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~FOWccPf4jOw7Ec2KCAV2cmQ51NLZETygLpdqI2SpnZ7_2PXTpYYWXMZr0EGlNS1Yy-_alNbuIiCDI0IMHvs1ow==",
+    "payload_sha256": "016d6bcbb9ed352ed732f0b3f69f7029420ae2ce1cfda6388fd32461439cf736",
+    "retained": "screenshots/taiwan-draft-with-cached-english.png"
+  },
+  {
+    "case": "OnboardingRegionViewTests/testReopeningPreservesExplicitEnglishWithoutAnotherLookup()",
+    "file": "reopened-explicit-english.png",
+    "filename": "Reopened explicit English_0_B4DBB381-8DC3-4708-A0C0-22EBE8D24B0C.png",
+    "lifetime": "keepAlways",
+    "name": "Reopened explicit English",
+    "payloadRef": {
+      "id": "0~R9O3nnJvIdZAGnaB5RCnSwyRqbArYJWxliYilCXVkWkZxHYnE5RHR2lHjqt98pjZd98y0iq30k5psxhS9Iu-yQ=="
+    },
+    "payloadSize": "85592",
+    "timestamp": "2026-10-28T00:30:26.651+0000",
+    "uniformTypeIdentifier": "public.png",
+    "uuid": "E87EB650-8EF1-4F07-9CA3-B2C5311D5169",
+    "activity_title": "Added attachment named 'Reopened explicit English'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/Debug.xcresult/Data/data.0~R9O3nnJvIdZAGnaB5RCnSwyRqbArYJWxliYilCXVkWkZxHYnE5RHR2lHjqt98pjZd98y0iq30k5psxhS9Iu-yQ==",
+    "payload_sha256": "53ea11b66b3c2b3f774eb23b98a49e65bf0b9e8437eff1469f6184a81ea064d1",
+    "retained": "screenshots/reopened-explicit-english.png"
+  }
+]

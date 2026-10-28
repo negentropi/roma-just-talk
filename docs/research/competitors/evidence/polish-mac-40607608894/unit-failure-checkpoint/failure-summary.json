@@ -1,0 +1,33 @@
+{
+  "run_id": 40607608894,
+  "head_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "classification": "actual-full-unit-runtime-failures",
+  "failed_log_fetch_count": 1,
+  "failed_log_bytes": 15101012,
+  "failed_log_sha256": "dbc626c9e7cffce26f9026341b55ed783f1b1f6d71df2febf51a911cac9e7e0c",
+  "raw_summary": [
+    [
+      "325",
+      "34",
+      "31.320 seconds with 5 issues."
+    ]
+  ],
+  "starts_matching_no_parameter_method_format": 293,
+  "outcomes_matching_no_parameter_method_format": {
+    "passed": 290,
+    "failed": 3
+  },
+  "failed_methods": [
+    "failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits",
+    "failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits",
+    "failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry"
+  ],
+  "actual_issues": [
+    "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:42.2748260Z \u2718 Test failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits() recorded an issue at HistoryCorrectionApprovalTests.swift:214:17: Expectation failed: (after.count \u2192 3) == (before.count \u2192 2)",
+    "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:42.2778320Z \u2718 Test failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits() recorded an issue at HistoryCorrectionApprovalTests.swift:216:17: Expectation failed: !(after.contains { $0.id == preview.record.id } \u2192 <not evaluated>)",
+    "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:54.8891230Z \u2718 Test failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits() recorded an issue at WordReplacementBackupAdapterTests.swift:217:13: Expectation failed: try context.fetch(FetchDescriptor<WordReplacement>()).count == 1",
+    "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0421440Z \u2718 Test failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry() recorded an issue at WordReplacementLibraryAdapterTests.swift:185:17: Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }",
+    "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0438890Z \u2718 Test failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry() recorded an issue at WordReplacementLibraryAdapterTests.swift:185:17: Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }"
+  ],
+  "scope": "Failed-step log only; complete xcresult/unit artifact audit remains root-owned. No new artifact download."
+}

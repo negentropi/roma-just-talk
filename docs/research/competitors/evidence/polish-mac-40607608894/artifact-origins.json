@@ -1,0 +1,80 @@
+{
+  "run_id": 40607608894,
+  "artifact_id": 12781379469,
+  "artifact_bytes": 107661635,
+  "artifact_sha256": "b7080ad80ee4eb0f3288538815f9f50ab16fe18004d1125a15703fdfa326874c",
+  "all_member_crc_valid": true,
+  "zip_members": 2586,
+  "files": [
+    {
+      "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/host-requirement.txt",
+      "relative": "_temp/writing-proof-snapshot/onboarding-test-evidence/host-requirement.txt",
+      "bytes": 51,
+      "sha256": "a0d221780b12629db8af380225e07975a8f0a4b33e13e56c528e1b2eed33d40d",
+      "zip_crc32": "67d88807"
+    },
+    {
+      "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-after.txt",
+      "relative": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-after.txt",
+      "bytes": 363,
+      "sha256": "655868d914c4036c315c4705adbc4d021666fa72d61fb72791098caf997d57f3",
+      "zip_crc32": "e40e028d"
+    },
+    {
+      "member": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-before.txt",
+      "relative": "_temp/writing-proof-snapshot/onboarding-test-evidence/identity-before.txt",
+      "bytes": 363,
+      "sha256": "655868d914c4036c315c4705adbc4d021666fa72d61fb72791098caf997d57f3",
+      "zip_crc32": "e40e028d"
+    },
+    {
+      "member": "_temp/writing-proof-snapshot/source-sha.txt",
+      "relative": "_temp/writing-proof-snapshot/source-sha.txt",
+      "bytes": 41,
+      "sha256": "284c87e3ee5b0ccd3445ecc521dc6d373552a1d1115f70099f5c24fb2fef418c",
+      "zip_crc32": "a45f23c3"
+    },
+    {
+      "member": "_temp/writing-package-proof/candidate-strict-resolve.json",
+      "relative": "_temp/writing-package-proof/candidate-strict-resolve.json",
+      "bytes": 48,
+      "sha256": "b8d7c4a83bc62f449ed9b854ff63c039bbfd672feff6a72e84e7ade28e08c02e",
+      "zip_crc32": "80699e3e"
+    },
+    {
+      "member": "_temp/writing-package-proof/candidate-strict-resolve.log",
+      "relative": "_temp/writing-package-proof/candidate-strict-resolve.log",
+      "bytes": 11912,
+      "sha256": "1fddb1c7e1570c73262732cdb150d4bf6fef03ce06c5cdd61e612a7d687703a4",
+      "zip_crc32": "b574d13d"
+    },
+    {
+      "member": "_temp/writing-package-proof/canonical-graph-contract.json",
+      "relative": "_temp/writing-package-proof/canonical-graph-contract.json",
+      "bytes": 838,
+      "sha256": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f",
+      "zip_crc32": "e7dd55b7"
+    },
+    {
+      "member": "_temp/writing-core-checks.log",
+      "relative": "_temp/writing-core-checks.log",
+      "bytes": 209947,
+      "sha256": "ed2f0e1036d4a2cc3471a1adfc5dbeedb3a1f8b966443db715eefe7d27d780cc",
+      "zip_crc32": "18aff6e9"
+    },
+    {
+      "member": "_temp/writing-dependency-setup.log",
+      "relative": "_temp/writing-dependency-setup.log",
+      "bytes": 334,
+      "sha256": "34ccdd96043718159310ec312a3160c4e6c104fd23717602d504dc7dd4915add",
+      "zip_crc32": "72889536"
+    },
+    {
+      "member": "_temp/writing-package-proof/canonical.Package.resolved",
+      "relative": "_temp/writing-package-proof/canonical.Package.resolved",
+      "bytes": 11320,
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+      "zip_crc32": "0a5f215e"
+    }
+  ]
+}

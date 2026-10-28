@@ -1,0 +1,37 @@
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2683750Z     NSMigratePersistentStoresAutomaticallyOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2684600Z     NSPersistentHistoryTrackingKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2685500Z     NSPersistentStoreRemoteChangeNotificationOptionKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2686820Z     NSReadOnlyPersistentStoreOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2688450Z }, reason=Unable to write to file opened Read Only., storeURL=/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Correction-E3FE03AD-87C4-45BE-B0D4-5744B308B81B/library.store}
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2748260Z ✘ Test failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits() recorded an issue at HistoryCorrectionApprovalTests.swift:214:17: Expectation failed: (after.count → 3) == (before.count → 2)
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2778320Z ✘ Test failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits() recorded an issue at HistoryCorrectionApprovalTests.swift:216:17: Expectation failed: !(after.contains { $0.id == preview.record.id } → <not evaluated>)
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2782690Z ✘ Test failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits() failed after 0.053 seconds with 2 issues.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2784820Z ✘ Suite HistoryCorrectionApprovalTests failed after 0.172 seconds with 2 issues.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:42.2795270Z ◇ Suite LocalCLIServiceLifetimeTests started.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8881640Z     NSMigratePersistentStoresAutomaticallyOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8882930Z     NSPersistentHistoryTrackingKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8883940Z     NSPersistentStoreRemoteChangeNotificationOptionKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8884900Z     NSReadOnlyPersistentStoreOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8886840Z }, reason=Unable to write to file opened Read Only., storeURL=/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Dictionary-Backup-F1CDCB9E-B139-4645-8DF1-C08A26600E17/read-only.store}
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8891230Z ✘ Test failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits() recorded an issue at WordReplacementBackupAdapterTests.swift:217:13: Expectation failed: try context.fetch(FetchDescriptor<WordReplacement>()).count == 1
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8896130Z 2026-10-28 00:30:54.880647+0000 roma just talk[27306:82179] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Dictionary-Backup-F1CDCB9E-B139-4645-8DF1-C08A26600E17/read-only.store-wal
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8899540Z 2026-10-28 00:30:54.880685+0000 roma just talk[27306:82179] [logging] invalidated open fd: 39 (0x11)
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:54.8902910Z 2026-10-28 00:30:54.880696+0000 roma just talk[27306:82179] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Dictionary-Backup-F1CDCB9E-B139-4645-8DF1-C08A26600E17/read-only.store-shm
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0410520Z     NSMigratePersistentStoresAutomaticallyOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0411100Z     NSPersistentHistoryTrackingKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0411560Z     NSPersistentStoreRemoteChangeNotificationOptionKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0411930Z     NSReadOnlyPersistentStoreOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0412700Z }, reason=Unable to write to file opened Read Only., storeURL=/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Correction-E07DAE45-BC03-4749-B6B1-C3776D8BBBBA/library.store}
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0421440Z ✘ Test failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry() recorded an issue at WordReplacementLibraryAdapterTests.swift:185:17: Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0423040Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 "The file couldn’t be saved because you don’t have permission." UserInfo={NSPersistentStoreOptions={
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0425810Z     NSInferMappingModelAutomaticallyOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0426260Z     NSMigratePersistentStoresAutomaticallyOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0435420Z     NSMigratePersistentStoresAutomaticallyOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0435700Z     NSPersistentHistoryTrackingKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0436040Z     NSPersistentStoreRemoteChangeNotificationOptionKey = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0436390Z     NSReadOnlyPersistentStoreOption = 1;
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0437090Z }, reason=Unable to write to file opened Read Only., storeURL=/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Correction-E07DAE45-BC03-4749-B6B1-C3776D8BBBBA/library.store}
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0438890Z ✘ Test failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry() recorded an issue at WordReplacementLibraryAdapterTests.swift:185:17: Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0440560Z 2026-10-28 00:30:55.017866+0000 roma just talk[27306:82179] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Correction-E07DAE45-BC03-4749-B6B1-C3776D8BBBBA/library.store
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0442010Z ✘ Test failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry() failed after 0.042 seconds with 2 issues.
+macos	Full Mac unit suite with fresh CI permissions	2026-10-28T00:30:55.0442570Z 2026-10-28 00:30:55.022587+0000 roma just talk[27306:82179] [logging] invalidated open fd: 41 (0x11)

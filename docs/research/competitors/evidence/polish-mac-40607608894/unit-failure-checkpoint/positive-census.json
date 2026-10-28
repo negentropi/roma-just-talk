@@ -1,0 +1,335 @@
+{
+  "run_id": 40607608894,
+  "head_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "scope": "Pinned source registry plus actual cached failed-step log. Parameterized totals and full unit xcresult audit remain root-owned.",
+  "total_exact_once_passed": 37,
+  "groups": {
+    "VoiceInkTests/WritingActionUndoTests.swift": {
+      "expected": 20,
+      "actual_passed": 20,
+      "methods": [
+        {
+          "method": "confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "refusedKeyboardAuthorizationBalancesCommandWithoutPostingV",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        }
+      ]
+    },
+    "VoiceInkTests/WritingActionUndoPipelineTests.swift": {
+      "expected": 8,
+      "actual_passed": 8,
+      "methods": [
+        {
+          "method": "confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        }
+      ]
+    },
+    "VoiceInkTests/ClipboardRestorationOwnershipTests.swift": {
+      "expected": 5,
+      "actual_passed": 5,
+      "methods": [
+        {
+          "method": "unresolvedMenuPreparationRejectsACompetingClipboardWrite",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "cancelingANewWaiterDoesNotCancelTheEarlierRestoration",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "cancellationDuringDeliveryObservationStillCommitsExactReadback",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "confirmedCallbackPrecedesImmediateRestorationAndFiresOnce",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        }
+      ]
+    },
+    "VoiceInkTests/ShortcutBackupTests.swift": {
+      "expected": 3,
+      "actual_passed": 3,
+      "methods": [
+        {
+          "method": "explicitModernKindRejectsMalformedDataEvenWithLegacyKeys",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        },
+        {
+          "method": "missingKindStillRequiresAValidLegacyCarbonPayload",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        }
+      ]
+    },
+    "VoiceInkTests/AudioFileTranscriptionPersistenceTests.swift": {
+      "expected": 1,
+      "actual_passed": 1,
+      "methods": [
+        {
+          "method": "savingCompletedAudioDoesNotCommitUnrelatedCallerEdits",
+          "starts": 1,
+          "results": [
+            "passed"
+          ],
+          "issues": 0
+        }
+      ]
+    }
+  },
+  "failed_log_sha256": "dbc626c9e7cffce26f9026341b55ed783f1b1f6d71df2febf51a911cac9e7e0c"
+}

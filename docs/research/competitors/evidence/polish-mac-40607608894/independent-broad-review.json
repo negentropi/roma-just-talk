@@ -1,0 +1,108 @@
+{
+  "acceptance": false,
+  "acceptance_blockers": [
+    "Three failed Swift Testing methods with five issues on immutable tested source.",
+    "Dedicated native6, strict8UI, normal History seed/verify and Release gates did not run."
+  ],
+  "classification": "broad-failed-receipt-consistent",
+  "contradictions": [],
+  "downstream": {
+    "History_seed": "ordinary Debug method gated-skipped; UI stage not invoked",
+    "History_verify": "not invoked",
+    "Release": "skipped",
+    "UI8": "skipped",
+    "native6": "skipped",
+    "workflow_skipped_list_matches_audit_exactly": true
+  },
+  "identity": {
+    "ExternalAXProbe_sha256": "75364546060b8995540fe38045a70d7c5fa854b3ca17d09dd57f8889c8740c8c",
+    "app_sha256": "ac83c09815ae2806b096bf4cc5ffee14850c439e7f87498dac638247b02f7b2a",
+    "before_after_fingerprint_receipts_byte_equal": true,
+    "cdhash": "c99ad2cb3fc74cd1389a269f07e8d54d89467655",
+    "strict_codesign_command_boundary": "Pinned unit driver verifies app before grant SQL and after tests; fingerprint comparison reached and equal. Built app not retained locally for another verification."
+  },
+  "independent_peer_review": "Count reconciliation, failure issue UUIDs, workflow skips and limited permission claims independently confirmed clean.",
+  "input_sha256": {
+    "artifact-origins.json": "f63be5e27644fb4a821a6aae7c7a572325e283739a764f08a9e7d26361372901",
+    "audit.json": "9eac1a0ab27bd1e645eedae89d4aeabd1d8a03dc2b4df7d2a7d5900660fd0d8a",
+    "build-checkpoint.json": "d074890bce63fa9b25bcb62d2aee322dc6cf78088651cf031ccfdac9ecdbe491",
+    "independent-unit-audit.json": "f6c0df9d0ceb86ee0822293b668aff9e279dac4fa1ab926c22c27e9e77350fe2",
+    "onboarding-attachment-origins.json": "24efeebf3208964ac595bab28ce8ef4f72936361b1935b5006f5de8c0f0b3022",
+    "raw/_temp/writing-core-checks.log": "ed2f0e1036d4a2cc3471a1adfc5dbeedb3a1f8b966443db715eefe7d27d780cc",
+    "raw/_temp/writing-dependency-setup.log": "34ccdd96043718159310ec312a3160c4e6c104fd23717602d504dc7dd4915add",
+    "raw/_temp/writing-package-proof/canonical-graph-contract.json": "135dedb03f8797e4259cf48bfb40a97123ca712b09755c26b791e4197e9bb69f",
+    "raw/_temp/writing-package-proof/canonical.Package.resolved": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+    "raw/_temp/writing-proof-snapshot/onboarding-test-evidence/identity-after.txt": "655868d914c4036c315c4705adbc4d021666fa72d61fb72791098caf997d57f3",
+    "raw/_temp/writing-proof-snapshot/onboarding-test-evidence/identity-before.txt": "655868d914c4036c315c4705adbc4d021666fa72d61fb72791098caf997d57f3",
+    "source-bindings.json": "3ae4da132a37be5e266db49093fd6a9136c9d69af5a386f70e8688fc2760d689",
+    "unit-results.json": "3b19c78dbc355e18100121e2bbf40c78c1940a56f41a53f008795254d5af139e",
+    "workflow-status.json": "04d5b713b0dd54a1f36850f5727a6449e1f096c2bcd1b63b066090ddbcf6a0c9"
+  },
+  "permissions": "Pinned SQL grants target current compiled csreq; actual onboarding AX reports trusted. No retained auth_value=2 row readback, post-UI permission stability or later native6 permission claim.",
+  "positive_new_methods": {
+    "all_summary_statuses": "Success",
+    "group_counts": {
+      "AudioFileTranscriptionPersistenceTests": 1,
+      "ClipboardRestorationOwnershipTests": 5,
+      "ShortcutBackupTests": 3,
+      "WritingActionUndoPipelineTests": 8,
+      "WritingActionUndoTests": 20
+    },
+    "raw_one_start_one_pass_census": "Owned and frozen by gate owner in exclusive checkpoint; compact broad success records independently checked here.",
+    "summary_records_checked": 37
+  },
+  "prerequisites": {
+    "Debug_build_for_testing": "passed",
+    "canonical_lock_bytes_equal_pinned_commit": true,
+    "canonical_package_pins": 41,
+    "canonical_pin_identities_unique": 41,
+    "compile_errors_in_checkpoint": 0,
+    "core_PASS_lines": 1758,
+    "core_summary": "Executed 1758 VoiceInkCore checks.",
+    "declaration_hashes_bound_to_git_show": 5,
+    "static_Whisper_verified_slices": 7,
+    "strict_resolution_exit_code": 0
+  },
+  "provenance_checks": {
+    "canonical_lock_included": true,
+    "mismatches": [],
+    "onboarding_payload_sha256_checks": 6,
+    "retained_raw_size_sha256_crc32_entries_checked": 10,
+    "whole_archive": "Owner one-fetch provenance and all-member CRC receipt retained; remote archive not reopened by this review."
+  },
+  "run_id": 40607608894,
+  "scope": "Read-only compact broad evidence review; exclusive unit-failure-checkpoint preserved and not reread. No downloads, runtime, source edits or commits.",
+  "source_checks": {
+    "artifact_source_receipt_matches": true,
+    "input_files_bound_to_git_show": 31,
+    "source_mismatches": []
+  },
+  "source_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "unit_count_reconciliation": {
+    "SwiftTesting_summary_records": 327,
+    "SwiftTesting_unique_method_statuses": {
+      "Failure": 3,
+      "Skipped": 30,
+      "Success": 292
+    },
+    "XCTest": {
+      "Success": 9,
+      "records": 9
+    },
+    "all_summary_records": 336,
+    "all_summary_statuses": {
+      "Failure": 3,
+      "Skipped": 30,
+      "Success": 303
+    },
+    "assertion_issues": 5,
+    "duplicate_scope": "Each named identifier appears twice in summary metadata; not a claim of 336 physical test invocations.",
+    "duplicated_parameterized_identifiers": [
+      "FluidAudioModelManagerTests/secondCallerJoinsActiveDownloadAndCancellationLeavesRetryState(usesURLCancellation:)",
+      "FluidAudioStreamingCommitTests/finalPassOverlapsCancelledLivePassWithoutPublishingItsLateResult(finalSamples:)"
+    ],
+    "raw_SwiftTesting_suites": 34,
+    "raw_SwiftTesting_tests": 325
+  },
+  "version": 1
+}

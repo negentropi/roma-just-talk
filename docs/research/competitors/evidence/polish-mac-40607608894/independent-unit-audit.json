@@ -1,0 +1,278 @@
+{
+  "version": 1,
+  "run_id": 40607608894,
+  "source_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "classification": "unit-failed-downstream-phases-not-run",
+  "scope": "Independent audit of retained Debug xcresult summaries, filtered existing failed log, selected source/package/Core/dependency/identity receipts and exact workflow metadata. No new runtime or artifact fetch.",
+  "artifact": {
+    "id": 12781379469,
+    "bytes": 107661635,
+    "sha256": "b7080ad80ee4eb0f3288538815f9f50ab16fe18004d1125a15703fdfa326874c",
+    "full_crc_verification_from_owner_receipt": true,
+    "members": 2586,
+    "independently_checked_selected_files": 9,
+    "selected_file_hashes_and_crc_valid": true,
+    "full_archive_downloaded_or_rehashed_by_auditor": false
+  },
+  "decoded_results": {
+    "bytes": 4915679,
+    "sha256": "d91873d8469b6ea6379719f53c18f6e5dadc969d21db623fe4e5f0b58ccd85f4",
+    "summary_records": 336,
+    "summary_statuses": {
+      "Success": 303,
+      "Skipped": 30,
+      "Failure": 3
+    },
+    "SwiftTesting_unique_method_identifiers": 325,
+    "SwiftTesting_unique_method_statuses": {
+      "Success": 292,
+      "Skipped": 30,
+      "Failure": 3
+    },
+    "SwiftTesting_suites": 34,
+    "duplicate_parameterized_summary_identifiers": {
+      "FluidAudioModelManagerTests/secondCallerJoinsActiveDownloadAndCancellationLeavesRetryState(usesURLCancellation:)": 2,
+      "FluidAudioStreamingCommitTests/finalPassOverlapsCancelledLivePassWithoutPublishingItsLateResult(finalSamples:)": 2
+    },
+    "raw_SwiftTesting_summary": {
+      "tests": 325,
+      "suites": 34,
+      "issues": 5
+    },
+    "XCTest_separate_summary": {
+      "tests": 9,
+      "failures": 0
+    },
+    "count_limit": "The 336 summary records are not 336 physical test invocations. Nine records are separate XCTest methods; two parameterized Swift Testing method identifiers repeat. Argument-level invocation counts are not reconstructed from repeated identifiers."
+  },
+  "failed_methods": [
+    {
+      "identifier": "VoiceInkTests/HistoryCorrectionApprovalTests/failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits()",
+      "status": "Failure",
+      "issues": [
+        {
+          "file": "HistoryCorrectionApprovalTests.swift",
+          "line": 214,
+          "message": "Expectation failed: (after.count \u2192 3) == (before.count \u2192 2)",
+          "uuid": "6C25FDC1-5151-4243-BE3E-B56933BA9EB5"
+        },
+        {
+          "file": "HistoryCorrectionApprovalTests.swift",
+          "line": 216,
+          "message": "Expectation failed: !(after.contains { $0.id == preview.record.id } \u2192 <not evaluated>)",
+          "uuid": "F0267C57-3ED1-49EB-9A86-3EC85F90333C"
+        }
+      ]
+    },
+    {
+      "identifier": "VoiceInkTests/WordReplacementBackupAdapterTests/failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits()",
+      "status": "Failure",
+      "issues": [
+        {
+          "file": "WordReplacementBackupAdapterTests.swift",
+          "line": 217,
+          "message": "Expectation failed: try context.fetch(FetchDescriptor<WordReplacement>()).count == 1",
+          "uuid": "EDD7C611-2A21-4ECD-B8B9-351F00DF627E"
+        }
+      ]
+    },
+    {
+      "identifier": "VoiceInkTests/WordReplacementLibraryAdapterTests/failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry()",
+      "status": "Failure",
+      "issues": [
+        {
+          "file": "WordReplacementLibraryAdapterTests.swift",
+          "line": 185,
+          "message": "Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }",
+          "uuid": "DD2A295B-5550-4AA4-BB20-E8185C5281BB"
+        },
+        {
+          "file": "WordReplacementLibraryAdapterTests.swift",
+          "line": 185,
+          "message": "Expectation failed: try fixture.context.fetch(FetchDescriptor<WordReplacement>()).contains { $0.id == initial.id }",
+          "uuid": "E4CD0A19-0C84-4B62-BB8C-5B2B431109AE"
+        }
+      ]
+    }
+  ],
+  "failure_method_count": 3,
+  "assertion_issue_count": 5,
+  "onboarding_XCTest": {
+    "all_nine_success": true,
+    "methods": [
+      {
+        "identifier": "OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testContinueConfirmsCachedEnglishAcrossOnboardingReset()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testExplicitEnglishAccessibilityActionWinsBeforeTaiwanResponse()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testExternalAccessibilityWaitsForOneDelayedNativeButtonAction()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testLateTaiwanDraftBlocksCachedEnglishContinueWithoutPersistingIt()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testProductionOnboardingWindowFitsVisibleDesktopAndKeepsUserResize()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testReopeningPreservesExplicitEnglishWithoutAnotherLookup()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testSkipUnmountsPendingLookupWithoutCommittingSuggestedModel()",
+        "status": "Success"
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testWindowAccessorReconfiguresAfterSwiftUIReusesItsView()",
+        "status": "Success"
+      }
+    ],
+    "standard_external_AX": [
+      {
+        "identifier": "OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+        "status": "Success",
+        "external_reports": 4,
+        "all_reports_trusted": true,
+        "actions": [
+          {
+            "actionError": 0,
+            "actionMatchCount": 1
+          }
+        ]
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testContinueConfirmsCachedEnglishAcrossOnboardingReset()",
+        "status": "Success",
+        "external_reports": 6,
+        "all_reports_trusted": true,
+        "actions": [
+          {
+            "actionError": 0,
+            "actionMatchCount": 1
+          }
+        ]
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testExplicitEnglishAccessibilityActionWinsBeforeTaiwanResponse()",
+        "status": "Success",
+        "external_reports": 4,
+        "all_reports_trusted": true,
+        "actions": [
+          {
+            "actionError": 0,
+            "actionMatchCount": 1
+          }
+        ]
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testLateTaiwanDraftBlocksCachedEnglishContinueWithoutPersistingIt()",
+        "status": "Success",
+        "external_reports": 4,
+        "all_reports_trusted": true,
+        "actions": []
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testReopeningPreservesExplicitEnglishWithoutAnotherLookup()",
+        "status": "Success",
+        "external_reports": 4,
+        "all_reports_trusted": true,
+        "actions": [
+          {
+            "actionError": 0,
+            "actionMatchCount": 1
+          }
+        ]
+      },
+      {
+        "identifier": "OnboardingRegionViewTests/testSkipUnmountsPendingLookupWithoutCommittingSuggestedModel()",
+        "status": "Success",
+        "external_reports": 2,
+        "all_reports_trusted": true,
+        "actions": [
+          {
+            "actionError": 0,
+            "actionMatchCount": 1
+          }
+        ]
+      }
+    ],
+    "delayed_native_button_AX": {
+      "identifier": "OnboardingRegionViewTests/testExternalAccessibilityWaitsForOneDelayedNativeButtonAction()",
+      "payload_sha256": "fd608c5793b8297b123480aef95930da1e99a461e71863859b7e00c72b90eb63",
+      "helperExitCode": 0,
+      "pressCount": 1,
+      "configuredCallbackDelaySeconds": 0.55,
+      "actionError": 0,
+      "actionMatchCount": 1,
+      "trusted": true
+    },
+    "limit": "Native fixtures/actions inside ordinary Debug tests; no claim that the later writing-native phase or broad onboarding acceptance ran."
+  },
+  "identity": {
+    "before_after_receipt_byte_equal": true,
+    "app_sha256": "ac83c09815ae2806b096bf4cc5ffee14850c439e7f87498dac638247b02f7b2a",
+    "external_AX_probe_sha256": "75364546060b8995540fe38045a70d7c5fa854b3ca17d09dd57f8889c8740c8c",
+    "app_cdhash": "c99ad2cb3fc74cd1389a269f07e8d54d89467655",
+    "host_requirement_matches": true,
+    "limit": "These selected receipts bind Debug app/helper hashes and host requirement before/after. They do not supply post-UI identity or later permission database observations."
+  },
+  "prerequisites": {
+    "proof_source_sha_matches_run_head": true,
+    "Core_checks": 1758,
+    "canonical_package_pins": 41,
+    "canonical_lock_and_five_declaration_hashes_match_frozen_source": true,
+    "strict_package_resolution_exit_code": 0,
+    "canonical_lock_unchanged": true,
+    "verified_static_Whisper_slices": 7
+  },
+  "downstream": {
+    "dedicated_native6": "workflow-step-skipped",
+    "native6_methods": [
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+        "ordinary_Debug_status": "Skipped"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+        "ordinary_Debug_status": "Skipped"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+        "ordinary_Debug_status": "Skipped"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+        "ordinary_Debug_status": "Skipped"
+      },
+      {
+        "identifier": "VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+        "ordinary_Debug_status": "Skipped"
+      },
+      {
+        "identifier": "VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+        "ordinary_Debug_status": "Skipped"
+      }
+    ],
+    "matched_snippet_regression": "workflow-step-skipped",
+    "History_seed": "gated-skipped-in-Debug; downstream UI stage not run",
+    "UI8": "workflow-step-skipped",
+    "History_readonly_verify": "not-invoked",
+    "Release_build_packaging": "workflow-step-skipped"
+  },
+  "limits": [
+    "Full relevant gate is red. Core and Debug onboarding positives do not establish native writing, UI8, History/correction persistence, ASR/provider/editor delivery or Release acceptance.",
+    "Thirty Swift Testing method identifiers were skipped under their environment gates.",
+    "Five assertion issues belong to three failed methods, not five failed test methods.",
+    "The existing remote 15,101,012-byte failed log was read only through a narrow filtered command; no duplicate full log/archive was downloaded."
+  ]
+}

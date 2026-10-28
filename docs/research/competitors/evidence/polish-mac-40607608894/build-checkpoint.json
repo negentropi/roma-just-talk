@@ -1,0 +1,476 @@
+{
+  "run_id": 40607608894,
+  "source_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "raw_failed_log": {
+    "path": "/data/rjt-full-mac-40607608894/failed.log",
+    "bytes": 15101012,
+    "sha256": "dbc626c9e7cffce26f9026341b55ed783f1b1f6d71df2febf51a911cac9e7e0c",
+    "fetched_by": "polish_gate_readiness once; this audit reused existing bytes"
+  },
+  "selected_log_lines": [
+    {
+      "line": 24664,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:31.8930510Z ** TEST BUILD SUCCEEDED **"
+    },
+    {
+      "line": 92049,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:28.4759490Z \t Executed 9 tests, with 0 failures (0 unexpected) in 34.124 (34.129) seconds"
+    },
+    {
+      "line": 92051,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:28.5343130Z \t Executed 9 tests, with 0 failures (0 unexpected) in 34.124 (34.130) seconds"
+    },
+    {
+      "line": 92053,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:28.5663320Z \t Executed 9 tests, with 0 failures (0 unexpected) in 34.124 (34.131) seconds"
+    },
+    {
+      "line": 92325,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:38.5209420Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 92343,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:38.6530970Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 92430,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:39.9118880Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93058,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:42.2680710Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93770,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:54.8790270Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93799,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0142700Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93806,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0162810Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93813,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0403700Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93821,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0423040Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93828,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0430040Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93835,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.0434380Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 93882,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:30:55.6367990Z SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 \"The file couldn\u2019t be saved because you don\u2019t have permission.\" UserInfo={NSPersistentStoreOptions={"
+    },
+    {
+      "line": 94098,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:31:00.3002930Z \u2718 Test run with 325 tests in 34 suites failed after 31.320 seconds with 5 issues."
+    },
+    {
+      "line": 94111,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:31:07.7289500Z ** TEST EXECUTE FAILED **"
+    }
+  ],
+  "compile_errors": [],
+  "resource_copy_lines": [
+    {
+      "line": 1228,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.2179560Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/GeneratedModuleMaps/VoiceInkQwen.modulemap /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkQwen.build/Debug/VoiceInkQwen.build/VoiceInkQwen.modulemap (in target 'VoiceInkQwen' from project 'VoiceInkQwen')"
+    },
+    {
+      "line": 1392,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.2510770Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/GeneratedModuleMaps/VoiceInkNVIDIA.modulemap /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkNVIDIA.build/Debug/VoiceInkNVIDIA.build/VoiceInkNVIDIA.modulemap (in target 'VoiceInkNVIDIA' from project 'VoiceInkNVIDIA')"
+    },
+    {
+      "line": 1396,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.2516130Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/GeneratedModuleMaps/VoiceInkCore.modulemap /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkCore.build/Debug/VoiceInkCore.build/VoiceInkCore.modulemap (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+    },
+    {
+      "line": 5250,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.8531370Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/steel/attn/kernels/steel_attention.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5272,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.8563340Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/scaled_dot_product_attention.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5276,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.8583430Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/rope.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5280,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.8597420Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/rms_norm.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5284,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.8607770Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/random.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5288,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.8617650Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/layer_norm.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5292,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:22:58.8629210Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/gemv.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5296,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:23:04.1341610Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/conv.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5300,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:23:04.1553110Z CompileMetalFile /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/checkouts/mlx-swift/Source/Cmlx/mlx-generated/metal/arg_reduce.metal (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 5323,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:23:04.1617320Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkQwen_VoiceInkQwen.bundle/Contents/Resources/Resources /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkQwen/Sources/VoiceInkQwen/Resources (in target 'VoiceInkQwen_VoiceInkQwen' from project 'VoiceInkQwen')"
+    },
+    {
+      "line": 5331,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:23:04.1647430Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle/Contents/Resources/ThirdPartyNotices /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkNVIDIA/Sources/VoiceInkNVIDIA/Resources/ThirdPartyNotices (in target 'VoiceInkNVIDIA_VoiceInkNVIDIA' from project 'VoiceInkNVIDIA')"
+    },
+    {
+      "line": 7638,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:25:33.5839300Z MetalLink /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib (in target 'mlx-swift_Cmlx' from project 'mlx-swift')"
+    },
+    {
+      "line": 18890,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:27:58.5869830Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkQwen.swiftmodule/arm64-apple-macos.swiftmodule /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkQwen.build/Debug/VoiceInkQwen.build/Objects-normal/arm64/VoiceInkQwen.swiftmodule (in target 'VoiceInkQwen' from project 'VoiceInkQwen')"
+    },
+    {
+      "line": 18894,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:27:58.6296590Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkQwen.swiftmodule/arm64-apple-macos.swiftdoc /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkQwen.build/Debug/VoiceInkQwen.build/Objects-normal/arm64/VoiceInkQwen.swiftdoc (in target 'VoiceInkQwen' from project 'VoiceInkQwen')"
+    },
+    {
+      "line": 18898,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:27:58.6707690Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkQwen.swiftmodule/arm64-apple-macos.abi.json /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkQwen.build/Debug/VoiceInkQwen.build/Objects-normal/arm64/VoiceInkQwen.abi.json (in target 'VoiceInkQwen' from project 'VoiceInkQwen')"
+    },
+    {
+      "line": 18902,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:27:58.7020290Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkQwen.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkQwen.build/Debug/VoiceInkQwen.build/Objects-normal/arm64/VoiceInkQwen.swiftsourceinfo (in target 'VoiceInkQwen' from project 'VoiceInkQwen')"
+    },
+    {
+      "line": 19687,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:04.6080050Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkNVIDIA.swiftmodule/arm64-apple-macos.swiftmodule /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkNVIDIA.build/Debug/VoiceInkNVIDIA.build/Objects-normal/arm64/VoiceInkNVIDIA.swiftmodule (in target 'VoiceInkNVIDIA' from project 'VoiceInkNVIDIA')"
+    },
+    {
+      "line": 19691,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:04.6085460Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkNVIDIA.swiftmodule/arm64-apple-macos.swiftdoc /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkNVIDIA.build/Debug/VoiceInkNVIDIA.build/Objects-normal/arm64/VoiceInkNVIDIA.swiftdoc (in target 'VoiceInkNVIDIA' from project 'VoiceInkNVIDIA')"
+    },
+    {
+      "line": 19695,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:04.6090820Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkNVIDIA.swiftmodule/arm64-apple-macos.abi.json /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkNVIDIA.build/Debug/VoiceInkNVIDIA.build/Objects-normal/arm64/VoiceInkNVIDIA.abi.json (in target 'VoiceInkNVIDIA' from project 'VoiceInkNVIDIA')"
+    },
+    {
+      "line": 19699,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:04.6096210Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkNVIDIA.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkNVIDIA.build/Debug/VoiceInkNVIDIA.build/Objects-normal/arm64/VoiceInkNVIDIA.swiftsourceinfo (in target 'VoiceInkNVIDIA' from project 'VoiceInkNVIDIA')"
+    },
+    {
+      "line": 19904,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:14.2483720Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkCore.swiftmodule/arm64-apple-macos.swiftmodule /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkCore.build/Debug/VoiceInkCore.build/Objects-normal/arm64/VoiceInkCore.swiftmodule (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+    },
+    {
+      "line": 19908,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:14.2491760Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkCore.swiftmodule/arm64-apple-macos.swiftdoc /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkCore.build/Debug/VoiceInkCore.build/Objects-normal/arm64/VoiceInkCore.swiftdoc (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+    },
+    {
+      "line": 19912,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:14.2499520Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkCore.swiftmodule/arm64-apple-macos.abi.json /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkCore.build/Debug/VoiceInkCore.build/Objects-normal/arm64/VoiceInkCore.abi.json (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+    },
+    {
+      "line": 19916,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:14.2509640Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkCore.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInkCore.build/Debug/VoiceInkCore.build/Objects-normal/arm64/VoiceInkCore.swiftsourceinfo (in target 'VoiceInkCore' from project 'VoiceInkCore')"
+    },
+    {
+      "line": 20086,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.4753920Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/zenURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/zenURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20090,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.5163110Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/yandexURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/yandexURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20094,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.5570480Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/vivaldiURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/vivaldiURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20098,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.5978500Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/sound7.wav /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/Sounds/sound7.wav (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20102,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.6406340Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/sound6.mp3 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/Sounds/sound6.mp3 (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20106,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.6814020Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/sound5.mp3 /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/Sounds/sound5.mp3 (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20110,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.7241790Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/sound4.wav /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/Sounds/sound4.wav (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20114,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.7569670Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/sound3.wav /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/Sounds/sound3.wav (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20118,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.7574400Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/sound2.wav /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/Sounds/sound2.wav (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20122,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.7873740Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/sound1.wav /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/Sounds/sound1.wav (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20126,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.8278440Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/safariURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/safariURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20130,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.8681980Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/orionURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/orionURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20134,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.9086460Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/operaURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/operaURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20138,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.9514260Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/ggml-silero-v5.1.2.bin /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/models/ggml-silero-v5.1.2.bin (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20142,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:18.9925800Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/firefoxURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/firefoxURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20146,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.0343990Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/edgeURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/edgeURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20150,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.0748220Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/chromeURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/chromeURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20154,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.1152650Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/braveURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/braveURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20158,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.1613460Z CpResource /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/arcURL.scpt /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Resources/arcURL.scpt (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20166,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.2481420Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/swift-transformers_Hub.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/swift-transformers_Hub.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20170,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.2888950Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/swift-nio_NIOPosix.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/swift-nio_NIOPosix.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20174,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.3301160Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/swift-crypto_Crypto.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/swift-crypto_Crypto.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20178,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.3719170Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/mlx-swift_Cmlx.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/mlx-swift_Cmlx.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20182,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.4121810Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkQwen_VoiceInkQwen.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20186,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.4527600Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20190,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.4929920Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/SwiftProtobuf_SwiftProtobuf.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20194,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.5366020Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/PermissionFlow_PermissionFlow.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PermissionFlow_PermissionFlow.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20198,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.5787890Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/MediaRemoteAdapter_MediaRemoteAdapter.bundle (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20202,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.6095300Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/libXCTestSwiftSupport.dylib /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20206,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.6516430Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/libXCTestBundleInject.dylib /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20210,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.6927320Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCUnit.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCUnit.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20214,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.7339080Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCUIAutomation.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCUIAutomation.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20218,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.7768580Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTestSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20222,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.8176500Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTestCore.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20226,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.8584750Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTest.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20230,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.9007760Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/XCTAutomationSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20234,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.9415930Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/Testing.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 20238,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:19.9823590Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/Sparkle.framework /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 21095,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:40.1978860Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInk.swiftmodule/arm64-apple-macos.swiftmodule /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/VoiceInk.swiftmodule (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 21099,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:40.1984700Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInk.swiftmodule/arm64-apple-macos.swiftdoc /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/VoiceInk.swiftdoc (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 21103,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:40.1990800Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInk.swiftmodule/arm64-apple-macos.abi.json /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/VoiceInk.abi.json (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 21107,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:40.1996010Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInk.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/VoiceInk.swiftsourceinfo (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 21853,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:55.9814880Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests.swiftmodule/arm64-apple-macos.swiftmodule /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkUITests.build/Objects-normal/arm64/VoiceInkUITests.swiftmodule (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 21857,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:55.9820830Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests.swiftmodule/arm64-apple-macos.swiftdoc /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkUITests.build/Objects-normal/arm64/VoiceInkUITests.swiftdoc (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 21861,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:55.9826490Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests.swiftmodule/arm64-apple-macos.abi.json /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkUITests.build/Objects-normal/arm64/VoiceInkUITests.abi.json (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 21865,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:28:55.9832670Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkUITests.build/Objects-normal/arm64/VoiceInkUITests.swiftsourceinfo (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 23492,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:27.9380950Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkTests.swiftmodule/arm64-apple-macos.swiftmodule /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkTests.build/Objects-normal/arm64/VoiceInkTests.swiftmodule (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 23496,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:27.9388390Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkTests.swiftmodule/arm64-apple-macos.swiftdoc /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkTests.build/Objects-normal/arm64/VoiceInkTests.swiftdoc (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 23500,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:27.9395450Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkTests.swiftmodule/arm64-apple-macos.abi.json /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkTests.build/Objects-normal/arm64/VoiceInkTests.abi.json (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 23504,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:27.9408610Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkTests.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInkTests.build/Objects-normal/arm64/VoiceInkTests.swiftsourceinfo (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 23760,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:27.9792140Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/Frameworks/MediaRemoteAdapter.framework /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework (in target 'VoiceInk' from project 'VoiceInk')"
+    },
+    {
+      "line": 24407,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0267840Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-transformers_Hub.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/swift-transformers_Hub.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24411,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0269990Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-nio_NIOPosix.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/swift-nio_NIOPosix.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24415,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0272060Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/swift-crypto_Crypto.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/swift-crypto_Crypto.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24419,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0274250Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/mlx-swift_Cmlx.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/mlx-swift_Cmlx.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24423,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0276420Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkQwen_VoiceInkQwen.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkQwen_VoiceInkQwen.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24427,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0279170Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkNVIDIA_VoiceInkNVIDIA.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24431,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0281430Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/SwiftProtobuf_SwiftProtobuf.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/SwiftProtobuf_SwiftProtobuf.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24435,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0283910Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/PermissionFlow_PermissionFlow.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PermissionFlow_PermissionFlow.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24439,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:28.0286340Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma\\ just\\ talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/Resources/MediaRemoteAdapter_MediaRemoteAdapter.bundle /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/MediaRemoteAdapter_MediaRemoteAdapter.bundle (in target 'VoiceInkTests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24537,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.5262890Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/PkgInfo /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Xcode/Agents/XCTRunner.app/Contents/PkgInfo (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24541,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.5664180Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/libXCTestSwiftSupport.dylib /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24545,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.6072130Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/XCUnit.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCUnit.framework (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24549,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.6475520Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/XCUIAutomation.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCUIAutomation.framework (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24553,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.6880450Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/XCTestSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24557,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.7287700Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/XCTestCore.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24561,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.7696710Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/XCTest.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24565,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.8221480Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/XCTAutomationSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24569,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:30.8665510Z Copy /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/VoiceInkUITests-Runner.app/Contents/Frameworks/Testing.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework (in target 'VoiceInkUITests' from project 'VoiceInk')"
+    },
+    {
+      "line": 24662,
+      "text": "macos\tFull Mac unit suite with fresh CI permissions\t2026-10-28T00:29:31.8727080Z /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj: warning: The Copy Bundle Resources build phase contains this target's Info.plist file '/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/Info.plist'. (in target 'VoiceInk' from project 'VoiceInk')"
+    }
+  ],
+  "limit": "These lines describe the Debug unit host build, not a Release packaging verdict."
+}

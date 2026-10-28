@@ -1,0 +1,9 @@
+{
+  "run_id": 40607608894,
+  "head_sha": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "unit_gate": "failure",
+  "failed_cases": 3,
+  "issues": 5,
+  "exact_once_positive_methods": 37,
+  "whole_source_files": 14
+}

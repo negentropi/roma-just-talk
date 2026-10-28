@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "scope": "Test-only real LanguageSelectionView full-mode host, separate from Undo control acceptance; no production UI edit.",
+  "authorship": {
+    "model": "claude-opus-5-5",
+    "cli_version": "2.1.310",
+    "effort": "high",
+    "result": "success",
+    "is_error": false,
+    "duration_ms": 104914,
+    "total_cost_usd": 0.4016976,
+    "num_turns": 12,
+    "raw_log_sha256": "19f49ca545b2a274d514458de6cc6dd666edd562e0493a3ed892afe7f911967b",
+    "prompt_sha256": "1d0fb17a7b1291326dd2dec82491915bf3f33cc7d2f457ccfc7b2565fef4a5a2",
+    "allowed_source_changes": [
+      "scripts/fixtures/LanguageSelectionProbeHost.swift"
+    ],
+    "before": "new file",
+    "after_sha256": "f953335e79a5e7af2d02226184250c2908e39db19cab7643f767a385fa6cecd6"
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "type": "read-only actual source/API/actor review",
+    "result": "clean",
+    "source_sha256": "f953335e79a5e7af2d02226184250c2908e39db19cab7643f767a385fa6cecd6",
+    "findings": []
+  },
+  "source_contract": [
+    "Actual unchanged LanguageSelectionView with displayMode full; no replacement picker or direct updateLanguage calls.",
+    "Real strongly retained Whisper, FluidAudio and TranscriptionModelManager; actual multilingual ggml-tiny catalog entry selected through public setDefaultTranscriptionModel.",
+    "Registered AppDefaults dictionary only; removes only persistent SelectedLanguage once before mounting.",
+    "Empty in-memory WordReplacement and VocabularyWord context, no CloudKit or group container.",
+    "Hosted environment, LOCAL_BUILD and existing absolute output/isolated-home directory guards; one Oracle invocation."
+  ],
+  "verification": {
+    "swift_frontend_parse": "passed with LOCAL_BUILD",
+    "full_build": "not run locally",
+    "native_runtime": "not run locally",
+    "same_english_reselect_behavior": "unproven; independent remote oracle owns observation"
+  },
+  "limits": [
+    "No engine, ASR, provider, model load/download, local app/frontmost/clipboard/native execution.",
+    "Source review and parsing do not establish SwiftUI same-value picker setter delivery or persisted explicit-language behavior.",
+    "No native screenshot or runtime visual review performed at this source freeze."
+  ],
+  "followup_authorship": {
+    "model": "claude-opus-5-5",
+    "cli_version": "2.1.310",
+    "effort": "high",
+    "result": "success",
+    "is_error": false,
+    "duration_ms": 11867,
+    "total_cost_usd": 0.0469146,
+    "num_turns": 3,
+    "raw_log_sha256": "28cf96707f776da95e28b701b551db068b673e1c45447d47c1e96949d9cf6072",
+    "prompt_sha256": "b7f580c17870088c9afcd4bfac92e722be3c1f9e4429d473f6d63864ad970f0d",
+    "change": "Only launch catch exit(EXIT_FAILURE) to exit(2); status 1 reserved for a valid measured same-English failure.",
+    "before_sha256": "f953335e79a5e7af2d02226184250c2908e39db19cab7643f767a385fa6cecd6",
+    "after_sha256": "1d50719b2fdd357ffd5df275896a2886b912d478d25e2ba75f154db9d18f668b",
+    "reverse_only_this_token_recovers_before": true,
+    "independent_review": {
+      "model": "gpt-6.1-sol",
+      "result": "clean",
+      "type": "read-only exact one-token delta and exit contract",
+      "findings": []
+    }
+  },
+  "final_source_sha256": "1d50719b2fdd357ffd5df275896a2886b912d478d25e2ba75f154db9d18f668b",
+  "cumulative_author_cost_usd": 0.4486122
+}

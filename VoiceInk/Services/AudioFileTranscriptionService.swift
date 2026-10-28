@@ -46,7 +46,7 @@ class AudioTranscriptionService {
                 in: recordingsDirectory,
                 fileExtension: url.pathExtension
             )
-            try FileManager.default.copyItem(at: url, to: permanentURL)
+            try VoiceInkStoredAudioFile.copyForUnsavedRecord(from: url, to: permanentURL)
         } catch {
             let message = VoiceInkAudioFileTranscriptionDiagnostics.permanentCopyFailedMessage(
                 localizedDescription: error.localizedDescription

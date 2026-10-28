@@ -151,22 +151,15 @@ class TranscriptionAutoCleanupService {
             })
 
             guard FileManager.default.fileExists(atPath: recordingsDirectory.path) else { return }
-            let filesInDirectory = try FileManager.default.contentsOfDirectory(
-                at: recordingsDirectory,
-                includingPropertiesForKeys: [.contentModificationDateKey]
+            let orphanedFiles = try VoiceInkStoredAudioFile.orphanedFiles(
+                in: recordingsDirectory,
+                referencedFileNames: referencedFiles
             )
-            // Files written after the snapshot (a new recording, or its Opus copy
-            // replacing the WAV) are not orphans yet.
-            let recentCutoff = Date().addingTimeInterval(-600)
 
             var deletedCount = 0
-            for fileURL in filesInDirectory {
-                let fileName = fileURL.lastPathComponent
-                let modifiedAt = (try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
-                if !referencedFiles.contains(fileName), modifiedAt.map({ $0 < recentCutoff }) ?? true {
-                    try? FileManager.default.removeItem(at: fileURL)
-                    deletedCount += 1
-                }
+            for fileURL in orphanedFiles {
+                try? FileManager.default.removeItem(at: fileURL)
+                deletedCount += 1
             }
 
             if deletedCount > 0 {

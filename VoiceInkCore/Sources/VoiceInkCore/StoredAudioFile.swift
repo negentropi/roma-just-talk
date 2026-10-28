@@ -97,6 +97,38 @@ public enum VoiceInkStoredAudioFile {
         fileURL(forFilename: "retranscribed_\(id.uuidString).\(fileExtension)", in: recordingsDirectory)
     }
 
+    /// Files this recent count as in flight: written, but their record is not saved yet.
+    public static let orphanGracePeriod: TimeInterval = 600
+
+    /// Copies audio into Recordings for a record that is saved later. `copyItem` keeps the
+    /// source's modification date, so stamp the copy as new to keep the orphan sweep off it.
+    public static func copyForUnsavedRecord(
+        from sourceURL: URL,
+        to destinationURL: URL,
+        now: Date = Date(),
+        fileManager: FileManager = .default
+    ) throws {
+        try fileManager.copyItem(at: sourceURL, to: destinationURL)
+        try fileManager.setAttributes([.modificationDate: now], ofItemAtPath: destinationURL.path)
+    }
+
+    public static func orphanedFiles(
+        in recordingsDirectory: URL,
+        referencedFileNames: Set<String>,
+        now: Date = Date(),
+        fileManager: FileManager = .default
+    ) throws -> [URL] {
+        let cutoff = now.addingTimeInterval(-orphanGracePeriod)
+        return try fileManager.contentsOfDirectory(
+            at: recordingsDirectory,
+            includingPropertiesForKeys: [.contentModificationDateKey]
+        ).filter { url in
+            guard !referencedFileNames.contains(url.lastPathComponent) else { return false }
+            let modifiedAt = (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+            return modifiedAt.map { $0 < cutoff } ?? true
+        }
+    }
+
     public static func resolvedURL(
         for storedValue: String?,
         relativeTo recordingsDirectory: URL? = nil

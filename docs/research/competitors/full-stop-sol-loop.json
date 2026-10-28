@@ -56,6 +56,8 @@
   "declinedFindings": [],
   "finalSourceVerdict": "APPROVE",
   "sourceReviewCovers": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e and subsequent metadata-only commits with identical behavior files",
-  "pushed": false,
+  "pushed": true,
+  "initialPublicationHead": "520943c54f206dcdc5addc077256a26252f84161",
+  "publicationBranch": "codex/rjt-mac-competitor-features-pr-20261028",
   "mergePolicy": "Full-stop: never merge, enable auto-merge, enter a merge queue or publish a release."
 }

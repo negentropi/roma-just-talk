@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.Safari",
+  "checkpoint" : "cleanup",
+  "date" : "2026-10-28T01:44:14Z",
+  "expected" : "owned surface closed",
+  "observed" : "<unavailable>",
+  "processIdentifier" : 26540,
+  "token" : "RJT-Writing-Live-269E3330-8419-44A3-A293-0DD7EC5A407E"
+}

@@ -1,0 +1,42 @@
+{
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "fixture-startup",
+  "documentBudgetMilliseconds" : 20000,
+  "failure" : null,
+  "finalStage" : "ready",
+  "processIdentifier" : 25119,
+  "stages" : [
+    {
+      "sinceOpenMilliseconds" : 499.20216666669148,
+      "stage" : "workspace-open-completed"
+    },
+    {
+      "accepted" : true,
+      "sinceOpenMilliseconds" : 499.72075000005134,
+      "stage" : "application-activation-requested"
+    },
+    {
+      "sinceOpenMilliseconds" : 505.6269166666425,
+      "stage" : "frontmost-identity-observed"
+    },
+    {
+      "documentIsOwnedFile" : true,
+      "existedBeforeOpen" : false,
+      "ownershipMarkerMatched" : true,
+      "sinceOpenMilliseconds" : 4023.3729999999923,
+      "stage" : "owned-document-observed",
+      "titleContainsToken" : true
+    },
+    {
+      "sameDocumentWindow" : true,
+      "sinceOpenMilliseconds" : 4054.1902500000333,
+      "stage" : "exact-textarea-observed"
+    },
+    {
+      "sinceOpenMilliseconds" : 4062.3689583333089,
+      "stage" : "owned-editor-focused"
+    }
+  ],
+  "textareaBudgetMilliseconds" : 5000,
+  "token" : "RJT-Writing-Live-8D953129-B49F-4255-BDF8-BCC8473B698F"
+}

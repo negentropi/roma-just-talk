@@ -1,0 +1,201 @@
+{
+  "classification": "invalid-or-failed",
+  "enumeration_host_launches": {
+    "discovery": [
+      {
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "mapped_text_paths": [
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+          "/usr/lib/dyld",
+          "/usr/lib/libRPAC.dylib",
+          "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+          "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+          "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+          "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+          "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice"
+        ],
+        "observed_live": true,
+        "pid": 25777,
+        "started_at": "Wed Oct 28 01:43:36 2026"
+      }
+    ],
+    "selection": [
+      {
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "mapped_text_paths": [
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+          "/usr/lib/dyld",
+          "/usr/lib/libRPAC.dylib",
+          "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+          "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+          "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+          "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+          "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice"
+        ],
+        "observed_live": true,
+        "pid": 25890,
+        "started_at": "Wed Oct 28 01:43:44 2026"
+      }
+    ]
+  },
+  "errors": [
+    "Every selected method must pass exactly once",
+    "One exact positive passed summary and exit zero are required",
+    "Issues, skips, cancellation, crashes and compilation/launch failures cannot pass",
+    "liveWritingUndoLatestOwnerAndCancellation: Incomplete or wrong method/schema receipt",
+    "liveWritingUndoLatestOwnerAndCancellation: Actual case checks missing or false",
+    "liveWritingUndoLatestOwnerAndCancellation: Actual forward attempt/confirmation must be singular",
+    "liveWritingUndoLatestOwnerAndCancellation: Exact unique actual stage set required",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration: Incomplete or wrong method/schema receipt",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration: Actual case checks missing or false",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration: Actual forward attempt/confirmation must be singular",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration: Exact unique actual stage set required",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference: Incomplete or wrong method/schema receipt",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference: Actual case checks missing or false",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference: Actual forward attempt/confirmation must be singular",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference: Exact unique actual stage set required"
+  ],
+  "exit_code": 65,
+  "native_host_launch": {
+    "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "mapped_text_paths": [
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/com.negentropi.RomaJustTalk/C092A52E-6D7C-4C0D-B768-07542312E4FB-26163-00000004885BC0F5/9E5939BD-B753-468C-9774-5C42C9ED1242-26290.profraw",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+      "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+      "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+      "/usr/lib/dyld",
+      "/usr/lib/libRPAC.dylib",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+      "/Library/Preferences/Logging/.plist-cache.vve6FNKo",
+      "/usr/lib/libobjc-trampolines.dylib",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+      "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+      "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+      "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/_Testing_Foundation.framework/Versions/A/_Testing_Foundation",
+      "/Users/runner/work/_temp/writing-undo-native-proof/remaining/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/default.store-shm",
+      "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+      "/Users/runner/work/_temp/writing-undo-native-proof/remaining/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/stats.store-shm",
+      "/Users/runner/work/_temp/writing-undo-native-proof/remaining/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store-shm",
+      "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+      "/System/Library/CoreServices/SystemVersion.bundle/English.lproj/SystemVersion.strings",
+      "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib",
+      "/private/var/db/timezone/tz/2026e.1.0/icutz/icutz44l.dat",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/SystemAppearance.car",
+      "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice",
+      "/private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-20971545-v2.csstore",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantLight.car",
+      "/System/Library/Frameworks/Foundation.framework/Versions/C/Resources/FoundationErrors.loctable",
+      "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests",
+      "/usr/share/icu/icudt78l.dat",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/Aqua.car",
+      "/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantLight.car"
+    ],
+    "observed_live": true,
+    "pid": 26290,
+    "started_at": "Wed Oct 28 01:43:58 2026"
+  },
+  "observation_sha256": {
+    "liveWritingUndoLatestOwnerAndCancellation.json": "d3865653f4ee01c6d5b40f5e037cb6b1c3bfe77429f8e943d677ecfee5f2ce28",
+    "liveWritingUndoRefusesTextCaretAndWindowDrift.json": "40eec59bf23da79cb81cf0a1f17131d7c0581f584a859a8d7d372529b123afcb",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration.json": "0cb7b6494681fd75e243e859b941385b3e1bdcb6a5a535c7c87f058a1ed78cd4",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference.json": "dfea0045f92a7731c02fa3cb493ced3f886de5a506a69a452d64764072ca47e9",
+    "liveWritingUndoTextEditRestoresExactUnicodeSelection.json": "53953820d154442bb048435e358883c799a51e4d7f2d0de4d91bd034060e9741"
+  },
+  "results": {
+    "liveWritingUndoLatestOwnerAndCancellation": [
+      "failed"
+    ],
+    "liveWritingUndoRefusesTextCaretAndWindowDrift": [
+      "passed"
+    ],
+    "liveWritingUndoSafariKeepsNewClipboardGeneration": [
+      "failed"
+    ],
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference": [
+      "failed"
+    ],
+    "liveWritingUndoTextEditRestoresExactUnicodeSelection": [
+      "passed"
+    ]
+  },
+  "starts": [
+    "liveWritingUndoTextEditRestoresExactUnicodeSelection",
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference",
+    "liveWritingUndoSafariKeepsNewClipboardGeneration",
+    "liveWritingUndoRefusesTextCaretAndWindowDrift",
+    "liveWritingUndoLatestOwnerAndCancellation"
+  ],
+  "summaries": [
+    [
+      "5",
+      "1",
+      "failed"
+    ]
+  ],
+  "valid": false
+}

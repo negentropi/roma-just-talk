@@ -1,0 +1,28 @@
+{
+  "all_observed_hosts_exited": true,
+  "exact_executable_census_empty": true,
+  "exact_executable_has_no_open_descriptors": true,
+  "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "host_pids": [
+    23949
+  ],
+  "limits": "Only exact observed RJT host processes are terminated. Editor cleanup belongs to owned test fixtures; no editor process-name termination.",
+  "observed_host_launches": [
+    {
+      "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld",
+        "/usr/lib/libRPAC.dylib",
+        "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib"
+      ],
+      "observed_live": true,
+      "pid": 23949,
+      "started_at": "Wed Oct 28 01:42:39 2026"
+    }
+  ],
+  "valid": true
+}

@@ -1,0 +1,128 @@
+{
+  "intent": "QA-only observednativeHistoryconfirmationSheet ownership; no productbehaviorchange.",
+  "actual_failed_run": 40635219212,
+  "tested_source": "004c1cfd61492428c0a5caacf65b2f686de59a14",
+  "failure": "486app.alerts.firstMatchmissing; realwindow-ownedSheetvisible",
+  "actual_native_contract": {
+    "tree_sha256": "6039cca36bb1e6330c663bc900dff552e597be27f42bcfad17030474b4174df9",
+    "tree_lines": "106-110",
+    "window_identifier": "com.negentropi.RomaJustTalk.mainWindow",
+    "sheet_role": "Sheet",
+    "sheet_label": "alert",
+    "sheet_frame": [
+      382,
+      299,
+      260,
+      138
+    ],
+    "unique_button_identifiers": [
+      "history.delete.confirm",
+      "history.delete.cancel"
+    ],
+    "title": "Delete Selected Items?",
+    "body": "This action cannot be undone. Are you sure you want to delete 1 item?",
+    "derived_frame_sha256": "c4037cac806d796c4baa21492de2b608fed7d10813d5ace907d2f0a2f134858d",
+    "frame_seconds": 84.4
+  },
+  "author": {
+    "actual_model": "claude-opus-5-5",
+    "requested_effort": "medium",
+    "provider": "firstParty",
+    "session_id": "dcf1dd9a-d29a-4451-b10e-e23b082222d2",
+    "edits": [
+      "/Users/atalphalnmomhappyhouse/.codex/worktrees/2ebd/VoiceInk/VoiceInkUITests/WritingFeaturesUITests.swift"
+    ],
+    "usage": {
+      "input_tokens": 16,
+      "cache_creation_input_tokens": 46694,
+      "cache_read_input_tokens": 261830,
+      "output_tokens": 5816,
+      "output_tokens_details": {
+        "thinking_tokens": 1572
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 46694
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1208,
+          "cache_read_input_tokens": 45866,
+          "cache_creation_input_tokens": 828,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 828,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-opus-5-5": {
+        "inputTokens": 16,
+        "outputTokens": 5816,
+        "cacheReadInputTokens": 261830,
+        "cacheCreationInputTokens": 46694,
+        "webSearchRequests": 0,
+        "costUSD": 0.40221999999999997,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 1572,
+        "canonicalModel": "claude-opus-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "raw_stream_sha256": "632f51dae74eca6aa1290dbe639522a40164ebb148852546a8c692c733b1445f"
+  },
+  "source_before_sha256": "7f3dc95cc0531b4844d8c606d51da16452a94723a6bc28321935e0b911ae4f2e",
+  "source_after_sha256": "62c8a1e3250610fe3cb1ff452877cc84eb35a978c4a906b809d17827ddeb2b68",
+  "unchanged7_test_bodies": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "14c9911f29f6c7b317dc34a9c3ad4c284fba4b2077a61aa3ba6f778f36b34b61",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": "5df0f3cb7b3afa77a71a00743a7aaa6867717dc685ed89efd4d7bd7861c2aea8",
+    "testTranslationTargetsReorderSelectAndPersist": "c07646262a4ca04d144df43362f68261975ba07831bdaacdba25679302d69f06",
+    "testDictationProfilePreservesCustomSettingsAndPersists": "2dbeddbeda7d7d583fb6aa5c5a0ce0421ac1cbfee3772cfbe98061624d5c0ea4",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": "ec685883153f5f3096d441ed3f7c985a521dc393b7eeb2c53b98c424e67815b6",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": "cb45d90a55115b71f278011f144764b3f0e6e77180cf037a09aa8922f2c501a3",
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": "a95ec15b51cdbd66fa6500a5524dddd8234c6f0f06a8fd9e403cb84f3f4e648f"
+  },
+  "retained_case_delta": {
+    "before": "2839e6c4dfc17efb78f073f183e2a9281cada95865c405f46394d34685d0d758",
+    "after": "fc8146f7ad9184240cf4960238b35b4d315da9df501fabc1fca6a7480302e18e",
+    "reason": "Onlyobservednativeconfirmationownership/census/assertions/disappearancevariable; all laterdata/provenance/rerunchecksremain."
+  },
+  "unchanged8_helpers": {
+    "metadataUUID": "1650d41ff5e0577456be1e4c61c9f220cbe0aeec983751a50ab7e870e161c389",
+    "revealCorrectionControl": "58afda45e991464555dbbbd14f78bad6e4c585be59bc8b02d07a1f72eb1969ad",
+    "assertExactHistoryCopy": "08cd49f9606b2fa9c06e1950f33ef0720af4eff83b2b25ff91f1e2d78e9385fb",
+    "assertHistoryStaticTextPresentation": "421e30c19150bab323c7e443589f9541de41cc2b8242847f676b585094c0b3a0",
+    "pasteLiteralText": "dfe63be46e4308042579d0eaed4474155ddbd3f0b654eb71c4cbf20f3ffd7d10",
+    "assertExactEditor": "3299daa95c6dd78d40a8ffc574287c8ce4881cb0196610a16a145752a4bb3f2b",
+    "approveCorrection": "babcbf35ba92448ec8ff44f77f4932dee6ac6774e217ee77d9dec8e7f735f161",
+    "previewCorrection": "d77858ff99275321c5eb800f8b57f9c5bf315a25d1160335f063c88b5b983661"
+  },
+  "checks": {
+    "swift_frontend_parse": "passed",
+    "diffcheck": "passed",
+    "native_runtime": "pendingnormalfullgate; no new8/nativepost/Releaseclaim"
+  },
+  "review": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "same_reviewer": "/root/none_profile_ui_checks/history_copy_sol_loop",
+    "same_base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+    "round": 4,
+    "budget": 5,
+    "verdict": "APPROVE",
+    "usage": "unavailable"
+  }
+}

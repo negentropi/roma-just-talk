@@ -482,13 +482,45 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(delete.waitForExistence(timeout: 5))
         XCTAssertTrue(delete.isEnabled && delete.isHittable)
         delete.click()
-        let alert = app.alerts.firstMatch
-        XCTAssertTrue(alert.waitForExistence(timeout: 5))
-        XCTAssertEqual(app.alerts.count, 1)
-        let confirm = alert.buttons["history.delete.confirm"]
-        XCTAssertTrue(confirm.exists && confirm.isEnabled && confirm.isHittable)
+        // Run 40635219212: the confirmation is a native window-modal Sheet labeled 'alert', never an app Alert.
+        // Its Sheet/Window carry modal Disabled traits; only the owned buttons must be actionable.
+        let window = mainWindow(in: app)
+        let dialogs = window.children(matching: .sheet)
+            .containing(.button, identifier: "history.delete.confirm")
+            .containing(.button, identifier: "history.delete.cancel")
+        let dialog = dialogs.firstMatch
+        guard dialog.waitForExistence(timeout: 5) else {
+            let hierarchy = XCTAttachment(string: window.debugDescription)
+            hierarchy.name = "History delete confirmation Sheet missing from main window"
+            hierarchy.lifetime = .keepAlways
+            add(hierarchy)
+            XCTFail("The main window must own one native History delete confirmation Sheet.")
+            return
+        }
+        let confirms = dialog.children(matching: .button).matching(identifier: "history.delete.confirm")
+        let cancels = dialog.children(matching: .button).matching(identifier: "history.delete.cancel")
+        let confirm = confirms.firstMatch, cancel = cancels.firstMatch
+        let texts = dialog.children(matching: .staticText).allElementsBoundByIndex.map { String(describing: $0.value ?? "") }
+        let census = XCTAttachment(string: [
+            "window id=\(window.identifier) frame=\(window.frame)",
+            "sheets=\(dialogs.count) id=\(dialog.identifier) role=\(dialog.elementType.rawValue) label=\(dialog.label) frame=\(dialog.frame)",
+            "confirm count=\(confirms.count) label=\(confirm.label) enabled=\(confirm.isEnabled) hittable=\(confirm.isHittable) frame=\(confirm.frame)",
+            "cancel count=\(cancels.count) label=\(cancel.label) enabled=\(cancel.isEnabled) hittable=\(cancel.isHittable) frame=\(cancel.frame)",
+            "texts=\(texts)",
+        ].joined(separator: "\n"))
+        census.name = "History delete confirmation Sheet census"
+        census.lifetime = .keepAlways
+        add(census)
+        XCTAssertEqual(dialogs.count, 1)
+        XCTAssertEqual(dialog.label, "alert")
+        XCTAssertEqual(texts, ["Delete Selected Items?", "This action cannot be undone. Are you sure you want to delete 1 item?"])
+        XCTAssertEqual(confirms.count, 1)
+        XCTAssertEqual(cancels.count, 1)
+        XCTAssertEqual([confirm.label, cancel.label], ["Delete", "Cancel"])
+        XCTAssertTrue(dialog.frame.contains(confirm.frame) && dialog.frame.contains(cancel.frame))
+        XCTAssertTrue(confirm.isEnabled && confirm.isHittable)
         confirm.click()
-        XCTAssertTrue(waitUntil { !source.exists && !alert.exists })
+        XCTAssertTrue(waitUntil { !source.exists && !dialog.exists })
         openDictionaryReplacements(in: app)
         _ = assertCorrectionRow(approved.id, enabled: true, sourceState: "source deleted", in: app)
         attachScreenshot(app, named: "Saved correction keeps provenance after its History source is deleted")

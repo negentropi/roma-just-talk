@@ -1,0 +1,11 @@
+VERDICT: APPROVE
+
+No open blocker/should findings in round 4’s bounded QA delta.
+
+The selector matches the observed main-window-owned native Sheet and its direct confirmation controls. Exact dialog text, unique button identities, containment and confirmation actionability remain required before clicking. Source disappearance, correction survival, relaunch and stored-value checks remain intact.
+
+Oracle hash matches 62c8a1e3…deb2b68; git diff --check passes.
+
+Limits: candidate XCTest compilation/runtime, eight-case green, native post-verification and Release/full gate remain pending.
+
+Usage: unavailable.

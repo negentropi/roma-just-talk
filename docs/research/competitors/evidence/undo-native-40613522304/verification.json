@@ -1,0 +1,2928 @@
+{
+  "run_id": 40613522304,
+  "head_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "ref": "ci/rjt-writing-undo-native-01a17bef-794fa259",
+  "artifacts": {
+    "observations": {
+      "created_at": "2026-10-28T01:25:03Z",
+      "digest": "sha256:5d0dda983718d048f3cfd36347597bc29fa6477ea85f049cff3c4e563e2770e4",
+      "expired": false,
+      "id": 12784787675,
+      "name": "roma.writing-undo-native-observations",
+      "size_in_bytes": 271161,
+      "updated_at": "2026-10-28T01:25:03Z"
+    },
+    "evidence": {
+      "created_at": "2026-10-28T01:25:09Z",
+      "digest": "sha256:b6e1026404019f5bd51dd8ff5270ed3261efdfb509b5ff62b8b9d68ed965b91f",
+      "expired": false,
+      "id": 12784518156,
+      "name": "roma.writing-undo-native-evidence",
+      "size_in_bytes": 104378156,
+      "updated_at": "2026-10-28T01:25:09Z"
+    }
+  },
+  "artifact_bytes_sha256_and_all_zip_crc_verified": true,
+  "source_before_matches_exact_committed_manifest": true,
+  "global_source_after_absent_due_to_abort": true,
+  "global_identity_after_absent_due_to_abort": true,
+  "source_manifest_files": 657,
+  "exact_committed_source_bindings": {
+    "run_id": 40613522304,
+    "head_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+    "paths": {
+      "scripts/run-writing-undo-native-check.sh": {
+        "exists": true,
+        "bytes": 54820,
+        "sha256": "c4ce797818075eed863dde43cbd618948ee6ffe463f7618cc88972cb313ee66b"
+      },
+      ".github/workflows/voiceink-writing-undo-native-check.yml": {
+        "exists": true,
+        "bytes": 5907,
+        "sha256": "3c64f8bbac3c321c7167a3f9870bb192c958e27e8de207a9efa9abc7f738ed72"
+      },
+      "VoiceInkTests/WritingUndoLiveTests.swift": {
+        "exists": true,
+        "bytes": 28386,
+        "sha256": "6bb7e7decfe0d7889c1337e3d5f9d4bef3b6e1abd7fc1ba574596a990f46d0ca"
+      },
+      "VoiceInkTests/WritingTargetLiveTests.swift": {
+        "exists": true,
+        "bytes": 102345,
+        "sha256": "fd1d9ffc2d833d1b21e977468a68ee2973f788f102ff5d2787a0622973bebf06"
+      },
+      "VoiceInkTests/VoiceInkTests.swift": {
+        "exists": true,
+        "bytes": 71838,
+        "sha256": "9c21e8667e6dc5d9b7546bfda5ae7f4f8f95f08afc3ad69df31aaa828c149395"
+      },
+      "VoiceInk/Services/WritingActionUndoController.swift": {
+        "exists": true,
+        "bytes": 4753,
+        "sha256": "c7d60432cad2dd68bbf9d6f87ac8fb054bd55778afed1df0d223cd69927b7bdc"
+      },
+      "VoiceInk/Services/WritingTarget.swift": {
+        "exists": true,
+        "bytes": 28356,
+        "sha256": "ec5dfd2be81817be0c0ba6041325a2b5117bdbe3d3c9d0878ccb4f73834f4ca2"
+      },
+      "VoiceInk/Services/CursorTextContextReader.swift": {
+        "exists": true,
+        "bytes": 83087,
+        "sha256": "96d45f1c103a5a4be1e57053374c0130fefd80c84adc4d4bd987b4f77bb9cb5d"
+      },
+      "VoiceInk/Paste/CursorPaster.swift": {
+        "exists": true,
+        "bytes": 42232,
+        "sha256": "0954eaa9465d0725278c5f955600ce3338a426d00915d08f6803401319e26342"
+      },
+      "VoiceInk/VoiceInk.swift": {
+        "exists": true,
+        "bytes": 23673,
+        "sha256": "3e80d99bc3c8558b7a73c6ae9bfee68769e3e6f9f77fa31f8cf14fba6827c51c"
+      },
+      "VoiceInk/Services/KeychainService.swift": {
+        "exists": true,
+        "bytes": 5063,
+        "sha256": "78ede0cfc66704712ec972a002c6369fc19aa4620a3d1eb4aad4d845b61b5301"
+      },
+      "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": {
+        "exists": true,
+        "bytes": 11320,
+        "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+      },
+      "scripts/run-writing-feature-regression.sh": {
+        "exists": true,
+        "bytes": 58437,
+        "sha256": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e"
+      },
+      "scripts/verify-adhoc-macos-test-host.sh": {
+        "exists": true,
+        "bytes": 3642,
+        "sha256": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5"
+      },
+      "scripts/verify-static-whisper-xcframework.sh": {
+        "exists": true,
+        "bytes": 1853,
+        "sha256": "325bb8ec708dab070d6639a5efdc40f462ddc2f052c1c38c94737ca744277327"
+      },
+      "scripts/verify-static-whisper-app.sh": {
+        "exists": true,
+        "bytes": 1926,
+        "sha256": "e40475d402148fbde4327619c94ad046de1fb4ff18a3f04228a35534d64e2ad8"
+      },
+      "Makefile": {
+        "exists": true,
+        "bytes": 17343,
+        "sha256": "c8337a54c4fcf472661eda136fe9ffd48eef2debd1dde2ebd3dc81f5685d7ff9"
+      },
+      "LocalBuild.xcconfig": {
+        "exists": true,
+        "bytes": 641,
+        "sha256": "67f3bd7edf3abe05d0b2870f1899469c391efb50a0078d5c1e617d81073a1844"
+      },
+      "VoiceInk/Services/BackupTypes.swift": {
+        "exists": true,
+        "bytes": 8317,
+        "sha256": "4b854ab2a1f50a9c65ec1481e01c0cbeb934d246743504e01fe196c56f6b2813"
+      },
+      "VoiceInk/Services/DictionaryPersistence.swift": {
+        "exists": true,
+        "bytes": 2951,
+        "sha256": "96ced8455dee409564b29f654da221be362d5f31a09badfca43e1557879b5a6d"
+      }
+    }
+  },
+  "canonical_package_pins": 41,
+  "actual_package_revision_and_tree_receipt": {
+    "artifact_kind": "observations",
+    "zip_member": "packages-before.json",
+    "bytes": 6824,
+    "sha256": "d2fd7ea4df957a932fd5eb85915aa8a3239c324c17f27cb433d74b96e740adf7"
+  },
+  "static_whisper_file_count": 86,
+  "static_whisper_manifest": {
+    "artifact_kind": "observations",
+    "zip_member": "static-whisper-before.json",
+    "bytes": 11104,
+    "sha256": "64902f978cc9a1f700d7d946b39da7eb87383c2a70edda8704e9b3d41479afa4"
+  },
+  "signing": {
+    "app_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "429522b5fffb1d8612166f0f649a9df57c85fb55fa2c5728a92871e4b06189ea",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "signed_host_designated_requirement": "cdhash H\"166b8131b6199aab8f12ec2828b496d01f039570\"",
+  "debug_app_binary_sha256": "429522b5fffb1d8612166f0f649a9df57c85fb55fa2c5728a92871e4b06189ea",
+  "app_file_count": 393,
+  "test_bundle_file_count": 134,
+  "identity_file_manifest_sha256": "700e99eb2c7cc92e162c523b40c7a528aa06ca8f8ae3b5ab30c1ed5a503ed2d8",
+  "phases": {
+    "process": {
+      "selection": {
+        "disabled": [
+          "VoiceInkTests/CapturedWritingPasteTests/aNewClipboardGenerationWithTheSameTextAndMarkerStillRefusesPosting()",
+          "VoiceInkTests/CapturedWritingPasteTests/aNewCopyAfterConfirmedPasteSurvivesScheduledRestoration()",
+          "VoiceInkTests/CapturedWritingPasteTests/acceptedNoOpRemainsUnconfirmedWithoutAnotherMutationOrClipboardRestore()",
+          "VoiceInkTests/CapturedWritingPasteTests/anErrorAfterConfirmedMutationDoesNotRepeatThePaste()",
+          "VoiceInkTests/CapturedWritingPasteTests/cancellationAfterAttemptKeepsUncertainContentWithoutRetrying()",
+          "VoiceInkTests/CapturedWritingPasteTests/cancellationDuringDiscoveryRestoresTheOwnedClipboardWithoutWriting()",
+          "VoiceInkTests/CapturedWritingPasteTests/canonicalEqualityDoesNotConfirmDifferentUTF16Output()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedPasteRestoresTheClipboardAfterTheRequestedDelay()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedReplacementRestoresAnEmptyClipboard()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedReplacementRestoresEveryImageAndTextClipboardFormat()",
+          "VoiceInkTests/CapturedWritingPasteTests/delayedReadbackConfirmsTheSameSingleMutation()",
+          "VoiceInkTests/CapturedWritingPasteTests/failureAfterMutationCannotEnterThePreMutationRestorationPath()",
+          "VoiceInkTests/CapturedWritingPasteTests/focusOrSelectionDriftDuringDiscoveryPreventsThePaste()",
+          "VoiceInkTests/CapturedWritingPasteTests/newerClipboardCopyDuringDiscoverySurvivesRefusal()",
+          "VoiceInkTests/CapturedWritingPasteTests/scheduledRestorationCannotOverwriteANewGenerationWithMatchingData()",
+          "VoiceInkTests/CapturedWritingPasteTests/targetDriftDuringDiscoveryLeavesTheNewDocumentAndClipboardUntouched()",
+          "VoiceInkTests/CapturedWritingPasteTests/unavailableMenuRestoresClipboardEvenWhenSuccessfulPastesWouldKeepIt()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/nestedWritingPastesRestoreOriginalAllFormatClipboard()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/newerClipboardCopySurvivesWritingRestorationDeadline()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/singleWritingPasteHonorsDefaultRestorationDeadline()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/cancelingANewWaiterDoesNotCancelTheEarlierRestoration()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/cancellationDuringDeliveryObservationStillCommitsExactReadback()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/confirmedCallbackPrecedesImmediateRestorationAndFiresOnce()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/unresolvedMenuPreparationRejectsACompetingClipboardWrite()",
+          "VoiceInkTests/CloudProviderVerificationTests/cartesiaKeepsStreamingOnlyVerificationAdapter()",
+          "VoiceInkTests/CloudProviderVerificationTests/coreBackedCloudProvidersShareCoreAPIKeyVerifier()",
+          "VoiceInkTests/CoreAudioPreRollBufferTests/streamingEmissionGateDropsQueuedChunksWhenCanceled()",
+          "VoiceInkTests/CoreAudioPreRollBufferTests/streamingEmissionGateQueuesLiveChunksUntilPreRollFinishes()",
+          "VoiceInkTests/FluidAudioModelManagerTests/retryForceRedownloadsInvalidExistingCache()",
+          "VoiceInkTests/FluidAudioModelManagerTests/secondCallerJoinsActiveDownloadAndCancellationLeavesRetryState(usesURLCancellation:)",
+          "VoiceInkTests/FluidAudioModelManagerTests/silentDownloadBecomesStalledThenRecoversWhenProgressResumes()",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/disconnectDrainsBothPredictionsAndPreventsFinalPublication()",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/finalPassOverlapsCancelledLivePassWithoutPublishingItsLateResult(finalSamples:)",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/longFinalAudioKeepsSDKProgressSessionsSequential()",
+          "VoiceInkTests/LaunchAtLoginControllerTests/cachesStatusInsteadOfReadingItDuringViewUpdates()",
+          "VoiceInkTests/ModelPrewarmServiceTests/cancelledPrewarmDoesNotLoadInstalledModel()",
+          "VoiceInkTests/ModelPrewarmServiceTests/prewarmRechecksInstalledModelBeforeEveryLoad()",
+          "VoiceInkTests/OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+          "VoiceInkTests/OnboardingRegionViewTests/testContinueConfirmsCachedEnglishAcrossOnboardingReset()",
+          "VoiceInkTests/OnboardingRegionViewTests/testExplicitEnglishAccessibilityActionWinsBeforeTaiwanResponse()",
+          "VoiceInkTests/OnboardingRegionViewTests/testExternalAccessibilityWaitsForOneDelayedNativeButtonAction()",
+          "VoiceInkTests/OnboardingRegionViewTests/testLateTaiwanDraftBlocksCachedEnglishContinueWithoutPersistingIt()",
+          "VoiceInkTests/OnboardingRegionViewTests/testProductionOnboardingWindowFitsVisibleDesktopAndKeepsUserResize()",
+          "VoiceInkTests/OnboardingRegionViewTests/testReopeningPreservesExplicitEnglishWithoutAnotherLookup()",
+          "VoiceInkTests/OnboardingRegionViewTests/testSkipUnmountsPendingLookupWithoutCommittingSuggestedModel()",
+          "VoiceInkTests/OnboardingRegionViewTests/testWindowAccessorReconfiguresAfterSwiftUIReusesItsView()",
+          "VoiceInkTests/PowerModeConfigTests/automaticRuleDetectionIgnoresDisabledRules()",
+          "VoiceInkTests/PowerModeConfigTests/automaticRuleDetectionSeparatesURLRulesFromAppAndDefaultRules()",
+          "VoiceInkTests/QwenRecordingSelectionTests/laterDeselectionJoinsInFlightTransition()",
+          "VoiceInkTests/QwenRecordingSelectionTests/rapidReselectionStillDrainsOldRecording()",
+          "VoiceInkTests/QwenRecordingSelectionTests/selectionCancelsDeferredConnectBeforeRuntimeReservation()",
+          "VoiceInkTests/RecordingStartupAudioRelayTests/clearDropsBufferedChunksBeforeSinkInstall()",
+          "VoiceInkTests/RecordingStartupAudioRelayTests/installSinkReplaysBufferedChunksAndForwardsLaterChunks()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/blankCommittedResultStopsBeforePasteDecision()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/cancellationWhileDrainIsBlockedNeverCommits()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/incompleteTranscriptionDoesNotPasteOrPlayCompletionSound()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/speechBeforeKeyDownDrainsBeforeCommitAndProducesPaste()",
+          "VoiceInkTests/TranscriptionModelCapabilityTests/localFluidAudioUsesShortFinalCommitTimeout()",
+          "VoiceInkTests/TranscriptionModelCapabilityTests/recordedFileTranscriptionIsUnavailableOnlyForStreamingOnlyProviders()",
+          "VoiceInkTests/TranscriptionModelManagerTests/loadingSavedCurrentModelBroadcastsModelAndSettingsChange()",
+          "VoiceInkTests/TranscriptionModelManagerTests/metadataRefreshUpdatesDescriptorAndPreservesExplicitPreferences()",
+          "VoiceInkTests/TranscriptionModelManagerTests/modelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh()",
+          "VoiceInkTests/TranscriptionModelManagerTests/qwenModelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh()",
+          "VoiceInkTests/TranscriptionModelManagerTests/refreshingRegisteredFallbackDoesNotPersistIt()",
+          "VoiceInkTests/VoiceInkTests/AudioFileTranscriptionPersistenceTests/savingCompletedAudioDoesNotCommitUnrelatedCallerEdits()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/clarityCancellationDoesNotReturnLateOutput()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/clarityPreservesLiteralProviderJSONAndCodeUnits()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/clarityRejectsMalformedAndBlankProviderResponses()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/claritySameOutputRetainsCapturedRequestMetadata()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/claritySnapshotKeepsCapturedCLICommandAndProvider()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/claritySnapshotKeepsCapturedCLITimeout()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/writingActionsRetainLegacyFilteringAndEmptyPolicies()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/clarityFactoryCapturesStyleAndConfigurationBeforeLaterEdits()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/customAndNoneKeepLegacyOwnershipWithoutProviderPreparation()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/factoryFreezesEnabledLibrariesLanguageAndLeavesPreferencesUntouched()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/lightRequiresAPersistedLanguageRatherThanRegisteredEnglish()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/requestCallbackRunsOnlyAtARealClarityRequest()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/canceledImportCannotResetItsRestartedItemsNewerState()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/clearingCanceledImportLeavesNoCompletedRecordOrOwnedAudio()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/importCapturesEachItemWhenItStartsAndPreservesItsRawMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/importMissingClarityProviderRetainsOriginalAndWarnsExactlyOnce()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionClarityKeepsCapturedStyleTimeoutAndSameOutputMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionClaritySnippetWinsBeforeMissingProvider()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionLateProviderCancellationDoesNotSaveOrKeepOwnedCopy()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionLightCapturesLanguageRulesAndSnippetsBeforeRecognition()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionProviderFailureRetainsUntouchedRecognitionAndOneFailureField()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionSavesOnlyItsRowAndReturnsTheCallersContext()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/acceptedEngineStartCapturesPlanBeforePermissionAndKeepsItAfterResourceCleanup()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/blankResultCanceledWhileDismissalWaitsCannotCompleteOrRecordMetric()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/cancellationBeforeProcessingRegistrationCannotLaunchClarity()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/clarityFailureReturnsUntouchedRecognitionAndWarnsAfterDeliveryOnce()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/clarityKeepsCapturedProviderStyleRulesAndSameOutputSuccessMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/customKeepsSnippetMappingAndNewRecognitionMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/failedReplacementPreparationUsesRawExceptForTerminalLiteralSnippet()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/heldCancellationCannotClearContextCapturedByANewerAcceptedRun()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/lightFreezesRulesLanguageAndProfileBeforeRecognitionAndPastesLiterally()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/missingProviderRecoversRawButBlankProfilesNeverPastePreviousText()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/newAcceptedRunCancelsOlderProviderAndRejectsItsLateCompletion()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/operationCancellationCancelsOwnedProviderAndRejectsIgnoredLateSuccess()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/parentTaskCancellationCancelsOwnedProviderWithoutFallback()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/resetCleanupCannotClearContextCapturedByANewerAcceptedRun()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/undeliveredFallbackWarningDoesNotClaimInsertionOrDurableHistory()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/wholeSnippetIsFrozenAndTerminalBeforeRulesOrMissingProvider()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/cancellationAfterProviderAwaitRejectsLateSuccessAndWrappedFailure()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/cancellationBeforeProcessingDoesNotExecuteTheProvider()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/capturedLibrariesSurviveLaterEditsAndFreshReads()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/clarityUsesFrozenStyleProviderAndPreparedTextWithoutFiltering()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/customDefersAndNonePreservesEveryCodeUnit()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/dictionarySnapshotsRemainCopiedWhileCustomReadsCurrentRules()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/entireSnippetWinsOverBothPreparationFailures()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/libraryFailureDoesNotRunClarityAndDoesNotReturnPartialLightText()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/lightUsesOnlyWholeUtteranceSnippetsAndThenCapturedRules()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/preparationAndProviderErrorsFallBackToUntouchedRecognition()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/providerCancellationAndOwnerCancellationNeverBecomeFallback()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/sameNonblankClarityKeepsMetadataWhileBlankRecognitionSkipsProcessing()",
+          "VoiceInkTests/VoiceInkTests/DictionaryContextFreshnessTests/aFreshContextReadsChangesSavedByAnotherContext()",
+          "VoiceInkTests/VoiceInkTests/DictionaryContextFreshnessTests/applyingAnotherStoreNeverReusesThePreviousStoresRules()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/approvalAndBulkImportCommitExactRecordsWithoutSavingBystanders()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/staleExpectedRuleCannotOverwriteAnExternalCommittedRevision()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/staleHistoryPreviewRejectsAnExternalCodeUnitRevision()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/successfulRuleMutationsRefreshTheRegisteredRowWithoutSavingBystanders()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/approvalRechecksNewConflictsAndDuplicatesWithoutOverwritingOrEnabling()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/approvalRevalidatesFullRevisionVariantAndSourceExistence()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/captureBindsTheDisplayedVariantAndExactRevision()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/invalidRangesAndBlankPairsCannotCreateAnApproval()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/occurrencesRetainExactSpellingAndAllOverlappingChoices()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/reviewDoesNotMutateAndApprovedLiteralSurvivesHistoryDeletion()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/capturedConfigurationPreservesCommandAndTimeoutWithoutPreferenceWrites()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/earlyChildExitWithLargeInputDoesNotBreakRawOrLegacyRequests()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/nulCommandAndPromptsRefuseBothEntryPointsBeforeLaunch()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/rawExecutionPreservesLiteralOutputAndLegacyEnhanceKeepsItsPolicies()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/canceledBeforeInvocationDoesNotLaunchACommand()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationAndExitRacesLeaveLaterRequestsUsable()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationDuringBlockedInputStopsOnlyItsOwnedRequest()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationEndsATermIgnoringOwnedChild()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/largeInputAndBothOutputPipesCompleteWithoutDeadlock()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/timeoutIncludesBlockedInputAndEndsItsOwnedChild()",
+          "VoiceInkTests/VoiceInkTests/ShortcutBackupTests/explicitModernKindRejectsMalformedDataEvenWithLegacyKeys()",
+          "VoiceInkTests/VoiceInkTests/ShortcutBackupTests/missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues()",
+          "VoiceInkTests/VoiceInkTests/ShortcutBackupTests/missingKindStillRequiresAValidLegacyCarbonPayload()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/fullBackupRoundTripsExactIdentityKindEnabledStateAndProvenance()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/fullLibraryConflictsBlockAllReplacementAndVocabularyInsertions()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/legacyMapImportUsesCanonicalNamesOfLiteralRowsWithoutOverwritingThem()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/legacyMapOnlyImportPreservesAdditiveTrimAndCommaContract()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/malformedFullPayloadRejectsBeforeAnyDictionaryMutation()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/preparedImportRechecksNewConflictsBeforeWritingAnything()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/presentEmptyFullLibraryWinsOverLegacyMapAndStillImportsVocabulary()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/repeatedFullImportIsIdempotentAndSuccessfulImportAffectsTheNextOperation()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/unsupportedStoredKindCannotSilentlyDisappearIntoLegacyExport()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/editConflictsExposeCompleteRecordsAndChangeNothing()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/literalEditKeepsExactStringsIdentityKindAndProvenance()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/storedKindsAndProvenanceRoundTripWithoutReinterpretingUnknownData()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/successfulMutationsAreVisibleToTheNextOperation()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/unknownEnabledRulesFailClosedAndLaterCallsReadCurrentData()",
+          "VoiceInkTests/VoiceInkTests/WritingActionDeliveryCommitTests/cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()",
+          "VoiceInkTests/VoiceInkTests/WritingActionDeliveryCommitTests/cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/refusedKeyboardAuthorizationBalancesCommandWithoutPostingV()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority()",
+          "VoiceInkTests/VoiceInkTests/accessibilityCommandVMenuMatchRequiresEnabledPlainShortcut()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertDeliversWithoutTouchingClipboard()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationAcceptsTextOrCursorMutation()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationRejectsSilentAXSuccess()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationRejectsUnrelatedTextMutation()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchFailureRetainsScalarChildrenAndShortcut()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchPreservesUnsupportedAttributeSlots()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchRejectsMissingOrInvalidShortcutState()",
+          "VoiceInkTests/VoiceInkTests/accessibilityPermissionUsesInjectedSystemClient()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementRejectsInvalidRange()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementRequiresExactRangeRestore()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementUsesUTF16Selection()",
+          "VoiceInkTests/VoiceInkTests/activeRecorderToggleDefersStopInsteadOfCancelingWhileStarting()",
+          "VoiceInkTests/VoiceInkTests/aiEnhancementServiceCachesPromptTriggerEligibility()",
+          "VoiceInkTests/VoiceInkTests/automaticSystemMuteFollowsAirPodsOutput()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackFindsLTRAndRTLEdges()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackFindsSharedLTRAndRTLBoundary()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackRejectsAmbiguousEdges()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackUsesAdjacentComposedCharacters()",
+          "VoiceInkTests/VoiceInkTests/browserCommandVShortcutAbortsBeforeVAndReleasesCommandOnDrift()",
+          "VoiceInkTests/VoiceInkTests/browserCommandVShortcutPostsOneBalancedChord()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuCandidateRequiresTriggerPointProvenance()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuPointRequiresUsableBoundsAndEditorHit()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRectAcceptsAccessibilityAndChromiumValues()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRectConvertsChromiumScreenCoordinates()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRightClickIsBalancedAndPositionBound()",
+          "VoiceInkTests/VoiceInkTests/browserPasteTargetRejectsFocusTextAndSelectionDrift()",
+          "VoiceInkTests/VoiceInkTests/canceledQueuedDictationPasteDoesNotWriteTheTarget()",
+          "VoiceInkTests/VoiceInkTests/chordAndSecureEvidenceCancelOnlyFreshShiftStart()",
+          "VoiceInkTests/VoiceInkTests/commandVPrefetchFindsDisabledPasteBeforeClipboardWrite()",
+          "VoiceInkTests/VoiceInkTests/commandVPrefetchNeverUsesTitleOnlyOrModifiedShortcuts()",
+          "VoiceInkTests/VoiceInkTests/customFinishUsesItsOwnEvidenceAndDoesNotCancelExistingRecording()",
+          "VoiceInkTests/VoiceInkTests/customSpecialShortcutStartsOnlyAfterSecondShiftRelease()",
+          "VoiceInkTests/VoiceInkTests/dictationCustomRetainsItsExistingCleanupPath()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneBlankRecognitionConsumesPendingPreviousTextFallback()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneCancellationDuringRecognitionDoesNotDeliver()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneDoesNotActivatePromptTriggersOrAI()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneKeepsItsProfileWhileRecognitionWaits()",
+          "VoiceInkTests/VoiceInkTests/dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceIgnoresDisabledWordReplacements()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceReadsCurrentWordReplacementsOnEachApplication()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceVocabularyRemovalDeletesWord()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceWordReplacementRemovalIsVisibleOnNextApplication()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceWordReplacementSaveIsVisibleToTheNextOperation()",
+          "VoiceInkTests/VoiceInkTests/directAccessibilityInsertionSkipsWebBackedEditors()",
+          "VoiceInkTests/VoiceInkTests/doubleShiftKeepsRecordingAfterReleaseAndAssignedShortcutFinishesOnce()",
+          "VoiceInkTests/VoiceInkTests/doubleShiftUsesSameSideAndStrictConfiguredGapBoundary()",
+          "VoiceInkTests/VoiceInkTests/eitherShiftCanLatchCustomShortcutAndLongSecondHoldFinishesAssignedShift()",
+          "VoiceInkTests/VoiceInkTests/expiredSecondDownCannotReplayAfterReleaseOrResetDuringSuspendedFinish()",
+          "VoiceInkTests/VoiceInkTests/freshDefaultsHideMenuBarAndDockIcons()",
+          "VoiceInkTests/VoiceInkTests/idleNoneRecorderSessionDoesNotBlockNextShortcutStart()",
+          "VoiceInkTests/VoiceInkTests/inputMonitoringPermissionUsesInjectedSystemClient()",
+          "VoiceInkTests/VoiceInkTests/intervalOffPreservesOrdinarySpecialHoldAndRelease()",
+          "VoiceInkTests/VoiceInkTests/latchedShiftTypingAndUnsafeFinishLeaveRecordingActive()",
+          "VoiceInkTests/VoiceInkTests/liveClarityImportQueueUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveClarityRetranscriptionUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveCorrectionLibraryPersistentStoreUpgrade()",
+          "VoiceInkTests/VoiceInkTests/liveDictationHistoryUISeed()",
+          "VoiceInkTests/VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+          "VoiceInkTests/VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+          "VoiceInkTests/VoiceInkTests/liveDictationPolishPipelineDeliversLiteralTextToTextEdit()",
+          "VoiceInkTests/VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+          "VoiceInkTests/VoiceInkTests/liveLightImportQueueUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveLightRetranscriptionUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveNoneProfileImportQueueUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+          "VoiceInkTests/VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoLatestOwnerAndCancellation()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoRefusesTextCaretAndWindowDrift()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoSafariKeepsNewClipboardGeneration()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoTextEditRestoresExactUnicodeSelection()",
+          "VoiceInkTests/VoiceInkTests/longShiftHoldFinishesImmediatelyWithoutDoubleTapWait()",
+          "VoiceInkTests/VoiceInkTests/macOnboardingProgressStorePersistsStageAndPermissionCursor()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutChecksPressedNonModifierKeysAtRelease()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutMarksOtherKeyUpAsTyping()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutMarksSecureInputAsUnreliableEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksOtherKeyDownWithoutReleaseEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksOtherModifierPressAndRelease()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksSystemDefinedEvidenceDuringPress()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutUsesEventTapOrderingWhenTrackingKeyEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutsUseNSEventMonitorPath()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlySpecialShortcutDoesNotStartWithoutKeyEvidenceTap()",
+          "VoiceInkTests/VoiceInkTests/monitorRefreshKeepsFinishAvailableAndStaleDeadlineCannotStopNewSession()",
+          "VoiceInkTests/VoiceInkTests/monitorRejectsSecureDoubleShiftAndDropsCallbacksFromOldGeneration()",
+          "VoiceInkTests/VoiceInkTests/monitorRoutesShiftOnlyOnceAndRejectsOverlappingShiftsAndTypingBetweenTaps()",
+          "VoiceInkTests/VoiceInkTests/monitoredAssignedShiftFinishesExistingRecorderAndSurvivingActionFinishesAfterRefresh()",
+          "VoiceInkTests/VoiceInkTests/nonInsertedAccessibilityResultsFallBackToPasteCommand()",
+          "VoiceInkTests/VoiceInkTests/noneRecorderStyleStartsSessionWithoutShowingRecorderWindow()",
+          "VoiceInkTests/VoiceInkTests/permissionNotificationSuppressionScopesNestUntilLastScopeEnds()",
+          "VoiceInkTests/VoiceInkTests/promptDetectionUsesCachedTriggerPrompts()",
+          "VoiceInkTests/VoiceInkTests/pushToTalkUsesActiveSessionWhenRecorderWindowIsNone()",
+          "VoiceInkTests/VoiceInkTests/rawShiftDoesNotStealAnotherRecordingShortcutSession()",
+          "VoiceInkTests/VoiceInkTests/resolvesAPIKeyEnvironmentReference()",
+          "VoiceInkTests/VoiceInkTests/retranscriptionNoneCancellationAfterRecognitionDoesNotSaveFallback()",
+          "VoiceInkTests/VoiceInkTests/retranscriptionNoneKeepsItsProfileWhileRecognitionWaits()",
+          "VoiceInkTests/VoiceInkTests/retranscriptionNonePreservesRecognitionWithoutPromptOrAI()",
+          "VoiceInkTests/VoiceInkTests/secureInputBlocksSpecialModifierShortcutUntilRelease()",
+          "VoiceInkTests/VoiceInkTests/sessionMetricRecorderAcceptsSnapshotModelName()",
+          "VoiceInkTests/VoiceInkTests/shortSingleShiftReleaseWaitsThenFinishesWithEmptyTapFallback()",
+          "VoiceInkTests/VoiceInkTests/shortcutCooldownAllowsFastBackToBackPressAfterDuplicateGuard()",
+          "VoiceInkTests/VoiceInkTests/shortcutKeyEvidenceTraceDetailsIdentifyEveryCause()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelPreservesClearedShortcutState()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelRestoresDefaultShortcutState()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelRestoresStoredShortcut()",
+          "VoiceInkTests/VoiceInkTests/slowRecordingStartupStillLatchesAndFinishWhileStartingRunsOnce()",
+          "VoiceInkTests/VoiceInkTests/specialModeCleanReleaseStopsRecording()",
+          "VoiceInkTests/VoiceInkTests/specialModeStartsRecordingImmediatelyOnKeyDown()",
+          "VoiceInkTests/VoiceInkTests/specialModeUnsafeKeyEvidenceCancelsStartedRecording()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()",
+          "VoiceInkTests/VoiceInkTests/startupFailureAndExternalCancelClearStaleLatch()",
+          "VoiceInkTests/VoiceInkTests/stoppingAndCancellationDrainBeforeNextStartAndRefreshKeepsValidPowerModeOwner()",
+          "VoiceInkTests/VoiceInkTests/unconfirmedPasteCommandDoesNotRestoreOverTranscriptClipboard()",
+          "VoiceInkTests/VoiceInkTests/writingProviderChecksRejectMissingMeaning()",
+          "VoiceInkTests/VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+          "VoiceInkTests/VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+          "VoiceInkTests/VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+          "VoiceInkTests/WritingActionEngineTests/oldStartupFailureDoesNotClearANewerRecordingStart()",
+          "VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()",
+          "VoiceInkTests/WritingTargetTests/cancellationBeforeNativeReplacementLeavesTheSelectionIntact()",
+          "VoiceInkTests/WritingTargetTests/changedDocumentOrSelectionRejectsReplacement()",
+          "VoiceInkTests/WritingTargetTests/changedFocusPreventsAnyEditorMutation()",
+          "VoiceInkTests/WritingTargetTests/editsOrSelectionMovementDuringGenerationRemainUntouched()",
+          "VoiceInkTests/WritingTargetTests/emptySelectionInsertsAtTheExactCursor()",
+          "VoiceInkTests/WritingTargetTests/errorAfterConfirmedReplacementDoesNotRepeatTheReplacement()",
+          "VoiceInkTests/WritingTargetTests/errorAfterPartialMutationDoesNotOverwriteTheChangedDocument()",
+          "VoiceInkTests/WritingTargetTests/insertionAtEndAndWholeDocumentReplacementAreValid()",
+          "VoiceInkTests/WritingTargetTests/invalidAndOverflowingRangesAreRejected()",
+          "VoiceInkTests/WritingTargetTests/matchingAllowsUnavailableSelectedTextOnlyWhenValueAndRangeStillMatch()",
+          "VoiceInkTests/WritingTargetTests/rejectedSelectedTextWriteIsNotRetriedThroughAnotherMutation()",
+          "VoiceInkTests/WritingTargetTests/replacementHandlesCombiningMarksWithoutChangingAdjacentText()",
+          "VoiceInkTests/WritingTargetTests/replacementPreservesTextAroundAnEmojiSelection()",
+          "VoiceInkTests/WritingTargetTests/scalarBoundariesWithinADecomposedCharacterRemainValid()",
+          "VoiceInkTests/WritingTargetTests/selectedTextSetterReplacesOnlyTheCapturedRange()",
+          "VoiceInkTests/WritingTargetTests/selectionCannotSplitAnEmojiSurrogatePair()",
+          "VoiceInkTests/WritingTargetTests/successfulButIneffectiveSetterDoesNotAttemptAnotherMutation()",
+          "VoiceInkTests/WritingTargetTests/targetIdentityRequiresBothOriginalProcessAndFocusedElement()",
+          "VoiceInkTests/WritingTargetTests/unicodeNormalizationChangesAreDocumentDrift()",
+          "VoiceInkTests/WritingTargetTests/unsupportedSelectedTextSetterLeavesTheDocumentAndSelectionIntact()"
+        ],
+        "enabled": [
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()"
+        ],
+        "requested": [
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()"
+        ],
+        "valid": true
+      },
+      "actual_xcresult_records": [
+        {
+          "identifier": "VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()",
+          "status": "Success"
+        }
+      ],
+      "counts": {
+        "Success": 1
+      },
+      "aggregate_member": "writing-undo-native-proof/process/Native.xcresult/Data/data.0~LayREXZwzpknupYw0nuORP02sfbLao4D_H5NnaPbp67duStvdZylHdhJ8A-Ha-s-FU0Sd5gomNWhCMti5Bcbeg==",
+      "aggregate_decoded_sha256": "bf4f5b6b81182348e5a027421bab7332a3979accd9aa730aa2f080a5ecb032f0",
+      "test_log": {
+        "artifact_kind": "observations",
+        "zip_member": "process/tests.log",
+        "bytes": 15743,
+        "sha256": "bf434d2da4e55ab93d054f9ad82e1cae7950b38e72d590aa1b66d6034c06796f"
+      },
+      "native_execution_launch": {
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "mapped_text_paths": [
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+          "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+          "/usr/lib/dyld",
+          "/usr/lib/libRPAC.dylib",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+          "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+          "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+          "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+          "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+          "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+          "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice"
+        ],
+        "observed_live": true,
+        "pid": 25295,
+        "started_at": "Wed Oct 28 01:23:31 2026"
+      },
+      "native_execution_host_closed": {
+        "all_observed_hosts_exited": true,
+        "exact_executable_census_empty": true,
+        "exact_executable_has_no_open_descriptors": true,
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "host_pids": [
+          25295
+        ],
+        "limits": "Only exact observed RJT host processes are terminated. Editor cleanup belongs to owned test fixtures; no editor process-name termination.",
+        "observed_host_launches": [
+          {
+            "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "mapped_text_paths": [
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+              "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+              "/usr/lib/dyld",
+              "/usr/lib/libRPAC.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+              "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+              "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+              "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+              "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice"
+            ],
+            "observed_live": true,
+            "pid": 25295,
+            "started_at": "Wed Oct 28 01:23:31 2026"
+          }
+        ],
+        "valid": true
+      },
+      "enumeration_host_launches": {
+        "discovery": [
+          {
+            "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "mapped_text_paths": [
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+              "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+              "/usr/lib/dyld",
+              "/usr/lib/libRPAC.dylib"
+            ],
+            "observed_live": true,
+            "pid": 24741,
+            "started_at": "Wed Oct 28 01:23:07 2026"
+          }
+        ],
+        "selection": [
+          {
+            "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "mapped_text_paths": [
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+              "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+              "/usr/lib/dyld",
+              "/usr/lib/libRPAC.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+              "/Library/Preferences/Logging/.plist-cache.PUgaMM2F",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/_Testing_Foundation.framework/Versions/A/_Testing_Foundation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+              "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+              "/usr/lib/libobjc-trampolines.dylib",
+              "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store-shm",
+              "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/default.store-shm",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+              "/Users/runner/work/_temp/writing-undo-native-proof/process/isolated-user/Library/Application Support/com.negentropi.RomaJustTalk/stats.store-shm",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+              "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+              "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+              "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests",
+              "/usr/share/icu/icudt78l.dat"
+            ],
+            "observed_live": true,
+            "pid": 24992,
+            "started_at": "Wed Oct 28 01:23:18 2026"
+          }
+        ]
+      },
+      "fresh_signed_tcc_rows_before_after_equal": true,
+      "tcc_rows": [
+        {
+          "auth_value": 2,
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "requirement": "FADE0C0000000028000000010000000800000014166B8131B6199AAB8F12EC2828B496D01F039570",
+          "service": "kTCCServiceAccessibility"
+        },
+        {
+          "auth_value": 2,
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "requirement": "FADE0C0000000028000000010000000800000014166B8131B6199AAB8F12EC2828B496D01F039570",
+          "service": "kTCCServiceMicrophone"
+        }
+      ],
+      "csreq_sha256": "a8e11ed5ebbf121341ab61f2ab773de3227acdebf5c7d2bc4a61033edf5a51a0",
+      "raw_summary": [
+        [
+          "1",
+          "1",
+          "passed"
+        ]
+      ]
+    },
+    "remaining": {
+      "selection": {
+        "disabled": [
+          "VoiceInkTests/CapturedWritingPasteTests/aNewClipboardGenerationWithTheSameTextAndMarkerStillRefusesPosting()",
+          "VoiceInkTests/CapturedWritingPasteTests/aNewCopyAfterConfirmedPasteSurvivesScheduledRestoration()",
+          "VoiceInkTests/CapturedWritingPasteTests/acceptedNoOpRemainsUnconfirmedWithoutAnotherMutationOrClipboardRestore()",
+          "VoiceInkTests/CapturedWritingPasteTests/anErrorAfterConfirmedMutationDoesNotRepeatThePaste()",
+          "VoiceInkTests/CapturedWritingPasteTests/cancellationAfterAttemptKeepsUncertainContentWithoutRetrying()",
+          "VoiceInkTests/CapturedWritingPasteTests/cancellationDuringDiscoveryRestoresTheOwnedClipboardWithoutWriting()",
+          "VoiceInkTests/CapturedWritingPasteTests/canonicalEqualityDoesNotConfirmDifferentUTF16Output()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedPasteRestoresTheClipboardAfterTheRequestedDelay()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedReplacementRestoresAnEmptyClipboard()",
+          "VoiceInkTests/CapturedWritingPasteTests/confirmedReplacementRestoresEveryImageAndTextClipboardFormat()",
+          "VoiceInkTests/CapturedWritingPasteTests/delayedReadbackConfirmsTheSameSingleMutation()",
+          "VoiceInkTests/CapturedWritingPasteTests/failureAfterMutationCannotEnterThePreMutationRestorationPath()",
+          "VoiceInkTests/CapturedWritingPasteTests/focusOrSelectionDriftDuringDiscoveryPreventsThePaste()",
+          "VoiceInkTests/CapturedWritingPasteTests/newerClipboardCopyDuringDiscoverySurvivesRefusal()",
+          "VoiceInkTests/CapturedWritingPasteTests/scheduledRestorationCannotOverwriteANewGenerationWithMatchingData()",
+          "VoiceInkTests/CapturedWritingPasteTests/targetDriftDuringDiscoveryLeavesTheNewDocumentAndClipboardUntouched()",
+          "VoiceInkTests/CapturedWritingPasteTests/unavailableMenuRestoresClipboardEvenWhenSuccessfulPastesWouldKeepIt()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/nestedWritingPastesRestoreOriginalAllFormatClipboard()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/newerClipboardCopySurvivesWritingRestorationDeadline()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/singleWritingPasteHonorsDefaultRestorationDeadline()",
+          "VoiceInkTests/ClipboardRestorationLeaseTests/writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/cancelingANewWaiterDoesNotCancelTheEarlierRestoration()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/cancellationDuringDeliveryObservationStillCommitsExactReadback()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/confirmedCallbackPrecedesImmediateRestorationAndFiresOnce()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation()",
+          "VoiceInkTests/ClipboardRestorationOwnershipTests/unresolvedMenuPreparationRejectsACompetingClipboardWrite()",
+          "VoiceInkTests/CloudProviderVerificationTests/cartesiaKeepsStreamingOnlyVerificationAdapter()",
+          "VoiceInkTests/CloudProviderVerificationTests/coreBackedCloudProvidersShareCoreAPIKeyVerifier()",
+          "VoiceInkTests/CoreAudioPreRollBufferTests/streamingEmissionGateDropsQueuedChunksWhenCanceled()",
+          "VoiceInkTests/CoreAudioPreRollBufferTests/streamingEmissionGateQueuesLiveChunksUntilPreRollFinishes()",
+          "VoiceInkTests/FluidAudioModelManagerTests/retryForceRedownloadsInvalidExistingCache()",
+          "VoiceInkTests/FluidAudioModelManagerTests/secondCallerJoinsActiveDownloadAndCancellationLeavesRetryState(usesURLCancellation:)",
+          "VoiceInkTests/FluidAudioModelManagerTests/silentDownloadBecomesStalledThenRecoversWhenProgressResumes()",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/disconnectDrainsBothPredictionsAndPreventsFinalPublication()",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/finalPassOverlapsCancelledLivePassWithoutPublishingItsLateResult(finalSamples:)",
+          "VoiceInkTests/FluidAudioStreamingCommitTests/longFinalAudioKeepsSDKProgressSessionsSequential()",
+          "VoiceInkTests/LaunchAtLoginControllerTests/cachesStatusInsteadOfReadingItDuringViewUpdates()",
+          "VoiceInkTests/ModelPrewarmServiceTests/cancelledPrewarmDoesNotLoadInstalledModel()",
+          "VoiceInkTests/ModelPrewarmServiceTests/prewarmRechecksInstalledModelBeforeEveryLoad()",
+          "VoiceInkTests/OnboardingRegionViewTests/testAdvancedDisclosureRejectsPendingTaiwanSuggestion()",
+          "VoiceInkTests/OnboardingRegionViewTests/testContinueConfirmsCachedEnglishAcrossOnboardingReset()",
+          "VoiceInkTests/OnboardingRegionViewTests/testExplicitEnglishAccessibilityActionWinsBeforeTaiwanResponse()",
+          "VoiceInkTests/OnboardingRegionViewTests/testExternalAccessibilityWaitsForOneDelayedNativeButtonAction()",
+          "VoiceInkTests/OnboardingRegionViewTests/testLateTaiwanDraftBlocksCachedEnglishContinueWithoutPersistingIt()",
+          "VoiceInkTests/OnboardingRegionViewTests/testProductionOnboardingWindowFitsVisibleDesktopAndKeepsUserResize()",
+          "VoiceInkTests/OnboardingRegionViewTests/testReopeningPreservesExplicitEnglishWithoutAnotherLookup()",
+          "VoiceInkTests/OnboardingRegionViewTests/testSkipUnmountsPendingLookupWithoutCommittingSuggestedModel()",
+          "VoiceInkTests/OnboardingRegionViewTests/testWindowAccessorReconfiguresAfterSwiftUIReusesItsView()",
+          "VoiceInkTests/PowerModeConfigTests/automaticRuleDetectionIgnoresDisabledRules()",
+          "VoiceInkTests/PowerModeConfigTests/automaticRuleDetectionSeparatesURLRulesFromAppAndDefaultRules()",
+          "VoiceInkTests/QwenRecordingSelectionTests/laterDeselectionJoinsInFlightTransition()",
+          "VoiceInkTests/QwenRecordingSelectionTests/rapidReselectionStillDrainsOldRecording()",
+          "VoiceInkTests/QwenRecordingSelectionTests/selectionCancelsDeferredConnectBeforeRuntimeReservation()",
+          "VoiceInkTests/RecordingStartupAudioRelayTests/clearDropsBufferedChunksBeforeSinkInstall()",
+          "VoiceInkTests/RecordingStartupAudioRelayTests/installSinkReplaysBufferedChunksAndForwardsLaterChunks()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/blankCommittedResultStopsBeforePasteDecision()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/cancellationWhileDrainIsBlockedNeverCommits()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/incompleteTranscriptionDoesNotPasteOrPlayCompletionSound()",
+          "VoiceInkTests/SpeechFirstStreamingReplayTests/speechBeforeKeyDownDrainsBeforeCommitAndProducesPaste()",
+          "VoiceInkTests/TranscriptionModelCapabilityTests/localFluidAudioUsesShortFinalCommitTimeout()",
+          "VoiceInkTests/TranscriptionModelCapabilityTests/recordedFileTranscriptionIsUnavailableOnlyForStreamingOnlyProviders()",
+          "VoiceInkTests/TranscriptionModelManagerTests/loadingSavedCurrentModelBroadcastsModelAndSettingsChange()",
+          "VoiceInkTests/TranscriptionModelManagerTests/metadataRefreshUpdatesDescriptorAndPreservesExplicitPreferences()",
+          "VoiceInkTests/TranscriptionModelManagerTests/modelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh()",
+          "VoiceInkTests/TranscriptionModelManagerTests/qwenModelSwitchesPreserveLanguageIntentAcrossReloadAndRefresh()",
+          "VoiceInkTests/TranscriptionModelManagerTests/refreshingRegisteredFallbackDoesNotPersistIt()",
+          "VoiceInkTests/VoiceInkTests/AudioFileTranscriptionPersistenceTests/savingCompletedAudioDoesNotCommitUnrelatedCallerEdits()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/clarityCancellationDoesNotReturnLateOutput()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/clarityPreservesLiteralProviderJSONAndCodeUnits()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/clarityRejectsMalformedAndBlankProviderResponses()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/claritySameOutputRetainsCapturedRequestMetadata()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/claritySnapshotKeepsCapturedCLICommandAndProvider()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/claritySnapshotKeepsCapturedCLITimeout()",
+          "VoiceInkTests/VoiceInkTests/ClarityProviderTests/writingActionsRetainLegacyFilteringAndEmptyPolicies()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/clarityFactoryCapturesStyleAndConfigurationBeforeLaterEdits()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/customAndNoneKeepLegacyOwnershipWithoutProviderPreparation()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/factoryFreezesEnabledLibrariesLanguageAndLeavesPreferencesUntouched()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/lightRequiresAPersistedLanguageRatherThanRegisteredEnglish()",
+          "VoiceInkTests/VoiceInkTests/DictationPlanCaptureTests/requestCallbackRunsOnlyAtARealClarityRequest()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/canceledImportCannotResetItsRestartedItemsNewerState()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/clearingCanceledImportLeavesNoCompletedRecordOrOwnedAudio()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/importCapturesEachItemWhenItStartsAndPreservesItsRawMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/importMissingClarityProviderRetainsOriginalAndWarnsExactlyOnce()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionClarityKeepsCapturedStyleTimeoutAndSameOutputMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionClaritySnippetWinsBeforeMissingProvider()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionLateProviderCancellationDoesNotSaveOrKeepOwnedCopy()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionLightCapturesLanguageRulesAndSnippetsBeforeRecognition()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionProviderFailureRetainsUntouchedRecognitionAndOneFailureField()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionReadOnlyStoreSaveFailureThrowsAndRemovesItsCopy()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/retranscriptionSavesOnlyItsRowAndReturnsTheCallersContext()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/acceptedEngineStartCapturesPlanBeforePermissionAndKeepsItAfterResourceCleanup()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/blankResultCanceledWhileDismissalWaitsCannotCompleteOrRecordMetric()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/cancellationBeforeProcessingRegistrationCannotLaunchClarity()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/clarityFailureReturnsUntouchedRecognitionAndWarnsAfterDeliveryOnce()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/clarityKeepsCapturedProviderStyleRulesAndSameOutputSuccessMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/customKeepsSnippetMappingAndNewRecognitionMetadata()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/failedReplacementPreparationUsesRawExceptForTerminalLiteralSnippet()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/heldCancellationCannotClearContextCapturedByANewerAcceptedRun()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/heldOldRecorderStopCannotRetargetOrClearANewerAcceptedRun()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/lightFreezesRulesLanguageAndProfileBeforeRecognitionAndPastesLiterally()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/missingProviderRecoversRawButBlankProfilesNeverPastePreviousText()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/newAcceptedRunCancelsOlderProviderAndRejectsItsLateCompletion()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/operationCancellationCancelsOwnedProviderAndRejectsIgnoredLateSuccess()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/parentTaskCancellationCancelsOwnedProviderWithoutFallback()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/resetCleanupCannotClearContextCapturedByANewerAcceptedRun()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/undeliveredFallbackWarningDoesNotClaimInsertionOrDurableHistory()",
+          "VoiceInkTests/VoiceInkTests/DictationPolishPipelineTests/wholeSnippetIsFrozenAndTerminalBeforeRulesOrMissingProvider()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/cancellationAfterProviderAwaitRejectsLateSuccessAndWrappedFailure()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/cancellationBeforeProcessingDoesNotExecuteTheProvider()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/capturedLibrariesSurviveLaterEditsAndFreshReads()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/clarityUsesFrozenStyleProviderAndPreparedTextWithoutFiltering()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/customDefersAndNonePreservesEveryCodeUnit()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/dictionarySnapshotsRemainCopiedWhileCustomReadsCurrentRules()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/entireSnippetWinsOverBothPreparationFailures()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/libraryFailureDoesNotRunClarityAndDoesNotReturnPartialLightText()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/lightUsesOnlyWholeUtteranceSnippetsAndThenCapturedRules()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/preparationAndProviderErrorsFallBackToUntouchedRecognition()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/providerCancellationAndOwnerCancellationNeverBecomeFallback()",
+          "VoiceInkTests/VoiceInkTests/DictationPostprocessingPlanTests/sameNonblankClarityKeepsMetadataWhileBlankRecognitionSkipsProcessing()",
+          "VoiceInkTests/VoiceInkTests/DictionaryContextFreshnessTests/aFreshContextReadsChangesSavedByAnotherContext()",
+          "VoiceInkTests/VoiceInkTests/DictionaryContextFreshnessTests/applyingAnotherStoreNeverReusesThePreviousStoresRules()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/approvalAndBulkImportCommitExactRecordsWithoutSavingBystanders()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/staleExpectedRuleCannotOverwriteAnExternalCommittedRevision()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/staleHistoryPreviewRejectsAnExternalCodeUnitRevision()",
+          "VoiceInkTests/VoiceInkTests/DictionaryPersistenceIsolationTests/successfulRuleMutationsRefreshTheRegisteredRowWithoutSavingBystanders()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/approvalRechecksNewConflictsAndDuplicatesWithoutOverwritingOrEnabling()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/approvalRevalidatesFullRevisionVariantAndSourceExistence()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/captureBindsTheDisplayedVariantAndExactRevision()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/invalidRangesAndBlankPairsCannotCreateAnApproval()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/occurrencesRetainExactSpellingAndAllOverlappingChoices()",
+          "VoiceInkTests/VoiceInkTests/HistoryCorrectionApprovalTests/reviewDoesNotMutateAndApprovedLiteralSurvivesHistoryDeletion()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/capturedConfigurationPreservesCommandAndTimeoutWithoutPreferenceWrites()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/earlyChildExitWithLargeInputDoesNotBreakRawOrLegacyRequests()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/nulCommandAndPromptsRefuseBothEntryPointsBeforeLaunch()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceConfigurationTests/rawExecutionPreservesLiteralOutputAndLegacyEnhanceKeepsItsPolicies()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/canceledBeforeInvocationDoesNotLaunchACommand()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationAndExitRacesLeaveLaterRequestsUsable()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationDuringBlockedInputStopsOnlyItsOwnedRequest()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/cancellationEndsATermIgnoringOwnedChild()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/largeInputAndBothOutputPipesCompleteWithoutDeadlock()",
+          "VoiceInkTests/VoiceInkTests/LocalCLIServiceLifetimeTests/timeoutIncludesBlockedInputAndEndsItsOwnedChild()",
+          "VoiceInkTests/VoiceInkTests/ShortcutBackupTests/explicitModernKindRejectsMalformedDataEvenWithLegacyKeys()",
+          "VoiceInkTests/VoiceInkTests/ShortcutBackupTests/missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues()",
+          "VoiceInkTests/VoiceInkTests/ShortcutBackupTests/missingKindStillRequiresAValidLegacyCarbonPayload()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/fullBackupRoundTripsExactIdentityKindEnabledStateAndProvenance()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/fullLibraryConflictsBlockAllReplacementAndVocabularyInsertions()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/legacyMapImportUsesCanonicalNamesOfLiteralRowsWithoutOverwritingThem()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/legacyMapOnlyImportPreservesAdditiveTrimAndCommaContract()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/malformedFullPayloadRejectsBeforeAnyDictionaryMutation()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/preparedImportRechecksNewConflictsBeforeWritingAnything()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/presentEmptyFullLibraryWinsOverLegacyMapAndStillImportsVocabulary()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/repeatedFullImportIsIdempotentAndSuccessfulImportAffectsTheNextOperation()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementBackupAdapterTests/unsupportedStoredKindCannotSilentlyDisappearIntoLegacyExport()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/editConflictsExposeCompleteRecordsAndChangeNothing()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/literalEditKeepsExactStringsIdentityKindAndProvenance()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/storedKindsAndProvenanceRoundTripWithoutReinterpretingUnknownData()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/successfulMutationsAreVisibleToTheNextOperation()",
+          "VoiceInkTests/VoiceInkTests/WordReplacementLibraryAdapterTests/unknownEnabledRulesFailClosedAndLaterCallsReadCurrentData()",
+          "VoiceInkTests/VoiceInkTests/WritingActionDeliveryCommitTests/cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()",
+          "VoiceInkTests/VoiceInkTests/WritingActionDeliveryCommitTests/cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoPipelineTests/translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/refusedKeyboardAuthorizationBalancesCommandWithoutPostingV()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange()",
+          "VoiceInkTests/VoiceInkTests/WritingActionUndoTests/unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority()",
+          "VoiceInkTests/VoiceInkTests/accessibilityCommandVMenuMatchRequiresEnabledPlainShortcut()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertDeliversWithoutTouchingClipboard()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationAcceptsTextOrCursorMutation()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationRejectsSilentAXSuccess()",
+          "VoiceInkTests/VoiceInkTests/accessibilityInsertionObservationRejectsUnrelatedTextMutation()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchFailureRetainsScalarChildrenAndShortcut()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchPreservesUnsupportedAttributeSlots()",
+          "VoiceInkTests/VoiceInkTests/accessibilityMenuBatchRejectsMissingOrInvalidShortcutState()",
+          "VoiceInkTests/VoiceInkTests/accessibilityPermissionUsesInjectedSystemClient()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementRejectsInvalidRange()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementRequiresExactRangeRestore()",
+          "VoiceInkTests/VoiceInkTests/accessibilityValueReplacementUsesUTF16Selection()",
+          "VoiceInkTests/VoiceInkTests/activeRecorderToggleDefersStopInsteadOfCancelingWhileStarting()",
+          "VoiceInkTests/VoiceInkTests/aiEnhancementServiceCachesPromptTriggerEligibility()",
+          "VoiceInkTests/VoiceInkTests/automaticSystemMuteFollowsAirPodsOutput()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackFindsLTRAndRTLEdges()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackFindsSharedLTRAndRTLBoundary()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackRejectsAmbiguousEdges()",
+          "VoiceInkTests/VoiceInkTests/browserCaretFallbackUsesAdjacentComposedCharacters()",
+          "VoiceInkTests/VoiceInkTests/browserCommandVShortcutAbortsBeforeVAndReleasesCommandOnDrift()",
+          "VoiceInkTests/VoiceInkTests/browserCommandVShortcutPostsOneBalancedChord()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuCandidateRequiresTriggerPointProvenance()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuPointRequiresUsableBoundsAndEditorHit()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRectAcceptsAccessibilityAndChromiumValues()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRectConvertsChromiumScreenCoordinates()",
+          "VoiceInkTests/VoiceInkTests/browserContextMenuRightClickIsBalancedAndPositionBound()",
+          "VoiceInkTests/VoiceInkTests/browserPasteTargetRejectsFocusTextAndSelectionDrift()",
+          "VoiceInkTests/VoiceInkTests/canceledQueuedDictationPasteDoesNotWriteTheTarget()",
+          "VoiceInkTests/VoiceInkTests/chordAndSecureEvidenceCancelOnlyFreshShiftStart()",
+          "VoiceInkTests/VoiceInkTests/commandVPrefetchFindsDisabledPasteBeforeClipboardWrite()",
+          "VoiceInkTests/VoiceInkTests/commandVPrefetchNeverUsesTitleOnlyOrModifiedShortcuts()",
+          "VoiceInkTests/VoiceInkTests/customFinishUsesItsOwnEvidenceAndDoesNotCancelExistingRecording()",
+          "VoiceInkTests/VoiceInkTests/customSpecialShortcutStartsOnlyAfterSecondShiftRelease()",
+          "VoiceInkTests/VoiceInkTests/dictationCustomRetainsItsExistingCleanupPath()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneBlankRecognitionConsumesPendingPreviousTextFallback()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneCancellationDuringRecognitionDoesNotDeliver()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneDoesNotActivatePromptTriggersOrAI()",
+          "VoiceInkTests/VoiceInkTests/dictationNoneKeepsItsProfileWhileRecognitionWaits()",
+          "VoiceInkTests/VoiceInkTests/dictationNonePreservesSnippetTriggersAndReplacementWordsLiterally()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceIgnoresDisabledWordReplacements()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceReadsCurrentWordReplacementsOnEachApplication()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceVocabularyRemovalDeletesWord()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceWordReplacementRemovalIsVisibleOnNextApplication()",
+          "VoiceInkTests/VoiceInkTests/dictionaryServiceWordReplacementSaveIsVisibleToTheNextOperation()",
+          "VoiceInkTests/VoiceInkTests/directAccessibilityInsertionSkipsWebBackedEditors()",
+          "VoiceInkTests/VoiceInkTests/doubleShiftKeepsRecordingAfterReleaseAndAssignedShortcutFinishesOnce()",
+          "VoiceInkTests/VoiceInkTests/doubleShiftUsesSameSideAndStrictConfiguredGapBoundary()",
+          "VoiceInkTests/VoiceInkTests/eitherShiftCanLatchCustomShortcutAndLongSecondHoldFinishesAssignedShift()",
+          "VoiceInkTests/VoiceInkTests/expiredSecondDownCannotReplayAfterReleaseOrResetDuringSuspendedFinish()",
+          "VoiceInkTests/VoiceInkTests/freshDefaultsHideMenuBarAndDockIcons()",
+          "VoiceInkTests/VoiceInkTests/idleNoneRecorderSessionDoesNotBlockNextShortcutStart()",
+          "VoiceInkTests/VoiceInkTests/inputMonitoringPermissionUsesInjectedSystemClient()",
+          "VoiceInkTests/VoiceInkTests/intervalOffPreservesOrdinarySpecialHoldAndRelease()",
+          "VoiceInkTests/VoiceInkTests/latchedShiftTypingAndUnsafeFinishLeaveRecordingActive()",
+          "VoiceInkTests/VoiceInkTests/liveClarityImportQueueUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveClarityRetranscriptionUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveCorrectionLibraryPersistentStoreUpgrade()",
+          "VoiceInkTests/VoiceInkTests/liveDictationHistoryUISeed()",
+          "VoiceInkTests/VoiceInkTests/liveDictationMetadataPersistentStoreUpgrade()",
+          "VoiceInkTests/VoiceInkTests/liveDictationPersistentStoreSeedControl()",
+          "VoiceInkTests/VoiceInkTests/liveDictationPolishPipelineDeliversLiteralTextToTextEdit()",
+          "VoiceInkTests/VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+          "VoiceInkTests/VoiceInkTests/liveLightImportQueueUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveLightRetranscriptionUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveNoneProfileImportQueueUsesRealWhisperRecognition()",
+          "VoiceInkTests/VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+          "VoiceInkTests/VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()",
+          "VoiceInkTests/VoiceInkTests/longShiftHoldFinishesImmediatelyWithoutDoubleTapWait()",
+          "VoiceInkTests/VoiceInkTests/macOnboardingProgressStorePersistsStageAndPermissionCursor()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutChecksPressedNonModifierKeysAtRelease()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutMarksOtherKeyUpAsTyping()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutMarksSecureInputAsUnreliableEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksOtherKeyDownWithoutReleaseEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksOtherModifierPressAndRelease()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutTracksSystemDefinedEvidenceDuringPress()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutUsesEventTapOrderingWhenTrackingKeyEvidence()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlyShortcutsUseNSEventMonitorPath()",
+          "VoiceInkTests/VoiceInkTests/modifierOnlySpecialShortcutDoesNotStartWithoutKeyEvidenceTap()",
+          "VoiceInkTests/VoiceInkTests/monitorRefreshKeepsFinishAvailableAndStaleDeadlineCannotStopNewSession()",
+          "VoiceInkTests/VoiceInkTests/monitorRejectsSecureDoubleShiftAndDropsCallbacksFromOldGeneration()",
+          "VoiceInkTests/VoiceInkTests/monitorRoutesShiftOnlyOnceAndRejectsOverlappingShiftsAndTypingBetweenTaps()",
+          "VoiceInkTests/VoiceInkTests/monitoredAssignedShiftFinishesExistingRecorderAndSurvivingActionFinishesAfterRefresh()",
+          "VoiceInkTests/VoiceInkTests/nonInsertedAccessibilityResultsFallBackToPasteCommand()",
+          "VoiceInkTests/VoiceInkTests/noneRecorderStyleStartsSessionWithoutShowingRecorderWindow()",
+          "VoiceInkTests/VoiceInkTests/permissionNotificationSuppressionScopesNestUntilLastScopeEnds()",
+          "VoiceInkTests/VoiceInkTests/promptDetectionUsesCachedTriggerPrompts()",
+          "VoiceInkTests/VoiceInkTests/pushToTalkUsesActiveSessionWhenRecorderWindowIsNone()",
+          "VoiceInkTests/VoiceInkTests/rawShiftDoesNotStealAnotherRecordingShortcutSession()",
+          "VoiceInkTests/VoiceInkTests/resolvesAPIKeyEnvironmentReference()",
+          "VoiceInkTests/VoiceInkTests/retranscriptionNoneCancellationAfterRecognitionDoesNotSaveFallback()",
+          "VoiceInkTests/VoiceInkTests/retranscriptionNoneKeepsItsProfileWhileRecognitionWaits()",
+          "VoiceInkTests/VoiceInkTests/retranscriptionNonePreservesRecognitionWithoutPromptOrAI()",
+          "VoiceInkTests/VoiceInkTests/secureInputBlocksSpecialModifierShortcutUntilRelease()",
+          "VoiceInkTests/VoiceInkTests/sessionMetricRecorderAcceptsSnapshotModelName()",
+          "VoiceInkTests/VoiceInkTests/shortSingleShiftReleaseWaitsThenFinishesWithEmptyTapFallback()",
+          "VoiceInkTests/VoiceInkTests/shortcutCooldownAllowsFastBackToBackPressAfterDuplicateGuard()",
+          "VoiceInkTests/VoiceInkTests/shortcutKeyEvidenceTraceDetailsIdentifyEveryCause()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelPreservesClearedShortcutState()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelRestoresDefaultShortcutState()",
+          "VoiceInkTests/VoiceInkTests/shortcutRecorderCancelRestoresStoredShortcut()",
+          "VoiceInkTests/VoiceInkTests/slowRecordingStartupStillLatchesAndFinishWhileStartingRunsOnce()",
+          "VoiceInkTests/VoiceInkTests/specialModeCleanReleaseStopsRecording()",
+          "VoiceInkTests/VoiceInkTests/specialModeStartsRecordingImmediatelyOnKeyDown()",
+          "VoiceInkTests/VoiceInkTests/specialModeUnsafeKeyEvidenceCancelsStartedRecording()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()",
+          "VoiceInkTests/VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()",
+          "VoiceInkTests/VoiceInkTests/startupFailureAndExternalCancelClearStaleLatch()",
+          "VoiceInkTests/VoiceInkTests/stoppingAndCancellationDrainBeforeNextStartAndRefreshKeepsValidPowerModeOwner()",
+          "VoiceInkTests/VoiceInkTests/unconfirmedPasteCommandDoesNotRestoreOverTranscriptClipboard()",
+          "VoiceInkTests/VoiceInkTests/writingProviderChecksRejectMissingMeaning()",
+          "VoiceInkTests/VoiceInkTests/writingProviderRewritesTheSuppliedSelection()",
+          "VoiceInkTests/VoiceInkTests/writingProviderTranslatesEnglishToTraditionalChinese()",
+          "VoiceInkTests/VoiceInkTests/writingProviderTranslatesJapaneseToEnglish()",
+          "VoiceInkTests/WritingActionEngineTests/oldStartupFailureDoesNotClearANewerRecordingStart()",
+          "VoiceInkTests/WritingActionEngineTests/permissionWaitReservesOneRecordingStart()",
+          "VoiceInkTests/WritingTargetTests/cancellationBeforeNativeReplacementLeavesTheSelectionIntact()",
+          "VoiceInkTests/WritingTargetTests/changedDocumentOrSelectionRejectsReplacement()",
+          "VoiceInkTests/WritingTargetTests/changedFocusPreventsAnyEditorMutation()",
+          "VoiceInkTests/WritingTargetTests/editsOrSelectionMovementDuringGenerationRemainUntouched()",
+          "VoiceInkTests/WritingTargetTests/emptySelectionInsertsAtTheExactCursor()",
+          "VoiceInkTests/WritingTargetTests/errorAfterConfirmedReplacementDoesNotRepeatTheReplacement()",
+          "VoiceInkTests/WritingTargetTests/errorAfterPartialMutationDoesNotOverwriteTheChangedDocument()",
+          "VoiceInkTests/WritingTargetTests/insertionAtEndAndWholeDocumentReplacementAreValid()",
+          "VoiceInkTests/WritingTargetTests/invalidAndOverflowingRangesAreRejected()",
+          "VoiceInkTests/WritingTargetTests/matchingAllowsUnavailableSelectedTextOnlyWhenValueAndRangeStillMatch()",
+          "VoiceInkTests/WritingTargetTests/rejectedSelectedTextWriteIsNotRetriedThroughAnotherMutation()",
+          "VoiceInkTests/WritingTargetTests/replacementHandlesCombiningMarksWithoutChangingAdjacentText()",
+          "VoiceInkTests/WritingTargetTests/replacementPreservesTextAroundAnEmojiSelection()",
+          "VoiceInkTests/WritingTargetTests/scalarBoundariesWithinADecomposedCharacterRemainValid()",
+          "VoiceInkTests/WritingTargetTests/selectedTextSetterReplacesOnlyTheCapturedRange()",
+          "VoiceInkTests/WritingTargetTests/selectionCannotSplitAnEmojiSurrogatePair()",
+          "VoiceInkTests/WritingTargetTests/successfulButIneffectiveSetterDoesNotAttemptAnotherMutation()",
+          "VoiceInkTests/WritingTargetTests/targetIdentityRequiresBothOriginalProcessAndFocusedElement()",
+          "VoiceInkTests/WritingTargetTests/unicodeNormalizationChangesAreDocumentDrift()",
+          "VoiceInkTests/WritingTargetTests/unsupportedSelectedTextSetterLeavesTheDocumentAndSelectionIntact()"
+        ],
+        "enabled": [
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoLatestOwnerAndCancellation()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoRefusesTextCaretAndWindowDrift()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoSafariKeepsNewClipboardGeneration()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoTextEditRestoresExactUnicodeSelection()"
+        ],
+        "requested": [
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoTextEditRestoresExactUnicodeSelection()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoSafariKeepsNewClipboardGeneration()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoRefusesTextCaretAndWindowDrift()",
+          "VoiceInkTests/VoiceInkTests/liveWritingUndoLatestOwnerAndCancellation()"
+        ],
+        "valid": true
+      },
+      "actual_xcresult_records": [
+        {
+          "identifier": "VoiceInkTests/liveWritingUndoTextEditRestoresExactUnicodeSelection()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()",
+          "status": "Failure"
+        },
+        {
+          "identifier": "VoiceInkTests/liveWritingUndoSafariKeepsNewClipboardGeneration()",
+          "status": "Failure"
+        },
+        {
+          "identifier": "VoiceInkTests/liveWritingUndoRefusesTextCaretAndWindowDrift()",
+          "status": "Success"
+        },
+        {
+          "identifier": "VoiceInkTests/liveWritingUndoLatestOwnerAndCancellation()",
+          "status": "Failure"
+        }
+      ],
+      "counts": {
+        "Success": 2,
+        "Failure": 3
+      },
+      "aggregate_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~nHXXt7v9S410D1p-l_zxFOhywYcJH9kYlVAz3u65TN52gmr8HxB7XLuu8Cq9cUhjm0WdxtblIxq4Mc8FbPvt1A==",
+      "aggregate_decoded_sha256": "39775737c70a521a7920b3282b65c80f550595837b7a8160dca070d499a64e96",
+      "test_log": {
+        "artifact_kind": "observations",
+        "zip_member": "remaining/tests.log",
+        "bytes": 13318,
+        "sha256": "68d505425c4e4c319e5f052c6b393d6422da2e750bec1ca246485fc5d1aac07e"
+      },
+      "native_execution_launch": {
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "mapped_text_paths": [
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+          "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+          "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+          "/usr/lib/dyld",
+          "/usr/lib/libRPAC.dylib",
+          "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib"
+        ],
+        "observed_live": true,
+        "pid": 26909,
+        "started_at": "Wed Oct 28 01:24:18 2026"
+      },
+      "native_execution_host_closed": {
+        "all_observed_hosts_exited": true,
+        "exact_executable_census_empty": true,
+        "exact_executable_has_no_open_descriptors": true,
+        "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "host_pids": [
+          26909
+        ],
+        "limits": "Only exact observed RJT host processes are terminated. Editor cleanup belongs to owned test fixtures; no editor process-name termination.",
+        "observed_host_launches": [
+          {
+            "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "mapped_text_paths": [
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+              "/usr/lib/dyld",
+              "/usr/lib/libRPAC.dylib",
+              "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib"
+            ],
+            "observed_live": true,
+            "pid": 26909,
+            "started_at": "Wed Oct 28 01:24:18 2026"
+          }
+        ],
+        "valid": true
+      },
+      "enumeration_host_launches": {
+        "discovery": [
+          {
+            "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "mapped_text_paths": [
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+              "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+              "/usr/lib/dyld",
+              "/usr/lib/libRPAC.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+              "/Library/Preferences/Logging/.plist-cache.PUgaMM2F",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/_Testing_Foundation.framework/Versions/A/_Testing_Foundation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+              "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+              "/Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Versions/A/DeviceInterface",
+              "/Library/Apple/System/Library/PrivateFrameworks/Mercury.framework/Versions/A/Mercury",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+              "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests"
+            ],
+            "observed_live": true,
+            "pid": 26229,
+            "started_at": "Wed Oct 28 01:23:54 2026"
+          }
+        ],
+        "selection": [
+          {
+            "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+            "mapped_text_paths": [
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTest.framework/Versions/A/XCTest",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestSupport.framework/Versions/A/XCTestSupport",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DTXConnectionServices.framework/Versions/A/DTXConnectionServices",
+              "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/lib_TestingInterop.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/kperfdataDT.framework/Versions/A/kperfdataDT",
+              "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+              "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTAutomationSupport.framework/Versions/A/XCTAutomationSupport",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DebugSymbolsDT.framework/Versions/A/DebugSymbolsDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/MallocStackLoggingDT.framework/Versions/A/MallocStackLoggingDT",
+              "/usr/lib/dyld",
+              "/usr/lib/libRPAC.dylib",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCUIAutomation.framework/Versions/A/XCUIAutomation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/CoreSymbolicationDT.framework/Versions/A/CoreSymbolicationDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ResultDataPublisher.framework/Versions/A/ResultDataPublisher",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/ktraceDT.framework/Versions/A/ktraceDT",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/Frameworks/DTRemoteServices.framework/Versions/A/DTRemoteServices",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/XCTestCore.framework/Versions/A/XCTestCore",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/SymbolicationDT.framework/Versions/A/SymbolicationDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/RecountDT.framework/Versions/A/RecountDT",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsFoundation.framework/Versions/A/DVTInstrumentsFoundation",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/DVTInstrumentsUtilities.framework/Versions/A/DVTInstrumentsUtilities",
+              "/Applications/Xcode_26.6.app/Contents/SharedFrameworks/Testing.framework/Versions/A/Testing",
+              "/Library/Developer/PrivateFrameworks/CoreDeviceUtilities.framework/Versions/A/CoreDeviceUtilities",
+              "/Library/Developer/PrivateFrameworks/CoreDevice.framework/Versions/A/CoreDevice",
+              "/Library/Apple/System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/MobileDevice"
+            ],
+            "observed_live": true,
+            "pid": 26551,
+            "started_at": "Wed Oct 28 01:24:01 2026"
+          }
+        ]
+      },
+      "fresh_signed_tcc_rows_before_after_equal": true,
+      "tcc_rows": [
+        {
+          "auth_value": 2,
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "requirement": "FADE0C0000000028000000010000000800000014166B8131B6199AAB8F12EC2828B496D01F039570",
+          "service": "kTCCServiceAccessibility"
+        },
+        {
+          "auth_value": 2,
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "requirement": "FADE0C0000000028000000010000000800000014166B8131B6199AAB8F12EC2828B496D01F039570",
+          "service": "kTCCServiceMicrophone"
+        }
+      ],
+      "csreq_sha256": "a8e11ed5ebbf121341ab61f2ab773de3227acdebf5c7d2bc4a61033edf5a51a0",
+      "raw_summary": [
+        [
+          "5",
+          "1",
+          "failed"
+        ]
+      ]
+    }
+  },
+  "cases": {
+    "liveWritingUndoTextEditRejectsTerminatedProcess": {
+      "receipt": {
+        "artifact_kind": "observations",
+        "zip_member": "process/observations/liveWritingUndoTextEditRejectsTerminatedProcess.json",
+        "bytes": 11214,
+        "sha256": "571f11169e0d96347540c7b944d65ca905accbef8994a78ad98fc92e73b2d2bd"
+      },
+      "completed": true,
+      "status": "Success",
+      "hostPID": 25295,
+      "actual_stages": [
+        "process-before",
+        "process-forward",
+        "process-terminated",
+        "replacement-process-refused"
+      ],
+      "checks": {
+        "completedStages": true,
+        "differentApplicationInstance": true,
+        "exactRangeObservations": true,
+        "exactTextObservations": true,
+        "expectedEditorRoutes": true,
+        "terminatedProcessRejected": true
+      },
+      "exact_full_utf16_observations": 3,
+      "exact_selected_range_observations": 3,
+      "exact_all_format_clipboard_observations": 0,
+      "extra": {
+        "latestForwardAttempts": 1,
+        "latestForwardConfirmations": 1,
+        "processTermination": {
+          "after": {
+            "actions": {
+              "saveCommandRequests": 1,
+              "terminationRequests": 1
+            },
+            "applicationTerminated": true,
+            "bundleApplicationCount": 0,
+            "confirmedSavedUTF16": [
+              66,
+              101,
+              102,
+              111,
+              114,
+              101,
+              32,
+              55357,
+              56425,
+              55356,
+              57341,
+              8205,
+              55357,
+              56507,
+              32,
+              79,
+              119,
+              110,
+              101,
+              100,
+              32,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              32,
+              114,
+              101,
+              119,
+              114,
+              105,
+              116,
+              101,
+              32,
+              55357,
+              56832,
+              32,
+              97,
+              102,
+              116,
+              101,
+              114,
+              32,
+              55358,
+              56785,
+              8205,
+              55357,
+              56960,
+              46,
+              10
+            ],
+            "currentApplicationInstanceMatches": false,
+            "exactWindowPresent": false,
+            "ownedDocumentURLMatches": false,
+            "ownsFocusedWindow": false,
+            "previousWindowCount": 0,
+            "previousWindowsPreserved": false,
+            "tokenWindowCount": -1,
+            "windowCount": -1,
+            "windowReadAXError": -25204,
+            "windowReadIsArray": false
+          },
+          "before": {
+            "actions": {
+              "saveCommandRequests": 1
+            },
+            "applicationTerminated": false,
+            "bundleApplicationCount": 1,
+            "confirmedSavedUTF16": [
+              66,
+              101,
+              102,
+              111,
+              114,
+              101,
+              32,
+              55357,
+              56425,
+              55356,
+              57341,
+              8205,
+              55357,
+              56507,
+              32,
+              79,
+              119,
+              110,
+              101,
+              100,
+              32,
+              112,
+              114,
+              111,
+              99,
+              101,
+              115,
+              115,
+              32,
+              114,
+              101,
+              119,
+              114,
+              105,
+              116,
+              101,
+              32,
+              55357,
+              56832,
+              32,
+              97,
+              102,
+              116,
+              101,
+              114,
+              32,
+              55358,
+              56785,
+              8205,
+              55357,
+              56960,
+              46,
+              10
+            ],
+            "currentApplicationInstanceMatches": true,
+            "exactWindowPresent": true,
+            "ownedDocumentURLMatches": true,
+            "ownsFocusedWindow": true,
+            "previousWindowCount": 0,
+            "previousWindowsPreserved": true,
+            "tokenWindowCount": 1,
+            "windowCount": 1,
+            "windowReadAXError": 0,
+            "windowReadIsArray": true
+          },
+          "terminationAccepted": true
+        }
+      },
+      "runtime_bounds": {
+        "ASR": false,
+        "clipboardBaseline": "Dedicated disposable runner pasteboard; no shared user clipboard. Test payloads left for host disposal.",
+        "controllerAPI": true,
+        "productMenuOrShortcut": false,
+        "syntheticProvider": false
+      }
+    },
+    "liveWritingUndoTextEditRestoresExactUnicodeSelection": {
+      "receipt": {
+        "artifact_kind": "observations",
+        "zip_member": "remaining/observations/liveWritingUndoTextEditRestoresExactUnicodeSelection.json",
+        "bytes": 13074,
+        "sha256": "dca69effb1a82f56a32ec52259f3bc1595d3b6f50d1e7ab6427f3e4ff8fcf701"
+      },
+      "completed": true,
+      "status": "Success",
+      "hostPID": 26909,
+      "actual_stages": [
+        "unicode1-forward",
+        "unicode1-restored",
+        "unicode2-forward",
+        "unicode2-restored",
+        "second-undo-refused"
+      ],
+      "checks": {
+        "completedStages": true,
+        "exactRangeObservations": true,
+        "exactTextObservations": true,
+        "expectedEditorRoutes": true,
+        "unicodeAndSelectionRestoredOnce": true
+      },
+      "exact_full_utf16_observations": 5,
+      "exact_selected_range_observations": 5,
+      "exact_all_format_clipboard_observations": 0,
+      "extra": {
+        "latestForwardAttempts": 1,
+        "latestForwardConfirmations": 1
+      },
+      "runtime_bounds": {
+        "ASR": false,
+        "clipboardBaseline": "Dedicated disposable runner pasteboard; no shared user clipboard. Test payloads left for host disposal.",
+        "controllerAPI": true,
+        "productMenuOrShortcut": false,
+        "syntheticProvider": false
+      }
+    },
+    "liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference": {
+      "receipt": {
+        "artifact_kind": "observations",
+        "zip_member": "remaining/observations/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference.json",
+        "bytes": 671,
+        "sha256": "cf1b6a57793c3eb03c39040389f304ca016ce031ffd92e3064c29355647bc394"
+      },
+      "completed": false,
+      "status": "Failure",
+      "hostPID": 26909,
+      "actual_stages": [],
+      "checks": {},
+      "exact_full_utf16_observations": 0,
+      "exact_selected_range_observations": 0,
+      "exact_all_format_clipboard_observations": 0,
+      "extra": {},
+      "runtime_bounds": {
+        "ASR": false,
+        "clipboardBaseline": "Dedicated disposable runner pasteboard; no shared user clipboard. Test payloads left for host disposal.",
+        "controllerAPI": true,
+        "productMenuOrShortcut": false,
+        "syntheticProvider": false
+      }
+    },
+    "liveWritingUndoSafariKeepsNewClipboardGeneration": {
+      "receipt": {
+        "artifact_kind": "observations",
+        "zip_member": "remaining/observations/liveWritingUndoSafariKeepsNewClipboardGeneration.json",
+        "bytes": 755,
+        "sha256": "670c70e02dc2932bc23b9adae5423b11e44801ae5690928ad743d9af59d83bd8"
+      },
+      "completed": false,
+      "status": "Failure",
+      "hostPID": 26909,
+      "actual_stages": [],
+      "checks": {
+        "expectedEditorRoutes": true
+      },
+      "exact_full_utf16_observations": 0,
+      "exact_selected_range_observations": 0,
+      "exact_all_format_clipboard_observations": 0,
+      "extra": {
+        "latestForwardAttempts": 1,
+        "latestForwardConfirmations": 0
+      },
+      "runtime_bounds": {
+        "ASR": false,
+        "clipboardBaseline": "Dedicated disposable runner pasteboard; no shared user clipboard. Test payloads left for host disposal.",
+        "controllerAPI": true,
+        "productMenuOrShortcut": false,
+        "syntheticProvider": false
+      }
+    },
+    "liveWritingUndoRefusesTextCaretAndWindowDrift": {
+      "receipt": {
+        "artifact_kind": "observations",
+        "zip_member": "remaining/observations/liveWritingUndoRefusesTextCaretAndWindowDrift.json",
+        "bytes": 16037,
+        "sha256": "13499378bf6824858e65d4ce36f02c56bcf164cac8d2dcd248b00ace6af13dd0"
+      },
+      "completed": true,
+      "status": "Success",
+      "hostPID": 26909,
+      "actual_stages": [
+        "caret-forward",
+        "caret-refused",
+        "text-forward",
+        "text-refused",
+        "window-forward",
+        "window-refused"
+      ],
+      "checks": {
+        "completedStages": true,
+        "driftNeverRetargetedOrMutated": true,
+        "exactRangeObservations": true,
+        "exactTextObservations": true,
+        "expectedEditorRoutes": true,
+        "sameProcessDifferentWindow": true
+      },
+      "exact_full_utf16_observations": 6,
+      "exact_selected_range_observations": 6,
+      "exact_all_format_clipboard_observations": 0,
+      "extra": {
+        "latestForwardAttempts": 1,
+        "latestForwardConfirmations": 1
+      },
+      "runtime_bounds": {
+        "ASR": false,
+        "clipboardBaseline": "Dedicated disposable runner pasteboard; no shared user clipboard. Test payloads left for host disposal.",
+        "controllerAPI": true,
+        "productMenuOrShortcut": false,
+        "syntheticProvider": false
+      }
+    },
+    "liveWritingUndoLatestOwnerAndCancellation": {
+      "receipt": {
+        "artifact_kind": "observations",
+        "zip_member": "remaining/observations/liveWritingUndoLatestOwnerAndCancellation.json",
+        "bytes": 3151,
+        "sha256": "3aa3cfb8cec3111cd53542ed8ae80bd746ed8856f077c56faa56d66f3ceb2017"
+      },
+      "completed": false,
+      "status": "Failure",
+      "hostPID": 26909,
+      "actual_stages": [
+        "first-forward"
+      ],
+      "checks": {
+        "expectedEditorRoutes": true
+      },
+      "exact_full_utf16_observations": 1,
+      "exact_selected_range_observations": 1,
+      "exact_all_format_clipboard_observations": 0,
+      "extra": {
+        "latestForwardAttempts": 1,
+        "latestForwardConfirmations": 0
+      },
+      "runtime_bounds": {
+        "ASR": false,
+        "clipboardBaseline": "Dedicated disposable runner pasteboard; no shared user clipboard. Test payloads left for host disposal.",
+        "controllerAPI": true,
+        "productMenuOrShortcut": false,
+        "syntheticProvider": false
+      }
+    }
+  },
+  "xcresult_decoding": "Linux Python3.14 compression.zstd; complete length-prefixed aggregate/summary parsing. No native execution or Apple signature re-verification performed by auditor.",
+  "limits": [
+    "Product menu/shortcut route is a separate UI gate.",
+    "No ASR, microphone, model/provider-quality or physical-keyboard proof.",
+    "Clipboard fixtures only on the disposable runner; no shared-user clipboard.",
+    "No release or broad editor compatibility claim.",
+    "Accessibility and Microphone are provisioned for the signed app; normal app initialization starts pre-roll. No Automation grant or microphone acceptance claim."
+  ],
+  "owned_editor_fixture_count": 8,
+  "native_termination_fixture_count": 1,
+  "normal_single_cmdw_cleanup_count": 7,
+  "safari_cleanup_scope": {
+    "fixtures": 3,
+    "with_nonempty_previous_windows": 0,
+    "shared_retained_window_observed_after_close": 0,
+    "nonempty_previous_window_preservation_proof": false,
+    "limits": "A true preservation flag with zero prior windows proves only the empty-prior-window scenario."
+  },
+  "helper_cleanup_evidence": {
+    "RJT-Writing-Live-CFB6FDD5-5B20-42AA-9F0D-B1F40416C27A": {
+      "kind": "com.apple.TextEdit",
+      "route": "one exact retained NSRunningApplication termination after saved bytes; no close command",
+      "before": {
+        "actions": {
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "before-termination",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          79,
+          119,
+          110,
+          101,
+          100,
+          32,
+          112,
+          114,
+          111,
+          99,
+          101,
+          115,
+          115,
+          32,
+          114,
+          101,
+          119,
+          114,
+          105,
+          116,
+          101,
+          32,
+          55357,
+          56832,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": true,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25421,
+        "systemUptime": 819.516549625,
+        "token": "RJT-Writing-Live-CFB6FDD5-5B20-42AA-9F0D-B1F40416C27A",
+        "tokenWindowCount": 1,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "saveCommandRequests": 1,
+          "terminationRequests": 1
+        },
+        "applicationTerminated": true,
+        "bundleApplicationCount": 0,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "terminated",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          79,
+          119,
+          110,
+          101,
+          100,
+          32,
+          112,
+          114,
+          111,
+          99,
+          101,
+          115,
+          115,
+          32,
+          114,
+          101,
+          119,
+          114,
+          105,
+          116,
+          101,
+          32,
+          55357,
+          56832,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": false,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": false,
+        "processIdentifier": 25421,
+        "systemUptime": 820.4234341250001,
+        "token": "RJT-Writing-Live-CFB6FDD5-5B20-42AA-9F0D-B1F40416C27A",
+        "tokenWindowCount": -1,
+        "windowCount": -1,
+        "windowReadAXError": -25204,
+        "windowReadIsArray": false
+      },
+      "raw_members": [
+        "process/editor-observations/RJT-Writing-Live-CFB6FDD5-5B20-42AA-9F0D-B1F40416C27A-cleanup-before-termination.json",
+        "process/editor-observations/RJT-Writing-Live-CFB6FDD5-5B20-42AA-9F0D-B1F40416C27A-cleanup-terminated.json"
+      ]
+    },
+    "RJT-Writing-Live-EB61CAE4-A0B3-45E5-A9C9-5018352CEF1E": {
+      "kind": "com.apple.TextEdit",
+      "route": "one CmdW after owned focus; exact saved bytes for TextEdit; previous Safari windows preserved",
+      "before": {
+        "actions": {
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "before-close",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": true,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 821.4566179166667,
+        "token": "RJT-Writing-Live-EB61CAE4-A0B3-45E5-A9C9-5018352CEF1E",
+        "tokenWindowCount": 1,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "closeCommandRequests": 1,
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "closed",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 821.5399610416667,
+        "token": "RJT-Writing-Live-EB61CAE4-A0B3-45E5-A9C9-5018352CEF1E",
+        "tokenWindowCount": 0,
+        "windowCount": 0,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "raw_members": [
+        "process/editor-observations/RJT-Writing-Live-EB61CAE4-A0B3-45E5-A9C9-5018352CEF1E-cleanup-before-close.json",
+        "process/editor-observations/RJT-Writing-Live-EB61CAE4-A0B3-45E5-A9C9-5018352CEF1E-cleanup-closed.json"
+      ]
+    },
+    "RJT-Writing-Live-1D069071-3388-49BF-B3D8-2D244C32D1B5": {
+      "kind": "com.apple.TextEdit",
+      "route": "one CmdW after owned focus; exact saved bytes for TextEdit; previous Safari windows preserved",
+      "before": {
+        "actions": {
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "before-close",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          68,
+          114,
+          105,
+          102,
+          116,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          55357,
+          56832,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": true,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 875.1469641250001,
+        "token": "RJT-Writing-Live-1D069071-3388-49BF-B3D8-2D244C32D1B5",
+        "tokenWindowCount": 1,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "closeCommandRequests": 1,
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "closed",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          68,
+          114,
+          105,
+          102,
+          116,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          55357,
+          56832,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 875.2076507500001,
+        "token": "RJT-Writing-Live-1D069071-3388-49BF-B3D8-2D244C32D1B5",
+        "tokenWindowCount": 0,
+        "windowCount": 0,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "raw_members": [
+        "remaining/editor-observations/RJT-Writing-Live-1D069071-3388-49BF-B3D8-2D244C32D1B5-cleanup-before-close.json",
+        "remaining/editor-observations/RJT-Writing-Live-1D069071-3388-49BF-B3D8-2D244C32D1B5-cleanup-closed.json"
+      ]
+    },
+    "RJT-Writing-Live-9471D062-5CCA-495B-A64E-D7CE3207396E": {
+      "kind": "com.apple.Safari",
+      "route": "one CmdW after owned focus; exact saved bytes for TextEdit; previous Safari windows preserved",
+      "before": {
+        "actions": {},
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.Safari",
+        "checkpoint": "before-close",
+        "confirmedSavedUTF16": null,
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 26939,
+        "systemUptime": 872.2566794166668,
+        "token": "RJT-Writing-Live-9471D062-5CCA-495B-A64E-D7CE3207396E",
+        "tokenWindowCount": 1,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "closeCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.Safari",
+        "checkpoint": "closed",
+        "confirmedSavedUTF16": null,
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 26939,
+        "systemUptime": 872.5298337083334,
+        "token": "RJT-Writing-Live-9471D062-5CCA-495B-A64E-D7CE3207396E",
+        "tokenWindowCount": 0,
+        "windowCount": 0,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "raw_members": [
+        "remaining/editor-observations/RJT-Writing-Live-9471D062-5CCA-495B-A64E-D7CE3207396E-cleanup-before-close.json",
+        "remaining/editor-observations/RJT-Writing-Live-9471D062-5CCA-495B-A64E-D7CE3207396E-cleanup-closed.json"
+      ]
+    },
+    "RJT-Writing-Live-A09267EC-C3B6-432A-B3B1-05E53C6F517B": {
+      "kind": "com.apple.Safari",
+      "route": "one CmdW after owned focus; exact saved bytes for TextEdit; previous Safari windows preserved",
+      "before": {
+        "actions": {},
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.Safari",
+        "checkpoint": "before-close",
+        "confirmedSavedUTF16": null,
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 26939,
+        "systemUptime": 874.1408473333333,
+        "token": "RJT-Writing-Live-A09267EC-C3B6-432A-B3B1-05E53C6F517B",
+        "tokenWindowCount": 1,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "closeCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.Safari",
+        "checkpoint": "closed",
+        "confirmedSavedUTF16": null,
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 26939,
+        "systemUptime": 874.2560968333333,
+        "token": "RJT-Writing-Live-A09267EC-C3B6-432A-B3B1-05E53C6F517B",
+        "tokenWindowCount": 0,
+        "windowCount": 0,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "raw_members": [
+        "remaining/editor-observations/RJT-Writing-Live-A09267EC-C3B6-432A-B3B1-05E53C6F517B-cleanup-before-close.json",
+        "remaining/editor-observations/RJT-Writing-Live-A09267EC-C3B6-432A-B3B1-05E53C6F517B-cleanup-closed.json"
+      ]
+    },
+    "RJT-Writing-Live-B58A6626-61E4-465A-87D2-8D691113909A": {
+      "kind": "com.apple.TextEdit",
+      "route": "one CmdW after owned focus; exact saved bytes for TextEdit; previous Safari windows preserved",
+      "before": {
+        "actions": {
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "before-close",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": true,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 863.6806782916667,
+        "token": "RJT-Writing-Live-B58A6626-61E4-465A-87D2-8D691113909A",
+        "tokenWindowCount": 1,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "closeCommandRequests": 1,
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "closed",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 863.8267276666667,
+        "token": "RJT-Writing-Live-B58A6626-61E4-465A-87D2-8D691113909A",
+        "tokenWindowCount": 0,
+        "windowCount": 0,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "raw_members": [
+        "remaining/editor-observations/RJT-Writing-Live-B58A6626-61E4-465A-87D2-8D691113909A-cleanup-before-close.json",
+        "remaining/editor-observations/RJT-Writing-Live-B58A6626-61E4-465A-87D2-8D691113909A-cleanup-closed.json"
+      ]
+    },
+    "RJT-Writing-Live-BFBE773E-43F5-40D4-A806-01C5BD7DC1C0": {
+      "kind": "com.apple.Safari",
+      "route": "one CmdW after owned focus; exact saved bytes for TextEdit; previous Safari windows preserved",
+      "before": {
+        "actions": {},
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.Safari",
+        "checkpoint": "before-close",
+        "confirmedSavedUTF16": null,
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 26939,
+        "systemUptime": 878.3395275416667,
+        "token": "RJT-Writing-Live-BFBE773E-43F5-40D4-A806-01C5BD7DC1C0",
+        "tokenWindowCount": 1,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "closeCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.Safari",
+        "checkpoint": "closed",
+        "confirmedSavedUTF16": null,
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 0,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 26939,
+        "systemUptime": 878.4762222916668,
+        "token": "RJT-Writing-Live-BFBE773E-43F5-40D4-A806-01C5BD7DC1C0",
+        "tokenWindowCount": 0,
+        "windowCount": 0,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "raw_members": [
+        "remaining/editor-observations/RJT-Writing-Live-BFBE773E-43F5-40D4-A806-01C5BD7DC1C0-cleanup-before-close.json",
+        "remaining/editor-observations/RJT-Writing-Live-BFBE773E-43F5-40D4-A806-01C5BD7DC1C0-cleanup-closed.json"
+      ]
+    },
+    "RJT-Writing-Live-FAF62218-4524-491F-AF4D-A1F25E3EB5BC": {
+      "kind": "com.apple.TextEdit",
+      "route": "one CmdW after owned focus; exact saved bytes for TextEdit; previous Safari windows preserved",
+      "before": {
+        "actions": {
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "before-close",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": true,
+        "failure": null,
+        "ownedDocumentURLMatches": true,
+        "ownsFocusedWindow": true,
+        "previousWindowCount": 1,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 874.9469592500001,
+        "token": "RJT-Writing-Live-FAF62218-4524-491F-AF4D-A1F25E3EB5BC",
+        "tokenWindowCount": 1,
+        "windowCount": 2,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "after": {
+        "actions": {
+          "closeCommandRequests": 1,
+          "saveCommandRequests": 1
+        },
+        "applicationTerminated": false,
+        "bundleApplicationCount": 1,
+        "bundleIdentifier": "com.apple.TextEdit",
+        "checkpoint": "closed",
+        "confirmedSavedUTF16": [
+          66,
+          101,
+          102,
+          111,
+          114,
+          101,
+          32,
+          55357,
+          56425,
+          55356,
+          57341,
+          8205,
+          55357,
+          56507,
+          32,
+          116,
+          97,
+          114,
+          103,
+          101,
+          116,
+          32,
+          101,
+          769,
+          32,
+          97,
+          102,
+          116,
+          101,
+          114,
+          32,
+          55358,
+          56785,
+          8205,
+          55357,
+          56960,
+          46,
+          10
+        ],
+        "currentApplicationInstanceMatches": true,
+        "exactWindowPresent": false,
+        "failure": null,
+        "ownedDocumentURLMatches": false,
+        "ownsFocusedWindow": false,
+        "previousWindowCount": 1,
+        "previousWindowsPreserved": true,
+        "processIdentifier": 25449,
+        "systemUptime": 875.0577103333334,
+        "token": "RJT-Writing-Live-FAF62218-4524-491F-AF4D-A1F25E3EB5BC",
+        "tokenWindowCount": 0,
+        "windowCount": 1,
+        "windowReadAXError": 0,
+        "windowReadIsArray": true
+      },
+      "raw_members": [
+        "remaining/editor-observations/RJT-Writing-Live-FAF62218-4524-491F-AF4D-A1F25E3EB5BC-cleanup-before-close.json",
+        "remaining/editor-observations/RJT-Writing-Live-FAF62218-4524-491F-AF4D-A1F25E3EB5BC-cleanup-closed.json"
+      ]
+    }
+  },
+  "helper_cleanup_limits": "Raw helpers prove owned surface closure/previous-window preservation. Fixture folder removal occurs after closed receipt; no separate post-removal filesystem receipt. Diagnostic document strings are canonical resource representations after typed ownership validation, not raw AX URL spellings.",
+  "original_and_replacement_literals_independently_recomputed_from_frozen_oracle": true,
+  "clipboard_generation_limit": "No clipboard-observation stage reached; no Safari clipboard preservation or newer-generation survival proof.",
+  "classification": "mixed-native-3-passed-3-safari-failed",
+  "actual_native_case_counts": {
+    "total": 6,
+    "passed": 3,
+    "failed": 3,
+    "skipped": 0
+  },
+  "positive_scope": [
+    "Retained exclusive TextEdit process terminated once after exact save; replacement process cannot reuse old authority.",
+    "Two exact Unicode rewrites restored original full text and selection once.",
+    "Caret, text and same-process window drift refused Undo without mutating captured text.",
+    "All8ownedfixtures safely cleaned:1retainedprocess termination+7singleCmdW; Safari prior-window counts reported explicitly."
+  ],
+  "unresolved_safari_scope": {
+    "first_case": "Fresh focused-UI read returned nil before target capture; AX error not retained.",
+    "other_two": "At least one forward attempt reached irreversible boundary with zero confirmation; delivery outcome enum/error and postfailed document value/range not retained. No assumption of no mutation.",
+    "latest_partial": "First-forward text/range stage succeeded; second forward failed before latest-restored or cancellation overlap checks.",
+    "no_safari_undo": "All three failed before any Safari Undo restoration or clipboard preservation observation.",
+    "attachments": "No test failure attachments or screenshots in the raw xcresult summaries."
+  },
+  "separate_execution_host_launches": true,
+  "whole_utf16_observations": 15,
+  "clipboard_observations": 0,
+  "github_run_receipt": {
+    "path": "github-run.json",
+    "bytes": 4878,
+    "sha256": "e76bf183e7f5086efd09e1e3e21f64543afdc2bbc3c1d8c086cc70eb4e25f476"
+  },
+  "failed_github_log_fetched_once": {
+    "path": "github-failed.log",
+    "bytes": 7568,
+    "sha256": "44eb221eb0d699ab28b0d513a27ad3fc19ca89e68024ff0ee4963364ab0173c4"
+  },
+  "raw_xcresult_detail_receipts": {
+    "process-xcresult-details.json": {
+      "bytes": 1054,
+      "sha256": "7b63719fe1d9568fd900ed6d06898ea24e26be5fb23eae02ba016565d7d67e2c"
+    },
+    "remaining-xcresult-details.json": {
+      "bytes": 15212,
+      "sha256": "e15d095600dbd52cabd008a56ff33f52699ec000f1df5b74443c57bbe7c7639a"
+    }
+  },
+  "raw_failed_safari_summaries": [
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()",
+      "failure_summaries": [
+        {
+          "expression": {
+            "sourceCode": "focused.map { CFEqual($0, editor.editor) } == true",
+            "subexpressions": [
+              {
+                "sourceCode": "focused.map { CFEqual($0, editor.editor) }",
+                "value": {
+                  "debugDescription": "nil",
+                  "description": "nil",
+                  "fullyQualifiedTypeName": "Swift.Optional<Swift.Bool>",
+                  "typeName": "Optional<Bool>"
+                }
+              },
+              {
+                "sourceCode": "true",
+                "value": {
+                  "children": [
+                    {
+                      "debugDescription": "true",
+                      "description": "true",
+                      "fullyQualifiedTypeName": "Swift.Bool",
+                      "label": "some",
+                      "typeName": "Bool"
+                    }
+                  ],
+                  "debugDescription": "Optional(true)",
+                  "description": "true",
+                  "fullyQualifiedTypeName": "Swift.Optional<Swift.Bool>",
+                  "typeName": "Optional<Bool>"
+                }
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "278",
+          "message": "Expectation failed: (focused.map { CFEqual($0, editor.editor) } \u2192 nil) == true",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4554349908"
+              },
+              {
+                "addressString": "4554348171"
+              },
+              {
+                "addressString": "4553807451"
+              },
+              {
+                "addressString": "4553811835"
+              },
+              {
+                "addressString": "4693647859",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "278"
+                  },
+                  "symbolName": "WritingUndoLiveFixture.deliver(_:to:controller:)"
+                }
+              },
+              {
+                "addressString": "4693674416",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "80"
+                  },
+                  "symbolName": "VoiceInkTests.liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()"
+                }
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4554118980"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553451680"
+              },
+              {
+                "addressString": "4553379780"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "11090460356"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+              "lineNumber": "278"
+            }
+          },
+          "timestamp": "2026-10-28T01:24:30.474+0000",
+          "uuid": "C96708C7-6C77-4B27-B069-2E163FABD72F"
+        }
+      ],
+      "attachment_count": 0
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoSafariKeepsNewClipboardGeneration()",
+      "failure_summaries": [
+        {
+          "expression": {
+            "sourceCode": "outcome.isConfirmed && attempts == 1 && confirmations == 1",
+            "subexpressions": [
+              {
+                "sourceCode": "outcome.isConfirmed && attempts == 1",
+                "value": {
+                  "debugDescription": "false",
+                  "description": "false",
+                  "fullyQualifiedTypeName": "Swift.Bool",
+                  "typeName": "Bool"
+                }
+              },
+              {
+                "sourceCode": "confirmations == 1"
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "293",
+          "message": "Expectation failed: (outcome.isConfirmed && attempts == 1 \u2192 false) && (confirmations == 1 \u2192 <not evaluated>)",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4554349908"
+              },
+              {
+                "addressString": "4554348171"
+              },
+              {
+                "addressString": "4553807451"
+              },
+              {
+                "addressString": "4553811835"
+              },
+              {
+                "addressString": "4693651163",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "293"
+                  },
+                  "symbolName": "WritingUndoLiveFixture.deliver(_:to:controller:)"
+                }
+              },
+              {
+                "addressString": "4693695056",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "110"
+                  },
+                  "symbolName": "VoiceInkTests.liveWritingUndoSafariKeepsNewClipboardGeneration()"
+                }
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4554118980"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553451680"
+              },
+              {
+                "addressString": "4553379780"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "11090460356"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+              "lineNumber": "293"
+            }
+          },
+          "timestamp": "2026-10-28T01:24:33.145+0000",
+          "uuid": "576C0D52-1E15-4E60-95A2-46425A0DB9E5"
+        }
+      ],
+      "attachment_count": 0
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoLatestOwnerAndCancellation()",
+      "failure_summaries": [
+        {
+          "expression": {
+            "sourceCode": "outcome.isConfirmed && attempts == 1 && confirmations == 1",
+            "subexpressions": [
+              {
+                "sourceCode": "outcome.isConfirmed && attempts == 1",
+                "value": {
+                  "debugDescription": "false",
+                  "description": "false",
+                  "fullyQualifiedTypeName": "Swift.Bool",
+                  "typeName": "Bool"
+                }
+              },
+              {
+                "sourceCode": "confirmations == 1"
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "293",
+          "message": "Expectation failed: (outcome.isConfirmed && attempts == 1 \u2192 false) && (confirmations == 1 \u2192 <not evaluated>)",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4554349908"
+              },
+              {
+                "addressString": "4554348171"
+              },
+              {
+                "addressString": "4553807451"
+              },
+              {
+                "addressString": "4553811835"
+              },
+              {
+                "addressString": "4693651163",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "293"
+                  },
+                  "symbolName": "WritingUndoLiveFixture.deliver(_:to:controller:)"
+                }
+              },
+              {
+                "addressString": "4693730176",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "179"
+                  },
+                  "symbolName": "VoiceInkTests.liveWritingUndoLatestOwnerAndCancellation()"
+                }
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4554118980"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553451680"
+              },
+              {
+                "addressString": "4553379780"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "11090460356"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+              "lineNumber": "293"
+            }
+          },
+          "timestamp": "2026-10-28T01:24:36.688+0000",
+          "uuid": "D0B6F6FC-78FA-4FAA-8E53-34FC6B44E042"
+        }
+      ],
+      "attachment_count": 0
+    }
+  ],
+  "raw_xcresult_attachment_count": 0,
+  "retention": "Both archives fetched once remotely with exact sizes/SHA256/allCRC: /data/rjt-writing-check-01a17bef/40613522304/{observations,evidence}.zip. All130compact original members retained locally; raw full ZIP/build/xcresult remains remote, with complete decoded case summary receipts here."
+}

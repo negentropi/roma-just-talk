@@ -1,0 +1,138 @@
+{
+  "observedAt": "2026-10-28T01:26:23.702442+00:00",
+  "run": {
+    "conclusion": "failure",
+    "createdAt": "2026-10-28T01:11:31Z",
+    "databaseId": 40613522304,
+    "headBranch": "ci/rjt-writing-undo-native-01a17bef-794fa259",
+    "headSha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+    "jobs": [
+      {
+        "completedAt": "2026-10-28T01:25:15Z",
+        "conclusion": "failure",
+        "databaseId": 122570534369,
+        "name": "native",
+        "startedAt": "2026-10-28T01:11:34Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-28T01:11:36Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-28T01:11:35Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:11:40Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-28T01:11:36Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:11:51Z",
+            "conclusion": "success",
+            "name": "Select Xcode and the static dependency toolchain",
+            "number": 3,
+            "startedAt": "2026-10-28T01:11:40Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:12:26Z",
+            "conclusion": "success",
+            "name": "Run actions/cache/restore@v4",
+            "number": 4,
+            "startedAt": "2026-10-28T01:11:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:12:29Z",
+            "conclusion": "success",
+            "name": "Check exact native selection, receipt and signing classifiers",
+            "number": 5,
+            "startedAt": "2026-10-28T01:12:26Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:13:30Z",
+            "conclusion": "success",
+            "name": "Bind candidate source, native oracles and 41 canonical packages",
+            "number": 6,
+            "startedAt": "2026-10-28T01:12:29Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:13:32Z",
+            "conclusion": "success",
+            "name": "Prepare and verify static Whisper for app linkage",
+            "number": 7,
+            "startedAt": "2026-10-28T01:13:30Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:13:32Z",
+            "conclusion": "skipped",
+            "name": "Run actions/cache/save@v4",
+            "number": 8,
+            "startedAt": "2026-10-28T01:13:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:25:00Z",
+            "conclusion": "failure",
+            "name": "Build once, isolate process termination, then execute remaining five cases",
+            "number": 9,
+            "startedAt": "2026-10-28T01:13:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:25:01Z",
+            "conclusion": "failure",
+            "name": "Recheck six receipts, closed execution and discovery hosts, frozen signed app",
+            "number": 10,
+            "startedAt": "2026-10-28T01:25:00Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:25:03Z",
+            "conclusion": "success",
+            "name": "Upload compact native Undo observations",
+            "number": 11,
+            "startedAt": "2026-10-28T01:25:01Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:25:09Z",
+            "conclusion": "success",
+            "name": "Upload build logs, both native results and exact launch configurations",
+            "number": 12,
+            "startedAt": "2026-10-28T01:25:03Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:25:09Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 24,
+            "startedAt": "2026-10-28T01:25:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-28T01:25:12Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 25,
+            "startedAt": "2026-10-28T01:25:09Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40613522304/job/122570534369"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-10-28T01:25:15Z",
+    "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40613522304"
+  }
+}

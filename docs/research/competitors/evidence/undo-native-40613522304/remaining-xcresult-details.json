@@ -1,0 +1,403 @@
+{
+  "run_id": 40613522304,
+  "scope": "live",
+  "aggregate_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~nHXXt7v9S410D1p-l_zxFOhywYcJH9kYlVAz3u65TN52gmr8HxB7XLuu8Cq9cUhjm0WdxtblIxq4Mc8FbPvt1A==",
+  "case_details": [
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoTextEditRestoresExactUnicodeSelection()",
+      "status": "Success",
+      "summary_reference": "0~A9kQQb386-pYgQuF06fxTYcZn7yFa2KeZjiVSNsYwAsQnbN4niQBDuy-vdjvb_VAaSE8r4fbP6cuk2TnlwDqvA==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~A9kQQb386-pYgQuF06fxTYcZn7yFa2KeZjiVSNsYwAsQnbN4niQBDuy-vdjvb_VAaSE8r4fbP6cuk2TnlwDqvA==",
+      "decoded_summary_sha256": "9fbcf98afb5ee71c63067ebd7adf72b45353f182ce1b83dae4336e69ce315dd4",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()",
+      "status": "Failure",
+      "summary_reference": "0~U-Zud9NWrvi-HddSgF-9SUxUDsTjCbotxbKLfjl24CeFF4u7a86XKe5PVuF4llybOhWoFH_G6EuPex-Yyp_8cw==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~U-Zud9NWrvi-HddSgF-9SUxUDsTjCbotxbKLfjl24CeFF4u7a86XKe5PVuF4llybOhWoFH_G6EuPex-Yyp_8cw==",
+      "decoded_summary_sha256": "75bfa43264b7f8ad668a5dddd6474928cdd664f2874e80a049e0168f16b8eace",
+      "failure_summaries": [
+        {
+          "_n": "Array"
+        },
+        {
+          "expression": {
+            "sourceCode": "focused.map { CFEqual($0, editor.editor) } == true",
+            "subexpressions": [
+              {
+                "sourceCode": "focused.map { CFEqual($0, editor.editor) }",
+                "value": {
+                  "debugDescription": "nil",
+                  "description": "nil",
+                  "fullyQualifiedTypeName": "Swift.Optional<Swift.Bool>",
+                  "typeName": "Optional<Bool>"
+                }
+              },
+              {
+                "sourceCode": "true",
+                "value": {
+                  "children": [
+                    {
+                      "debugDescription": "true",
+                      "description": "true",
+                      "fullyQualifiedTypeName": "Swift.Bool",
+                      "label": "some",
+                      "typeName": "Bool"
+                    }
+                  ],
+                  "debugDescription": "Optional(true)",
+                  "description": "true",
+                  "fullyQualifiedTypeName": "Swift.Optional<Swift.Bool>",
+                  "typeName": "Optional<Bool>"
+                }
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "278",
+          "message": "Expectation failed: (focused.map { CFEqual($0, editor.editor) } \u2192 nil) == true",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4554349908"
+              },
+              {
+                "addressString": "4554348171"
+              },
+              {
+                "addressString": "4553807451"
+              },
+              {
+                "addressString": "4553811835"
+              },
+              {
+                "addressString": "4693647859",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "278"
+                  },
+                  "symbolName": "WritingUndoLiveFixture.deliver(_:to:controller:)"
+                }
+              },
+              {
+                "addressString": "4693674416",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "80"
+                  },
+                  "symbolName": "VoiceInkTests.liveWritingUndoSafariPreservesClipboardWithEitherForwardPreference()"
+                }
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4554118980"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553451680"
+              },
+              {
+                "addressString": "4553379780"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "11090460356"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+              "lineNumber": "278"
+            }
+          },
+          "timestamp": "2026-10-28T01:24:30.474+0000",
+          "uuid": "C96708C7-6C77-4B27-B069-2E163FABD72F"
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoSafariKeepsNewClipboardGeneration()",
+      "status": "Failure",
+      "summary_reference": "0~i2FlBdSIF6YdtzMOvA6iI938IyRQzH4LDu6TQDHUiGALUzx8PekxIDNKHxIupNbM75jVn9yiCUfvNB0A17yDPw==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~i2FlBdSIF6YdtzMOvA6iI938IyRQzH4LDu6TQDHUiGALUzx8PekxIDNKHxIupNbM75jVn9yiCUfvNB0A17yDPw==",
+      "decoded_summary_sha256": "ded5b740ffb675e2bc54d4fc8f560e6084faee32b6d458a4b1b5674655f307a8",
+      "failure_summaries": [
+        {
+          "_n": "Array"
+        },
+        {
+          "expression": {
+            "sourceCode": "outcome.isConfirmed && attempts == 1 && confirmations == 1",
+            "subexpressions": [
+              {
+                "sourceCode": "outcome.isConfirmed && attempts == 1",
+                "value": {
+                  "debugDescription": "false",
+                  "description": "false",
+                  "fullyQualifiedTypeName": "Swift.Bool",
+                  "typeName": "Bool"
+                }
+              },
+              {
+                "sourceCode": "confirmations == 1"
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "293",
+          "message": "Expectation failed: (outcome.isConfirmed && attempts == 1 \u2192 false) && (confirmations == 1 \u2192 <not evaluated>)",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4554349908"
+              },
+              {
+                "addressString": "4554348171"
+              },
+              {
+                "addressString": "4553807451"
+              },
+              {
+                "addressString": "4553811835"
+              },
+              {
+                "addressString": "4693651163",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "293"
+                  },
+                  "symbolName": "WritingUndoLiveFixture.deliver(_:to:controller:)"
+                }
+              },
+              {
+                "addressString": "4693695056",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "110"
+                  },
+                  "symbolName": "VoiceInkTests.liveWritingUndoSafariKeepsNewClipboardGeneration()"
+                }
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4554118980"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553451680"
+              },
+              {
+                "addressString": "4553379780"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "11090460356"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+              "lineNumber": "293"
+            }
+          },
+          "timestamp": "2026-10-28T01:24:33.145+0000",
+          "uuid": "576C0D52-1E15-4E60-95A2-46425A0DB9E5"
+        }
+      ],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoRefusesTextCaretAndWindowDrift()",
+      "status": "Success",
+      "summary_reference": "0~ydugEABaGKdLjIenAxrGai8zn_zf3QwSoVmEQgyhdg_eErUbYhZpfQo2-Pk9qREWJS0hnjKvftbsSJBLor3TMg==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~ydugEABaGKdLjIenAxrGai8zn_zf3QwSoVmEQgyhdg_eErUbYhZpfQo2-Pk9qREWJS0hnjKvftbsSJBLor3TMg==",
+      "decoded_summary_sha256": "91b82629c77462de26ae7ab3c2dec0033abdf4eda711234a1b8b186fb46a48ed",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoLatestOwnerAndCancellation()",
+      "status": "Failure",
+      "summary_reference": "0~qe0DSEbVrNl29Hn1PELvcufTprAKWKitNte4gy2xpNAaBsyNk0mYO308EaTQDLZRFNq0hzjkVTZz4Uz80oIPAQ==",
+      "summary_member": "writing-undo-native-proof/remaining/Native.xcresult/Data/data.0~qe0DSEbVrNl29Hn1PELvcufTprAKWKitNte4gy2xpNAaBsyNk0mYO308EaTQDLZRFNq0hzjkVTZz4Uz80oIPAQ==",
+      "decoded_summary_sha256": "9019865bd52df0c70db73849590dd5f0e924fefc8589e9219d3539d5be228ea5",
+      "failure_summaries": [
+        {
+          "_n": "Array"
+        },
+        {
+          "expression": {
+            "sourceCode": "outcome.isConfirmed && attempts == 1 && confirmations == 1",
+            "subexpressions": [
+              {
+                "sourceCode": "outcome.isConfirmed && attempts == 1",
+                "value": {
+                  "debugDescription": "false",
+                  "description": "false",
+                  "fullyQualifiedTypeName": "Swift.Bool",
+                  "typeName": "Bool"
+                }
+              },
+              {
+                "sourceCode": "confirmations == 1"
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "293",
+          "message": "Expectation failed: (outcome.isConfirmed && attempts == 1 \u2192 false) && (confirmations == 1 \u2192 <not evaluated>)",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4554349908"
+              },
+              {
+                "addressString": "4554348171"
+              },
+              {
+                "addressString": "4553807451"
+              },
+              {
+                "addressString": "4553811835"
+              },
+              {
+                "addressString": "4693651163",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "293"
+                  },
+                  "symbolName": "WritingUndoLiveFixture.deliver(_:to:controller:)"
+                }
+              },
+              {
+                "addressString": "4693730176",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "179"
+                  },
+                  "symbolName": "VoiceInkTests.liveWritingUndoLatestOwnerAndCancellation()"
+                }
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4554118980"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553451680"
+              },
+              {
+                "addressString": "4553379780"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "4553455868"
+              },
+              {
+                "addressString": "4553455872"
+              },
+              {
+                "addressString": "11090460356"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+              "lineNumber": "293"
+            }
+          },
+          "timestamp": "2026-10-28T01:24:36.688+0000",
+          "uuid": "D0B6F6FC-78FA-4FAA-8E53-34FC6B44E042"
+        }
+      ],
+      "attachments": []
+    }
+  ],
+  "boundaries": [],
+  "external_ax_reports": [],
+  "poststate_limit": "AX fixtureWindows trees come from before action unless the report explicitly says otherwise. UI boundary reports reflect their named observation phases."
+}

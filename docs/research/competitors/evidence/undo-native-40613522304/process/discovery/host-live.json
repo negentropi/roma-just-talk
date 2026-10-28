@@ -1,0 +1,18 @@
+{
+  "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "hosts": [
+    {
+      "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+        "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib",
+        "/usr/lib/dyld",
+        "/usr/lib/libRPAC.dylib"
+      ],
+      "observed_live": true,
+      "pid": 24741,
+      "started_at": "Wed Oct 28 01:23:07 2026"
+    }
+  ]
+}

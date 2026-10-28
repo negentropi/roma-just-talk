@@ -1,0 +1,24 @@
+{
+  "caseName" : "liveWritingUndoSafariKeepsNewClipboardGeneration",
+  "checks" : {
+    "expectedEditorRoutes" : true
+  },
+  "completed" : false,
+  "extra" : {
+    "latestForwardAttempts" : 1,
+    "latestForwardConfirmations" : 0
+  },
+  "hostExecutablePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/.local-build\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "hostPID" : 26909,
+  "observations" : [
+
+  ],
+  "runtimeBounds" : {
+    "ASR" : false,
+    "clipboardBaseline" : "Dedicated disposable runner pasteboard; no shared user clipboard. Test payloads left for host disposal.",
+    "controllerAPI" : true,
+    "productMenuOrShortcut" : false,
+    "syntheticProvider" : false
+  },
+  "schemaVersion" : 1
+}

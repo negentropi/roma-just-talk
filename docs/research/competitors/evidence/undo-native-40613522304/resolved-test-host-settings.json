@@ -1,0 +1,9 @@
+{
+  "limits": "Build settings only; actual ad-hoc CodeDirectory flags are verified separately. No Hardened Runtime signature claim.",
+  "resolved": {
+    "ENABLE_DEBUG_DYLIB": "NO",
+    "ENABLE_HARDENED_RUNTIME": "YES",
+    "ENABLE_PREVIEWS": "NO"
+  },
+  "target": "VoiceInk"
+}

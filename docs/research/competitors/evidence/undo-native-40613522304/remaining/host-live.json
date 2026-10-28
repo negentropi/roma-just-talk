@@ -1,0 +1,20 @@
+{
+  "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "hosts": [
+    {
+      "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libXCTestBundleInject.dylib",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld",
+        "/usr/lib/libRPAC.dylib",
+        "/Applications/Xcode_26.6.app/Contents/Developer/usr/lib/libMainThreadChecker.dylib"
+      ],
+      "observed_live": true,
+      "pid": 26909,
+      "started_at": "Wed Oct 28 01:24:18 2026"
+    }
+  ]
+}

@@ -48,7 +48,12 @@ struct DiscardedRecordingTests {
 
     init() throws {
         let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
-        let container = try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)])
+        // Mirror the app's named stores; the host app binds SessionMetric to "stats" process-wide.
+        let container = try ModelContainer(for: schema, configurations: [
+            ModelConfiguration("default", schema: Schema([Transcription.self]), isStoredInMemoryOnly: true),
+            ModelConfiguration("dictionary", schema: Schema([VocabularyWord.self, WordReplacement.self]), isStoredInMemoryOnly: true),
+            ModelConfiguration("stats", schema: Schema([SessionMetric.self]), isStoredInMemoryOnly: true),
+        ])
         context = ModelContext(container)
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

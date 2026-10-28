@@ -1,6 +1,6 @@
 # Undo the latest writing edit
 
-The current candidate includes Undo and clipboard-restoration ownership. Component regression checks and seven native TextEdit/Safari cases pass. Product menu/shortcut and combined UI/Release acceptance remain open. This guide describes the implemented contract; it is not a release receipt.
+Undo and shared clipboard-restoration ownership have passed component regression checks and seven native TextEdit/Safari cases. The [menu and configured-shortcut check](research/competitors/evidence/undo-controls-40657960693/README.md) also passed four editor cases and three safety states in an isolated component host. This guide describes the implemented contract; no release was published. The [implementation plan](research/competitors/implementation-plan.md#current-verification-status) keeps each proof's scope separate.
 
 **Undo Last Writing Edit** restores the selected plain text from your latest confirmed **Edit selected text** action. It also tries to restore the original selection. There is one step, held in memory until RJT quits.
 
@@ -50,7 +50,9 @@ Only plain text and UTF-16 ranges are retained. Original formatting, links and r
 
 [Native run 40617647503](research/competitors/evidence/undo-native-40617647503/README.md) passed all seven cases. TextEdit covered process replacement refusal, decomposed Unicode text/selection restoration and drift refusal. Safari covered forward/inverse delivery, both clipboard preferences, a newer clipboard copy and latest-owner cancellation during a pending restoration lease. The private lease wait entry was not instrumented.
 
-Safari's successful fixtures use precomposed text. A separate case requests decomposed text and observes different exact UTF-16 readback. That result remains unconfirmed, cannot arm Undo, and stays unchanged when Undo returns unavailable. The exact-output guard is unchanged. These are the corrected seven-case acceptance conditions; they do not turn the earlier six-case failures into passes. Product menu/shortcut and full UI/Release acceptance remain open.
+Safari's successful fixtures use precomposed text. A separate case requests decomposed text and observes different exact UTF-16 readback. That result remains unconfirmed, cannot arm Undo, and stays unchanged when Undo returns unavailable. The exact-output guard is unchanged. These are the corrected seven-case acceptance conditions; they do not turn the earlier six-case failures into passes.
+
+[Controls run 40657960693](research/competitors/evidence/undo-controls-40657960693/README.md) separately passed the actual product menu and configured global shortcut in both editors, plus unavailable, busy and focus-refusal states. It used the real engine/controller and shortcut bridge inside an isolated host. It does not establish normal app composition, physical keyboard input or the recording/provider pipeline. Its clipboard checks cover policy and restoration settlement; the seven-case native check supplies the separate clipboard-byte observations.
 
 The [implementation plan](research/competitors/implementation-plan.md#current-verification-status) tracks the current gates. These results do not establish every editor, physical shortcuts, speech, provider quality or a published release.
 

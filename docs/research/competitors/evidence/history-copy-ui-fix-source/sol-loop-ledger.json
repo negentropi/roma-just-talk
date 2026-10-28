@@ -1,7 +1,7 @@
 {
   "base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
-  "round": 5,
-  "budget": 5,
+  "round": 6,
+  "budget": 7,
   "reviewer": {
     "provider": "OpenAI",
     "model": "gpt-6.1-sol",
@@ -24,7 +24,7 @@
     "CHANGELOG.md": "071f140b716a19cc69e5ce1df7f9449838e2a39bf289b102cc03426feabd4c10",
     ".github/workflows/voiceink-writing-actions-check.yml": "184fed3f02e09b6abcb326fbccf3c70abf39d9073ef21f5d6d1f3b23eccbe1b0",
     "VoiceInk/Views/History/SaveCorrectionSheet.swift": "029344ea9e7c2ca821a8429c93a48e25bdce522ef13117f96b911a043e192b55",
-    "VoiceInkUITests/WritingFeaturesUITests.swift": "b32c269aa0832b5ed4ab8827fbd45105a9fe315d79432e8f1b310e66e9664346"
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "88dd1c608e9d35cb565378e801691da7f65222158964b63ed552fe2739e61ded"
   },
   "oracle700_sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
   "checks": {
@@ -104,6 +104,20 @@
         "All8UI/nativepost/Releasefullgaterequired",
         "Oldpermissionservicesunattributed"
       ]
+    },
+    {
+      "round": 6,
+      "reviewer_task_id": "/root/none_profile_ui_checks/history_copy_sol_loop",
+      "verdict": "APPROVE",
+      "scope": "Handler-only measured native action-ID pair selection and bounded native title/value diagnostics since9afb; same7paths/base/reviewer.",
+      "findings": [],
+      "blocker_should_open": 0,
+      "usage": "unavailable",
+      "limits": [
+        "Candidate XCTest compilation/consent handling pending",
+        "Strict signed microphone auth2 and final semantic native verification pending",
+        "Normal full/Release gate remains required"
+      ]
     }
   ],
   "findings": [],
@@ -155,5 +169,31 @@
     "files": 3,
     "insertions": 116,
     "deletions": 4
+  },
+  "user_budget_extension_round6": {
+    "from": 5,
+    "to": 7,
+    "question": "Allow two additional Sol review rounds for each check?",
+    "answer": "Finish both checks (Recommended)",
+    "scope": "Two additional focused rounds for History permissions and separately Undo Controls; no reset. This ledger remains the same History unit, reviewer and base.",
+    "authorized_by": "Direct human answer relayed by root",
+    "evidence_run": 40647571351,
+    "reason": "Owned microphone Dialog action labels empty; label-only selection rejects actual visible Allow, default denies twice; post-native permission preflight remains blocked."
+  },
+  "round6_change": {
+    "baseline_source": "9afb1ed848ea2c12c4a00d6173871d67d13bfb45",
+    "paths": [
+      "VoiceInkUITests/WritingFeaturesUITests.swift"
+    ],
+    "insertions": 34,
+    "deletions": 5,
+    "reason": "Actual empty native action labels; measured scoped ID pair preserves strict owned Mic-only consent.",
+    "checks": "Swift parse/diffcheck and eight method/eight helper exact comparison passed; runtime pending."
+  },
+  "candidate_microphone_native_id_sha256": "88dd1c608e9d35cb565378e801691da7f65222158964b63ed552fe2739e61ded",
+  "diff_size_round6": {
+    "files": 1,
+    "insertions": 34,
+    "deletions": 5
   }
 }

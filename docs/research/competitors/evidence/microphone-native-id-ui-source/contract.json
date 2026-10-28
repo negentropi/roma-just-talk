@@ -1,0 +1,127 @@
+{
+  "scope": "Test-only observed native microphone Dialog action ID adapter. No production, workflow, regrant, shortcut or byte/store changes.",
+  "known_bad_run": 40647571351,
+  "known_bad_source": "9afb1ed848ea2c12c4a00d6173871d67d13bfb45",
+  "observed_bad_boundary": {
+    "UI_once_passed": 8,
+    "monitor_callbacks": 2,
+    "exact_owned_app_and_microphone_purpose": true,
+    "Allow_label_matches": 0,
+    "default_denials": 2,
+    "native_verify_attempted": false,
+    "postUI_Mic_auth_value": 0
+  },
+  "measured_contract": {
+    "allow_ID": "action-button-1",
+    "deny_ID": "action-button-2",
+    "both_PNG_and_AX_frames_matched": true,
+    "prior_native_button_title_value": "unrecorded; unknown"
+  },
+  "candidate": {
+    "before_sha256": "b32c269aa0832b5ed4ab8827fbd45105a9fe315d79432e8f1b310e66e9664346",
+    "sha256": "88dd1c608e9d35cb565378e801691da7f65222158964b63ed552fe2739e61ded",
+    "eight_test_bodies_equal": {
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "14c9911f29f6c7b317dc34a9c3ad4c284fba4b2077a61aa3ba6f778f36b34b61",
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": "5df0f3cb7b3afa77a71a00743a7aaa6867717dc685ed89efd4d7bd7861c2aea8",
+      "testTranslationTargetsReorderSelectAndPersist": "c07646262a4ca04d144df43362f68261975ba07831bdaacdba25679302d69f06",
+      "testDictationProfilePreservesCustomSettingsAndPersists": "2dbeddbeda7d7d583fb6aa5c5a0ce0421ac1cbfee3772cfbe98061624d5c0ea4",
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": "ec685883153f5f3096d441ed3f7c985a521dc393b7eeb2c53b98c424e67815b6",
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": "cb45d90a55115b71f278011f144764b3f0e6e77180cf037a09aa8922f2c501a3",
+      "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": "a95ec15b51cdbd66fa6500a5524dddd8234c6f0f06a8fd9e403cb84f3f4e648f",
+      "testApprovedHistoryCorrectionSurvivesSourceDeletion": "fc8146f7ad9184240cf4960238b35b4d315da9df501fabc1fca6a7480302e18e"
+    },
+    "eight_byte_state_helpers_equal": {
+      "metadataUUID": "1650d41ff5e0577456be1e4c61c9f220cbe0aeec983751a50ab7e870e161c389",
+      "revealCorrectionControl": "58afda45e991464555dbbbd14f78bad6e4c585be59bc8b02d07a1f72eb1969ad",
+      "assertExactHistoryCopy": "08cd49f9606b2fa9c06e1950f33ef0720af4eff83b2b25ff91f1e2d78e9385fb",
+      "assertHistoryStaticTextPresentation": "421e30c19150bab323c7e443589f9541de41cc2b8242847f676b585094c0b3a0",
+      "pasteLiteralText": "dfe63be46e4308042579d0eaed4474155ddbd3f0b654eb71c4cbf20f3ffd7d10",
+      "assertExactEditor": "3299daa95c6dd78d40a8ffc574287c8ce4881cb0196610a16a145752a4bb3f2b",
+      "approveCorrection": "babcbf35ba92448ec8ff44f77f4932dee6ac6774e217ee77d9dec8e7f735f161",
+      "previewCorrection": "d77858ff99275321c5eb800f8b57f9c5bf315a25d1160335f063c88b5b983661"
+    },
+    "checks": {
+      "swift_frontend_parse": "passed",
+      "git_diff_check": "passed",
+      "XCTest_full_compile_runtime": "pending remote; local CLT lacks XCTest"
+    }
+  },
+  "guards": [
+    "Same unique current owned app pid/bundleURL/executable/launchDate and actual Info.plist identity.",
+    "Same exact microphone purpose and owned-app Microphone title; Dialog role and bounded total census.",
+    "Unique observed action IDs, no extra action ID, native frames contained, distinct and Allow right of denial.",
+    "Any nonempty human label/title/string value must agree; numeric or non-String state is not a human choice.",
+    "Native Allow is enabled/hittable; ordinary native click, unknown returns false.",
+    "All eight bodies, byte/editor/metadata/preview/approval helpers, strict signed auth2 and semantic native verification unchanged."
+  ],
+  "authorship": {
+    "model": "claude-opus-5-5",
+    "requested_effort": "medium",
+    "provider": "firstParty",
+    "session_id": "761013fb-ec8a-4cfe-b5e1-748ab4978edb",
+    "usage": {
+      "input_tokens": 10,
+      "cache_creation_input_tokens": 43657,
+      "cache_read_input_tokens": 146172,
+      "output_tokens": 6522,
+      "output_tokens_details": {
+        "thinking_tokens": 2024
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 43657
+      },
+      "inference_geo": "global",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1586,
+          "cache_read_input_tokens": 42414,
+          "cache_creation_input_tokens": 1243,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 1243,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-opus-5-5": {
+        "inputTokens": 10,
+        "outputTokens": 6522,
+        "cacheReadInputTokens": 146172,
+        "cacheCreationInputTokens": 43657,
+        "webSearchRequests": 0,
+        "costUSD": 0.37799940000000004,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 2024,
+        "canonicalModel": "claude-opus-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "raw_stream_sha256": "41592325c2efcd103a2772bd07be0019060b8ac4c00e2c6f74446689ef1398b6"
+  },
+  "review": {
+    "same_reviewer": "/root/none_profile_ui_checks/history_copy_sol_loop",
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "round": 6,
+    "maximum": 7,
+    "same_base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+    "state": "APPROVE; source only",
+    "verdict": "APPROVE",
+    "findings": [],
+    "usage": "unavailable"
+  },
+  "runtime": "Pending. Known-bad all8 UI green is distinct from new consent/strict postverification required proof."
+}

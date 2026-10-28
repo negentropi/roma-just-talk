@@ -1132,7 +1132,18 @@ final class WritingFeaturesUITests: XCTestCase {
         let texts = (0..<min(textCount, textLimit)).map { dialog.staticTexts.element(boundBy: $0) }
         let strings = texts.flatMap { [$0.label, ($0.value as? String) ?? ""] }.filter { !$0.isEmpty }
         let buttons = (0..<min(buttonCount, buttonLimit)).map { dialog.buttons.element(boundBy: $0) }
-        let allow = buttons.filter { $0.label == "Allow" }
+        // Measured AX contract (run 40647571351): the TCC alert's action buttons expose empty labels, so the
+        // right-hand Allow is selected only by its scoped native identifier action-button-1, paired with
+        // Don't Allow as action-button-2 on its left. Any nonempty human text must agree; numeric/non-String
+        // values (button state) are not a human choice.
+        let allowTexts: Set<String> = ["Allow"], denyTexts: Set<String> = ["Don't Allow", "Don’t Allow"]
+        func choices(_ button: XCUIElement) -> [String] {
+            let value = (button.value as? String).flatMap { Int($0) == nil ? $0 : nil } ?? ""
+            return [button.label, button.title, value].filter { !$0.isEmpty }
+        }
+        let allow = buttons.filter { $0.identifier == "action-button-1" }
+        let deny = buttons.filter { $0.identifier == "action-button-2" }
+        let others = buttons.filter { !["action-button-1", "action-button-2"].contains($0.identifier) }
         let rejectReason: String? = {
             if let reason = owner.rejectReason { return reason }
             if dialog.elementType != .dialog { return "interrupting element is not a dialog" }
@@ -1142,10 +1153,24 @@ final class WritingFeaturesUITests: XCTestCase {
             guard let name, !name.isEmpty, strings.contains(where: {
                 $0 != purpose && $0.contains(name) && $0.localizedCaseInsensitiveContains("microphone")
             }) else { return "no title naming the owned app and the microphone" }
-            if allow.count != 1 { return "Allow button is not unique" }
-            let button = allow[0]
+            if allow.count != 1 || deny.count != 1 { return "action-button-1/action-button-2 pair is not unique" }
+            let button = allow[0], companion = deny[0]
+            if others.contains(where: { $0.identifier.hasPrefix("action-button") }) {
+                return "dialog has an unexpected extra action button"
+            }
+            if !choices(button).allSatisfy(allowTexts.contains) { return "action-button-1 text conflicts with Allow" }
+            if !choices(companion).allSatisfy(denyTexts.contains) {
+                return "action-button-2 text conflicts with Don't Allow"
+            }
+            if others.contains(where: { !Set(choices($0)).isDisjoint(with: allowTexts.union(denyTexts)) }) {
+                return "a non-action button claims an Allow/Don't Allow choice"
+            }
             if !(button.isEnabled && button.isHittable && dialogFrame.contains(button.frame)) {
                 return "Allow button is not enabled, hittable, and inside the dialog"
+            }
+            let allowFrame = button.frame, denyFrame = companion.frame
+            if !dialogFrame.contains(denyFrame) || allowFrame.intersects(denyFrame) || allowFrame.minX < denyFrame.maxX {
+                return "action button frames are not distinct, contained, and Don't Allow-left/Allow-right"
             }
             return nil
         }()
@@ -1158,7 +1183,11 @@ final class WritingFeaturesUITests: XCTestCase {
             "staticTexts": texts.map { ["label": $0.label, "value": String(describing: $0.value),
                                         "frame": NSStringFromRect($0.frame)] },
             "buttons": buttons.map { ["label": $0.label, "identifier": $0.identifier, "enabled": $0.isEnabled,
-                                      "hittable": $0.isHittable, "frame": NSStringFromRect($0.frame)] },
+                                      "hittable": $0.isHittable, "frame": NSStringFromRect($0.frame),
+                                      "title": $0.title, "value": String(describing: $0.value),
+                                      "valueType": $0.value.map { String(reflecting: type(of: $0)) } ?? "nil",
+                                      "choices": choices($0)] },
+            "selector": "identifier == action-button-1 (companion action-button-2)",
             "owner": owner.facts,
             "bundleDisplayName": name ?? NSNull(), "bundlePurpose": purpose ?? NSNull(),
             "expectedPurpose": Self.microphonePurpose,
@@ -1179,7 +1208,7 @@ final class WritingFeaturesUITests: XCTestCase {
         guard rejectReason == nil else { return false }
 
         allow[0].click()
-        let outcome = XCTAttachment(string: "clicked Allow; dialog dismissed: \(waitUntil { !dialog.exists })")
+        let outcome = XCTAttachment(string: "clicked Allow (action-button-1); dialog dismissed: \(waitUntil { !dialog.exists })")
         outcome.name = "Microphone consent interruption outcome"
         outcome.lifetime = .keepAlways
         add(outcome)

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "actual_reviewer": "gpt-6.1-sol",
+  "effort": "medium",
+  "scope": "Read-only actual raw artifact boundary and two real PNGs; not a new source-review round",
+  "verdict": "CLEAN factual audit; runtime failed",
+  "failure_png_sha256": "d2e14e81b4782f452e50a32a357a6e3f0913b42cafa0c10cb9cf9f47031f085b",
+  "unavailable_png_sha256": "1a2863fd7acda7260cd27ede30c86078a64b08d43d898c2dcc6795d904c9e2db",
+  "dimensions": [
+    1024,
+    768
+  ],
+  "observed": "Unavailable PNG: disabled native Undo menu, Finder foreground, inactive host. Failure PNG: active host and real recorder still shows Press shortcut.",
+  "completed_states": [
+    "unavailable"
+  ],
+  "completed_cases": 0,
+  "source_review_rounds_used": 4,
+  "limits": [
+    "One of three state checks completed: actual disabled unavailable menu and single-Escape closure.",
+    "Zero completed cases; no global Undo shortcut dispatch, Undo editor/range/focus or result notice proof.",
+    "Actual recorder click and capture placeholder observed; chord-post routine returned, but exact saved chord was not observed.",
+    "No event-delivery/input-source diagnostic establishes why capture failed; no product defect established.",
+    "No candidate/closure/monitor error recorded; missing full post-run source/signature/TCC receipts prevents complete acceptance."
+  ],
+  "usage": null,
+  "usage_status": "Unavailable, not estimated.",
+  "files_sha256": {
+    "README.md": "da9721ec2c3cbe42a48e4be06484853ba7065db20edcdf5cd1fe33e51e58f9fc",
+    "artifacts.json": "ae2484d9f0e8d868797fa8585da0e16eda2828b52c240a34959e8ff0f4fcbe04",
+    "audit.json": "3b3d4e97235fd91a54b7405a54cefde38bdec6cdf2bd2c31ed0478d16e09d987",
+    "failure-diagnosis.json": "d778e65eb2a98d77949435a409b21a8c10cef8d5bcfe875569d6caf918867783",
+    "failure.png": "d2e14e81b4782f452e50a32a357a6e3f0913b42cafa0c10cb9cf9f47031f085b",
+    "milestones.json": "cc5aa77a722c44642133e9e730133410a713f6315927807710c6021968e677fa",
+    "unavailable-menu.png": "1a2863fd7acda7260cd27ede30c86078a64b08d43d898c2dcc6795d904c9e2db"
+  }
+}

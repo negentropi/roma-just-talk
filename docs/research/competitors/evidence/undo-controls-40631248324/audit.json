@@ -1,0 +1,1114 @@
+{
+  "classification": "invalid-or-failed",
+  "details": {
+    "artifact-integrity": {
+      "logs": {
+        "artifact_id": 12791039614,
+        "crc_verified_independently": true,
+        "members": 9,
+        "zip_bytes": 249353,
+        "zip_sha256": "dbc704cee42352942455567a88b5ef3eaf6b3d1b6b26d1f5561607cca407dec1"
+      },
+      "observations": {
+        "artifact_id": 12791797318,
+        "crc_verified_independently": true,
+        "members": 315,
+        "zip_bytes": 4235404,
+        "zip_sha256": "c808d75a9562ab4eca5f94eddc270fb1778b66a473c19580745a5c5d9534e002"
+      }
+    },
+    "candidate-mismatch-receipts": {
+      "limit": "No mismatch receipt was retained. Absence alone does not prove the candidate remained unchanged.",
+      "postrun_candidate_fidelity_established_by_absence": false,
+      "reported_candidate_source_mismatch_censuses": 0
+    },
+    "candidate-source-censuses": [],
+    "compile": {
+      "actual_architecture_response_paths": {
+        "arm64": "Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/roma just talk.SwiftFileList"
+      },
+      "excluded_main_only": true,
+      "limit": "File-list contents are remote driver attestations; this audit independently binds their exact paths to the raw Xcode settings.",
+      "raw_build_settings_bound": true,
+      "swift_sources": 222
+    },
+    "dependencies": {
+      "canonical_pins": 41,
+      "git_trees_and_recursive_links_recorded": true,
+      "limit": "Tree/link hashes are retained runtime attestations; expected input supplies revisions, not an independent checkout.",
+      "static_whisper_files": 86
+    },
+    "external-diagnostic-screens": {
+      "counts_as_native_case_capture": false,
+      "diagnostic_only": true,
+      "screens": []
+    },
+    "launch-diagnostics": {
+      "diagnostic_only": true,
+      "first_completed_checkpoint": {
+        "mainThread": true,
+        "name": "progress/0001-app.init.entry.json",
+        "sequence": 1,
+        "stage": "app.init.entry",
+        "systemUptime": 724.5952412083334,
+        "unixTime": 1793161551.046647
+      },
+      "last_completed_checkpoint": {
+        "mainThread": true,
+        "name": "progress/0271-oracle.catch.finish.after.json",
+        "sequence": 271,
+        "stage": "oracle.catch.finish.after",
+        "systemUptime": 736.528488375,
+        "unixTime": 1793161562.979718
+      },
+      "limit": "Last checkpoint and sampled frames are observations only. They do not establish a root cause or authorize product Undo.",
+      "progress_absent": false,
+      "progress_records": 271,
+      "raw_profiles_outside_frozen_sources": 2,
+      "samples": []
+    },
+    "prepared-source": {
+      "candidate_files": 606,
+      "direct_fake_undo_calls": 0,
+      "generated_swift_files": 3,
+      "source_files": 613
+    },
+    "public-policy-bootstrap": {
+      "homeMatchesExpected_observed": true,
+      "home_equality_is_acceptance_requirement": false,
+      "limit": "Before values and observed home do not establish why an earlier externally seeded plist differed.",
+      "persistent_and_registered_policy_confirmed": true,
+      "public_preference_api_used": true
+    },
+    "raw-readiness-facts": {
+      "diagnostic_only": true,
+      "limit": "Initial/final geometry and root facts only; no inferred transience or root cause without observed change.",
+      "observation_count": 3,
+      "observations": [
+        {
+          "attempt": 1,
+          "checkpoint": "menu.unavailable-menu.status",
+          "displays": {
+            "apiError": 0,
+            "attempted": true,
+            "containingCount": 0,
+            "count": 1,
+            "displays": [
+              {
+                "bounds": {
+                  "height": 768,
+                  "width": 1024,
+                  "x": 0,
+                  "y": 0
+                },
+                "containsCenter": false,
+                "containsTarget": false,
+                "id": 1,
+                "intersectsTarget": true
+              }
+            ]
+          },
+          "frame": {
+            "attempted": true,
+            "center": {
+              "x": 16,
+              "y": 768
+            },
+            "finitePositive": true,
+            "height": 24,
+            "positionDecoded": true,
+            "positionRead": true,
+            "sizeDecoded": true,
+            "sizeRead": true,
+            "width": 34,
+            "x": -1,
+            "y": 756
+          },
+          "hitTest": {
+            "attempted": false
+          },
+          "member": "native/click-readiness-menu.unavailable-menu.status-attempt-1.json",
+          "provenance": {
+            "ancestors": [
+              {
+                "depth": 1,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": true,
+                "pid": 22817,
+                "role": "AXMenuBar",
+                "title": ""
+              }
+            ],
+            "appMenuBarPresent": true,
+            "attempted": true,
+            "extrasMenuBarPresent": true,
+            "maxDepth": 4,
+            "rootKind": "extras-menu-bar"
+          },
+          "ready": false,
+          "reason": "frame is not contained in exactly one active display",
+          "target": {
+            "attempted": true,
+            "enabled": true,
+            "identifier": "undoControlHost.statusItem",
+            "identityContract": "identifier",
+            "pid": 22817,
+            "role": "AXMenuBarItem",
+            "title": "Undo"
+          },
+          "window": {
+            "attempted": false
+          }
+        },
+        {
+          "attempt": 2,
+          "checkpoint": "menu.unavailable-menu.status",
+          "displays": {
+            "apiError": 0,
+            "attempted": true,
+            "containingCount": 1,
+            "count": 1,
+            "displays": [
+              {
+                "bounds": {
+                  "height": 768,
+                  "width": 1024,
+                  "x": 0,
+                  "y": 0
+                },
+                "containsCenter": true,
+                "containsTarget": true,
+                "id": 1,
+                "intersectsTarget": true
+              }
+            ]
+          },
+          "frame": {
+            "attempted": true,
+            "center": {
+              "x": 779,
+              "y": 15
+            },
+            "finitePositive": true,
+            "height": 24,
+            "positionDecoded": true,
+            "positionRead": true,
+            "sizeDecoded": true,
+            "sizeRead": true,
+            "width": 34,
+            "x": 762,
+            "y": 3
+          },
+          "hitTest": {
+            "attempted": true,
+            "axError": 0,
+            "depth": 0,
+            "elementPresent": true,
+            "pid": 22817,
+            "point": {
+              "x": 779,
+              "y": 15
+            },
+            "reachedTarget": true
+          },
+          "member": "native/click-readiness-menu.unavailable-menu.status-attempt-2.json",
+          "provenance": {
+            "ancestors": [
+              {
+                "depth": 1,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": true,
+                "pid": 22817,
+                "role": "AXMenuBar",
+                "title": ""
+              }
+            ],
+            "appMenuBarPresent": true,
+            "attempted": true,
+            "extrasMenuBarPresent": true,
+            "maxDepth": 4,
+            "rootKind": "extras-menu-bar"
+          },
+          "ready": true,
+          "reason": null,
+          "target": {
+            "attempted": true,
+            "enabled": true,
+            "identifier": "undoControlHost.statusItem",
+            "identityContract": "identifier",
+            "pid": 22817,
+            "role": "AXMenuBarItem",
+            "title": "Undo"
+          },
+          "window": {
+            "attempted": true,
+            "hitWindowPresent": false,
+            "menuAncestorRole": "AXMenuBar",
+            "policy": "windowless-native-menu",
+            "targetWindowPresent": false
+          }
+        },
+        {
+          "attempt": 1,
+          "checkpoint": "shortcut.recorder",
+          "displays": {
+            "apiError": 0,
+            "attempted": true,
+            "containingCount": 1,
+            "count": 1,
+            "displays": [
+              {
+                "bounds": {
+                  "height": 768,
+                  "width": 1024,
+                  "x": 0,
+                  "y": 0
+                },
+                "containsCenter": true,
+                "containsTarget": true,
+                "id": 1,
+                "intersectsTarget": true
+              }
+            ]
+          },
+          "frame": {
+            "attempted": true,
+            "center": {
+              "x": 802,
+              "y": 215
+            },
+            "finitePositive": true,
+            "height": 27,
+            "positionDecoded": true,
+            "positionRead": true,
+            "sizeDecoded": true,
+            "sizeRead": true,
+            "width": 105,
+            "x": 749.5,
+            "y": 201.5
+          },
+          "hitTest": {
+            "attempted": true,
+            "axError": 0,
+            "depth": 0,
+            "elementPresent": true,
+            "pid": 22817,
+            "point": {
+              "x": 802,
+              "y": 215
+            },
+            "reachedTarget": true
+          },
+          "member": "native/click-readiness-shortcut.recorder-attempt-1.json",
+          "provenance": {
+            "ancestors": [
+              {
+                "depth": 1,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXGroup",
+                "title": ""
+              },
+              {
+                "depth": 2,
+                "identifier": "undoControlHost.setup",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXScrollArea",
+                "title": ""
+              },
+              {
+                "depth": 3,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXGroup",
+                "title": ""
+              },
+              {
+                "depth": 4,
+                "identifier": "VoiceInk.(unknown context at $106ef37d0).WritingUndoControlSetupView-1-AppWindow-1",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXWindow",
+                "title": "RJT Undo control check"
+              }
+            ],
+            "appMenuBarPresent": true,
+            "attempted": true,
+            "extrasMenuBarPresent": true,
+            "maxDepth": 4,
+            "rootKind": "unresolved-within-bound"
+          },
+          "ready": true,
+          "reason": null,
+          "target": {
+            "attempted": true,
+            "enabled": true,
+            "identifier": "shortcutRecorder.undoLastWritingEdit",
+            "identityContract": "identifier",
+            "pid": 22817,
+            "role": "AXButton",
+            "title": null
+          },
+          "window": {
+            "attempted": true,
+            "hitWindowPresent": true,
+            "policy": "same-window",
+            "targetWindowPresent": true,
+            "windowOwnedByHost": true
+          }
+        }
+      ]
+    }
+  },
+  "diagnostics": {
+    "bounded_build_or_native_errors": [
+      {
+        "line": "Undo control check failed: The real recorder did not save the exact captured chord.",
+        "member": "writing-undo-controls-proof/host.log"
+      }
+    ],
+    "build_log_observed_boundary": "build-succeeded",
+    "candidate_source_mismatches": [],
+    "case_observation_errors": [],
+    "cleanup_failure_is_product_undo_failure": null,
+    "editor_cleanup_issues": [],
+    "external_diagnostic_screens": {
+      "counts_as_native_case_capture": false,
+      "diagnostic_only": true,
+      "screens": []
+    },
+    "failure_receipts": [
+      {
+        "member": "failure-native.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "Control host oracle failed (exit 1): The real recorder did not save the exact captured chord.; inspect host-outcome.json for secondary diagnostics",
+          "mode": "native"
+        }
+      },
+      {
+        "member": "failure-verify.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "[Errno 2] No such file or directory: '/Users/runner/work/_temp/writing-undo-controls-proof/identity-after.json'",
+          "mode": "verify"
+        }
+      },
+      {
+        "failure": "The real recorder did not save the exact captured chord.",
+        "issues": [],
+        "member": "native/result.json"
+      }
+    ],
+    "highest_observed_stage": "native-result",
+    "host_outcome": {
+      "candidate_error": null,
+      "classification": "invalid-or-failed",
+      "closure_error": null,
+      "diagnostic_screens": [],
+      "exit_code": 1,
+      "mapped_host_observed": true,
+      "monitor_error": null,
+      "native_failure": "The real recorder did not save the exact captured chord.",
+      "native_issues": [],
+      "observed_completed_cases": [],
+      "profile_files": {
+        "profiles/undo-controls-22817-3973123513286346596_0.profraw": {
+          "bytes": 14152,
+          "sha256": "51ddc0db6e57b83cad96cf1768cede834e661515ae4699992f2c16949ac7dff1"
+        },
+        "profiles/undo-controls-22817-7523741424897814290_0.profraw": {
+          "bytes": 8890016,
+          "sha256": "56faa9205564c473340cf1d7bd959e882c0f25c35aee5b11d4e63422c15f7459"
+        }
+      },
+      "progress_files": [
+        "progress/0001-app.init.entry.json",
+        "progress/0002-app.init.exit.json",
+        "progress/0003-owner.launch.entry.json",
+        "progress/0004-owner.init.entry.json",
+        "progress/0005-owner.register-defaults.before.json",
+        "progress/0006-owner.register-defaults.after.json",
+        "progress/0007-owner.schema.before.json",
+        "progress/0008-owner.schema.after.json",
+        "progress/0009-owner.container.before.json",
+        "progress/0010-owner.container.after.json",
+        "progress/0011-owner.whisper-model-manager.before.json",
+        "progress/0012-owner.whisper-model-manager.after.json",
+        "progress/0013-owner.fluid-audio-model-manager.before.json",
+        "progress/0014-owner.fluid-audio-model-manager.after.json",
+        "progress/0015-owner.transcription-model-manager.before.json",
+        "progress/0016-owner.transcription-model-manager.after.json",
+        "progress/0017-owner.recorder-ui-manager.before.json",
+        "progress/0018-owner.recorder-ui-manager.after.json",
+        "progress/0019-owner.engine.before.json",
+        "progress/0020-owner.engine.after.json",
+        "progress/0021-owner.configure.before.json",
+        "progress/0022-owner.configure.after.json",
+        "progress/0023-owner.shortcut-manager.before.json",
+        "progress/0024-owner.shortcut-manager.after.json",
+        "progress/0025-owner.init.exit.json",
+        "progress/0026-owner.launch.exit.json",
+        "progress/0027-app.scene-body.first.json",
+        "progress/0028-view.body.first.json",
+        "progress/0029-view.task.entry.json",
+        "progress/0030-view.task.claimed.json",
+        "progress/0031-oracle.run.entry.json",
+        "progress/0032-oracle.check-init.before.json",
+        "progress/0033-oracle.check-init.after.json",
+        "progress/0034-execute.preflight.before.json",
+        "progress/0035-execute.preflight.accessibility.before.json",
+        "progress/0036-execute.preflight.accessibility.after.json",
+        "progress/0037-execute.preflight.listen-event.before.json",
+        "progress/0038-execute.preflight.listen-event.after.json",
+        "progress/0039-execute.preflight.post-event.before.json",
+        "progress/0040-execute.preflight.post-event.after.json",
+        "progress/0041-execute.preflight.screen-capture.before.json",
+        "progress/0042-execute.preflight.screen-capture.after.json",
+        "progress/0043-execute.preflight.after.json",
+        "progress/0044-policy.snapshot-before.before.json",
+        "progress/0045-policy.snapshot-before.after.json",
+        "progress/0046-policy.public-writes.before.json",
+        "progress/0047-policy.public-writes.after.json",
+        "progress/0048-policy.snapshot-after.before.json",
+        "progress/0049-policy.snapshot-after.after.json",
+        "progress/0050-menu.unavailable-menu.status-lookup.before.json",
+        "progress/0051-menu.unavailable-menu.status-press.before.json",
+        "progress/0052-click.menu.unavailable-menu.status.a1.unique-scan.before.json",
+        "progress/0053-click.menu.unavailable-menu.status.a1.unique-scan.after.json",
+        "progress/0054-click.menu.unavailable-menu.status.a1.role.before.json",
+        "progress/0055-click.menu.unavailable-menu.status.a1.role.after.json",
+        "progress/0056-click.menu.unavailable-menu.status.a1.identifier.before.json",
+        "progress/0057-click.menu.unavailable-menu.status.a1.identifier.after.json",
+        "progress/0058-click.menu.unavailable-menu.status.a1.title-attribute.before.json",
+        "progress/0059-click.menu.unavailable-menu.status.a1.title-attribute.after.json",
+        "progress/0060-click.menu.unavailable-menu.status.a1.enabled.before.json",
+        "progress/0061-click.menu.unavailable-menu.status.a1.enabled.after.json",
+        "progress/0062-click.menu.unavailable-menu.status.a1.pid.before.json",
+        "progress/0063-click.menu.unavailable-menu.status.a1.pid.after.json",
+        "progress/0064-click.menu.unavailable-menu.status.a1.frame.position.before.json",
+        "progress/0065-click.menu.unavailable-menu.status.a1.frame.position.after.json",
+        "progress/0066-click.menu.unavailable-menu.status.a1.frame.size.before.json",
+        "progress/0067-click.menu.unavailable-menu.status.a1.frame.size.after.json",
+        "progress/0068-click.menu.unavailable-menu.status.a1.root-menu-bar.before.json",
+        "progress/0069-click.menu.unavailable-menu.status.a1.root-menu-bar.after.json",
+        "progress/0070-click.menu.unavailable-menu.status.a1.root-extras-menu-bar.before.json",
+        "progress/0071-click.menu.unavailable-menu.status.a1.root-extras-menu-bar.after.json",
+        "progress/0072-click.menu.unavailable-menu.status.a1.provenance-parent.0.before.json",
+        "progress/0073-click.menu.unavailable-menu.status.a1.provenance-parent.0.after.json",
+        "progress/0074-click.menu.unavailable-menu.status.a1.provenance-role.0.before.json",
+        "progress/0075-click.menu.unavailable-menu.status.a1.provenance-role.0.after.json",
+        "progress/0076-click.menu.unavailable-menu.status.a1.provenance-identifier.0.before.json",
+        "progress/0077-click.menu.unavailable-menu.status.a1.provenance-identifier.0.after.json",
+        "progress/0078-click.menu.unavailable-menu.status.a1.provenance-title.0.before.json",
+        "progress/0079-click.menu.unavailable-menu.status.a1.provenance-title.0.after.json",
+        "progress/0080-click.menu.unavailable-menu.status.a1.provenance-pid.0.before.json",
+        "progress/0081-click.menu.unavailable-menu.status.a1.provenance-pid.0.after.json",
+        "progress/0082-click.menu.unavailable-menu.status.a1.displays.before.json",
+        "progress/0083-click.menu.unavailable-menu.status.a1.displays.after.json",
+        "progress/0084-click.menu.unavailable-menu.status.a1.observation-write.before.json",
+        "progress/0085-click.menu.unavailable-menu.status.a1.observation-write.after.json",
+        "progress/0086-click.menu.unavailable-menu.status.a2.unique-scan.before.json",
+        "progress/0087-click.menu.unavailable-menu.status.a2.unique-scan.after.json",
+        "progress/0088-click.menu.unavailable-menu.status.a2.role.before.json",
+        "progress/0089-click.menu.unavailable-menu.status.a2.role.after.json",
+        "progress/0090-click.menu.unavailable-menu.status.a2.identifier.before.json",
+        "progress/0091-click.menu.unavailable-menu.status.a2.identifier.after.json",
+        "progress/0092-click.menu.unavailable-menu.status.a2.title-attribute.before.json",
+        "progress/0093-click.menu.unavailable-menu.status.a2.title-attribute.after.json",
+        "progress/0094-click.menu.unavailable-menu.status.a2.enabled.before.json",
+        "progress/0095-click.menu.unavailable-menu.status.a2.enabled.after.json",
+        "progress/0096-click.menu.unavailable-menu.status.a2.pid.before.json",
+        "progress/0097-click.menu.unavailable-menu.status.a2.pid.after.json",
+        "progress/0098-click.menu.unavailable-menu.status.a2.frame.position.before.json",
+        "progress/0099-click.menu.unavailable-menu.status.a2.frame.position.after.json",
+        "progress/0100-click.menu.unavailable-menu.status.a2.frame.size.before.json",
+        "progress/0101-click.menu.unavailable-menu.status.a2.frame.size.after.json",
+        "progress/0102-click.menu.unavailable-menu.status.a2.root-menu-bar.before.json",
+        "progress/0103-click.menu.unavailable-menu.status.a2.root-menu-bar.after.json",
+        "progress/0104-click.menu.unavailable-menu.status.a2.root-extras-menu-bar.before.json",
+        "progress/0105-click.menu.unavailable-menu.status.a2.root-extras-menu-bar.after.json",
+        "progress/0106-click.menu.unavailable-menu.status.a2.provenance-parent.0.before.json",
+        "progress/0107-click.menu.unavailable-menu.status.a2.provenance-parent.0.after.json",
+        "progress/0108-click.menu.unavailable-menu.status.a2.provenance-role.0.before.json",
+        "progress/0109-click.menu.unavailable-menu.status.a2.provenance-role.0.after.json",
+        "progress/0110-click.menu.unavailable-menu.status.a2.provenance-identifier.0.before.json",
+        "progress/0111-click.menu.unavailable-menu.status.a2.provenance-identifier.0.after.json",
+        "progress/0112-click.menu.unavailable-menu.status.a2.provenance-title.0.before.json",
+        "progress/0113-click.menu.unavailable-menu.status.a2.provenance-title.0.after.json",
+        "progress/0114-click.menu.unavailable-menu.status.a2.provenance-pid.0.before.json",
+        "progress/0115-click.menu.unavailable-menu.status.a2.provenance-pid.0.after.json",
+        "progress/0116-click.menu.unavailable-menu.status.a2.displays.before.json",
+        "progress/0117-click.menu.unavailable-menu.status.a2.displays.after.json",
+        "progress/0118-click.menu.unavailable-menu.status.a2.hit-test.before.json",
+        "progress/0119-click.menu.unavailable-menu.status.a2.hit-test.after.json",
+        "progress/0120-click.menu.unavailable-menu.status.a2.hit-pid.before.json",
+        "progress/0121-click.menu.unavailable-menu.status.a2.hit-pid.after.json",
+        "progress/0122-click.menu.unavailable-menu.status.a2.target-window.before.json",
+        "progress/0123-click.menu.unavailable-menu.status.a2.target-window.after.json",
+        "progress/0124-click.menu.unavailable-menu.status.a2.hit-window.before.json",
+        "progress/0125-click.menu.unavailable-menu.status.a2.hit-window.after.json",
+        "progress/0126-click.menu.unavailable-menu.status.a2.menu-ancestor.0.before.json",
+        "progress/0127-click.menu.unavailable-menu.status.a2.menu-ancestor.0.after.json",
+        "progress/0128-click.menu.unavailable-menu.status.a2.menu-ancestor-pid.0.before.json",
+        "progress/0129-click.menu.unavailable-menu.status.a2.menu-ancestor-pid.0.after.json",
+        "progress/0130-click.menu.unavailable-menu.status.a2.menu-ancestor-role.0.before.json",
+        "progress/0131-click.menu.unavailable-menu.status.a2.menu-ancestor-role.0.after.json",
+        "progress/0132-click.menu.unavailable-menu.status.a2.frame-recheck.position.before.json",
+        "progress/0133-click.menu.unavailable-menu.status.a2.frame-recheck.position.after.json",
+        "progress/0134-click.menu.unavailable-menu.status.a2.frame-recheck.size.before.json",
+        "progress/0135-click.menu.unavailable-menu.status.a2.frame-recheck.size.after.json",
+        "progress/0136-click.menu.unavailable-menu.status.a2.observation-write.before.json",
+        "progress/0137-click.menu.unavailable-menu.status.a2.observation-write.after.json",
+        "progress/0138-click.menu.unavailable-menu.status.post.before.json",
+        "progress/0139-click.menu.unavailable-menu.status.post.after.json",
+        "progress/0140-menu.unavailable-menu.item-lookup.before.json",
+        "progress/0141-menu.unavailable-menu.enabled-wait.before.json",
+        "progress/0142-menu.unavailable-menu.item-describe.before.json",
+        "progress/0143-menu.unavailable-menu.item.describe.actions.json",
+        "progress/0144-menu.unavailable-menu.item.describe.position.json",
+        "progress/0145-menu.unavailable-menu.item.describe.size.json",
+        "progress/0146-menu.unavailable-menu.item.describe.identifier.json",
+        "progress/0147-menu.unavailable-menu.item.describe.role.json",
+        "progress/0148-menu.unavailable-menu.item.describe.label.json",
+        "progress/0149-menu.unavailable-menu.item.describe.value.json",
+        "progress/0150-menu.unavailable-menu.item.describe.enabled.json",
+        "progress/0151-menu.unavailable-menu.item.describe.exit.json",
+        "progress/0152-menu.unavailable-menu.hierarchy.before.json",
+        "progress/0153-menu.unavailable-menu.screenshot.before.json",
+        "progress/0154-menu.unavailable-menu.status-describe.before.json",
+        "progress/0155-menu.unavailable-menu.status.describe.actions.json",
+        "progress/0156-menu.unavailable-menu.status.describe.position.json",
+        "progress/0157-menu.unavailable-menu.status.describe.size.json",
+        "progress/0158-menu.unavailable-menu.status.describe.identifier.json",
+        "progress/0159-menu.unavailable-menu.status.describe.role.json",
+        "progress/0160-menu.unavailable-menu.status.describe.label.json",
+        "progress/0161-menu.unavailable-menu.status.describe.value.json",
+        "progress/0162-menu.unavailable-menu.status.describe.enabled.json",
+        "progress/0163-menu.unavailable-menu.status.describe.exit.json",
+        "progress/0164-menu.unavailable-menu.exit.json",
+        "progress/0165-unavailable.dismiss-menu.before.json",
+        "progress/0166-unavailable.dismiss-menu.after.json",
+        "progress/0167-shortcut.window-wait.before.json",
+        "progress/0168-shortcut.activate.before.json",
+        "progress/0169-shortcut.active-wait.before.json",
+        "progress/0170-shortcut.recorder-lookup.before.json",
+        "progress/0171-shortcut.recorder-describe.before.json",
+        "progress/0172-shortcut.recorder.describe.actions.json",
+        "progress/0173-shortcut.recorder.describe.position.json",
+        "progress/0174-shortcut.recorder.describe.size.json",
+        "progress/0175-shortcut.recorder.describe.identifier.json",
+        "progress/0176-shortcut.recorder.describe.role.json",
+        "progress/0177-shortcut.recorder.describe.label.json",
+        "progress/0178-shortcut.recorder.describe.value.json",
+        "progress/0179-shortcut.recorder.describe.enabled.json",
+        "progress/0180-shortcut.recorder.describe.exit.json",
+        "progress/0181-shortcut.recorder-press.before.json",
+        "progress/0182-click.shortcut.recorder.a1.unique-scan.before.json",
+        "progress/0183-click.shortcut.recorder.a1.unique-scan.after.json",
+        "progress/0184-click.shortcut.recorder.a1.role.before.json",
+        "progress/0185-click.shortcut.recorder.a1.role.after.json",
+        "progress/0186-click.shortcut.recorder.a1.identifier.before.json",
+        "progress/0187-click.shortcut.recorder.a1.identifier.after.json",
+        "progress/0188-click.shortcut.recorder.a1.title-attribute.before.json",
+        "progress/0189-click.shortcut.recorder.a1.title-attribute.after.json",
+        "progress/0190-click.shortcut.recorder.a1.enabled.before.json",
+        "progress/0191-click.shortcut.recorder.a1.enabled.after.json",
+        "progress/0192-click.shortcut.recorder.a1.pid.before.json",
+        "progress/0193-click.shortcut.recorder.a1.pid.after.json",
+        "progress/0194-click.shortcut.recorder.a1.frame.position.before.json",
+        "progress/0195-click.shortcut.recorder.a1.frame.position.after.json",
+        "progress/0196-click.shortcut.recorder.a1.frame.size.before.json",
+        "progress/0197-click.shortcut.recorder.a1.frame.size.after.json",
+        "progress/0198-click.shortcut.recorder.a1.root-menu-bar.before.json",
+        "progress/0199-click.shortcut.recorder.a1.root-menu-bar.after.json",
+        "progress/0200-click.shortcut.recorder.a1.root-extras-menu-bar.before.json",
+        "progress/0201-click.shortcut.recorder.a1.root-extras-menu-bar.after.json",
+        "progress/0202-click.shortcut.recorder.a1.provenance-parent.0.before.json",
+        "progress/0203-click.shortcut.recorder.a1.provenance-parent.0.after.json",
+        "progress/0204-click.shortcut.recorder.a1.provenance-role.0.before.json",
+        "progress/0205-click.shortcut.recorder.a1.provenance-role.0.after.json",
+        "progress/0206-click.shortcut.recorder.a1.provenance-identifier.0.before.json",
+        "progress/0207-click.shortcut.recorder.a1.provenance-identifier.0.after.json",
+        "progress/0208-click.shortcut.recorder.a1.provenance-title.0.before.json",
+        "progress/0209-click.shortcut.recorder.a1.provenance-title.0.after.json",
+        "progress/0210-click.shortcut.recorder.a1.provenance-pid.0.before.json",
+        "progress/0211-click.shortcut.recorder.a1.provenance-pid.0.after.json",
+        "progress/0212-click.shortcut.recorder.a1.provenance-parent.1.before.json",
+        "progress/0213-click.shortcut.recorder.a1.provenance-parent.1.after.json",
+        "progress/0214-click.shortcut.recorder.a1.provenance-role.1.before.json",
+        "progress/0215-click.shortcut.recorder.a1.provenance-role.1.after.json",
+        "progress/0216-click.shortcut.recorder.a1.provenance-identifier.1.before.json",
+        "progress/0217-click.shortcut.recorder.a1.provenance-identifier.1.after.json",
+        "progress/0218-click.shortcut.recorder.a1.provenance-title.1.before.json",
+        "progress/0219-click.shortcut.recorder.a1.provenance-title.1.after.json",
+        "progress/0220-click.shortcut.recorder.a1.provenance-pid.1.before.json",
+        "progress/0221-click.shortcut.recorder.a1.provenance-pid.1.after.json",
+        "progress/0222-click.shortcut.recorder.a1.provenance-parent.2.before.json",
+        "progress/0223-click.shortcut.recorder.a1.provenance-parent.2.after.json",
+        "progress/0224-click.shortcut.recorder.a1.provenance-role.2.before.json",
+        "progress/0225-click.shortcut.recorder.a1.provenance-role.2.after.json",
+        "progress/0226-click.shortcut.recorder.a1.provenance-identifier.2.before.json",
+        "progress/0227-click.shortcut.recorder.a1.provenance-identifier.2.after.json",
+        "progress/0228-click.shortcut.recorder.a1.provenance-title.2.before.json",
+        "progress/0229-click.shortcut.recorder.a1.provenance-title.2.after.json",
+        "progress/0230-click.shortcut.recorder.a1.provenance-pid.2.before.json",
+        "progress/0231-click.shortcut.recorder.a1.provenance-pid.2.after.json",
+        "progress/0232-click.shortcut.recorder.a1.provenance-parent.3.before.json",
+        "progress/0233-click.shortcut.recorder.a1.provenance-parent.3.after.json",
+        "progress/0234-click.shortcut.recorder.a1.provenance-role.3.before.json",
+        "progress/0235-click.shortcut.recorder.a1.provenance-role.3.after.json",
+        "progress/0236-click.shortcut.recorder.a1.provenance-identifier.3.before.json",
+        "progress/0237-click.shortcut.recorder.a1.provenance-identifier.3.after.json",
+        "progress/0238-click.shortcut.recorder.a1.provenance-title.3.before.json",
+        "progress/0239-click.shortcut.recorder.a1.provenance-title.3.after.json",
+        "progress/0240-click.shortcut.recorder.a1.provenance-pid.3.before.json",
+        "progress/0241-click.shortcut.recorder.a1.provenance-pid.3.after.json",
+        "progress/0242-click.shortcut.recorder.a1.displays.before.json",
+        "progress/0243-click.shortcut.recorder.a1.displays.after.json",
+        "progress/0244-click.shortcut.recorder.a1.hit-test.before.json",
+        "progress/0245-click.shortcut.recorder.a1.hit-test.after.json",
+        "progress/0246-click.shortcut.recorder.a1.hit-pid.before.json",
+        "progress/0247-click.shortcut.recorder.a1.hit-pid.after.json",
+        "progress/0248-click.shortcut.recorder.a1.target-window.before.json",
+        "progress/0249-click.shortcut.recorder.a1.target-window.after.json",
+        "progress/0250-click.shortcut.recorder.a1.hit-window.before.json",
+        "progress/0251-click.shortcut.recorder.a1.hit-window.after.json",
+        "progress/0252-click.shortcut.recorder.a1.window-pid.before.json",
+        "progress/0253-click.shortcut.recorder.a1.window-pid.after.json",
+        "progress/0254-click.shortcut.recorder.a1.frame-recheck.position.before.json",
+        "progress/0255-click.shortcut.recorder.a1.frame-recheck.position.after.json",
+        "progress/0256-click.shortcut.recorder.a1.frame-recheck.size.before.json",
+        "progress/0257-click.shortcut.recorder.a1.frame-recheck.size.after.json",
+        "progress/0258-click.shortcut.recorder.a1.observation-write.before.json",
+        "progress/0259-click.shortcut.recorder.a1.observation-write.after.json",
+        "progress/0260-click.shortcut.recorder.post.before.json",
+        "progress/0261-click.shortcut.recorder.post.after.json",
+        "progress/0262-shortcut.clear-wait.before.json",
+        "progress/0263-shortcut.chord-post.before.json",
+        "progress/0264-shortcut.save-wait.before.json",
+        "progress/0265-oracle.catch.entry.json",
+        "progress/0266-oracle.catch.hierarchy.before.json",
+        "progress/0267-oracle.catch.hierarchy.after.json",
+        "progress/0268-oracle.catch.screenshot.before.json",
+        "progress/0269-oracle.catch.screenshot.after.json",
+        "progress/0270-oracle.catch.finish.before.json",
+        "progress/0271-oracle.catch.finish.after.json"
+      ],
+      "samples": []
+    },
+    "independently_validated_case_observations": [],
+    "independently_validated_partial_states": [
+      "unavailable"
+    ],
+    "launch_diagnostics": {
+      "diagnostic_only": true,
+      "first_completed_checkpoint": {
+        "mainThread": true,
+        "name": "progress/0001-app.init.entry.json",
+        "sequence": 1,
+        "stage": "app.init.entry",
+        "systemUptime": 724.5952412083334,
+        "unixTime": 1793161551.046647
+      },
+      "last_completed_checkpoint": {
+        "mainThread": true,
+        "name": "progress/0271-oracle.catch.finish.after.json",
+        "sequence": 271,
+        "stage": "oracle.catch.finish.after",
+        "systemUptime": 736.528488375,
+        "unixTime": 1793161562.979718
+      },
+      "limit": "Last checkpoint and sampled frames are observations only. They do not establish a root cause or authorize product Undo.",
+      "progress_absent": false,
+      "progress_records": 271,
+      "raw_profiles_outside_frozen_sources": 2,
+      "samples": []
+    },
+    "native_completed_flag": false,
+    "native_failure_boundary": "native-or-setup",
+    "native_primary_failure": "The real recorder did not save the exact captured chord.",
+    "no_completed_cases_promoted_to_success": true,
+    "observed_case_ids": [],
+    "observed_completed_native_cases": 0,
+    "observed_state_ids": [
+      "unavailable"
+    ],
+    "other_oracle_issues": [],
+    "partial_state_errors": [],
+    "raw_readiness": {
+      "diagnostic_only": true,
+      "limit": "Initial/final geometry and root facts only; no inferred transience or root cause without observed change.",
+      "observation_count": 3,
+      "observations": [
+        {
+          "attempt": 1,
+          "checkpoint": "menu.unavailable-menu.status",
+          "displays": {
+            "apiError": 0,
+            "attempted": true,
+            "containingCount": 0,
+            "count": 1,
+            "displays": [
+              {
+                "bounds": {
+                  "height": 768,
+                  "width": 1024,
+                  "x": 0,
+                  "y": 0
+                },
+                "containsCenter": false,
+                "containsTarget": false,
+                "id": 1,
+                "intersectsTarget": true
+              }
+            ]
+          },
+          "frame": {
+            "attempted": true,
+            "center": {
+              "x": 16,
+              "y": 768
+            },
+            "finitePositive": true,
+            "height": 24,
+            "positionDecoded": true,
+            "positionRead": true,
+            "sizeDecoded": true,
+            "sizeRead": true,
+            "width": 34,
+            "x": -1,
+            "y": 756
+          },
+          "hitTest": {
+            "attempted": false
+          },
+          "member": "native/click-readiness-menu.unavailable-menu.status-attempt-1.json",
+          "provenance": {
+            "ancestors": [
+              {
+                "depth": 1,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": true,
+                "pid": 22817,
+                "role": "AXMenuBar",
+                "title": ""
+              }
+            ],
+            "appMenuBarPresent": true,
+            "attempted": true,
+            "extrasMenuBarPresent": true,
+            "maxDepth": 4,
+            "rootKind": "extras-menu-bar"
+          },
+          "ready": false,
+          "reason": "frame is not contained in exactly one active display",
+          "target": {
+            "attempted": true,
+            "enabled": true,
+            "identifier": "undoControlHost.statusItem",
+            "identityContract": "identifier",
+            "pid": 22817,
+            "role": "AXMenuBarItem",
+            "title": "Undo"
+          },
+          "window": {
+            "attempted": false
+          }
+        },
+        {
+          "attempt": 2,
+          "checkpoint": "menu.unavailable-menu.status",
+          "displays": {
+            "apiError": 0,
+            "attempted": true,
+            "containingCount": 1,
+            "count": 1,
+            "displays": [
+              {
+                "bounds": {
+                  "height": 768,
+                  "width": 1024,
+                  "x": 0,
+                  "y": 0
+                },
+                "containsCenter": true,
+                "containsTarget": true,
+                "id": 1,
+                "intersectsTarget": true
+              }
+            ]
+          },
+          "frame": {
+            "attempted": true,
+            "center": {
+              "x": 779,
+              "y": 15
+            },
+            "finitePositive": true,
+            "height": 24,
+            "positionDecoded": true,
+            "positionRead": true,
+            "sizeDecoded": true,
+            "sizeRead": true,
+            "width": 34,
+            "x": 762,
+            "y": 3
+          },
+          "hitTest": {
+            "attempted": true,
+            "axError": 0,
+            "depth": 0,
+            "elementPresent": true,
+            "pid": 22817,
+            "point": {
+              "x": 779,
+              "y": 15
+            },
+            "reachedTarget": true
+          },
+          "member": "native/click-readiness-menu.unavailable-menu.status-attempt-2.json",
+          "provenance": {
+            "ancestors": [
+              {
+                "depth": 1,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": true,
+                "pid": 22817,
+                "role": "AXMenuBar",
+                "title": ""
+              }
+            ],
+            "appMenuBarPresent": true,
+            "attempted": true,
+            "extrasMenuBarPresent": true,
+            "maxDepth": 4,
+            "rootKind": "extras-menu-bar"
+          },
+          "ready": true,
+          "reason": null,
+          "target": {
+            "attempted": true,
+            "enabled": true,
+            "identifier": "undoControlHost.statusItem",
+            "identityContract": "identifier",
+            "pid": 22817,
+            "role": "AXMenuBarItem",
+            "title": "Undo"
+          },
+          "window": {
+            "attempted": true,
+            "hitWindowPresent": false,
+            "menuAncestorRole": "AXMenuBar",
+            "policy": "windowless-native-menu",
+            "targetWindowPresent": false
+          }
+        },
+        {
+          "attempt": 1,
+          "checkpoint": "shortcut.recorder",
+          "displays": {
+            "apiError": 0,
+            "attempted": true,
+            "containingCount": 1,
+            "count": 1,
+            "displays": [
+              {
+                "bounds": {
+                  "height": 768,
+                  "width": 1024,
+                  "x": 0,
+                  "y": 0
+                },
+                "containsCenter": true,
+                "containsTarget": true,
+                "id": 1,
+                "intersectsTarget": true
+              }
+            ]
+          },
+          "frame": {
+            "attempted": true,
+            "center": {
+              "x": 802,
+              "y": 215
+            },
+            "finitePositive": true,
+            "height": 27,
+            "positionDecoded": true,
+            "positionRead": true,
+            "sizeDecoded": true,
+            "sizeRead": true,
+            "width": 105,
+            "x": 749.5,
+            "y": 201.5
+          },
+          "hitTest": {
+            "attempted": true,
+            "axError": 0,
+            "depth": 0,
+            "elementPresent": true,
+            "pid": 22817,
+            "point": {
+              "x": 802,
+              "y": 215
+            },
+            "reachedTarget": true
+          },
+          "member": "native/click-readiness-shortcut.recorder-attempt-1.json",
+          "provenance": {
+            "ancestors": [
+              {
+                "depth": 1,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXGroup",
+                "title": ""
+              },
+              {
+                "depth": 2,
+                "identifier": "undoControlHost.setup",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXScrollArea",
+                "title": ""
+              },
+              {
+                "depth": 3,
+                "identifier": "",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXGroup",
+                "title": ""
+              },
+              {
+                "depth": 4,
+                "identifier": "VoiceInk.(unknown context at $106ef37d0).WritingUndoControlSetupView-1-AppWindow-1",
+                "isAppMenuBar": false,
+                "isApplication": false,
+                "isExtrasMenuBar": false,
+                "pid": 22817,
+                "role": "AXWindow",
+                "title": "RJT Undo control check"
+              }
+            ],
+            "appMenuBarPresent": true,
+            "attempted": true,
+            "extrasMenuBarPresent": true,
+            "maxDepth": 4,
+            "rootKind": "unresolved-within-bound"
+          },
+          "ready": true,
+          "reason": null,
+          "target": {
+            "attempted": true,
+            "enabled": true,
+            "identifier": "shortcutRecorder.undoLastWritingEdit",
+            "identityContract": "identifier",
+            "pid": 22817,
+            "role": "AXButton",
+            "title": null
+          },
+          "window": {
+            "attempted": true,
+            "hitWindowPresent": true,
+            "policy": "same-window",
+            "targetWindowPresent": true,
+            "windowOwnedByHost": true
+          }
+        }
+      ]
+    },
+    "runtime_receipt_present": true,
+    "transport_errors": {}
+  },
+  "errors": [
+    {
+      "reason": "No source-after receipt: prepared source does not establish post-run source fidelity",
+      "stage": "postrun-source"
+    },
+    {
+      "reason": "Missing observation: identity-after.json",
+      "stage": "signature"
+    },
+    {
+      "reason": "Missing observation: tcc-after.json",
+      "stage": "fresh-tcc"
+    },
+    {
+      "reason": "No exact live mapped successful host",
+      "stage": "host-lifecycle"
+    },
+    {
+      "reason": "Native oracle incomplete/failed",
+      "stage": "native-controls"
+    },
+    {
+      "reason": "Missing observation: native/textedit-menu-forward.png",
+      "stage": "screenshots"
+    },
+    {
+      "reason": "Missing observation: native-classification.json",
+      "stage": "result-bindings"
+    },
+    {
+      "reason": "GitHub workflow is not completed successfully on the exact head",
+      "stage": "workflow-run"
+    }
+  ],
+  "limits": [
+    "Offline source/compile/signature/TCC/runtime artifact audit only; no execution or network.",
+    "Signatures, actual compile lists and fresh TCC are retained runtime attestations bound by artifact hashes; absent original binary is not reverified here.",
+    "No shipping app composition/full pipeline/ASR/provider/physical-keyboard/rich-format proof.",
+    "Screenshot semantic review belongs to actual Sol; PNG integrity alone does not verify visual meaning."
+  ],
+  "run_id": 40631248324,
+  "schemaVersion": 1,
+  "source_sha": "994a98e87161afc31d2086ffe2e6408f78dee397",
+  "stages": {
+    "artifact-integrity": "passed",
+    "candidate-mismatch-receipts": "passed",
+    "compile": "passed",
+    "dependencies": "passed",
+    "external-diagnostic-screens": "passed",
+    "fresh-tcc": "failed-or-missing",
+    "host-lifecycle": "failed-or-missing",
+    "launch-diagnostics": "passed",
+    "native-controls": "failed-or-missing",
+    "postrun-source": "failed-or-missing",
+    "prepared-source": "passed",
+    "public-policy-bootstrap": "passed",
+    "raw-readiness-facts": "passed",
+    "result-bindings": "failed-or-missing",
+    "screenshots": "failed-or-missing",
+    "signature": "failed-or-missing",
+    "workflow-run": "failed-or-missing"
+  },
+  "valid": false
+}

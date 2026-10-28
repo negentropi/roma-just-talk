@@ -274,11 +274,17 @@ private final class WritingUndoLiveFixture {
     func caret(_ text: String) -> NSRange { NSRange(location: LiveWritingEditor.prefix.utf16.count + text.utf16.count, length: 0) }
 
     func deliver(_ text: String, to editor: LiveWritingEditor, controller: WritingActionUndoController) async throws {
+        recordDeliveryDiagnostic("before-capture", editor: editor, output: text)
         let focused = Self.element(kAXFocusedUIElementAttribute, from: AXUIElementCreateSystemWide())
         try #require(focused.map { CFEqual($0, editor.editor) } == true)
         let usesSystemPaste = CursorTextContextReader.usesSystemPaste(for: editor.editor)
         try check("expectedEditorRoutes", usesSystemPaste == (editor.kind == .safari))
-        let target = try WritingTarget.capture(requiresSelection: true)
+        let target: WritingTarget
+        do { target = try WritingTarget.capture(requiresSelection: true) }
+        catch {
+            recordDeliveryDiagnostic("capture-failed", editor: editor, output: text, failure: error)
+            throw error
+        }
         let id = controller.beginDelivery(transcriptionID: UUID())
         var attempts = 0
         var confirmations = 0
@@ -290,9 +296,99 @@ private final class WritingUndoLiveFixture {
         controller.finishDelivery(outcome, for: id)
         extra["latestForwardAttempts"] = attempts
         extra["latestForwardConfirmations"] = confirmations
+        recordDeliveryDiagnostic("after-delivery", editor: editor, output: text, outcome: outcome,
+                                 attempts: attempts, confirmations: confirmations)
         try #require(outcome.isConfirmed && attempts == 1 && confirmations == 1)
         try #require(controller.isAvailable, "Native output was confirmed without a coherent Undo receipt.")
         try await editor.waitForValue(result(text))
+    }
+
+    private func recordDeliveryDiagnostic(
+        _ phase: String, editor: LiveWritingEditor, output: String,
+        outcome: WritingTarget.DeliveryOutcome? = nil, attempts: Int = 0,
+        confirmations: Int = 0, failure: Error? = nil
+    ) {
+        let application = AXUIElementCreateApplication(editor.application.processIdentifier)
+        let system = AXUIElementCreateSystemWide()
+        let windows = Self.diagnosticAttribute(kAXWindowsAttribute, from: application)
+        let title = Self.diagnosticAttribute(kAXTitleAttribute, from: editor.window)
+        let document = Self.diagnosticAttribute(kAXDocumentAttribute, from: editor.window)
+        let editorWindow = Self.diagnosticAttribute(kAXWindowAttribute, from: editor.editor)
+        let globalFocus = Self.diagnosticAttribute(kAXFocusedUIElementAttribute, from: system)
+        let appFocus = Self.diagnosticAttribute(kAXFocusedUIElementAttribute, from: application)
+        let focusedWindow = Self.diagnosticAttribute(kAXFocusedWindowAttribute, from: application)
+        let documentURL = (document.value as? URL) ?? (document.value as? String).flatMap(URL.init(string:))
+        let ownedDocument = documentURL.map { $0.isFileURL && $0.standardizedFileURL == editor.resource.standardizedFileURL } == true
+        let tokenTitle = (title.value as? String)?.contains(editor.token) == true
+        let windowPresent = (windows.value as? [AXUIElement])?.contains { CFEqual($0, editor.window) } == true
+        let sameWindow = Self.diagnosticElement(editorWindow.value).map { CFEqual($0, editor.window) } == true
+        let sameApplication = !editor.application.isTerminated && NSRunningApplication(processIdentifier: editor.application.processIdentifier)
+            .map { editor.application.isEqual($0) } == true
+        let owned = sameApplication && windowPresent && sameWindow && (tokenTitle || ownedDocument)
+        let value = Self.diagnosticAttribute(kAXValueAttribute, from: editor.editor)
+        let range = Self.diagnosticAttribute(kAXSelectedTextRangeAttribute, from: editor.editor)
+        let selection = Self.diagnosticAttribute(kAXSelectedTextAttribute, from: editor.editor)
+        var selectedRange = CFRange()
+        let rangeDecoded = range.value.map {
+            CFGetTypeID($0) == AXValueGetTypeID() && AXValueGetValue($0 as! AXValue, .cfRange, &selectedRange)
+        } == true
+        var receipt: [String: Any] = [
+            "phase": phase, "uptime": ProcessInfo.processInfo.systemUptime,
+            "pid": Int(editor.application.processIdentifier), "token": editor.token,
+            "bundleIdentifier": editor.kind.bundleIdentifier, "applicationTerminated": editor.application.isTerminated,
+            "currentApplicationInstanceMatches": sameApplication,
+            "frontmostPID": Int(NSWorkspace.shared.frontmostApplication?.processIdentifier ?? -1),
+            "sameFrontmostApplication": NSWorkspace.shared.frontmostApplication.map { editor.application.isEqual($0) } == true,
+            "windowPresent": windowPresent, "sameEditorWindow": sameWindow,
+            "tokenWindowTitle": tokenTitle, "ownedDocumentURL": ownedDocument, "ownsRetainedSurface": owned,
+            "sameGlobalFocusedEditor": Self.diagnosticElement(globalFocus.value).map { CFEqual($0, editor.editor) } == true,
+            "globalFocusedElementReturned": globalFocus.value != nil,
+            "globalFocusIsAXElement": Self.diagnosticElement(globalFocus.value) != nil,
+            "sameApplicationFocusedEditor": Self.diagnosticElement(appFocus.value).map { CFEqual($0, editor.editor) } == true,
+            "sameFocusedWindow": Self.diagnosticElement(focusedWindow.value).map { CFEqual($0, editor.window) } == true,
+            "AXErrors": ["windows": windows.error, "windowTitle": title.error, "documentURL": document.error,
+                "editorWindow": editorWindow.error, "globalFocusedElement": globalFocus.error,
+                "applicationFocusedElement": appFocus.error, "focusedWindow": focusedWindow.error,
+                "value": value.error, "selectedRange": range.error, "selectedText": selection.error],
+            "observedUTF16": owned ? (value.value as? String).map { Array($0.utf16).map(Int.init) } as Any? ?? NSNull() : NSNull(),
+            "selectedUTF16": owned ? (selection.value as? String).map { Array($0.utf16).map(Int.init) } as Any? ?? NSNull() : NSNull(),
+            "range": owned && rangeDecoded ? ["location": selectedRange.location, "length": selectedRange.length] as Any : NSNull(),
+            "outputUTF16": Array(output.utf16).map(Int.init),
+            "expectedFullUTF16": Array(result(output).utf16).map(Int.init),
+            "clipboardChangeCount": NSPasteboard.general.changeCount,
+            "usesSystemPaste": CursorTextContextReader.usesSystemPaste(for: editor.editor),
+            "attemptCallbacks": attempts, "confirmationCallbacks": confirmations,
+            "nativeAttemptResult": "AXPress result is not exposed by the product delivery API; no native result inferred from callback counts.",
+            "snapshotScope": "Independent AX reads of the retained surface using existing timeout policy; no atomic snapshot or delivery-time focus stability claim."
+        ]
+        if let outcome {
+            switch outcome {
+            case .notAttempted: receipt["outcome"] = "notAttempted"
+            case .attemptedUnconfirmed: receipt["outcome"] = "attemptedUnconfirmed"
+            case .confirmed(let edit):
+                receipt["outcome"] = "confirmed"
+                receipt["undoReceiptPresent"] = edit != nil
+            }
+        }
+        if let error = failure ?? outcome?.failure {
+            receipt["failure"] = ["type": String(reflecting: type(of: error)),
+                "description": String(describing: error), "localizedDescription": error.localizedDescription,
+                "domain": (error as NSError).domain, "code": (error as NSError).code]
+        }
+        var diagnostics = extra["deliveryDiagnostics"] as? [[String: Any]] ?? []
+        diagnostics.append(receipt)
+        extra["deliveryDiagnostics"] = diagnostics
+    }
+
+    private static func diagnosticAttribute(_ name: String, from owner: AXUIElement) -> (value: CFTypeRef?, error: Int) {
+        var value: CFTypeRef?
+        let error = AXUIElementCopyAttributeValue(owner, name as CFString, &value)
+        return (error == .success ? value : nil, Int(error.rawValue))
+    }
+
+    private static func diagnosticElement(_ value: CFTypeRef?) -> AXUIElement? {
+        guard let value, CFGetTypeID(value) == AXUIElementGetTypeID() else { return nil }
+        return (value as! AXUIElement)
     }
 
     func reset(_ editor: LiveWritingEditor) async throws {

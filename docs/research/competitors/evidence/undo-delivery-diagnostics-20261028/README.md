@@ -1,0 +1,11 @@
+# Native delivery diagnostics
+
+Run `40613522304` reached three native passes: TextEdit process-lifetime refusal, Unicode Undo and drift refusal. Three Safari cases failed before Undo. The retained receipts lacked the failing delivery outcome and post-delivery text, so they do not distinguish a refused/uncertain command from a text mutation followed by a readback failure.
+
+`WritingUndoLiveTests.swift` now adds `extra.deliveryDiagnostics` before the existing capture assertion, after a capture error, and immediately after delivery returns, before its success assertion. Entries include the retained application/window identity, token/file ownership, route, AX read status codes, full UTF-16 and selection for a proven owned surface, output expectation, typed delivery outcome/error, callback counts and clipboard generation. Reads are independent samples, not an atomic snapshot. The product does not expose its AXPress return value; callback counts are explicitly not that result.
+
+No retries, refocus, changed assertions, changed scenario stages, or production edits. The new diagnostic reads add no timeout setters. Independent review removed an initially proposed system-wide timeout setter because it would globally change the test host's AX behavior.
+
+The same change removes one existing system-wide 0.1-second timeout setter from `LiveWritingEditor.recordOperationFailure`. The macOS SDK contract at `/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/ApplicationServices.framework/Frameworks/HIServices.framework/Headers/AXUIElement.h:389` states that a timeout on the system-wide object changes the process-global policy. Per-object setters remain unchanged. Because every observation calls this helper, the old diagnostic could affect later product calls. This is a verified fixture contamination risk, not proof that it caused Safari's failure.
+
+Before: create the system-wide object, set its timeout to 0.1 seconds, read focus. After: create the system-wide object and read focus. The next run has a corrected timeout boundary; it is not a reproduction under the prior timing policy. These diagnostics alone establish no Safari cause or completed Safari Undo.

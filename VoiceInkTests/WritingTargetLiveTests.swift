@@ -1294,7 +1294,6 @@ final class LiveWritingEditor {
         let range = owned ? selectedRange : nil
         let selected = owned ? Self.string(kAXSelectedTextAttribute, from: editor) : nil
         let system = AXUIElementCreateSystemWide()
-        _ = AXUIElementSetMessagingTimeout(system, 0.1)
         let focused = Self.element(kAXFocusedUIElementAttribute, from: system)
         let frontmostIsExpected = NSWorkspace.shared.frontmostApplication?.processIdentifier == application.processIdentifier
         let title = Self.scopedString(kAXTitleAttribute, from: window, token: token)

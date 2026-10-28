@@ -117,17 +117,21 @@ def assertion_sites(source):
     require(len(sites) == 3, 'Two delivery assertions and one Undo assertion required')
     return sites
 
-def unit_identity(derived):
+def unit_identity(derived, require_unit=True):
     app = derived / 'Build/Products/Debug/roma just talk.app'
-    bundles = sorted((derived / 'Build/Products').rglob('VoiceInkTests.xctest'))
-    require(len(bundles) == 1, 'Exactly one actual unit-test bundle is required')
-    info = plistlib.loads((bundles[0] / 'Contents/Info.plist').read_bytes())
-    binary = bundles[0] / 'Contents/MacOS' / info['CFBundleExecutable']
+    bundles = sorted((derived / 'Build/Products').rglob('*.xctest'))
+    require(bool(bundles) and (not require_unit or len([path for path in bundles if path.name == 'VoiceInkTests.xctest']) == 1),
+        'Actual compiled test bundles are missing or ambiguous')
+    binaries = {}
+    for bundle in bundles:
+        info = plistlib.loads((bundle / 'Contents/Info.plist').read_bytes())
+        binary = bundle / 'Contents/MacOS' / info['CFBundleExecutable']
+        binaries[str(binary)] = sha(binary.read_bytes())
     files = {}
     for path in sorted(app.rglob('*')):
         if path.is_symlink(): files[str(path.relative_to(app))] = {'link': os.readlink(path)}
         elif path.is_file(): files[str(path.relative_to(app))] = {'sha256': sha(path.read_bytes())}
-    return {'app': str(app), 'appFiles': files, 'unitBinary': str(binary), 'unitBinarySHA256': sha(binary.read_bytes())}
+    return {'app': str(app), 'appFiles': files, 'testBinaries': binaries}
 
 def snippet_result(rows, lane):
     names = ['malformed-json', 'invalid-library', 'wrong-storage-type', 'missing-library', 'valid-library']
@@ -205,7 +209,7 @@ require(not git('ls-files', '--others', '--exclude-standard', '-z', '--', *roots
 original = {path: (repo / path).read_bytes() for path in [prefs, last]}
 before = snapshot()
 ordinary_derived = repo / '.local-build'
-ordinary_identity = unit_identity(ordinary_derived)
+ordinary_identity = unit_identity(ordinary_derived, require_unit=False)
 native_sites = assertion_sites((repo / oracle).read_text())
 old = {path: git('show', bad + ':' + path) for path in [prefs, last, view]}
 new_helper = mutate_body((repo / view).read_text())
@@ -271,8 +275,28 @@ try:
     enum = out / 'native-discovery'
     enum.mkdir()
     enumeration = enum / 'selected-tests.json'
+    recipe = (repo / 'scripts/run-macos-ci-unit-tests.sh').read_text()
+    substitutions = {
+        'evidence="$PWD/.local-build/onboarding-test-evidence"': 'evidence="$RJT_PR_REVIEW_EVIDENCE"',
+        'probe=/tmp/roma-onboarding-diagnostic/ExternalAXProbe': 'probe="$evidence/ExternalAXProbe"',
+        'app="$PWD/.local-build/Build/Products/Debug/roma just talk.app"': 'app="$RJT_PR_REVIEW_DERIVED/Build/Products/Debug/roma just talk.app"',
+        '-derivedDataPath "$PWD/.local-build"': '-derivedDataPath "$RJT_PR_REVIEW_DERIVED" -clonedSourcePackagesDirPath "$RJT_PR_REVIEW_PACKAGES"'
+    }
+    owned_recipe = recipe
+    for old_text, new_text in substitutions.items():
+        require(owned_recipe.count(old_text) == 1, 'Signed-host recipe boundary changed: ' + old_text)
+        owned_recipe = owned_recipe.replace(old_text, new_text)
+    env = dict(os.environ, RJT_PR_REVIEW_DERIVED=str(derived), RJT_PR_REVIEW_PACKAGES=str(ordinary_derived / 'SourcePackages'),
+        RJT_PR_REVIEW_DRIVER=str(repo / 'scripts/run-writing-pr-review-regression.sh'))
+    require(owned_recipe.count('test_exit=0\n') == 1, 'Signed-host build/provision boundary changed')
+    build_prefix = owned_recipe.split('test_exit=0\n')[0]
+    (enum / 'build-and-provision.sh').write_text(build_prefix)
+    (repo / last).write_bytes(old[last])
+    require(run(['bash', '-c', build_prefix, str(repo / 'scripts/run-macos-ci-unit-tests.sh')], enum / 'build.log',
+        timeout=1200, env=dict(env, RJT_PR_REVIEW_EVIDENCE=str(enum))) == 0,
+        'Lane-owned unit host must build successfully before discovering tests')
     arguments = ['-project', 'VoiceInk.xcodeproj', '-scheme', 'VoiceInk', '-configuration', 'Debug', '-destination', 'platform=macOS',
-        '-derivedDataPath', str(ordinary_derived), '-xcconfig', 'LocalBuild.xcconfig', '-parallel-testing-enabled', 'NO', '-only-testing:VoiceInkTests']
+        '-derivedDataPath', str(derived), '-xcconfig', 'LocalBuild.xcconfig', '-parallel-testing-enabled', 'NO', '-only-testing:VoiceInkTests']
     require(run(['xcodebuild', 'test-without-building', *arguments, '-enumerate-tests', '-test-enumeration-style', 'flat',
         '-test-enumeration-format', 'json', '-test-enumeration-output-path', str(enumeration)], enum / 'enumeration.log', timeout=180) == 0,
         'Native test enumeration failed')
@@ -284,22 +308,14 @@ try:
         found = [identifier for identifier in enabled if identifier.endswith('/' + name + '()') and 'WritingActionUndoTests' in identifier]
         require(len(found) == 1, 'Busy oracle must resolve uniquely: ' + name)
         selected.append(found[0])
-    recipe = (repo / 'scripts/run-macos-ci-unit-tests.sh').read_text()
     for lane in ['baseline', 'candidate']:
         directory = out / 'native' / lane
         directory.mkdir(parents=True)
         (repo / last).write_bytes(old[last] if lane == 'baseline' else original[last])
-        changed = recipe
-        substitutions = {
-            '-only-testing:VoiceInkTests\n': '\n'.join('  ' + shlex.quote('-only-testing:' + identifier) for identifier in selected) + '\n',
-            'evidence="$PWD/.local-build/onboarding-test-evidence"': 'evidence=' + shlex.quote(str(directory)),
-            'probe=/tmp/roma-onboarding-diagnostic/ExternalAXProbe': 'probe="$evidence/ExternalAXProbe"',
-            'app="$PWD/.local-build/Build/Products/Debug/roma just talk.app"': 'app="$RJT_PR_REVIEW_DERIVED/Build/Products/Debug/roma just talk.app"',
-            '-derivedDataPath "$PWD/.local-build"': '-derivedDataPath "$RJT_PR_REVIEW_DERIVED" -clonedSourcePackagesDirPath "$RJT_PR_REVIEW_PACKAGES"'
-        }
-        for old_text, new_text in substitutions.items():
-            require(changed.count(old_text) == 1, 'Signed-host recipe boundary changed: ' + old_text)
-            changed = changed.replace(old_text, new_text)
+        changed = owned_recipe
+        require(changed.count('-only-testing:VoiceInkTests\n') == 1, 'Unit target selection boundary changed')
+        changed = changed.replace('-only-testing:VoiceInkTests\n',
+            '\n'.join('  ' + shlex.quote('-only-testing:' + identifier) for identifier in selected) + '\n')
         additions = {
             'fingerprint > "$evidence/identity-before.txt"': 'fingerprint > "$evidence/identity-before.txt"\n'
                 'bash "$RJT_PR_REVIEW_DRIVER" identity "$RJT_PR_REVIEW_DERIVED" > "$evidence/native-binary-before.json"',
@@ -317,9 +333,8 @@ try:
         write(directory / 'recipe.json', {'sourceSHA256': sha(recipe.encode()), 'executedSHA256': sha(changed.encode()),
             'selected': selected, 'changes': list(substitutions), 'addedIdentityAndEnumerationChecks': list(additions), 'derivedData': str(derived),
             'signingAndTCC': 'Unchanged existing fresh-host provisioning and before/after fingerprint checks.'})
-        env = dict(os.environ, RJT_PR_REVIEW_DERIVED=str(derived), RJT_PR_REVIEW_PACKAGES=str(ordinary_derived / 'SourcePackages'),
-            RJT_PR_REVIEW_DRIVER=str(repo / 'scripts/run-writing-pr-review-regression.sh'))
-        code = run(['bash', '-c', changed, str(repo / 'scripts/run-macos-ci-unit-tests.sh')], directory / 'tests.log', timeout=1200, env=env)
+        code = run(['bash', '-c', changed, str(repo / 'scripts/run-macos-ci-unit-tests.sh')], directory / 'tests.log', timeout=1200,
+            env=dict(env, RJT_PR_REVIEW_EVIDENCE=str(directory)))
         text = (directory / 'tests.log').read_text(errors='replace')
         result = native_result(text, code, lane)
         enumeration = json.loads((directory / 'selected-tests.json').read_text())
@@ -345,7 +360,7 @@ finally:
     write(out / 'source-after.json', after)
     require(after == before, 'PR review comparison changed candidate source or package pins')
     require(not git('ls-files', '--others', '--exclude-standard', '-z', '--', *roots), 'Comparison added untracked product/test inputs')
-    require(unit_identity(ordinary_derived) == ordinary_identity, 'Ordinary unit/UI host artifacts changed')
+    require(unit_identity(ordinary_derived, require_unit=False) == ordinary_identity, 'Ordinary unit/UI host artifacts changed')
 write(out / 'result.json', {'valid': True, 'classification': 'matched-pr-review-regression-passed', 'sourceSHA': source_head,
     'productRef': product_ref, 'knownBad': bad, 'candidateSourcesRestored': True,
     'scope': ['reset-clear-markers', 'actual-snippet-helper-transaction', 'Paste-Last-delivery-and-Undo-ownership'],

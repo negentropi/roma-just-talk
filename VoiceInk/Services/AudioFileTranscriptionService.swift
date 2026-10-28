@@ -92,10 +92,10 @@ class AudioTranscriptionService {
                 enhancementFailurePolicy: .omitEnhancedText
             )
             try Task.checkCancellation()
-            let savedID = try saveCompletedTranscription(draft)
+            let savedID = try AudioFileTranscriptionPersistence.save(draft, in: modelContext.container)
             committed = true
             guard let newTranscription = modelContext.model(for: savedID) as? Transcription else {
-                throw SavedTranscriptionUnavailable()
+                throw AudioFileTranscriptionPersistence.SavedTranscriptionUnavailable()
             }
             NotificationCenter.default.post(name: .transcriptionCreated, object: newTranscription)
             NotificationCenter.default.post(name: .transcriptionCompleted, object: newTranscription)
@@ -108,14 +108,17 @@ class AudioTranscriptionService {
             throw error
         }
     }
+}
 
-    private struct SavedTranscriptionUnavailable: LocalizedError {
+@MainActor
+enum AudioFileTranscriptionPersistence {
+    struct SavedTranscriptionUnavailable: LocalizedError {
         var errorDescription: String? { "The transcription was saved, but History could not reopen it." }
     }
 
-    private func saveCompletedTranscription(_ draft: VoiceInkCompletedTranscriptionDraft) throws -> PersistentIdentifier {
+    static func save(_ draft: VoiceInkCompletedTranscriptionDraft, in container: ModelContainer) throws -> PersistentIdentifier {
         // A rejected save can leak a pending row into its context's first fetch. Keep that writer private.
-        let writer = ModelContext(modelContext.container)
+        let writer = ModelContext(container)
         writer.autosaveEnabled = false
         let transcription = Transcription(completedDraft: draft)
         writer.insert(transcription)
@@ -124,10 +127,6 @@ class AudioTranscriptionService {
             return transcription.persistentModelID
         } catch {
             writer.rollback()
-            let message = VoiceInkAudioFileTranscriptionDiagnostics.saveFailedMessage(
-                localizedDescription: error.localizedDescription
-            )
-            logger.error("\(message, privacy: .public)")
             throw error
         }
     }

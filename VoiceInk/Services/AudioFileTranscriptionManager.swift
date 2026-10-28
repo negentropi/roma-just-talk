@@ -223,19 +223,20 @@ class AudioTranscriptionManager: ObservableObject {
                     }
                 }
             )
-            let transcription = Transcription(completedDraft: draft)
             try checkOwnership()
-            modelContext.insert(transcription)
-            do { try modelContext.save() }
-            catch {
-                modelContext.delete(transcription)
-                throw error
-            }
+            let savedID = try AudioFileTranscriptionPersistence.save(draft, in: modelContext.container)
             committed = true
+            try checkOwnership()
+            guard let transcription = modelContext.model(for: savedID) as? Transcription else {
+                throw AudioFileTranscriptionPersistence.SavedTranscriptionUnavailable()
+            }
+            try checkOwnership()
             item.transcription = transcription
             item.status = .completed
             lastCompletedItemId = item.id
+            try checkOwnership()
             NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
+            try checkOwnership()
             NotificationCenter.default.post(name: .transcriptionCompleted, object: transcription)
             if owns(item, generation: generation), let reason = transcription.processingFailureReason {
                 processingWarning(reason)

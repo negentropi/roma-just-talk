@@ -1,6 +1,6 @@
 {
   "classification": "source-authorship-and-review-only",
-  "implementation_status": "Sol-loop rounds1\u20133 approved the isolated component source; latest actual run opened the status menu but completed zero states/cases. New native-menu selector and dismissal contract require remote verification. No behavior changed after round3 approval.",
+  "implementation_status": "Sol-loop rounds1\u20134 approved the isolated QA source, max budget5 after evidence-backed state/focus/ownership extension. Actual40629369072 opened the status menu but completed zero states/cases. Native nonreciprocal-parent calibration now source-approved; runtime acceptance pending. No behavior edits after round4.",
   "author_cli": {
     "binary": "claude",
     "version": "2.1.310",
@@ -151,6 +151,22 @@
         "duration_ms": 347324,
         "total_cost_usd": 1.2072554000000002
       }
+    },
+    {
+      "invocation": "observed-nonreciprocal-native-menu-graph",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "medium",
+      "raw_jsonl_sha256": "96fc887b4a068357f4fa5975a27620d9d61cc279fa37ed294b7be1e8c93f3ba5",
+      "prompt_sha256": "b1f2c8a86aa328af4d45ff2f256991ac88bd2ab54dce8c53ea1cb21d62f3aea2",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 68129,
+        "total_cost_usd": 0.3349082
+      }
     }
   ],
   "authorship_scope": {
@@ -158,7 +174,8 @@
       "scripts/fixtures/WritingUndoControlHost.swift",
       "CursorPaster.WritingPasteError enum conformance and four fixed descriptions only",
       "WritingUndoControlOracle.swift: synchronous diagnostics and per-editor positive fixture calibration only; original native verification remains GPT authored.",
-      "WritingUndoControlOracle.swift: observed-control native mouse click helper and three call-site/receipt changes only."
+      "WritingUndoControlOracle.swift: observed-control native mouse click helper and three call-site/receipt changes only.",
+      "WritingUndoControlOracle.swift: observed native nonreciprocal menu graph calibration; authoritative downward proof and raw non-authoritative upward diagnostics only."
     ],
     "gpt_authored_native_verification": [
       "scripts/fixtures/WritingUndoControlOracle.swift",
@@ -170,9 +187,9 @@
   },
   "source_sha256": {
     "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
-    "scripts/fixtures/WritingUndoControlOracle.swift": "f576a2d4d7c3e3a6f4452383d96cef1bbdc108fbaf40831cdf2688c05a5a56fb",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "f867c1be32b47125c06f448118045267e5f73aa26e229593cb91feed53b0ff60",
     "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
-    "scripts/verify-writing-undo-controls.py": "f1dbdf1d56f71ef0e7cf469697d38e52d491f7aead2bb0f0a518bf8785b208a0",
+    "scripts/verify-writing-undo-controls.py": "fe1c3ed8749b36c43f0068f1581911e15d5136e5fbc13832de8c8a31b11fef99",
     ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd"
   },
   "clipboard_error_copy": {
@@ -207,7 +224,7 @@
   },
   "source_contract": {
     "host_owner": "One actual engine and its own controller, RecorderUIManager and RecordingShortcutManager; production VoiceInkApp composition excluded only in disposable candidate copy.",
-    "menu": "Actual product UndoLastWritingEditMenuButton in MenuBarExtra. Status control keeps its actual identifier; native bridged AXMenuItem is identified by exact production title/role/host PID, unique bounded descent under the same retained status item and host extras root, with matching upward ancestry. Actual native identifier is diagnostic, not required. Native mouse click retains exact geometry/hit/window proof.",
+    "menu": "Actual product UndoLastWritingEditMenuButton in MenuBarExtra. Exact production title/AXMenuItem/hostPID, fully readable unique bounded downward path under the same retained owned status item/host extras root; actual identifier diagnostic. Upward AXParent graph is raw diagnostic only. Activation still requires a fresh systemwide exact center hit on the same owned target, exact geometry/display and native-menu/window proof.",
     "shortcut": "Actual ShortcutRecorder clicked via the same observed-control native mouse path; capture and global CGEvent chord through the real registered event tap. No private handler or direct Undo call.",
     "native_editor_helper": "Exact current source tail of WritingTargetLiveTests.swift copied unchanged into the disposable candidate. Separately owned helper supports an explicit test-only passage seed; default NFD bytes remain unchanged.",
     "cases": [
@@ -241,7 +258,7 @@
     "Source authoring and pure classifier/syntax checks only; remote runtime and visual acceptance pending. Parent owns CI transport.",
     "Plain-text guarded inverse only; no restart, generic Cmd-Z, rich-format or general editor compatibility claim."
   ],
-  "total_author_cost_usd": 6.737358,
+  "total_author_cost_usd": 7.0722662,
   "raw_log_policy": "Only model, status, timing, cost and hashes retained; raw JSONL stays outside the repository.",
   "compiler_response_path_correction": {
     "failed_run_id": 40605378801,
@@ -487,6 +504,28 @@
       "all_prior_checks": "passed"
     },
     "sol_loop": "Round3 APPROVE, same actualGPT6.1Sol medium reviewer and fixed6927base/six-path diff; no findings, usage unavailable. RUNTIME2 resolved-source/pending-native. Default3-round budget used; any later extension requires skill-permitted evidence and an explicit ledger note.",
+    "native_runtime_verified": false
+  },
+  "native_menu_graph_calibration": {
+    "runtime_finding_id": "RUNTIME3",
+    "actual_run_id": 40629369072,
+    "head": "5ee7c9fee5366797bcb6117dfb631df4338fd604",
+    "evidence": "../undo-controls-40629369072/failure-diagnosis.json",
+    "observed": "Same retained status downward subtree contains one exact native menu item. Item parent equals that menu; menu parent is a host AXMenuBar, not the retained status AXMenuBarItem. Exact final parent object identity was not retained. Zero completed states/cases.",
+    "author_scope": "Actual Opus edited only Oracle comments/typed native menu proof and upward diagnostics. No production source, lookup fallback, root requirement or native click/Undo behavior edits.",
+    "authority": "Fully readable, untruncated unique exact-title AXMenuItem/hostPID under the same retained status item directly owned by host AXExtrasMenuBar. Downward path all hostPID. Actual activation additionally keeps same-target global hit, finite exact display/frame/window guards and a single two-event post.",
+    "upward_diagnostics": "Bounded raw AXParent facts; diagnosticOnly true and authorizationCondition false. No reciprocal-tree requirement, invented backlink or alternate owner accepted.",
+    "receipt_protocol": "native-menu-bridge-identity schema2 mandates retained-status-downward-subtree authority and upwardParentAuthorizes false; no legacy-schema fallback.",
+    "before_oracle_sha256": "f576a2d4d7c3e3a6f4452383d96cef1bbdc108fbaf40831cdf2688c05a5a56fb",
+    "after_oracle_sha256": "f867c1be32b47125c06f448118045267e5f73aa26e229593cb91feed53b0ff60",
+    "checks": {
+      "swift_frontend_parse": "passed",
+      "classifier_malformed_receipts_rejected": 73,
+      "metadata_positives": "Observed asymmetric upward graph and bounded diagnostic AX read error accepted only with unchanged complete downward/click authority.",
+      "all_prior_self_checks": "passed",
+      "native_runtime": "pending; no local execution"
+    },
+    "sol_loop": "Round4 APPROVE, same actualGPT6.1Sol medium reviewer and fixed6927base/six-path diff; no findings, usage unavailable. RUNTIME3 resolved-source/pending-native. Budget4of5 used after explicit evidence-backed extension; no reset.",
     "native_runtime_verified": false
   }
 }

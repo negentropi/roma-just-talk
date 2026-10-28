@@ -412,9 +412,13 @@ enum WritingUndoControlOracle {
         // EMPTY AXIdentifier, so its `.accessibilityIdentifier(menuCommand)` is not observable there. The
         // command is therefore identified only as: role AXMenuItem, exact `UndoLastWritingEditPresentation.title`,
         // host PID, the UNIQUE such descendant found by bounded traversal of the SAME retained status item
-        // (itself host-owned with a direct parent equal to the host's own AXExtrasMenuBar), and an upward
-        // AXParent chain identical to the downward path. The actual identifier is recorded, never required
-        // or invented. There is no global, text or identifier fallback; status and recorder contracts are unchanged.
+        // (itself host-owned with a direct parent equal to the host's own AXExtrasMenuBar) whose downward
+        // path is a host-owned AXMenu chain, plus the unchanged actual center hit-test proof in `click`.
+        // Native run 40629369072 observed that the NSMenu's AXParent is a host AXMenuBar, NOT the status
+        // AXMenuBarItem, so the AX graph is not a reciprocal tree: upward AXParent reads are recorded raw as
+        // `upwardParentDiagnostics` (diagnosticOnly, authorizationCondition false) and never authorize or
+        // refuse. The actual identifier is recorded, never required or invented. There is no global, text
+        // or identifier fallback; status and recorder contracts are unchanged.
         static let menuScanMaxDepth = 4
         static let menuScanMaxNodes = 64
         static let menuClosureMaxHitAncestors = 10
@@ -499,8 +503,9 @@ enum WritingUndoControlOracle {
                  "title": string(kAXTitleAttribute, node) as Any? ?? NSNull(), "pid": pidValue(pid(node)), "depth": depth]
             }
             var facts: [String: Any] = [
-                "schemaVersion": 1, "attempted": true, "kind": "native-menu-bridge-identity",
+                "schemaVersion": 2, "attempted": true, "kind": "native-menu-bridge-identity",
                 "contract": "status-owned-native-menu-item-title", "expectedTitle": title, "expectedRole": "AXMenuItem",
+                "identityAuthority": "retained-status-downward-subtree", "upwardParentAuthorizes": false,
                 "hostPID": Int(host), "identifierRequired": false, "globalSearchUsed": false, "textFallbackUsed": false,
                 "maxDepth": Self.menuScanMaxDepth, "maxNodes": Self.menuScanMaxNodes, "proven": false]
             func fail(_ reason: String) -> MenuScan {
@@ -581,28 +586,38 @@ enum WritingUndoControlOracle {
                       && pid($0) == host }) else {
                 return fail("downward path is not a host-owned native submenu chain")
             }
+            // Authoritative identity: everything checked above, all from the same retained status reference.
+            facts["downwardProof"] = [
+                "rootIsRetainedStatus": true, "statusParentIsHostExtrasMenuBar": true,
+                "fullyReadable": true, "truncated": false, "uniqueExactMatch": true,
+                "pathLength": path.count, "allHostPID": true, "menuRole": "AXMenu",
+                "commandRole": "AXMenuItem", "exactTitle": title] as [String: Any]
 
-            // Upward AXParent chain must be exactly the downward path back to the same status reference.
+            // DIAGNOSTICS ONLY, not an authorization condition: the native AX graph is not a reciprocal
+            // tree (run 40629369072: menu AXParent was a host AXMenuBar, not the status item). Raw upward
+            // reads, bounded to the downward path length, never change `proven` and never invent a backlink.
             var upward: [[String: Any]] = []
             var cursor = command
             let expectedUp = Array(intermediates.reversed()) + [status]
             for (level, expected) in expectedUp.enumerated() {
                 let (error, raw) = copy(kAXParentAttribute, cursor)
                 let parent = raw.flatMap { CFGetTypeID($0) == AXUIElementGetTypeID() ? ($0 as! AXUIElement) : nil }
-                var entry: [String: Any] = ["level": level + 1, "axError": Int(error.rawValue)]
+                var entry: [String: Any] = ["level": level + 1, "axError": Int(error.rawValue),
+                                            "elementPresent": parent != nil,
+                                            "expectedDownwardRole": string(kAXRoleAttribute, expected) ?? ""]
                 if let parent { entry.merge(summary(parent, depth: path.count - level - 1)) { _, new in new } }
-                let same = parent.map { CFEqual($0, expected) } ?? false
-                entry["matchesDownwardPath"] = same
+                entry["matchesDownwardPath"] = parent.map { CFEqual($0, expected) } ?? false
                 entry["isRetainedStatus"] = parent.map { CFEqual($0, status) } ?? false
                 upward.append(entry)
-                facts["upwardPath"] = upward
-                guard error == .success, let parent, same else {
-                    return fail("upward ancestry did not reproduce the status-owned submenu path")
-                }
+                guard error == .success, let parent else { break }
                 cursor = parent
             }
-            facts["upwardPath"] = upward
-            facts["upwardReachesRetainedStatus"] = true
+            let reciprocal = upward.count == expectedUp.count
+                && upward.allSatisfy { $0["axError"] as? Int == 0 && $0["matchesDownwardPath"] as? Bool == true }
+            facts["upwardParentDiagnostics"] = [
+                "diagnosticOnly": true, "authorizationCondition": false, "maxLevels": expectedUp.count,
+                "observations": upward, "reciprocalToDownwardPath": reciprocal,
+                "reachesRetainedStatus": upward.contains { $0["isRetainedStatus"] as? Bool == true }] as [String: Any]
 
             var frame: CGRect?
             if let raw = attribute(kAXPositionAttribute, command), CFGetTypeID(raw) == AXValueGetTypeID(),

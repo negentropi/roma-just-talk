@@ -6,7 +6,7 @@
   "reviewer": "/root/explicit_language_choice/controls_click_medium_review",
   "actual_model": "gpt-6.1-sol",
   "effort": "medium",
-  "budget_rounds": 3,
+  "budget_rounds": 5,
   "diff_command": [
     "git",
     "diff",
@@ -84,18 +84,37 @@
       "shortstat": "6 files changed, 3986 insertions(+)",
       "verdict": "APPROVE",
       "usage_status": "Not exposed; not estimated."
+    },
+    {
+      "round": 4,
+      "status": "complete",
+      "scope": "changed code since approved5ee7c9fee and actual RUNTIME3 only",
+      "findings": [],
+      "usage": null,
+      "frozen_sha256": {
+        "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
+        "scripts/fixtures/WritingUndoControlOracle.swift": "f867c1be32b47125c06f448118045267e5f73aa26e229593cb91feed53b0ff60",
+        "scripts/verify-writing-undo-controls.py": "fe1c3ed8749b36c43f0068f1581911e15d5136e5fbc13832de8c8a31b11fef99",
+        "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
+        ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd",
+        "docs/research/competitors/evidence/undo-controls-source/authorship-and-review.json": "708ab08f4d0cf0344dc6730cdb614ae011799ba173156728c891c810fa3da859"
+      },
+      "diff_sha256": "466b7722143afbce77a1b5e1ccd27cc7f91657394be418f469df59f6b95c621e",
+      "shortstat": "6 files changed, 4085 insertions(+)",
+      "verdict": "APPROVE",
+      "usage_status": "Not exposed; not estimated."
     }
   ],
-  "native_runtime_status": "pending; previous8fab run stopped in status press helper before any completed case",
+  "native_runtime_status": "pending; latest40629369072 real status click opened disabled menu, then reciprocal-parent QA ownership assumption refused with zero cases/states",
   "status": "source-approved-native-still-pending",
-  "rounds_used": 3,
+  "rounds_used": 4,
   "open_blockers_or_shoulds": [],
   "fixed_findings": [],
   "declined_findings": [],
   "code_diff_shortstat_after_review": "6 files changed, 3095 insertions(+)",
   "code_diff_sha256_after_review": "24ae35cdfa3a53ea0d564f590b21210dd245ca8fc0d7a6ef6ee7ee56b22ec597",
   "scoped_files_frozen_through_terminal_verdict": true,
-  "post_review_changes": "Verdict/ledger/authorship metadata only after round3; no behavior changes.",
+  "post_review_changes": "Verdict/ledger/authorship metadata only after round4; no behavior changes.",
   "runtime_findings": [
     {
       "id": "RUNTIME1",
@@ -110,6 +129,13 @@
       "provenance": "actual40627170433 at1639a273c",
       "claim": "Real opened native AXMenuItem exacttitle exposes emptyidentifier; oldIDselectorcannotfindit.",
       "outcome": "resolved-source / pending-native; scoped title/role/retained-status native-menu contract implemented with full proof bindings"
+    },
+    {
+      "id": "RUNTIME3",
+      "severity": "should",
+      "provenance": "actual40629369072 at5ee7c9fee",
+      "claim": "Native menu downward subtree is owned/unique, but AXMenu parent returns a host AXMenuBar rather than the retained status AXMenuBarItem. Reciprocal-tree expectation refused before any Undo.",
+      "outcome": "resolved-source / pending-native; schema2 downward identity remains strict, nonreciprocal upward graph retained as diagnostics only"
     }
   ],
   "open_native_requirements": [
@@ -118,5 +144,13 @@
     "15 actual case/state screenshots and native visual review."
   ],
   "code_diff_shortstat_after_round2": "6 files changed, 3518 insertions(+)",
-  "code_diff_shortstat_after_round3": "6 files changed, 3986 insertions(+)"
+  "code_diff_shortstat_after_round3": "6 files changed, 3986 insertions(+)",
+  "budget_extension": {
+    "from": 3,
+    "to": 5,
+    "authorized_by": "root task owner",
+    "reason": "Actual RUNTIME3 exposes native menu open-state and ownership graph asymmetry at the same real control boundary; preserving safe state/focus/ownership acceptance requires a remaining review round. No budget reset.",
+    "evidence": "../undo-controls-40629369072/failure-diagnosis.json"
+  },
+  "code_diff_shortstat_after_round4": "6 files changed, 4085 insertions(+)"
 }

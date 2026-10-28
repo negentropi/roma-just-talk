@@ -593,8 +593,10 @@ def receipt_errors(value, executable, pid, expected_home):
         check(isinstance(proof, dict), 'Status-owned native menu proof missing')
         if not isinstance(proof, dict):
             return
-        check(proof.get('schemaVersion') == 1 and proof.get('kind') == 'native-menu-bridge-identity'
+        check(proof.get('schemaVersion') == 2 and proof.get('kind') == 'native-menu-bridge-identity'
             and proof.get('contract') == 'status-owned-native-menu-item-title'
+            and proof.get('identityAuthority') == 'retained-status-downward-subtree'
+            and proof.get('upwardParentAuthorizes') is False
             and proof.get('expectedTitle') == 'Undo Last Writing Edit' and proof.get('expectedRole') == 'AXMenuItem'
             and proof.get('hostPID') == pid and proof.get('identifierRequired') is False
             and proof.get('globalSearchUsed') is False and proof.get('textFallbackUsed') is False
@@ -620,19 +622,39 @@ def receipt_errors(value, executable, pid, expected_home):
             and command.get('identifierEmpty') is (target.get('id') == '')
             and command.get('frame') == target.get('frame') and command.get('enabled') is target.get('enabled'),
             'Native command differs from actual described menu item')
-        down, up = proof.get('downwardPath', []), proof.get('upwardPath', [])
-        check(isinstance(down, list) and 2 <= len(down) <= 4 and len(up) == len(down)
-            and proof.get('upwardReachesRetainedStatus') is True, 'Native submenu ancestry paths missing')
-        if isinstance(down, list) and 2 <= len(down) <= 4 and len(up) == len(down):
+        down = proof.get('downwardPath', [])
+        check(isinstance(down, list) and 2 <= len(down) <= 4, 'Native downward submenu ancestry missing')
+        if isinstance(down, list) and 2 <= len(down) <= 4:
             check(all(item.get('pid') == pid and item.get('depth') == n
                 and item.get('role') in ('AXMenu', 'AXMenuItem') for n, item in enumerate(down, 1))
                 and down[-1].get('role') == 'AXMenuItem' and down[-1].get('title') == 'Undo Last Writing Edit',
                 'Native downward path is not a host-owned submenu chain')
+            check(proof.get('downwardProof') == {'rootIsRetainedStatus': True, 'statusParentIsHostExtrasMenuBar': True,
+                'fullyReadable': True, 'truncated': False, 'uniqueExactMatch': True, 'pathLength': len(down),
+                'allHostPID': True, 'menuRole': 'AXMenu', 'commandRole': 'AXMenuItem', 'exactTitle': 'Undo Last Writing Edit'},
+                'Authoritative downward proof differs from the retained owned subtree')
+            # Native run40629369072 has a nonreciprocal AXParent edge. These
+            # bounded observations describe that graph; they never grant identity.
+            diagnostic = proof.get('upwardParentDiagnostics', {})
+            up = diagnostic.get('observations', [])
+            check(diagnostic.get('diagnosticOnly') is True and diagnostic.get('authorizationCondition') is False
+                and diagnostic.get('maxLevels') == len(down) and isinstance(up, list) and 1 <= len(up) <= len(down),
+                'Upward parent diagnostics lack explicit non-authority or bounds')
             expected_up = list(reversed(down[:-1])) + [dict(owner, depth=0)]
-            check(all(item.get('axError') == 0 and item.get('matchesDownwardPath') is True
-                and item.get('isRetainedStatus') is (n == len(up)) and item.get('pid') == pid
-                and item.get('role') == expected.get('role') and item.get('identifier') == expected.get('identifier')
-                for n, (item, expected) in enumerate(zip(up, expected_up), 1)), 'Native upward path does not reproduce retained status ownership')
+            if isinstance(up, list) and 1 <= len(up) <= len(down):
+                check(all(type(item.get('axError')) is int and item.get('level') == n
+                    and type(item.get('elementPresent')) is bool and type(item.get('matchesDownwardPath')) is bool
+                    and type(item.get('isRetainedStatus')) is bool and item.get('expectedDownwardRole') == expected.get('role')
+                    and (not item['elementPresent'] or isinstance(item.get('role'), str)
+                        and isinstance(item.get('identifier'), str) and (item.get('title') is None or isinstance(item['title'], str))
+                        and (item.get('pid') is None or type(item['pid']) is int and item['pid'] > 0))
+                    for n, (item, expected) in enumerate(zip(up, expected_up), 1)), 'Malformed raw upward parent observations')
+                check(all(item.get('axError') == 0 and item.get('elementPresent') is True for item in up[:-1]),
+                    'Upward diagnostic walk continued after an AX error or missing parent')
+                reciprocal = len(up) == len(down) and all(item.get('axError') == 0 and item.get('matchesDownwardPath') is True for item in up)
+                check(diagnostic.get('reciprocalToDownwardPath') is reciprocal
+                    and diagnostic.get('reachesRetainedStatus') is any(item.get('isRetainedStatus') is True for item in up),
+                    'Upward diagnostic summary invents reciprocal ownership')
     def click(item, target, identifier, roles, checkpoint, status=False):
         check(isinstance(item, dict) and isinstance(target, dict), 'Native mouse input receipt is missing')
         if not isinstance(item, dict) or not isinstance(target, dict):
@@ -1044,14 +1066,24 @@ def self_test():
             'parentRole': 'AXMenuBar', 'extrasMenuBarPresent': True, 'extrasMenuBarPID': 42, 'parentIsHostExtrasMenuBar': True}
         path = [{'role': 'AXMenu', 'identifier': '', 'title': '', 'pid': 42, 'depth': 1},
             {'role': 'AXMenuItem', 'identifier': target['id'], 'title': 'Undo Last Writing Edit', 'pid': 42, 'depth': 2}]
-        return {'schemaVersion': 1, 'kind': 'native-menu-bridge-identity', 'contract': 'status-owned-native-menu-item-title',
+        return {'schemaVersion': 2, 'kind': 'native-menu-bridge-identity', 'contract': 'status-owned-native-menu-item-title',
+            'identityAuthority': 'retained-status-downward-subtree', 'upwardParentAuthorizes': False,
             'expectedTitle': 'Undo Last Writing Edit', 'expectedRole': 'AXMenuItem', 'hostPID': 42,
             'identifierRequired': False, 'globalSearchUsed': False, 'textFallbackUsed': False, 'maxDepth': 4, 'maxNodes': 64,
             'status': owner, 'traversal': {'discoveredCount': 3, 'expandedCount': 3, 'truncated': False,
                 'unreadableChildren': [], 'exactMatchCount': 1, 'otherRoleTitleMatches': 0}, 'uniqueMatch': True,
-            'downwardPath': path, 'upwardPath': [dict(path[0], axError=0, matchesDownwardPath=True, isRetainedStatus=False),
-                dict(owner, depth=0, axError=0, matchesDownwardPath=True, isRetainedStatus=True)],
-            'upwardReachesRetainedStatus': True, 'command': {'role': 'AXMenuItem', 'title': 'Undo Last Writing Edit',
+            'downwardPath': path,
+            'downwardProof': {'rootIsRetainedStatus': True, 'statusParentIsHostExtrasMenuBar': True,
+                'fullyReadable': True, 'truncated': False, 'uniqueExactMatch': True, 'pathLength': 2,
+                'allHostPID': True, 'menuRole': 'AXMenu', 'commandRole': 'AXMenuItem', 'exactTitle': 'Undo Last Writing Edit'},
+            'upwardParentDiagnostics': {'diagnosticOnly': True, 'authorizationCondition': False, 'maxLevels': 2,
+                'observations': [dict(path[0], level=1, axError=0, elementPresent=True, expectedDownwardRole='AXMenu',
+                    matchesDownwardPath=True, isRetainedStatus=False),
+                    {'role': 'AXMenuBar', 'identifier': '', 'title': None, 'pid': 42, 'depth': 0, 'level': 2,
+                        'axError': 0, 'elementPresent': True, 'expectedDownwardRole': 'AXMenuBarItem',
+                        'matchesDownwardPath': False, 'isRetainedStatus': False}],
+                'reciprocalToDownwardPath': False, 'reachesRetainedStatus': False},
+            'command': {'role': 'AXMenuItem', 'title': 'Undo Last Writing Edit',
                 'pid': 42, 'identifier': target['id'], 'identifierEmpty': target['id'] == '', 'enabled': target['enabled'],
                 'frame': copy.deepcopy(target['frame'])}, 'proven': True, 'reason': None}
     def dismissal_fixture():
@@ -1117,6 +1149,12 @@ def self_test():
         require(accent in case_replacement.encode('utf-8') and (769 not in units(case_replacement) if safari else 769 in units(case_replacement)),
             'Positive per-editor fixture output uses the wrong scalar bytes')
     require(not receipt_errors(value, '/fixture/app', 42, '/fixture/isolated-user'), 'Valid classifier fixture rejected')
+    parent_read_error = copy.deepcopy(value)
+    diagnostic = parent_read_error['cases'][0]['command']['nativeMenuIdentity']['upwardParentDiagnostics']
+    diagnostic['observations'] = [{'level': 1, 'axError': -25212, 'elementPresent': False,
+        'expectedDownwardRole': 'AXMenu', 'matchesDownwardPath': False, 'isRetainedStatus': False}]
+    require(not receipt_errors(parent_read_error, '/fixture/app', 42, '/fixture/isolated-user'),
+        'Diagnostic parent-read error was incorrectly used as identity authority')
     unsupported_actions = copy.deepcopy(value)
     for target in [unsupported_actions['shortcut']['recorderControl'],
         *[item['command'] for item in unsupported_actions['cases'] if item['commandKind'] == 'menu'],
@@ -1190,7 +1228,14 @@ def self_test():
         lambda v: v['cases'][0]['command']['nativeMenuIdentity']['traversal'].update(exactMatchCount=2),
         lambda v: v['cases'][0]['command']['nativeMenuIdentity']['traversal'].update(truncated=True),
         lambda v: v['cases'][0]['command']['nativeMenuIdentity']['traversal'].update(unreadableChildren=[{'axError': -1}]),
-        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['upwardPath'][0].update(matchesDownwardPath=False),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity'].update(upwardParentAuthorizes=True),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity'].update(schemaVersion=1),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity'].update(identityAuthority='global-title'),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['downwardProof'].update(rootIsRetainedStatus=False),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['downwardProof'].update(allHostPID=False),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['upwardParentDiagnostics'].update(authorizationCondition=True),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['upwardParentDiagnostics'].update(reciprocalToDownwardPath=True),
+        lambda v: v['cases'][0]['command']['nativeMenuIdentity']['upwardParentDiagnostics']['observations'][0].update(level=9),
         lambda v: v['cases'][0]['command']['nativeMenuIdentity']['downwardPath'][0].update(pid=43),
         lambda v: v['cases'][0]['command']['nativeMenuIdentity']['command'].update(title='Undo'),
         lambda v: v['stateChecks']['unavailable']['dismissal']['closure'].update(hitAXError=-1),

@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 VERIFIER="$ROOT/scripts/verify-macos-distribution-launch.sh"
 TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/roma-distribution-launch.XXXXXX")"
+TEMP_ROOT="$(cd "$TEMP_ROOT" && pwd -P)"
 APP="$TEMP_ROOT/Fixture.app"
 LEAF_FRAMEWORK="$APP/Contents/Frameworks/RomaDistributionFixtureLeaf.framework"
 MIDDLE_FRAMEWORKS="$APP/Contents/Frameworks/My Frameworks"
@@ -11,6 +12,7 @@ EVIDENCE="$TEMP_ROOT/evidence"
 OUTPUT="$TEMP_ROOT/verifier-output.txt"
 fixture_pid=""
 unrelated_pid=""
+capture_verifier_pid=""
 
 cleanup() {
   if [[ -n "$fixture_pid" ]]; then
@@ -20,6 +22,10 @@ cleanup() {
   if [[ -n "$unrelated_pid" ]]; then
     kill -KILL "$unrelated_pid" 2>/dev/null || true
     wait "$unrelated_pid" 2>/dev/null || true
+  fi
+  if [[ -n "$capture_verifier_pid" ]]; then
+    kill -KILL "$capture_verifier_pid" 2>/dev/null || true
+    wait "$capture_verifier_pid" 2>/dev/null || true
   fi
   if [[ "${KEEP_DISTRIBUTION_FIXTURE:-false}" == "true" ]]; then
     echo "preserved distribution fixture: $TEMP_ROOT" >&2
@@ -257,17 +263,31 @@ expect_failure \
 stop_fixture
 
 start_fixture
+capture_evidence="$(mktemp -d "$TEMP_ROOT/capture-evidence.XXXXXX")"
 DISTRIBUTION_E2E_REQUIRE_TRANSLOCATION=false \
 DISTRIBUTION_E2E_CAPTURE_MAPPED_CODE_UNTIL_EXIT=true \
 DISTRIBUTION_E2E_CAPTURE_TIMEOUT_SECONDS=30 \
 DISTRIBUTION_E2E_STABILITY_SECONDS=0 \
-  bash "$VERIFIER" "$APP" "$fixture_pid" "$EVIDENCE" &
+  bash "$VERIFIER" "$APP" "$fixture_pid" "$capture_evidence" &
 capture_verifier_pid=$!
-sleep 2
+capture_readiness_deadline=$((SECONDS + 30))
+while ! grep -Fxq "n$APP/Contents/MacOS/Fixture" \
+  "$capture_evidence/process-open-files-runtime-sample.txt" 2>/dev/null; do
+  if ! kill -0 "$capture_verifier_pid" 2>/dev/null; then
+    echo 'capture verifier exited before sampling the fixture executable' >&2
+    exit 1
+  fi
+  if (( SECONDS >= capture_readiness_deadline )); then
+    echo 'capture verifier did not sample the fixture executable within 30 seconds' >&2
+    exit 1
+  fi
+  sleep 0.2
+done
 stop_fixture
 wait "$capture_verifier_pid"
+capture_verifier_pid=""
 grep -Fq 'capture_mapped_code_until_exit=true' \
-  "$EVIDENCE/distribution-launch-verdict.txt"
+  "$capture_evidence/distribution-launch-verdict.txt"
 
 start_fixture
 expect_failure \

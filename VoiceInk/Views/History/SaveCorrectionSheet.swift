@@ -63,7 +63,11 @@ struct SaveCorrectionCaptureError: View {
 
 /// Explicit approval of one literal phrase from captured History text. Nothing persists until
 /// Approve, which the service revalidates against the current transcript and library.
+/// Present with `settingsSheet(item:width: SaveCorrectionSheet.width)`: the sheet's height then fits the
+/// presenting page, the Form scrolls, and the footer with Preview and Approve stays on screen.
 struct SaveCorrectionSheet: View {
+    static let width: CGFloat = 620
+
     let target: SaveCorrectionTarget
 
     @Environment(\.dismiss) private var dismiss
@@ -180,7 +184,6 @@ struct SaveCorrectionSheet: View {
             Divider()
             footer
         }
-        .frame(width: 620, height: 720)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("history.correction.sheet")
     }

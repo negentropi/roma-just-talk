@@ -1,5 +1,5 @@
 {
-  "authorship": "Actual Claude Opus5.5 authored all3productionUIpaths+Unreleasedbullet; rootauthoredworkflow. GPTorchestrator did not edit production UI.",
+  "authorship": "Actual ClaudeOpus5.5 authored prior3HistoryUI and responsiveSaveCorrectionSheet+2callers+Unreleased; root authoredworkflow. GPTorchestrator didnoteditproductionUI.",
   "passes": [
     {
       "pass": "author",
@@ -135,6 +135,69 @@
       },
       "raw_stream_sha256": "42d9ce292f3ab628db9bb3a28b7efb5485ce0f1598a2e357b1e953744bb8f5ba",
       "raw_stream_retained_local_only": "/tmp/rjt-history-copy-opus-finalize.jsonl"
+    },
+    {
+      "pass": "responsive-sheet-followup",
+      "actual_init": {
+        "model": "claude-opus-5-5",
+        "permissionMode": "acceptEdits",
+        "session_id": "f347fddf-8925-498e-ab10-38f3835ee6e6"
+      },
+      "requested_effort": "medium",
+      "explicit_CLI_flags": "--model claude-opus-5-5 --effort medium",
+      "edits": [],
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 47929,
+        "cache_read_input_tokens": 118101,
+        "output_tokens": 3847,
+        "output_tokens_details": {
+          "thinking_tokens": 1020
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 47929
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1390,
+            "cache_read_input_tokens": 46169,
+            "cache_creation_input_tokens": 1760,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 1760,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-opus-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 3847,
+          "cacheReadInputTokens": 118101,
+          "cacheCreationInputTokens": 47929,
+          "webSearchRequests": 0,
+          "costUSD": 0.34023719999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 1020,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "raw_stream_sha256": "989324e832d982be228ecd94ffe3eb6d2e9fdc8940672f15b91ccefbfbdc0ab3",
+      "raw_stream_retained_local_only": "/tmp/rjt-correction-sheet-opus.jsonl"
     }
   ],
   "scope": [
@@ -142,19 +205,26 @@
     "VoiceInk/Views/History/InlineHistoryView.swift",
     "VoiceInk/Views/History/TranscriptionDetailView.swift",
     "CHANGELOG.md",
-    ".github/workflows/voiceink-writing-actions-check.yml"
+    ".github/workflows/voiceink-writing-actions-check.yml",
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift"
   ],
   "frozen_sha256": {
     "VoiceInk/Views/History/HistoryProcessingViews.swift": "5d14f3f74d63e662a6befd9a0d5202a4241076df84ac6b4bc1401718811929b1",
-    "VoiceInk/Views/History/InlineHistoryView.swift": "6f2a9cb0ab945de004fb791cddab9e7ec952443d215e741d3dd40e03ca17bea4",
-    "VoiceInk/Views/History/TranscriptionDetailView.swift": "3b5b38ddf071072c7961806ac4cd8311a0f4ccd4010350c8ddace9913951107f",
-    "CHANGELOG.md": "a344c016de2dc833702b9591acdd0d852312a3f93af290803bd5afec1b9dd99f",
-    ".github/workflows/voiceink-writing-actions-check.yml": "184fed3f02e09b6abcb326fbccf3c70abf39d9073ef21f5d6d1f3b23eccbe1b0"
+    "VoiceInk/Views/History/InlineHistoryView.swift": "ea59ba30be0b9199969d7500dc4afa515a6d227b74277aa5b2a5be7bc784d77f",
+    "VoiceInk/Views/History/TranscriptionDetailView.swift": "396d0a9b9f6599f4aecc8268e43de544a7a052ab0e8c05993f95016f402fe9e6",
+    "CHANGELOG.md": "6742fb36021dc39999683dedbfa71646444e88cf93ddae910c47455ad616dfd9",
+    ".github/workflows/voiceink-writing-actions-check.yml": "184fed3f02e09b6abcb326fbccf3c70abf39d9073ef21f5d6d1f3b23eccbe1b0",
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift": "50e065718ba2bab5270a2b080389856d594b542ab7db4922f72f7a4b09e87c50"
   },
   "oracle700file_sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
   "known_red_run": 40619909088,
   "rawCopyFacts": "../polish-mac-40619909088/history-copy-audit.json",
   "record_identity": "Existing parent ForEach(recordUUID) and detail.id(recordUUID); local subtree identity variant+exact UTF8bytes, nothash/label.",
   "mechanism_limit": "Stale SwiftUIcanonicalStringdiff inferred from exactpreviousOriginalcopiedbytes, notobservedframeworkinternals.",
-  "runtime": "pending; nofixed/greengateclaim"
+  "runtime": "Prior5ebb Copy9observed exact; responsivecandidatebuild/runtimepending; nofullgateacceptance",
+  "sol_loop_rounds": 2,
+  "sol_loop_current_verdict": "APPROVE",
+  "responsive_known_red_run": 40626673160,
+  "responsive_known_red_source": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e",
+  "responsive_failure": "Two648Preview.isHittable failures;620x720footeroffscreeninactual1024x768recordingframes;frozen700oracle"
 }

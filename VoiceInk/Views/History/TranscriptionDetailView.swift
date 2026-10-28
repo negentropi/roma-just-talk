@@ -58,7 +58,7 @@ struct TranscriptionDetailView: View {
         }
         .padding(.vertical, 12)
         .background(Color(NSColor.controlBackgroundColor))
-        .sheet(item: $correctionTarget) { target in
+        .settingsSheet(item: $correctionTarget, width: SaveCorrectionSheet.width) { target in
             SaveCorrectionSheet(target: target)
         }
     }

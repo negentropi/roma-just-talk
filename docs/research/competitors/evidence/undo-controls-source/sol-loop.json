@@ -125,7 +125,7 @@
     }
   ],
   "native_runtime_status": "pending; latest40631248324 passed unavailable state then recorder exact capture wait failed; zero cases or global Undo dispatch",
-  "status": "source-approved-native-still-pending",
+  "status": "approved-intended-behavior-compiler-annotation-native-pending",
   "rounds_used": 5,
   "open_blockers_or_shoulds": [],
   "fixed_findings": [
@@ -141,7 +141,7 @@
   "code_diff_shortstat_after_review": "6 files changed, 3095 insertions(+)",
   "code_diff_sha256_after_review": "24ae35cdfa3a53ea0d564f590b21210dd245ca8fc0d7a6ef6ee7ee56b22ec597",
   "scoped_files_frozen_through_terminal_verdict": true,
-  "post_review_changes": "Verdict/ledger/authorship metadata only after round5; no behavior changes.",
+  "post_review_changes": "After round5 metadata: one actualOpus compiler-only closure type annotation; exact body/all other bytes preserved and full inverse restores reviewed source. No sixth review or budget reset; proof compiler-annotation.json. Current exact source hash differs, intended behavior unchanged.",
   "runtime_findings": [
     {
       "id": "RUNTIME1",
@@ -187,5 +187,15 @@
     "evidence": "../undo-controls-40629369072/failure-diagnosis.json"
   },
   "code_diff_shortstat_after_round4": "6 files changed, 4085 insertions(+)",
-  "code_diff_shortstat_after_round5": "6 files changed, 4609 insertions(+)"
+  "code_diff_shortstat_after_round5": "6 files changed, 4609 insertions(+)",
+  "post_review_compiler_annotation": {
+    "source": "scripts/fixtures/WritingUndoControlOracle.swift",
+    "reviewed_sha256": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
+    "current_sha256": "c5156d4f60fa0766727a575ad343d453edd4e44c95fe1873e0a4479b248b8f14",
+    "proof": "compiler-annotation.json",
+    "whole_file_inverse_identical": true,
+    "closure_body_identical": true,
+    "native_runtime_status": "No035host launched; new full CI build/runtime pending.",
+    "skill_basis": "Section4: no new behavior diff or unreviewed behavior; explicit closure types qualify existing intended result type only."
+  }
 }

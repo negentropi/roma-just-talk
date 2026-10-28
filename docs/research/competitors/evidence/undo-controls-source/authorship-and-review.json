@@ -1,6 +1,6 @@
 {
   "classification": "source-authorship-and-review-only",
-  "implementation_status": "Sol-loop rounds1\u20135 approved the isolated QA source with no final findings; budget5/5 used, no reset. Latest actual994run passed unavailable state then failed recorder capture; zero Undo cases. Named local/global input and default global AX policy source now approved, native acceptance pending.",
+  "implementation_status": "Round5 intended behavior remains source-approved; compiler-only post-review annotation proven by whole-file inverse/body equivalence. Actual035candidate failed before native build; new complete CI build/runtime pending. Budget5/5 unchanged.",
   "author_cli": {
     "binary": "claude",
     "version": "2.1.310",
@@ -216,6 +216,22 @@
         "duration_ms": 20599,
         "total_cost_usd": 0.049176
       }
+    },
+    {
+      "invocation": "compiler-only-explicit-event-map-closure-types",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "effort": "medium",
+      "raw_jsonl_sha256": "b4365bdc348b319ae692becb3ef963e513158dfc0ffaec7a58fdc4e956b70a00",
+      "prompt_sha256": "36156cebd14ee44181f27741b435b989bbe44b1f74b09fd519bf87431df3a07e",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 16261,
+        "total_cost_usd": 0.0515404
+      }
     }
   ],
   "authorship_scope": {
@@ -237,7 +253,7 @@
   },
   "source_sha256": {
     "scripts/fixtures/WritingUndoControlHost.swift": "45d526310f73ed769f4425198846f786b32bc73cec51b356bee83237c6544d1b",
-    "scripts/fixtures/WritingUndoControlOracle.swift": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
+    "scripts/fixtures/WritingUndoControlOracle.swift": "c5156d4f60fa0766727a575ad343d453edd4e44c95fe1873e0a4479b248b8f14",
     "scripts/run-writing-undo-controls-check.sh": "886e1d8a3b2d974c111fc8fa71b3b2daae13f51d0246e2e60c8efd16e660e454",
     "scripts/verify-writing-undo-controls.py": "20f17317ec04ca40d6327594b11b9583b1364d5be89caa81682b8615b89de909",
     ".github/workflows/voiceink-writing-undo-controls-check.yml": "fa8adb2cbfd47b14b7f2f3a10a827b25922f910f0b1396d342da1473fad783bd"
@@ -308,7 +324,7 @@
     "Source authoring and pure classifier/syntax checks only; remote runtime and visual acceptance pending. Parent owns CI transport.",
     "Plain-text guarded inverse only; no restart, generic Cmd-Z, rich-format or general editor compatibility claim."
   ],
-  "total_author_cost_usd": 8.146062,
+  "total_author_cost_usd": 8.1976024,
   "raw_log_policy": "Only model, status, timing, cost and hashes retained; raw JSONL stays outside the repository.",
   "compiler_response_path_correction": {
     "failed_run_id": 40605378801,
@@ -615,5 +631,16 @@
     "fix": "Actual Opus removed all three, without replacement/reset/temporary global setting. Two remaining Oracle setters are on host-owned descendant nodes; VoiceInk production source contains no timeout setters. Shared native editor helper remains unchanged and uses object-specific budgets.",
     "historical_limit": "Earlier isolated controls observations were under the earlier QA timeout policy; no native Undo case succeeded or was accepted.",
     "review_status": "Same actualSol round5 APPROVE; SDK1 resolved-source. Actual default-policy native execution remains pending."
+  },
+  "compiler_only_post_review_annotation": {
+    "actual_failed_run_id": 40634301546,
+    "failed_head": "0355254815f8fbcf627fe48e7d65987ab36ea32b",
+    "evidence": "../undo-controls-40634301546/failure-diagnosis.json",
+    "proof": "compiler-annotation.json",
+    "reviewed_oracle_sha256": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
+    "current_oracle_sha256": "c5156d4f60fa0766727a575ad343d453edd4e44c95fe1873e0a4479b248b8f14",
+    "mechanical_equivalence": "Only explicit closure parameter/return types; all closure-body bytes and every other Oracle byte unchanged. Inverse substitution restores full round5 source hash.",
+    "checks": "NEW-only uncalled SDK expression typecheck passed; no event construction/posting or app. Full candidate CI build/runtime still pending; not semantic regression proof.",
+    "review_disposition": "Existing round5 covers unchanged intended behavior; no sixth review and no budget reset. Current whole-file hash was not separately reviewed as exact source."
   }
 }

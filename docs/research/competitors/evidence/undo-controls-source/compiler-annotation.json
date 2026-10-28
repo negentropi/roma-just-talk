@@ -1,0 +1,26 @@
+{
+  "classification": "compiler-annotation-only; native pending",
+  "before_head": "0355254815f8fbcf627fe48e7d65987ab36ea32b",
+  "before_oracle_sha256": "76c00b4682a714eadd2af371dad0ccfb732d2da7c43901ebc4f47474ce18c9b4",
+  "after_oracle_sha256": "c5156d4f60fa0766727a575ad343d453edd4e44c95fe1873e0a4479b248b8f14",
+  "inverse_single_line_substitution_recovers_entire_reviewed_source": true,
+  "changed_old_line": "let events: [[String: Any]] = [down, up].map { event in",
+  "changed_new_line": "let events: [[String: Any]] = [down, up].map { (event: CGEvent) -> [String: Any] in",
+  "closure_body_bytes_identical": true,
+  "closure_body_sha256": "f8fbf91f7d8c0ab932a6cc458fefb5ae6f061eaeff1565866d9a24dc1820b3ad",
+  "sdk_expression_typecheck": {
+    "exit_code": 0,
+    "duration_seconds_observed": 0.76932,
+    "sdk_version": "26.0",
+    "compiler_version": "Apple Swift version 6.2 (swiftlang-6.2.0.16.14 clang-1700.3.16.4)\nTarget: arm64-apple-macosx26.0",
+    "probe_source_sha256": "e351e9b2a6ef68612fe6ed48db2128f9608753f62cb4ee43b96f77ffc290f831",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_scope": "NEW annotated map copied byte-exact from Oracle into an uncalled function taking CGEvent parameters; no event construction/posting/app execution.",
+    "limit": "Tiny SDK typecheck only, not CI app build; actual old CI65 red, next complete candidate build/runtime still required.",
+    "toolchain_limit": "Local SDK26.0 / Swift6.2; CI toolchain/app build not reproduced by this tiny expression check. Next exact-head full CI build required."
+  },
+  "git_patch": "diff --git a/scripts/fixtures/WritingUndoControlOracle.swift b/scripts/fixtures/WritingUndoControlOracle.swift\nindex 05a868221..f8978470d 100644\n--- a/scripts/fixtures/WritingUndoControlOracle.swift\n+++ b/scripts/fixtures/WritingUndoControlOracle.swift\n@@ -221,7 +221,7 @@ enum WritingUndoControlOracle {\n             }\n             down.flags = flags\n             up.flags = flags\n-            let events: [[String: Any]] = [down, up].map { event in\n+            let events: [[String: Any]] = [down, up].map { (event: CGEvent) -> [String: Any] in\n                 [\"type\": event.type == .keyDown ? \"keyDown\" : event.type == .keyUp ? \"keyUp\" : \"unexpected-\\(event.type.rawValue)\",\n                  \"keyCode\": Int(event.getIntegerValueField(.keyboardEventKeycode)),\n                  \"flagsRawValue\": event.flags.rawValue]\n",
+  "git_patch_sha256": "b847a30dfcc7684e8f3b41393fc05926f2476015867093b5f9b35ed571449633",
+  "review_scope": "Actual Sol round5 approved the intended current behavior. One explicit CGEvent parameter / [String:Any] return type annotation only; whole-file inverse substitution restores exact reviewed Oracle. No sixth review, no budget reset, no exact-new-source review claim."
+}

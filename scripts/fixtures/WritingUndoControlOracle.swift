@@ -221,7 +221,7 @@ enum WritingUndoControlOracle {
             }
             down.flags = flags
             up.flags = flags
-            let events: [[String: Any]] = [down, up].map { event in
+            let events: [[String: Any]] = [down, up].map { (event: CGEvent) -> [String: Any] in
                 ["type": event.type == .keyDown ? "keyDown" : event.type == .keyUp ? "keyUp" : "unexpected-\(event.type.rawValue)",
                  "keyCode": Int(event.getIntegerValueField(.keyboardEventKeycode)),
                  "flagsRawValue": event.flags.rawValue]

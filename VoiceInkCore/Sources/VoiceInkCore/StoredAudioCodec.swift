@@ -278,7 +278,10 @@ public enum VoiceInkStoredAudioCompression {
         save: () throws -> Void,
         fileManager: FileManager = .default
     ) async throws -> URL? {
-        guard let storedValue = record.audioFileURL,
+        // A deleted SwiftData record traps on property access, and immediate-delete
+        // cleanup can remove it before this runs, so check liveness first.
+        guard isLive(record),
+              let storedValue = record.audioFileURL,
               let wavURL = record.existingAudioFileURL(fileManager: fileManager),
               VoiceInkStoredAudioCodec.isWAV(wavURL) else {
             return nil

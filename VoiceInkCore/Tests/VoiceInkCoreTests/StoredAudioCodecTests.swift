@@ -11,7 +11,36 @@ final class StoredAudioCodecTests: XCTestCase {
         }
     }
 
+    /// Mirrors a deleted SwiftData model, which traps when its properties are read.
+    private final class DeletedRecordFixture: VoiceInkStoredAudioRecord {
+        private(set) var propertyReads = 0
+
+        var audioFileURL: String? {
+            get {
+                propertyReads += 1
+                return "file:///tmp/deleted.wav"
+            }
+            set {
+                propertyReads += 1
+            }
+        }
+    }
+
     private struct SaveFailure: Error {}
+
+    @MainActor
+    func testRecordDeletedBeforeCompressionStartsIsNeverRead() async throws {
+        let record = DeletedRecordFixture()
+
+        let result = try await VoiceInkStoredAudioCompression.compressStoredWAV(
+            of: record,
+            isLive: { _ in false },
+            save: { XCTFail("deleted record is not saved") }
+        )
+
+        XCTAssertNil(result)
+        XCTAssertEqual(record.propertyReads, 0, "deleted record's properties are not read")
+    }
 
     @MainActor
     func testStoredWAVBecomesSmallOpusThatPlaysBackAtTheSameDuration() async throws {

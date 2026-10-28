@@ -4,6 +4,8 @@
 
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
 
+- Store new recordings as Opus instead of WAV, about 10x smaller on disk; playback, Retranscribe, and Retry keep working, and existing WAV recordings are unchanged.
+
 ## v1.95.1 - 2026-09-11
 
 - Explain rejected NVIDIA API keys, missing access, and connection failures instead of showing an internal gRPC error.

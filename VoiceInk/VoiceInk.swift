@@ -190,6 +190,7 @@ struct VoiceInkApp: App {
 
         AppShortcuts.updateAppShortcutParameters()
 
+        StoredAudioCompressionService.shared.startMonitoring()
         let migrationTask = SessionMetricMigrationService.shared.runIfNeeded(modelContainer: resolvedContainer)
         let mainContext = resolvedContainer.mainContext
         Task {

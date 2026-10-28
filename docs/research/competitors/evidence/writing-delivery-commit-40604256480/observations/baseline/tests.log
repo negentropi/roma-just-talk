@@ -1,0 +1,170 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -xctestrun /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/isolated.xctestrun -destination platform=macOS -parallel-testing-enabled NO "-only-testing:VoiceInkTests/VoiceInkTests/WritingActionDeliveryCommitTests/cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()" "-only-testing:VoiceInkTests/VoiceInkTests/WritingActionDeliveryCommitTests/cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()" "-only-testing:VoiceInkTests/VoiceInkTests/DictationPolishAudioFileTests/importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow()" -resultBundlePath /Users/runner/work/_temp/writing-delivery-commit-proof/baseline/Native.xcresult
+
+2026-10-27 23:55:45.429 xcodebuild[27167:82671] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+Writing result bundle at path:
+	/Users/runner/work/_temp/writing-delivery-commit-proof/baseline/Native.xcresult
+
+2026-10-27 23:55:45.433 xcodebuild[27167:82671] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64e, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:arm64, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:x86_64, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Mac Catalyst, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:DriverKit, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Designed for [iPad,iPhone], id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:89be32f3ec9c3168cb2a080c0ce7306f354fdf99, name:My Mac }
+2026-10-27 23:55:46.972 xcodebuild[27167:82671] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 23:55:50.773 xcodebuild[27167:82671] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-27 23:55:53.958651+0000 roma just talk[27431:83415] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x8035fa560> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-27 23:55:54.099651+0000 roma just talk[27431:83415] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:55:54.101017+0000 roma just talk[27431:83415] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-27 23:55:54.101230+0000 roma just talk[27431:83415] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-27 23:55:54.102658+0000 roma just talk[27431:83415] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-27 23:55:54.102713+0000 roma just talk[27431:83415] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-27 23:55:54.112930+0000 roma just talk[27431:83465] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-27 23:55:54.125194+0000 roma just talk[27431:83445] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.130908+0000 roma just talk[27431:83445] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.131229+0000 roma just talk[27431:83465] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.131264+0000 roma just talk[27431:83465] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.133375+0000 roma just talk[27431:83444] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.133409+0000 roma just talk[27431:83444] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.135216+0000 roma just talk[27431:83444] [Connection] Will NOT re-try to establish the connection
+2026-10-27 23:55:54.135448+0000 roma just talk[27431:83465] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.135493+0000 roma just talk[27431:83465] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-27 23:55:54.899319+0000 roma just talk[27431:83415] [RecorderUIManager] Resetting recording state on launch
+2026-10-27 23:55:54.900387+0000 roma just talk[27431:83415] [Recorder] stopRecording called
+2026-10-27 23:55:54.901221+0000 roma just talk[27431:83415] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-27 23:55:54.901276+0000 roma just talk[27431:83415] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-27 23:55:54.901493+0000 roma just talk[27431:83415] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-27 23:55:55.646939+0000 roma just talk[27431:83415] [ContentView] ContentView appeared
+2026-10-27 23:55:55.682399+0000 roma just talk[27431:83415] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-27 23:55:55.683151+0000 roma just talk[27431:83415] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-27 23:55:55.683211+0000 roma just talk[27431:83415] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-27 23:55:56.011192+0000 roma just talk[27431:83415] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-27 23:55:56.043512+0000 roma just talk[27431:83415] [ShortcutMonitor] installEventTap: installed
+2026-10-27 23:55:56.043719+0000 roma just talk[27431:83415] [WindowManager] configureWindow: registering main window
+2026-10-27 23:55:56.231939+0000 roma just talk[27431:83415] [VoiceInkEngine] cleanupResources: completed
+2026-10-27 23:55:56.234120+0000 roma just talk[27431:83464] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 23:55:56.234188+0000 roma just talk[27431:83464] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 81
+2026-10-27 23:55:56.234517+0000 roma just talk[27431:83464] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice
+2026-10-27 23:55:56.234530+0000 roma just talk[27431:83464] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-27 23:55:56.234637+0000 roma just talk[27431:83464] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-27 23:55:56.275727+0000 roma just talk[27431:83464] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-27 23:55:56.275756+0000 roma just talk[27431:83464] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-27 23:55:56.291568+0000 roma just talk[27431:83464] [carc] Reporter disconnected. { function=sendMessage, reporterID=117815247896577 }
+2026-10-27 23:55:56.302820+0000 roma just talk[27431:83464] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-27 23:55:56.302875+0000 roma just talk[27431:83464] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-27 23:55:56.302886+0000 roma just talk[27431:83464] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-27 23:55:56.363670+0000 roma just talk[27431:83415] [Recorder] startPreRollBuffering: active on deviceID=81
+Test Suite 'Selected tests' started at 2026-10-27 23:55:56.421.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-27 23:55:56.422.
+Test Suite 'VoiceInkTests.xctest' passed at 2026-10-27 23:55:56.423.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'Selected tests' passed at 2026-10-27 23:55:56.423.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VoiceInkTests started.
+◇ Suite DictationPolishAudioFileTests started.
+◇ Test importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() started.
+SwiftData.DefaultStore save failed with error: Error Domain=NSCocoaErrorDomain Code=513 "The file couldn’t be saved because you don’t have permission." UserInfo={NSPersistentStoreOptions={
+    NSInferMappingModelAutomaticallyOption = 1;
+    NSMigratePersistentStoresAutomaticallyOption = 1;
+    NSPersistentHistoryTrackingKey = 1;
+    NSPersistentStoreRemoteChangeNotificationOptionKey = 1;
+    NSReadOnlyPersistentStoreOption = 1;
+}, reason=Unable to write to file opened Read Only., storeURL=/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Polish-Audio-7AEC050F-016D-42FF-B1B0-4100E3AB68F2/read-only.store}
+2026-10-27 23:55:56.609795+0000 roma just talk[27431:83415] [AudioTranscriptionManager] Transcription error: The file couldn’t be saved because you don’t have permission.
+✘ Test importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() recorded an issue at DictationPolishAudioFileTests.swift:278:17: Expectation failed: (firstVisibleRows → [VoiceInk.Transcription]).isEmpty → false
+2026-10-27 23:55:56.909585+0000 roma just talk[27431:83415] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 23:55:56.909613+0000 roma just talk[27431:83415] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-27 23:55:56.909585+0000 roma just talk[27431:83646] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Polish-Audio-7AEC050F-016D-42FF-B1B0-4100E3AB68F2/read-only.store-wal
+2026-10-27 23:55:56.909629+0000 roma just talk[27431:83646] [logging] invalidated open fd: 20 (0x11)
+2026-10-27 23:55:56.909648+0000 roma just talk[27431:83646] [logging] BUG IN CLIENT OF libsqlite3.dyl✘ Test importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() failed after 0.464 seconds with 1 issue.
+ib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Polish-Audio-7AEC050F-016D-42FF-B1B0-4100E3AB68F2/read-only.store-shm
+2026-10-27 23:55:56.911045+0000 roma just talk[27431:83646] [logging] invalidated open fd: 21 (0x11)
+2026-10-27 23:55:56.910025+0000 roma just talk[27431:83466] [logging] BUG IN CLIENT OF libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use: /private/var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Polish-Audio-7AEC050F-016D-42FF-B1B0-4100E3AB68F2/read-only.store
+2026-10-27 23:55:56.911090+0000 roma just talk[27431:83466] [logging] invalidated open fd: 19 (0x11)
+✘ Suite DictationPolishAudioFileTests failed after 0.465 seconds with 1 issue.
+◇ Suite WritingActionDeliveryCommitTests started.
+◇ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() started.
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:18:13: Expectation failed: (record.transcriptionState → .canceled) == .completed
+↳ Confirmed external delivery must not become a canceled recording.
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:19:13: Expectation failed: (record.text → "The transcription was canceled.") == (fixture.instruction → "Rewrite the selected phrase without changing its identifier.")
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:20:13: Expectation failed: (record.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) → nil) == true
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:21:13: Expectation failed: (record.aiEnhancementModelName → nil) == "owned-writing-model"
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:22:13: Expectation failed: (record.aiRequestSystemMessage → nil) == "owned system request"
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:23:13: Expectation failed: (record.aiRequestUserMessage → nil) == "owned user request"
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:24:13: Expectation failed: (fixture.cancellations → 1) == 0
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:26:13: Expectation failed: (saved.transcriptionState → .canceled) == .completed
+2026-10-27 23:55:56.960468+0000 roma just talk[27431:83464] [AQ]        LoudnessManager.mm:1261  GetHardwarePlatformKey: cannot get acoustic ID
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:27:13: Expectation failed: (saved.text → "The transcription was canceled.") == (fixture.instruction → "Rewrite the selected phrase without changing its identifier.")
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:28:13: Expectation failed: (saved.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) → nil) == true
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:29:13: Expectation failed: (saved.aiRequestSystemMessage → nil) == "owned system request"
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:30:13: Expectation failed: (saved.aiRequestUserMessage → nil) == "owned user request"
+✘ Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() failed after 0.063 seconds with 12 issues.
+◇ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() started.
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:41:13: Expectation failed: (record.transcriptionState → .canceled) == .failed
+↳ An attempted unconfirmed edit retains a recoverable failed result.
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:42:13: Expectation failed: (record.text → "The transcription was canceled.") == (fixture.instruction → "Rewrite the selected phrase without changing its identifier.")
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:43:13: Expectation failed: (record.enhancedText?.utf8.elementsEqual(fixture.enhancement.output.utf8) → nil) == true
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:44:13: Expectation failed: (record.aiEnhancementModelName → nil) == "owned-writing-model"
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:45:13: Expectation failed: (record.aiRequestSystemMessage → nil) == "owned system request"
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:46:13: Expectation failed: (record.aiRequestUserMessage → nil) == "owned user request"
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:47:13: Expectation failed: (fixture.cancellations → 1) == 0
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:49:13: Expectation failed: (saved.transcriptionState → .canceled) == .failed
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:50:13: Expectation failed: (saved.text → "The transcription was canceled.") == (fixture.instruction → "Rewrite the selected phrase without changing its identifier.")
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:51:13: Expectation failed: (saved.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) → nil) == true
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:52:13: Expectation failed: (saved.aiRequestSystemMessage → nil) == "owned system request"
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:53:13: Expectation failed: (saved.aiRequestUserMessage → nil) == "owned user request"
+2026-10-27 23:55:57.075833+0000 roma just talk[27431:83415] [Sparkle] The app has an EdDSA public key, but there is no EdDSA signature in the appcast, so the appcast will be rejected.
+✘ Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() failed after 0.100 seconds with 12 issues.
+2026-10-27 23:55:57.079429+0000 roma just talk[27431:83415] [Sparkle] Error: The update feed is improperly signed and could not be validated. Please try again later or contact the app developer. (null) (URL (null))
+2026-10-27 23:55:57.082653+0000 roma just talk[27431:83415] [Sparkle] Error: The app has an EdDSA public key, but there is no EdDSA signature in the appcast, so the appcast will be rejected. (null) (URL (null))
+✘ Suite WritingActionDeliveryCommitTests failed after 0.171 seconds with 24 issues.
+✘ Suite VoiceInkTests failed after 0.638 seconds with 25 issues.
+✘ Test run with 3 tests in 3 suites failed after 0.638 seconds with 25 issues.
+2026-10-27 23:55:57.127170+0000 roma just talk[27431:83466] [tcp] tcp_input [C1.1.1.1:3] flags=[R] seq=3568226302, ack=0, win=0 state=CLOSED rcv_nxt=3568226302, snd_una=1834740641
+2026-10-27 23:55:57.132854+0000 roma just talk[27431:83466] [tcp] tcp_input [C1.1.1.1:3] flags=[R] seq=3568226302, ack=0, win=0 state=CLOSED rcv_nxt=3568226302, snd_una=1834740641
+2026-10-27 23:56:03.228 xcodebuild[27167:82671] [MT] IDETestOperationsObserverDebug: 16.160 elapsed -- Testing started completed.
+2026-10-27 23:56:03.230 xcodebuild[27167:82671] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-27 23:56:03.230 xcodebuild[27167:82671] [MT] IDETestOperationsObserverDebug: 16.160 sec, +16.160 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/writing-delivery-commit-proof/baseline/Native.xcresult
+
+Failing tests:
+	DictationPolishAudioFileTests.importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+	WritingActionDeliveryCommitTests.cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata()
+
+** TEST EXECUTE FAILED **
+
+Testing started

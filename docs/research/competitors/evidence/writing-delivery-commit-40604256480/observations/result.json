@@ -1,0 +1,105 @@
+{
+  "classification": "matched-baseline-valid",
+  "contract_sha256": "e43dc51d182dafadf4a0c7e3e00a4338108cb9f79bccc07a7b6fd9f09b3a604e",
+  "cross_run_match_required": "Compare exact common oracle, initializer bridge, original baseline runtime, toolchain, canonical package checkout/tree and static Whisper receipts before claiming matched red/green across these lane runs.",
+  "lane": "baseline",
+  "oracle_sha256": {
+    "VoiceInkTests/DictationPolishAudioFileTests.swift": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9",
+    "VoiceInkTests/WritingActionDeliveryCommitTests.swift": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506"
+  },
+  "result": {
+    "classification": "intended-post-delivery-and-first-query-failures",
+    "errors": [],
+    "exit_code": 65,
+    "failure_sites": [
+      "DictationPolishAudioFileTests.swift:278",
+      "WritingActionDeliveryCommitTests.swift:18",
+      "WritingActionDeliveryCommitTests.swift:19",
+      "WritingActionDeliveryCommitTests.swift:20",
+      "WritingActionDeliveryCommitTests.swift:21",
+      "WritingActionDeliveryCommitTests.swift:22",
+      "WritingActionDeliveryCommitTests.swift:23",
+      "WritingActionDeliveryCommitTests.swift:24",
+      "WritingActionDeliveryCommitTests.swift:26",
+      "WritingActionDeliveryCommitTests.swift:27",
+      "WritingActionDeliveryCommitTests.swift:28",
+      "WritingActionDeliveryCommitTests.swift:29",
+      "WritingActionDeliveryCommitTests.swift:30",
+      "WritingActionDeliveryCommitTests.swift:41",
+      "WritingActionDeliveryCommitTests.swift:42",
+      "WritingActionDeliveryCommitTests.swift:43",
+      "WritingActionDeliveryCommitTests.swift:44",
+      "WritingActionDeliveryCommitTests.swift:45",
+      "WritingActionDeliveryCommitTests.swift:46",
+      "WritingActionDeliveryCommitTests.swift:47",
+      "WritingActionDeliveryCommitTests.swift:49",
+      "WritingActionDeliveryCommitTests.swift:50",
+      "WritingActionDeliveryCommitTests.swift:51",
+      "WritingActionDeliveryCommitTests.swift:52",
+      "WritingActionDeliveryCommitTests.swift:53"
+    ],
+    "issues": [
+      "\u2718 Test importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow() recorded an issue at DictationPolishAudioFileTests.swift:278:17: Expectation failed: (firstVisibleRows \u2192 [VoiceInk.Transcription]).isEmpty \u2192 false",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:18:13: Expectation failed: (record.transcriptionState \u2192 .canceled) == .completed",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:19:13: Expectation failed: (record.text \u2192 \"The transcription was canceled.\") == (fixture.instruction \u2192 \"Rewrite the selected phrase without changing its identifier.\")",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:20:13: Expectation failed: (record.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) \u2192 nil) == true",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:21:13: Expectation failed: (record.aiEnhancementModelName \u2192 nil) == \"owned-writing-model\"",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:22:13: Expectation failed: (record.aiRequestSystemMessage \u2192 nil) == \"owned system request\"",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:23:13: Expectation failed: (record.aiRequestUserMessage \u2192 nil) == \"owned user request\"",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:24:13: Expectation failed: (fixture.cancellations \u2192 1) == 0",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:26:13: Expectation failed: (saved.transcriptionState \u2192 .canceled) == .completed",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:27:13: Expectation failed: (saved.text \u2192 \"The transcription was canceled.\") == (fixture.instruction \u2192 \"Rewrite the selected phrase without changing its identifier.\")",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:28:13: Expectation failed: (saved.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) \u2192 nil) == true",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:29:13: Expectation failed: (saved.aiRequestSystemMessage \u2192 nil) == \"owned system request\"",
+      "\u2718 Test cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:30:13: Expectation failed: (saved.aiRequestUserMessage \u2192 nil) == \"owned user request\"",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:41:13: Expectation failed: (record.transcriptionState \u2192 .canceled) == .failed",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:42:13: Expectation failed: (record.text \u2192 \"The transcription was canceled.\") == (fixture.instruction \u2192 \"Rewrite the selected phrase without changing its identifier.\")",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:43:13: Expectation failed: (record.enhancedText?.utf8.elementsEqual(fixture.enhancement.output.utf8) \u2192 nil) == true",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:44:13: Expectation failed: (record.aiEnhancementModelName \u2192 nil) == \"owned-writing-model\"",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:45:13: Expectation failed: (record.aiRequestSystemMessage \u2192 nil) == \"owned system request\"",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:46:13: Expectation failed: (record.aiRequestUserMessage \u2192 nil) == \"owned user request\"",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:47:13: Expectation failed: (fixture.cancellations \u2192 1) == 0",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:49:13: Expectation failed: (saved.transcriptionState \u2192 .canceled) == .failed",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:50:13: Expectation failed: (saved.text \u2192 \"The transcription was canceled.\") == (fixture.instruction \u2192 \"Rewrite the selected phrase without changing its identifier.\")",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:51:13: Expectation failed: (saved.enhancedText?.utf16.elementsEqual(fixture.enhancement.output.utf16) \u2192 nil) == true",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:52:13: Expectation failed: (saved.aiRequestSystemMessage \u2192 nil) == \"owned system request\"",
+      "\u2718 Test cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata() recorded an issue at WritingActionDeliveryCommitTests.swift:53:13: Expectation failed: (saved.aiRequestUserMessage \u2192 nil) == \"owned user request\""
+    ],
+    "lane": "baseline",
+    "summaries": [
+      [
+        "3",
+        "3",
+        "failed"
+      ]
+    ],
+    "tests": {
+      "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      },
+      "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow": {
+        "results": [
+          "failed"
+        ],
+        "starts": 1
+      }
+    },
+    "valid": true
+  },
+  "scope": "Actual app pipeline post-mutation metadata and importer first-caller-context fetch. Synthetic controlled fixtures; no physical input, Clipboard Undo, CloudKit or runtime review-UI proof.",
+  "source_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "tests": [
+    "cancellationAfterConfirmedWritingMutationKeepsGeneratedMetadata",
+    "cancellationAfterUnconfirmedWritingMutationKeepsRecoveryMetadata",
+    "importReadOnlyStoreSaveFailureDoesNotExposeAPendingRow"
+  ]
+}

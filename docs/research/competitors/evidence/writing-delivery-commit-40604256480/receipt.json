@@ -1,0 +1,76 @@
+{
+  "run_id": 40604256480,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40604256480",
+  "head_sha": "6394dc0fb777e77a5dc237b42a68455dba1fac99",
+  "classification": "valid-native-old-post-delivery-and-first-query-red",
+  "baseline_reference_sha": "c29ac2d7c6fa7690ea3bd0d5a38697b44a37d182",
+  "artifacts": {
+    "observations": {
+      "id": 12780193297,
+      "bytes": 672434,
+      "sha256": "502928cceb981fbb1a46bcea2ca2243be0b4e346b75d629af15b1a719ab001e2",
+      "crc_members": 49,
+      "download_count": 1
+    },
+    "native": {
+      "id": 12780343120,
+      "bytes": 51786750,
+      "sha256": "50929445d21f7ea1fa16ae30e3d973f172095b222276f7bceb9ecd56384f8734",
+      "crc_members": 1715,
+      "download_count": 1
+    }
+  },
+  "source_closure": {
+    "source_head_tracked_files_match_git": 4253,
+    "historical_original_tracked_files_match_git": 3241,
+    "historical_receiver_sources_preserved_except_initializer_bridge": true,
+    "test_instrumentation": {
+      "added_test": "VoiceInkTests/WritingActionDeliveryCommitTests.swift",
+      "production_bridge_only": "VoiceInk/Services/WritingActionSession.swift",
+      "replaced_tracked_test": "VoiceInkTests/DictationPolishAudioFileTests.swift"
+    },
+    "source_after_matches_before": true,
+    "common_oracle_sha256": {
+      "VoiceInkTests/DictationPolishAudioFileTests.swift": "365bc7f2b3b019ba2dd9284d8901b8b18fc4c82db1827cd7e134c109f95ab1e9",
+      "VoiceInkTests/WritingActionDeliveryCommitTests.swift": "43933722762e49b156387907dcf0631be35154745b14b8d0ac5393ed81e12506"
+    },
+    "natural_initializer_bridge_sha256": "1b6048e13f973dc7cc8aae5ab13ff90a586396c7e7bffdeadca9a162e4ae2bea",
+    "canonical_packages": 41,
+    "hidden_helper_bytes_not_in_observation_archive": [
+      ".github/workflows/voiceink-writing-delivery-commit-check.yml"
+    ],
+    "hidden_helper_hashes_equal_pinned_git_and_full_source_census": true
+  },
+  "actual_results": {
+    "native_started": 3,
+    "native_failed": 3,
+    "skipped": 0,
+    "issues": 25,
+    "exit_code": 65,
+    "post_mutation_metadata_issues": 24,
+    "first_caller_query_ghost_issue": 1,
+    "controlled_read_only_Cocoa513_diagnostics": 1,
+    "strict_fixture_provider_requirements_passed": true,
+    "other_positive_controls_passed": true,
+    "unchanged_full_app_and_test_bundle_identity": true,
+    "exact_nested_selection_verified": true,
+    "strict_adhoc_debug_signature_verified": true,
+    "fresh_signed_TCC_matches_csreq": true,
+    "isolated_xctestrun_bytes_verified": true,
+    "spaced_provider_absent_from_argv": true
+  },
+  "raw_log_identity": {
+    "build_bytes": 5433326,
+    "build_sha256": "baac5cfce8e16a2939f86937213083b6ad4620d8eef19535d3f5ca600411e2e5",
+    "tests_bytes": 23825,
+    "tests_sha256": "896ef15004b9255326171e9d9d5d3b63dff02a733de96e2b6e2a3972f2e4bc9a"
+  },
+  "candidate_tested": false,
+  "limits": [
+    "Controlled native app pipeline and SwiftData boundary only",
+    "Fake editor access and synthetic recognition/provider outputs; no physical/editor UI/ASR/model-quality proof",
+    "Old bugs reproduced; candidate fix and cross-run matched comparison remain required",
+    "No future Undo gesture, CloudKit synchronization, or general dictation-profile acceptance claim",
+    "Raw build/xcresult archive remains on remote /data; no failed-log fetch needed for this successful diagnostic run"
+  ]
+}

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Source-bound disposable Mac acceptance for unchanged Undo controls."""
+import ast
 import contextlib
 import copy
 import hashlib
@@ -12,6 +13,7 @@ import signal
 import subprocess
 import struct
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -196,8 +198,42 @@ def identity():
 
 def compile_inputs():
     expected = {str(p) for p in (candidate / 'VoiceInk').rglob('*.swift') if p.name != 'VoiceInk.swift'}
-    lists = sorted((derived / 'Build/Intermediates.noindex').rglob('VoiceInk.SwiftFileList'))
-    require(bool(lists), 'Actual Swift compiler input list unavailable')
+    raw_settings = (output / 'build-settings.json').read_bytes()
+    targets = [item['buildSettings'] for item in json.loads(raw_settings) if item.get('target') == 'VoiceInk']
+    require(len(targets) == 1, 'Exactly one actual VoiceInk compiler-settings target required')
+    settings = targets[0]
+    require(settings.get('TARGET_NAME') == settings.get('PRODUCT_MODULE_NAME') == 'VoiceInk'
+        and settings.get('PRODUCT_BUNDLE_IDENTIFIER') == bundle_id and settings.get('SRCROOT') == str(candidate)
+        and settings.get('PROJECT_FILE_PATH') == str(candidate / 'VoiceInk.xcodeproj'), 'Compiler settings belong to a different target/source tree')
+    def resolved_path(key):
+        value = settings.get(key)
+        require(isinstance(value, str) and value and '$' not in value and '\n' not in value,
+            'Missing/unresolved actual compiler path: ' + key)
+        path = Path(value)
+        require(path.is_absolute() and '..' not in path.parts and path.resolve() == path,
+            'Unsafe/noncanonical actual compiler path: ' + key)
+        return path
+    objroot = resolved_path('OBJROOT')
+    target_temp = resolved_path('TARGET_TEMP_DIR')
+    objects = resolved_path('OBJECT_FILE_DIR_normal')
+    require(objroot == derived / 'Build/Intermediates.noindex' and target_temp.is_relative_to(objroot)
+        and target_temp.name == 'VoiceInk.build' and target_temp.parent.name == 'Debug'
+        and objects == target_temp / 'Objects-normal', 'Compiler response namespace differs from the isolated app target')
+    require(isinstance(settings.get('ARCHS'), str), 'Actual compiler architectures missing')
+    architectures = settings['ARCHS'].split()
+    require(bool(architectures) and len(architectures) == len(set(architectures))
+        and all(re.fullmatch('[A-Za-z0-9_]+', arch) for arch in architectures), 'Missing/duplicate/unsafe actual compiler architectures')
+    require({key for key in settings if key.startswith('SWIFT_RESPONSE_FILE_PATH_normal_')}
+        == {'SWIFT_RESPONSE_FILE_PATH_normal_' + arch for arch in architectures}, 'Ambiguous architecture response-file settings')
+    lists, identities = [], set()
+    for arch in architectures:
+        path = resolved_path('SWIFT_RESPONSE_FILE_PATH_normal_' + arch)
+        require(path.parent == objects / arch and path.name.endswith('.SwiftFileList')
+            and path.is_file() and not path.is_symlink(), 'Actual response file is missing or outside its target/architecture namespace')
+        identity = (path.stat().st_dev, path.stat().st_ino)
+        require(path not in lists and identity not in identities, 'Duplicate/ambiguous actual compiler response files')
+        lists.append(path)
+        identities.add(identity)
     generated = {}
     for path in lists:
         entries = shlex.split(path.read_text())
@@ -208,6 +244,8 @@ def compile_inputs():
         require(len(entries) == len(set(entries)) and set(entries) - extra == expected,
             'Compiler inputs must contain every product Swift source plus fixtures, excluding only VoiceInk.swift')
     return {'excluded_source_files': ['VoiceInk.swift'], 'source_paths': sorted(str(Path(p).relative_to(candidate)) for p in expected),
+        'build_settings_sha256': digest(raw_settings),
+        'response_file_settings': {arch: str(path.relative_to(derived)) for arch, path in zip(architectures, lists)},
         'generated_asset_sources_sha256': generated,
         'swift_file_lists_sha256': {str(p.relative_to(derived)): digest(p.read_bytes()) for p in lists}}
 
@@ -569,6 +607,90 @@ def self_test():
         require(receipt_errors(invalid, '/fixture/app', 42), 'Malformed acceptance fixture incorrectly passed')
     print('Undo controls classifier passed: four exact cases and three states; ' + str(len(mutations))
         + ' malformed receipts rejected. No app, clipboard or native interaction executed.')
+    compiler_inputs_self_test()
+
+
+def compiler_inputs_self_test():
+    # The actual failed 40605378801 build resolved a product-named response file.
+    # Run the historical owning function against this same metadata/path fixture.
+    historical = git('show', '794fa2595f943ae501bbe3407a9dd1120c678f76:scripts/verify-writing-undo-controls.py').decode()
+    functions = [node for node in ast.parse(historical).body if isinstance(node, ast.FunctionDef) and node.name == 'compile_inputs']
+    require(len(functions) == 1, 'Known-bad compiler-input function missing/ambiguous')
+    old_namespace = dict(globals())
+    exec(compile(ast.Module(body=functions, type_ignores=[]), '<794fa259 compile_inputs>', 'exec'), old_namespace)
+    current_globals = globals()
+    saved = {key: current_globals[key] for key in ('candidate', 'derived', 'output')}
+    with tempfile.TemporaryDirectory(prefix='rjt-undo-compiler-inputs-') as directory:
+        fixture = Path(directory).resolve()
+        current_globals.update(output=fixture, candidate=fixture / 'candidate', derived=fixture / 'derived')
+        old_namespace.update(output=current_globals['output'], candidate=current_globals['candidate'], derived=current_globals['derived'])
+        try:
+            source_paths = ['VoiceInk.swift', 'Engine.swift', 'Views/AI Models/Editor.swift', 'WritingUndoControlHost.swift', 'WritingUndoControlOracle.swift']
+            for relative in source_paths:
+                path = candidate / 'VoiceInk' / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('// compiler-input fixture only\n')
+            target_temp = derived / 'Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build'
+            response = target_temp / 'Objects-normal/arm64/roma just talk.SwiftFileList'
+            response.parent.mkdir(parents=True)
+            generated = target_temp / 'DerivedSources/GeneratedAssetSymbols.swift'
+            generated.parent.mkdir()
+            generated.write_text('// Xcode asset symbol fixture only\n')
+            expected_entries = [str(candidate / 'VoiceInk' / path) for path in source_paths if path != 'VoiceInk.swift'] + [str(generated)]
+            original_list = '\n'.join(shlex.quote(path) for path in expected_entries) + '\n'
+            response.write_text(original_list)
+            settings = {'target': 'VoiceInk', 'buildSettings': {'TARGET_NAME': 'VoiceInk', 'PRODUCT_MODULE_NAME': 'VoiceInk',
+                'PRODUCT_NAME': 'roma just talk', 'PRODUCT_BUNDLE_IDENTIFIER': bundle_id, 'SRCROOT': str(candidate),
+                'PROJECT_FILE_PATH': str(candidate / 'VoiceInk.xcodeproj'), 'OBJROOT': str(derived / 'Build/Intermediates.noindex'),
+                'TARGET_TEMP_DIR': str(target_temp), 'OBJECT_FILE_DIR_normal': str(target_temp / 'Objects-normal'), 'ARCHS': 'arm64',
+                'SWIFT_RESPONSE_FILE_PATH_normal_arm64': str(response)}}
+            def write_settings(value):
+                (output / 'build-settings.json').write_text(json.dumps(value))
+            write_settings([settings])
+            try:
+                old_namespace['compile_inputs']()
+            except RuntimeError as error:
+                require(str(error) == 'Actual Swift compiler input list unavailable', 'Known-bad function failed outside the observed filename defect')
+                print('RED 794fa259 actual compile_inputs: Actual Swift compiler input list unavailable (product-named path with spaces).')
+            else:
+                raise RuntimeError('Known-bad compile_inputs accepted the observed failed-run fixture; regression invalid')
+            result = compile_inputs()
+            require(result['source_paths'] == sorted(str(Path(path).relative_to(candidate)) for path in expected_entries if path != str(generated))
+                and result['response_file_settings'] == {'arm64': str(response.relative_to(derived))}, 'Candidate did not validate exact actual response path/source inputs')
+            print('GREEN candidate compile_inputs: actual SWIFT_RESPONSE_FILE_PATH_normal_arm64 resolved; exact sources and sole main exclusion preserved.')
+            bad_settings = []
+            bad = copy.deepcopy(settings); bad['target'] = 'VoiceInkTests'; bad_settings.append([bad])
+            bad_settings.append([settings, settings])
+            bad = copy.deepcopy(settings); bad['buildSettings']['SWIFT_RESPONSE_FILE_PATH_normal_arm64'] = str(fixture / 'foreign.SwiftFileList'); bad_settings.append([bad])
+            bad = copy.deepcopy(settings); bad['buildSettings']['ARCHS'] = 'arm64 arm64'; bad_settings.append([bad])
+            bad = copy.deepcopy(settings); bad['buildSettings']['SWIFT_RESPONSE_FILE_PATH_normal_arm64'] = str(response.parent / '..' / 'arm64' / response.name); bad_settings.append([bad])
+            alias = target_temp / 'Objects-normal/x86_64' / response.name
+            alias.parent.mkdir()
+            os.link(response, alias)
+            bad = copy.deepcopy(settings); bad['buildSettings'].update(ARCHS='arm64 x86_64', SWIFT_RESPONSE_FILE_PATH_normal_x86_64=str(alias)); bad_settings.append([bad])
+            for value in bad_settings:
+                write_settings(value)
+                try:
+                    compile_inputs()
+                except RuntimeError:
+                    pass
+                else:
+                    raise RuntimeError('Invalid compiler target/response namespace accepted')
+            write_settings([settings])
+            bad_lists = [original_list + shlex.quote(expected_entries[0]) + '\n',
+                '\n'.join(shlex.quote(path) for path in expected_entries[1:]) + '\n',
+                original_list + shlex.quote(str(candidate / 'VoiceInk/VoiceInk.swift')) + '\n']
+            for value in bad_lists:
+                response.write_text(value)
+                try:
+                    compile_inputs()
+                except RuntimeError:
+                    pass
+                else:
+                    raise RuntimeError('Duplicate/missing/normal-main compiler source accepted')
+            print('Compiler input controls passed: wrong/duplicate target, unsafe/outside path, duplicate architecture/response inode, duplicate/missing source and normal-main inclusion rejected (9 controls). Metadata fixture only; no build/native execution.')
+        finally:
+            current_globals.update(saved)
 
 
 def interrupted(signum, _frame):

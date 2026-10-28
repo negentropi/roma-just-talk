@@ -51,6 +51,7 @@ jobs:
 
       - name: Check receipt rejection and signing classifiers
         run: |
+          git fetch --no-tags --depth=1 origin 794fa2595f943ae501bbe3407a9dd1120c678f76
           bash scripts/run-writing-undo-controls-check.sh self-test
           bash scripts/tests/verify-adhoc-macos-test-host.test.sh
 

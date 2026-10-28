@@ -1,0 +1,45 @@
+{
+  "run_id": 40605378801,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40605378801",
+  "head_sha": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "branch": "ci/rjt-writing-undo-controls-01a17bef-794fa259",
+  "github_conclusion": "failure",
+  "classification": "verification-path-failure-before-native-launch",
+  "build": {
+    "build_succeeded_markers": 1,
+    "app_response_path_exports": [
+      "export SWIFT_RESPONSE_FILE_PATH_normal_arm64\\=/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/roma\\ just\\ talk.SwiftFileList"
+    ],
+    "compile_error_count": 0
+  },
+  "prepared_source_matches_independent_git_objects": true,
+  "prepared_candidate_matches_independent_git_objects": true,
+  "source_input_files": 612,
+  "candidate_files": 605,
+  "expected_app_swift_sources": 221,
+  "actual_compiler_input_validation": "Not reached: verifier searched a module-named path rather than the resolved product-named response file.",
+  "actual_xcode_settings": {
+    "ARCHS": "arm64",
+    "CURRENT_ARCH": "undefined_arch",
+    "OBJECT_FILE_DIR_normal": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal",
+    "OBJROOT": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex",
+    "PRODUCT_MODULE_NAME": "VoiceInk",
+    "PRODUCT_NAME": "roma just talk",
+    "SWIFT_RESPONSE_FILE_PATH_normal_arm64": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/roma just talk.SwiftFileList",
+    "TARGET_TEMP_DIR": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build"
+  },
+  "failed_lookup": "rglob('VoiceInk.SwiftFileList')",
+  "failure_native": "Actual Swift compiler input list unavailable",
+  "native_completed_cases": 0,
+  "host_launched": false,
+  "signature_verified": false,
+  "tcc_provisioned": false,
+  "screenshots": 0,
+  "actual_sol_boundary_review": "gpt-6.1-sol independently verified retained success marker, zero compile errors, product/module filename mismatch and zero runtime evidence. No screenshot review possible.",
+  "proposed_correction": "Resolve the exact SWIFT_RESPONSE_FILE_PATH_normal_<arch> from the unique actual target build settings, preserve exact source-list validation and reject ambiguous/foreign paths.",
+  "limits": [
+    "App compilation succeeded; this does not establish native Undo control behavior.",
+    "No actual compiler-list, signed-host, fresh-TCC, menu/hotkey, editor restoration, focus or visual acceptance was completed.",
+    "The later five-string Pipeline copy delta is outside this pinned run."
+  ]
+}

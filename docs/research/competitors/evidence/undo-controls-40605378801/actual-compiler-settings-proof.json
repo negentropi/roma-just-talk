@@ -1,0 +1,27 @@
+{
+  "actual_settings": {
+    "ARCHS": "arm64",
+    "OBJECT_FILE_DIR_normal": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal",
+    "OBJROOT": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex",
+    "PRODUCT_BUNDLE_IDENTIFIER": "com.negentropi.RomaJustTalk",
+    "PRODUCT_MODULE_NAME": "VoiceInk",
+    "PROJECT_FILE_PATH": "/Users/runner/work/_temp/writing-undo-controls-proof/candidate/VoiceInk.xcodeproj",
+    "SRCROOT": "/Users/runner/work/_temp/writing-undo-controls-proof/candidate",
+    "SWIFT_RESPONSE_FILE_PATH_normal_arm64": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/roma just talk.SwiftFileList",
+    "TARGET_NAME": "VoiceInk",
+    "TARGET_TEMP_DIR": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build"
+  },
+  "all_required_keys_present": true,
+  "artifact_id": 12781971314,
+  "artifact_zip_sha256": "0c193fb1c91d51bb4ee4e180387d532be64d7b21cd1462b1a34f722cd4d6685a",
+  "matching_app_target_count": 1,
+  "namespace_readback_passed": true,
+  "raw_member": "build-settings.json",
+  "raw_member_sha256": "616089193d4b13aeacf2223a18b42a6ce0366b8823e398a93dd90cc57d56e839",
+  "response_setting_keys": [
+    "SWIFT_RESPONSE_FILE_PATH_normal_arm64"
+  ],
+  "run_id": 40605378801,
+  "source_kind": "Actual archived xcodebuild -showBuildSettings -json output, not compiler-log environment or invented self-test data",
+  "source_sha": "794fa2595f943ae501bbe3407a9dd1120c678f76"
+}

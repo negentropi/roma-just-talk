@@ -1,0 +1,114 @@
+{
+  "classification": "invalid-or-failed",
+  "details": {
+    "artifact-integrity": {
+      "logs": {
+        "artifact_id": 12781531655,
+        "crc_verified_independently": true,
+        "members": 5,
+        "zip_bytes": 236608,
+        "zip_sha256": "405345a7d940d591f42837df4ec11f928c41bfe2af7f22095c362062f879097c"
+      },
+      "observations": {
+        "artifact_id": 12781971314,
+        "crc_verified_independently": true,
+        "members": 19,
+        "zip_bytes": 105485,
+        "zip_sha256": "0c193fb1c91d51bb4ee4e180387d532be64d7b21cd1462b1a34f722cd4d6685a"
+      }
+    },
+    "dependencies": {
+      "canonical_pins": 41,
+      "git_trees_and_recursive_links_recorded": true,
+      "limit": "Tree/link hashes are retained runtime attestations; expected input supplies revisions, not an independent checkout.",
+      "static_whisper_files": 86
+    }
+  },
+  "diagnostics": {
+    "bounded_build_or_native_errors": [],
+    "failure_receipts": [
+      {
+        "member": "failure-native.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "Actual Swift compiler input list unavailable",
+          "mode": "native"
+        }
+      },
+      {
+        "member": "failure-verify.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "[Errno 2] No such file or directory: '/Users/runner/work/_temp/writing-undo-controls-proof/identity-before.json'",
+          "mode": "verify"
+        }
+      }
+    ],
+    "highest_observed_stage": "source-prepared",
+    "native_completed_flag": null,
+    "no_completed_cases_promoted_to_success": true,
+    "observed_completed_native_cases": 0,
+    "runtime_receipt_present": false
+  },
+  "errors": [
+    {
+      "reason": "Missing observation: source-after.json",
+      "stage": "source"
+    },
+    {
+      "reason": "Missing observation: compile-inputs.json",
+      "stage": "compile"
+    },
+    {
+      "reason": "Missing observation: identity-before.json",
+      "stage": "signature"
+    },
+    {
+      "reason": "Missing observation: tcc-before.json",
+      "stage": "fresh-tcc"
+    },
+    {
+      "reason": "Missing observation: host-live.json",
+      "stage": "host-lifecycle"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "native-controls"
+    },
+    {
+      "reason": "Missing observation: native/textedit-menu-forward.png",
+      "stage": "screenshots"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "result-bindings"
+    },
+    {
+      "reason": "GitHub workflow is not completed successfully on the exact head",
+      "stage": "workflow-run"
+    }
+  ],
+  "limits": [
+    "Offline source/compile/signature/TCC/runtime artifact audit only; no execution or network.",
+    "Signatures, actual compile lists and fresh TCC are retained runtime attestations bound by artifact hashes; absent original binary is not reverified here.",
+    "No shipping app composition/full pipeline/ASR/provider/physical-keyboard/rich-format proof.",
+    "Screenshot semantic review belongs to actual Sol; PNG integrity alone does not verify visual meaning."
+  ],
+  "run_id": 40605378801,
+  "schemaVersion": 1,
+  "source_sha": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "stages": {
+    "artifact-integrity": "passed",
+    "compile": "failed-or-missing",
+    "dependencies": "passed",
+    "fresh-tcc": "failed-or-missing",
+    "host-lifecycle": "failed-or-missing",
+    "native-controls": "failed-or-missing",
+    "result-bindings": "failed-or-missing",
+    "screenshots": "failed-or-missing",
+    "signature": "failed-or-missing",
+    "source": "failed-or-missing",
+    "workflow-run": "failed-or-missing"
+  },
+  "valid": false
+}

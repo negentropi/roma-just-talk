@@ -93,6 +93,34 @@
         "duration_ms": 62216,
         "total_cost_usd": 0.2224542
       }
+    },
+    {
+      "invocation": "new-delivery-and-History-notice-copy",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "658debb128ea609c909778d9b4c0b4494ee48dac15d61c7b2b2d930bfae2959e",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 69671,
+        "total_cost_usd": 0.27024840000000006
+      }
+    },
+    {
+      "invocation": "current-product-name-in-new-delivery-copy",
+      "requested_model": "claude-opus-5-5",
+      "reported_assistant_models": [
+        "claude-opus-5-5"
+      ],
+      "raw_jsonl_sha256": "708d63fbbe33a54dc51f0ce7754e5a698a1f6e54547bded72c7bfd6328b2d0ca",
+      "result": {
+        "subtype": "success",
+        "is_error": false,
+        "duration_ms": 27243,
+        "total_cost_usd": 0.08159939999999999
+      }
     }
   ],
   "core_label": {
@@ -110,7 +138,8 @@
     "source_scope": "Shared sole engine entry, nested controller observed, passive notice cannot become key/main, no activation/retarget path. Outcome semantics/utility wiring clean; baseline manager paste-controller arguments byte-preserved.",
     "native_limit": "No compilation, native focus/menu/hotkey/event/accessibility/visual proof.",
     "final_copy_delta": "Actual Sol verified previous exact helper hash; three strings only, explicit confirmed/plain-text scope and unchanged cursor/selection help plus busy message attributing nonreplacement only to Undo. Other six hashes unchanged; no state/IDs/layout/modifier changes.",
-    "supplemental_refusal_copy": "Actual Sol exact delta clean; known closed clipboard-error messages only, no arbitrary error display, no retry or clipboard-preservation promise. Native behavior still unproven."
+    "supplemental_refusal_copy": "Actual Sol exact delta clean; known closed clipboard-error messages only, no arbitrary error display, no retry or clipboard-preservation promise. Native behavior still unproven.",
+    "supplemental_pipeline_copy": "Actual Sol exact-hash five-string delta clean; current product name, delivery uncertainty and History-save semantics verified; LastTranscriptionService unchanged."
   },
   "native_runtime_verified": false,
   "limits": [
@@ -136,7 +165,7 @@
     "native_UI": "not run",
     "focus_code": "PassiveNoticePanel cannot become key/main, ignores mouse, uses orderFrontRegardless; no makeKey/activate/openMainWindow in Undo command/presentation path. Native focus behavior remains unproven."
   },
-  "total_author_cost_usd": 2.152581,
+  "total_author_cost_usd": 2.5044288000000003,
   "accessibility_contract": {
     "menu_command": "undoLastWritingEdit.menuCommand",
     "settings_row": "undoLastWritingEdit.settings.row",
@@ -155,5 +184,22 @@
     "scope": "Only refusalMessage: display fixed known clipboard enum copy for notAttempted; never arbitrary errors; cover busy or changed clipboard; callbacks, IDs and other bytes unchanged.",
     "related_enum_receipt": "../undo-controls-source/authorship-and-review.json"
   },
-  "source_hash_scope": "Authorship boundaries. Later independent backend integration edits may supersede the original non-View integration hashes; the supplemental helper copy boundary is recorded explicitly."
+  "source_hash_scope": "Authorship boundaries. Later independent backend integration edits may supersede the original non-View integration hashes; the supplemental helper copy boundary is recorded explicitly.",
+  "supplemental_pipeline_copy": {
+    "path": "VoiceInk/Transcription/Engine/TranscriptionPipeline.swift",
+    "before_sha256": "e90c955bc0e61f1b748b24389b654069058741838b4ae9411c91a69c58c48190",
+    "first_author_pass_sha256": "7d4c45678791943ca25f0166cc10d6e21763d6ce6b7f477ed8aac98ee892b718",
+    "after_sha256": "10c3e509b4b9d6d5bbaac73909ab99cb3a7288502000aa7e7e0bf28fb334c958",
+    "changed_string_tokens": 5,
+    "outside_string_tokens_identical": true,
+    "interpolation_prefixes_preserved": true,
+    "actual_reviewer": "gpt-6.1-sol",
+    "status": "clean",
+    "reviewed_at_head": "6880082a2aa95603a3efa59fff3d66712ebfeb72",
+    "scope": "Only five new Undo delivery/recovery/History-save notification text spans introduced between073f4c4 and794fa259. Ordinary/style copy, logs, branches and behavior unchanged. Final new copy uses Roma Just Talk; uncertain outcomes give checking advice without auto-retry or an unchanged guarantee; pending History retention does not promise a successful save.",
+    "inspected_unchanged_path": "VoiceInk/Services/LastTranscriptionService.swift",
+    "inspected_unchanged_sha256": "4053455f1a665e2920aa98a4379bd4ed4a345e876d2e848177ef3bf552cfdb0f",
+    "why_unchanged": "The073f-to794 LastTranscriptionService delta added controller integration but no new user-visible notification text.",
+    "runtime_limit": "Run40605378801 is pinned to794fa259 and does not test this later copy delta. No new runtime or rendering claim."
+  }
 }

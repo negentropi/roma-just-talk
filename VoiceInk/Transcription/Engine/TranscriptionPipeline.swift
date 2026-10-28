@@ -336,8 +336,8 @@ class TranscriptionPipeline {
                     }
                     transcription.transcriptionState = .failed
                     let advice = writingDeliveryWasAttempted
-                        ? "The editor action was not confirmed. Check the original field before retrying. The recording and generated text are retained for History."
-                        : "The recording and any generated text are retained for History."
+                        ? "Roma Just Talk couldn’t confirm whether the original field was changed. Check that field before making more changes. The recording and generated text are kept for History."
+                        : "The recording and any generated text are kept for History."
                     reportProcessingFailure("\(error.localizedDescription) \(advice)")
                 }
             } else if capturedProfile != .custom {
@@ -509,7 +509,7 @@ class TranscriptionPipeline {
 
             if writingDeliveryWasAttempted {
                 transcription.transcriptionState = writingDeliveryWasConfirmed ? .completed : .failed
-                reportProcessingFailure("\(errorDescription) The editor action will not be repeated; the generated text is retained for History.")
+                reportProcessingFailure("\(errorDescription) Roma Just Talk won’t try to change the original field again. Check that field before making more changes. The generated text is kept for History.")
             } else {
                 transcription.markAsFailedTranscription(reason: errorDescription)
             }
@@ -544,8 +544,8 @@ class TranscriptionPipeline {
                 logger.error("Failed to save transcription: \(error.localizedDescription, privacy: .public)")
                 if writingDeliveryWasAttempted {
                     let delivery = writingDeliveryWasConfirmed
-                        ? "The edit was delivered, but History couldn’t be saved."
-                        : "An editor action was attempted, but History couldn’t be saved. Check the original field before retrying."
+                        ? "The original field was updated, but History couldn’t be saved."
+                        : "Roma Just Talk couldn’t confirm whether the original field was changed, and History couldn’t be saved. Check that field before making more changes."
                     reportWritingSaveFailure("\(delivery) \(error.localizedDescription)")
                 }
             }

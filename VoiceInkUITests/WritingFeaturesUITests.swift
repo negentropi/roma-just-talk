@@ -528,7 +528,13 @@ final class WritingFeaturesUITests: XCTestCase {
         XCTAssertTrue(section.waitForExistence(timeout: 5))
         reveal(section, identifier: "dictionary.section.wordReplacements", in: app)
         section.click()
-        XCTAssertTrue(app.buttons["dictionary.replacement.add"].waitForExistence(timeout: 5))
+        // The Add button appears only after a draft; the empty inputs identify the page.
+        for identifier in ["dictionary.replacement.add.original", "dictionary.replacement.add.replacement"] {
+            let fields = app.textFields.matching(identifier: identifier)
+            XCTAssertTrue(fields.firstMatch.waitForExistence(timeout: 5))
+            XCTAssertEqual(fields.count, 1)
+            XCTAssertTrue(fields.firstMatch.isEnabled)
+        }
     }
 
     @MainActor private func replacementCount(in app: XCUIApplication) -> Int {
@@ -1471,10 +1477,20 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor private func containsText(_ text: String, in element: XCUIElement) -> Bool {
-        element.label.contains(text) || element.descendants(matching: .any)
+        // Native StaticText can expose its displayed text as its own value.
+        let matches = element.label.contains(text) || (element.value as? String)?.contains(text) == true
+            || element.descendants(matching: .any)
             .allElementsBoundByIndex.contains {
                 $0.label.contains(text) || ($0.value as? String)?.contains(text) == true
             }
+        if !matches && element.identifier == "history.capturedCleanup" {
+            let details = "Expected: \(text)\nLabel: \(element.label)\nValue: \(String(describing: element.value))\n\n\(element.debugDescription)"
+            let attachment = XCTAttachment(string: details)
+            attachment.name = "History captured cleanup text mismatch"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+        return matches
     }
 
     @MainActor private func identified(_ identifier: String, in element: XCUIElement) -> XCUIElement {

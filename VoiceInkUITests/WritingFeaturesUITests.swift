@@ -9,6 +9,8 @@ final class WritingFeaturesUITests: XCTestCase {
     private var shortcutPreferences: WritingFeaturesShortcutPreferences?
     private var writingApplication: XCUIApplication?
     private var writingApplicationOwnership: WritingFeaturesAppOwnership?
+    private var microphoneConsentMonitor: NSObjectProtocol?
+    private static let microphonePurpose = "roma-just-talk needs access to your microphone to record audio for transcription."
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -1040,6 +1042,16 @@ final class WritingFeaturesUITests: XCTestCase {
                 app.terminate()
             }
         }
+        // Registered once per test before any launch so relaunches share one monitor.
+        XCTAssertNil(microphoneConsentMonitor, "A microphone consent monitor was already registered.")
+        let monitor = addUIInterruptionMonitor(withDescription: "Owned RJT microphone consent") { [weak self] dialog in
+            MainActor.assumeIsolated { self?.handleMicrophoneConsent(dialog, ownership: ownership) ?? false }
+        }
+        microphoneConsentMonitor = monitor
+        addTeardownBlock { @MainActor in
+            self.removeUIInterruptionMonitor(monitor)
+            self.microphoneConsentMonitor = nil
+        }
         shortcutPreferences = shortcuts
         attachShortcutCensus("before", preferences: shortcuts)
         try ownership.requireNoRunningApplication()
@@ -1104,6 +1116,74 @@ final class WritingFeaturesUITests: XCTestCase {
         hierarchy.lifetime = .keepAlways
         add(hierarchy)
         attachScreenshot(app, named: "Writing Features failed launch")
+    }
+
+    // Allows only the current owned launch's microphone consent; anything else falls through to XCTest's default.
+    @MainActor private func handleMicrophoneConsent(_ dialog: XCUIElement, ownership: WritingFeaturesAppOwnership) -> Bool {
+        let owner = ownership.currentOwnedApplicationFacts()
+        let purpose = owner.info?["NSMicrophoneUsageDescription"] as? String
+        let name = (owner.info?["CFBundleDisplayName"] ?? owner.info?["CFBundleName"]) as? String
+        let dialogFrame = dialog.frame
+        // Bounded census: read at most these many elements; over-bound dialogs are rejected so unread
+        // elements (for example another Allow) can never be hidden by truncation.
+        let textLimit = 16, buttonLimit = 8
+        let textCount = dialog.staticTexts.count
+        let buttonCount = dialog.buttons.count
+        let texts = (0..<min(textCount, textLimit)).map { dialog.staticTexts.element(boundBy: $0) }
+        let strings = texts.flatMap { [$0.label, ($0.value as? String) ?? ""] }.filter { !$0.isEmpty }
+        let buttons = (0..<min(buttonCount, buttonLimit)).map { dialog.buttons.element(boundBy: $0) }
+        let allow = buttons.filter { $0.label == "Allow" }
+        let rejectReason: String? = {
+            if let reason = owner.rejectReason { return reason }
+            if dialog.elementType != .dialog { return "interrupting element is not a dialog" }
+            if textCount > textLimit || buttonCount > buttonLimit { return "dialog exceeds the bounded census" }
+            guard let purpose, purpose == Self.microphonePurpose else { return "bundle purpose differs from source" }
+            if !strings.contains(purpose) { return "dialog lacks the exact purpose text" }
+            guard let name, !name.isEmpty, strings.contains(where: {
+                $0 != purpose && $0.contains(name) && $0.localizedCaseInsensitiveContains("microphone")
+            }) else { return "no title naming the owned app and the microphone" }
+            if allow.count != 1 { return "Allow button is not unique" }
+            let button = allow[0]
+            if !(button.isEnabled && button.isHittable && dialogFrame.contains(button.frame)) {
+                return "Allow button is not enabled, hittable, and inside the dialog"
+            }
+            return nil
+        }()
+        let payload: [String: Any] = [
+            "dialog": ["elementType": dialog.elementType.rawValue, "identifier": dialog.identifier,
+                       "label": dialog.label, "title": dialog.title,
+                       "value": String(describing: dialog.value), "frame": NSStringFromRect(dialogFrame)],
+            "staticTextCount": textCount, "staticTextLimit": textLimit,
+            "buttonCount": buttonCount, "buttonLimit": buttonLimit,
+            "staticTexts": texts.map { ["label": $0.label, "value": String(describing: $0.value),
+                                        "frame": NSStringFromRect($0.frame)] },
+            "buttons": buttons.map { ["label": $0.label, "identifier": $0.identifier, "enabled": $0.isEnabled,
+                                      "hittable": $0.isHittable, "frame": NSStringFromRect($0.frame)] },
+            "owner": owner.facts,
+            "bundleDisplayName": name ?? NSNull(), "bundlePurpose": purpose ?? NSNull(),
+            "expectedPurpose": Self.microphonePurpose,
+            "recognized": rejectReason == nil, "rejectReason": rejectReason ?? NSNull()
+        ]
+        if let data = try? JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted, .sortedKeys]) {
+            let census = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
+            census.name = "Microphone consent interruption census"
+            census.lifetime = .keepAlways
+            add(census)
+        } else {
+            XCTFail("Unable to encode the microphone consent interruption census.")
+        }
+        let screenshot = XCTAttachment(screenshot: dialog.screenshot())
+        screenshot.name = "Microphone consent interruption"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        guard rejectReason == nil else { return false }
+
+        allow[0].click()
+        let outcome = XCTAttachment(string: "clicked Allow; dialog dismissed: \(waitUntil { !dialog.exists })")
+        outcome.name = "Microphone consent interruption outcome"
+        outcome.lifetime = .keepAlways
+        add(outcome)
+        return true
     }
 
     @MainActor private func openSnippets(in app: XCUIApplication) {
@@ -2036,6 +2116,7 @@ private final class WritingFeaturesDictationPreferences {
 private final class WritingFeaturesAppOwnership {
     private struct OwnedProcess {
         let pid: pid_t
+        let bundleURL: URL
         let executableURL: URL
         let launchDate: Date
     }
@@ -2053,12 +2134,39 @@ private final class WritingFeaturesAppOwnership {
 
     func captureLaunchedApplication() throws {
         let applications = Self.runningApplications
-        guard applications.count == 1, let application = applications.first,
+        guard applications.count == 1, let application = applications.first, let bundleURL = application.bundleURL,
               let executableURL = application.executableURL, let launchDate = application.launchDate else {
             throw WritingFeaturesUIError.appOwnershipUnavailable
         }
-        processes.append(OwnedProcess(pid: application.processIdentifier,
+        processes.append(OwnedProcess(pid: application.processIdentifier, bundleURL: bundleURL,
                                       executableURL: executableURL, launchDate: launchDate))
+    }
+
+    /// Facts about the unique running app, plus its on-disk Info.plist only when it is the current owned launch.
+    func currentOwnedApplicationFacts() -> (facts: [String: Any], info: [String: Any]?, rejectReason: String?) {
+        let applications = Self.runningApplications
+        var facts: [String: Any] = ["runningCount": applications.count, "ownedLaunches": processes.count]
+        guard applications.count == 1, let application = applications.first, let current = processes.last else {
+            return (facts, nil, "no unique running app with a captured launch")
+        }
+        facts["pid"] = Int(application.processIdentifier)
+        facts["bundleURL"] = application.bundleURL?.path ?? NSNull()
+        facts["executableURL"] = application.executableURL?.path ?? NSNull()
+        facts["launchDate"] = application.launchDate?.timeIntervalSince1970 ?? NSNull()
+        guard current.pid == application.processIdentifier, current.bundleURL == application.bundleURL,
+              current.executableURL == application.executableURL, current.launchDate == application.launchDate else {
+            return (facts, nil, "running app is not the current owned launch")
+        }
+        let info = NSDictionary(contentsOf: current.bundleURL.appendingPathComponent("Contents/Info.plist")) as? [String: Any]
+        facts["infoBundleIdentifier"] = info?["CFBundleIdentifier"] ?? NSNull()
+        facts["infoExecutable"] = info?["CFBundleExecutable"] ?? NSNull()
+        guard let info, info["CFBundleIdentifier"] as? String == Self.bundleIdentifier,
+              let executable = info["CFBundleExecutable"] as? String,
+              current.bundleURL.appendingPathComponent("Contents/MacOS/\(executable)").standardizedFileURL
+                == current.executableURL.standardizedFileURL else {
+            return (facts, info, "Info.plist does not describe the owned executable")
+        }
+        return (facts, info, nil)
     }
 
     var hasOnlyOwnedRunningApplications: Bool {

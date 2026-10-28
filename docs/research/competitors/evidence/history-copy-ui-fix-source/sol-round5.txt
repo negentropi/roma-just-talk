@@ -1,0 +1,11 @@
+VERDICT: APPROVE
+
+No open blocker/should findings in round 5’s three-file delta.
+
+Consent handling checks the current owned launch, published microphone purpose, app-naming title and one actionable Allow button inside the dialog. Unknown dialogs fall through; monitor removal uses its exact token. Census limits reject truncated evidence. Approval-state copy now defers saved/existing-result claims to outcomeView.
+
+Oracle hash matches b32c269a…9664346; git diff --check passes.
+
+Limits: source approval only. Callback execution, actual permission-dialog recognition, candidate eight-case run, native post-verification and Release/full gate remain unproved. Earlier TCC change remains unattributed.
+
+Usage: unavailable.

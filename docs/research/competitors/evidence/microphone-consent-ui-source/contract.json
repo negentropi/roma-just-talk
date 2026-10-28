@@ -1,0 +1,194 @@
+{
+  "scope": "Test-onlypublicmicconsentmonitor/lifecycle+actualsmallSaveCorrectionpresentationstatefix. NoCIregrant/productrecordingchange.",
+  "actual_bad_run": 40639673814,
+  "actual_bad_head": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+  "actual_runtime_facts": [
+    "All8UIoncepass1279.560s;finalsemanticnativehostNOTattempted.",
+    "RawMic2beforeSeed\u21920beforeVerify,SAMEclient/csreq;AX2unchanged.",
+    "App/nativebundleidentityandsignatureseedbefore/after/verifybeforebyteequal.",
+    "XCTestimplicitDontAllowtwoactionsfirstcaset16.15/17.74;exactservices/titlesunrecorded.",
+    "SourceappstartupHALpreRollcapableofinputactivation;runtimecausalpathunproved."
+  ],
+  "monitor_contract": [
+    "OnceperprepareAppbeforelaunch,exacttokenremovedteardown,relaunchreuses.",
+    "CurrentuniqueownedNSRunningApplicationpid/bundleURL/executable/launchDate;actualbundleInfoID/executablematches.",
+    "ExactpublishedMicpurpose+actualbundlenameandmicrophonesemanticstitle,roleDialog;noassumedOSpunctuation.",
+    "OnlyoneenabledhittableAllowwithinDialog;nootherpermissionfallback.",
+    "Everyinvocationbounded16texts/8buttons+actualtotals/owner/rejectcensus+DialogPNG;overboundsreject;unknownreturnsfalse.",
+    "NoSQL/publicpermissionreset/no3shortcutedits;strictsignedauth2pre/postunchanged."
+  ],
+  "source_lifecycle_checks": {
+    "eight_test_bodies_equal": {
+      "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "14c9911f29f6c7b317dc34a9c3ad4c284fba4b2077a61aa3ba6f778f36b34b61",
+      "testCSVImportPreviewsMultilineContentBeforeReplacing": "5df0f3cb7b3afa77a71a00743a7aaa6867717dc685ed89efd4d7bd7861c2aea8",
+      "testTranslationTargetsReorderSelectAndPersist": "c07646262a4ca04d144df43362f68261975ba07831bdaacdba25679302d69f06",
+      "testDictationProfilePreservesCustomSettingsAndPersists": "2dbeddbeda7d7d583fb6aa5c5a0ce0421ac1cbfee3772cfbe98061624d5c0ea4",
+      "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": "ec685883153f5f3096d441ed3f7c985a521dc393b7eeb2c53b98c424e67815b6",
+      "testHistoryPreservesRecognizedFallbackAndLegacyVariants": "cb45d90a55115b71f278011f144764b3f0e6e77180cf037a09aa8922f2c501a3",
+      "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": "a95ec15b51cdbd66fa6500a5524dddd8234c6f0f06a8fd9e403cb84f3f4e648f",
+      "testApprovedHistoryCorrectionSurvivesSourceDeletion": "fc8146f7ad9184240cf4960238b35b4d315da9df501fabc1fca6a7480302e18e"
+    },
+    "eight_frozen_helpers_equal": {
+      "metadataUUID": "1650d41ff5e0577456be1e4c61c9f220cbe0aeec983751a50ab7e870e161c389",
+      "revealCorrectionControl": "58afda45e991464555dbbbd14f78bad6e4c585be59bc8b02d07a1f72eb1969ad",
+      "assertExactHistoryCopy": "08cd49f9606b2fa9c06e1950f33ef0720af4eff83b2b25ff91f1e2d78e9385fb",
+      "assertHistoryStaticTextPresentation": "421e30c19150bab323c7e443589f9541de41cc2b8242847f676b585094c0b3a0",
+      "pasteLiteralText": "dfe63be46e4308042579d0eaed4474155ddbd3f0b654eb71c4cbf20f3ffd7d10",
+      "assertExactEditor": "3299daa95c6dd78d40a8ffc574287c8ce4881cb0196610a16a145752a4bb3f2b",
+      "approveCorrection": "babcbf35ba92448ec8ff44f77f4932dee6ac6774e217ee77d9dec8e7f735f161",
+      "previewCorrection": "d77858ff99275321c5eb800f8b57f9c5bf315a25d1160335f063c88b5b983661"
+    },
+    "one_registration_one_exact_removal": true,
+    "registration_inprepareApp_beforelaunchhelper": true,
+    "bounded_handler_and_unknown_false": true,
+    "published_Info_purpose_exact": true,
+    "Foundation_optionalJSONdictionary_typecheck": "passedtinycompiler-onlyexpression; noapp",
+    "fullXCTest_typecheck": "unavailablelocalCLT; noinstalls/builds"
+  },
+  "copy_state_visual_red": {
+    "run": 40639673814,
+    "PNG": "4771FE64-6A10-45C9-BEDB-C01187CC678E.png",
+    "observation": "Done-onlypostapprovalstillshowsNothingissaveduntilApprove.",
+    "fix": "GenericCorrectionpreviewtitle;preapprovalplanStatusonlyoutcome==nil;outcomeViewauthoritySaved/AlreadyExistsunchanged.",
+    "logic_footer_actions_DTO_changes": false
+  },
+  "before_oracle_sha256": "62c8a1e3250610fe3cb1ff452877cc84eb35a978c4a906b809d17827ddeb2b68",
+  "candidate_oracle_sha256": "b32c269aa0832b5ed4ab8827fbd45105a9fe315d79432e8f1b310e66e9664346",
+  "authorship": [
+    {
+      "pass": "opus",
+      "model": "claude-opus-5-5",
+      "requested_effort": "medium",
+      "provider": "firstParty",
+      "session_id": "baf3c2dc-ca8e-4734-b9d2-45e593cbeec0",
+      "edits": [
+        "/Users/atalphalnmomhappyhouse/.codex/worktrees/2ebd/VoiceInk/VoiceInkUITests/WritingFeaturesUITests.swift"
+      ],
+      "usage": {
+        "input_tokens": 20,
+        "cache_creation_input_tokens": 51883,
+        "cache_read_input_tokens": 379217,
+        "output_tokens": 12091,
+        "output_tokens_details": {
+          "thinking_tokens": 5089
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 51883
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1661,
+            "cache_read_input_tokens": 51301,
+            "cache_creation_input_tokens": 582,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 582,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-opus-5-5": {
+          "inputTokens": 20,
+          "outputTokens": 12091,
+          "cacheReadInputTokens": 379217,
+          "cacheCreationInputTokens": 51883,
+          "webSearchRequests": 0,
+          "costUSD": 0.5771584000000002,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 5089,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "raw_stream_sha256": "86b4d2f5d48d141f4d61db273b04ce86e835087eea4472d515dae005a54d11b1"
+    },
+    {
+      "pass": "opus-finalize",
+      "model": "claude-opus-5-5",
+      "requested_effort": "medium",
+      "provider": "firstParty",
+      "session_id": "44a290f1-05a4-4c5e-b3e4-218d7654ed31",
+      "edits": [
+        "/Users/atalphalnmomhappyhouse/.codex/worktrees/2ebd/VoiceInk/VoiceInk/Views/History/SaveCorrectionSheet.swift",
+        "/Users/atalphalnmomhappyhouse/.codex/worktrees/2ebd/VoiceInk/VoiceInkUITests/WritingFeaturesUITests.swift",
+        "/Users/atalphalnmomhappyhouse/.codex/worktrees/2ebd/VoiceInk/CHANGELOG.md"
+      ],
+      "usage": {
+        "input_tokens": 16,
+        "cache_creation_input_tokens": 44372,
+        "cache_read_input_tokens": 265662,
+        "output_tokens": 4519,
+        "output_tokens_details": {
+          "thinking_tokens": 465
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 44372
+        },
+        "inference_geo": "global",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 1337,
+            "cache_read_input_tokens": 42454,
+            "cache_creation_input_tokens": 1918,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 1918,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "type": "message"
+          }
+        ],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 4519,
+          "cacheReadInputTokens": 265662,
+          "cacheCreationInputTokens": 44372,
+          "webSearchRequests": 0,
+          "costUSD": 0.36543640000000005,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 465,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "raw_stream_sha256": "245389eebd4a2dfd6fc7b4f26b951eb1b7bf486d7c459cbdd325e2ee30e0803e"
+    }
+  ],
+  "runtime": "Pending;oldtwoMicservicesnotattributedwithoutnewcensus;nofullgateacceptance",
+  "review": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "same_reviewer": "/root/none_profile_ui_checks/history_copy_sol_loop",
+    "same_base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+    "round": 5,
+    "budget": 5,
+    "verdict": "APPROVE",
+    "usage": "unavailable"
+  }
+}

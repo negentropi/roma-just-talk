@@ -34,6 +34,13 @@ jobs:
             sw_vers
           } | tee "$RUNNER_TEMP/swiftdata-save-probe/environment.txt"
           cp scripts/probe-swiftdata-owned-save-cleanup.swift "$RUNNER_TEMP/swiftdata-save-probe/source.swift"
+          sdk=$(xcrun --sdk macosx --show-sdk-path)
+          interface="$sdk/System/Library/Frameworks/SwiftData.framework/Modules/SwiftData.swiftmodule/arm64e-apple-macos.swiftinterface"
+          shasum -a 256 "$interface" > "$RUNNER_TEMP/swiftdata-save-probe/sdk-interface-sha256.txt"
+          sed -n '/^public class ModelContext[ :{]/,/^}/p; /^public struct FetchDescriptor</,/^}/p' "$interface" \
+            > "$RUNNER_TEMP/swiftdata-save-probe/sdk-public-context.txt"
+          grep -q 'func processPendingChanges()' "$RUNNER_TEMP/swiftdata-save-probe/sdk-public-context.txt"
+          grep -q 'var includePendingChanges:' "$RUNNER_TEMP/swiftdata-save-probe/sdk-public-context.txt"
 
       - name: Compile standalone two-model probe
         run: |
@@ -53,6 +60,39 @@ jobs:
             "$RUNNER_TEMP/swiftdata-save-probe/probe" "$RUNNER_TEMP/swiftdata-save-probe" \
             2>&1 | tee "$RUNNER_TEMP/swiftdata-save-probe/run.log"
 
+      - name: Observe registered caller rows after isolated rule transactions
+        run: |
+          export PROBE_HEAD_SHA="$(git rev-parse HEAD)"
+          export PROBE_SOURCE_SHA256="$(shasum -a 256 scripts/probe-swiftdata-owned-save-cleanup.swift | cut -d ' ' -f 1)"
+          export PROBE_SWIFT_VERSION="$(xcrun swiftc --version)"
+          python3 - <<'PY'
+          import itertools, json, os, pathlib, subprocess, time
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'swiftdata-save-probe'
+          results = []
+          for operation, access, reader, first in itertools.product(
+              ['update', 'toggle', 'delete', 'create', 'batch'], ['writable', 'readonly'],
+              ['main', 'explicit'], ['fetch', 'persisted', 'pending-fetch', 'pending-persisted', 'model', 'runloop-fetch']
+          ):
+              specification = '/'.join([operation, access, reader, first])
+              name = 'rule-' + specification.replace('/', '-')
+              started = time.monotonic()
+              try:
+                  process = subprocess.run([str(root / 'probe'), str(root), '--rule-case', specification], capture_output=True, timeout=20)
+                  (root / (name + '.log')).write_bytes(process.stdout + process.stderr)
+                  result = {'recipe': specification, 'exitCode': process.returncode, 'elapsedSeconds': time.monotonic() - started}
+              except subprocess.TimeoutExpired as error:
+                  (root / (name + '.log')).write_bytes((error.stdout or b'') + (error.stderr or b''))
+                  result = {'recipe': specification, 'timeout': True, 'elapsedSeconds': time.monotonic() - started}
+              receipt = root / (name + '.json')
+              result['receiptPresent'] = receipt.is_file()
+              if receipt.is_file():
+                  result['lastRecordedStage'] = json.loads(receipt.read_text())['stage']
+              results.append(result)
+              print(json.dumps(result), flush=True)
+              (root / 'rule-subprocess-results.json').write_text(json.dumps(results, indent=2) + '\n')
+          assert len(results) == 120
+          PY
+
       - name: Retain source, toolchain and raw observations
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,4 +103,5 @@ jobs:
             ${{ runner.temp }}/swiftdata-save-probe/source.swift
             ${{ runner.temp }}/swiftdata-save-probe/*.log
             ${{ runner.temp }}/swiftdata-save-probe/*.json
+            ${{ runner.temp }}/swiftdata-save-probe/*.txt
           if-no-files-found: error

@@ -16,6 +16,8 @@ struct InlineHistoryView: View {
     @State private var hasMoreContent = true
     @State private var lastTimestamp: Date?
     @State private var isViewCurrentlyVisible = false
+    /// Owned here, not by the row, so deleting or paging the source row can't silently drop it.
+    @State private var correctionTarget: SaveCorrectionTarget?
 
     private let exportService = VoiceInkCSVExportService()
 
@@ -93,9 +95,14 @@ struct InlineHistoryView: View {
             Button(VoiceInkHistoryPresentation.deleteConfirmationPrimaryButtonTitle, role: .destructive) {
                 deleteSelectedTranscriptions()
             }
+            .accessibilityIdentifier("history.delete.confirm")
             Button(VoiceInkHistoryPresentation.deleteConfirmationCancelButtonTitle, role: .cancel) {}
+                .accessibilityIdentifier("history.delete.cancel")
         } message: {
             Text(VoiceInkTranscriptPresentation.deleteConfirmationMessage(selectedCount: selectedTranscriptions.count))
+        }
+        .settingsSheet(item: $correctionTarget, width: SaveCorrectionSheet.width) { target in
+            SaveCorrectionSheet(target: target)
         }
         .onAppear {
             isViewCurrentlyVisible = true
@@ -129,6 +136,7 @@ struct InlineHistoryView: View {
                 TextField(VoiceInkHistoryPresentation.macOSInlineHistorySearchPrompt, text: $searchText)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13))
+                    .accessibilityIdentifier("history.search")
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
@@ -184,6 +192,7 @@ struct InlineHistoryView: View {
             }
             .buttonStyle(.plain)
             .foregroundColor(.red.opacity(0.8))
+            .accessibilityIdentifier("history.selection.delete")
 
             Divider()
                 .frame(height: 16)
@@ -259,6 +268,13 @@ struct InlineHistoryView: View {
                             withAnimation(.smooth(duration: 0.3)) {
                                 isPanelPresented = true
                             }
+                        },
+                        onSaveCorrection: { variant, displayedText in
+                            beginCorrection(
+                                transcriptionID: transcription.id,
+                                variant: variant,
+                                displayedText: displayedText
+                            )
                         }
                     )
                 }
@@ -419,6 +435,27 @@ struct InlineHistoryView: View {
         isLoading = plan.isLoading
     }
 
+    // MARK: - Save Correction
+
+    /// Captures the exact displayed text through the service; returns a visible error on failure.
+    private func beginCorrection(
+        transcriptionID: UUID,
+        variant: HistoryTextVariant,
+        displayedText: String
+    ) -> String? {
+        do {
+            correctionTarget = try SaveCorrectionTarget.capture(
+                transcriptionID: transcriptionID,
+                variant: variant,
+                displayedText: displayedText,
+                using: modelContext
+            )
+            return nil
+        } catch {
+            return error.localizedDescription
+        }
+    }
+
     // MARK: - Selection & Deletion
 
     private func toggleSelection(_ transcription: Transcription) {
@@ -495,14 +532,18 @@ private struct HistoryCardRow: View {
     let onToggleExpand: () -> Void
     let onToggleCheck: () -> Void
     let onShowInfo: () -> Void
+    /// Receives the visible variant and its exact displayed text; returns an error message on failure.
+    let onSaveCorrection: (HistoryTextVariant, String) -> String?
 
-    @State private var selectedTab: VoiceInkTranscriptTextVariant = .original
+    @State private var selectedTab: HistoryTextVariant = .original
+    @State private var correctionError: (variant: HistoryTextVariant, message: String)?
 
-    private var displayText: String {
-        selectedTab.displayText(
-            rawText: transcription.text,
-            enhancedText: transcription.enhancedText
-        )
+    private var availableTabs: [HistoryTextVariant] {
+        HistoryTextVariant.available(for: transcription)
+    }
+
+    private var visibleTab: HistoryTextVariant {
+        availableTabs.contains(selectedTab) ? selectedTab : .original
     }
 
     private var hasAudioFile: Bool {
@@ -518,83 +559,155 @@ private struct HistoryCardRow: View {
                 ))
                 .toggleStyle(CircularCheckboxStyle())
                 .labelsHidden()
+                // Selection checkbox only; the header's ".expand" identifier is the expand target.
+                .accessibilityLabel(Text("Select transcription"))
+                .accessibilityIdentifier("\(rowAccessibilityIdentifier).select")
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.secondary)
+                // The non-interactive header (timestamp, preview, chevron) is one real Button,
+                // a sibling of the checkbox, so the expand action and ID survive in the AX tree.
+                Button(action: onToggleExpand) {
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 6) {
+                                Text(VoiceInkDatePresentation.compactTimestamp(transcription.timestamp))
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.secondary)
+                                HistoryProcessingWarningBadge(transcription: transcription)
+                            }
 
-                    if !isExpanded {
-                        Text(
-                            VoiceInkTranscriptPresentation.preferredText(
-                                rawText: transcription.text,
-                                enhancedText: transcription.enhancedText
-                            ) ?? transcription.text
-                        )
-                            .font(.system(size: 13))
-                            .lineLimit(2)
-                            .foregroundColor(.primary)
+                            if !isExpanded {
+                                Text(
+                                    VoiceInkTranscriptPresentation.preferredText(
+                                        rawText: transcription.text,
+                                        enhancedText: transcription.enhancedText
+                                    ) ?? transcription.text
+                                )
+                                    .font(.system(size: 13))
+                                    .lineLimit(2)
+                                    .foregroundColor(.primary)
+                            }
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundColor(.secondary)
+                            .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                            .animation(.easeInOut(duration: 0.2), value: isExpanded)
                     }
+                    .contentShape(Rectangle())
                 }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundColor(.secondary)
-                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
-                    .animation(.easeInOut(duration: 0.2), value: isExpanded)
+                .buttonStyle(.plain)
+                // Label names the action plus the recording's timestamp so rows stay distinguishable
+                // without repeating transcript text; state and the real cleanup warning are the value.
+                .accessibilityLabel(Text(expandAccessibilityLabel))
+                .accessibilityValue(Text(expandAccessibilityValue))
+                .accessibilityIdentifier("\(rowAccessibilityIdentifier).expand")
             }
-            .contentShape(Rectangle())
-            .onTapGesture { onToggleExpand() }
 
             if isExpanded {
                 expandedContent
                     .padding(.top, 10)
             }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(rowAccessibilityIdentifier)
+    }
+
+    private var rowAccessibilityIdentifier: String {
+        "history.row.\(transcription.id.uuidString)"
+    }
+
+    /// Action plus recording identity (full date and time, including year).
+    private var expandAccessibilityLabel: String {
+        let recordedAt = VoiceInkDatePresentation.abbreviatedTimestamp(transcription.timestamp)
+        return isExpanded
+            ? "Collapse transcription from \(recordedAt)"
+            : "Expand transcription from \(recordedAt)"
+    }
+
+    /// Expansion state, followed by the cleanup warning only when a failure was actually recorded.
+    private var expandAccessibilityValue: String {
+        let state = isExpanded ? "Expanded" : "Collapsed"
+        guard transcription.processingFailureReason != nil else { return state }
+        return "\(state), cleanup didn’t finish"
     }
 
     // MARK: - Expanded Content
 
     private var expandedContent: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Tabs
-            if VoiceInkTranscriptTextVariant.shouldShowTabs(enhancedText: transcription.enhancedText) {
+        // One variant+text snapshot per evaluation: the same value is rendered, copied and
+        // captured for Save Correction; the action never re-reads the record.
+        let shownVariant = visibleTab
+        let shownText = shownVariant.text(for: transcription)
+        return VStack(alignment: .leading, spacing: 8) {
+            HistoryProcessingWarning(transcription: transcription)
+
+            if availableTabs.count > 1 || transcription.dictationProfile != nil {
                 HStack(spacing: 4) {
-                    ForEach(VoiceInkTranscriptTextVariant.allCases, id: \.self) { tab in
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                selectedTab = tab
+                    if availableTabs.count > 1 {
+                        ForEach(availableTabs) { tab in
+                            let isSelected = shownVariant == tab
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    selectedTab = tab
+                                }
+                            } label: {
+                                Text(tab.title)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(isSelected ? .primary : .secondary)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule()
+                                            .fill(isSelected ? Color.secondary.opacity(0.15) : Color.clear)
+                                    )
                             }
-                        } label: {
-                            Text(tab.title)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(selectedTab == tab ? .primary : .secondary)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 4)
-                                .background(
-                                    Capsule()
-                                        .fill(selectedTab == tab ? Color.secondary.opacity(0.15) : Color.clear)
-                                )
+                            .buttonStyle(.plain)
+                            .help(tab.helpText)
+                            .accessibilityAddTraits(isSelected ? .isSelected : [])
+                            .accessibilityIdentifier(tab.accessibilityIdentifier)
                         }
-                        .buttonStyle(.plain)
                     }
-                    Spacer()
+                    Spacer(minLength: 8)
+                    HistoryCapturedCleanupLabel(transcription: transcription)
                 }
             }
 
-            ScrollView {
-                Text(displayText)
-                    .font(.body)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            // Text, Copy and Save Correction share one byte-exact snapshot identity; the
+            // audio player stays outside so a tab switch doesn't reset playback.
+            VStack(alignment: .leading, spacing: 8) {
+                ScrollView {
+                    Text(verbatim: shownText)
+                        .font(.body)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityIdentifier(shownVariant.textAccessibilityIdentifier)
+                }
+                .frame(maxHeight: 350)
+                .overlay(alignment: .bottomTrailing) {
+                    CopyIconButton(textToCopy: shownText)
+                        .accessibilityIdentifier("history.copy.\(shownVariant.rawValue)")
+                        .padding(8)
+                }
+
+                // The service rejects this rendered value if the stored variant changed since.
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    if let correctionError, correctionError.variant == shownVariant {
+                        SaveCorrectionCaptureError(variant: correctionError.variant, message: correctionError.message)
+                    }
+                    Spacer(minLength: 0)
+                    SaveCorrectionButton(variant: shownVariant) {
+                        if let message = onSaveCorrection(shownVariant, shownText) {
+                            correctionError = (variant: shownVariant, message: message)
+                        } else {
+                            correctionError = nil
+                        }
+                    }
+                }
             }
-            .frame(maxHeight: 350)
-            .overlay(alignment: .bottomTrailing) {
-                CopyIconButton(textToCopy: displayText)
-                    .padding(8)
-            }
+            .id(HistoryRenderedTextIdentity(variant: shownVariant, text: shownText))
 
             if let url = transcription.storedAudioAvailability().existingURL {
                 Divider()

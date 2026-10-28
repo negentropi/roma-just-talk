@@ -20,6 +20,10 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
     var powerModeName: String?
     var powerModeEmoji: String?
     var transcriptionStatus: String?
+    var recognitionText: String?
+    var dictationProfileRawValue: String?
+    var clarityStyleRawValue: String?
+    var processingFailureReason: String?
 
     init(text: String,
          duration: TimeInterval,
@@ -34,7 +38,11 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
          aiRequestUserMessage: String? = nil,
          powerModeName: String? = nil,
          powerModeEmoji: String? = nil,
-         transcriptionStatus: VoiceInkTranscriptionStatus = .pending) {
+         transcriptionStatus: VoiceInkTranscriptionStatus = .pending,
+         recognitionText: String? = nil,
+         dictationProfile: VoiceInkDictationProfile? = nil,
+         clarityStyle: VoiceInkClarityStyle? = nil,
+         processingFailureReason: String? = nil) {
         self.id = UUID()
         self.text = text
         self.enhancedText = enhancedText
@@ -51,6 +59,10 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         self.powerModeName = powerModeName
         self.powerModeEmoji = powerModeEmoji
         self.transcriptionStatus = transcriptionStatus.rawValue
+        self.recognitionText = recognitionText
+        self.dictationProfileRawValue = dictationProfile?.rawValue
+        self.clarityStyleRawValue = clarityStyle?.rawValue
+        self.processingFailureReason = processingFailureReason
     }
 
     convenience init(completedDraft draft: VoiceInkCompletedTranscriptionDraft) {
@@ -68,7 +80,11 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
             aiRequestUserMessage: draft.aiRequestUserMessage,
             powerModeName: draft.powerModeName,
             powerModeEmoji: draft.powerModeEmoji,
-            transcriptionStatus: draft.transcriptionStatus
+            transcriptionStatus: draft.transcriptionStatus,
+            recognitionText: draft.recognitionText,
+            dictationProfile: draft.dictationProfile,
+            clarityStyle: draft.clarityStyle,
+            processingFailureReason: draft.processingFailureReason
         )
     }
 
@@ -87,6 +103,10 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         powerModeName = draft.powerModeName
         powerModeEmoji = draft.powerModeEmoji
         transcriptionState = draft.transcriptionStatus
+        recognitionText = draft.recognitionText
+        dictationProfileRawValue = draft.dictationProfile?.rawValue
+        clarityStyleRawValue = draft.clarityStyle?.rawValue
+        processingFailureReason = draft.processingFailureReason
     }
 
     convenience init(recordingDraft draft: VoiceInkRecordingTranscriptionDraft) {
@@ -124,6 +144,10 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         promptName = plan.promptName
         aiRequestSystemMessage = plan.aiRequestSystemMessage
         aiRequestUserMessage = plan.aiRequestUserMessage
+        recognitionText = nil
+        dictationProfileRawValue = nil
+        clarityStyleRawValue = nil
+        processingFailureReason = nil
     }
 
     func markAsFailedTranscription(reason: String) {
@@ -140,6 +164,14 @@ final class Transcription: VoiceInkStoredAudioRecord, VoiceInkSessionMetricSourc
         set {
             transcriptionStatus = newValue?.rawValue
         }
+    }
+
+    var dictationProfile: VoiceInkDictationProfile? {
+        dictationProfileRawValue.flatMap(VoiceInkDictationProfile.init(rawValue:))
+    }
+
+    var clarityStyle: VoiceInkClarityStyle? {
+        clarityStyleRawValue.flatMap(VoiceInkClarityStyle.init(rawValue:))
     }
 
 }

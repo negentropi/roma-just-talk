@@ -113,6 +113,36 @@ final class OnboardingRegionViewTests: XCTestCase {
         attach(fixture, name: "Advanced choice rejects delayed country")
     }
 
+    @MainActor func testExternalAccessibilityWaitsForOneDelayedNativeButtonAction() async throws {
+        let fixture = DelayedNativeAXActionFixture()
+        defer { fixture.close() }
+        let response = try await fixture.pressOnce()
+        let boundary: [String: Any] = [
+            "version": 1, "configuredCallbackDelaySeconds": fixture.delaySeconds,
+            "pressCount": fixture.pressCount, "callbackElapsedSeconds": fixture.callbackElapsedSeconds ?? -1,
+            "helperExitCode": response.exitCode, "helperReport": response.report,
+            "hostPID": ProcessInfo.processInfo.processIdentifier,
+            "windowTitle": fixture.window.title, "targetIdentifier": fixture.targetIdentifier
+        ]
+        let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: boundary, options: [.prettyPrinted, .sortedKeys]),
+                                       uniformTypeIdentifier: "public.json")
+        attachment.name = "Delayed native AX action boundary"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        XCTAssertEqual(response.report["trusted"] as? Bool, true)
+        XCTAssertEqual(response.report["hostPID"] as? Int, Int(ProcessInfo.processInfo.processIdentifier))
+        XCTAssertEqual(response.report["parentPID"] as? Int, Int(ProcessInfo.processInfo.processIdentifier))
+        XCTAssertEqual(response.report["activeBeforeAction"] as? Bool, true)
+        XCTAssertEqual(response.report["sameWindowBeforeAction"] as? Bool, true)
+        XCTAssertEqual(response.report["actionMatchCount"] as? Int, 1)
+        XCTAssertEqual(fixture.pressCount, 1, "The delayed native control must be pressed exactly once.")
+        XCTAssertGreaterThanOrEqual(fixture.callbackElapsedSeconds ?? -1, 0.45)
+        XCTAssertEqual(response.exitCode, 0, "The single delayed native action was not acknowledged within the helper action budget.")
+        if response.exitCode == 0 {
+            XCTAssertEqual(response.report["actionError"] as? Int, 0)
+        }
+    }
+
     @MainActor func testSkipUnmountsPendingLookupWithoutCommittingSuggestedModel() async throws {
         let preferences = OnboardingTestPreferences()
         defer { preferences.restore() }
@@ -215,6 +245,86 @@ private actor DelayedOnboardingRegion {
         completion?.resume(returning: country)
         completion = nil
     }
+}
+
+@MainActor private final class DelayedNativeAXActionFixture: NSObject {
+    let window: NSWindow
+    let delaySeconds = 0.55
+    let targetIdentifier = "onboarding-delayed-native-action"
+    private(set) var pressCount = 0
+    private(set) var callbackElapsedSeconds: TimeInterval?
+    private let previousActivationPolicy = NSApplication.shared.activationPolicy()
+
+    override init() {
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 320, height: 160),
+                          styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        super.init()
+        window.isReleasedWhenClosed = false
+        window.title = "Roma delayed native AX fixture \(ProcessInfo.processInfo.processIdentifier) \(UUID().uuidString)"
+        let button = NSButton(title: "Run one delayed native action", target: self, action: #selector(performDelayedAction(_:)))
+        button.setAccessibilityIdentifier(targetIdentifier)
+        button.frame = NSRect(x: 25, y: 55, width: 270, height: 40)
+        window.contentView?.addSubview(button)
+        NSApplication.shared.setActivationPolicy(.regular)
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+
+    @objc private func performDelayedAction(_ sender: NSButton) {
+        let started = ProcessInfo.processInfo.systemUptime
+        // A real native action callback outlasts the helper's 250 ms query budget.
+        Thread.sleep(forTimeInterval: delaySeconds)
+        pressCount += 1
+        callbackElapsedSeconds = ProcessInfo.processInfo.systemUptime - started
+    }
+
+    func pressOnce() async throws -> (exitCode: Int32, report: [String: Any]) {
+        let readinessDeadline = ProcessInfo.processInfo.systemUptime + 3
+        while !window.isKeyWindow || !NSApplication.shared.isActive {
+            guard ProcessInfo.processInfo.systemUptime < readinessDeadline else { throw Failure.notReady }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        let reportURL = FileManager.default.temporaryDirectory.appendingPathComponent("roma-delayed-native-ax-\(UUID().uuidString).json")
+        let errorURL = reportURL.appendingPathExtension("stderr")
+        FileManager.default.createFile(atPath: reportURL.path, contents: nil)
+        FileManager.default.createFile(atPath: errorURL.path, contents: nil)
+        let output = try FileHandle(forWritingTo: reportURL)
+        let errors = try FileHandle(forWritingTo: errorURL)
+        defer { try? output.close(); try? errors.close() }
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/tmp/roma-onboarding-diagnostic/ExternalAXProbe")
+        process.arguments = [String(ProcessInfo.processInfo.processIdentifier), window.title, "press-id", targetIdentifier]
+        process.standardOutput = output
+        process.standardError = errors
+        try process.run()
+        defer { if process.isRunning { process.terminate() } }
+        let deadline = ProcessInfo.processInfo.systemUptime + 12
+        while process.isRunning && ProcessInfo.processInfo.systemUptime < deadline {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        guard !process.isRunning else { throw Failure.helperTimedOut }
+        let data = try Data(contentsOf: reportURL)
+        let report = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let stderr = (try? String(contentsOf: errorURL, encoding: .utf8)) ?? ""
+        print("ROMA_DELAYED_NATIVE_AX_REPORT: \(String(decoding: data, as: UTF8.self))\n\(stderr)")
+        // A failed acknowledgement can still have executed the callback. Observe it;
+        // never issue another toggle or press to infer success.
+        let completionDeadline = ProcessInfo.processInfo.systemUptime + 2
+        while callbackElapsedSeconds == nil && ProcessInfo.processInfo.systemUptime < completionDeadline {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        return (process.terminationStatus, report)
+    }
+
+    func close() {
+        window.contentView = nil
+        window.orderOut(nil)
+        window.close()
+        NSApplication.shared.setActivationPolicy(previousActivationPolicy)
+    }
+
+    private enum Failure: Error { case notReady, helperTimedOut }
 }
 
 @MainActor private final class OnboardingTestWindow {

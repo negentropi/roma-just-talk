@@ -54,6 +54,7 @@ struct ShortcutRecorder: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(accessibilityLabel)
+            .accessibilityIdentifier("shortcutRecorder.\(action.storageName)")
             .help(accessibilityLabel)
 
         }

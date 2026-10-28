@@ -4,6 +4,42 @@
 
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
 
+- Add Undo Last Writing Edit in the menu and as an optional shortcut for the latest confirmed selected-text rewrite, guarded by the same editor, text and caret.
+- Preserve the clipboard across overlapping pastes and Undo, and retain Writing Action results and request metadata when cancellation follows an editor attempt.
+
+- Reject malformed modern shortcut backups instead of interpreting their legacy fields as another binding.
+
+- Save an approved correction from History as one literal phrase, with a preview, source reference, enable switch and Dictionary editing. Keep complete replacement records in backups and show conflicts before importing.
+- Read replacements from the current operation's store instead of reusing a process-wide dictionary cache.
+- Keep rejected correction and dictionary-import saves from changing the visible library or unrelated unsaved edits.
+- Keep History Copy and Save Correction on the selected text variant's exact text, including canonically equivalent Unicode.
+- Fit the Save Correction sheet to the History window so Preview and Approve stay reachable on smaller displays.
+- After approving a correction, show only the saved result instead of the pre-approval “Nothing is saved” note.
+- Expand History through a native button with keyboard and accessibility labels, keeping selection and playback controls separate.
+
+- Add Light dictation cleanup and Clarity AI cleanup with Natural, Casual and Formal styles. Capture the chosen profile, libraries and Clarity provider when each operation starts; keep Custom settings saved.
+- Keep recognition text separately in History, with a Recognized view and a distinct cleanup-failure warning. Preserve original recognition when cleanup fails, including imports and retries.
+- Keep older recording, cancellation and reset completions from clearing a newer recording's captured context or delivering obsolete text.
+- Keep failed audio imports and retranscription saves from leaving a temporary History row, and preserve unrelated unsaved edits while saving their completed results.
+
+- Keep Local CLI processing from stalling on large input or output, and apply its timeout while input is being sent.
+
+- Keep the Ollama model named in Writing Action History consistent with the model sent in its captured request, including choices made in Ollama settings.
+
+- Open settings, prompt editors and Power Mode configuration in native Mac sheets, with keyboard dismissal and one presentation owner per screen.
+
+- Add a global None dictation cleanup option that preserves the transcription model’s text and bypasses AI enhancement, snippets, replacements, capitalization and added spaces. Keep existing behavior and saved settings under Custom.
+- Let cancellation reach queued dictation paste tasks before they write text or post paste commands.
+- Add separate recording shortcuts for translation, selected-text editing, and drafting, with saved translation targets independent of the transcription language. Keep results in History when the original field changes, and refuse unsafe replacements.
+- Add spoken snippets with exact multiline content, enable controls, and CSV import and export. Snippet-containing dictation stays literal so cleanup and AI cannot alter the saved text or its spoken trigger.
+- Keep a canceled recording start from clearing a newer recording after delayed permission or model preparation finishes.
+- Reject malformed text selections that split an emoji during writing actions.
+- Keep snippet and translation-target changes separate from Power Mode's saved settings.
+- Preserve dollar signs and backslashes in saved word replacements.
+- Keep dictionary replacements from changing part of an accented word or name, while preserving mixed-language matches.
+- Stop canceled recordings from collecting clipboard or screen context after delayed model preparation finishes.
+- Use a captured-target Paste command for browser writing actions, with text, selection, cancellation, and clipboard checks before the single attempt.
+
 ## v1.95.1 - 2026-09-11
 
 - Explain rejected NVIDIA API keys, missing access, and connection failures instead of showing an internal gRPC error.

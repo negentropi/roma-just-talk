@@ -38,6 +38,8 @@ struct EnhancementSettingsPanel: View {
                 }
                 .buttonStyle(.plain)
                 .help(presentation.closeButtonHelp)
+                .accessibilityLabel(presentation.closeButtonHelp)
+                .accessibilityIdentifier("enhancement.settings.close")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -56,6 +58,7 @@ struct EnhancementSettingsPanel: View {
                         }
                     }
                     .toggleStyle(.switch)
+                    .accessibilityIdentifier("enhancement.settings.clipboard")
 
                     Toggle(isOn: $enhancementService.useScreenCaptureContext) {
                         HStack(spacing: 4) {

@@ -129,6 +129,9 @@ public struct VoiceInkAudioFileTranscriptionDraftContext: Equatable, Sendable {
     public let transcriptionDuration: TimeInterval?
     public let powerModeName: String?
     public let powerModeEmoji: String?
+    public let recognitionText: String?
+    public let dictationProfile: VoiceInkDictationProfile?
+    public let clarityStyle: VoiceInkClarityStyle?
 
     public init(
         cleanedText: String,
@@ -137,7 +140,10 @@ public struct VoiceInkAudioFileTranscriptionDraftContext: Equatable, Sendable {
         transcriptionModelName: String?,
         transcriptionDuration: TimeInterval?,
         powerModeName: String? = nil,
-        powerModeEmoji: String? = nil
+        powerModeEmoji: String? = nil,
+        recognitionText: String? = nil,
+        dictationProfile: VoiceInkDictationProfile? = nil,
+        clarityStyle: VoiceInkClarityStyle? = nil
     ) {
         self.cleanedText = cleanedText
         self.duration = duration
@@ -146,6 +152,9 @@ public struct VoiceInkAudioFileTranscriptionDraftContext: Equatable, Sendable {
         self.transcriptionDuration = transcriptionDuration
         self.powerModeName = powerModeName
         self.powerModeEmoji = powerModeEmoji
+        self.recognitionText = recognitionText
+        self.dictationProfile = dictationProfile
+        self.clarityStyle = clarityStyle
     }
 }
 
@@ -187,7 +196,8 @@ public enum VoiceInkAudioFileTranscriptionDiagnostics {
 public enum VoiceInkAudioFileTranscriptionDraft {
     public static func completed(
         context: VoiceInkAudioFileTranscriptionDraftContext,
-        enhancementOutcome: VoiceInkAudioFileTranscriptionEnhancementOutcome = .notAttempted
+        enhancementOutcome: VoiceInkAudioFileTranscriptionEnhancementOutcome = .notAttempted,
+        processingFailureReason: String? = nil
     ) -> VoiceInkCompletedTranscriptionDraft {
         switch enhancementOutcome {
         case .notAttempted:
@@ -198,7 +208,11 @@ public enum VoiceInkAudioFileTranscriptionDraft {
                 transcriptionModelName: context.transcriptionModelName,
                 transcriptionDuration: context.transcriptionDuration,
                 powerModeName: context.powerModeName,
-                powerModeEmoji: context.powerModeEmoji
+                powerModeEmoji: context.powerModeEmoji,
+                recognitionText: context.recognitionText,
+                dictationProfile: context.dictationProfile,
+                clarityStyle: context.clarityStyle,
+                processingFailureReason: processingFailureReason
             )
         case .succeeded(let enhancementResult):
             return VoiceInkCompletedTranscriptionDraft(
@@ -209,7 +223,11 @@ public enum VoiceInkAudioFileTranscriptionDraft {
                 transcriptionDuration: context.transcriptionDuration,
                 powerModeName: context.powerModeName,
                 powerModeEmoji: context.powerModeEmoji,
-                enhancementResult: enhancementResult
+                enhancementResult: enhancementResult,
+                recognitionText: context.recognitionText,
+                dictationProfile: context.dictationProfile,
+                clarityStyle: context.clarityStyle,
+                processingFailureReason: processingFailureReason
             )
         case .failed(let reason, let policy):
             return VoiceInkCompletedTranscriptionDraft(
@@ -221,7 +239,11 @@ public enum VoiceInkAudioFileTranscriptionDraft {
                 powerModeName: context.powerModeName,
                 powerModeEmoji: context.powerModeEmoji,
                 enhancementFailureReason: reason,
-                enhancementFailurePolicy: policy
+                enhancementFailurePolicy: policy,
+                recognitionText: context.recognitionText,
+                dictationProfile: context.dictationProfile,
+                clarityStyle: context.clarityStyle,
+                processingFailureReason: processingFailureReason
             )
         }
     }
@@ -277,6 +299,10 @@ public struct VoiceInkCompletedTranscriptionDraft: Equatable, Sendable {
     public let powerModeName: String?
     public let powerModeEmoji: String?
     public let transcriptionStatus: VoiceInkTranscriptionStatus
+    public let recognitionText: String?
+    public let dictationProfile: VoiceInkDictationProfile?
+    public let clarityStyle: VoiceInkClarityStyle?
+    public let processingFailureReason: String?
 
     public init(
         cleanedText: String,
@@ -288,7 +314,11 @@ public struct VoiceInkCompletedTranscriptionDraft: Equatable, Sendable {
         powerModeEmoji: String? = nil,
         enhancementResult: VoiceInkAIEnhancementResult? = nil,
         enhancementFailureReason: String? = nil,
-        enhancementFailurePolicy: VoiceInkEnhancementFailureDraftPolicy = .omitEnhancedText
+        enhancementFailurePolicy: VoiceInkEnhancementFailureDraftPolicy = .omitEnhancedText,
+        recognitionText: String? = nil,
+        dictationProfile: VoiceInkDictationProfile? = nil,
+        clarityStyle: VoiceInkClarityStyle? = nil,
+        processingFailureReason: String? = nil
     ) {
         self.text = cleanedText
         self.duration = duration
@@ -298,6 +328,10 @@ public struct VoiceInkCompletedTranscriptionDraft: Equatable, Sendable {
         self.powerModeName = powerModeName
         self.powerModeEmoji = powerModeEmoji
         self.transcriptionStatus = .completed
+        self.recognitionText = recognitionText
+        self.dictationProfile = dictationProfile
+        self.clarityStyle = clarityStyle
+        self.processingFailureReason = processingFailureReason
 
         if let enhancementResult {
             self.enhancedText = enhancementResult.text

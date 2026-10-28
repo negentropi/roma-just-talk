@@ -2,9 +2,25 @@ import SwiftUI
 import SwiftData
 import VoiceInkCore
 
+private enum DictionaryPane: Hashable {
+    case catalog(VoiceInkDictionarySettingsSection)
+    case snippets
+
+    static var all: [DictionaryPane] {
+        VoiceInkDictionarySettingsSection.allCases.map(DictionaryPane.catalog) + [.snippets]
+    }
+
+    var accessibilityIdentifier: String {
+        switch self {
+        case .catalog(let section): "dictionary.section.\(section)"
+        case .snippets: "dictionary.section.snippets"
+        }
+    }
+}
+
 struct DictionarySettingsView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var selectedSection: VoiceInkDictionarySettingsSection = .defaultSelection
+    @State private var selectedPane: DictionaryPane = .catalog(.defaultSelection)
     @State private var isShowingSettings = false
     private let dictionaryPresentation = VoiceInkDictionarySettingsPresentation.macOS
 
@@ -17,7 +33,7 @@ struct DictionarySettingsView: View {
         }
         .frame(minWidth: 600, minHeight: 500)
         .background(Color(NSColor.controlBackgroundColor))
-        .slidingPanel(isPresented: $isShowingSettings, width: 400) {
+        .settingsSheet(isPresented: $isShowingSettings, width: 400) {
             DictionarySettingsPanel {
                 withAnimation(.smooth(duration: 0.3)) {
                     isShowingSettings = false
@@ -64,28 +80,51 @@ struct DictionarySettingsView: View {
                 }
                 .buttonStyle(.plain)
                 .help(dictionaryPresentation.settingsButtonHelp ?? "")
+                .accessibilityLabel(dictionaryPresentation.settingsButtonHelp ?? "Dictionary Settings")
+                .accessibilityIdentifier("dictionary.settings.open")
             }
 
-            HStack(spacing: 20) {
-                ForEach(VoiceInkDictionarySettingsSection.allCases, id: \.self) { section in
-                    SectionCard(
-                        presentation: section.presentation(in: dictionaryPresentation),
-                        isSelected: selectedSection == section,
-                        action: { selectedSection = section }
-                    )
+            HStack(alignment: .top, spacing: 16) {
+                ForEach(DictionaryPane.all, id: \.self) { pane in
+                    sectionCard(for: pane)
+                        .accessibilityIdentifier(pane.accessibilityIdentifier)
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
-    
+
+    @ViewBuilder
+    private func sectionCard(for pane: DictionaryPane) -> some View {
+        switch pane {
+        case .catalog(let section):
+            SectionCard(
+                presentation: section.presentation(in: dictionaryPresentation),
+                isSelected: selectedPane == pane,
+                action: { selectedPane = pane }
+            )
+        case .snippets:
+            SectionCard(
+                systemImageName: "text.quote",
+                title: "Snippets",
+                description: "Say a short phrase to insert saved text exactly.",
+                isSelected: selectedPane == pane,
+                action: { selectedPane = pane }
+            )
+        }
+    }
+
     private var selectedSectionContent: some View {
         VStack(alignment: .leading, spacing: 20) {
-            switch selectedSection {
-            case .wordReplacements:
+            switch selectedPane {
+            case .catalog(.wordReplacements):
                 WordReplacementView()
                     .background(CardBackground(isSelected: false))
-            case .vocabulary:
+            case .catalog(.vocabulary):
                 VocabularyView()
+                    .background(CardBackground(isSelected: false))
+            case .snippets:
+                SpokenSnippetsView()
                     .background(CardBackground(isSelected: false))
             }
         }
@@ -93,32 +132,64 @@ struct DictionarySettingsView: View {
 }
 
 struct SectionCard: View {
-    let presentation: VoiceInkDictionarySettingsSectionPresentation
+    let systemImageName: String
+    let title: String
+    let description: String
     let isSelected: Bool
     let action: () -> Void
-    
+
+    init(
+        presentation: VoiceInkDictionarySettingsSectionPresentation,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) {
+        self.init(
+            systemImageName: presentation.systemImageName,
+            title: presentation.title,
+            description: presentation.description,
+            isSelected: isSelected,
+            action: action
+        )
+    }
+
+    init(
+        systemImageName: String,
+        title: String,
+        description: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) {
+        self.systemImageName = systemImageName
+        self.title = title
+        self.description = description
+        self.isSelected = isSelected
+        self.action = action
+    }
+
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 12) {
-                Image(systemName: presentation.systemImageName)
+                Image(systemName: systemImageName)
                     .font(.system(size: 28))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(isSelected ? .blue : .secondary)
-                
+                    .accessibilityHidden(true)
+
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(presentation.title)
+                    Text(title)
                         .font(.headline)
-                    
-                    Text(presentation.description)
+
+                    Text(description)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding()
             .background(CardBackground(isSelected: isSelected))
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
-} 
+}

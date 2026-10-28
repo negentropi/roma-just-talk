@@ -49,6 +49,45 @@ final class DictionaryPolicyTests: XCTestCase {
             VoiceInkWordReplacementEngine.apply(rules, to: "Use Voice Ink, not voice inking."),
             "Use roma, not voice inking."
         )
+
+        let literalCases = [
+            ("cost", "$5.00", "The cost is due.", "The $5.00 is due."),
+            ("path", #"C:\Temp\$1"#, "Use PATH here.", #"Use C:\Temp\$1 here."#)
+        ]
+        for (original, replacement, input, expected) in literalCases {
+            XCTAssertEqual(
+                VoiceInkWordReplacementEngine.apply(
+                    [.init(originalText: original, replacementText: replacement)],
+                    to: input
+                ),
+                expected
+            )
+        }
+
+        let boundaryCases = [
+            ("clair", "clear", "éclair clair", "éclair clear"),
+            ("clair", "clear", "e\u{301}clair clair", "e\u{301}clair clear"),
+            ("Roma", "RJT", "Romaé éRoma Roma", "Romaé éRoma RJT"),
+            ("Roma", "RJT", "Roma\u{301} e\u{301}Roma Roma", "Roma\u{301} e\u{301}Roma RJT"),
+            ("Roma", "RJT", "Romaβ βRoma Roma", "Romaβ βRoma RJT"),
+            ("Roma", "RJT", "Roma٣ ٣Roma Roma", "Roma٣ ٣Roma RJT"),
+            ("Roma", "RJT", "Roma๑ ๑Roma Roma", "Roma๑ ๑Roma RJT"),
+            ("Roma", "RJT", "\u{10400}Roma Roma\u{10400} \u{1D7D8}Roma Roma\u{1D7D8} Roma",
+             "\u{10400}Roma Roma\u{10400} \u{1D7D8}Roma Roma\u{1D7D8} RJT"),
+            ("Roma", "RJT", "Roma_ Roma-Roma (Roma) Roma's Roma/Roma", "RJT_ RJT-RJT (RJT) RJT's RJT/RJT"),
+            ("naïve", "careful", "NAÏVE naïveté", "careful naïveté"),
+            ("Roma", "RJT", "あRomaい アRomaイ 使用Roma輸入 사용Roma입력 ใช้Romaป้อน",
+             "あRJTい アRJTイ 使用RJT輸入 사용RJT입력 ใช้RJTป้อน")
+        ]
+        for (original, replacement, input, expected) in boundaryCases {
+            XCTAssertEqual(
+                VoiceInkWordReplacementEngine.apply(
+                    [.init(originalText: original, replacementText: replacement)],
+                    to: input
+                ),
+                expected
+            )
+        }
     }
 
     func testWordReplacementEngineApplySortsCommaSeparatedVariantsByLength() {
@@ -70,6 +109,22 @@ final class DictionaryPolicyTests: XCTestCase {
         XCTAssertEqual(
             VoiceInkWordReplacementEngine.apply(rules, to: "東京都 and 東京"),
             "Tokyo都 and Tokyo"
+        )
+
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply(
+                [.init(originalText: "東京", replacementText: #"C:\東京\$5.00"#)],
+                to: "東京都"
+            ),
+            #"C:\東京\$5.00都"#
+        )
+
+        XCTAssertEqual(
+            VoiceInkWordReplacementEngine.apply(
+                [.init(originalText: "กรุง", replacementText: "เมือง")],
+                to: "กรุงเทพ และ กรุง"
+            ),
+            "เมืองเทพ และ เมือง"
         )
     }
 

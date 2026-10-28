@@ -1,0 +1,62 @@
+name: Probe real writing Local CLI service
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-writing-local-cli-service-probe-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: writing-local-cli-service-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          mkdir -p "$RUNNER_TEMP/writing-local-cli-service-probe"
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            swift --version
+            sw_vers
+          } > "$RUNNER_TEMP/writing-local-cli-service-probe/environment.txt"
+
+      - name: Prepare unchanged service sources and pinned dependencies
+        run: bash scripts/run-writing-local-cli-service-probe.sh prepare
+
+      - name: Build and verify deterministic service transport
+        run: bash scripts/run-writing-local-cli-service-probe.sh build
+
+      - name: Upload source contracts and service results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-local-cli-service-evidence
+          path: |
+            ${{ runner.temp }}/writing-local-cli-service-probe/*.json
+            ${{ runner.temp }}/writing-local-cli-service-probe/*.txt
+            ${{ runner.temp }}/writing-local-cli-service-probe/*.log
+            ${{ runner.temp }}/writing-local-cli-service-probe/deterministic/**
+            ${{ runner.temp }}/writing-local-cli-service-probe/package/Package.swift
+            ${{ runner.temp }}/writing-local-cli-service-probe/package/Package.resolved
+            ${{ runner.temp }}/writing-local-cli-service-probe/package/Sources/**
+          if-no-files-found: error
+
+      - name: Upload the signed service probe
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.writing-local-cli-service-probe
+          path: ${{ runner.temp }}/writing-local-cli-service-probe/signed-probe.tar.gz
+          if-no-files-found: error

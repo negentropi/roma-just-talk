@@ -24,7 +24,11 @@ extension VoiceInkShortcutActionIdentifier {
         .pasteLastEnhancement,
         .retryLastTranscription,
         .openHistoryWindow,
-        .quickAddToDictionary
+        .quickAddToDictionary,
+        .translateRecording,
+        .rewriteSelectionRecording,
+        .draftRecording,
+        .undoLastWritingEdit
     ]
 
     static let miniRecorderStoredActions: [VoiceInkShortcutActionIdentifier] = [

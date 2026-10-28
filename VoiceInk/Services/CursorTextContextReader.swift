@@ -13,8 +13,8 @@ enum CursorTextContextReader {
     private static let commandVMenuTraversalTimeout: TimeInterval = 0.25
     private static let contextMenuTraversalAttempts = 4
     private static let contextMenuTraversalRetryDelay: TimeInterval = 0.05
-    private static let pasteDeliveryObservationAttempts = 6
-    private static let pasteDeliveryObservationDelay: TimeInterval = 0.05
+    static let pasteDeliveryObservationAttempts = 6
+    static let pasteDeliveryObservationDelay: TimeInterval = 0.05
 
     enum SelectedTextInsertionResult: String {
         case inserted
@@ -93,7 +93,7 @@ enum CursorTextContextReader {
         fileprivate let text: String?
         fileprivate let selectedRange: CFRange?
 
-        fileprivate init(
+        init(
             focusedElement: AXUIElement,
             processIdentifier: pid_t,
             text: String?,
@@ -104,6 +104,13 @@ enum CursorTextContextReader {
             self.text = text
             self.selectedRange = selectedRange
         }
+
+        func withSnapshot(text: String, selectedRange: CFRange) -> FocusedPasteTarget {
+            FocusedPasteTarget(
+                focusedElement: focusedElement, processIdentifier: processIdentifier,
+                text: text, selectedRange: selectedRange
+            )
+        }
     }
 
     enum CommandVMenuAttempt {
@@ -111,6 +118,58 @@ enum CursorTextContextReader {
         case unavailable(FocusedPasteTarget?)
         case targetChanged(pid_t?)
     }
+
+    enum CapturedMenuAttempt {
+        case notAttempted
+        case attempted(AXError)
+    }
+
+    static func usesSystemPaste(for element: AXUIElement) -> Bool {
+        !shouldUseDirectAccessibilityInsertion(ancestorRoles: insertionAncestorRoles(startingAt: element))
+    }
+
+    @MainActor
+    static func capturedPasteTargetIsCurrent(_ target: FocusedPasteTarget) -> Bool {
+        guard AXIsProcessTrusted(),
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == target.processIdentifier,
+              capturedEditorIsFocused(target.focusedElement, processIdentifier: target.processIdentifier),
+              let original = target.text,
+              let current = textValue(from: target.focusedElement),
+              let originalRange = target.selectedRange,
+              let currentRange = selectedTextRange(from: target.focusedElement) else {
+            return false
+        }
+        return original.utf16.elementsEqual(current.utf16) && sameRange(originalRange, currentRange)
+    }
+
+    @MainActor
+    static func pressCapturedCommandVMenuItem(
+        target: FocusedPasteTarget,
+        authorize: () throws -> Void,
+        willAttempt: () throws -> Void
+    ) async throws -> CapturedMenuAttempt {
+        let application = AXUIElementCreateApplication(target.processIdentifier)
+        for attempt in 0..<commandVMenuTraversalAttempts {
+            try authorize()
+            guard capturedPasteTargetIsCurrent(target) else { return .notAttempted }
+            if let menuBar = elementAttribute(kAXMenuBarAttribute as CFString, from: application),
+               let menuItem = plainCommandVMenuItem(in: menuBar).menuItem {
+                var menuPID = pid_t()
+                guard AXUIElementGetPid(menuItem, &menuPID) == .success,
+                      menuPID == target.processIdentifier,
+                      element(menuItem, belongsTo: menuBar) else { return .notAttempted }
+                guard capturedPasteTargetIsCurrent(target) else { return .notAttempted }
+                try authorize()
+                try willAttempt()
+                // An AXPress error can follow a mutation. No other route may run afterward.
+                return .attempted(AXUIElementPerformAction(menuItem, kAXPressAction as CFString))
+            }
+            guard attempt < commandVMenuTraversalAttempts - 1 else { break }
+            try await Task.sleep(nanoseconds: UInt64(commandVMenuTraversalRetryDelay * 1_000_000_000))
+        }
+        return .notAttempted
+    }
+
 
     @MainActor
     final class PreparedContext: Sendable {
@@ -240,7 +299,8 @@ enum CursorTextContextReader {
     static func pressFocusedCommandVMenuItem(
         retryIfUnavailable: Bool,
         preparedContext: PreparedContext? = nil,
-        latencyTraceToken: VoiceInkLatencyTrace.Token?
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
+        willAttempt: @escaping () throws -> Void = {}
     ) async -> CommandVMenuAttempt {
         guard AXIsProcessTrusted(),
               let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
@@ -287,6 +347,7 @@ enum CursorTextContextReader {
                 guard !Task.isCancelled, pasteTargetIsCurrent(target) else {
                     return .targetChanged(processIdentifier)
                 }
+                do { try willAttempt() } catch { return .targetChanged(processIdentifier) }
                 // Once attempted, retain the existing AXPress outcome and fallback behavior.
                 guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
                     return .unavailable(target)
@@ -335,6 +396,7 @@ enum CursorTextContextReader {
                       pasteTargetIsCurrent(target) else {
                     return .targetChanged(processIdentifier)
                 }
+                do { try willAttempt() } catch { return .targetChanged(processIdentifier) }
                 guard AXUIElementPerformAction(menuItem, kAXPressAction as CFString) == .success else {
                     return .unavailable(target)
                 }
@@ -388,11 +450,16 @@ enum CursorTextContextReader {
     static func postCommandVShortcutEvents(
         _ events: [CGEvent],
         targetIsCurrent: () -> Bool,
-        post: (CGEvent) -> Void
+        post: (CGEvent) -> Void,
+        willAttempt: () throws -> Void = {}
     ) -> Bool {
         guard events.count == 4, targetIsCurrent() else { return false }
         post(events[0])
         guard targetIsCurrent() else {
+            post(events[3])
+            return false
+        }
+        do { try willAttempt() } catch {
             post(events[3])
             return false
         }
@@ -406,7 +473,8 @@ enum CursorTextContextReader {
     static func postFocusedCommandVShortcut(
         target: FocusedPasteTarget,
         expectedText: String,
-        latencyTraceToken: VoiceInkLatencyTrace.Token?
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
+        willAttempt: @escaping () throws -> Void = {}
     ) async -> CommandVShortcutPasteResult? {
         guard !Task.isCancelled,
               !expectedText.isEmpty,
@@ -438,7 +506,8 @@ enum CursorTextContextReader {
                     && NSWorkspace.shared.frontmostApplication?.processIdentifier
                         == processIdentifier
             },
-            post: { $0.post(tap: .cghidEventTap) }
+            post: { $0.post(tap: .cghidEventTap) },
+            willAttempt: willAttempt
         )
         guard postedPaste else {
             VoiceInkLatencyTrace.shared.event(
@@ -481,7 +550,8 @@ enum CursorTextContextReader {
     static func pressFocusedContextMenuPasteItem(
         target: FocusedPasteTarget,
         expectedText: String,
-        latencyTraceToken: VoiceInkLatencyTrace.Token?
+        latencyTraceToken: VoiceInkLatencyTrace.Token?,
+        willAttempt: @escaping () throws -> Void = {}
     ) async -> ContextMenuPasteResult? {
         guard !Task.isCancelled,
               !expectedText.isEmpty,
@@ -610,6 +680,10 @@ enum CursorTextContextReader {
                         processIdentifier: processIdentifier,
                         disposition: .deliveryUncertain
                     )
+                }
+                do { try willAttempt() } catch {
+                    cancelMenus(contextMenus)
+                    return ContextMenuPasteResult(processIdentifier: processIdentifier, disposition: .deliveryUncertain)
                 }
                 let pressResult = AXUIElementPerformAction(
                     menuItem,
@@ -1420,7 +1494,8 @@ enum CursorTextContextReader {
     @MainActor
     static func insertSelectedText(
         _ text: String,
-        preparedContext: PreparedContext?
+        preparedContext: PreparedContext?,
+        willAttempt: () throws -> Void = {}
     ) -> SelectedTextInsertionResult {
         guard !text.isEmpty,
               AXIsProcessTrusted(),
@@ -1446,6 +1521,9 @@ enum CursorTextContextReader {
             kAXSelectedTextAttribute as CFString,
             on: focusedElement
         )
+        if canSetSelectedText {
+            do { try willAttempt() } catch { return .notApplied }
+        }
         if canSetSelectedText,
            AXUIElementSetAttributeValue(
                focusedElement,
@@ -1496,9 +1574,16 @@ enum CursorTextContextReader {
                 rangeBeforeInsertion: selectedRange,
                 insertedText: text
               ),
-              isAttributeSettable(kAXValueAttribute as CFString, on: focusedElement),
-              setSelectedTextRange(selectedRange, on: focusedElement),
-              AXUIElementSetAttributeValue(
+              isAttributeSettable(kAXValueAttribute as CFString, on: focusedElement) else {
+            return canSetSelectedText ? .notApplied : .unsupported
+        }
+        do { try willAttempt() } catch { return .notApplied }
+        guard setSelectedTextRange(selectedRange, on: focusedElement) else {
+            return canSetSelectedText ? .notApplied : .unsupported
+        }
+        // The range helper can run the event loop; authorize the text write again afterward.
+        do { try willAttempt() } catch { return .notApplied }
+        guard AXUIElementSetAttributeValue(
                 focusedElement,
                 kAXValueAttribute as CFString,
                 replacement.text as CFString

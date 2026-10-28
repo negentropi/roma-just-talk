@@ -393,10 +393,23 @@ class RecordingShortcutManager: ObservableObject {
 
     private func handleGlobalShortcut(_ action: ShortcutAction) async {
         switch action {
+        case .translateRecording:
+            await engine.toggleWritingAction(.translate)
+        case .rewriteSelectionRecording:
+            await engine.toggleWritingAction(.rewriteSelection)
+        case .draftRecording:
+            await engine.toggleWritingAction(.draft)
+        case .undoLastWritingEdit:
+            // Same engine entry as the menu command; the guarded inverse owns every target check.
+            await UndoLastWritingEditCommand.perform(engine: engine)
         case .pasteLastTranscription:
-            LastTranscriptionService.pasteLastTranscription(from: engine.modelContext)
+            LastTranscriptionService.pasteLastTranscription(
+                from: engine.modelContext, writingActionUndoController: engine.writingActionUndoController
+            )
         case .pasteLastEnhancement:
-            LastTranscriptionService.pasteLastEnhancement(from: engine.modelContext)
+            LastTranscriptionService.pasteLastEnhancement(
+                from: engine.modelContext, writingActionUndoController: engine.writingActionUndoController
+            )
         case .retryLastTranscription:
             LastTranscriptionService.retryLastTranscription(
                 from: engine.modelContext,

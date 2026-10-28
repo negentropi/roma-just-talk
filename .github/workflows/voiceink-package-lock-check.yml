@@ -1,0 +1,127 @@
+name: Resolve the Mac package lock
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/rjt-package-lock-check-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: package-lock-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the verification Xcode
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          test -n "$latest"
+          sudo xcode-select -s "$latest"
+          mkdir -p "$RUNNER_TEMP/package-lock-proof"
+          {
+            git rev-parse HEAD
+            xcodebuild -version
+            swift --version
+            sw_vers
+          } > "$RUNNER_TEMP/package-lock-proof/environment.txt"
+
+      - name: Preserve the declared graph and original lock
+        run: |
+          proof="$RUNNER_TEMP/package-lock-proof"
+          cp VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved "$proof/original.Package.resolved"
+          python3 - "$proof" <<'PY'
+          import hashlib
+          import json
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          output = Path(sys.argv[1])
+          tracked = subprocess.check_output(["git", "ls-files", "-z"]).split(b"\0")
+          inputs = [Path(value.decode()) for value in tracked if value and (value.endswith(b"/Package.swift") or value == b"VoiceInk.xcodeproj/project.pbxproj")]
+          receipt = {}
+          for path in inputs:
+              data = path.read_bytes()
+              receipt[str(path)] = hashlib.sha256(data).hexdigest()
+              destination = output / "declared-inputs" / path
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              destination.write_bytes(data)
+          (output / "declared-inputs.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Resolve the existing project graph once
+        id: resolve
+        run: |
+          set -o pipefail
+          xcodebuild -resolvePackageDependencies -project VoiceInk.xcodeproj -scheme VoiceInk \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/package-lock-packages" \
+            -derivedDataPath "$RUNNER_TEMP/package-lock-derived" \
+            -skipPackageUpdates 2>&1 | tee "$RUNNER_TEMP/package-lock-proof/resolve.log"
+
+      - name: Capture the generated lock and pin changes
+        if: always()
+        run: |
+          proof="$RUNNER_TEMP/package-lock-proof"
+          mkdir -p "$proof"
+          cp VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved "$proof/resolved.Package.resolved"
+          git diff -- VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved > "$proof/lock.patch"
+          git diff --name-only > "$proof/changed-paths.txt"
+          python3 - "$proof" <<'PY'
+          import hashlib
+          import json
+          import sys
+          from pathlib import Path
+
+          root = Path(sys.argv[1])
+          original = (root / "original.Package.resolved").read_bytes()
+          resolved = (root / "resolved.Package.resolved").read_bytes()
+          before = {pin["identity"]: pin for pin in json.loads(original)["pins"]}
+          after = {pin["identity"]: pin for pin in json.loads(resolved)["pins"]}
+          added = {key: after[key] for key in sorted(after.keys() - before.keys())}
+          removed = {key: before[key] for key in sorted(before.keys() - after.keys())}
+          changed = {key: {"original": before[key], "resolved": after[key]} for key in sorted(before.keys() & after.keys()) if before[key] != after[key]}
+          expected = {
+              "grpc-swift-nio-transport": {"revision": "65adb0bc4721a6c4695e1956af9552970c06a59f"},
+              "grpc-swift-2": {"version": "2.4.3"},
+              "grpc-swift-protobuf": {"version": "2.4.1"},
+              "swift-protobuf": {"version": "1.38.1"},
+              "swift-nio-transport-services": {"version": "1.28.0"},
+          }
+          constraints_match = all(key in after and all(after[key]["state"].get(field) == value for field, value in state.items()) for key, state in expected.items())
+          fork_matches = after.get("grpc-swift-nio-transport", {}).get("location") == "https://github.com/negentropi/grpc-swift-nio-transport.git"
+          inputs = json.loads((root / "declared-inputs.json").read_text())
+          unchanged_inputs = all(hashlib.sha256(Path(path).read_bytes()).hexdigest() == digest for path, digest in inputs.items())
+          result = {"classification": "stale" if original != resolved else "unchanged", "original_sha256": hashlib.sha256(original).hexdigest(), "resolved_sha256": hashlib.sha256(resolved).hexdigest(), "original_pin_count": len(before), "resolved_pin_count": len(after), "declared_direct_constraints_match": constraints_match and fork_matches, "declared_inputs_unchanged": unchanged_inputs, "added_pins": added, "removed_pins": removed, "changed_pins": changed}
+          (root / "result.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Upload the canonical resolution for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roma.package-lock-resolution
+          path: ${{ runner.temp }}/package-lock-proof/**
+          if-no-files-found: error
+
+      - name: Require a current checked-in lock
+        if: ${{ !cancelled() && steps.resolve.outcome == 'success' }}
+        run: |
+          python3 - "$RUNNER_TEMP/package-lock-proof/result.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          result = json.loads(Path(sys.argv[1]).read_text())
+          if not result["declared_direct_constraints_match"] or not result["declared_inputs_unchanged"]:
+              raise SystemExit("Resolution did not retain the declared dependency constraints")
+          if result["classification"] != "unchanged":
+              raise SystemExit("The checked-in package lock is stale; review the generated lock artifact before updating it")
+          PY

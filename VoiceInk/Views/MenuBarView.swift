@@ -209,6 +209,8 @@ struct MenuBarView: View {
                 LastTranscriptionService.copyLastTranscription(from: engine.modelContext)
             }
             .keyboardShortcut("c", modifiers: [.command, .shift])
+
+            UndoLastWritingEditMenuButton(engine: engine)
             
             Button(VoiceInkMacOSMenuBarPresentation.historyTitle) {
                 menuBarManager.openHistoryWindow()

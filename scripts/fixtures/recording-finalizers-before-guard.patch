@@ -1,0 +1,26 @@
+--- a/VoiceInk/Transcription/Engine/VoiceInkEngine.swift
++++ b/VoiceInk/Transcription/Engine/VoiceInkEngine.swift
+@@ -874,7 +874,6 @@
+             token: traceToken
+         )
+         logger.notice("cancelRecording called – state=\(String(describing: self.recordingState), privacy: .public)")
+-        let cancellationRunID = activeRecordingRunID
+         let cancellationPlan = VoiceInkMacOSRecordingCancellationPolicy.plan(
+             recordingState: recordingState
+         )
+@@ -899,7 +898,6 @@
+                 recordingState = $0
+             },
+             finishRecorderSessionImmediately: {
+-                guard activeRecordingRunID == nil || activeRecordingRunID == cancellationRunID else { return }
+                 await finishRecorderSession()
+             }
+         )
+@@ -928,7 +926,6 @@
+         recordedFile = nil
+         recordingState = .idle
+         await cleanupResources()
+-        guard activeRecordingRunID == nil else { return }
+         await finishRecorderSession()
+         latencyTrace.finish(event: "engine.session_reset_complete", token: traceToken)
+     }

@@ -1,0 +1,15 @@
+# RJT Mac feature PR readiness
+
+This branch contains the competitor-feature task's changes, replayed onto default-branch commit `bf9ed37c19f6f381a0bde485da254dbeafb6234f`. The selected features are snippets, translation, selected-text Edit, Draft, cleanup profiles and styles, approved corrections, and guarded Undo Last Writing Edit.
+
+The original checkout remains on `codex/competitor-feature-audit-20261027` at `99d0ebba40cfcd0f04a1536b4118cabe3a96a075`. Its [immutable evidence archive](https://github.com/negentropi/roma-just-talk/tree/99d0ebba40cfcd0f04a1536b4118cabe3a96a075/docs/research/competitors/evidence) retains the historical source, observations, screenshots and review receipts. Links in the task guides point directly to those receipts; raw archives are excluded from this PR's source diff.
+
+Task changes start after `9e35e991b15c94e0089cc5f02f3b75522e78362b`. Earlier updater work, YZU competition documents, and hands-free Double Shift work belong to other tasks and are excluded. The separate synthetic-key shortcut fix `27984ec98` is also excluded. The default branch's Codemagic configuration and changelog entry are retained.
+
+Historical verification applies only to its pinned source and test boundary. The [full Mac gate at `0184f9a15`](https://github.com/negentropi/roma-just-talk/blob/99d0ebba40cfcd0f04a1536b4118cabe3a96a075/docs/research/competitors/evidence/microphone-native-id-full-40655003105/README.md), [Undo controls at `18d53e8f5`](https://github.com/negentropi/roma-just-talk/blob/99d0ebba40cfcd0f04a1536b4118cabe3a96a075/docs/research/competitors/evidence/undo-controls-40657960693/README.md), and [seven native Undo cases at `0b60c5e62`](https://github.com/negentropi/roma-just-talk/blob/99d0ebba40cfcd0f04a1536b4118cabe3a96a075/docs/research/competitors/evidence/undo-native-40617647503/README.md) passed before this source integration. They do not establish that this new branch passes.
+
+The source integration applied without source or UI conflicts. Of 184 imported non-documentation paths, 174 are byte-identical to the archive; the other ten differ only by the excluded inherited baseline changes. The changelog combines this task's entries with the current default's Codemagic entry. All 157 redirected historical proof links resolve to existing archive blobs. The single-space context line inside the frozen patch in `scripts/run-writing-delivery-commit-regression.sh` remains literal; it produces a known whitespace warning.
+
+Fresh matched pipeline verification uses snippets-only commit `b4df0b236592fe701e45b249856a4b731e96b104`, before writing-pipeline integration, as its known-bad baseline. It has the same default-branch project composition as this candidate. The declaration comparison and runtime assertions stay unchanged; the earlier `ec7bc1bcf` baseline retains its separate historical context.
+
+Final source review and fresh candidate verification remain pending. Physical input, universal editor support, CloudKit synchronization, and backup-conflict dialog interaction remain outside the retained proof. Full-stop requires a ready, open PR; it does not authorize merging or publishing a release.

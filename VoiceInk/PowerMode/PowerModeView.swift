@@ -6,11 +6,25 @@ struct PowerModeView: View {
     @StateObject private var powerModeManager = PowerModeManager.shared
     @EnvironmentObject private var enhancementService: AIEnhancementService
     @EnvironmentObject private var aiService: AIService
-    @State private var configurationMode: VoiceInkPowerModeConfigurationMode?
-    @State private var isPanelOpen = false
-    @State private var panelID = UUID()
-    @State private var isReorderPanelOpen = false
-    
+    @State private var activeSheet: PowerModeSheet?
+
+    /// Single sheet route so add/edit/reorder share one native sheet owner and never
+    /// race two `.sheet` modifiers. Each configuration presentation gets a fresh ID so
+    /// the form's state is rebuilt from the selected mode's payload.
+    private enum PowerModeSheet: Identifiable {
+        case configuration(VoiceInkPowerModeConfigurationMode, presentationID: UUID)
+        case reorder
+
+        var id: String {
+            switch self {
+            case .configuration(_, let presentationID):
+                return "configuration-\(presentationID.uuidString)"
+            case .reorder:
+                return "reorder"
+            }
+        }
+    }
+
     var body: some View {
             VStack(spacing: 0) {
                 // Header Section
@@ -37,7 +51,7 @@ struct PowerModeView: View {
                         
                         HStack(spacing: 8) {
                             Button(action: {
-                                openPanel(mode: .add)
+                                openConfiguration(.add)
                             }) {
                                 HStack(spacing: 6) {
                                     Image(systemName: VoiceInkPowerModePresentation.addButtonSystemImageName)
@@ -52,8 +66,9 @@ struct PowerModeView: View {
                                 .cornerRadius(6)
                             }
                             .buttonStyle(PlainButtonStyle())
+                            .accessibilityIdentifier("powerMode.configuration.add")
 
-                            Button(action: { openReorderPanel() }) {
+                            Button(action: { openReorder() }) {
                                 HStack(spacing: 6) {
                                     Image(systemName: VoiceInkPowerModePresentation.reorderButtonSystemImageName)
                                         .font(.system(size: 12, weight: .medium))
@@ -71,6 +86,7 @@ struct PowerModeView: View {
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
+                            .accessibilityIdentifier("powerMode.reorder.open")
                         }
                     }
                 }
@@ -117,7 +133,7 @@ struct PowerModeView: View {
                                             PowerModeConfigurationsGrid(
                                                 powerModeManager: powerModeManager,
                                                 onEditConfig: { config in
-                                                    openPanel(mode: .edit(config))
+                                                    openConfiguration(.edit(config))
                                                 }
                                             )
                                             .padding(.horizontal, 24)
@@ -135,48 +151,27 @@ struct PowerModeView: View {
                 .background(Color(NSColor.controlBackgroundColor))
             }
             .background(Color(NSColor.controlBackgroundColor))
-            .slidingPanel(isPresented: .init(
-                get: { isPanelOpen },
-                set: { if !$0 { closePanel() } }
-            ), width: 400) {
-                if let mode = configurationMode {
-                    ConfigurationView(mode: mode, powerModeManager: powerModeManager, onDismiss: closePanel)
-                        .id(panelID)
+            .settingsSheet(item: $activeSheet, width: 400) { sheet in
+                switch sheet {
+                case .configuration(let mode, let presentationID):
+                    ConfigurationView(mode: mode, powerModeManager: powerModeManager, onDismiss: dismissSheet)
+                        .id(presentationID)
+                case .reorder:
+                    ReorderPanelView(powerModeManager: powerModeManager, onDismiss: dismissSheet)
                 }
             }
-            .slidingPanel(isPresented: .init(
-                get: { isReorderPanelOpen },
-                set: { if !$0 { closeReorderPanel() } }
-            ), width: 400) {
-                ReorderPanelView(powerModeManager: powerModeManager, onDismiss: closeReorderPanel)
-            }
     }
 
-    private func openPanel(mode: VoiceInkPowerModeConfigurationMode) {
-        configurationMode = mode
-        panelID = UUID()
-        withAnimation(.smooth(duration: 0.3)) {
-            isPanelOpen = true
-        }
+    private func openConfiguration(_ mode: VoiceInkPowerModeConfigurationMode) {
+        activeSheet = .configuration(mode, presentationID: UUID())
     }
 
-    private func closePanel() {
-        withAnimation(.smooth(duration: 0.3)) {
-            isPanelOpen = false
-            configurationMode = nil
-        }
+    private func openReorder() {
+        activeSheet = .reorder
     }
 
-    private func openReorderPanel() {
-        withAnimation(.smooth(duration: 0.3)) {
-            isReorderPanelOpen = true
-        }
-    }
-
-    private func closeReorderPanel() {
-        withAnimation(.smooth(duration: 0.3)) {
-            isReorderPanelOpen = false
-        }
+    private func dismissSheet() {
+        activeSheet = nil
     }
 }
 
@@ -203,6 +198,8 @@ struct ReorderPanelView: View {
                 }
                 .buttonStyle(.plain)
                 .help(VoiceInkPowerModePresentation.reorderPanelCloseHelpText)
+                .accessibilityLabel(Text(VoiceInkPowerModePresentation.reorderPanelCloseHelpText))
+                .accessibilityIdentifier("powerMode.reorder.close")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)

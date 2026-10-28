@@ -139,6 +139,8 @@ struct ConfigurationView: View {
                 }
                 .buttonStyle(.plain)
                 .help(VoiceInkPowerModePresentation.formCloseHelpText)
+                .accessibilityLabel(Text(VoiceInkPowerModePresentation.formCloseHelpText))
+                .accessibilityIdentifier("powerMode.configuration.close")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -170,6 +172,7 @@ struct ConfigurationView: View {
                         TextField(VoiceInkPowerModePresentation.nameFieldPlaceholder, text: $configName)
                             .textFieldStyle(.roundedBorder)
                             .focused($isNameFieldFocused)
+                            .accessibilityIdentifier("powerMode.configuration.name")
                     }
                 }
 
@@ -607,6 +610,7 @@ struct ConfigurationView: View {
                             .keyboardShortcut(.escape, modifiers: [])
                             .buttonStyle(.plain)
                             .foregroundColor(.secondary)
+                            .accessibilityIdentifier("powerMode.configuration.cancel")
                     }
 
                     Spacer()

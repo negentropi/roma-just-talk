@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "actual_reviewer": "gpt-6.1-sol",
+  "effort": "medium",
+  "scope": "Read-only actual raw artifact boundary and one real failure screenshot",
+  "verdict": "Facts confirmed; no native case acceptance",
+  "failure_png_sha256": "ac453143357be7a5e17d6b66dde1bed60afff57c362f321c16c5e4cf6292eb9e",
+  "dimensions": [
+    1024,
+    768
+  ],
+  "observed": "Open disabled Undo Last Writing Edit status menu, Finder foreground, inactive setup window.",
+  "confirmed_geometry": "Same PID/AX reference/extras root changed from offscreen rectangle to exactly one display-contained, owned hit-tested rectangle before one post pair.",
+  "next_failure": "Exact native menu command identifier lookup; real AXMenuItem title exists with empty identifier.",
+  "completed_states": 0,
+  "completed_cases": 0,
+  "limits": [
+    "No recorder, chord, Undo action, editor/range/focus or notice acceptance.",
+    "Flat hierarchy alone does not prove submenu-parent relationship.",
+    "No source-after/signature-after/TCC-after receipt."
+  ],
+  "usage": null,
+  "usage_status": "Unavailable, not estimated.",
+  "files_sha256": {
+    "audit.json": "121005345f1aa12e6e5ea788c90e92de8df0f441632bb33c32c8abc511f9f33b",
+    "milestones.json": "065b04efd2f9db4f1624ff71ebe6c72f2e406c56a02840812ea0487536f6713d",
+    "README.md": "c7c14d8d48260a9a853e8d7a9093918c7fc5daaf759717b08f44e60579b2de12",
+    "failure-diagnosis.json": "54864601dc8595f4c48e457a5dce7a1dd392035bce8f1c1c07d52bdc6b4dfd63",
+    "failure.png": "ac453143357be7a5e17d6b66dde1bed60afff57c362f321c16c5e4cf6292eb9e",
+    "artifacts.json": "69f7f1c8280f240d6ed88e1121eefa0ce32ff821bfb99442e3dbb145addc1fbc"
+  }
+}

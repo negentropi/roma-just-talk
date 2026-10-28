@@ -1,0 +1,422 @@
+{
+  "run_id": 40627170433,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40627170433",
+  "head_sha": "1639a273c98e9307f872e9a76a9c5a01cdac9cce",
+  "classification": "status-layout-calibration-and-real-menu-opened-then-native-command-identifier-missing",
+  "build_succeeded": true,
+  "build_log_sha256": "a601069a87a4c497b1bb5523ee11f1fcd96d858b82e456f7a6452841db15d896",
+  "prepared_source_inputs": 613,
+  "prepared_candidate_files": 606,
+  "prepared_manifests_match_git_objects": true,
+  "actual_compiler_swift_inputs": 222,
+  "canonical_pins": 41,
+  "signature_before": {
+    "app_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "8c495e3792976dd9f2e0d0526431627c8d84e56486f26530cea5b98ef3bc2224",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "fresh_tcc_rows_before": 5,
+  "host_live": {
+    "exit_code": 1,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 16451,
+      "started_at": "Wed Oct 28 03:38:10 2026"
+    },
+    "spawned_identity": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "started_at": "Wed Oct 28 03:38:10 2026"
+    }
+  },
+  "host_closed": {
+    "error": null,
+    "exact_executable_census_empty": true,
+    "exact_executable_has_no_open_descriptors": true,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 16451,
+      "started_at": "Wed Oct 28 03:38:10 2026"
+    },
+    "valid": true
+  },
+  "oracle_failure": "Expected one actual control for undoLastWritingEdit.menuCommand.",
+  "native_cases_completed": 0,
+  "state_checks_completed": 0,
+  "native_mouse_post_pairs": 1,
+  "post_markers": [
+    {
+      "diagnosticOnly": true,
+      "mainThread": true,
+      "pid": 16451,
+      "schemaVersion": 1,
+      "sequence": 138,
+      "stage": "click.menu.unavailable-menu.status.post.before",
+      "systemUptime": 466.8013657916667,
+      "unixTime": 1793158693.302247
+    },
+    {
+      "diagnosticOnly": true,
+      "mainThread": true,
+      "pid": 16451,
+      "schemaVersion": 1,
+      "sequence": 139,
+      "stage": "click.menu.unavailable-menu.status.post.after",
+      "systemUptime": 466.81598962500004,
+      "unixTime": 1793158693.316887
+    }
+  ],
+  "readiness_observations": [
+    {
+      "attempt": 1,
+      "checkpoint": "click.menu.unavailable-menu.status",
+      "coordinateSpace": "AX global top-left (CG display space); no NSScreen or pixel conversion",
+      "diagnosticOnly": true,
+      "displays": {
+        "apiError": 0,
+        "attempted": true,
+        "containingCount": 0,
+        "count": 1,
+        "displays": [
+          {
+            "bounds": {
+              "height": 768,
+              "width": 1024,
+              "x": 0,
+              "y": 0
+            },
+            "containsCenter": false,
+            "containsTarget": false,
+            "id": 1,
+            "intersectsTarget": true
+          }
+        ]
+      },
+      "expected": {
+        "identifier": "undoControlHost.statusItem",
+        "roles": [
+          "AXMenuBarItem",
+          "AXButton"
+        ],
+        "title": "RJT Undo check"
+      },
+      "experiment": "preinput-readiness-calibration",
+      "frame": {
+        "attempted": true,
+        "center": {
+          "x": 16,
+          "y": 768
+        },
+        "finitePositive": true,
+        "height": 24,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "width": 34,
+        "x": -1,
+        "y": 756
+      },
+      "frameRecheck": {
+        "attempted": false
+      },
+      "hitTest": {
+        "attempted": false
+      },
+      "hostPID": 16451,
+      "identity": {
+        "attempted": true,
+        "sameReferenceAsLookup": true,
+        "uniqueCount": 1
+      },
+      "inputPosted": false,
+      "kind": "native-click-preinput-readiness-observation",
+      "maxAttempts": 6,
+      "provenance": {
+        "ancestors": [
+          {
+            "depth": 1,
+            "identifier": "",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": true,
+            "pid": 16451,
+            "role": "AXMenuBar",
+            "title": ""
+          }
+        ],
+        "appMenuBarPresent": true,
+        "attempted": true,
+        "extrasMenuBarPresent": true,
+        "maxDepth": 4,
+        "rootKind": "extras-menu-bar"
+      },
+      "ready": false,
+      "reason": "frame is not contained in exactly one active display",
+      "schemaVersion": 1,
+      "systemUptime": 465.5677258333334,
+      "target": {
+        "attempted": true,
+        "enabled": true,
+        "identifier": "undoControlHost.statusItem",
+        "identityContract": "identifier",
+        "pid": 16451,
+        "role": "AXMenuBarItem",
+        "title": "Undo"
+      },
+      "window": {
+        "attempted": false
+      }
+    },
+    {
+      "attempt": 2,
+      "checkpoint": "click.menu.unavailable-menu.status",
+      "coordinateSpace": "AX global top-left (CG display space); no NSScreen or pixel conversion",
+      "diagnosticOnly": true,
+      "displays": {
+        "apiError": 0,
+        "attempted": true,
+        "containingCount": 1,
+        "count": 1,
+        "displays": [
+          {
+            "bounds": {
+              "height": 768,
+              "width": 1024,
+              "x": 0,
+              "y": 0
+            },
+            "containsCenter": true,
+            "containsTarget": true,
+            "id": 1,
+            "intersectsTarget": true
+          }
+        ]
+      },
+      "expected": {
+        "identifier": "undoControlHost.statusItem",
+        "roles": [
+          "AXMenuBarItem",
+          "AXButton"
+        ],
+        "title": "RJT Undo check"
+      },
+      "experiment": "preinput-readiness-calibration",
+      "frame": {
+        "attempted": true,
+        "center": {
+          "x": 779,
+          "y": 15
+        },
+        "finitePositive": true,
+        "height": 24,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "width": 34,
+        "x": 762,
+        "y": 3
+      },
+      "frameRecheck": {
+        "attempted": true,
+        "center": {
+          "x": 779,
+          "y": 15
+        },
+        "finitePositive": true,
+        "height": 24,
+        "positionDecoded": true,
+        "positionRead": true,
+        "sizeDecoded": true,
+        "sizeRead": true,
+        "stable": true,
+        "width": 34,
+        "x": 762,
+        "y": 3
+      },
+      "hitTest": {
+        "attempted": true,
+        "axError": 0,
+        "depth": 0,
+        "elementPresent": true,
+        "pid": 16451,
+        "point": {
+          "x": 779,
+          "y": 15
+        },
+        "reachedTarget": true
+      },
+      "hostPID": 16451,
+      "identity": {
+        "attempted": true,
+        "sameReferenceAsLookup": true,
+        "uniqueCount": 1
+      },
+      "inputPosted": false,
+      "kind": "native-click-preinput-readiness-observation",
+      "maxAttempts": 6,
+      "provenance": {
+        "ancestors": [
+          {
+            "depth": 1,
+            "identifier": "",
+            "isApplication": false,
+            "isAppMenuBar": false,
+            "isExtrasMenuBar": true,
+            "pid": 16451,
+            "role": "AXMenuBar",
+            "title": ""
+          }
+        ],
+        "appMenuBarPresent": true,
+        "attempted": true,
+        "extrasMenuBarPresent": true,
+        "maxDepth": 4,
+        "rootKind": "extras-menu-bar"
+      },
+      "ready": true,
+      "reason": null,
+      "schemaVersion": 1,
+      "systemUptime": 466.67695670833336,
+      "target": {
+        "attempted": true,
+        "enabled": true,
+        "identifier": "undoControlHost.statusItem",
+        "identityContract": "identifier",
+        "pid": 16451,
+        "role": "AXMenuBarItem",
+        "title": "Undo"
+      },
+      "window": {
+        "attempted": true,
+        "hitWindowPresent": false,
+        "menuAncestorRole": "AXMenuBar",
+        "policy": "windowless-native-menu",
+        "targetWindowPresent": false
+      }
+    }
+  ],
+  "transient_geometry_claim": "Same AX reference/PID/extras-menu root observed partly offscreen, then within exactly the same one-display predicate before input. Actual transient initial geometry demonstrated in this run; no coordinate adjustment or guard relaxation.",
+  "actual_native_menu_item": {
+    "enabled": false,
+    "id": "",
+    "label": "",
+    "role": "AXMenuItem",
+    "title": "Undo Last Writing Edit"
+  },
+  "native_menu_identity_claim": "Exact title and native AXMenuItem exist with empty identifier. Screenshot shows open owned status menu. Flat hierarchy alone does not prove menu-parent relationship; next scoped selector must prove it.",
+  "policy_bootstrap": {
+    "after": {
+      "effective": {
+        "clipboardRestoreDelay": 2,
+        "restoreClipboardAfterPaste": true
+      },
+      "persistent": {
+        "clipboardRestoreDelay": {
+          "type": "number",
+          "value": 2
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "boolean",
+          "value": true
+        }
+      },
+      "registered": {
+        "clipboardRestoreDelay": {
+          "type": "number",
+          "value": 2
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    },
+    "before": {
+      "effective": {
+        "clipboardRestoreDelay": 2,
+        "restoreClipboardAfterPaste": true
+      },
+      "persistent": {
+        "clipboardRestoreDelay": {
+          "type": "missing"
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "missing"
+        }
+      },
+      "registered": {
+        "clipboardRestoreDelay": {
+          "type": "number",
+          "value": 2
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    },
+    "bundleIdentifier": "com.negentropi.RomaJustTalk",
+    "expectedUserHome": "/Users/runner/work/_temp/writing-undo-controls-proof/isolated-user",
+    "hasArgumentOverrides": false,
+    "homeMatchesExpected": true,
+    "observedUserHome": "/Users/runner/work/_temp/writing-undo-controls-proof/isolated-user",
+    "publicPreferenceAPIsUsed": true,
+    "synchronizeSucceeded": true
+  },
+  "host_outcome_summary": {
+    "exit_code": 1,
+    "candidate_error": null,
+    "closure_error": null,
+    "monitor_error": null,
+    "profile_files": {
+      "profiles/undo-controls-16451-3973123513286346596_0.profraw": {
+        "bytes": 14152,
+        "sha256": "a81ec1483a16013ceca2684b438d2291fa879fb7b9e944f597e8c251275b5b10"
+      },
+      "profiles/undo-controls-16451-7522894683845750546_0.profraw": {
+        "bytes": 8884664,
+        "sha256": "0c28d679950b0e6970a7bd5920dd06f882755da953455102384b9aeafe402669"
+      }
+    },
+    "samples": [],
+    "diagnostic_screens": []
+  },
+  "failure_png": {
+    "member": "native/failure.png",
+    "sha256": "ac453143357be7a5e17d6b66dde1bed60afff57c362f321c16c5e4cf6292eb9e",
+    "width": 1024,
+    "height": 768,
+    "scope": "Open disabled Undo Last Writing Edit status menu with Finder foreground; setup window inactive. No Undo activation or editor/focus acceptance."
+  },
+  "limits": [
+    "Zero completed state/case; no recorder, configured chord, Undo command or editor capture executed.",
+    "Transient geometry proof applies to this observed run; does not establish every prior failure cause.",
+    "Missing native item identifier is observed; no production accessibility modifier propagation guarantee is assumed.",
+    "No source-after/identity-after/TCC-after receipts; candidate_error is null and closed-host checks passed."
+  ]
+}

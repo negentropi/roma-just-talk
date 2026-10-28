@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "scope": "Final task-only Mac competitor-feature integration",
+  "base": "bf9ed37c19f6f381a0bde485da254dbeafb6234f",
+  "archive": "99d0ebba40cfcd0f04a1536b4118cabe3a96a075",
+  "reviewer": "/root/full_stop_sol_loop",
+  "route": "native_subagent",
+  "selectedModel": "gpt-6.1-sol",
+  "selectedReasoningEffort": "medium",
+  "usage": "Not exposed; not estimated.",
+  "roundBudget": 5,
+  "diffCommand": "git diff bf9ed37c19f6f381a0bde485da254dbeafb6234f -- . ':!docs/research/competitors/full-stop-pr-readiness.md' ':!docs/research/competitors/full-stop-sol-loop.json'",
+  "rounds": [
+    {
+      "round": 1,
+      "head": "d5d12e4fe93687a845b91baa49855c393dd4f41d",
+      "verdict": "CHANGES",
+      "diff": {
+        "files": 211,
+        "insertions": 52613,
+        "deletions": 1187
+      },
+      "findings": [
+        {
+          "id": "S1",
+          "severity": "should",
+          "status": "resolved",
+          "file": "scripts/tests/dictation-store-schema-canonicalization.test.py:15",
+          "finding": "Moving historical evidence out of the PR also omitted immutable JSON and WAV inputs consumed by executable tests and native verification workflows.",
+          "fix": "Restore only the consumed fixture closure with original bytes, hashes and provenance, then rerun the affected checks without weakening assertions."
+        }
+      ],
+      "sourceAssessment": "No additional reachable product-source defect identified. Source approval withheld for S1; fresh exact-candidate Mac CI separately required.",
+      "usage": "Not exposed."
+    },
+    {
+      "round": 2,
+      "head": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e",
+      "verdict": "APPROVE",
+      "diff": {
+        "files": 252,
+        "insertions": 71296,
+        "deletions": 1210
+      },
+      "findings": [],
+      "resolved": [
+        "S1"
+      ],
+      "independentChecks": "All 35 fixture inputs match the archive by content, SHA-256 and Git object identity. Schema fixture loading and metadata-store, correction-store, Local CLI and polish self-tests passed unchanged. Shell syntax and diff checks passed.",
+      "limits": "Source approval only. Full Swift canonicalization and fresh candidate Mac/iOS/native gates remain required.",
+      "usage": "Not exposed."
+    },
+    {
+      "round": 3,
+      "head": "2b165a5c960817f2b1ea4d5683c8f64e2109de3b",
+      "verdict": "APPROVE",
+      "diff": {
+        "files": 255,
+        "insertions": 72036,
+        "deletions": 1210
+      },
+      "findings": [],
+      "resolved": [
+        "S1"
+      ],
+      "independentChecks": "PR-review classifier controls and whitespace checks passed; product fixes and matched-proof driver reviewed.",
+      "limits": "New runtime regression comparisons pending CI. Projection plan accepted subject to exact product/resource/project/dependency/compiled-test equality, QA dependency closure and documentation redirects. The unseen projected commit and its CI are not separately certified by this source review.",
+      "usage": "Not exposed."
+    },
+    {
+      "round": 4,
+      "head": "78f867c7e742c0ed6379873dc0e5b8574592ff16",
+      "qaHead": "0509af36a2136a958ff2c702b42e37f0dca53be0",
+      "verdict": "APPROVE",
+      "findings": [],
+      "scope": "One compiled native fixture file; two QA-only controls extraction/provenance files.",
+      "independentChecks": "QA self-test: 102 receipt, 8 extraction, 5 provenance and 10 compiler-input rejection controls; whitespace checks.",
+      "limits": "Fresh hosted compilation/native acceptance required. Original Safari focus AX status was not retained; timeout-causality red/green not claimed.",
+      "usage": "Not exposed."
+    }
+  ],
+  "openFindings": [],
+  "round2Brief": {
+    "sourceHead": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e",
+    "changedSinceRound1": [
+      "35 immutable fixture inputs, provenance manifest and full Mac fixture-preflight step",
+      "Hosted Mac/iOS runners, toolchain setup and independent workflow/ref queues; existing assertions preserved",
+      "C collation for the existing pinned model-path digest",
+      "Previously verified capture-readiness and physical-path distribution-launch fixture fixes"
+    ],
+    "proof": "Five original missing-input failures reproduced; six available restored-fixture controls passed. Native Swift schema test pending disposable Mac CI. Model digest has a matched en_US.UTF-8 failure and C-collation success on the same 22 paths.",
+    "status": "approved"
+  },
+  "declinedFindings": [
+    {
+      "id": "CR4",
+      "reason": "Accepted None/Light/Clarity literal-output contract deliberately bypasses trial prefixes. Supported LOCAL_BUILD packages initialize licensed; non-local trial state remains reachable. Written reply discussion_r4401569730.",
+      "reply": "https://github.com/negentropi/roma-just-talk/pull/30#discussion_r4401569730"
+    }
+  ],
+  "finalSourceVerdict": "APPROVE",
+  "sourceReviewCovers": "Product sources at round3 plus the native compiled-fixture timeout-state fix at 78f867c7. QA updater extraction approved at 0509af36. Source-equivalent descendants require independent comparison and fresh CI.",
+  "pushed": true,
+  "initialPublicationHead": "520943c54f206dcdc5addc077256a26252f84161",
+  "publicationBranch": "codex/rjt-mac-competitor-features-pr-20261028",
+  "mergePolicy": "Full-stop: never merge, enable auto-merge, enter a merge queue or publish a release.",
+  "botReview": {
+    "sourceHead": "c1f3bb69356aed9abce01c43a4432c894b89c838",
+    "commentsFixed": {
+      "CR1": "71b2abe03",
+      "CR2": "71b2abe03",
+      "CR3": "43a79bc50926b8f21ffa6fe9c80365b92d3be17f",
+      "CR5": "748fc9218",
+      "CR6": "4f0419de2",
+      "CR7": "1928b409c9c62ccf63cc4945763b3ad4eb8bc173",
+      "CR8": "1928b409c9c62ccf63cc4945763b3ad4eb8bc173"
+    },
+    "nitsFixed": "Both persistent-default-domain snapshot findings fixed in 1928b409c.",
+    "declined": {
+      "CR4": "Accepted None/Light/Clarity literal-output contract deliberately bypasses trial prefixes. Supported LOCAL_BUILD packages initialize licensed; non-local trial state remains reachable. Written reply discussion_r4401569730."
+    }
+  },
+  "uiAuthorship": {
+    "scope": "Single strict snippet-mutation read callsite",
+    "model": "claude-opus-5-5",
+    "session": "6d6d1e89-55b9-467f-ab43-ecc6ce883c7f",
+    "costUSD": 0.1279172,
+    "receipt": "/tmp/rjt-pr30-snippets-authorship.json",
+    "note": "Actual first-party Claude CLI output; no UI authored by the parent."
+  },
+  "projection": {
+    "approvedProductSource": "2b165a5c960817f2b1ea4d5683c8f64e2109de3b",
+    "qaCheckpoint": "69f9a2a3801b97d910520942a86ddb5c675ca94d",
+    "keepPaths": 136,
+    "deferredTaskAddedPaths": 121,
+    "behaviorChanges": "None: product, resources, project/configuration, dependencies and compiled tests retained byte-for-byte.",
+    "publishedArchive": "codex/rjt-pr30-verification-20261028",
+    "automaticCI": "Must execute the actual projected PR head.",
+    "extendedCI": "Runs on a verification descendant of PR source; actual SHA retained. Exact product trees and normal-app/UI compiler inputs must be independently verified.",
+    "sourceReviewLimit": "Round3 approved source and projection conditions; it does not assert execution success on an unseen projected commit."
+  },
+  "budgetExtensionReason": "Actual editor-identity proof was blocked by retained AX timeout state contamination and an isolated controls-host production-type omission. State/permission-boundary findings qualify for the skill extension; no extra source reviewer.",
+  "runtimeFixtureFindings": {
+    "NATIVE1": "Scoped retained-handle timeout overrides; preserve exact window/token checks and record the original AX query error.",
+    "CONTROLS1": "Include the exact production updater declaration/imports in the generated component host; normal application main remains excluded.",
+    "acceptance": "Pending fresh hosted runtime; no failed observation relabelled."
+  }
+}

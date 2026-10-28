@@ -4,6 +4,18 @@ import LLMkit
 import VoiceInkCore
 
 class OllamaService: ObservableObject {
+    struct RequestConfiguration {
+        let baseURL: String
+        let modelName: String
+
+        static func fromPreferences() -> Self {
+            Self(
+                baseURL: VoiceInkDynamicAIProviderPreference.ollamaBaseURL(),
+                modelName: VoiceInkDynamicAIProviderPreference.ollamaRuntimeSelectedModel()
+            )
+        }
+    }
+
     // MARK: - Published Properties
     @Published var baseURL: String {
         didSet {
@@ -22,8 +34,9 @@ class OllamaService: ObservableObject {
     @Published var isLoadingModels: Bool = false
 
     init() {
-        self.baseURL = VoiceInkDynamicAIProviderPreference.ollamaBaseURL()
-        self.selectedModel = VoiceInkDynamicAIProviderPreference.ollamaRuntimeSelectedModel()
+        let configuration = RequestConfiguration.fromPreferences()
+        self.baseURL = configuration.baseURL
+        self.selectedModel = configuration.modelName
     }
 
     private var baseURLValue: URL? {
@@ -74,18 +87,32 @@ class OllamaService: ObservableObject {
     }
 
     func enhance(_ text: String, withSystemPrompt systemPrompt: String? = nil, timeout: TimeInterval) async throws -> String {
+        try await Self.enhance(
+            text,
+            withSystemPrompt: systemPrompt,
+            configuration: RequestConfiguration(baseURL: baseURL, modelName: selectedModel),
+            timeout: timeout
+        )
+    }
+
+    static func enhance(
+        _ text: String,
+        withSystemPrompt systemPrompt: String? = nil,
+        configuration: RequestConfiguration,
+        timeout: TimeInterval
+    ) async throws -> String {
         guard let systemPrompt = systemPrompt else {
             throw VoiceInkOllamaEnhancementFailure.invalidRequest.enhancementError
         }
 
-        guard let url = baseURLValue else {
+        guard let url = URL(string: configuration.baseURL) else {
             throw VoiceInkOllamaEnhancementFailure.invalidURL.enhancementError
         }
 
         do {
             return try await OllamaClient.generate(
                 baseURL: url,
-                model: selectedModel,
+                model: configuration.modelName,
                 prompt: text,
                 systemPrompt: systemPrompt,
                 temperature: VoiceInkAIEnhancementProviderKind.ollamaTextEnhancementRequestTemperature,

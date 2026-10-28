@@ -92,7 +92,7 @@ struct VoiceInkTests {
                 return expectedResult
             }
 
-            let result = await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text")
+            let result = await CursorPaster.startPasteAtCursor("dictated text").value
             try await Task.sleep(nanoseconds: 350_000_000)
 
             #expect(result == expectedResult)
@@ -140,7 +140,7 @@ struct VoiceInkTests {
             .insertedViaValueWithoutSelection
         ] {
             insertionResult = result
-            #expect(await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text") == .textInserted)
+            #expect(await CursorPaster.startPasteAtCursor("dictated text").value == .textInserted)
         }
         #expect(!postedCommand)
         #expect(pasteboard.string(forType: .string) == "previous clipboard")
@@ -183,7 +183,7 @@ struct VoiceInkTests {
             pasteboard.clearContents()
             pasteboard.setString("previous clipboard", forType: .string)
 
-            #expect(await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text") == .commandPosted)
+            #expect(await CursorPaster.startPasteAtCursor("dictated text").value == .commandPosted)
             #expect(pasteboard.string(forType: .string) == "dictated text")
         }
 
@@ -865,32 +865,24 @@ struct VoiceInkTests {
         #expect(VoiceInkAPIKeyReference.resolvedValue("$MISSING", environment: environment) == nil)
     }
 
-    @Test @MainActor func dictionaryServiceUsesWarmedWordReplacementCacheUntilInvalidated() throws {
+    @Test @MainActor func dictionaryServiceReadsCurrentWordReplacementsOnEachApplication() throws {
         let container = try makeWordReplacementContainer()
         let context = container.mainContext
-        DictionaryService.invalidateWordReplacementCache()
-        defer { DictionaryService.invalidateWordReplacementCache() }
 
         context.insert(WordReplacement(originalText: "voice ink", replacementText: "roma"))
         try context.save()
 
-        DictionaryService.warmWordReplacementCache(using: context)
         #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "roma")
 
         context.insert(WordReplacement(originalText: "quick release", replacementText: "instant paste"))
         try context.save()
 
-        #expect(DictionaryService.applyWordReplacements(to: "quick release", using: context) == "quick release")
-
-        DictionaryService.invalidateWordReplacementCache()
         #expect(DictionaryService.applyWordReplacements(to: "quick release", using: context) == "instant paste")
     }
 
     @Test @MainActor func dictionaryServiceIgnoresDisabledWordReplacements() throws {
         let container = try makeWordReplacementContainer()
         let context = container.mainContext
-        DictionaryService.invalidateWordReplacementCache()
-        defer { DictionaryService.invalidateWordReplacementCache() }
 
         context.insert(
             WordReplacement(
@@ -904,40 +896,29 @@ struct VoiceInkTests {
         #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "voice ink")
     }
 
-    @Test @MainActor func dictionaryServiceWordReplacementSaveInvalidatesWarmedWordReplacementCache() throws {
+    @Test @MainActor func dictionaryServiceWordReplacementSaveIsVisibleToTheNextOperation() throws {
         let container = try makeWordReplacementContainer()
         let context = container.mainContext
-        DictionaryService.invalidateWordReplacementCache()
-        defer { DictionaryService.invalidateWordReplacementCache() }
 
-        DictionaryService.warmWordReplacementCache(using: context)
         #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "voice ink")
 
-        let submission = VoiceInkWordReplacementDraftState(
-            original: "voice ink",
-            replacement: "roma"
-        ).submitting(existingRules: [])
-        let appliedSubmission = DictionaryService.applyWordReplacementSubmission(
-            submission,
-            context: context
+        let inserted = try DictionaryService.addWordReplacement(
+            originalText: "voice ink", replacementText: "roma", context: context
         )
 
-        #expect(appliedSubmission.alertPresentation == nil)
-        #expect(appliedSubmission.plan.shouldComplete)
+        #expect(inserted.originalText == "voice ink")
+        #expect(inserted.replacementText == "roma")
         #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "roma")
     }
 
-    @Test @MainActor func dictionaryServiceWordReplacementRemovalInvalidatesWarmedWordReplacementCache() throws {
+    @Test @MainActor func dictionaryServiceWordReplacementRemovalIsVisibleOnNextApplication() throws {
         let container = try makeWordReplacementContainer()
         let context = container.mainContext
-        DictionaryService.invalidateWordReplacementCache()
-        defer { DictionaryService.invalidateWordReplacementCache() }
 
         let replacement = WordReplacement(originalText: "voice ink", replacementText: "roma")
         context.insert(replacement)
         try context.save()
 
-        DictionaryService.warmWordReplacementCache(using: context)
         #expect(DictionaryService.applyWordReplacements(to: "voice ink", using: context) == "roma")
 
         #expect(DictionaryService.removeWordReplacement(replacement, context: context) == nil)

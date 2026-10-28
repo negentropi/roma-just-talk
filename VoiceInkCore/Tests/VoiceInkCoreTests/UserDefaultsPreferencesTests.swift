@@ -2926,6 +2926,13 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
     func testSharedPreferenceResetClearsCoreUserSettings() {
         withIsolatedDefaults { defaults in
+            let writingShortcutKeys = [VoiceInkShortcutActionIdentifier.translateRecording,
+                .rewriteSelectionRecording, .draftRecording, .undoLastWritingEdit].map(\.shortcutStorageKey)
+            for key in writingShortcutKeys {
+                VoiceInkShortcutStoragePreference.markShortcutCleared(for: key, to: defaults)
+                XCTAssertTrue(VoiceInkShortcutStoragePreference.isShortcutCleared(for: key, from: defaults))
+            }
+            VoiceInkDictationProfile.none.save(to: defaults)
             let mode = Mode.defaultLocalWhisper()
             VoiceInkModeStorage.saveModes([mode], to: defaults)
             VoiceInkModeStorage.saveSelectedModeId(mode.id, to: defaults)
@@ -3001,6 +3008,12 @@ final class UserDefaultsPreferencesTests: XCTestCase {
 
             VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
 
+            for key in writingShortcutKeys {
+                XCTAssertNil(defaults.object(forKey: VoiceInkShortcutStoragePreference.clearedKey(for: key)),
+                    "Reset must remove the writing shortcut's cleared marker: \(key)")
+            }
+            XCTAssertEqual(VoiceInkDictationProfile.current(in: defaults), .custom)
+            XCTAssertNil(defaults.object(forKey: VoiceInkDictationProfile.storageKey))
             XCTAssertTrue(VoiceInkModeStorage.loadModes(from: defaults).isEmpty)
             XCTAssertNil(VoiceInkModeStorage.loadSelectedModeId(from: defaults))
             XCTAssertFalse(VoiceInkOnboardingPreference.hasCompletedOnboarding(from: defaults))
@@ -3095,6 +3108,15 @@ final class UserDefaultsPreferencesTests: XCTestCase {
                 VoiceInkPreferenceDefault.middleClickActivationDelay
             )
             XCTAssertTrue(VoiceInkRecordingShortcutPreference.shouldPasteLastTranscriptOnEmptyTap(from: defaults))
+
+            for key in writingShortcutKeys {
+                VoiceInkShortcutStoragePreference.saveShortcutData(Data([1, 2, 3]), for: key, to: defaults)
+            }
+            VoiceInkSharedPreferenceReset.clearCoreUserSettings(from: defaults, providers: [.groq])
+            for key in writingShortcutKeys {
+                XCTAssertNil(VoiceInkShortcutStoragePreference.shortcutData(for: key, from: defaults),
+                    "Reset must remove the writing shortcut's saved binding: \(key)")
+            }
         }
     }
 

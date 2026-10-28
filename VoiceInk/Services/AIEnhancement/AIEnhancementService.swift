@@ -6,6 +6,17 @@ import LLMkit
 import VoiceInkCore
 
 @MainActor
+struct AIEnhancementProviderSnapshot {
+    let modelName: String
+    let apiKey: String
+    let executionPlan: VoiceInkAIEnhancementRequestExecutionPlan
+    let timeoutSeconds: TimeInterval
+    let retryOnTimeout: Bool
+    fileprivate let ollama: OllamaService.RequestConfiguration?
+    fileprivate let localCLI: LocalCLIService.RequestConfiguration?
+}
+
+@MainActor
 class AIEnhancementService: ObservableObject {
     private let logger = Logger(
         subsystem: VoiceInkAppIdentity.loggingSubsystem,
@@ -135,6 +146,23 @@ class AIEnhancementService: ObservableObject {
         aiService.isAPIKeyValid
     }
 
+    func providerSnapshot() throws -> AIEnhancementProviderSnapshot {
+        guard isConfigured else { throw VoiceInkAIEnhancementError.notConfigured }
+        let provider = aiService.selectedProvider
+        // Metadata and wire requests share the runtime picker model; the generic model cache can be stale.
+        let ollama = provider == .ollama ? OllamaService.RequestConfiguration.fromPreferences() : nil
+        let modelName = ollama?.modelName ?? aiService.currentModel
+        return AIEnhancementProviderSnapshot(
+            modelName: modelName,
+            apiKey: aiService.apiKey,
+            executionPlan: .planning(provider: provider, modelName: modelName),
+            timeoutSeconds: VoiceInkAIEnhancementRequestPreference.timeoutSeconds(),
+            retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout(),
+            ollama: ollama,
+            localCLI: provider == .localCLI ? LocalCLIService.RequestConfiguration.fromPreferences() : nil
+        )
+    }
+
     private func waitForRateLimit() async throws {
         if let delay = rateLimitPolicy.delaySinceLastRequest(lastRequest: lastRequestTime, now: Date()) {
             try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
@@ -165,11 +193,16 @@ class AIEnhancementService: ObservableObject {
         return await SelectedTextService.fetchSelectedText()
     }
 
-    private func makeRequest(text: String) async throws -> String {
+    private func makeRequest(
+        text: String,
+        writingRequest: VoiceInkWritingActionRequest? = nil,
+        providerSnapshot: AIEnhancementProviderSnapshot? = nil
+    ) async throws -> String {
+        try Task.checkCancellation()
         let requestPayload: VoiceInkAIEnhancementRequestPayload
         switch try VoiceInkAIEnhancementRequestPreparation.preparing(
             transcript: text,
-            isConfigured: isConfigured
+            isConfigured: providerSnapshot != nil || isConfigured
         ) {
         case .skipEmptyTranscript:
             return ""
@@ -177,53 +210,103 @@ class AIEnhancementService: ObservableObject {
             requestPayload = payload
         }
 
-        let formattedText = requestPayload.userMessage
-        let systemMessage = await getSystemMessage()
+        let formattedText: String
+        let systemMessage: String
+        if let writingRequest {
+            // Explicit actions use only the captured selection and spoken input.
+            // Do not collect live selection, screen or clipboard context here.
+            formattedText = writingRequest.userMessage
+            systemMessage = writingRequest.systemMessage
+        } else {
+            formattedText = requestPayload.userMessage
+            systemMessage = await getSystemMessage()
+        }
 
         await MainActor.run {
             self.lastSystemMessageSent = systemMessage
             self.lastUserMessageSent = formattedText
         }
 
-        let executionPlan = VoiceInkAIEnhancementRequestExecutionPlan.planning(
+        let output = try await executeProviderRequest(
+            systemMessage: systemMessage,
+            userMessage: formattedText,
+            using: providerSnapshot
+        )
+        let legacyOutput: String
+        if providerSnapshot?.localCLI != nil {
+            legacyOutput = VoiceInkLocalCLIPreference.cleanedOutput(output)
+            guard !legacyOutput.isEmpty else {
+                throw VoiceInkAIEnhancementError.localCLIExecutionFailure(VoiceInkLocalCLIExecutionError.emptyOutput)
+            }
+        } else {
+            legacyOutput = output
+        }
+        return VoiceInkAIEnhancementRequestPayload.enhancedText(from: legacyOutput)
+    }
+
+    private func executeProviderRequest(
+        systemMessage: String,
+        userMessage: String,
+        using providerSnapshot: AIEnhancementProviderSnapshot?
+    ) async throws -> String {
+        try Task.checkCancellation()
+        let executionPlan = providerSnapshot?.executionPlan ?? VoiceInkAIEnhancementRequestExecutionPlan.planning(
             provider: aiService.selectedProvider,
             modelName: aiService.currentModel
         )
+        let apiKey = providerSnapshot?.apiKey ?? aiService.apiKey
+        let timeoutSeconds = providerSnapshot?.timeoutSeconds ?? VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
 
-        return try await executionPlan.applyRuntimeState(
+        let output = try await executionPlan.applyRuntimeState(
             ollama: { _ in
                 do {
-                    let result = try await aiService.enhanceWithOllama(
-                        text: formattedText,
-                        systemPrompt: systemMessage,
-                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
-                    )
-                    return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
-                } catch let error as VoiceInkAIEnhancementError {
-                    throw error
+                    let result: String
+                    if let ollama = providerSnapshot?.ollama {
+                        result = try await OllamaService.enhance(
+                            userMessage,
+                            withSystemPrompt: systemMessage,
+                            configuration: ollama,
+                            timeout: timeoutSeconds
+                        )
+                    } else {
+                        result = try await aiService.enhanceWithOllama(text: userMessage, systemPrompt: systemMessage, timeout: timeoutSeconds)
+                    }
+                    try Task.checkCancellation()
+                    return result
                 } catch {
+                    try rethrowCancellation(error)
+                    if let error = error as? VoiceInkAIEnhancementError { throw error }
                     throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
                 }
             },
             localCLI: { _ in
                 do {
-                    let result = try await aiService.enhanceWithLocalCLI(
-                        systemPrompt: systemMessage,
-                        userPrompt: formattedText
-                    )
-                    return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
+                    let result: String
+                    if let localCLI = providerSnapshot?.localCLI {
+                        result = try await LocalCLIService.execute(
+                            systemPrompt: systemMessage,
+                            userPrompt: userMessage,
+                            configuration: localCLI
+                        )
+                    } else {
+                        // Custom retains its live executor and legacy output policy.
+                        result = try await aiService.enhanceWithLocalCLI(systemPrompt: systemMessage, userPrompt: userMessage)
+                    }
+                    try Task.checkCancellation()
+                    return result
                 } catch {
+                    try rethrowCancellation(error)
                     throw VoiceInkAIEnhancementError.localCLIExecutionFailure(error)
                 }
             },
             anthropicMessages: { modelName in
                 try await executeCloudAIRequest {
                     try await AnthropicLLMClient.chatCompletion(
-                        apiKey: aiService.apiKey,
+                        apiKey: apiKey,
                         model: modelName,
-                        messages: [.user(formattedText)],
+                        messages: [.user(userMessage)],
                         systemPrompt: systemMessage,
-                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
+                        timeout: timeoutSeconds
                     )
                 }
             },
@@ -231,52 +314,58 @@ class AIEnhancementService: ObservableObject {
                 try await executeCloudAIRequest {
                     try await OpenAILLMClient.chatCompletion(
                         baseURL: requestURL,
-                        apiKey: aiService.apiKey,
+                        apiKey: apiKey,
                         model: modelName,
-                        messages: [.user(formattedText)],
+                        messages: [.user(userMessage)],
                         systemPrompt: systemMessage,
                         temperature: requestParameters.temperature,
                         reasoningEffort: requestParameters.reasoningEffort,
                         extraBody: requestParameters.extraBodyParameters,
-                        timeout: VoiceInkAIEnhancementRequestPreference.timeoutSeconds()
+                        timeout: timeoutSeconds
                     )
                 }
             }
         )
+        try Task.checkCancellation()
+        return output
     }
 
     private func executeCloudAIRequest(_ request: () async throws -> String) async throws -> String {
+        try Task.checkCancellation()
         try await waitForRateLimit()
+        try Task.checkCancellation()
 
         do {
             let result = try await request()
-            return VoiceInkAIEnhancementRequestPayload.enhancedText(from: result)
-        } catch let error as LLMKitError {
-            throw VoiceInkAIEnhancementError.transportFailure(
-                error.voiceInkAIEnhancementTransportFailure
-            )
-        } catch let error as VoiceInkAIEnhancementError {
-            throw error
+            try Task.checkCancellation()
+            return result
         } catch {
+            try rethrowCancellation(error)
+            if let error = error as? LLMKitError {
+                throw VoiceInkAIEnhancementError.transportFailure(error.voiceInkAIEnhancementTransportFailure)
+            }
+            if let error = error as? VoiceInkAIEnhancementError { throw error }
             throw VoiceInkAIEnhancementError.customError(error.localizedDescription)
         }
     }
 
-    private func makeRequestWithRetry(text: String) async throws -> String {
-        var retryState = VoiceInkAIEnhancementRetryState(
-            retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
-        )
+    private func makeRequestWithRetry(
+        retryOnTimeout: Bool,
+        operation: () async throws -> String
+    ) async throws -> String {
+        var retryState = VoiceInkAIEnhancementRetryState(retryOnTimeout: retryOnTimeout)
 
         while true {
+            try Task.checkCancellation()
             do {
-                return try await makeRequest(text: text)
-            } catch let error as VoiceInkAIEnhancementError {
-                try await handleRetryDecision(
-                    retryState.recordFailure(error),
-                    state: retryState
-                )
+                let result = try await operation()
+                try Task.checkCancellation()
+                return result
             } catch {
-                if let retryPlan = retryState.recordNonEnhancementError(error) {
+                try rethrowCancellation(error)
+                if let error = error as? VoiceInkAIEnhancementError {
+                    try await handleRetryDecision(retryState.recordFailure(error), state: retryState)
+                } else if let retryPlan = retryState.recordNonEnhancementError(error) {
                     try await retryPlan.applyRuntimeState { decision, transportNetworkFailure in
                         try await handleRetryDecision(
                             decision,
@@ -291,11 +380,17 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
+    private func rethrowCancellation(_ error: Error) throws {
+        try Task.checkCancellation()
+        if error is CancellationError { throw error }
+    }
+
     private func handleRetryDecision(
         _ decision: VoiceInkAIEnhancementRetryDecision,
         state: VoiceInkAIEnhancementRetryState,
         transportNetworkFailure: Bool = false
     ) async throws {
+        try Task.checkCancellation()
         if let message = VoiceInkAIEnhancementRetryProgressPresentation.diagnosticMessage(
             for: decision,
             failedAttempts: state.failedAttempts,
@@ -340,7 +435,12 @@ class AIEnhancementService: ObservableObject {
         let startTime = Date()
         let promptName = activePrompt?.title
 
-        let result = try await makeRequestWithRetry(text: text)
+        let result = try await makeRequestWithRetry(
+            retryOnTimeout: VoiceInkAIEnhancementRequestPreference.shouldRetryOnTimeout()
+        ) {
+            try await makeRequest(text: text)
+        }
+        try Task.checkCancellation()
         let endTime = Date()
         return VoiceInkAIEnhancementResult.completed(
             text: result,
@@ -350,6 +450,62 @@ class AIEnhancementService: ObservableObject {
             promptName: promptName,
             requestSystemMessage: lastSystemMessageSent,
             requestUserMessage: lastUserMessageSent
+        )
+    }
+
+    func performWritingAction(
+        _ request: VoiceInkWritingActionRequest,
+        using providerSnapshot: AIEnhancementProviderSnapshot
+    ) async throws -> VoiceInkAIEnhancementResult {
+        let startTime = Date()
+        let result = try await makeRequestWithRetry(retryOnTimeout: providerSnapshot.retryOnTimeout) {
+            try await makeRequest(text: request.transcript, writingRequest: request, providerSnapshot: providerSnapshot)
+        }
+        try Task.checkCancellation()
+        guard !result.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw VoiceInkWritingActionError.emptyOutput
+        }
+        return VoiceInkAIEnhancementResult.completed(
+            text: result,
+            startedAt: startTime,
+            endedAt: Date(),
+            modelName: providerSnapshot.modelName,
+            promptName: request.promptName,
+            requestSystemMessage: request.systemMessage,
+            requestUserMessage: request.userMessage
+        )
+    }
+
+    func performClarity(
+        request: VoiceInkClarityRequest,
+        using providerSnapshot: AIEnhancementProviderSnapshot
+    ) async throws -> VoiceInkAIEnhancementResult {
+        try Task.checkCancellation()
+        let startTime = Date()
+        let response = try await makeRequestWithRetry(retryOnTimeout: providerSnapshot.retryOnTimeout) {
+            try await executeProviderRequest(
+                systemMessage: request.systemMessage,
+                userMessage: request.userMessage,
+                using: providerSnapshot
+            )
+        }
+        try Task.checkCancellation()
+        let result: String
+        do {
+            result = try request.decodeResponse(response)
+        } catch {
+            try rethrowCancellation(error)
+            throw error
+        }
+        try Task.checkCancellation()
+        return VoiceInkAIEnhancementResult.completed(
+            text: result,
+            startedAt: startTime,
+            endedAt: Date(),
+            modelName: providerSnapshot.modelName,
+            promptName: nil,
+            requestSystemMessage: request.systemMessage,
+            requestUserMessage: request.userMessage
         )
     }
 

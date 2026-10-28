@@ -3,6 +3,7 @@ import VoiceInkCore
 
 extension Notification.Name {
     static let AppSettingsDidChange = VoiceInkMacOSAppEventRequest.appSettingsDidChangeNotificationName
+    static let writingFeaturesDidChange = Notification.Name("VoiceInkWritingFeaturesDidChange")
     static let languageDidChange = VoiceInkMacOSAppEventRequest.languageDidChangeNotificationName
     static let toggleMiniRecorder = VoiceInkMiniRecorderRequest.toggleNotificationName
     static let dismissMiniRecorder = VoiceInkMiniRecorderRequest.dismissNotificationName

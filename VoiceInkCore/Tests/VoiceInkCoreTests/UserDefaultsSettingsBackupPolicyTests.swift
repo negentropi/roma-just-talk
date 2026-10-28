@@ -374,6 +374,106 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
         XCTAssertEqual(decoded.generalSettings?.generalSettingsBackupPreferences, preferences)
     }
 
+    func testSettingsBackupRoundTripsAndImportsNoneDictationProfile() throws {
+        let payload = VoiceInkGeneralSettingsBackupPayload<TestShortcutBackup>(
+            shortcutBackupRecords: [:],
+            preferences: generalSettingsBackupPreferencesFixture(dictationProfile: VoiceInkDictationProfile.none)
+        )
+        let backup = VoiceInkSettingsBackupFile(
+            version: "2.4.0",
+            customPrompts: [],
+            powerModeConfigs: [],
+            powerModeShortcuts: nil,
+            vocabularyWords: nil,
+            wordReplacements: nil,
+            generalSettings: payload,
+            customEmojis: nil,
+            customCloudModels: nil
+        )
+        let data = try VoiceInkSettingsBackupFileCodec.encode(backup)
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let generalSettingsJSON = try XCTUnwrap(json["generalSettings"] as? [String: Any])
+        XCTAssertEqual(generalSettingsJSON["dictationProfile"] as? String, "none")
+        let decoded: VoiceInkSettingsBackupFile<TestShortcutBackup> = try VoiceInkSettingsBackupFileCodec.decode(from: data)
+        let preferences = try XCTUnwrap(decoded.generalSettings?.generalSettingsBackupPreferences)
+
+        withIsolatedDefaults { defaults in
+            VoiceInkDictationProfile.custom.save(to: defaults)
+            VoiceInkGeneralSettingsBackupPolicy.importPlans(from: preferences).applyRuntimeState(
+                to: defaults,
+                applyRecordingShortcutImportPlan: { _ in },
+                applyMacOSShellImportPlan: { _ in },
+                applyRecordingFeedbackImportPlan: { _ in },
+                reportImportedGeneralSettings: {}
+            )
+
+            XCTAssertEqual(VoiceInkDictationProfile.current(in: defaults), .none)
+            XCTAssertEqual(VoiceInkPastePreference.clipboardRestoreDelay(from: defaults), 1.25)
+        }
+    }
+
+    func testLegacySettingsBackupImportPreservesCurrentDictationProfile() throws {
+        let data = Data(#"{"generalSettings":{"clipboardRestoreDelay":1.25}}"#.utf8)
+        let backup: VoiceInkSettingsBackupFile<TestShortcutBackup> = try VoiceInkSettingsBackupFileCodec.decode(from: data)
+        let preferences = try XCTUnwrap(backup.generalSettings?.generalSettingsBackupPreferences)
+        XCTAssertNil(preferences.dictationProfile)
+
+        withIsolatedDefaults { defaults in
+            VoiceInkDictationProfile.none.save(to: defaults)
+            VoiceInkPastePreference.saveClipboardRestoreDelay(2.5, to: defaults)
+
+            VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
+                VoiceInkGeneralSettingsBackupPolicy.importPlans(from: preferences),
+                to: defaults
+            )
+
+            XCTAssertEqual(VoiceInkDictationProfile.current(in: defaults), .none)
+            XCTAssertEqual(VoiceInkPastePreference.clipboardRestoreDelay(from: defaults), 1.25)
+        }
+    }
+
+    func testSettingsBackupRejectsInvalidDictationProfileBeforeApplyingDecodedPreferences() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "generalSettings": ["dictationProfile": "invalid", "clipboardRestoreDelay": 1.25],
+            "spokenSnippets": [[
+                "id": UUID().uuidString,
+                "trigger": "new snippet",
+                "content": "imported content",
+                "enabled": true
+            ]]
+        ])
+        let originalSnippets = [VoiceInkSpokenSnippet(trigger: "existing snippet", content: "preserved content")]
+
+        withIsolatedDefaults { defaults in
+            VoiceInkDictationProfile.none.save(to: defaults)
+            VoiceInkPastePreference.saveClipboardRestoreDelay(2.5, to: defaults)
+            do {
+                try VoiceInkSpokenSnippets.save(originalSnippets, to: defaults)
+                var rejectedInvalidProfile = false
+                do {
+                    let backup: VoiceInkSettingsBackupFile<TestShortcutBackup> = try VoiceInkSettingsBackupFileCodec.decode(from: data)
+                    if let preferences = backup.generalSettings?.generalSettingsBackupPreferences {
+                        VoiceInkGeneralSettingsBackupPolicy.applyCorePreferenceImportPlans(
+                            VoiceInkGeneralSettingsBackupPolicy.importPlans(from: preferences),
+                            to: defaults
+                        )
+                    }
+                    try VoiceInkWritingFeatureBackupImportPlan(backup: backup, categories: [.general, .dictionary]).apply(to: defaults)
+                } catch DecodingError.dataCorrupted(let context) {
+                    rejectedInvalidProfile = true
+                    XCTAssertEqual(context.codingPath.map(\.stringValue), ["generalSettings", "dictationProfile"])
+                }
+
+                XCTAssertTrue(rejectedInvalidProfile)
+                XCTAssertEqual(VoiceInkDictationProfile.current(in: defaults), .none)
+                XCTAssertEqual(VoiceInkPastePreference.clipboardRestoreDelay(from: defaults), 2.5)
+                XCTAssertEqual(VoiceInkSpokenSnippets.load(from: defaults), originalSnippets)
+            } catch {
+                XCTFail("Unexpected backup import error: \(error)")
+            }
+        }
+    }
+
     func testGeneralSettingsBackupPayloadPreservesWireShapeAndGroupedPreferences() throws {
         let preferences = generalSettingsBackupPreferencesFixture()
         let payload = VoiceInkGeneralSettingsBackupPayload(
@@ -729,7 +829,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
     }
 
     private func generalSettingsBackupPreferencesFixture(
-        showDockIcon: Bool = true
+        showDockIcon: Bool = true,
+        dictationProfile: VoiceInkDictationProfile? = nil
     ) -> VoiceInkGeneralSettingsBackupPreferences {
         VoiceInkGeneralSettingsBackupPreferences(
             recordingShortcut: VoiceInkRecordingShortcutBackupPreferences(
@@ -770,7 +871,8 @@ final class UserDefaultsSettingsBackupPolicyTests: XCTestCase {
             paste: VoiceInkPasteBackupPreferences(
                 shouldRestoreClipboardAfterPaste: false,
                 clipboardRestoreDelay: 1.25
-            )
+            ),
+            dictationProfile: dictationProfile
         )
     }
 

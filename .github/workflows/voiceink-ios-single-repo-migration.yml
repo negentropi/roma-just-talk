@@ -16,6 +16,7 @@ on:
       - "Makefile"
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
+      - "scripts/prepare-apple-ci-toolchain.sh"
       - "scripts/verify-ios-single-repo-migration.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
@@ -42,6 +43,7 @@ on:
       - "Makefile"
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
+      - "scripts/prepare-apple-ci-toolchain.sh"
       - "scripts/verify-ios-single-repo-migration.sh"
       - "scripts/verify-static-whisper-app.sh"
       - "scripts/verify-static-whisper-xcframework.sh"
@@ -62,7 +64,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: namespace-profile-roma-jt
+  group: ios-migration-${{ github.ref }}
   cancel-in-progress: false
   queue: max
 
@@ -174,21 +176,15 @@ jobs:
     name: Verify single-repo migration
     needs: reuse
     if: ${{ !cancelled() && needs.reuse.outputs.hit != 'true' }}
-    runs-on: namespace-profile-roma-jt
+    runs-on: macos-26
     timeout-minutes: 90
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show toolchain
-        run: |
-          ls -d /Applications/Xcode*.app
-          xcode-select -p
-          xcodebuild -version
-          swift --version
+      - name: Select Xcode and build dependencies
+        run: bash scripts/prepare-apple-ci-toolchain.sh
 
       - name: Run config verifier
         run: bash scripts/verify-ios-single-repo-migration.sh

@@ -603,22 +603,35 @@ struct AudioPlayerView: View {
             return
         }
 
+        guard !isOperationInProgress else { return }
+
         isRetranscribing = true
         bannerPresentation = nil
+        let service = transcriptionService
 
-        Task {
+        Task { @MainActor in
+            defer { isRetranscribing = false }
             do {
-                let _ = try await transcriptionService.retranscribeAudio(from: url, using: currentTranscriptionModel)
-                await MainActor.run {
-                    isRetranscribing = false
+                let saved = try await service.retranscribeAudio(from: url, using: currentTranscriptionModel)
+                // The service saves and returns; it posts no user-facing notice, so this is the only outcome.
+                if saved.processingFailureReason != nil {
+                    showTemporaryBanner(Self.retranscriptionCleanupIncompleteBanner)
+                } else {
                     showTemporaryBanner(.retranscriptionSuccess)
                 }
+            } catch is CancellationError {
+                // Cancelled: nothing was saved, and this is neither a success nor a failure to report.
             } catch {
-                await MainActor.run {
-                    isRetranscribing = false
-                    showTemporaryBanner(.retranscriptionFailure(errorDescription: error.localizedDescription))
-                }
+                showTemporaryBanner(.retranscriptionFailure(errorDescription: error.localizedDescription))
             }
         }
     }
+
+    /// Retranscription saved, but Light/Clarity cleanup didn't finish, so the recognized text was kept as-is.
+    /// The exact reason stays on the saved record, where History shows its processing warning.
+    /// `isError` is the only non-success appearance StatusBanner has, so a fallback never looks like a green success.
+    private static let retranscriptionCleanupIncompleteBanner = VoiceInkAudioPlaybackActionBannerPresentation(
+        message: "Cleanup didn’t finish. Original transcription saved.",
+        isError: true
+    )
 }

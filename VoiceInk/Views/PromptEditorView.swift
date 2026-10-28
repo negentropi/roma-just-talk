@@ -56,6 +56,8 @@ struct PromptEditorView: View {
                 }
                 .buttonStyle(.plain)
                 .help(VoiceInkCustomPromptPresentation.closeHelpText)
+                .accessibilityLabel(VoiceInkCustomPromptPresentation.closeHelpText)
+                .accessibilityIdentifier("promptEditor.close")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -78,6 +80,7 @@ struct PromptEditorView: View {
                         .keyboardShortcut(.escape, modifiers: [])
                         .buttonStyle(.plain)
                         .foregroundColor(.secondary)
+                        .accessibilityIdentifier("promptEditor.cancel")
 
                     Spacer()
 
@@ -145,6 +148,7 @@ struct PromptEditorView: View {
 
                     TextField(VoiceInkCustomPromptPresentation.promptNamePlaceholder, text: $draft.title)
                         .textFieldStyle(.roundedBorder)
+                        .accessibilityIdentifier("promptEditor.name")
                 }
 
                 TextField(VoiceInkCustomPromptPresentation.descriptionPlaceholder, text: $draft.description)

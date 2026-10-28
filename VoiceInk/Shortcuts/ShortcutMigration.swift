@@ -11,13 +11,17 @@ struct LegacyKeyboardShortcut: Codable {
 struct ShortcutBackup: Codable {
     let shortcut: Shortcut
 
+    private enum CodingKeys: String, CodingKey { case kind }
+
     init(_ shortcut: Shortcut) {
         self.shortcut = shortcut
     }
 
     init(from decoder: Decoder) throws {
-        if let shortcut = try? Shortcut(from: decoder) {
-            self.shortcut = shortcut
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        // Only missing kind denotes a legacy Carbon backup; explicit modern data must validate.
+        if values.contains(.kind) {
+            self.shortcut = try Shortcut(from: decoder)
             return
         }
 

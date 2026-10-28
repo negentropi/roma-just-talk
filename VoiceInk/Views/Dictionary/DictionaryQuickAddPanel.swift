@@ -143,12 +143,13 @@ struct DictionaryQuickAddView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Query private var vocabularyWords: [VocabularyWord]
-    @Query private var wordReplacements: [WordReplacement]
 
     @State private var mode: Mode = .vocabulary
     @State private var vocabularyDraftState = VoiceInkVocabularyDraftState()
     @State private var wordReplacementDraftState = VoiceInkWordReplacementDraftState()
     @State private var errorMessage: String?
+    /// Shown inline: a sheet or alert would take key status and this nonactivating panel hides on resign.
+    @State private var replacementIssue: WordReplacementIssue?
     @FocusState private var focusedField: Field?
 
     enum Field: Hashable { case word, original, replacement }
@@ -169,6 +170,14 @@ struct DictionaryQuickAddView: View {
                     .foregroundColor(.red)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 6)
+            }
+            if let replacementIssue {
+                ScrollView {
+                    WordReplacementIssueView(issue: replacementIssue, identifier: "dictionary.quickAdd.replacement.error")
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 6)
+                }
+                .frame(maxHeight: replacementIssue.conflicts.isEmpty ? 40 : 300)
             }
             Divider().opacity(0.4)
             hintBar
@@ -191,15 +200,28 @@ struct DictionaryQuickAddView: View {
             vocabularyDraftState = VoiceInkVocabularyDraftState()
             wordReplacementDraftState = VoiceInkWordReplacementDraftState()
             errorMessage = nil
+            replacementIssue = nil
             DispatchQueue.main.async {
                 focusedField = newMode == .vocabulary ? .word : .original
             }
             onResize(newMode.panelHeight)
         }
-        .onChange(of: errorMessage) { _, newError in
-            let height = mode.panelHeight + (newError != nil ? 24 : 0)
-            onResize(height)
+        .onChange(of: errorMessage) { _, _ in
+            onResize(panelHeight)
         }
+        .onChange(of: replacementIssue) { _, _ in
+            onResize(panelHeight)
+        }
+        .onChange(of: wordReplacementDraftState) { _, _ in
+            replacementIssue = nil
+        }
+    }
+
+    private var panelHeight: CGFloat {
+        var height = mode.panelHeight
+        if errorMessage != nil { height += 24 }
+        if let replacementIssue { height += replacementIssue.conflicts.isEmpty ? 40 : 300 }
+        return height
     }
 
     // MARK: - Mode Bar
@@ -279,6 +301,7 @@ struct DictionaryQuickAddView: View {
                     .font(.system(size: 14))
                     .focused($focusedField, equals: .original)
                     .onSubmit { focusedField = .replacement }
+                    .accessibilityIdentifier("dictionary.quickAdd.replacement.original")
             }
 
             HStack(spacing: 10) {
@@ -295,6 +318,7 @@ struct DictionaryQuickAddView: View {
                     .font(.system(size: 14))
                     .focused($focusedField, equals: .replacement)
                     .onSubmit { submitReplacement() }
+                    .accessibilityIdentifier("dictionary.quickAdd.replacement.replacement")
             }
         }
         .padding(.horizontal, 14)
@@ -344,20 +368,19 @@ struct DictionaryQuickAddView: View {
         }
     }
 
+    /// Same manual comma-alternatives API as Dictionary; dismisses only after an actual insert.
     private func submitReplacement() {
-        let submission = wordReplacementDraftState.submitting(
-            existingRules: wordReplacements.map(\.voiceInkRule)
-        )
-        let appliedSubmission = DictionaryService.applyWordReplacementSubmission(
-            submission,
-            context: modelContext
-        )
-        if let alertPresentation = appliedSubmission.alertPresentation {
-            errorMessage = alertPresentation.message
-            return
-        }
-        if appliedSubmission.plan.shouldComplete {
+        guard wordReplacementDraftState.canSubmit else { return }
+        do {
+            _ = try DictionaryService.addWordReplacement(
+                originalText: wordReplacementDraftState.original,
+                replacementText: wordReplacementDraftState.replacement,
+                context: modelContext
+            )
+            replacementIssue = nil
             onDismiss()
+        } catch {
+            replacementIssue = WordReplacementIssue(error)
         }
     }
 }

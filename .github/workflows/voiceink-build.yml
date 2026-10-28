@@ -16,6 +16,7 @@ on:
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
+      - "scripts/prepare-apple-ci-toolchain.sh"
       - "scripts/run-macos-ci-unit-tests.sh"
       - "scripts/verify-macos-release-instrumentation.sh"
       - "scripts/test-qwen-package.sh"
@@ -57,6 +58,7 @@ on:
       - "Tools/**"
       - "scripts/check-find-reusable-ci-run.sh"
       - "scripts/find-reusable-ci-run.sh"
+      - "scripts/prepare-apple-ci-toolchain.sh"
       - "scripts/run-macos-ci-unit-tests.sh"
       - "scripts/verify-macos-release-instrumentation.sh"
       - "scripts/test-qwen-package.sh"
@@ -93,7 +95,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: namespace-profile-roma-jt
+  group: macos-build-${{ github.ref }}
   cancel-in-progress: false
   queue: max
 
@@ -166,12 +168,15 @@ jobs:
 
   runtime-helper:
     name: Build reusable runtime E2E helper
-    runs-on: namespace-profile-roma-jt
+    runs-on: macos-26
     timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Select Xcode for the runtime helper
+        run: bash scripts/prepare-apple-ci-toolchain.sh --swift-only
 
       - name: Compile and verify autonomous runtime E2E harness
         run: |
@@ -209,8 +214,8 @@ jobs:
     name: Build release macOS app
     needs: reuse
     if: ${{ !cancelled() && needs.reuse.outputs.hit != 'true' }}
-    runs-on: namespace-profile-roma-jt
-    timeout-minutes: 60
+    runs-on: macos-26
+    timeout-minutes: 120
 
     steps:
       - name: Checkout
@@ -221,11 +226,8 @@ jobs:
           /usr/bin/caffeinate -d -i -u -t 3600 </dev/null >/dev/null 2>&1 &
           echo "Temporary desktop assertion PID: $!"
 
-      - name: Show Xcode version
-        run: |
-          xcode-select -p
-          xcodebuild -version
-          swift --version
+      - name: Select Xcode and build dependencies
+        run: bash scripts/prepare-apple-ci-toolchain.sh
 
       - name: Compile visible text latency harness helper
         run: make latency-harness-app

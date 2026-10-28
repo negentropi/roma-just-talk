@@ -1,0 +1,104 @@
+{
+  "run_id": 40605454469,
+  "artifact_id": 12781093654,
+  "download_route": "repos/negentropi/roma-just-talk/actions/artifacts/12781093654/zip",
+  "download_count": 1,
+  "zip_bytes": 262487,
+  "zip_sha256": "bc19b747a024264549a9c3b3fa2ab39d4cb3e363d51bae60a16fdbdd2e981474",
+  "all_members_crc_verified": true,
+  "members": {
+    "app-archive-sha256.txt": {
+      "bytes": 133,
+      "sha256": "39c045bb7dc9909ecf216696e0974a3c49d594166933c3131cae2b1b621509bc"
+    },
+    "__pycache__/pin_contract.cpython-315.pyc": {
+      "bytes": 2885,
+      "sha256": "34885bc95f342fc3776f2f2742d370d1f7ed3d977aa9b1a17a78ed6f9975ca5a"
+    },
+    "build.log": {
+      "bytes": 4562082,
+      "sha256": "1ee4e34249375d1509a634a87eefe8952b3b29d65776c88576b87fa82a409703"
+    },
+    "config-verifier.log": {
+      "bytes": 5940,
+      "sha256": "3af9a9fe260bc0bf52550a917eda64c5ac5c77cf316f347fef6c79477a85cd70"
+    },
+    "dependencies.log": {
+      "bytes": 39579,
+      "sha256": "68f110e3ee53b92a92486e0d34cbf075da3f83ac207c25c11fec25421356f357"
+    },
+    "executable-sha256.txt": {
+      "bytes": 177,
+      "sha256": "cdcd17e26671bd0cc5d073bcd1572e506f1d744d32c3b462aebae9ca9303a851"
+    },
+    "package-locks-after.json": {
+      "bytes": 8096,
+      "sha256": "4937d254699ce93e77a64e0919570e691c007884c8f46e6888d7fa9b555c4faf"
+    },
+    "package-locks-before.json": {
+      "bytes": 488050,
+      "sha256": "b2616fe2298498afa8a20f6e3feea88664798dc24b80e4b5bb509b0f28979872"
+    },
+    "package-resolution-receipt.json": {
+      "bytes": 471,
+      "sha256": "b3f0759c882bc02bef53d052f1df5a7514dacad1143a0be987799c3effd8e125"
+    },
+    "package-resolution.log": {
+      "bytes": 8298,
+      "sha256": "39e6ef5ded20a74ed7cea2f8f0b1dd00b99d1b1e0bd8718a6d3a483c38d57af1"
+    },
+    "package-seed-receipt.json": {
+      "bytes": 782,
+      "sha256": "9a7593cb8d9fb5e301c537031fef477ae92f2ba07ad2c73830df810fc755165f"
+    },
+    "pin_contract.py": {
+      "bytes": 1678,
+      "sha256": "940ccb49b99a2754ae38855c583503359fb111274efb32bfb26caf639e865f8d"
+    },
+    "project-list.json": {
+      "bytes": 438,
+      "sha256": "57f262dec0ccdf3ba9d8f672cef75ed5e10787cd67424db6b8655a7b30755329"
+    },
+    "resolved-ios.Package.resolved": {
+      "bytes": 6989,
+      "sha256": "9ef0281253cc36305582b4e077be84fc659d9ad62abb2f112118e8f86d9f9a0f"
+    },
+    "scope.txt": {
+      "bytes": 132,
+      "sha256": "c0e286aa3ce3e1e41ebd3bc1d4fa0d4d90061bcf88c38846666be7ebf23c001e"
+    },
+    "seed-ios.Package.resolved": {
+      "bytes": 11337,
+      "sha256": "f2272461a6b8fb943c5e40051fecf8b37bf06816a0dd453ebc1bf2d6219431d2"
+    },
+    "signature-identity.txt": {
+      "bytes": 936,
+      "sha256": "75c73a5cf314e621c6dff42fb005ba0222d2e235d861ca4d86c0584a2f62f378"
+    },
+    "signature-verification.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "source-integrity.json": {
+      "bytes": 278,
+      "sha256": "fd82845432575c98ad0198461311ae2a22751641e3929bb76441666cbbbd25b9"
+    },
+    "source-manifest-before.json": {
+      "bytes": 77285,
+      "sha256": "9242bdb2e1954ccebbdc8bb0260c7a90b65580df399d33a1bf718e9d7df2726e"
+    },
+    "source-sha.txt": {
+      "bytes": 41,
+      "sha256": "55b427bc1c5330ed7fd00b7fe2d322b8264ae9300e22d3e71f13e7b68cd7bac4"
+    },
+    "static-whisper.log": {
+      "bytes": 55,
+      "sha256": "1fa0d07e853ab4ca576cd5d1a22565fd28aeb3127735ad30550388cd084f05e5"
+    },
+    "xcode-version.txt": {
+      "bytes": 32,
+      "sha256": "18730ed2ae28a2c9cf0c2d5db549033a4f07089331391a7133b7b32187454fa9"
+    }
+  },
+  "remote_archive": "/data/rjt-writing-check-01a17bef/undo-ios-40605454469/compile-evidence.zip"
+}

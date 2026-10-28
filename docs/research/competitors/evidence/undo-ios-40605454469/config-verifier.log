@@ -1,0 +1,201 @@
+
+==> tool availability
+
+==> repository root
+
+==> required project directories
+
+==> required project files
+
+==> required app configuration files
+
+==> required iOS shared shell files
+
+==> required iOS resources
+
+==> abandoned root-level shared-core shape stays absent
+
+==> project/plist/entitlements lint
+VoiceInk.xcodeproj/project.pbxproj: OK
+iOS/VoiceInk-ios.xcodeproj/project.pbxproj: OK
+VoiceInk/Info.plist: OK
+VoiceInk/VoiceInk.entitlements: OK
+VoiceInk/VoiceInk.local.entitlements: OK
+iOS/VoiceInk-ios/Info.plist: OK
+iOS/VoiceInk-ios/PrivacyInfo.xcprivacy: OK
+iOS/VoiceInk-ios/VoiceInk_ios.entitlements: OK
+iOS/VoiceInkKeyboard/Info.plist: OK
+iOS/VoiceInkKeyboard/VoiceInkKeyboard.entitlements: OK
+
+==> iOS app icon JSON lint
+
+==> workspace and scheme XML lint
+
+==> workspace includes in-repo iOS project
+
+==> iOS workspace scheme includes unit-test bundle
+
+==> iOS workspace scheme enables unit-test bundle
+
+==> iOS workspace scheme includes UI-test bundle
+
+==> iOS workspace scheme enables UI-test bundle
+
+==> iOS app display name stays roma just talk
+
+==> iOS app bundle name stays roma just talk
+
+==> iOS record deep-link scheme stays romajusttalk
+
+==> iOS app keeps audio background mode
+
+==> keyboard extension point stays keyboard service
+
+==> keyboard open access stays enabled
+
+==> iOS app entitlement uses shared App Group
+
+==> keyboard entitlement uses shared App Group
+
+==> iOS CI allows Simulator signing for builds and tests
+
+==> iOS CI uses the ad-hoc Simulator signing identity
+
+==> iOS CI keeps Simulator entitlements in builds and tests
+
+==> iOS CI does not disable signing for Simulator artifacts
+
+==> iOS CI does not exclude test source files
+
+==> iOS CI runs the complete unit-test bundle
+
+==> iOS CI avoids class-level unit-test allowlists
+
+==> iOS CI runs the complete UI-test bundle
+
+==> iOS CI avoids class-level UI-test allowlists
+
+==> iOS CI has only the two complete-bundle selectors
+
+==> iOS CI does not skip tests inside either bundle
+
+==> iOS CI avoids broad unrelated trigger docs/**
+
+==> iOS CI avoids broad unrelated trigger scripts/**
+
+==> iOS CI avoids broad unrelated trigger VoiceInk/**
+
+==> iOS CI watches shared input .github/workflows/voiceink-build.yml
+
+==> iOS CI watches shared input LocalBuild.xcconfig
+
+==> iOS CI watches shared input Makefile
+
+==> iOS CI watches shared input scripts/check-find-reusable-ci-run.sh
+
+==> iOS CI watches shared input scripts/find-reusable-ci-run.sh
+
+==> iOS CI watches shared input scripts/verify-ios-single-repo-migration.sh
+
+==> iOS CI watches shared input scripts/verify-static-whisper-app.sh
+
+==> iOS CI watches shared input scripts/verify-static-whisper-xcframework.sh
+
+==> iOS CI watches shared input VoiceInkCore/**
+
+==> iOS CI watches shared input iOS/**
+
+==> iOS CI watches shared input VoiceInk/Info.plist
+
+==> iOS CI watches shared input VoiceInk/Resources/Sounds/**
+
+==> iOS CI watches shared input VoiceInk/Transcription/FluidAudio/FluidAudioModelManager.swift
+
+==> iOS CI watches shared input VoiceInk/Transcription/Streaming/FluidAudioStreamingProvider.swift
+
+==> iOS CI watches shared input VoiceInk/Transcription/Streaming/FluidAudioWordTimingAdapter.swift
+
+==> iOS CI watches shared input VoiceInk/VoiceInk.entitlements
+
+==> iOS CI watches shared input VoiceInk/VoiceInk.local.entitlements
+
+==> iOS CI watches shared input VoiceInk.xcodeproj/**
+
+==> iOS CI watches shared input VoiceInk.xcworkspace/**
+
+==> macOS build watches shared core
+
+==> macOS build watches scripts/verify-static-whisper-app.sh
+
+==> macOS build watches scripts/verify-static-whisper-xcframework.sh
+
+==> macOS build watches the ad-hoc Library Validation check
+
+==> macOS build watches the ad-hoc Library Validation regression test
+
+==> macOS build runs the ad-hoc Library Validation regression test
+
+==> local build verifies its DerivedData app before installation
+
+==> local build fails before installation when static Whisper verification fails
+
+==> local build verifies the staged install before replacing the current app
+
+==> local build fails when staging the verified app fails
+
+==> standalone ad-hoc Library Validation check targets the installed app
+
+==> local entitlements disable Library Validation for ad-hoc dynamic frameworks
+
+==> certificate-signed release entitlements keep Library Validation enabled
+
+==> iOS CI does not duplicate the macOS build
+
+==> macOS build checks pull requests
+
+==> macOS pull requests never reuse prior proof
+
+==> macOS project references VoiceInkCore
+
+==> iOS project references VoiceInkCore
+
+==> iOS project references shared shell group
+
+==> macOS project product name stays roma just talk
+
+==> iOS project product name stays roma just talk
+
+==> macOS project avoids sibling VoiceInk-iOS references
+
+==> iOS project avoids sibling VoiceInk-iOS references
+
+==> macOS project uses canonical local Whisper framework path
+
+==> iOS project uses canonical local Whisper framework path
+
+==> macOS project does not embed static Whisper
+
+==> iOS project does not embed static Whisper
+
+==> Makefile requests upstream static Whisper packaging
+
+==> macOS app explicitly links CoreML required by static Whisper
+
+==> iOS app explicitly links CoreML required by static Whisper
+
+==> macOS project avoids obsolete framework path ../Downloads/build-apple/whisper.xcframework
+
+==> iOS project avoids obsolete framework path ../Downloads/build-apple/whisper.xcframework
+
+==> macOS project avoids obsolete framework path ../whisper.cpp/build-apple/whisper.xcframework
+
+==> iOS project avoids obsolete framework path ../whisper.cpp/build-apple/whisper.xcframework
+
+==> macOS project avoids obsolete framework path ../build-apple/whisper.xcframework
+
+==> iOS project avoids obsolete framework path ../build-apple/whisper.xcframework
+
+==> local framework readiness
+WARN: local Whisper xcframework missing at /Users/runner/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework
+
+All required single-repo config gates passed; 1 warning(s).

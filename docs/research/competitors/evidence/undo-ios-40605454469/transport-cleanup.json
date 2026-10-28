@@ -1,0 +1,14 @@
+{
+  "remote": "https://github.com/negentropi/roma-just-talk.git",
+  "deleted_ref": "refs/heads/ci/rjt-core-check-undo-794fa259-01a17bef",
+  "verified_head_before_deletion": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "deleted_at_utc": "2026-10-28T00:26:16.847539+00:00",
+  "absence_verified": true,
+  "workflow_results_retained": [
+    40605454144,
+    40605454469
+  ],
+  "both_exact_head_runs_completed_success": true,
+  "duplicate_generic_workflow_visible_on_this_ref": false,
+  "scope": "Only this task-created disposable CI transport ref removed; no normal branch or release write"
+}

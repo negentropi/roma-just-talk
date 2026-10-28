@@ -1,0 +1,23 @@
+Executable=/Users/runner/work/_temp/none-ios-build/Build/Products/Debug-iphonesimulator/roma just talk.app/roma just talk
+Identifier=com.negentropi.RomaJustTalk
+Format=app bundle with Mach-O universal (x86_64 arm64)
+CodeDirectory v=20400 size=436 flags=0x2(adhoc) hashes=3+7 location=embedded
+VersionPlatform=7
+VersionMin=1114112
+VersionSDK=1705216
+Hash type=sha256 size=32
+CandidateCDHash sha256=5b543d27504f21e8f29de9860d5b8bac15e5a3ac
+CandidateCDHashFull sha256=5b543d27504f21e8f29de9860d5b8bac15e5a3ac8afb84d212ed513a09a8dabf
+Hash choices=sha256
+CMSDigest=5b543d27504f21e8f29de9860d5b8bac15e5a3ac8afb84d212ed513a09a8dabf
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=16384
+Executable Segment flags=0x1
+Page size=16384
+CDHash=5b543d27504f21e8f29de9860d5b8bac15e5a3ac
+Signature=adhoc
+Info.plist entries=35
+TeamIdentifier=not set
+Sealed Resources version=2 rules=10 files=195
+Internal requirements count=0 size=12

@@ -1,0 +1,10 @@
+{
+  "source_head": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "complete_workflow_source_census": true,
+  "all_source_sha256_match_pinned_git_blobs": true,
+  "source_files": 600,
+  "all_lock_snapshots_match_pinned_git_blobs": true,
+  "tracked_lock_snapshots": 46,
+  "expectations_sha256": "2e1f431c6976e221b76ae7a841eff794397bd1c8a1c04d448967e367be590a5f",
+  "scope": "Prepares immutable source expectations for remote artifact audit; count includes retained evidence Package.resolved snapshots"
+}

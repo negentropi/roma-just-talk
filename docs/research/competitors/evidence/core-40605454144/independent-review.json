@@ -27,5 +27,16 @@
     "artifact.json": "0b8793780d63111fcb1c2cb2af592fc748ae903d462bb6b9ccedfe5868a9efd7",
     "download-receipt.json": "30edce60be23718b04fff98a8c00b76638dc8f37d601919395cd14117a43e8cc"
   },
-  "readme_scope": "Core audit evidence; later source-authorship link is separately recorded in core-label-authorship.json"
+  "readme_scope": "Core audit evidence; later source-authorship link is separately recorded in core-label-authorship.json",
+  "supplemental_review": {
+    "status": "clean",
+    "scope": "Pinned Opus authorship receipt and compiled Core display-label bytes; README separates source authorship from UI runtime",
+    "reviewed_file_sha256": {
+      "core-label-authorship.json": "dfc665c60b0838ef91548e3aff156e3340756d88f1c4834959449099ca1843d3",
+      "README.md": "d4bb1e9e42697cd5daf2240813f12b006b74a2adda034afb9d894a5c5f995e9e"
+    },
+    "inverse_label_removal_recovers_frozen_backend_hash": true,
+    "production_edits": 0,
+    "builds": 0
+  }
 }

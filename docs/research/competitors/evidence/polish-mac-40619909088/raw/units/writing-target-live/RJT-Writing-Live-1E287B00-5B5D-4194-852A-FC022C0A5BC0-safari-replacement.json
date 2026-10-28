@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.Safari",
+  "checkpoint" : "safari-replacement",
+  "date" : "2026-10-28T02:36:06Z",
+  "expected" : "Before 👩🏽‍💻 Translated 日本語\nNext paragraph after 🧑‍🚀.\n",
+  "observed" : "Before 👩🏽‍💻 Translated 日本語\nNext paragraph after 🧑‍🚀.\n",
+  "processIdentifier" : 36735,
+  "token" : "RJT-Writing-Live-1E287B00-5B5D-4194-852A-FC022C0A5BC0"
+}

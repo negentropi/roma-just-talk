@@ -1,0 +1,27 @@
+{
+  "closedAfterUI": false,
+  "closedBeforeUI": true,
+  "correctionReceiptsUnchanged": false,
+  "corrections": null,
+  "exit_code": 0,
+  "hostPID": 73009,
+  "normalFactoryReused": true,
+  "normalStorePaths": [
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+  ],
+  "phase": "seed",
+  "saveCompleted": true,
+  "savedCounts": {
+    "SessionMetric": 0,
+    "Transcription": 6,
+    "VocabularyWord": 1,
+    "WordReplacement": 1
+  },
+  "sourceSHA": "700cde9be5867b8c0c625cc95ee9ac7cf141720a",
+  "statsUnchanged": false,
+  "testName": "liveDictationHistoryUISeed",
+  "valid": true,
+  "verificationReadOnly": false
+}

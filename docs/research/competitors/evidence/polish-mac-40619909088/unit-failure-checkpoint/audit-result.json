@@ -1,0 +1,15 @@
+{
+  "run_id": 40619909088,
+  "head_sha": "700cde9be5867b8c0c625cc95ee9ac7cf141720a",
+  "selected_success": 44,
+  "correction_success": 29,
+  "overlap": 7,
+  "unique_swift_identifiers": {
+    "Success": 299,
+    "Skipped": 31
+  },
+  "unique_onboarding_xctest_identifiers": {
+    "Success": 9
+  },
+  "whole_workflow": "UI failed; Release skipped"
+}

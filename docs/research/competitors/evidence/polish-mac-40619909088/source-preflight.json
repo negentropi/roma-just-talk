@@ -1,0 +1,55 @@
+{
+  "run_id": 40619909088,
+  "candidate_sha": "700cde9be5867b8c0c625cc95ee9ac7cf141720a",
+  "failed_full_source": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "inputs": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": {
+      "sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
+      "unchanged_vs53d": false
+    },
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": {
+      "sha256": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec",
+      "unchanged_vs53d": true
+    },
+    "scripts/run-writing-feature-regression.sh": {
+      "sha256": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e",
+      "unchanged_vs53d": true
+    },
+    ".github/workflows/voiceink-writing-actions-check.yml": {
+      "sha256": "14254f712f90a3561caa767ebe486d4f85aea0579c9c7cf88169cdaf19027d84",
+      "unchanged_vs53d": true
+    },
+    "VoiceInkTests/HistoryCorrectionApprovalTests.swift": {
+      "sha256": "017b18990d4c7df0205ae56bba8400fc579f05be5a658502741ba4b837472f5a",
+      "unchanged_vs53d": true
+    },
+    "VoiceInkTests/WordReplacementLibraryAdapterTests.swift": {
+      "sha256": "539dda87d29f35ab95a8a5e099c9a9a2435295bbb39e020961f33709bf72e201",
+      "unchanged_vs53d": true
+    },
+    "VoiceInkTests/WordReplacementBackupAdapterTests.swift": {
+      "sha256": "3d0c6a1c1cd56d8704637587f889f47bbf66324fe648caec1728c342e4004c69",
+      "unchanged_vs53d": true
+    }
+  },
+  "production_directories_byte_equal_vs53d": true,
+  "strict_UI_case_names": [
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing",
+    "testTranslationTargetsReorderSelectAndPersist",
+    "testDictationProfilePreservesCustomSettingsAndPersists",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants",
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement",
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion"
+  ],
+  "baseline_None_marker_line": 1058,
+  "contract": "../history-ui-text-boundary-source/contract.json",
+  "status": "Runtimepending; noCopy/@Query/nativeHistory/UI8/Release acceptance fromsource.",
+  "expected_exact_History_Copy_receipts": {
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": 7,
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": 2,
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": 2
+  },
+  "Copy_receipt_acceptance": "Each actual observed UTF8+UTF16 must match independently pinned native seed expected variant bytes, not merely the receipt own expected fields. Correction methods require the recognized source Copy before capture."
+}

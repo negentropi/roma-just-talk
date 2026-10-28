@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.Safari",
+  "checkpoint" : "pipeline-success-delivery",
+  "date" : "2026-10-28T02:36:09Z",
+  "expected" : "Before 👩🏽‍💻 Pipeline 台灣\nSecond line after 🧑‍🚀.\n",
+  "observed" : "Before 👩🏽‍💻 Pipeline 台灣\nSecond line after 🧑‍🚀.\n",
+  "processIdentifier" : 36735,
+  "token" : "RJT-Writing-Live-A419D733-F5CF-423C-88C5-C37F3733B4BA"
+}

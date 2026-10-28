@@ -1,0 +1,39 @@
+{
+  "baseline": {
+    "added_pin_identities": [
+      "grpc-swift-2",
+      "grpc-swift-nio-transport",
+      "grpc-swift-protobuf",
+      "swift-algorithms",
+      "swift-async-algorithms",
+      "swift-certificates",
+      "swift-http-structured-headers",
+      "swift-http-types",
+      "swift-log",
+      "swift-nio",
+      "swift-nio-extras",
+      "swift-nio-http2",
+      "swift-nio-ssl",
+      "swift-nio-transport-services",
+      "swift-protobuf",
+      "swift-service-lifecycle",
+      "swift-system"
+    ],
+    "changed_pins": [],
+    "declarations_identical": true,
+    "original_sha256": "2cdda5176a184329f2ca828316bfdefd9578d94bfed96a2b48b34b42b851e84c",
+    "removed_pins": [],
+    "retained_pin_count": 24
+  },
+  "canonical_pin_count": 41,
+  "canonical_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "declaration_sha256": {
+    "VoiceInk.xcodeproj/project.pbxproj": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e",
+    "VoiceInkCore/Package.swift": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac",
+    "VoiceInkNVIDIA/Package.swift": "d05deef6aec46eba19ad6d529432459a0136d8bedbe22d247b43a229996ffa22",
+    "VoiceInkQwen/Package.swift": "058f93419dd0da3a92dfd135af2c8a6b664192f53ec883168c279b7564b21d4e",
+    "iOS/VoiceInk-ios.xcodeproj/project.pbxproj": "1de9826aef36e173e54a8d62b0422fde6a4657011f86b8012dc62ff8807b9676"
+  },
+  "scope": "package metadata only; existing pins and all dependency declarations unchanged",
+  "source": "reviewed Xcode resolution run 40482229518"
+}

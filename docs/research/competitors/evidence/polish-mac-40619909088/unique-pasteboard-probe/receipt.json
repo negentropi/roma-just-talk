@@ -1,0 +1,11 @@
+{
+  "scope": "Unique named temporary pasteboard only; never general clipboard, no app/foreground/TCC.",
+  "actual_system": "macOS26.6.1/25G76",
+  "results": "NFD+NFC NSStringbridge/setString/getString/rawdata exact UTF8/UTF16.",
+  "stronger_CI_control": "Same CI26.6.2 actual History Copy of legacyOriginal NFD succeeds, while recognized canonical-equivalent variant copies Original NFC bytes.",
+  "files": {
+    "probe.swift": "6fb6b5c8fefdeb8d4247e86af0231592fc62b3c437da259ca8525f3edb9200e1",
+    "probe.json": "6c3abed7acf9296d4cc6d254c88f4f8d74efc97e33f685abbd0940b291ab4898"
+  },
+  "limits": "Local probe does not reproduce SwiftUI selected-variant view identity or prove CI OS internals. No production fix acceptance."
+}

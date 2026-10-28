@@ -1,0 +1,48 @@
+{
+  "run_id": 40619909088,
+  "source_sha": "700cde9be5867b8c0c625cc95ee9ac7cf141720a",
+  "oracle_entire_file_sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
+  "actual_boundary": "RealHistoryCopy, notStaticAX. ExactUTF8assert892 afteractualButtonclick+changedpasteboardgeneration.",
+  "UIcases": 8,
+  "passed": 5,
+  "failed": 3,
+  "raw_Copy_receipts": "history-copy-audit.json",
+  "observations": {
+    "independent_native_seed_expected_equals_saved_fresh_context_rows": true,
+    "row_count": 6,
+    "fields_each": 20,
+    "legacy_NFD_Copy_control": "actualUIexactUTF8/16pass",
+    "legacy_enhanced_Copy_control": "actualUIexactUTF8/16pass",
+    "recognized_Copy_cases": [
+      {
+        "row": "A1000000-0000-4000-8000-000000000002",
+        "actual": "Exactly storedprocessedOriginalNFCbytes",
+        "expected": "IndependentrecognitionNFDbytes"
+      },
+      {
+        "row": "A1000000-0000-4000-8000-000000000005",
+        "actual": "Exactly storedprocessedOriginalNFCbytes",
+        "expected": "IndependentrecognitionNFDbytes"
+      },
+      {
+        "row": "A1000000-0000-4000-8000-000000000006",
+        "actual": "Exactly storedprocessedOriginalNFCbytes",
+        "expected": "IndependentrecognitionNFDbytes"
+      }
+    ],
+    "actual_copy_generations_changed": 5,
+    "staticAXcanonical_presentation_checks": "passed beforeactualCopy; rawreceiptsretainedseparately"
+  },
+  "rootcause_support": "SameCIlegacyNFDsuccessrulesoutgenericNSPasteboardNFDnormalizationforthispath. AllrecognizedcopiedpayloadsmatchOriginalexactly. SwiftUIcanonicalStringdiffstaleactionmechanismremainsinference.",
+  "local_control": "unique-pasteboard-probe/receipt.json; nevergeneralclipboard; local26.6.1notCI26.6.2claim.",
+  "correction_UI": "unreached aftersourceCopyfailure",
+  "native_postverify": "correctlyblocked,notattempted",
+  "candidate_source_fix": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e actualOpus3HistoryUI+changelog androotui_onlyworkflow; ONEactualSolMEDIUMroundAPPROVEsourceonly",
+  "candidate_runtime": "ui_only40626673160pending; no green/productfixedclaim",
+  "limits": [
+    "No changes to700UIoracle in productcandidate.",
+    "No productiondata normalization/tolerance/testhooks.",
+    "No Correctionapproval/editor/source-delete orfinalT5W2V1proofinthisfailedrun.",
+    "Release skipped."
+  ]
+}

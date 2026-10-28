@@ -1,0 +1,15 @@
+# 700cde9 unit checkpoint
+
+[Run 40619909088](https://github.com/negentropi/roma-just-talk/actions/runs/40619909088) tested `700cde9be5867b8c0c625cc95ee9ac7cf141720a`. Its ordinary Mac unit step passed. The overall workflow failed later, with five successful and three failed settings UI cases; Release packaging was skipped. This folder does not accept the failed UI or skipped Release checks.
+
+The decoded unit xcresult contains 330 unique Swift Testing identifiers: 299 `Success` and 31 `Skipped`. Nine Onboarding XCTest identifiers all have `Success`. There are 341 summary records and 339 unique identifiers because two parameterized identifiers appear twice. No failure issue message appears. These are decoded record and identifier counts, not a claim of 341 distinct executions or a retained console aggregate.
+
+All 44 focused unit cases have exactly one concrete `Success` record and no failure issue. They cover 37 earlier positive cases, four persistence isolation cases, and three correction failure-isolation regressions. All 29 correction cases also pass: six Library adapter, seven History approval, two context freshness, ten backup adapter and four persistence isolation cases. Seven cases overlap the two censuses; do not add 44 and 29 as distinct cases.
+
+The three unchanged correction regressions originally failed through five issues in [run 40607608894](../../polish-mac-40607608894/unit-failure-checkpoint/README.md). They passed in [run 40613521362](../../polish-mac-40613521362/unit-failure-checkpoint/README.md), and remain successful here. Their whole test files and shared fixture are byte-identical across all three tested heads. The 44 focused methods and production files retained here are also byte-identical to the preceding successful unit checkpoint at `53d62fb1`.
+
+The only added identifier relative to that preceding unit result is `liveWritingUndoSafariRejectsNormalizedDecomposedOutput()`. It has one `Skipped` record in this ordinary unit gate, as expected for the separately gated live check. This checkpoint claims no execution or acceptance of that live case.
+
+`unit-results.json` retains all 44 focused and 29 correction records, original xcresult member paths and decoded summary hashes. Its complete result counts were derived from the existing full decoded JSON at `/data/rjt-writing-check-01a17bef/40619909088/unit-details/details.json`, 4,902,220 bytes, SHA-256 `88e73bc370634a623c344d728301e1b1176a253b95d55aeba0f05aeebbf0aff6`. The broad owner fetched the archive once. This unit audit used that existing decoded result and fetched no archive or GitHub log.
+
+`source/` retains 26 whole files from the tested head, including the three unchanged regression files, focused test groups, production persistence files and the live-test source declaring the added skip. `source-registry.json` records bytes and hashes. `audit.py` verifies pinned Git bytes, focused/correction records, previous regression evidence and identifier counts without a build. `extract-from-existing-xcresult.py` documents the compact extraction from the already-retained raw JSON.

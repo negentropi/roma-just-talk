@@ -1,0 +1,128 @@
+macos	Writing, snippet and dictation settings UI	﻿2026-10-28T02:49:53.6654600Z ##[group]Run bash scripts/run-writing-feature-regression.sh ui
+macos	Writing, snippet and dictation settings UI	2026-10-28T02:49:53.6655450Z ^[[36;1mbash scripts/run-writing-feature-regression.sh ui^[[0m
+macos	Writing, snippet and dictation settings UI	2026-10-28T02:49:53.9711260Z shell: /bin/bash -e {0}
+macos	Writing, snippet and dictation settings UI	2026-10-28T02:49:53.9711670Z env:
+macos	Writing, snippet and dictation settings UI	2026-10-28T02:49:53.9712140Z   BASELINE_REF: ec7bc1bcf804cb9362e342e4c3f5fbf2dd9b69eb
+macos	Writing, snippet and dictation settings UI	2026-10-28T02:49:53.9712640Z ##[endgroup]
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:53.5139540Z UI verification requires exactly eight known cases once, passed, without skips or extra cases
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2654320Z     t =    71.52s     Checking `Expect predicate `existsNoRetry == 1` for object StatusItem (First Match)`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2655240Z     t =    71.52s         Checking existence of `StatusItem (First Match)`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2655830Z     t =    71.54s Get number of matches for: Descendants matching type StatusItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2656270Z     t =    71.70s Click StatusItem (First Match)
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2656850Z     t =    71.70s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2657500Z     t =    71.71s     Find the StatusItem (First Match)
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2658040Z     t =    71.73s     Check for interrupting elements affecting "menuBarIcon" StatusItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2658640Z     t =    71.73s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2659540Z     t =    72.13s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2660090Z     t =    72.14s Waiting 5.0s for "Settings" MenuItem to exist
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2661040Z     t =    73.18s     Checking `Expect predicate `existsNoRetry == 1` for object "Settings" MenuItem`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2661740Z     t =    73.18s         Checking existence of `"Settings" MenuItem`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2662150Z     t =    73.27s Click "Settings" MenuItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2662570Z     t =    73.27s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2663020Z     t =    73.27s     Find the "Settings" MenuItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2663560Z     t =    73.34s     Check for interrupting elements affecting "menuAction:" MenuItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2664110Z     t =    73.34s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2664810Z     t =    73.34s         Checking existence of `"menuAction:" MenuItem`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2665350Z     t =    73.38s         Hover menu item 'Settings'
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2665780Z     t =    73.38s             Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2666530Z     t =    73.39s             Find the "menuAction:" MenuItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2667310Z     t =    73.43s             Check for interrupting elements affecting "menuAction:" MenuItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2667740Z     t =    73.43s             Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2668220Z     t =    73.65s             Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2681410Z     t =    73.65s         Find the "menuAction:" MenuItem
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2683380Z     t =    74.73s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2684400Z     t =    74.81s Waiting 15.0s for "com.negentropi.RomaJustTalk.mainWindow" Window to exist
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2685170Z     t =    75.84s     Checking `Expect predicate `existsNoRetry == 1` for object "com.negentropi.RomaJustTalk.mainWindow" Window`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2686180Z     t =    75.84s         Checking existence of `"com.negentropi.RomaJustTalk.mainWindow" Window`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2687170Z     t =    75.84s Get number of matches for: Elements matching predicate '"com.negentropi.RomaJustTalk.mainWindow" IN identifiers'
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2687960Z     t =    76.25s Waiting 10.0s for "Dictionary" Button to exist
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2688610Z     t =    77.28s     Checking `Expect predicate `existsNoRetry == 1` for object "Dictionary" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2693820Z     t =    77.28s         Checking existence of `"Dictionary" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2694690Z     t =    77.46s Waiting 10.0s for "style" Button to exist
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2695350Z     t =    78.46s     Checking `Expect predicate `existsNoRetry == 1` for object "style" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2701300Z     t =    78.46s         Checking existence of `"style" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2701680Z     t =    78.64s Click "style" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2702330Z     t =    78.64s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2703310Z     t =    78.64s     Find the "style" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2704040Z     t =    78.80s     Check for interrupting elements affecting "style" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2704490Z     t =    78.83s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2705030Z     t =    79.91s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2705730Z     t =    79.91s Waiting 10.0s for "writingActions.target.add" Button to exist
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2706520Z     t =    80.92s     Checking `Expect predicate `existsNoRetry == 1` for object "writingActions.target.add" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2707270Z     t =    80.92s         Checking existence of `"writingActions.target.add" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2707810Z     t =    81.21s Checking existence of `"writingActions.target.add" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2708580Z     t =    81.52s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2709080Z     t =    83.60s Checking existence of `ScrollView (First Match)`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2709800Z     t =    83.86s Scroll ScrollView (First Match) by dx: 0.00, dy: -180.00
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2710530Z     t =    83.86s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2711190Z     t =    83.86s     Find the ScrollView (First Match)
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2711790Z     t =    84.03s     Check for interrupting elements affecting ScrollView
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2712450Z     t =    84.06s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2713100Z     t =    84.58s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2713800Z     t =    84.60s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2714570Z     t =    86.86s Checking existence of `ScrollView at {{255.0, 83.0}, {732.0, 627.0}}`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2715250Z     t =    87.14s Scroll ScrollView at {{255.0, 83.0}, {732.0, 627.0}} by dx: 0.00, dy: -180.00
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2716650Z     t =    87.14s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2717410Z     t =    87.15s     Find the ScrollView at {{255.0, 83.0}, {732.0, 627.0}}
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2718090Z     t =    87.44s     Check for interrupting elements affecting ScrollView
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2718540Z     t =    87.48s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2719310Z     t =    87.74s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2719940Z     t =    87.74s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2720560Z     t =    88.17s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2721300Z     t =    88.63s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2722050Z     t =    89.02s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2723130Z     t =    89.38s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2723720Z     t =    89.89s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2724360Z     t =    90.20s Find the "writingActions.target.add" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2724880Z     t =    90.47s Find the "writingActions.target.fr.select" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2725560Z     t =    90.74s Find the "writingActions.target.fr.moveUp" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2726490Z     t =    91.05s Checking existence of `"writingActions.target.de.select" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2728950Z     t =    91.29s Find the Target Application 'com.negentropi.RomaJustTalk'
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2729800Z     t =    91.53s Added attachment named 'Translation target persisted after relaunch'
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2730650Z     t =    91.53s Checking existence of `"writingActions.target.en.select" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2731500Z     t =    91.81s Click "writingActions.target.en.select" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2732130Z     t =    91.81s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2733180Z     t =    91.81s     Find the "writingActions.target.en.select" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2733870Z     t =    92.12s     Check for interrupting elements affecting "writingActions.target.en.select" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2734600Z     t =    92.17s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2735270Z     t =    92.59s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2737030Z     t =    92.60s Click "writingActions.target.de.remove" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2738380Z     t =    92.60s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2739820Z     t =    92.60s     Find the "writingActions.target.de.remove" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2740970Z     t =    93.04s     Check for interrupting elements affecting "writingActions.target.de.remove" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2741840Z     t =    93.10s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2742420Z     t =    93.54s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2743270Z     t =    93.55s Click "writingActions.target.fr.remove" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2743960Z     t =    93.55s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2745810Z     t =    93.56s     Find the "writingActions.target.fr.remove" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2747680Z     t =    93.93s     Check for interrupting elements affecting "writingActions.target.fr.remove" Button
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2748350Z     t =    93.96s     Synthesize event
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2749110Z     t =    94.38s     Wait for com.negentropi.RomaJustTalk to idle
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2750340Z     t =    94.38s Checking existence of `"writingActions.target.de.select" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2752180Z     t =    94.69s Checking existence of `"writingActions.target.fr.select" Button`
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2753030Z     t =    95.20s Tear Down
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2753430Z     t =    95.21s     Terminate com.negentropi.RomaJustTalk:9574
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2754780Z     t =    96.31s     Added attachment named 'UI shortcut preference census restored'
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2755720Z Test Case '-[VoiceInkUITests.WritingFeaturesUITests testTranslationTargetsReorderSelectAndPersist]' passed (96.358 seconds).
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2756770Z Test Suite 'WritingFeaturesUITests' failed at 2026-10-28 03:08:34.017.
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2757270Z 	 Executed 8 tests, with 3 failures (0 unexpected) in 958.125 (958.134) seconds
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2758230Z Test Suite 'VoiceInkUITests.xctest' failed at 2026-10-28 03:08:34.019.
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2758810Z 	 Executed 8 tests, with 3 failures (0 unexpected) in 958.125 (958.135) seconds
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2759440Z Test Suite 'Selected tests' failed at 2026-10-28 03:08:34.020.
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2760240Z 	 Executed 8 tests, with 3 failures (0 unexpected) in 958.125 (958.136) seconds
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2761990Z 2026-10-28 03:08:38.944 xcodebuild[74946:211022] [MT] IDETestOperationsObserverDebug: 963.638 elapsed -- Testing started completed.
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2763010Z 2026-10-28 03:08:38.945 xcodebuild[74946:211022] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2763820Z 2026-10-28 03:08:38.945 xcodebuild[74946:211022] [MT] IDETestOperationsObserverDebug: 963.638 sec, +963.638 sec -- end
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2764330Z 
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2764600Z Test session results, code coverage, and logs:
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2765450Z 	/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-ui/UI.xcresult
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2766110Z 
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2766690Z Failing tests:
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2769960Z 	WritingFeaturesUITests.testApprovedHistoryCorrectionSurvivesSourceDeletion()
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2774230Z 	WritingFeaturesUITests.testHistoryCorrectionPreviewApprovalAndDictionaryManagement()
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2777480Z 	WritingFeaturesUITests.testHistoryPreservesRecognizedFallbackAndLegacyVariants()
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2778100Z 
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2778360Z ** TEST EXECUTE FAILED **
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2779070Z 
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.2779680Z Testing started
+macos	Writing, snippet and dictation settings UI	2026-10-28T03:08:57.3378840Z ##[error]Process completed with exit code 65.

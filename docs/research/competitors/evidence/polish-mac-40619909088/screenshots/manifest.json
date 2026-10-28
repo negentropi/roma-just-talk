@@ -1,0 +1,245 @@
+[
+  {
+    "test": "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+    "title": "CSV current and imported multiline preview",
+    "file": "screenshots/csv-current-and-imported-multiline-preview.png",
+    "bytes": 241354,
+    "sha256": "21568e54878086148d8b7e76e3daf8ef3de0fa86edc34d29299e9b1a29c3e5a9",
+    "original_export_name": "699B825C-674A-46D7-B71D-24F3CCDADD7E.png",
+    "timestamp": 1793156083.595
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "Power Mode reorder native sheet",
+    "file": "screenshots/power-mode-reorder-native-sheet.png",
+    "bytes": 176704,
+    "sha256": "986cbf898c65d33b373c4cea397fa3cee21887b488a2466b7cc31a286ae87946",
+    "original_export_name": "9D92003A-8715-47FE-99B2-A06A264D7A4F.png",
+    "timestamp": 1793156342.67
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "Power Mode unsaved native sheet",
+    "file": "screenshots/power-mode-unsaved-native-sheet.png",
+    "bytes": 205384,
+    "sha256": "4a63b9f9e40cc9dd1b9003a6d9b7a066362bc822c2d3e22cc6bf2d80c3b2bb14",
+    "original_export_name": "82E51DAF-FB42-4FAD-A98F-F573A11775A6.png",
+    "timestamp": 1793156335.462
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "Prompt editor unsaved native sheet",
+    "file": "screenshots/prompt-editor-unsaved-native-sheet.png",
+    "bytes": 217949,
+    "sha256": "bd64f7122419f9bbfff10a6c422982881c287d6e036899a858c3fd6ba152adad",
+    "original_export_name": "29C69873-F66A-4D8A-863D-0E07938E5FD6.png",
+    "timestamp": 1793156320.092
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "Enhancement settings native sheet",
+    "file": "screenshots/enhancement-settings-native-sheet.png",
+    "bytes": 224182,
+    "sha256": "7d052eee7e59082be5b9cd53f8f4057824b4730dcd75016590c36dc0ddea24e3",
+    "original_export_name": "A91AB8DC-FFFD-486C-8B06-2823F24FD12A.png",
+    "timestamp": 1793156299.071
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "Dictionary settings native sheet",
+    "file": "screenshots/dictionary-settings-native-sheet.png",
+    "bytes": 213409,
+    "sha256": "bcf39523a79496bcd963077538be88cdcbc94f6531dc5fa8a8afcbd5f1d5de83",
+    "original_export_name": "96D6BF5E-4CFD-4EF3-90A1-9FFC1F394B7C.png",
+    "timestamp": 1793156288.119
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "Custom formatting restored without changing saved values",
+    "file": "screenshots/custom-formatting-restored-without-changing-saved-values.png",
+    "bytes": 252752,
+    "sha256": "e6b6eb10ae676306a9e7b39c20e54124f1102b237865dcd4bd6d91266daae63e",
+    "original_export_name": "E1CB3BFB-7302-4435-B0DD-708B8BC37C19.png",
+    "timestamp": 1793156272.668
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "None dictation cleanup persisted after relaunch",
+    "file": "screenshots/none-dictation-cleanup-persisted-after-relaunch.png",
+    "bytes": 271439,
+    "sha256": "ffffa4908529eedf65368a054ff1ee2865dd593012fc5462f946cedf3d88f96b",
+    "original_export_name": "F41136FE-F169-4C88-B47A-DC7EF80C3E5E.png",
+    "timestamp": 1793156248.771
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "None preserves inactive Custom formatting",
+    "file": "screenshots/none-preserves-inactive-custom-formatting.png",
+    "bytes": 254148,
+    "sha256": "cc0dc11b890b61d0fe313c3c2af334f224fce1c80d785bcb23b10d36aa27cf1e",
+    "original_export_name": "73E04866-3A09-4DC5-AB88-9C0620C3B512.png",
+    "timestamp": 1793156184.168
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "None dictation cleanup selected",
+    "file": "screenshots/none-dictation-cleanup-selected.png",
+    "bytes": 270096,
+    "sha256": "6af9b83e6cc2cb6b6712b38e80fc61b21ea0c42431c547bacc52ae514201d8b4",
+    "original_export_name": "E909286D-6645-4BE0-909F-53C380243317.png",
+    "timestamp": 1793156175.146
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "title": "Custom dictation cleanup settings",
+    "file": "screenshots/custom-dictation-cleanup-settings.png",
+    "bytes": 251618,
+    "sha256": "c8bd819d052a1daeb50ca78c6f192b4eb1bd8bbaf7dd546c69a1e99448c4de36",
+    "original_export_name": "5B6D37D0-30CC-41B0-B8EB-D5A041FCD6C6.png",
+    "timestamp": 1793156167.931
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Profile switching preserves the seeded vocabulary library",
+    "file": "screenshots/profile-switching-preserves-the-seeded-vocabulary-library.png",
+    "bytes": 244779,
+    "sha256": "bb3ad3b428b92413d6693f8d25d6e11fb8c05bc6f31ea3b7dc3d22d44180eae8",
+    "original_export_name": "76675EDC-7FB5-4FC6-9954-34B4B6E83A1E.png",
+    "timestamp": 1793156561.05
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Clarity Formal persisted after relaunch",
+    "file": "screenshots/clarity-formal-persisted-after-relaunch.png",
+    "bytes": 274546,
+    "sha256": "c6d5b6b25bb5f15c50259e8972f947e00dcabbe1ac2b7ecbf61152d9bd82342a",
+    "original_export_name": "23733A13-5CB7-46A6-8005-20351899A299.png",
+    "timestamp": 1793156541.668
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Clarity Formal style",
+    "file": "screenshots/clarity-formal-style.png",
+    "bytes": 272982,
+    "sha256": "ce4716d8dd3c5692edc5efd6c67c6fec5c0420b6709475d5a354d5424e9998d9",
+    "original_export_name": "E91E4B5F-B672-48CD-B660-4E4E0AC57D03.png",
+    "timestamp": 1793156453.528
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Clarity Casual style",
+    "file": "screenshots/clarity-casual-style.png",
+    "bytes": 271525,
+    "sha256": "d11b89ffc41287b2ec5d385e4fe986292f7e89929b3dc6f393e6405fa69f472c",
+    "original_export_name": "87EFC7A1-305B-4FC8-A39B-AF06BA1E97CF.png",
+    "timestamp": 1793156447.62
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Clarity Natural style",
+    "file": "screenshots/clarity-natural-style.png",
+    "bytes": 270856,
+    "sha256": "21617a198412cee081ef639c5e37ff56a89edb7a4c7bfae95e694069ff347297",
+    "original_export_name": "3637B92F-D158-4F41-B6E1-D316446DE6B8.png",
+    "timestamp": 1793156441.472
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Clarity profile and retained library settings",
+    "file": "screenshots/clarity-profile-and-retained-library-settings.png",
+    "bytes": 270856,
+    "sha256": "21617a198412cee081ef639c5e37ff56a89edb7a4c7bfae95e694069ff347297",
+    "original_export_name": "8A8EA479-80D5-45F0-8D4F-689EE8F1C6BC.png",
+    "timestamp": 1793156435.038
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Light profile and retained library settings",
+    "file": "screenshots/light-profile-and-retained-library-settings.png",
+    "bytes": 270449,
+    "sha256": "1d42c63e057d5d57bbc0146d543928d8ae47a2d3dddeac0d0fa6a8efdfe62577",
+    "original_export_name": "ABE8EC24-D0BB-4EEC-A1A2-BA2EC9F77148.png",
+    "timestamp": 1793156426.177
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "None profile and retained library settings",
+    "file": "screenshots/none-profile-and-retained-library-settings.png",
+    "bytes": 270016,
+    "sha256": "5546a4deb5d5ecd8151857381b12bc4f95bc7651bcb9906a234ae60340e867c4",
+    "original_export_name": "A1D190CC-1314-4FE0-A2E6-BBE855C25E57.png",
+    "timestamp": 1793156418.593
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "title": "Profile switching preserves the seeded vocabulary library",
+    "file": "screenshots/profile-switching-preserves-the-seeded-vocabulary-library--2BFFEB9A.png",
+    "bytes": 244334,
+    "sha256": "0a392a7ee800b65028f11d9e766fc5e061781305005ce39ec64798a35a28b663",
+    "original_export_name": "2BFFEB9A-0DB5-4670-A881-16728CD0BCBC.png",
+    "timestamp": 1793156368.866
+  },
+  {
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "title": "History RJT History legacy enhanced",
+    "file": "screenshots/history-rjt-history-legacy-enhanced.png",
+    "bytes": 122508,
+    "sha256": "c28be4833a6776080f481504c02e20404d85a4b81c44da410eb653d9c1beb143",
+    "original_export_name": "AB187038-B3B7-47E3-B8D4-2B86AE1EDE84.png",
+    "timestamp": 1793156674.665
+  },
+  {
+    "test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+    "title": "History RJT History legacy original",
+    "file": "screenshots/history-rjt-history-legacy-original.png",
+    "bytes": 123231,
+    "sha256": "0e52eef5995873fe766cca5b07779c624c6fa1db467c3e1c475643ea50056da7",
+    "original_export_name": "C16DA1E9-A54E-4253-9A63-2EA146E0FFF2.png",
+    "timestamp": 1793156665.573
+  },
+  {
+    "test": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+    "title": "Snippet deletion confirmation",
+    "file": "screenshots/snippet-deletion-confirmation.png",
+    "bytes": 245712,
+    "sha256": "fa4d166394ecff15ae812ba311b10e5b3b0b39395c82f5b5acf443b2ac357a49",
+    "original_export_name": "E83BD0C5-D5F2-4B4D-90CA-3C69AC342433.png",
+    "timestamp": 1793156763.712
+  },
+  {
+    "test": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+    "title": "Literal multiline snippet editor",
+    "file": "screenshots/literal-multiline-snippet-editor.png",
+    "bytes": 232670,
+    "sha256": "8d0fe815f43ef899d05cf8537d36f597863f6f9b5021f8a9d625dd7a96365bdb",
+    "original_export_name": "A879446E-9FDB-4DA7-8FC8-3B94E9D708E2.png",
+    "timestamp": 1793156751.954
+  },
+  {
+    "test": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+    "title": "Spoken snippets library",
+    "file": "screenshots/spoken-snippets-library.png",
+    "bytes": 255443,
+    "sha256": "59278d7782d35b9f34cb9b28d9556f1040351e2217e3f46b05ccbe181faea87c",
+    "original_export_name": "6B5D232A-FAF2-472D-B913-123A5940F437.png",
+    "timestamp": 1793156742.693
+  },
+  {
+    "test": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+    "title": "Translation target persisted after relaunch",
+    "file": "screenshots/translation-target-persisted-after-relaunch.png",
+    "bytes": 182571,
+    "sha256": "4f24028dc625a7adabbc60c4d21b2c191b6bb559027be074da2e285d808b42c8",
+    "original_export_name": "AAE9C388-BB46-4D30-9BDF-0DEC9C9C7C98.png",
+    "timestamp": 1793156909.189
+  },
+  {
+    "test": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+    "title": "Writing actions and ordered translation targets",
+    "file": "screenshots/writing-actions-and-ordered-translation-targets.png",
+    "bytes": 182502,
+    "sha256": "677d146939e2987b7662c9b8219c663eb9b1bd70a4708e80a0fae37a51e581ca",
+    "original_export_name": "75F5F636-3A5A-43EF-89B1-3C1F7BD7CD0E.png",
+    "timestamp": 1793156884.687
+  }
+]

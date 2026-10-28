@@ -1,0 +1,215 @@
+{
+  "run_id": 40619909088,
+  "source_sha": "700cde9be5867b8c0c625cc95ee9ac7cf141720a",
+  "verdict": "CLEAN audit of failed immutable run; actual Copy failure confirmed, no product-green claim",
+  "scope": "Original small native/seed receipts plus existing decoded live/UI attachment content; no source review, builds, downloads or archive fetch. No normalization/tolerance applied to acceptance.",
+  "native6": {
+    "actual_Success": 6,
+    "tests": {
+      "liveWritingTargetTextEditPreservesUnicodeOutsideSelection": "passed",
+      "liveWritingTargetTextEditRefusesRangeTextAndFocusDrift": "passed",
+      "liveWritingTargetSafariTextareaReplacesOnlySelection": "passed",
+      "liveWritingActionPipelineUsesLocalCLIAndRetainsFailure": "passed",
+      "liveWritingStartupContextRespectsOwnerAfterCancellation": "passed",
+      "liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges": "passed"
+    },
+    "each_console_start_pass_once": true,
+    "suite_log": [
+      "Test run with 6 tests in 1 suite passed after 27.508 seconds."
+    ],
+    "app_identity_before_after_equal": true,
+    "app_sha256": "122aea7d60fdda2a2df57a75b6e6ce81c2e44cc04591b0d24119fea90b63536c",
+    "owned_fixture_cleanup_pairs": 7,
+    "tokens": [
+      "RJT-Writing-Live-07D6CFA0-67CE-4429-9C49-E284743587C7",
+      "RJT-Writing-Live-1E287B00-5B5D-4194-852A-FC022C0A5BC0",
+      "RJT-Writing-Live-271DB26E-8723-45EC-9E71-AA52DAA48401",
+      "RJT-Writing-Live-3C3C86DC-7E9C-48FC-8534-43456FDBBD9E",
+      "RJT-Writing-Live-A3709A08-37E1-4EB5-99D0-2F303A8597E3",
+      "RJT-Writing-Live-A419D733-F5CF-423C-88C5-C37F3733B4BA",
+      "RJT-Writing-Live-B9D903CA-6143-4C8B-8794-9442EF362EBA"
+    ]
+  },
+  "seed": {
+    "host_pid": 73009,
+    "one_actual_PASS": "◇ Test liveDictationHistoryUISeed() started.\n✔ Test liveDictationHistoryUISeed() passed after 0.616 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.617 seconds.",
+    "rows": 6,
+    "fields_each": 20,
+    "WordReplacement_raw_fields": 11,
+    "canonical_DTO": true,
+    "VocabularyWord_rows": 1,
+    "stats_baseline": [],
+    "independent_expected_byte_comparison": {
+      "rows": {
+        "equal_raw_bytes": true,
+        "sha256": "a38bf82918ffa6b91822e0bb39aa67fae0df27e1e8c2e76dd2ed1ef23c5705bb"
+      },
+      "libraries": {
+        "equal_raw_bytes": true,
+        "sha256": "f56de83d257f7a4619af0d0120ca22093f875cf025189ca28ced490cfe883061"
+      },
+      "stats": {
+        "equal_raw_bytes": true,
+        "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+      }
+    },
+    "factory": "VoiceInkApp.createPersistentContainer(schema:logger:)",
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "normal_store_configurations": [
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "Transcription"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "default",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "VocabularyWord",
+          "WordReplacement"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "dictionary",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "SessionMetric"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "stats",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      }
+    ],
+    "closed_before_UI": true,
+    "host_exited_no_open_descriptors": true,
+    "app_and_test_bundle_phase_identity_equal": true,
+    "app_sha256": "122aea7d60fdda2a2df57a75b6e6ce81c2e44cc04591b0d24119fea90b63536c"
+  },
+  "initial_and_seed_TCC_raw_bytes_equal": true,
+  "TCC": {
+    "system-tcc.json": {
+      "service": "kTCCServiceAccessibility",
+      "client": "com.negentropi.RomaJustTalk",
+      "client_type": 0,
+      "auth_value": 2,
+      "csreq": "FADE0C0000000028000000010000000800000014A154DC5F784E11BC9193ECD021AB48EB083DC17D"
+    },
+    "microphone-tcc.json": {
+      "service": "kTCCServiceMicrophone",
+      "client": "com.negentropi.RomaJustTalk",
+      "client_type": 0,
+      "auth_value": 2,
+      "csreq": "FADE0C0000000028000000010000000800000014A154DC5F784E11BC9193ECD021AB48EB083DC17D"
+    }
+  },
+  "ui_status": {
+    "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()": "Failure",
+    "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()": "Success",
+    "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()": "Success",
+    "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()": "Success",
+    "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()": "Failure",
+    "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()": "Failure",
+    "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()": "Success",
+    "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()": "Success"
+  },
+  "actual_Copy": {
+    "attachments_crosschecked_against_retained_audit": 5,
+    "independent_seed_comparisons": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "rowID": "A1000000-0000-4000-8000-000000000006",
+        "variant": "recognized",
+        "attachment_sha256": "2b47a0b106c48635cbc7658b606d08e6a03dbb4dcefdb02e3cf5764f14976083",
+        "independent_seed_field": "recognitionText",
+        "UTF8_equal": false,
+        "UTF16_equal": false,
+        "actual_equals_seed_original_processed_bytes": true,
+        "changeCount": [
+          21,
+          22
+        ]
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "rowID": "A1000000-0000-4000-8000-000000000005",
+        "variant": "recognized",
+        "attachment_sha256": "99bbd3185484683475c0928cbc8ff76840fde5514450f60833efde0d8874a46c",
+        "independent_seed_field": "recognitionText",
+        "UTF8_equal": false,
+        "UTF16_equal": false,
+        "actual_equals_seed_original_processed_bytes": true,
+        "changeCount": [
+          27,
+          28
+        ]
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000001",
+        "variant": "original",
+        "attachment_sha256": "d62b7aed0a933a841da293b5a3de11a5adc0ffe2626462e9ee9e35312daa2fc6",
+        "independent_seed_field": "text",
+        "UTF8_equal": true,
+        "UTF16_equal": true,
+        "actual_equals_seed_original_processed_bytes": true,
+        "changeCount": [
+          29,
+          30
+        ]
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000001",
+        "variant": "enhanced",
+        "attachment_sha256": "d530235140dd646c210dc34336f678f6ef2895e66a0c345cf181778b9f3586db",
+        "independent_seed_field": "enhancedText",
+        "UTF8_equal": true,
+        "UTF16_equal": true,
+        "actual_equals_seed_original_processed_bytes": false,
+        "changeCount": [
+          31,
+          32
+        ]
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+        "rowID": "A1000000-0000-4000-8000-000000000002",
+        "variant": "recognized",
+        "attachment_sha256": "cb5ff87304caed88d1c17468ddac9bd07a001c8ca60ca05a7e853d65524f8d3b",
+        "independent_seed_field": "recognitionText",
+        "UTF8_equal": false,
+        "UTF16_equal": false,
+        "actual_equals_seed_original_processed_bytes": true,
+        "changeCount": [
+          33,
+          34
+        ]
+      }
+    ],
+    "exact_pass": 2,
+    "exact_fail": 3,
+    "recognized_mismatch_row_suffixes": [
+      2,
+      5,
+      6
+    ],
+    "finding": "Recognized Copy delivers the seeded Original NFC payload; expected recognitionText NFD differs in raw UTF8 and UTF16. Legacy Original NFD and Enhanced copies pass. Each Copy changed pasteboard generation.",
+    "remaining_Copy_and_correction_flows": "Unproved after early failures; 5 receipts of required 11."
+  },
+  "limits": [
+    "Post-UI native verification BLOCKED, not attempted; no final History/correction/store result.",
+    "Post-UI identity/TCC missing; no after-UI stability claim.",
+    "Synthetic seed and fixed native pipeline do not prove ASR/provider/migration/production durability.",
+    "Whole archive integrity inherited from owning one-fetch audit, not repeated.",
+    "Separate later UI-only source/run and production fix outside this immutable-run evidence scope."
+  ],
+  "findings_in_audit": []
+}

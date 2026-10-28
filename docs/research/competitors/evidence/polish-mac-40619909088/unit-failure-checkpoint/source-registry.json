@@ -1,0 +1,178 @@
+{
+  "run_id": 40619909088,
+  "head_sha": "700cde9be5867b8c0c625cc95ee9ac7cf141720a",
+  "known_red_head": "4b50179da8ea145738bae9dcd011aa6d93de8669",
+  "whole_sources": {
+    "VoiceInkTests/HistoryCorrectionApprovalTests.swift": {
+      "bytes": 14811,
+      "sha256": "017b18990d4c7df0205ae56bba8400fc579f05be5a658502741ba4b837472f5a"
+    },
+    "VoiceInkTests/WordReplacementBackupAdapterTests.swift": {
+      "bytes": 16399,
+      "sha256": "3d0c6a1c1cd56d8704637587f889f47bbf66324fe648caec1728c342e4004c69"
+    },
+    "VoiceInkTests/WordReplacementLibraryAdapterTests.swift": {
+      "bytes": 15883,
+      "sha256": "539dda87d29f35ab95a8a5e099c9a9a2435295bbb39e020961f33709bf72e201"
+    },
+    "VoiceInkTests/WritingActionUndoTests.swift": {
+      "bytes": 22172,
+      "sha256": "edb909fe02670265c786aab991fa1d3eb45444f9de8e4b13814ce8915a4d26ad"
+    },
+    "VoiceInkTests/WritingActionUndoPipelineTests.swift": {
+      "bytes": 14571,
+      "sha256": "747d830de46cc52bdb03fad1ca122ebc18cdb3a3fdd653652885965404db1e6d"
+    },
+    "VoiceInkTests/ClipboardRestorationOwnershipTests.swift": {
+      "bytes": 8022,
+      "sha256": "7cce4a2f94326bcdbbbc297899fab995e319f69331ad28a456b4112df9d0eb68"
+    },
+    "VoiceInkTests/ShortcutBackupTests.swift": {
+      "bytes": 3743,
+      "sha256": "cc6f2f6d30897e60be8d7d3280993f58a2aedc4201f867e2a2f8ae9e39ff44d3"
+    },
+    "VoiceInkTests/AudioFileTranscriptionPersistenceTests.swift": {
+      "bytes": 3550,
+      "sha256": "f6747e802abcc84e17176f5735da232da4a06141b56ff0522df421a459cc7343"
+    },
+    "VoiceInkTests/DictionaryPersistenceIsolationTests.swift": {
+      "bytes": 15513,
+      "sha256": "397479bcd868fd8448862b9316c897b5577c263683006c4920cfdc873bd61153"
+    },
+    "VoiceInkTests/DictionaryContextFreshnessTests.swift": {
+      "bytes": 4528,
+      "sha256": "3e76e3c168c50c73b028ba564746981cb0a82e5f0371d3a60174cde76b41cd33"
+    }
+  },
+  "positive_registry": {
+    "VoiceInkTests/WritingActionUndoTests.swift": [
+      "confirmedUnicodeRewriteRestoresExactTextAndOriginalSelectionOnce",
+      "confirmationCallbackRunsBeforeReturnAndSurvivesLateCancellation",
+      "confirmedWriteWithoutSafeCaretOrRangeSetterDoesNotArmUndo",
+      "unchangedOutputAndEmptyOriginalSelectionNeverCreateAuthority",
+      "uncertainNativeAttemptRetiresPreviousAuthorityEvenWhenValueDidNotChange",
+      "rejectedPreparationAndUnauthorizedAttemptPreservePreviousAuthority",
+      "textCaretWindowProcessAndProtectionDriftRefuseWithoutInverseAttempt",
+      "errorAfterRangeChangeAndTextMutationCanStillConfirmEachPostcondition",
+      "cancellationAfterOwnedRangeSelectionRestoresCaretWithoutTextAttempt",
+      "cancellationBeforeUndoLeavesTextSelectionAndAuthorityUntouched",
+      "newerStateDuringRangeSelectionIsNeverOverwrittenByCleanup",
+      "newerPendingDeliveryCancelsUndoBeforeItsInverseTextAttempt",
+      "restoredTextWithUnrestoredSelectionConsumesAuthorityWithoutRepeatingEdit",
+      "newerOwnerAfterInverseTextAttemptPreventsOldSelectionRestoration",
+      "uncertainInverseConsumesAuthorityAndDoesNotRetryOrRollback",
+      "staleDeliveryCannotInstallReceiptOrClearNewerBusyOwner",
+      "pendingDeliveryBlocksUndoAndExternalMutationRetiresOnlyCurrentAuthority",
+      "authorizationIsRepeatableWithinOrdinaryFallbackButStopsAfterConfirmation",
+      "queuedAutoSendOwnershipSurvivesFinishButNotANewerPendingDelivery",
+      "refusedKeyboardAuthorizationBalancesCommandWithoutPostingV"
+    ],
+    "VoiceInkTests/WritingActionUndoPipelineTests.swift": [
+      "confirmedRewriteCommitsUndoBeforeLateCancellationAndKeepsItAfterCompletion",
+      "translateAndDraftConfirmDeliveryWithoutCreatingRewriteUndo",
+      "generationFailureBeforeAnyAttemptLeavesThePreviousConfirmedEditUndoable",
+      "supersededProviderCompletionCannotWriteOrReplaceTheNewerReceipt",
+      "historySaveFailureAfterDeliveryReportsFailureWithoutReplayOrLosingUndo",
+      "cancellationBeforeAnAttemptPreservesThePreviousUndoAndClearsUndeliveredOutput",
+      "taskCancellationAtConfirmedDeliveryCannotEraseMetadataOrUndo",
+      "delayedAutoSendDistinguishesNormalCleanupCancellationAndNewerDelivery"
+    ],
+    "VoiceInkTests/ClipboardRestorationOwnershipTests.swift": [
+      "unresolvedMenuPreparationRejectsACompetingClipboardWrite",
+      "cancelingANewWaiterDoesNotCancelTheEarlierRestoration",
+      "cancellationDuringDeliveryObservationStillCommitsExactReadback",
+      "confirmedCallbackPrecedesImmediateRestorationAndFiresOnce",
+      "unreadableOriginalFormatRefusesBeforeClipboardOrEditorMutation"
+    ],
+    "VoiceInkTests/ShortcutBackupTests.swift": [
+      "explicitModernKindRejectsMalformedDataEvenWithLegacyKeys",
+      "missingKindRetainsLegacyCarbonAndValidModernUsesItsOwnValues",
+      "missingKindStillRequiresAValidLegacyCarbonPayload"
+    ],
+    "VoiceInkTests/AudioFileTranscriptionPersistenceTests.swift": [
+      "savingCompletedAudioDoesNotCommitUnrelatedCallerEdits"
+    ],
+    "VoiceInkTests/DictionaryPersistenceIsolationTests.swift": [
+      "successfulRuleMutationsRefreshTheRegisteredRowWithoutSavingBystanders",
+      "approvalAndBulkImportCommitExactRecordsWithoutSavingBystanders",
+      "staleExpectedRuleCannotOverwriteAnExternalCommittedRevision",
+      "staleHistoryPreviewRejectsAnExternalCodeUnitRevision"
+    ]
+  },
+  "known_red_registry": [
+    "failedApprovalSaveKeepsExistingRulesAndUnrelatedUnsavedEdits",
+    "failedSaveRemovesOnlyImportInsertionsAndPreservesUnrelatedDirtyEdits",
+    "failedEditToggleAndDeleteRestoreOnlyTheirOwnEntry"
+  ],
+  "unchanged_gate_sources": {
+    ".github/workflows/voiceink-writing-actions-check.yml": {
+      "bytes": 9220,
+      "sha256": "14254f712f90a3561caa767ebe486d4f85aea0579c9c7cf88169cdaf19027d84"
+    },
+    "scripts/run-writing-feature-regression.sh": {
+      "bytes": 58437,
+      "sha256": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e"
+    },
+    "VoiceInk.xcodeproj/project.pbxproj": {
+      "bytes": 32671,
+      "sha256": "e4a9458135e103d327477fedb1485b8f3de8e1b223f14d98e426f42e9bda3e9e"
+    },
+    "VoiceInk.xcodeproj/xcshareddata/xcschemes/VoiceInk.xcscheme": {
+      "bytes": 3869,
+      "sha256": "ea217d3c735fa3dcd797537714f8fe48bb4b1bb96ca7ea0d297301dce17489c3"
+    },
+    "VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved": {
+      "bytes": 11320,
+      "sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f"
+    },
+    "VoiceInkCore/Package.swift": {
+      "bytes": 1041,
+      "sha256": "4320101452d3b079fc319d6459cc595d5e30474ea4e44899294d03a93d6ccfac"
+    },
+    "VoiceInkCore/Package.resolved": {
+      "bytes": 6140,
+      "sha256": "146873579ca308c62a7a0bc5b8d4743d1bc2d8be0fab818e0bb032126b26ffa2"
+    }
+  },
+  "candidate_production_sources": {
+    "VoiceInk/Services/DictionaryPersistence.swift": {
+      "bytes": 2951,
+      "sha256": "96ced8455dee409564b29f654da221be362d5f31a09badfca43e1557879b5a6d"
+    },
+    "VoiceInk/Services/DictionaryService.swift": {
+      "bytes": 10961,
+      "sha256": "9e22d94ff4e3c5ad86bd782205d7f00349d3b40fd44211619f41e21437682d6a"
+    },
+    "VoiceInk/Services/HistoryCorrectionApprovalService.swift": {
+      "bytes": 8859,
+      "sha256": "751e137c2019eff9339fea588605c7b24ef3adf0aeb4d830605129495b6374b0"
+    },
+    "VoiceInk/Services/BackupTypes.swift": {
+      "bytes": 8317,
+      "sha256": "4b854ab2a1f50a9c65ec1481e01c0cbeb934d246743504e01fe196c56f6b2813"
+    },
+    "VoiceInk/Services/BackupImporter.swift": {
+      "bytes": 9476,
+      "sha256": "b37c84b2e4e50be758a8451a7edc89b476868166acf32b977a191ba5d3e4c37c"
+    },
+    "VoiceInk/Services/ImportExportService.swift": {
+      "bytes": 20456,
+      "sha256": "2f66c4adc8f871f29fdcd0c56d900a889c81abb8d168e00e1d2748a26c2507ee"
+    },
+    "VoiceInk/Models/WordReplacement.swift": {
+      "bytes": 5251,
+      "sha256": "034a015173fe1484f20c6fdb13b9bf423686150954fbe7abed8e9cc47e9c7d3d"
+    }
+  },
+  "prior_green_head": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "additional_gated_test_source": {
+    "VoiceInkTests/WritingTargetLiveTests.swift": {
+      "bytes": 103424,
+      "sha256": "5a02613a8269fb08634b8b338249200e25ef590402fcf48cbb4d6671f580d07a"
+    },
+    "VoiceInkTests/WritingUndoLiveTests.swift": {
+      "bytes": 38850,
+      "sha256": "782476cdff52b58138418ae85c84274da2a5e2b1860bb20116a8ab50a6a87551"
+    }
+  }
+}

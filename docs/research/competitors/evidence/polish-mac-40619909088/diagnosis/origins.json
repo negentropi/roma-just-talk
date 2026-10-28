@@ -1,0 +1,95 @@
+[
+  {
+    "file": "diagnosis/testapproved-recognized-copy.png",
+    "source_recording": {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "file": "testapprovedhistorycorrectionsurvivessourcedeletion-0.mp4",
+      "filename": "kXCTAttachmentScreenRecording_0_6274D7BD-8E30-40DB-8F40-8EFF60205D1F.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~9Q0vNyhM8F28sv-5wn8qKHIkSJ2rUlBpddcIhSS9juPBRFPCTizua-faX1hlKcFrchApmflZvkh98uHrutJcSg=="
+      },
+      "payloadSize": "2348173",
+      "timestamp": "2026-10-28T02:52:36.728+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "B635887B-3924-4F0E-B6DA-9F7B73F2CF4E",
+      "activity_title": "Start Test at 2026-10-28 02:52:35.885",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~9Q0vNyhM8F28sv-5wn8qKHIkSJ2rUlBpddcIhSS9juPBRFPCTizua-faX1hlKcFrchApmflZvkh98uHrutJcSg==",
+      "payload_sha256": "d60b5a8a843b22f34e42a60c7d05253423c6a4ce7af7b49c2eca4331f10aabb3"
+    },
+    "video_timestamp_seconds": 42.8,
+    "sha256": "7fe2281977585305b623253726af2ceaed706874bdee00678f0de91dcd395c5d",
+    "scope": "Derived single original recording frame; no visual edits."
+  },
+  {
+    "file": "diagnosis/testhistorycorrection-recognized-copy.png",
+    "source_recording": {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "file": "testhistorycorrectionpreviewapprovalanddictionarymanagement-0.mp4",
+      "filename": "kXCTAttachmentScreenRecording_0_0C9B826F-0760-4305-991D-D20D445274AC.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~thSMk9Ua0wRBOo7ipleDKmMiWSmXPMuCg3sJm1JTDMl0AuHBT7Jvaeu8Ap-Z57NrYC2xDjyUII5QdtE5Vddg_A=="
+      },
+      "payloadSize": "1975251",
+      "timestamp": "2026-10-28T03:03:20.023+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "883EB45E-05BB-4B0A-B638-6F937C659716",
+      "activity_title": "Start Test at 2026-10-28 03:03:19.920",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~thSMk9Ua0wRBOo7ipleDKmMiWSmXPMuCg3sJm1JTDMl0AuHBT7Jvaeu8Ap-Z57NrYC2xDjyUII5QdtE5Vddg_A==",
+      "payload_sha256": "9f7451099d633ad8d8ec1ecf5068b227ab3189431d83f5226b99f8b2434a0c5a"
+    },
+    "video_timestamp_seconds": 33.8,
+    "sha256": "4007921167df8391a2bcb85d3f52b688986ac58ff11b649af16cda9dc41986db",
+    "scope": "Derived single original recording frame; no visual edits."
+  },
+  {
+    "file": "diagnosis/testhistorypreserves-recognized-copy.png",
+    "source_recording": {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "file": "testhistorypreservesrecognizedfallbackandlegacyvariants-0.mp4",
+      "filename": "kXCTAttachmentScreenRecording_0_F5846BD0-8436-4213-9E8D-08EC29BFACC7.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~DY-qhZmt10PsWhDhmPXmHhevkWXqZ1fbTdFhBDZFilFCJQ73czGyNi3dllsRdvR_k4Zc02yvphVnGO_SZkxJzA=="
+      },
+      "payloadSize": "3588028",
+      "timestamp": "2026-10-28T03:03:56.482+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "9FC984D0-1ECA-4690-A1E8-12BD00F527A7",
+      "activity_title": "Start Test at 2026-10-28 03:03:56.334",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~DY-qhZmt10PsWhDhmPXmHhevkWXqZ1fbTdFhBDZFilFCJQ73czGyNi3dllsRdvR_k4Zc02yvphVnGO_SZkxJzA==",
+      "payload_sha256": "ca5dd06bb8a488423efec1999e3f97b74eba951ced1ee6bf1d14051cd3c4fde7"
+    },
+    "video_timestamp_seconds": 58.5,
+    "sha256": "b78743050b169d6f6aa4f42bca01217db21c5d5d0c2fec299fcfb551dd43a33e",
+    "scope": "Derived single original recording frame; no visual edits."
+  }
+]

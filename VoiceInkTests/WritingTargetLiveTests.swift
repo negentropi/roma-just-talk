@@ -868,6 +868,10 @@ final class LiveWritingEditor {
     let editor: AXUIElement
     let previousApplication: NSRunningApplication?
     let previousWindows: [AXUIElement]
+    private var cleanupAttempted = false
+    private var cleanupCompleted = false
+    private var cleanupActions: [String: Int] = [:]
+    private var confirmedSavedUTF16: [Int]?
 
     private init(
         token: String, kind: Kind, directory: URL, resource: URL,
@@ -1102,61 +1106,162 @@ final class LiveWritingEditor {
     }
 
     func close() {
-        guard Self.elements(kAXWindowsAttribute, from: appElement).contains(where: { CFEqual($0, window) }),
+        guard !cleanupCompleted, !cleanupAttempted else { return }
+        do {
+            if !surfaceIsClosed() {
+                try focusForCleanup()
+                if kind == .textEdit { try saveOwnedDocument() }
+                guard ownsFocusedWindow() else { throw LiveWritingFailure.failed("The owned editor lost focus before CmdW.") }
+                recordCleanup("before-close")
+                guard ownsFocusedWindow() else { throw LiveWritingFailure.failed("The owned editor lost focus during close diagnostics.") }
+                cleanupAttempted = true
+                cleanupActions["closeCommandRequests", default: 0] += 1
+                Self.key(kVK_ANSI_W, pid: application.processIdentifier, flags: .maskCommand)
+                guard Self.poll(seconds: 5, { self.surfaceIsClosed() }) else {
+                    throw LiveWritingFailure.failed("The owned surface did not close after one CmdW.")
+                }
+            }
+            recordCleanup("closed")
+            record("cleanup", expected: "owned surface closed")
+            try finishCleanup()
+        } catch {
+            recordCleanup("close-failed", failure: String(describing: error))
+            Issue.record("Live writing cleanup failed: \(error); preserved \(directory.path).")
+        }
+    }
+
+    func terminateOwnedApplication() throws -> [String: Any] {
+        guard !cleanupCompleted, !cleanupAttempted, kind == .textEdit, previousWindows.isEmpty else {
+            throw LiveWritingFailure.failed("Termination requires an untouched, exclusively owned TextEdit fixture.")
+        }
+        do {
+            try focusForCleanup()
+            try requireExclusiveOwnedApplication()
+            try saveOwnedDocument()
+            try requireExclusiveOwnedApplication()
+            let before = cleanupState()
+            recordCleanup("before-termination")
+            try requireExclusiveOwnedApplication()
+            cleanupAttempted = true
+            cleanupActions["terminationRequests", default: 0] += 1
+            let accepted = application.terminate()
+            guard accepted, Self.poll(seconds: 8, { self.application.isTerminated }) else {
+                throw LiveWritingFailure.failed("The exact owned process did not complete its single termination request (accepted: \(accepted)).")
+            }
+            recordCleanup("terminated")
+            try finishCleanup()
+            return ["before": before, "after": cleanupState(), "terminationAccepted": accepted]
+        } catch {
+            recordCleanup("termination-failed", failure: String(describing: error))
+            throw error
+        }
+    }
+
+    private func focusForCleanup() throws {
+        guard !application.isTerminated,
+              Self.windows(in: appElement)?.contains(where: { CFEqual($0, window) }) == true,
               Self.identifies(window, token: token) else {
-            Issue.record("Live writing cleanup lost ownership; preserved fixture \(directory.path).")
-            return
+            throw LiveWritingFailure.failed("The fixture no longer owns its live editor window.")
         }
         application.activate(options: [.activateAllWindows])
         _ = AXUIElementPerformAction(window, kAXRaiseAction as CFString)
         _ = AXUIElementSetAttributeValue(editor, kAXFocusedAttribute as CFString, kCFBooleanTrue)
-        guard Self.poll(seconds: 2, {
-            guard NSWorkspace.shared.frontmostApplication?.processIdentifier == self.application.processIdentifier,
-                  let focused = Self.element(kAXFocusedUIElementAttribute, from: AXUIElementCreateSystemWide()) else { return false }
-            return CFEqual(focused, self.editor)
+        guard Self.poll(seconds: 3, { self.ownsFocusedWindow() }) else {
+            throw LiveWritingFailure.failed("The owned editor did not receive cleanup focus.")
+        }
+    }
+
+    private func ownsFocusedWindow() -> Bool {
+        guard !application.isTerminated,
+              let current = NSRunningApplication(processIdentifier: application.processIdentifier), application.isEqual(current),
+              NSWorkspace.shared.frontmostApplication.map({ application.isEqual($0) }) == true,
+              Self.windows(in: appElement)?.contains(where: { CFEqual($0, window) }) == true,
+              Self.identifies(window, token: token),
+              let focused = Self.element(kAXFocusedUIElementAttribute, from: AXUIElementCreateSystemWide()),
+              let focusedWindow = Self.element(kAXFocusedWindowAttribute, from: appElement),
+              let editorWindow = Self.element(kAXWindowAttribute, from: editor) else { return false }
+        return CFEqual(focused, editor) && CFEqual(focusedWindow, window) && CFEqual(editorWindow, window)
+    }
+
+    private func saveOwnedDocument() throws {
+        guard kind == .textEdit, ownsFocusedWindow(),
+              Self.scopedURL(kAXDocumentAttribute, from: window, resource: resource) == resource.absoluteString,
+              let expected = value else {
+            throw LiveWritingFailure.failed("The fixture cannot prove ownership of the document to save.")
+        }
+        cleanupActions["saveCommandRequests", default: 0] += 1
+        Self.key(kVK_ANSI_S, pid: application.processIdentifier, flags: .maskCommand)
+        var savedText: String?
+        guard Self.poll(seconds: 5, {
+            guard self.ownsFocusedWindow(), self.value?.utf16.elementsEqual(expected.utf16) == true,
+                  let saved = try? String(contentsOf: self.resource, encoding: .utf8),
+                  saved.utf16.elementsEqual(expected.utf16) else { return false }
+            savedText = saved
+            return true
         }) else {
-            Issue.record("Live writing cleanup could not focus its owned editor; preserved \(directory.path).")
-            return
+            throw LiveWritingFailure.failed("The owned document did not confirm exact saved text and restored editor focus.")
         }
-        if kind == .textEdit {
-            guard let expected = value else {
-                Issue.record("Live writing cleanup could not read its owned document.")
-                return
-            }
-            Self.key(kVK_ANSI_S, pid: application.processIdentifier, flags: .maskCommand)
-            guard Self.poll(seconds: 3, {
-                (try? String(contentsOf: self.resource, encoding: .utf8))?.utf16.elementsEqual(expected.utf16) == true
-            }) else {
-                Issue.record("Live writing cleanup could not save its owned document; preserved \(directory.path).")
-                return
-            }
-            guard let close = Self.element(kAXCloseButtonAttribute, from: window),
-                  AXUIElementPerformAction(close, kAXPressAction as CFString) == .success else {
-                Issue.record("Live writing cleanup could not close its owned document.")
-                return
-            }
-        } else {
-            Self.key(kVK_ANSI_W, pid: application.processIdentifier, flags: .maskCommand)
+        confirmedSavedUTF16 = savedText.map { Array($0.utf16).map(Int.init) }
+    }
+
+    private func requireExclusiveOwnedApplication() throws {
+        let applications = NSRunningApplication.runningApplications(withBundleIdentifier: kind.bundleIdentifier)
+        guard previousWindows.isEmpty, applications.count == 1, applications[0].isEqual(application),
+              ownsFocusedWindow(), let windows = Self.windows(in: appElement), windows.count == 1,
+              CFEqual(windows[0], window),
+              Self.scopedURL(kAXDocumentAttribute, from: window, resource: resource) == resource.absoluteString else {
+            throw LiveWritingFailure.failed("Refusing termination without one exact saved fixture window in the retained application instance.")
         }
-        let closed = Self.poll(seconds: 3) {
-            guard let windows = Self.windows(in: self.appElement) else {
-                return self.application.isTerminated && self.previousWindows.isEmpty
-            }
-            guard self.previousWindows.allSatisfy({ previous in
-                windows.contains { CFEqual($0, previous) }
-            }) else { return false }
-            return !windows.contains { candidate in
-                Self.identifies(candidate, token: self.token)
-            }
-        }
-        record("cleanup", expected: closed ? "owned surface closed" : "owned surface still open")
-        guard closed else {
-            Issue.record("Live writing cleanup did not prove its owned surface closed; preserved \(directory.path).")
-            return
-        }
-        do { try FileManager.default.removeItem(at: directory) }
-        catch { Issue.record("Live writing cleanup could not remove its owned fixture: \(error)") }
+    }
+
+    private func surfaceIsClosed() -> Bool {
+        if application.isTerminated { return previousWindows.isEmpty }
+        guard let windows = Self.windows(in: appElement), previousWindows.allSatisfy({ previous in
+            windows.contains { CFEqual($0, previous) }
+        }) else { return false }
+        let sharedSafariWindow = kind == .safari && previousWindows.contains { CFEqual($0, window) }
+        return !windows.contains { Self.identifies($0, token: token) || (!sharedSafariWindow && CFEqual($0, window)) }
+    }
+
+    private func finishCleanup() throws {
+        cleanupCompleted = true
+        try FileManager.default.removeItem(at: directory)
         if let previousApplication, !previousApplication.isTerminated { previousApplication.activate() }
+    }
+
+    private func cleanupState() -> [String: Any] {
+        for element in [appElement, window, editor] { _ = AXUIElementSetMessagingTimeout(element, 0.1) }
+        var raw: CFTypeRef?
+        let status = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &raw)
+        let windows = status == .success ? raw as? [AXUIElement] : nil
+        let current = NSRunningApplication(processIdentifier: application.processIdentifier)
+        return ["applicationTerminated": application.isTerminated,
+            "bundleApplicationCount": NSRunningApplication.runningApplications(withBundleIdentifier: kind.bundleIdentifier).count,
+            "currentApplicationInstanceMatches": current.map { application.isEqual($0) } == true,
+            "windowReadAXError": status.rawValue, "windowReadIsArray": windows != nil,
+            "windowCount": windows?.count ?? -1, "previousWindowCount": previousWindows.count,
+            "exactWindowPresent": windows?.contains { CFEqual($0, window) } == true,
+            "tokenWindowCount": windows?.filter { Self.identifies($0, token: token) }.count ?? -1,
+            "previousWindowsPreserved": windows.map { all in previousWindows.allSatisfy { previous in all.contains { CFEqual($0, previous) } } } == true,
+            "ownedDocumentURLMatches": Self.scopedURL(kAXDocumentAttribute, from: window, resource: resource) == resource.absoluteString,
+            "ownsFocusedWindow": ownsFocusedWindow(), "actions": cleanupActions,
+            "confirmedSavedUTF16": confirmedSavedUTF16 as Any? ?? NSNull()]
+    }
+
+    private func recordCleanup(_ phase: String, failure: String? = nil) {
+        guard let output = Self.evidenceDirectory else { return }
+        var receipt = cleanupState()
+        receipt["checkpoint"] = phase
+        receipt["token"] = token
+        receipt["processIdentifier"] = Int(application.processIdentifier)
+        receipt["bundleIdentifier"] = kind.bundleIdentifier
+        receipt["failure"] = failure as Any? ?? NSNull()
+        receipt["systemUptime"] = ProcessInfo.processInfo.systemUptime
+        do {
+            try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+                .write(to: output.appendingPathComponent("\(token)-cleanup-\(phase).json"))
+        } catch { Issue.record("Could not write cleanup diagnostics: \(error)") }
     }
 
     func record(_ name: String, expected: String) {

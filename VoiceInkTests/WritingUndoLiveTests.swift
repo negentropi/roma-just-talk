@@ -23,14 +23,8 @@ extension VoiceInkTests {
         try fixture.observe("process-forward", editor: editor, expected: fixture.result(replacement), range: fixture.caret(replacement))
         let application = editor.application
         let pid = application.processIdentifier
-        editor.close()
+        fixture.extra["processTermination"] = try editor.terminateOwnedApplication()
         closed = true
-        if !application.isTerminated {
-            let remainingWindows = try #require(WritingUndoLiveFixture.windows(of: application))
-            try #require(remainingWindows.isEmpty,
-                         "Refusing to terminate a process that has a remaining window.")
-            try #require(application.terminate(), "The exact owned process did not accept termination.")
-        }
         try await fixture.wait("The owned process did not terminate.") { application.isTerminated }
         try await fixture.wait("Terminated target retained Undo authority.") { !controller.isAvailable }
         fixture.stage("process-terminated", ["pid": Int(pid), "bundleIdentifier": "com.apple.TextEdit",

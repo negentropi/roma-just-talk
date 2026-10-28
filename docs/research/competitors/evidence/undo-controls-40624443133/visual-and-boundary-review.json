@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "review_model": "gpt-6.1-sol",
+  "effort": "medium",
+  "review_type": "read-only retained raw runtime boundary and actual single failure screenshot",
+  "result": "bounded failure review complete; no native acceptance",
+  "reviewed_runtime_head": "b2c82ce6e55fe54c8eee9237586e332a0cedcfef",
+  "visual_review": {
+    "png_sha256": "18f18a48b24918878bc6b6d61100ca872220b43edea36caa2da62ba375e1d9f8",
+    "dimensions": [
+      1024,
+      768
+    ],
+    "observed": "Finder menu bar, inactive setup window, Nothing to undo/Record/initial waiting text; no open product menu or obvious fixture status icon.",
+    "acceptance_scope": "Setup presentation only."
+  },
+  "confirmed_boundary": "Before any input, exact-one-display containment predicate refused; raw geometry values were not retained.",
+  "native_cases_completed": 0,
+  "state_checks_completed": 0,
+  "claims_not_established": [
+    "Zero versus multiple containment matches.",
+    "Transient layout, wrong root, coordinate mismatch or any normalization cause.",
+    "Click, menu, chord, Undo, editor, selection, focus or passive feedback acceptance."
+  ],
+  "usage": null,
+  "usage_status": "Not exposed by native review route; not estimated.",
+  "artifact_files_sha256": {
+    "audit.json": "5fbede9440759141f8b1ecb35ed7fcf6fb0622f58f64696e8ef704342473ef40",
+    "milestones.json": "5bf9873038397e17eadf7a91f5a7f1284cdd2701c4a50db0d0bc37aea11d57c4",
+    "README.md": "ad4238a382727761a28717f2de932e02d7704de5d4f3b544a96a7476928e0b3d",
+    "failure-diagnosis.json": "eb1477d9a330bb1d80d017af5018ecf0624dff622b6aefaa4ece25f0fd6492ff",
+    "failure.png": "18f18a48b24918878bc6b6d61100ca872220b43edea36caa2da62ba375e1d9f8",
+    "artifacts.json": "7f4467360167120564c2e5bcfbcd9dec3370883726b00c276b18ebc2879083f3"
+  }
+}

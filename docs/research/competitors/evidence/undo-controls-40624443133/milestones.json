@@ -1,0 +1,742 @@
+[
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 1,
+    "stage": "app.init.entry",
+    "systemUptime": 553.167942625,
+    "unixTime": 1793157074.6552901
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 2,
+    "stage": "app.init.exit",
+    "systemUptime": 553.1764023333334,
+    "unixTime": 1793157074.663334
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 3,
+    "stage": "owner.launch.entry",
+    "systemUptime": 553.54853175,
+    "unixTime": 1793157075.0354981
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 4,
+    "stage": "owner.init.entry",
+    "systemUptime": 553.5497445416667,
+    "unixTime": 1793157075.036666
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 5,
+    "stage": "owner.register-defaults.before",
+    "systemUptime": 553.5501457916668,
+    "unixTime": 1793157075.037061
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 6,
+    "stage": "owner.register-defaults.after",
+    "systemUptime": 553.5514677083333,
+    "unixTime": 1793157075.038393
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 7,
+    "stage": "owner.schema.before",
+    "systemUptime": 553.5523382083334,
+    "unixTime": 1793157075.039264
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 8,
+    "stage": "owner.schema.after",
+    "systemUptime": 553.5656280416667,
+    "unixTime": 1793157075.05259
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 9,
+    "stage": "owner.container.before",
+    "systemUptime": 553.5667275416668,
+    "unixTime": 1793157075.0536451
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 10,
+    "stage": "owner.container.after",
+    "systemUptime": 553.594384125,
+    "unixTime": 1793157075.081311
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 11,
+    "stage": "owner.whisper-model-manager.before",
+    "systemUptime": 553.5949715,
+    "unixTime": 1793157075.081888
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 12,
+    "stage": "owner.whisper-model-manager.after",
+    "systemUptime": 553.5958552083333,
+    "unixTime": 1793157075.082777
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 13,
+    "stage": "owner.fluid-audio-model-manager.before",
+    "systemUptime": 553.596308,
+    "unixTime": 1793157075.083224
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 14,
+    "stage": "owner.fluid-audio-model-manager.after",
+    "systemUptime": 553.59687525,
+    "unixTime": 1793157075.083795
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 15,
+    "stage": "owner.transcription-model-manager.before",
+    "systemUptime": 553.597273125,
+    "unixTime": 1793157075.0841908
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 16,
+    "stage": "owner.transcription-model-manager.after",
+    "systemUptime": 553.599780625,
+    "unixTime": 1793157075.086714
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 17,
+    "stage": "owner.recorder-ui-manager.before",
+    "systemUptime": 553.6017835833334,
+    "unixTime": 1793157075.0887
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 18,
+    "stage": "owner.recorder-ui-manager.after",
+    "systemUptime": 553.6023420416667,
+    "unixTime": 1793157075.089258
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 19,
+    "stage": "owner.engine.before",
+    "systemUptime": 553.6026540416667,
+    "unixTime": 1793157075.089569
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 20,
+    "stage": "owner.engine.after",
+    "systemUptime": 553.8688942916667,
+    "unixTime": 1793157075.3558369
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 21,
+    "stage": "owner.configure.before",
+    "systemUptime": 553.8705884166667,
+    "unixTime": 1793157075.357516
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 22,
+    "stage": "owner.configure.after",
+    "systemUptime": 553.8722822916667,
+    "unixTime": 1793157075.359201
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 23,
+    "stage": "owner.shortcut-manager.before",
+    "systemUptime": 553.8734669166666,
+    "unixTime": 1793157075.360394
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 24,
+    "stage": "owner.shortcut-manager.after",
+    "systemUptime": 553.8797343333333,
+    "unixTime": 1793157075.366665
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 25,
+    "stage": "owner.init.exit",
+    "systemUptime": 553.8812880416667,
+    "unixTime": 1793157075.3682141
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 26,
+    "stage": "owner.launch.exit",
+    "systemUptime": 553.8822468750001,
+    "unixTime": 1793157075.369163
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 27,
+    "stage": "app.scene-body.first",
+    "systemUptime": 553.8872742083333,
+    "unixTime": 1793157075.37421
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 28,
+    "stage": "view.body.first",
+    "systemUptime": 555.2892507916667,
+    "unixTime": 1793157076.776197
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 29,
+    "stage": "view.task.entry",
+    "systemUptime": 555.7699612916667,
+    "unixTime": 1793157077.256902
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 30,
+    "stage": "view.task.claimed",
+    "systemUptime": 555.7768369166668,
+    "unixTime": 1793157077.2637548
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 31,
+    "stage": "oracle.run.entry",
+    "systemUptime": 555.7795552083334,
+    "unixTime": 1793157077.266481
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 32,
+    "stage": "oracle.check-init.before",
+    "systemUptime": 555.7843186666666,
+    "unixTime": 1793157077.271245
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 33,
+    "stage": "oracle.check-init.after",
+    "systemUptime": 555.7885322916667,
+    "unixTime": 1793157077.2754622
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 34,
+    "stage": "execute.preflight.before",
+    "systemUptime": 555.7899472500001,
+    "unixTime": 1793157077.276866
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 35,
+    "stage": "execute.preflight.accessibility.before",
+    "systemUptime": 555.7920119166668,
+    "unixTime": 1793157077.278938
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 36,
+    "stage": "execute.preflight.accessibility.after",
+    "systemUptime": 555.809246875,
+    "unixTime": 1793157077.296205
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 37,
+    "stage": "execute.preflight.listen-event.before",
+    "systemUptime": 555.8125887083334,
+    "unixTime": 1793157077.2995381
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 38,
+    "stage": "execute.preflight.listen-event.after",
+    "systemUptime": 555.8163925,
+    "unixTime": 1793157077.30333
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 39,
+    "stage": "execute.preflight.post-event.before",
+    "systemUptime": 555.8174779166667,
+    "unixTime": 1793157077.304394
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 40,
+    "stage": "execute.preflight.post-event.after",
+    "systemUptime": 555.8205840416667,
+    "unixTime": 1793157077.307513
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 41,
+    "stage": "execute.preflight.screen-capture.before",
+    "systemUptime": 555.82169925,
+    "unixTime": 1793157077.308622
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 42,
+    "stage": "execute.preflight.screen-capture.after",
+    "systemUptime": 555.8253114166668,
+    "unixTime": 1793157077.312241
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 43,
+    "stage": "execute.preflight.after",
+    "systemUptime": 555.8290481666667,
+    "unixTime": 1793157077.315978
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 44,
+    "stage": "policy.snapshot-before.before",
+    "systemUptime": 555.8349644583334,
+    "unixTime": 1793157077.321883
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 45,
+    "stage": "policy.snapshot-before.after",
+    "systemUptime": 555.8430225833333,
+    "unixTime": 1793157077.3299441
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 46,
+    "stage": "policy.public-writes.before",
+    "systemUptime": 555.8442375000001,
+    "unixTime": 1793157077.3311539
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 47,
+    "stage": "policy.public-writes.after",
+    "systemUptime": 555.8461997916667,
+    "unixTime": 1793157077.333125
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 48,
+    "stage": "policy.snapshot-after.before",
+    "systemUptime": 555.8479278333334,
+    "unixTime": 1793157077.3348498
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 49,
+    "stage": "policy.snapshot-after.after",
+    "systemUptime": 555.8492868333334,
+    "unixTime": 1793157077.336207
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 50,
+    "stage": "menu.unavailable-menu.status-lookup.before",
+    "systemUptime": 555.8508721666667,
+    "unixTime": 1793157077.337795
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 51,
+    "stage": "menu.unavailable-menu.status-press.before",
+    "systemUptime": 556.3344960000001,
+    "unixTime": 1793157077.821475
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 52,
+    "stage": "click.menu.unavailable-menu.status.unique-scan.before",
+    "systemUptime": 556.3385534166667,
+    "unixTime": 1793157077.825481
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 53,
+    "stage": "click.menu.unavailable-menu.status.unique-scan.after",
+    "systemUptime": 556.4315118333334,
+    "unixTime": 1793157077.918437
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 54,
+    "stage": "click.menu.unavailable-menu.status.role.before",
+    "systemUptime": 556.4322667916667,
+    "unixTime": 1793157077.919183
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 55,
+    "stage": "click.menu.unavailable-menu.status.role.after",
+    "systemUptime": 556.4327694166667,
+    "unixTime": 1793157077.919685
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 56,
+    "stage": "click.menu.unavailable-menu.status.identifier.before",
+    "systemUptime": 556.4331084583333,
+    "unixTime": 1793157077.920023
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 57,
+    "stage": "click.menu.unavailable-menu.status.identifier.after",
+    "systemUptime": 556.4334922500001,
+    "unixTime": 1793157077.920407
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 58,
+    "stage": "click.menu.unavailable-menu.status.enabled.before",
+    "systemUptime": 556.4338005000001,
+    "unixTime": 1793157077.920716
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 59,
+    "stage": "click.menu.unavailable-menu.status.enabled.after",
+    "systemUptime": 556.439830375,
+    "unixTime": 1793157077.926748
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 60,
+    "stage": "click.menu.unavailable-menu.status.pid.before",
+    "systemUptime": 556.4404503333334,
+    "unixTime": 1793157077.927367
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 61,
+    "stage": "click.menu.unavailable-menu.status.pid.after",
+    "systemUptime": 556.4442681666667,
+    "unixTime": 1793157077.9311929
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 62,
+    "stage": "click.menu.unavailable-menu.status.frame.position.before",
+    "systemUptime": 556.4596418333334,
+    "unixTime": 1793157077.946562
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 63,
+    "stage": "click.menu.unavailable-menu.status.frame.position.after",
+    "systemUptime": 556.4608014583333,
+    "unixTime": 1793157077.947719
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 64,
+    "stage": "click.menu.unavailable-menu.status.frame.size.before",
+    "systemUptime": 556.4613722916667,
+    "unixTime": 1793157077.9482908
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 65,
+    "stage": "click.menu.unavailable-menu.status.frame.size.after",
+    "systemUptime": 556.461995125,
+    "unixTime": 1793157077.94891
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 66,
+    "stage": "click.menu.unavailable-menu.status.displays.before",
+    "systemUptime": 556.4623917083334,
+    "unixTime": 1793157077.949307
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 67,
+    "stage": "click.menu.unavailable-menu.status.displays.after",
+    "systemUptime": 556.485619875,
+    "unixTime": 1793157077.972559
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 68,
+    "stage": "oracle.catch.entry",
+    "systemUptime": 556.4881725,
+    "unixTime": 1793157077.975097
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 69,
+    "stage": "oracle.catch.hierarchy.before",
+    "systemUptime": 556.4906090833333,
+    "unixTime": 1793157077.9775271
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 70,
+    "stage": "oracle.catch.hierarchy.after",
+    "systemUptime": 556.5286926666668,
+    "unixTime": 1793157078.015651
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 71,
+    "stage": "oracle.catch.screenshot.before",
+    "systemUptime": 556.5346187916667,
+    "unixTime": 1793157078.0215368
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 72,
+    "stage": "oracle.catch.screenshot.after",
+    "systemUptime": 557.1095882083333,
+    "unixTime": 1793157078.5965328
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 73,
+    "stage": "oracle.catch.finish.before",
+    "systemUptime": 557.1102732916667,
+    "unixTime": 1793157078.597192
+  },
+  {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 74,
+    "stage": "oracle.catch.finish.after",
+    "systemUptime": 557.1269520833333,
+    "unixTime": 1793157078.613894
+  }
+]

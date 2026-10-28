@@ -1,0 +1,188 @@
+{
+  "run_id": 40624443133,
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40624443133",
+  "head_sha": "b2c82ce6e55fe54c8eee9237586e332a0cedcfef",
+  "classification": "pre-input-exact-one-display-guard-refusal",
+  "build_succeeded": true,
+  "build_log_sha256": "c54477f9109e95dd199ef7db1a031472372ef3e0978c62181ae7096e75fc0541",
+  "prepared_source_inputs": 613,
+  "prepared_candidate_files": 606,
+  "prepared_manifests_match_git_objects": true,
+  "actual_compiler_swift_inputs": 222,
+  "canonical_pins": 41,
+  "fresh_tcc_rows_before": 5,
+  "signature_before": {
+    "app_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "e2b9edef2595328b974df2efdf7d66dc39e1817691af201ccfd648af1065796a",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "host_live": {
+    "exit_code": 1,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 18641,
+      "started_at": "Wed Oct 28 03:11:14 2026"
+    },
+    "spawned_identity": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "started_at": "Wed Oct 28 03:11:14 2026"
+    }
+  },
+  "host_closed": {
+    "error": null,
+    "exact_executable_census_empty": true,
+    "exact_executable_has_no_open_descriptors": true,
+    "host": {
+      "executable_path": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "mapped_text_paths": [
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/roma just talk.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle",
+        "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/Products/Debug/PackageFrameworks/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+        "/usr/lib/dyld"
+      ],
+      "pid": 18641,
+      "started_at": "Wed Oct 28 03:11:14 2026"
+    },
+    "valid": true
+  },
+  "oracle_failure": "Native click refused at click.menu.unavailable-menu.status: frame is not contained in exactly one active display",
+  "last_preflight_stage": "click.menu.unavailable-menu.status.displays.after",
+  "progress_records": 74,
+  "last_checkpoint": {
+    "diagnosticOnly": true,
+    "mainThread": true,
+    "pid": 18641,
+    "schemaVersion": 1,
+    "sequence": 74,
+    "stage": "oracle.catch.finish.after",
+    "systemUptime": 557.1269520833333,
+    "unixTime": 1793157078.613894
+  },
+  "mouse_input_posted": false,
+  "completed_cases": 0,
+  "completed_states": 0,
+  "actual_policy_bootstrap": {
+    "after": {
+      "effective": {
+        "clipboardRestoreDelay": 2,
+        "restoreClipboardAfterPaste": true
+      },
+      "persistent": {
+        "clipboardRestoreDelay": {
+          "type": "number",
+          "value": 2
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "boolean",
+          "value": true
+        }
+      },
+      "registered": {
+        "clipboardRestoreDelay": {
+          "type": "number",
+          "value": 2
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    },
+    "before": {
+      "effective": {
+        "clipboardRestoreDelay": 2,
+        "restoreClipboardAfterPaste": true
+      },
+      "persistent": {
+        "clipboardRestoreDelay": {
+          "type": "missing"
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "missing"
+        }
+      },
+      "registered": {
+        "clipboardRestoreDelay": {
+          "type": "number",
+          "value": 2
+        },
+        "restoreClipboardAfterPaste": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    },
+    "bundleIdentifier": "com.negentropi.RomaJustTalk",
+    "expectedUserHome": "/Users/runner/work/_temp/writing-undo-controls-proof/isolated-user",
+    "hasArgumentOverrides": false,
+    "homeMatchesExpected": true,
+    "observedUserHome": "/Users/runner/work/_temp/writing-undo-controls-proof/isolated-user",
+    "publicPreferenceAPIsUsed": true,
+    "synchronizeSucceeded": true
+  },
+  "actual_paste_preferences": {
+    "clipboardRestoreDelay": 2,
+    "hasArgumentOverrides": false,
+    "restoreClipboardAfterPaste": true
+  },
+  "host_outcome_summary": {
+    "classification": "invalid-or-failed",
+    "exit_code": 1,
+    "candidate_error": null,
+    "closure_error": null,
+    "monitor_error": null,
+    "native_failure": "Native click refused at click.menu.unavailable-menu.status: frame is not contained in exactly one active display",
+    "native_issues": [],
+    "observed_completed_cases": [],
+    "profile_files": {
+      "profiles/undo-controls-18641-3973123513286346596_0.profraw": {
+        "bytes": 14152,
+        "sha256": "2d769733d1008756ab20c11275a2c385b8b047767ad299641a1f40ff55f222c6"
+      },
+      "profiles/undo-controls-18641-7522395434658885394_0.profraw": {
+        "bytes": 8881184,
+        "sha256": "d86392808753793d0113a4856e6a82dd38340cff4756f706c8c39c82403fe58d"
+      }
+    },
+    "samples": [],
+    "diagnostic_screens": []
+  },
+  "actual_flat_status_node": {
+    "enabled": true,
+    "id": "undoControlHost.statusItem",
+    "label": "",
+    "role": "AXMenuBarItem",
+    "title": "Undo"
+  },
+  "geometry_evidence": "Position/size and display enumeration returned; raw rectangle, count and bounds were not persisted, so zero versus multiple containment matches and root/readiness/coordinate causes remain unknown.",
+  "failure_png": {
+    "member": "native/failure.png",
+    "sha256": "18f18a48b24918878bc6b6d61100ca872220b43edea36caa2da62ba375e1d9f8",
+    "visual_boundary": "Single inactive setup-window image; no menu/control/case acceptance."
+  },
+  "limits": [
+    "Guard stopped before any native mouse event; no menu, shortcut or Undo case/state completed.",
+    "Wrong menu-root identity, offscreen initial layout and coordinate mismatch are hypotheses, not established causes.",
+    "No source-after, identity-after or TCC-after receipts; prelaunch signature and permission evidence are retained.",
+    "Flat AX hierarchy does not record ancestry or geometry, and cannot identify the intended extras-menu root.",
+    "One setup failure screenshot does not prove button activation, editor restoration or focus."
+  ]
+}

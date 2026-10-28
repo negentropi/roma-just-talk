@@ -1,0 +1,13 @@
+# Undo controls run 40624443133
+
+[Exact run](https://github.com/negentropi/roma-just-talk/actions/runs/40624443133), head `b2c82ce6e55fe54c8eee9237586e332a0cedcfef`, built successfully with 222 verified compiler inputs, 41 canonical revisions, prelaunch signature verification and five fresh TCC rows. Both archives downloaded once; hashes, byte sizes and every member CRC verified. Raw archives remain in `/data/rjt-writing-check-01a17bef/undo-controls-40624443133/`.
+
+The Oracle exited with an explicit refusal before posting any mouse event: the status control's frame was not contained in exactly one active display. Unique lookup, role, identifier, enabled state, PID, finite AX geometry and display enumeration returned. The raw rectangle, display count and bounds were not retained, so this run cannot distinguish zero containment matches from multiple matches, transient layout from an incorrect menu root, or a coordinate problem.
+
+The final native receipt confirms the actual public preference setup: effective and registered clipboard restoration were true with a two-second delay, synchronized typed persistence matched, and the observed isolated home matched the configured home. No menu or shortcut state check completed; no editor or Undo case ran. The exact process exited with code 1 and closed cleanly. No candidate mismatch was reported; post-run source, identity and TCC receipts were not reached.
+
+The actual 1024×768 failure screenshot shows Finder's menu bar and an inactive setup window with “Nothing to undo”, “Record”, and the initial waiting message. No open product menu or obvious fixture status icon is visible. The flat AX dump identifies `undoControlHost.statusItem` as an `AXMenuBarItem` titled `Undo`, and a disabled “Undo Last Writing Edit” item without an identifier. It does not preserve ancestor or geometry provenance. Neither the image nor the dump proves that the matched control was a visible extras-menu item.
+
+Actual GPT-6.1 Sol on medium reviewed this screenshot and the retained raw boundary. This is setup-only visual evidence, with no click delivery, text, selection, focus, notice or menu acceptance. `failure.png` has SHA-256 `18f18a48b24918878bc6b6d61100ca872220b43edea36caa2da62ba375e1d9f8`.
+
+`milestones.json` preserves 74 stage records. `failure-diagnosis.json` records the observed refusal and policy values; `audit.json` retains missing-proof failures. The next readiness experiment must retain raw initial/final geometry and root provenance, preserve every guard and wait only before input. No clamped coordinates, arbitrary display choice or retry after input is justified by this run.

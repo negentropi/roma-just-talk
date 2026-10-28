@@ -20,15 +20,35 @@ private struct UndoControlCheckFailure: Error, CustomStringConvertible {
 @MainActor
 enum WritingUndoControlOracle {
     static func run(owner: WritingUndoControlHostOwner) async {
+        // Diagnostic breadcrumbs only (see WritingUndoControlHostProgress). A failed record before
+        // `execute` is latched and fails the first `record` inside it, so it reaches `finish` below.
+        WritingUndoControlHostProgress.recordDeferringFailure("oracle.run.entry")
+        WritingUndoControlHostProgress.recordDeferringFailure("oracle.check-init.before")
         let check = Check(owner: owner)
+        WritingUndoControlHostProgress.recordDeferringFailure("oracle.check-init.after")
         do {
             try await check.execute()
+            try WritingUndoControlHostProgress.record("oracle.finish-success.before")
             try check.finish(completed: true, failure: nil)
+            try WritingUndoControlHostProgress.record("oracle.finish-success.after")
             Darwin.exit(0)
         } catch {
-            try? check.dumpHierarchy("failure")
-            try? await check.screenshot("failure")
-            try? check.finish(completed: false, failure: String(describing: error))
+            // The original reason reaches stderr before any AX work, so a stalled failure dump stays diagnosable.
+            // Breadcrumb or secondary evidence failures here are reported and never replace this error.
+            fputs("Undo control check failing; collecting failure evidence: \(error)\n", stderr)
+            WritingUndoControlHostProgress.recordDeferringFailure("oracle.catch.entry")
+            WritingUndoControlHostProgress.recordDeferringFailure("oracle.catch.hierarchy.before")
+            do { try check.dumpHierarchy("failure") }
+            catch let secondary { fputs("Undo control failure hierarchy not written: \(secondary)\n", stderr) }
+            WritingUndoControlHostProgress.recordDeferringFailure("oracle.catch.hierarchy.after")
+            WritingUndoControlHostProgress.recordDeferringFailure("oracle.catch.screenshot.before")
+            do { try await check.screenshot("failure") }
+            catch let secondary { fputs("Undo control failure screenshot not written: \(secondary)\n", stderr) }
+            WritingUndoControlHostProgress.recordDeferringFailure("oracle.catch.screenshot.after")
+            WritingUndoControlHostProgress.recordDeferringFailure("oracle.catch.finish.before")
+            do { try check.finish(completed: false, failure: String(describing: error)) }
+            catch let secondary { fputs("Undo control failure result not written: \(secondary)\n", stderr) }
+            WritingUndoControlHostProgress.recordDeferringFailure("oracle.catch.finish.after")
             fputs("Undo control check failed: \(error)\n", stderr)
             Darwin.exit(1)
         }
@@ -51,11 +71,26 @@ enum WritingUndoControlOracle {
 
         init(owner: WritingUndoControlHostOwner) { self.owner = owner }
 
+        /// Diagnostic breadcrumb naming the step about to start; the next mark proves that step returned.
+        func mark(_ stage: String) throws { try WritingUndoControlHostProgress.record(stage) }
+
         func execute() async throws {
+            // One fixed before/after pair per permission check: a missing ".after"
+            // names the exact permission that blocked the run.
+            try mark("execute.preflight.before")
+            try mark("execute.preflight.accessibility.before")
             try require(AXIsProcessTrusted(), "The exact signed host lacks Accessibility access.")
+            try mark("execute.preflight.accessibility.after")
+            try mark("execute.preflight.listen-event.before")
             try require(CGPreflightListenEventAccess(), "The exact signed host lacks Input Monitoring access.")
+            try mark("execute.preflight.listen-event.after")
+            try mark("execute.preflight.post-event.before")
             try require(CGPreflightPostEventAccess(), "The exact signed host cannot post native keyboard events.")
+            try mark("execute.preflight.post-event.after")
+            try mark("execute.preflight.screen-capture.before")
             try require(CGPreflightScreenCaptureAccess(), "The exact signed host lacks Screen Recording access.")
+            try mark("execute.preflight.screen-capture.after")
+            try mark("execute.preflight.after")
             let argumentDomain = UserDefaults.standard.volatileDomain(forName: UserDefaults.argumentDomain)
             let pasteKeys = [VoiceInkPastePreference.restoreClipboardAfterPasteKey, VoiceInkPastePreference.clipboardRestoreDelayKey]
             let hasArgumentOverrides = pasteKeys.contains { argumentDomain[$0] != nil }
@@ -63,13 +98,19 @@ enum WritingUndoControlOracle {
             let expectedHome = ProcessInfo.processInfo.environment["CFFIXED_USER_HOME"] ?? ""
             try require(bundleID == "com.negentropi.RomaJustTalk" && expectedHome.hasPrefix("/") && !hasArgumentOverrides,
                         "The controlled preference input requires the exact host and no policy launch overrides.")
+            try mark("policy.snapshot-before.before")
             let before = policySnapshot(bundleID: bundleID)
+            try mark("policy.snapshot-before.after")
             // Configure test-owned inputs through the same public preference APIs
             // as Settings. A plist placed by another process is not the oracle.
+            try mark("policy.public-writes.before")
             VoiceInkPastePreference.saveShouldRestoreClipboardAfterPaste(VoiceInkPastePreference.defaultRestoreClipboardAfterPaste)
             VoiceInkPastePreference.saveClipboardRestoreDelay(VoiceInkPastePreference.defaultClipboardRestoreDelay)
             let synchronized = UserDefaults.standard.synchronize()
+            try mark("policy.public-writes.after")
+            try mark("policy.snapshot-after.before")
             let after = policySnapshot(bundleID: bundleID)
+            try mark("policy.snapshot-after.after")
             policyBootstrap = ["bundleIdentifier": bundleID, "expectedUserHome": expectedHome,
                                "observedUserHome": NSHomeDirectory(),
                                "homeMatchesExpected": URL(fileURLWithPath: NSHomeDirectory()).standardizedFileURL
@@ -91,7 +132,9 @@ enum WritingUndoControlOracle {
                         "The public preference APIs did not confirm the persistent clipboard policy.")
             try require(!owner.engine.writingActionUndoController.isAvailable, "A fresh engine already owns an edit.")
             let unavailable = try await openMenu(expectedEnabled: false, checkpoint: "unavailable-menu")
+            try mark("unavailable.dismiss-menu.before")
             try await dismissMenu()
+            try mark("unavailable.dismiss-menu.after")
             states["unavailable"] = ["passed": true, "menu": unavailable]
             try await configureShortcut()
 
@@ -100,31 +143,42 @@ enum WritingUndoControlOracle {
             }
             try await focusRefusal()
             try require(Issue.messages.isEmpty, "The editor helper reported a failure: \(Issue.messages)")
+            try mark("execute.exit")
         }
 
         func configureShortcut() async throws {
+            try mark("shortcut.window-wait.before")
             try await wait("The fixture setup window did not appear.") {
                 NSApp.windows.contains { $0.title == "RJT Undo control check" && $0.isVisible }
             }
             guard let window = NSApp.windows.first(where: { $0.title == "RJT Undo control check" }) else {
                 throw UndoControlCheckFailure("Missing fixture setup window.")
             }
+            try mark("shortcut.activate.before")
             NSApp.activate(ignoringOtherApps: true)
             window.makeKeyAndOrderFront(nil)
+            try mark("shortcut.active-wait.before")
             try await wait("The setup window did not become active.") { NSApp.isActive && window.isKeyWindow }
+            try mark("shortcut.recorder-lookup.before")
             let recorder = try await unique(identifier: "shortcutRecorder.undoLastWritingEdit")
+            try mark("shortcut.recorder-describe.before")
             let control = try describe(recorder)
+            try mark("shortcut.recorder-press.before")
             try press(recorder)
+            try mark("shortcut.clear-wait.before")
             try await wait("The real recorder did not clear its shortcut for capture.") {
                 ShortcutStore.isShortcutCleared(for: .undoLastWritingEdit)
             }
+            try mark("shortcut.chord-post.before")
             try postChord()
             let expected = Shortcut.key(keyCode: keyCode, modifierFlags: modifiers)
+            try mark("shortcut.save-wait.before")
             try await wait("The real recorder did not save the exact captured chord.") {
                 ShortcutStore.shortcut(for: .undoLastWritingEdit) == expected
             }
             // A subsequent global chord must reach the registered event tap, not
             // the setup recorder's local capture monitor.
+            try mark("shortcut.display-wait.before")
             try await wait("The shortcut recorder stayed in capture mode.") {
                 self.string(kAXDescriptionAttribute, recorder) == expected.displayString
                     || self.string(kAXTitleAttribute, recorder) == expected.displayString
@@ -133,8 +187,11 @@ enum WritingUndoControlOracle {
             shortcut = ["recordedViaActualRecorder": true, "keyCode": Int(keyCode),
                         "modifierFlagsRawValue": modifiers.rawValue, "displayString": expected.displayString,
                         "recorderControl": control]
+            try mark("shortcut.screenshot.before")
             try await screenshot("shortcut-configured")
+            try mark("shortcut.hierarchy.before")
             try dumpHierarchy("shortcut-configured")
+            try mark("shortcut.exit")
         }
 
         func policySnapshot(bundleID: String) -> [String: Any] {
@@ -155,22 +212,49 @@ enum WritingUndoControlOracle {
         }
 
         func successCase(_ id: String, kind: LiveWritingEditor.Kind) async throws {
-            let editor = try await LiveWritingEditor.open(kind)
-            defer { editor.close() }
+            // Native run 40615667402 requested NFD "e\u{301}" in Safari and read back
+            // NFC "\u{e9}" through AX after delivery. That run does not show where the
+            // change happened (clipboard, editor, DOM, storage or AX). Safari positive
+            // controls therefore use explicit NFC fixture text. TextEdit keeps the
+            // default NFD source and output. Editor reads and receipts are never
+            // normalized; all checks stay UTF-16 exact.
+            let isShortcut = id.contains("shortcut")
+            let replacement: String
+            try mark("case.\(id).editor-open.before")
+            let editor: LiveWritingEditor
+            if kind == .safari {
+                editor = try await LiveWritingEditor.open(kind, passage: "target \u{e9}")
+                replacement = isShortcut ? "Short \u{e9} 😀" : "Longer 👩🏽‍💻 \u{e9}\nRJT, 台灣, 🧑‍🚀."
+            } else {
+                editor = try await LiveWritingEditor.open(kind)
+                replacement = isShortcut ? "Short e\u{301} 😀" : "Longer 👩🏽‍💻 e\u{301}\nRJT, 台灣, 🧑‍🚀."
+            }
+            defer {
+                WritingUndoControlHostProgress.recordDeferringFailure("case.\(id).editor-close.before")
+                editor.close()
+                WritingUndoControlHostProgress.recordDeferringFailure("case.\(id).editor-close.after")
+            }
+            try mark("case.\(id).select.before")
             try await editor.selectOriginalPassage()
+            try mark("case.\(id).before-snapshot.before")
+            let sourceOriginal = editor.sourceOriginal
+            let sourceRange = editor.sourceRange
             let before = try snapshot(editor)
-            try expect(before, value: LiveWritingEditor.original, range: originalRange)
-            let replacement = id.contains("shortcut") ? "Short e\u{301} 😀" : "Longer 👩🏽‍💻 e\u{301}\nRJT, 台灣, 🧑‍🚀."
+            try expect(before, value: sourceOriginal, range: sourceRange)
             let result = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
             let caret = NSRange(location: LiveWritingEditor.prefix.utf16.count + replacement.utf16.count, length: 0)
+            try mark("case.\(id).deliver.before")
             let counts = try await deliver(replacement)
+            try mark("case.\(id).forward-snapshot.before")
             let forward = try snapshot(editor)
             try expect(forward, value: result, range: caret)
             try require(owner.engine.canUndoLastWritingEdit, "A confirmed native edit did not enable the engine command.")
+            try mark("case.\(id).forward-screenshot.before")
             try await screenshot(id + "-forward")
             if id == "textedit-shortcut" { try await busyCheck(editor, result: result, caret: caret) }
             // Each command must produce its own feedback. A prior success has
             // identical copy, so observing that older panel is insufficient.
+            try mark("case.\(id).prior-notice-wait.before")
             try await wait("Prior passive feedback did not dismiss.", seconds: 7) {
                 self.nodes().allSatisfy {
                     self.string(kAXIdentifierAttribute, $0) != "undoLastWritingEdit.notice" || !self.hasVisibleFrame($0)
@@ -182,70 +266,105 @@ enum WritingUndoControlOracle {
                 command = try await openMenu(expectedEnabled: true, checkpoint: id + "-menu")
                 // This is the actual product Button through the native menu
                 // bridge. No engine, shared-command or private handler call.
-                try press(try await unique(identifier: "undoLastWritingEdit.menuCommand"))
+                try mark("case.\(id).menu-command-lookup.before")
+                let menuCommand = try await unique(identifier: "undoLastWritingEdit.menuCommand")
+                try mark("case.\(id).menu-command-press.before")
+                try press(menuCommand)
             } else {
                 command = ["kind": "configured-global-shortcut", "keyCode": Int(keyCode),
                            "modifierFlagsRawValue": modifiers.rawValue, "nativeEventsPosted": 2]
+                try mark("case.\(id).global-chord.before")
                 try postChord()
             }
+            try mark("case.\(id).restore-wait.before")
             try await wait("The product control did not restore the original text and selection.", seconds: 12) {
-                editor.value?.utf16.elementsEqual(LiveWritingEditor.original.utf16) == true
-                    && editor.selectedRange == self.originalRange
+                editor.value?.utf16.elementsEqual(sourceOriginal.utf16) == true
+                    && editor.selectedRange == sourceRange
                     && !self.owner.engine.writingActionUndoController.isAvailable
             }
+            try mark("case.\(id).notice-wait.before")
             let notice = try await notice(expected: "Restored the original text and selection.")
             // Check focus after the new product panel appears, not merely after
             // the engine changed the text but before feedback was displayed.
+            try mark("case.\(id).restored-snapshot.before")
             let restored = try snapshot(editor)
-            try expect(restored, value: LiveWritingEditor.original, range: originalRange)
+            try expect(restored, value: sourceOriginal, range: sourceRange)
+            try mark("case.\(id).restored-screenshot.before")
             try await screenshot(id + "-restored")
+            try mark("case.\(id).restored-hierarchy.before")
             try dumpHierarchy(id + "-restored")
+            try mark("case.\(id).clipboard-settle.before")
             try await CursorPaster.settlePendingClipboardRestore()
             try require(!owner.engine.writingActionUndoController.isAvailable, "The consumed edit remained available.")
             cases.append(["id": id, "editor": kind == .textEdit ? "textedit" : "safari",
                           "commandKind": id.hasSuffix("menu") ? "menu" : "shortcut",
                           "forwardAttempts": counts.0, "forwardConfirmations": counts.1,
-                          "originalUTF16": units(LiveWritingEditor.original), "resultUTF16": units(result),
-                          "originalRange": range(originalRange), "before": before, "forward": forward,
+                          "originalUTF16": units(sourceOriginal), "resultUTF16": units(result),
+                          "originalRange": range(sourceRange), "before": before, "forward": forward,
                           "restored": restored, "command": command, "notice": notice,
                           "noticeWasAbsentBeforeCommand": true,
                           "capabilityConsumed": true,
                           "screenshots": [id + "-forward.png", id + "-restored.png"]])
+            try mark("case.\(id).exit")
         }
 
         func busyCheck(_ editor: LiveWritingEditor, result: String, caret: NSRange) async throws {
             owner.engine.recordingState = .busy
             defer { owner.engine.recordingState = .idle }
             let menu = try await openMenu(expectedEnabled: false, checkpoint: "busy-menu")
+            try mark("busy.dismiss-menu.before")
             try await dismissMenu()
+            try mark("busy.global-chord.before")
             try postChord()
+            try mark("busy.notice-wait.before")
             let feedback = try await notice(expected: "RJT is busy right now, so Undo didn't replace any text.")
+            try mark("busy.snapshot.before")
             let observed = try snapshot(editor)
             try expect(observed, value: result, range: caret)
             try require(owner.engine.writingActionUndoController.isAvailable, "A busy command consumed the native edit.")
             states["busy"] = ["passed": true, "recordingStateFixture": "busy", "menu": menu,
                               "notice": feedback, "observed": observed, "capabilityRetained": true]
+            try mark("busy.screenshot.before")
             try await screenshot("busy-shortcut-refused")
+            try mark("busy.exit")
         }
 
         func focusRefusal() async throws {
+            try mark("focus.source-open.before")
             let source = try await LiveWritingEditor.open(.textEdit)
-            defer { source.close() }
+            defer {
+                WritingUndoControlHostProgress.recordDeferringFailure("focus.source-close.before")
+                source.close()
+                WritingUndoControlHostProgress.recordDeferringFailure("focus.source-close.after")
+            }
+            try mark("focus.source-select.before")
             try await source.selectOriginalPassage()
             let replacement = "Source remains e\u{301} 🧪"
             let result = LiveWritingEditor.prefix + replacement + LiveWritingEditor.suffix
             let caret = NSRange(location: LiveWritingEditor.prefix.utf16.count + replacement.utf16.count, length: 0)
+            try mark("focus.deliver.before")
             _ = try await deliver(replacement)
+            try mark("focus.other-open.before")
             let other = try await LiveWritingEditor.open(.textEdit)
-            defer { other.close() }
+            defer {
+                WritingUndoControlHostProgress.recordDeferringFailure("focus.other-close.before")
+                other.close()
+                WritingUndoControlHostProgress.recordDeferringFailure("focus.other-close.after")
+            }
+            try mark("focus.other-select.before")
             try await other.selectOriginalPassage()
             try require(!CFEqual(source.window, other.window), "Focus-refusal setup reused the source window.")
+            try mark("focus.other-snapshot.before")
             let otherBefore = try snapshot(other)
+            try mark("focus.global-chord.before")
             try postChord()
+            try mark("focus.notice-wait.before")
             let feedback = try await notice(expected: "The edited field changed or isn't focused, so Undo didn't replace any text.")
+            try mark("focus.retire-wait.before")
             try await wait("Focus refusal did not retire stale authority.") {
                 !self.owner.engine.writingActionUndoController.isAvailable
             }
+            try mark("focus.after-snapshots.before")
             let sourceAfter = try snapshot(source)
             let otherAfter = try snapshot(other)
             try expect(sourceAfter, value: result, range: caret, focused: false)
@@ -255,11 +374,16 @@ enum WritingUndoControlOracle {
                                       "otherBefore": otherBefore, "otherAfter": otherAfter,
                                       "notice": feedback, "capabilityRetired": true,
                                       "differentWindow": true]
+            try mark("focus.screenshot.before")
             try await screenshot("focus-refusal")
+            try mark("focus.exit")
         }
 
         func deliver(_ text: String) async throws -> (Int, Int) {
+            try mark("deliver.capture.before")
             let target = try WritingTarget.capture(requiresSelection: true)
+            // Marked before beginDelivery so no breadcrumb can interrupt an open delivery.
+            try mark("deliver.native-delivery.before")
             let controller = owner.engine.writingActionUndoController
             let id = controller.beginDelivery(transcriptionID: UUID())
             var attempts = 0, confirmations = 0
@@ -271,12 +395,14 @@ enum WritingUndoControlOracle {
                 controller.confirmedDelivery(edit, for: id)
             })
             controller.finishDelivery(outcome, for: id)
+            try mark("deliver.native-delivery.after")
             try require(outcome.isConfirmed && attempts == 1 && confirmations == 1 && controller.isAvailable,
                         "Forward delivery lacked exactly one confirmed native edit receipt.")
             return (attempts, confirmations)
         }
 
         func openMenu(expectedEnabled: Bool, checkpoint: String) async throws -> [String: Any] {
+            try mark("menu.\(checkpoint).status-lookup.before")
             let status = try await waitForElement("The actual status item was unavailable.") { nodes in
                 nodes.filter { node in
                     let role = self.string(kAXRoleAttribute, node)
@@ -287,17 +413,26 @@ enum WritingUndoControlOracle {
                             })
                 }
             }
+            try mark("menu.\(checkpoint).status-press.before")
             try press(status)
+            try mark("menu.\(checkpoint).item-lookup.before")
             let item = try await unique(identifier: "undoLastWritingEdit.menuCommand")
+            try mark("menu.\(checkpoint).enabled-wait.before")
             try await wait("The real menu command had the wrong enabled state.") {
                 self.hasVisibleFrame(item) && self.enabled(item) == expectedEnabled
             }
+            try mark("menu.\(checkpoint).item-describe.before")
             let observed = try describe(item)
             try require(["AXMenuItem", "AXButton"].contains(observed["role"] as? String ?? ""),
                         "The Undo identifier did not identify a native actionable control.")
+            try mark("menu.\(checkpoint).hierarchy.before")
             try dumpHierarchy(checkpoint)
+            try mark("menu.\(checkpoint).screenshot.before")
             try await screenshot(checkpoint)
-            return observed.merging(["kind": "product-menu", "statusControl": try describe(status)]) { _, new in new }
+            try mark("menu.\(checkpoint).status-describe.before")
+            let statusControl = try describe(status)
+            try mark("menu.\(checkpoint).exit")
+            return observed.merging(["kind": "product-menu", "statusControl": statusControl]) { _, new in new }
         }
 
         func dismissMenu() async throws {

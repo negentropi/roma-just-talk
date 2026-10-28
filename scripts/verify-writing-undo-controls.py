@@ -319,8 +319,67 @@ def provision(host):
     return rows
 
 
+def progress_files():
+    directory = native / 'progress'
+    return sorted(str(path.relative_to(native)) for path in directory.glob('*.json') if path.is_file() and not path.is_symlink())
+
+
+def profile_files():
+    return {str(path.relative_to(native)): {'bytes': path.stat().st_size, 'sha256': digest(path.read_bytes())}
+        for path in sorted((native / 'profiles').glob('*.profraw')) if path.is_file() and not path.is_symlink()}
+
+
+def verify_profile_configuration(configuration):
+    require(configuration.get('working_directory') == str(native)
+        and configuration.get('LLVM_PROFILE_FILE') == str(native / 'profiles/undo-controls-%p-%m.profraw')
+        and configuration.get('host_timeout_seconds') == 180,
+        'Host working directory/profile destination differs from the owned external diagnostic output')
+    profile = Path(configuration['LLVM_PROFILE_FILE'])
+    require(profile.is_absolute() and profile.parent.resolve() == profile.parent
+        and not profile.is_relative_to(candidate) and not profile.is_relative_to(derived),
+        'Raw profile destination reaches frozen source/compiler inputs')
+
+
+def sample_host(host, checkpoint, elapsed_seconds):
+    directory = native / ('sample-' + checkpoint)
+    directory.mkdir()
+    expected = {key: host[key] for key in ('started_at', 'executable_path')}
+    before = process_identity(host['pid'])
+    result = {'checkpoint': checkpoint, 'pid': host['pid'], 'expected_identity': expected, 'identity_before': before,
+        'identity_after': None, 'tool': '/usr/bin/sample', 'tool_timeout_seconds': 8, 'tool_exit_code': None,
+        'tool_arguments': [str(host['pid']), '1', '1', '-file', str(directory / 'sample.txt')],
+        'status': 'identity-refused', 'valid': False, 'progress_files': progress_files(), 'observed_elapsed_seconds': elapsed_seconds}
+    if before == expected and expected['executable_path'] in host['mapped_text_paths']:
+        try:
+            tool = subprocess.run(['/usr/bin/sample', str(host['pid']), '1', '1', '-file', str(directory / 'sample.txt')],
+                capture_output=True, timeout=8)
+            (directory / 'tool-stdout.txt').write_bytes(tool.stdout)
+            (directory / 'tool-stderr.txt').write_bytes(tool.stderr)
+            result.update(tool_exit_code=tool.returncode, status='tool-failed')
+            after = process_identity(host['pid'])
+            result['identity_after'] = after
+            if after != expected:
+                result['status'] = 'identity-changed-during-sample'
+            elif tool.returncode == 0 and (directory / 'sample.txt').is_file() and not (directory / 'sample.txt').is_symlink() and (directory / 'sample.txt').stat().st_size > 0:
+                result.update(status='captured', valid=True, sample_sha256=digest((directory / 'sample.txt').read_bytes()))
+        except subprocess.TimeoutExpired as error:
+            (directory / 'tool-stdout.txt').write_bytes(error.stdout or b'')
+            (directory / 'tool-stderr.txt').write_bytes(error.stderr or b'')
+            result.update(status='timeout', identity_after=process_identity(host['pid']))
+        except OSError as error:
+            result.update(status='tool-unavailable', error=str(error), identity_after=process_identity(host['pid']))
+    write_json(directory / 'receipt.json', result)
+    return result
+
+
 def run_host(host):
     native.mkdir()
+    profiles = native / 'profiles'
+    profiles.mkdir()
+    profile_template = profiles / 'undo-controls-%p-%m.profraw'
+    require(native.is_absolute() and native.resolve() == native and profiles.resolve() == profiles
+        and not profiles.is_relative_to(candidate) and not profiles.is_relative_to(derived),
+        'Profile output must be owned and outside the frozen candidate/compiler tree')
     home = output / 'isolated-user'
     preferences = home / 'Library/Preferences'
     preferences.mkdir(parents=True)
@@ -330,20 +389,28 @@ def run_host(host):
         'clipboardRestoreDelay': 2.0}
     (preferences / (bundle_id + '.plist')).write_bytes(plistlib.dumps(seed))
     environment = dict(os.environ, CFFIXED_USER_HOME=str(home), RJT_UNDO_CONTROLS_CHECKS='1', RJT_UNDO_CONTROLS_EVIDENCE=str(native),
-        RJT_LIVE_WRITING_TARGET_EVIDENCE=str(native / 'editor-observations'), RJT_LIVE_WRITING_TARGET_CHECKS='1')
-    write_json(output / 'configuration.json', {'executable_path': host['executable_path'], 'seed_preferences': seed,
+        RJT_LIVE_WRITING_TARGET_EVIDENCE=str(native / 'editor-observations'), RJT_LIVE_WRITING_TARGET_CHECKS='1',
+        LLVM_PROFILE_FILE=str(profile_template))
+    configuration = {'executable_path': host['executable_path'], 'seed_preferences': seed,
         'CFFIXED_USER_HOME': str(home), 'RJT_UNDO_CONTROLS_EVIDENCE': str(native), 'command_line_arguments': [],
         'RJT_UNDO_CONTROLS_CHECKS': '1',
-        'scope': 'One isolated component host; VoiceInkApp entry point excluded; no provider, recording, ASR or model loading.'})
+        'working_directory': str(native), 'LLVM_PROFILE_FILE': str(profile_template),
+        'host_timeout_seconds': 180,
+        'coverage_policy': 'Compiler instrumentation preserved; raw profiles stay outside frozen source/compiler inputs.',
+        'scope': 'One isolated component host; VoiceInkApp entry point excluded; no provider, recording, ASR or model loading.'}
+    verify_profile_configuration(configuration)
+    write_json(output / 'configuration.json', configuration)
     executable = host['executable_path']
     require(not host_census(executable), 'Fresh exact host executable already running')
     observed, launched = None, None
     monitor_error, closure_error, candidate_error = None, None, None
     census_empty, descriptors_closed = None, None
+    samples = []
     with (output / 'host.log').open('xb') as stream:
-        process = subprocess.Popen([executable], cwd=candidate, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+        process = subprocess.Popen([executable], cwd=native, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
         try:
-            deadline = time.monotonic() + 900
+            started = time.monotonic()
+            deadline = started + 180
             while True:
                 if process.poll() is not None:
                     break
@@ -362,7 +429,11 @@ def run_host(host):
                         observed = dict(current, pid=process.pid, mapped_text_paths=paths)
                 elif current != {key: observed[key] for key in ('started_at', 'executable_path')}:
                     raise RuntimeError('Host PID reused')
-                require(time.monotonic() < deadline, 'Control host exceeded bounded deadline')
+                for threshold in (15, 60):
+                    checkpoint = str(threshold) + 's'
+                    if observed is not None and time.monotonic() - started >= threshold and checkpoint not in [item['checkpoint'] for item in samples]:
+                        samples.append(sample_host(observed, checkpoint, time.monotonic() - started))
+                require(time.monotonic() < deadline, 'Control host exceeded the 180-second diagnostic deadline')
                 time.sleep(0.1)
         except BaseException as error:
             monitor_error = str(error) or type(error).__name__
@@ -406,7 +477,9 @@ def run_host(host):
     write_json(output / 'host-outcome.json', {'classification': 'passed' if valid else 'invalid-or-failed',
         'exit_code': process.returncode, 'mapped_host_observed': observed is not None, 'native_failure': native_failure,
         'native_issues': native_issues, 'monitor_error': monitor_error, 'closure_error': closure_error,
-        'candidate_error': candidate_error, 'observed_completed_cases': receipt.get('executedCases', [])})
+        'candidate_error': candidate_error, 'observed_completed_cases': receipt.get('executedCases', []),
+        'progress_files': progress_files(), 'samples': samples,
+        'profile_files': profile_files()})
     if native_failure or native_issues:
         raise RuntimeError('Control host oracle failed (exit ' + str(process.returncode) + '): ' + str(native_failure or native_issues)
             + '; inspect host-outcome.json for secondary diagnostics')
@@ -425,6 +498,17 @@ def units(value):
 
 def exact_range(location, length):
     return {'location': location, 'length': length}
+
+
+def case_text_fixture(case_id):
+    require(case_id in cases, 'Unknown fixed native control case')
+    if case_id.startswith('safari-'):
+        source = 'target \u00e9'
+        replacement = 'Longer 👩🏽‍💻 \u00e9\nRJT, 台灣, 🧑‍🚀.' if case_id.endswith('-menu') else 'Short \u00e9 😀'
+    else:
+        source = passage
+        replacement = replacement_menu if case_id.endswith('-menu') else replacement_shortcut
+    return prefix + source + suffix, replacement, exact_range(len(units(prefix)), len(units(source)))
 
 
 def receipt_errors(value, executable, pid, expected_home):
@@ -546,17 +630,17 @@ def receipt_errors(value, executable, pid, expected_home):
             is_menu = name.endswith('-menu')
             editor = 'textedit' if name.startswith('textedit-') else 'safari'
             bundle = 'com.apple.TextEdit' if editor == 'textedit' else 'com.apple.Safari'
-            replacement = replacement_menu if is_menu else replacement_shortcut
+            case_original, replacement, case_selected = case_text_fixture(name)
             result = prefix + replacement + suffix
             caret = exact_range(len(units(prefix + replacement)), 0)
             check(item.get('editor') == editor and item.get('commandKind') == ('menu' if is_menu else 'shortcut'), 'Wrong editor/command case')
             check(type(item.get('forwardAttempts')) is int and item['forwardAttempts'] == 1
                 and type(item.get('forwardConfirmations')) is int and item['forwardConfirmations'] == 1, 'Forward was not confirmed once')
-            check(item.get('originalUTF16') == units(original) and item.get('resultUTF16') == units(result)
-                and item.get('originalRange') == selected, 'Claimed before/result oracle differs')
-            snapshot(item.get('before'), original, selected, bundle)
+            check(item.get('originalUTF16') == units(case_original) and item.get('resultUTF16') == units(result)
+                and item.get('originalRange') == case_selected, 'Claimed before/result oracle differs')
+            snapshot(item.get('before'), case_original, case_selected, bundle)
             snapshot(item.get('forward'), result, caret, bundle)
-            snapshot(item.get('restored'), original, selected, bundle)
+            snapshot(item.get('restored'), case_original, case_selected, bundle)
             check(len({(item[key]['pid'], item[key]['token']) for key in ('before', 'forward', 'restored')}) == 1,
                 'Product command switched captured process/document')
             if is_menu:
@@ -596,6 +680,7 @@ def receipt_errors(value, executable, pid, expected_home):
 def classify_native(host, live):
     value = json.loads((native / 'result.json').read_text())
     configuration = json.loads((output / 'configuration.json').read_text())
+    verify_profile_configuration(configuration)
     errors = receipt_errors(value, host['executable_path'], live['pid'], configuration['CFFIXED_USER_HOME'])
     screenshots = [name + suffix for name in cases for suffix in ('-forward.png', '-restored.png')]
     screenshots += ['unavailable-menu.png', 'busy-menu.png', 'busy-shortcut-refused.png', 'shortcut-configured.png',
@@ -666,15 +751,15 @@ def self_test():
             'displayString': 'fixture', 'recorderControl': control('shortcutRecorder.undoLastWritingEdit')}, 'cases': []}
     for name in cases:
         is_menu = name.endswith('-menu')
-        replacement = replacement_menu if is_menu else replacement_shortcut
+        case_original, replacement, case_selected = case_text_fixture(name)
         bundle = 'com.apple.TextEdit' if name.startswith('textedit') else 'com.apple.Safari'
         result = prefix + replacement + suffix
         token = 'RJT-Writing-Live-00000000-0000-4000-8000-' + str(len(value['cases']) + 1).zfill(12)
         value['cases'].append({'id': name, 'editor': 'textedit' if name.startswith('textedit') else 'safari',
             'commandKind': 'menu' if is_menu else 'shortcut', 'forwardAttempts': 1, 'forwardConfirmations': 1,
-            'originalUTF16': units(original), 'resultUTF16': units(result), 'originalRange': selected,
-            'before': snapshot(original, selected, bundle, token), 'forward': snapshot(result, exact_range(len(units(prefix + replacement)), 0), bundle, token),
-            'restored': snapshot(original, selected, bundle, token), 'command': menu() if is_menu else {'kind': 'configured-global-shortcut',
+            'originalUTF16': units(case_original), 'resultUTF16': units(result), 'originalRange': case_selected,
+            'before': snapshot(case_original, case_selected, bundle, token), 'forward': snapshot(result, exact_range(len(units(prefix + replacement)), 0), bundle, token),
+            'restored': snapshot(case_original, case_selected, bundle, token), 'command': menu() if is_menu else {'kind': 'configured-global-shortcut',
                 'keyCode': 32, 'modifierFlagsRawValue': 1835008, 'nativeEventsPosted': 2}, 'notice': notice(restored_message),
             'capabilityConsumed': True, 'noticeWasAbsentBeforeCommand': True,
             'screenshots': [name + '-forward.png', name + '-restored.png']})
@@ -693,7 +778,32 @@ def self_test():
             'persistent': {key: {'type': 'missing'} for key in policy}, 'registered': copy.deepcopy(policy)},
         'after': {'effective': {'restoreClipboardAfterPaste': True, 'clipboardRestoreDelay': 2.0},
             'persistent': copy.deepcopy(policy), 'registered': copy.deepcopy(policy)}}
+    for name in cases:
+        case_original, case_replacement, case_range = case_text_fixture(name)
+        safari = name.startswith('safari-')
+        source_utf8 = b'target \xc3\xa9' if safari else b'target e\xcc\x81'
+        source_utf16 = [116, 97, 114, 103, 101, 116, 32, 233] if safari else [116, 97, 114, 103, 101, 116, 32, 101, 769]
+        require(case_original.encode('utf-8') == prefix.encode('utf-8') + source_utf8 + suffix.encode('utf-8')
+            and units(case_original)[case_range['location']:case_range['location'] + case_range['length']] == source_utf16,
+            'Positive per-editor fixture source differs from known exact UTF-8/UTF-16 scalar bytes')
+        accent = b'\xc3\xa9' if safari else b'e\xcc\x81'
+        require(accent in case_replacement.encode('utf-8') and (769 not in units(case_replacement) if safari else 769 in units(case_replacement)),
+            'Positive per-editor fixture output uses the wrong scalar bytes')
     require(not receipt_errors(value, '/fixture/app', 42, '/fixture/isolated-user'), 'Valid classifier fixture rejected')
+    def substitute_source(record, index, text):
+        # Keep the mutated receipt internally coherent, so rejection tests the
+        # known editor fixture boundary rather than contradictory metadata.
+        item = record['cases'][index]
+        source = prefix + text + suffix
+        source_range = exact_range(len(units(prefix)), len(units(text)))
+        item.update(originalUTF16=units(source), originalRange=source_range)
+        for key in ('before', 'restored'):
+            item[key].update(valueUTF16=units(source), range=source_range, selectedTextUTF16=units(text))
+    def substitute_output(record, index, text):
+        item = record['cases'][index]
+        result = prefix + text + suffix
+        item['resultUTF16'] = units(result)
+        item['forward'].update(valueUTF16=units(result), range=exact_range(len(units(prefix + text)), 0), selectedTextUTF16=[])
     mutations = [lambda v: v.update(completed=False), lambda v: v['selectedCases'].pop(), lambda v: v['cases'].pop(),
         lambda v: v['host'].update(pid=99), lambda v: v['runtimeBounds'].update(normalAppComposition=True),
         lambda v: v['shortcut'].update(recordedViaActualRecorder=False), lambda v: v['shortcut']['recorderControl'].update(actions=[]),
@@ -712,7 +822,13 @@ def self_test():
         lambda v: v['policyBootstrap']['after']['registered'].update(clipboardRestoreDelay={'type': 'number', 'value': 0}),
         lambda v: v['cases'][0]['notice'].update(label='invented'), lambda v: v['stateChecks']['busy'].update(capabilityRetained=False),
         lambda v: v['stateChecks']['focusRefusal'].update(differentWindow=False), lambda v: v['issues'].append('cleanup failed'),
-        lambda v: v.update(failure='setup failure')]
+        lambda v: v.update(failure='setup failure'),
+        lambda v: substitute_source(v, 2, 'target e\u0301'),
+        lambda v: substitute_source(v, 0, 'target \u00e9'),
+        lambda v: substitute_output(v, 2, replacement_menu),
+        lambda v: substitute_output(v, 0, 'Longer 👩🏽‍💻 \u00e9\nRJT, 台灣, 🧑‍🚀.'),
+        lambda v: v['cases'][2]['before']['range'].update(length=9),
+        lambda v: v['cases'][3]['forward']['range'].update(location=v['cases'][3]['forward']['range']['location'] + 1)]
     for mutation in mutations:
         invalid = copy.deepcopy(value)
         mutation(invalid)
@@ -721,6 +837,7 @@ def self_test():
         + ' malformed receipts rejected. No app, clipboard or native interaction executed.')
     compiler_inputs_self_test()
     host_failure_self_test()
+    profile_and_sampling_self_test()
 
 
 def compiler_inputs_self_test():
@@ -809,7 +926,7 @@ def compiler_inputs_self_test():
 def host_failure_self_test():
     # Execute the actual transport loop with process/OS calls replaced, including
     # the poll→ps→nonzero-exit race observed after the failed setup-policy check.
-    globals_before = {key: globals()[key] for key in ('output', 'native', 'candidate', 'process_identity', 'host_census')}
+    globals_before = {key: globals()[key] for key in ('output', 'native', 'candidate', 'derived', 'process_identity', 'host_census')}
     popen_before, run_before, sleep_before = subprocess.Popen, subprocess.run, time.sleep
     policy_failure = 'The controls check requires the actual persistent default clipboard restoration policy.'
     with tempfile.TemporaryDirectory(prefix='rjt-undo-host-failure-') as directory:
@@ -818,7 +935,7 @@ def host_failure_self_test():
             for changed in (False, True):
                 lane = base / ('changed' if changed else 'unchanged')
                 lane.mkdir()
-                globals().update(output=lane, native=lane / 'native', candidate=lane / 'candidate')
+                globals().update(output=lane, native=lane / 'native', candidate=lane / 'candidate', derived=lane / 'derived')
                 candidate.mkdir()
                 source = candidate / 'owned.swift'
                 source.write_text('// before\n')
@@ -878,6 +995,117 @@ def host_failure_self_test():
             print('Host failure transport controls passed: actual nonzero poll/ps race preserves setup failure, zero cases, mapped identity and strict closure; changed-candidate path/hash census records added/removed/changed (2 simulated transport cases). No native process executed.')
         finally:
             globals().update(globals_before)
+            subprocess.Popen, subprocess.run, time.sleep = popen_before, run_before, sleep_before
+
+
+def profile_and_sampling_self_test():
+    historical = git('show', '794fa2595f943ae501bbe3407a9dd1120c678f76:scripts/verify-writing-undo-controls.py').decode()
+    functions = [node for node in ast.parse(historical).body if isinstance(node, ast.FunctionDef) and node.name == 'run_host']
+    require(len(functions) == 1, 'Known-bad source-CWD host transport missing')
+    old_namespace = dict(globals())
+    exec(compile(ast.Module(body=functions, type_ignores=[]), '<794fa259 run_host>', 'exec'), old_namespace)
+    saved = {key: globals()[key] for key in ('output', 'native', 'candidate', 'derived', 'process_identity', 'host_census')}
+    popen_before, run_before, sleep_before = subprocess.Popen, subprocess.run, time.sleep
+    with tempfile.TemporaryDirectory(prefix='rjt-undo-profile-sample-') as directory:
+        base = Path(directory).resolve()
+        try:
+            for historical_lane in (True, False):
+                lane = base / ('known-bad' if historical_lane else 'candidate')
+                lane.mkdir()
+                globals().update(output=lane, native=lane / 'native', candidate=lane / 'candidate', derived=lane / 'derived')
+                candidate.mkdir()
+                (candidate / 'owned.swift').write_text('// frozen compiler input\n')
+                write_json(output / 'candidate-source.json', candidate_manifest())
+                executable = str(lane / 'app/Contents/MacOS/roma just talk')
+                identity = {'started_at': 'Wed Oct 28 01:23:51 2026', 'executable_path': executable}
+                state = {'finished': False, 'spawn': None}
+                class ProfileWriterFixture:
+                    pid, returncode = 24716, None
+                    def __init__(self, *args, **kwargs):
+                        state['spawn'] = kwargs
+                        pattern = kwargs['env'].get('LLVM_PROFILE_FILE') or str(Path(kwargs['cwd']) / 'default.profraw')
+                        path = Path(pattern.replace('%p', str(self.pid)).replace('%m', 'fixture-binary'))
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_bytes(b'')
+                        write_json(native / 'result.json', {'completed': True, 'failure': None, 'issues': [], 'executedCases': cases})
+                    def poll(self):
+                        if state['finished']:
+                            self.returncode = 0
+                        return self.returncode
+                def fake_run(command, **kwargs):
+                    class Result:
+                        returncode, stderr = 0, ''
+                        stdout = 'n' + executable + '\n' if '-d' in command else ''
+                    return Result()
+                globals().update(process_identity=lambda _pid: identity, host_census=lambda _executable: [])
+                subprocess.Popen, subprocess.run = ProfileWriterFixture, fake_run
+                time.sleep = lambda _seconds: state.update(finished=True)
+                if historical_lane:
+                    old_namespace.update({key: globals()[key] for key in saved})
+                    # The matched fixture models the actual failed run's unset
+                    # LLVM variable, independently of the developer's shell.
+                    inherited = os.environ.get('LLVM_PROFILE_FILE')
+                    os.environ.pop('LLVM_PROFILE_FILE', None)
+                    try:
+                        old_namespace['run_host']({'executable_path': executable})
+                    finally:
+                        if inherited is not None:
+                            os.environ['LLVM_PROFILE_FILE'] = inherited
+                    try:
+                        verify_candidate()
+                    except RuntimeError:
+                        require((candidate / 'default.profraw').is_file(), 'Known-bad source pollution was not the observed profile filename')
+                        print('RED actual 794fa259 run_host: source CWD plus unset LLVM profile destination adds default.profraw to frozen candidate.')
+                    else:
+                        raise RuntimeError('Known-bad source-CWD profile fixture did not fail source integrity')
+                else:
+                    run_host({'executable_path': executable})
+                    verify_candidate()
+                    config = json.loads((output / 'configuration.json').read_text())
+                    require(state['spawn']['cwd'] == native and state['spawn']['env']['LLVM_PROFILE_FILE'] == config['LLVM_PROFILE_FILE']
+                        and not (candidate / 'default.profraw').exists(), 'Candidate did not control actual Popen working directory/profile environment')
+                    for invalid in [dict(config, LLVM_PROFILE_FILE=str(candidate / 'unsafe.profraw')), dict(config, working_directory=str(candidate))]:
+                        try:
+                            verify_profile_configuration(invalid)
+                        except RuntimeError:
+                            pass
+                        else:
+                            raise RuntimeError('Unsafe source-CWD/profile path accepted')
+                    (candidate / 'owned.swift').write_text('// changed\n')
+                    try:
+                        verify_candidate()
+                    except RuntimeError:
+                        pass
+                    else:
+                        raise RuntimeError('Profile relocation weakened the source integrity guard')
+                    print('GREEN candidate run_host: owned external working directory/profile destination; wrong destination, source CWD and actual source mutation remain rejected.')
+            globals().update(native=base / 'samples')
+            native.mkdir()
+            expected = {'started_at': 'Wed Oct 28 01:23:51 2026', 'executable_path': '/fixture/executable'}
+            host = dict(expected, pid=24716, mapped_text_paths=['/fixture/executable'])
+            for scenario in ('captured', 'missing', 'reused', 'changed-during', 'timeout'):
+                reads, calls = [], []
+                def fake_identity(_pid):
+                    reads.append(True)
+                    return None if scenario == 'missing' else dict(expected, started_at='different launch') if scenario == 'reused' or scenario == 'changed-during' and len(reads) > 1 else expected
+                def fake_sample(command, **kwargs):
+                    calls.append(command)
+                    if scenario == 'timeout':
+                        raise subprocess.TimeoutExpired(command, kwargs['timeout'], output=b'', stderr=b'timeout fixture')
+                    Path(command[-1]).write_text('sample fixture only\n')
+                    class Result:
+                        returncode, stdout, stderr = 0, b'', b''
+                    return Result()
+                globals()['process_identity'], subprocess.run = fake_identity, fake_sample
+                result = sample_host(host, scenario, 15.0)
+                require(result['valid'] is (scenario == 'captured'), 'Invalid/missing/foreign/timed-out sample was labeled valid')
+                require(bool(calls) == (scenario in ('captured', 'changed-during', 'timeout')), 'Sampler invoked for missing/reused PID')
+                if scenario == 'captured':
+                    require(result['identity_before'] == result['identity_after'] == expected and bool(result.get('sample_sha256')),
+                        'Positive sample lacks exact before/after process identity and retained trace')
+            print('Profile-output and sampling fixtures passed: actual old source-CWD transport RED/current GREEN; exact live sample plus missing/reused/changed-during-sample PID and timeout controls. Simulated metadata only; no compiler/native process sampled or executed.')
+        finally:
+            globals().update(saved)
             subprocess.Popen, subprocess.run, time.sleep = popen_before, run_before, sleep_before
 
 
@@ -981,6 +1209,23 @@ def main():
         and outcome['observed_completed_cases'] == cases and outcome['native_issues'] == []
         and all(outcome[key] is None for key in ('native_failure', 'monitor_error', 'closure_error', 'candidate_error')),
         'Retained host outcome contains a failure or incomplete execution')
+    require(outcome['progress_files'] == progress_files() and outcome['profile_files'] == profile_files(),
+        'Retained progress/profile diagnostic inventory changed')
+    require(len(outcome['samples']) == len({item['checkpoint'] for item in outcome['samples']}), 'Duplicate diagnostic sampling checkpoint')
+    for item in outcome['samples']:
+        expected_identity = {key: live['host'][key] for key in ('started_at', 'executable_path')}
+        require(item['checkpoint'] in ('15s', '60s') and item['pid'] == live['host']['pid']
+            and item['expected_identity'] == expected_identity and item['tool'] == '/usr/bin/sample'
+            and item['tool_timeout_seconds'] == 8 and type(item['valid']) is bool
+            and item['observed_elapsed_seconds'] >= int(item['checkpoint'][:-1]),
+            'Diagnostic sample is not bound to the actual host/checkpoint')
+        require(item == json.loads((native / ('sample-' + item['checkpoint']) / 'receipt.json').read_text()),
+            'Retained sampling status or exact process-identity evidence changed')
+        if item['valid'] is True:
+            trace = native / ('sample-' + item['checkpoint']) / 'sample.txt'
+            require(item['status'] == 'captured' and item['tool_exit_code'] == 0
+                and item['identity_before'] == item['identity_after'] == expected_identity and not trace.is_symlink()
+                and item['sample_sha256'] == digest(trace.read_bytes()), 'Retained verified sample identity/trace changed')
     require(live['spawned_identity'] == {key: live['host'][key] for key in ('started_at', 'executable_path')}, 'Spawned and mapped host identities differ')
     require(closed['exact_executable_census_empty'] is True and closed['exact_executable_has_no_open_descriptors'] is True,
         'Host closure observations invalid')

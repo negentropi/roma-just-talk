@@ -39,6 +39,84 @@ struct WritingUndoControlHostLaunchError: LocalizedError {
     var errorDescription: String? { reason }
 }
 
+/// TEST-ONLY stage breadcrumbs for diagnosing a stalled hosted run. Each call synchronously
+/// writes one small JSON file `<RJT_UNDO_CONTROLS_EVIDENCE>/progress/NNNN-<stage>.json` (temp file
+/// then rename in that same directory) and one unbuffered stderr line, BEFORE the caller continues.
+/// A stage is a fixed code label; no user text, clipboard, preference or source data is recorded.
+/// Progress is never native proof: `result.json` from the Oracle remains the only acceptance receipt.
+///
+/// Failure is never silent. `record` throws through the caller's existing error path.
+/// `recordDeferringFailure` (for places without an error path, and for the already-failing
+/// catch path) reports to stderr at once and latches the failure, so every later `record`
+/// throws; the Oracle success path always passes one `record` before writing its result.
+@MainActor
+enum WritingUndoControlHostProgress {
+    struct Failure: LocalizedError, CustomStringConvertible {
+        let reason: String
+        var errorDescription: String? { reason }
+        var description: String { reason }
+    }
+
+    private static let maximumRecords = 1000
+    private static var sequence = 0
+    private static var directory: URL?
+    private static var firstFailure: String?
+    private static var recordedOnce: Set<String> = []
+
+    static func record(_ stage: String) throws {
+        recordDeferringFailure(stage)
+        if let firstFailure { throw Failure(reason: "Progress diagnostics failed at \(firstFailure)") }
+    }
+
+    static func recordDeferringFailure(_ stage: String) {
+        do {
+            try write(stage)
+        } catch {
+            let reason = "\(stage): \(error.localizedDescription)"
+            if firstFailure == nil { firstFailure = reason }
+            fputs("WritingUndoControlHost progress failed at \(reason)\n", stderr)
+        }
+    }
+
+    /// For repeatedly evaluated SwiftUI bodies: records only the first evaluation.
+    static func recordOnce(_ stage: String) {
+        guard recordedOnce.insert(stage).inserted else { return }
+        recordDeferringFailure(stage)
+    }
+
+    private static func write(_ stage: String) throws {
+        let allowed = stage.utf8.allSatisfy { (0x61...0x7a).contains($0) || (0x30...0x39).contains($0) || $0 == 0x2d || $0 == 0x2e }
+        guard !stage.isEmpty, stage.utf8.count <= 120, allowed else {
+            throw Failure(reason: "Invalid progress stage label.")
+        }
+        guard sequence < maximumRecords else { throw Failure(reason: "Progress record limit exceeded.") }
+        sequence += 1
+        let progress: URL
+        if let directory {
+            progress = directory
+        } else {
+            // The same validated hosted output the owner uses; the subdirectory must be new.
+            progress = try WritingUndoControlHostOwner.requireHostedOutputDirectory()
+                .appendingPathComponent("progress", isDirectory: true)
+            try FileManager.default.createDirectory(at: progress, withIntermediateDirectories: false)
+            directory = progress
+        }
+        let uptime = ProcessInfo.processInfo.systemUptime
+        let name = String(format: "%04ld-", sequence) + stage + ".json"
+        let data = try JSONSerialization.data(withJSONObject: [
+            "schemaVersion": 1, "diagnosticOnly": true, "sequence": sequence, "stage": stage,
+            "pid": Int(ProcessInfo.processInfo.processIdentifier), "systemUptime": uptime,
+            "unixTime": Date().timeIntervalSince1970, "mainThread": Thread.isMainThread
+        ] as [String: Any], options: [.sortedKeys])
+        let temporary = progress.appendingPathComponent("." + name + ".tmp")
+        try data.write(to: temporary, options: .withoutOverwriting)
+        try FileManager.default.moveItem(at: temporary, to: progress.appendingPathComponent(name))
+        guard fputs("RJT undo progress \(String(format: "%04ld", sequence)) \(stage) uptime=\(uptime)\n", stderr) >= 0 else {
+            throw Failure(reason: "Progress stderr write failed.")
+        }
+    }
+}
+
 @MainActor
 final class WritingUndoControlHostOwner: ObservableObject {
     let engine: VoiceInkEngine
@@ -55,11 +133,16 @@ final class WritingUndoControlHostOwner: ObservableObject {
     private var didClaimOracleRun = false
 
     init(output: URL) throws {
+        try WritingUndoControlHostProgress.record("owner.init.entry")
         // Same registration-domain defaults the excluded VoiceInkApp init registers. Registration only:
         // persisted values still win, and launch-at-login/migration side effects stay out of this host.
+        try WritingUndoControlHostProgress.record("owner.register-defaults.before")
         UserDefaults.standard.register(defaults: AppDefaults.registeredDefaults)
+        try WritingUndoControlHostProgress.record("owner.register-defaults.after")
 
+        try WritingUndoControlHostProgress.record("owner.schema.before")
         let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
+        try WritingUndoControlHostProgress.record("owner.schema.after")
         func memoryConfiguration(_ name: String, _ models: [any PersistentModel.Type]) -> ModelConfiguration {
             ModelConfiguration(
                 name,
@@ -69,6 +152,7 @@ final class WritingUndoControlHostOwner: ObservableObject {
                 cloudKitDatabase: .none
             )
         }
+        try WritingUndoControlHostProgress.record("owner.container.before")
         let container = try ModelContainer(
             for: schema,
             configurations:
@@ -76,18 +160,28 @@ final class WritingUndoControlHostOwner: ObservableObject {
                 memoryConfiguration("dictionary", [VocabularyWord.self, WordReplacement.self]),
                 memoryConfiguration("stats", [SessionMetric.self])
         )
+        try WritingUndoControlHostProgress.record("owner.container.after")
 
         // Model managers are constructed only; nothing is refreshed, loaded or downloaded.
+        try WritingUndoControlHostProgress.record("owner.whisper-model-manager.before")
         let whisperModelManager = WhisperModelManager(
             modelsDirectory: output.appendingPathComponent("unused-models", isDirectory: true)
         )
+        try WritingUndoControlHostProgress.record("owner.whisper-model-manager.after")
+        try WritingUndoControlHostProgress.record("owner.fluid-audio-model-manager.before")
         let fluidAudioModelManager = FluidAudioModelManager()
+        try WritingUndoControlHostProgress.record("owner.fluid-audio-model-manager.after")
+        try WritingUndoControlHostProgress.record("owner.transcription-model-manager.before")
         let transcriptionModelManager = TranscriptionModelManager(
             whisperModelManager: whisperModelManager,
             fluidAudioModelManager: fluidAudioModelManager
         )
+        try WritingUndoControlHostProgress.record("owner.transcription-model-manager.after")
 
+        try WritingUndoControlHostProgress.record("owner.recorder-ui-manager.before")
         let recorderUIManager = RecorderUIManager()
+        try WritingUndoControlHostProgress.record("owner.recorder-ui-manager.after")
+        try WritingUndoControlHostProgress.record("owner.engine.before")
         let engine = VoiceInkEngine(
             modelContext: container.mainContext,
             whisperModelManager: whisperModelManager,
@@ -95,8 +189,11 @@ final class WritingUndoControlHostOwner: ObservableObject {
             qwenRuntimeResult: .failure(WritingUndoControlHostUnusedRuntime()),
             enhancementService: nil
         )
+        try WritingUndoControlHostProgress.record("owner.engine.after")
+        try WritingUndoControlHostProgress.record("owner.configure.before")
         recorderUIManager.configure(engine: engine, recorder: engine.recorder)
         engine.recorderUIManager = recorderUIManager
+        try WritingUndoControlHostProgress.record("owner.configure.after")
 
         self.output = output
         self.container = container
@@ -106,7 +203,10 @@ final class WritingUndoControlHostOwner: ObservableObject {
         self.engine = engine
         self.recorderUIManager = recorderUIManager
         // The one shortcut manager for this process; it registers the configured global chord.
+        try WritingUndoControlHostProgress.record("owner.shortcut-manager.before")
         self.shortcutManager = RecordingShortcutManager(engine: engine, recorderUIManager: recorderUIManager)
+        try WritingUndoControlHostProgress.record("owner.shortcut-manager.after")
+        try WritingUndoControlHostProgress.record("owner.init.exit")
     }
 
     /// True only the first time it is called in this process's owner.
@@ -119,14 +219,18 @@ final class WritingUndoControlHostOwner: ObservableObject {
     /// Validates the hosted check environment, then builds the one owner. Any failure ends the process.
     static func launch() -> WritingUndoControlHostOwner {
         do {
-            return try WritingUndoControlHostOwner(output: requireHostedOutputDirectory())
+            try WritingUndoControlHostProgress.record("owner.launch.entry")
+            let owner = try WritingUndoControlHostOwner(output: requireHostedOutputDirectory())
+            try WritingUndoControlHostProgress.record("owner.launch.exit")
+            return owner
         } catch {
             FileHandle.standardError.write(Data("WritingUndoControlHost failed to start: \(error.localizedDescription)\n".utf8))
             exit(EXIT_FAILURE)
         }
     }
 
-    private static func requireHostedOutputDirectory() throws -> URL {
+    /// File-private so only this owner and the progress recorder above reuse the one launch guard.
+    fileprivate static func requireHostedOutputDirectory() throws -> URL {
         let environment = ProcessInfo.processInfo.environment
         let required = [
             ("GITHUB_ACTIONS", "true"),
@@ -157,10 +261,14 @@ struct WritingUndoControlHostApp: App {
     @StateObject private var owner: WritingUndoControlHostOwner
 
     init() {
+        // Earliest host code. StateObject is lazy, so owner.launch.entry may come later than app.init.exit.
+        WritingUndoControlHostProgress.recordDeferringFailure("app.init.entry")
         _owner = StateObject(wrappedValue: WritingUndoControlHostOwner.launch())
+        WritingUndoControlHostProgress.recordDeferringFailure("app.init.exit")
     }
 
     var body: some Scene {
+        let _ = WritingUndoControlHostProgress.recordOnce("app.scene-body.first")
         WindowGroup(WritingUndoControlHostPresentation.windowTitle) {
             WritingUndoControlSetupView(owner: owner)
         }
@@ -184,6 +292,7 @@ private struct WritingUndoControlSetupView: View {
     @ObservedObject var owner: WritingUndoControlHostOwner
 
     var body: some View {
+        let _ = WritingUndoControlHostProgress.recordOnce("view.body.first")
         Form {
             Section {
                 LabeledContent {
@@ -212,7 +321,12 @@ private struct WritingUndoControlSetupView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(WritingUndoControlHostPresentation.AccessibilityID.setup)
         .task {
-            guard owner.claimOracleRun() else { return }
+            WritingUndoControlHostProgress.recordDeferringFailure("view.task.entry")
+            guard owner.claimOracleRun() else {
+                WritingUndoControlHostProgress.recordDeferringFailure("view.task.duplicate")
+                return
+            }
+            WritingUndoControlHostProgress.recordDeferringFailure("view.task.claimed")
             await WritingUndoControlOracle.run(owner: owner)
         }
     }

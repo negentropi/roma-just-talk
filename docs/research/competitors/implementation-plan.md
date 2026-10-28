@@ -7,7 +7,7 @@ Target confirmed by Felix on 2026-10-27: the VoiceInk-based macOS app. The Rust 
 - [x] Read Poteto mode's Principles section in full.
 - [x] Phase A: Frame.
 - [x] Phase B: Design the workflow.
-- [ ] Phase C: Run the loop. First Mac unit verified; the global Custom/None unit is in progress.
+- [ ] Phase C: Run the loop. The first Mac and global Custom/None units passed their full gates. Combined polish, corrections and Undo acceptance remains open.
 - [x] Phase D: Keep the audit trail.
 - [ ] Phase E: Verify and hand back. First-unit evidence is retained; later units remain open.
 
@@ -43,11 +43,29 @@ Three backend owners work on separate files while Claude owns Views. The shared 
 
 ## Remaining scope
 
-The [52-capability ledger](rjt-parity.md) remains the full inventory. This first unit does not establish complete competitor parity. Later units include correction learning, richer cleanup and style controls, transform review and undo, local notes, and context and developer workflows. Mobile, meetings, account sync, and team administration retain separate acceptance contracts. Hosted features require concrete service and operating decisions before their dependent implementation.
+The [52-capability ledger](rjt-parity.md) remains the full inventory. Current polish, corrections and Undo acceptance is tracked below. Remaining feature work includes automatic correction learning, per-mode cleanup/style overrides, durable transform review/history, local notes, and context and developer workflows. Mobile, meetings, account sync and team administration retain separate acceptance contracts. Hosted features require concrete service and operating decisions before their dependent implementation.
 
 The decision trail is [implementation-decisions.tsv](implementation-decisions.tsv). Record results as VERIFIED, NOT VERIFIED, or INCONCLUSIVE.
 
-## Current evidence
+## Current verification status
+
+Each receipt applies to its pinned source. Earlier successful checks do not make the combined candidate a green full gate.
+
+| Work | Retained proof | Remaining acceptance |
+| --- | --- | --- |
+| First Mac unit and global Custom/None | [First-unit full gate](evidence/mac-40507127520/debug-native-ui-release-summary.json); [Custom/None full gate](evidence/none-mac-40581988482/verification.json) | Later combined source has its own gate. No published release. |
+| Light/Clarity and styles | [Native run 40606709664](evidence/polish-native-40606709664/README.md): four real Whisper file operations and three TextEdit scenarios; [current-English component](evidence/language-selection-40617652407/README.md) persists the choice and updates fresh Light plans | Current combined UI/Release, full Models-page composition and per-mode overrides. Synthetic speech does not establish human microphone accuracy. |
+| Clipboard restoration | [Matched comparison](evidence/clipboard-lease-40605378358/README.md): three old-code failures, two passing controls, five candidate passes; [native Undo](evidence/undo-native-40617647503/README.md) adds five exact all-format clipboard observations | Product menu/shortcut acceptance and broader editor coverage. |
+| Delivery and recording ownership | [Delivery/import comparison](evidence/writing-delivery-commit-40606540349/README.md) and [recording-finalizer comparison](evidence/recording-finalizers-40604292885/README.md) passed | Controlled pipeline/editor access remains separate from native product controls and ASR. |
+| Shared Core and iOS | [1,758 Core checks](evidence/core-40605454144/README.md); [iOS Simulator compilation](evidence/undo-ios-40605454469/README.md) at `794fa259` | App runtime, device input and iOS Undo are separate. |
+| Approved corrections | [Local-store upgrade](evidence/correction-library-store-40599070748/audit-summary.json), [matched context freshness](evidence/dictionary-context-40602009529/README.md), [SDK writer probe](evidence/swiftdata-save-probe-40610436627/README.md), and [29 successful application cases](evidence/polish-mac-40613521362/unit-failure-checkpoint/README.md) | History approval and Dictionary UI await the combined gate. Backup conflict-dialog interaction and CloudKit are outside those eight UI scenarios. |
+| Native Undo | [Run 40617647503](evidence/undo-native-40617647503/README.md): seven successes, zero skips at `0b60c5e62`; 28 exact UTF-16/range and five clipboard observations. Stronger `5247b9b75` identity checks passed offline on those receipts | Product menu/shortcut controls. Positive Safari fixtures use NFC; the separate NFD case correctly remains unconfirmed with unavailable Undo. This is not a matched green for the earlier six-case failures. |
+
+[Full run 40613521362](evidence/polish-mac-40613521362/unit-failure-checkpoint/README.md) at `53d62fb1` retained 329 unique Swift Testing identifiers: 299 successful and 30 skipped, plus nine successful Onboarding XCTest identifiers. All 44 focused cases passed, including three unchanged old failures, 37 preserved positives and four new persistence cases. All 29 correction-group cases passed; seven overlap the 44 and must not be added as distinct tests.
+
+The full run passed five of eight settings workflows. Three History workflows stopped at AX text comparisons before raw Copy verification; Release was skipped. The [QA-only full retry 40619909088](https://github.com/negentropi/roma-just-talk/actions/runs/40619909088) at `700cde9` retains unchanged production source and remains open. [Controls diagnostics 40618717054](https://github.com/negentropi/roma-just-talk/actions/runs/40618717054) stopped inside the test harness before any accepted case; the next controls harness still needs its own result. Component success is not full UI/Release acceptance.
+
+## First-unit audit trail
 
 - `ec7bc1bc` contains the snippet library and 17 behavior checks. All 17 passed against the compiled production module.
 - `827845a1` contains Mac workflows and their settings, backup, and boundary tests. GPT-6.1 Sol source review found no remaining blockers after startup ownership, inline snippet delivery, and UI conflict fixes.
@@ -81,9 +99,9 @@ TextEdit's tested target boundary is established on `2c5058fe`; the separate mat
 
 ## Following Mac units
 
-1. Add cleanup strength and style presets around the existing cleanup and Power Mode owners. The [reviewed design](cleanup-profile-design.md) preserves Custom as the migration default and defines literal None, deterministic Light and bounded Clarity with visible raw fallback. [Integration findings](cleanup-profile-integration.md) identify the shared processing plan, actual recognition storage, snapshot points and compatibility boundaries.
-2. Add correction provenance and review. The [approved-correction design](correction-learning-design.md) reuses the replacement library and records discovered literal-template and Unicode boundary defects. Automatic learning additionally needs reliable attribution to a delivered range; ordinary typing must not become training input.
-3. Add transform transactions with stored originals, results, review, retry from the original, and undo of the latest owned edit. A single `enhancedText` value cannot represent that history.
-4. Add a local scratchpad with durable drafts and versions. Sync, image storage, meetings, and organization features keep their separate contracts.
+1. Close the combined settings UI/Release and product-control gates above. Keep component and whole-app acceptance separate.
+2. Add per-mode cleanup/style overrides and automatic correction learning only under their [profile](clarity-run-plan-design.md) and [attribution](correction-learning-design.md) contracts. Unrelated typing must not become training input.
+3. Add [durable transform review/history](transform-undo-design.md), stored originals/results and retry from the original. The implemented latest-edit Undo is memory-only and does not establish those workflows.
+4. Add a local scratchpad with durable drafts and versions. Sync, image storage, meetings and organization features keep their separate contracts.
 
-The first unit and [global Custom/None stage](raw-profile-plan.md) passed their relevant full gates. Light/Clarity and [explicit approved corrections](../../approved-corrections.md) are integrated in candidate source, with separate native acceptance still in progress. Guarded latest-edit Undo is being prepared without a new schema; durable transform history, per-mode profiles and local notes remain queued. This is not a complete competitor-parity claim.
+The first Mac and global Custom/None units passed their relevant full gates. Light/Clarity and seven-case Undo have separate native acceptance; approved corrections have local-store, context and application-service evidence. Combined acceptance remains open. The [52-capability ledger](rjt-parity.md) still includes the remaining competitor gaps.

@@ -1,6 +1,6 @@
 # Undo the latest writing edit
 
-Implementation status: the current candidate includes Undo and its clipboard-restoration integration. The matched clipboard component checks pass; candidate native editor, cancellation and menu/shortcut verification remain pending. This guide describes the implemented contract; it is not a release receipt.
+The current candidate includes Undo and clipboard-restoration ownership. Component regression checks and seven native TextEdit/Safari cases pass. Product menu/shortcut and combined UI/Release acceptance remain open. This guide describes the implemented contract; it is not a release receipt.
 
 **Undo Last Writing Edit** restores the selected plain text from your latest confirmed **Edit selected text** action. It also tries to restore the original selection. There is one step, held in memory until RJT quits.
 
@@ -26,11 +26,11 @@ A newer RJT editor mutation attempt retires the previous receipt, even when that
 
 Undo settles a pending confirmed forward-paste restoration before changing the selection, honoring its original restoration deadline. Writing Paste and ordinary clipboard Paste share that restoration owner. Undo's menu-Paste route preserves the current clipboard even when ordinary paste restoration is disabled. Snapshots retain every readable item format; an unreadable format stops preparation. Generation and session checks leave a newer clipboard copy untouched. A failed restoration stops the next paste while that clipboard generation remains current. Canceling a waiting Undo does not cancel the earlier paste's restoration.
 
-The [matched clipboard check](research/competitors/evidence/clipboard-lease-40605378358/README.md) reproduced three failures on the old code and passed all five cases on the candidate, including both controls. It uses actual clipboard formats and timers with controlled menu/document access. Native product Undo remains a separate check.
+The [matched clipboard check](research/competitors/evidence/clipboard-lease-40605378358/README.md) reproduced three failures on the old code and passed all five cases on the candidate, including both controls. It uses actual clipboard formats and timers with controlled menu/document access. The native Undo results below have their own scope.
 
 Cancellation before the inverse text attempt leaves the field text unchanged. If RJT temporarily selected the inserted span, it restores the prior caret only while the field still matches that intermediate state. Once an inverse text mutation is attempted, the receipt is consumed; RJT does not repeat it or guess whether another attempt would help.
 
-After a forward Writing Action changes the editor, later cancellation preserves its generated text and request metadata for History. An unconfirmed attempt also retains that recovery material. A later History save failure reports the storage problem without repeating or rolling back the editor action.
+After a forward Writing Action changes the editor, later cancellation preserves its generated text and request metadata for History. An unconfirmed attempt also retains that recovery material. A later History save failure reports the storage problem without repeating or rolling back the editor action. The [matched delivery comparison](research/competitors/evidence/writing-delivery-commit-40606540349/README.md) passed confirmed and uncertain delivery cancellation with controlled editor access. The [recording-finalizer comparison](research/competitors/evidence/recording-finalizers-40604292885/README.md) separately passed stale-owner context checks.
 
 The command distinguishes these outcomes:
 
@@ -48,6 +48,10 @@ This first unit covers a nonempty selection rewritten by **Edit selected text**.
 
 Only plain text and UTF-16 ranges are retained. Original formatting, links and rich-text attributes are not restored. Formatting-only changes and an external edit racing the final checks cannot be ruled out by these APIs. Exact observed text and identity checks do not make an edit atomic with another app.
 
-The [implementation plan](research/competitors/transform-undo-design.md) tracks the clipboard prerequisite, cancellation boundary and native TextEdit/Safari checks. Source and unit-test preparation alone do not prove those interactions, every editor, physical shortcuts, speech, provider quality or a signed release.
+[Native run 40617647503](research/competitors/evidence/undo-native-40617647503/README.md) passed all seven cases. TextEdit covered process replacement refusal, decomposed Unicode text/selection restoration and drift refusal. Safari covered forward/inverse delivery, both clipboard preferences, a newer clipboard copy and latest-owner cancellation during a pending restoration lease. The private lease wait entry was not instrumented.
+
+Safari's successful fixtures use precomposed text. A separate case requests decomposed text and observes different exact UTF-16 readback. That result remains unconfirmed, cannot arm Undo, and stays unchanged when Undo returns unavailable. The exact-output guard is unchanged. These are the corrected seven-case acceptance conditions; they do not turn the earlier six-case failures into passes. Product menu/shortcut and full UI/Release acceptance remain open.
+
+The [implementation plan](research/competitors/implementation-plan.md#current-verification-status) tracks the current gates. These results do not establish every editor, physical shortcuts, speech, provider quality or a published release.
 
 Implementation owners: [live target](../VoiceInk/Services/WritingTarget.swift), [memory-only controller](../VoiceInk/Services/WritingActionUndoController.swift), [delivery integration](../VoiceInk/Transcription/Engine/TranscriptionPipeline.swift), [menu and notices](../VoiceInk/Views/UndoLastWritingEditControl.swift), and [shortcut/backup contract](../VoiceInkCore/Sources/VoiceInkCore/UserDefaultsPreferences.swift).

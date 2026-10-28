@@ -1,6 +1,6 @@
-# Queued Mac unit: approved corrections
+# Mac unit: approved corrections
 
-The candidate now implements explicit History approval, Dictionary review and full-record backup. Native compilation, persistence, matched freshness and eight-case UI acceptance remain pending. Automatic correction learning is separate. [User instructions](../../approved-corrections.md).
+The candidate implements explicit History approval, Dictionary review and full-record backup. The [actual local-store upgrade](evidence/correction-library-store-40599070748/audit-summary.json) and [matched context-freshness comparison](evidence/dictionary-context-40602009529/README.md) passed. The [private-writer SDK probe](evidence/swiftdata-save-probe-40610436627/README.md) covers minimal models. The [application-service checkpoint](evidence/polish-mac-40613521362/unit-failure-checkpoint/README.md) separately passes all 29 correction cases, including three unchanged failed-save regressions. History approval and Dictionary UI still require the [combined gate](implementation-plan.md#current-verification-status); its eight scenarios do not cover the backup conflict dialog. Automatic learning and CloudKit synchronization remain separate. [User instructions](../../approved-corrections.md). Source descriptions below retain the discovery-time state.
 
 ## User contract
 

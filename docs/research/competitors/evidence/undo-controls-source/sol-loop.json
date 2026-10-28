@@ -124,10 +124,12 @@
       "usage_status": "Not exposed; not estimated."
     }
   ],
-  "native_runtime_status": "pending; latest40631248324 passed unavailable state then recorder exact capture wait failed; zero cases or global Undo dispatch",
-  "status": "approved-intended-behavior-compiler-annotation-native-pending",
+  "native_runtime_status": "Actual40635627619 at8f2e99ead: full CI build and222 compiler inputs passed; unavailable menu/dismissal1of3 states passed; local postToPid chord saved exactly with fresh visible keycaps. Display wait failed on expired retained AX reference; fresh-node PID/window unretained. Zero menu/shortcut Undo cases or global Undo dispatch; overall native acceptance failed.",
+  "status": "native-acceptance-failed-awaiting-user-review-budget-decision",
   "rounds_used": 5,
-  "open_blockers_or_shoulds": [],
+  "open_blockers_or_shoulds": [
+    "RUNTIME5"
+  ],
   "fixed_findings": [
     {
       "id": "SDK1",
@@ -138,8 +140,8 @@
     }
   ],
   "declined_findings": [],
-  "code_diff_shortstat_after_review": "6 files changed, 3095 insertions(+)",
-  "code_diff_sha256_after_review": "24ae35cdfa3a53ea0d564f590b21210dd245ca8fc0d7a6ef6ee7ee56b22ec597",
+  "code_diff_shortstat_after_review": "6 files changed, 4609 insertions(+)",
+  "code_diff_sha256_after_review": "c95d119bbd293861b63ee25e34419ab88dfa2f9ea0d456fb075aef18cd0d4f04",
   "scoped_files_frozen_through_terminal_verdict": true,
   "post_review_changes": "After round5 metadata: one actualOpus compiler-only closure type annotation; exact body/all other bytes preserved and full inverse restores reviewed source. No sixth review or budget reset; proof compiler-annotation.json. Current exact source hash differs, intended behavior unchanged.",
   "runtime_findings": [
@@ -170,12 +172,22 @@
       "provenance": "actual40631248324 at994a98e87161afc31d2086ffe2e6408f78dee397",
       "claim": "Unavailable menu and dismissal passed; real recorder click reached capture mode, but exact chord not observed after self-host HID input. No delivery diagnostics establish cause.",
       "outcome": "resolved-source / pending-native; recorder-only owned-PID capture protocol, exact focused state/readback and unchanged global dispatch remain required"
+    },
+    {
+      "id": "RUNTIME5",
+      "severity": "should",
+      "provenance": "Actual40635627619 at8f2e99ead66682c9b387c8682a5d2442f0043aeb; retained proof5cc5881a0",
+      "claim": "Exact public local chord save and fresh visible keycaps observed, but post-capture display wait read an expired retained AX reference. Fresh flat tree has one enabled exact-ID AXButton; fresh-node PID/window were not retained. Zero Undo cases.",
+      "evidence": "../undo-controls-40635627619/failure-diagnosis.json",
+      "proposed_fix": "Read-only reacquire one visible exact-ID AXButton with actual host PID and same verified setup AXWindow; require exact expected public stored value and idle display before global cases. Preserve pre-input proof, input routes, event counts and guards; no new input/retry, shortcut writes, private handlers or product changes.",
+      "applied": false,
+      "outcome": "Open; proposed fix unapplied and unreviewed. User decision pending on two additional focused Sol rounds; existing5of5 used, no sixth approval or reset."
     }
   ],
   "open_native_requirements": [
-    "Actual ready status/menu geometry and ownership.",
-    "Four native menu/shortcut cases, three states, exact editor/range/selection/focus/notice and closed-host proof.",
-    "15 actual case/state screenshots and native visual review."
+    "Fresh post-capture recorder PID/window/display ownership and exact public readback; stale-reference observer fix remains unapplied.",
+    "Four native menu/shortcut cases and remaining busy/focus states, exact editor/range/selection/focus/notice and closed-host proof.",
+    "15 actual case/state screenshots and native visual review, plus complete post-run source/signature/TCC receipts."
   ],
   "code_diff_shortstat_after_round2": "6 files changed, 3518 insertions(+)",
   "code_diff_shortstat_after_round3": "6 files changed, 3986 insertions(+)",
@@ -195,7 +207,28 @@
     "proof": "compiler-annotation.json",
     "whole_file_inverse_identical": true,
     "closure_body_identical": true,
-    "native_runtime_status": "No035host launched; new full CI build/runtime pending.",
-    "skill_basis": "Section4: no new behavior diff or unreviewed behavior; explicit closure types qualify existing intended result type only."
+    "native_runtime_status": "Confirmed by actual40635627619 at8f2e99ead: full CI build succeeded and222 actual compiler inputs verified. Local chord save observed; native acceptance then failed at stale retained AX display readback, with zero Undo cases. Fresh-node PID/window unretained.",
+    "skill_basis": "Section4: no new behavior diff or unreviewed behavior; explicit closure types qualify existing intended result type only.",
+    "full_ci_build_evidence": "../undo-controls-40635627619/compiler-transition.json"
+  },
+  "code_diff_after_review_scope": "Last completed source review, round5; initial3095 snapshot remains in initial_diff_shortstat. Current post-review annotation/authorship metadata snapshot is separate below.",
+  "current_scoped_diff_snapshot": {
+    "base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+    "shortstat": "6 files changed, 4636 insertions(+)",
+    "sha256": "e73c96326fadfb4622faa4afbb91eb5e5da79f516ef221c9b2a2ca1071f1ee85",
+    "scope": "Exact existing six-path diff_command; includes compiler-only closure annotation and post-review authorship metadata. Not a new review; ledger and compiler-annotation.json are outside this original six-path scope."
+  },
+  "pending_user_review_budget_request": {
+    "additional_focused_rounds": 2,
+    "status": "pending user decision",
+    "approved": false,
+    "skill_basis": "Section5: budget end is not approval; user decides.",
+    "source_behavior_changes_held": true
+  },
+  "recorded_ci_transport_push": {
+    "ref": "ci/rjt-writing-undo-controls-01a17bef-794fa259",
+    "head": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
+    "scope": "Earlier verified disposable CI transport push only; no normal work-branch push or release claim.",
+    "run_id": 40635627619
   }
 }

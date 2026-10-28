@@ -299,10 +299,12 @@ def run_host(host):
     seed = {'PrewarmModelOnWake': False, 'hasCompletedOnboarding': True,
         'isAIEnhancementEnabled': False, 'enableAnnouncements': False, 'SUEnableAutomaticChecks': False}
     (preferences / (bundle_id + '.plist')).write_bytes(plistlib.dumps(seed))
-    environment = dict(os.environ, CFFIXED_USER_HOME=str(home), RJT_LANGUAGE_SELECTION_PROBE='1', RJT_LANGUAGE_SELECTION_EVIDENCE=str(native))
+    profile_path = native / 'profile-%p.profraw'
+    environment = dict(os.environ, CFFIXED_USER_HOME=str(home), RJT_LANGUAGE_SELECTION_PROBE='1',
+        RJT_LANGUAGE_SELECTION_EVIDENCE=str(native), LLVM_PROFILE_FILE=str(profile_path))
     write_json(output / 'configuration.json', {'executable_path': host['executable_path'], 'seed_preferences': seed,
         'CFFIXED_USER_HOME': str(home), 'RJT_LANGUAGE_SELECTION_EVIDENCE': str(native), 'command_line_arguments': [],
-        'RJT_LANGUAGE_SELECTION_PROBE': '1',
+        'RJT_LANGUAGE_SELECTION_PROBE': '1', 'LLVM_PROFILE_FILE': str(profile_path), 'working_directory': str(native),
         'scope': 'Unchanged language picker component; production entry excluded; no engine, provider, ASR or model loading.'})
     executable = host['executable_path']
     require(not host_census(executable), 'Fresh exact host executable already running')
@@ -310,7 +312,7 @@ def run_host(host):
     monitor_error, closure_error, candidate_error = None, None, None
     census_empty, descriptors_closed = None, None
     with (output / 'host.log').open('xb') as stream:
-        process = subprocess.Popen([executable], cwd=candidate, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+        process = subprocess.Popen([executable], cwd=native, env=environment, stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
         try:
             deadline = time.monotonic() + 120
             while True:
@@ -331,7 +333,20 @@ def run_host(host):
                         observed = dict(current, pid=process.pid, mapped_text_paths=paths)
                 elif current != {key: observed[key] for key in ('started_at', 'executable_path')}:
                     raise RuntimeError('Host PID reused')
-                require(time.monotonic() < deadline, 'Language host exceeded bounded deadline')
+                if time.monotonic() >= deadline:
+                    # Capture the proven spawned process before timeout cleanup, never a name-matched PID.
+                    require(launched == current, 'Refusing to sample a changed host process')
+                    with (output / 'host-timeout-sample.log').open('xb') as diagnostic:
+                        try:
+                            sampled = subprocess.run(['/usr/bin/sample', str(process.pid), '3', '-mayDie',
+                                '-file', str(native / 'host-timeout-sample.txt')],
+                                stdout=diagnostic, stderr=subprocess.STDOUT, timeout=10)
+                            write_json(output / 'host-timeout-sample.json', {'host': dict(current, pid=process.pid),
+                                'exit_code': sampled.returncode, 'scope': 'External sample of the proven spawned host on timeout'})
+                        except subprocess.TimeoutExpired:
+                            write_json(output / 'host-timeout-sample.json', {'host': dict(current, pid=process.pid),
+                                'classification': 'diagnostic-timeout'})
+                    raise RuntimeError('Language host exceeded bounded deadline')
                 time.sleep(0.1)
         except BaseException as error:
             monitor_error = str(error) or type(error).__name__

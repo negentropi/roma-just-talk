@@ -1,6 +1,6 @@
 # Undo the latest writing edit
 
-Implementation status: the current candidate includes Undo and its clipboard-restoration integration. Candidate native editor, clipboard, cancellation and menu/shortcut verification remain pending. This guide describes the implemented contract; it is not a release or runtime-verification receipt.
+Implementation status: the current candidate includes Undo and its clipboard-restoration integration. The matched clipboard component checks pass; candidate native editor, cancellation and menu/shortcut verification remain pending. This guide describes the implemented contract; it is not a release receipt.
 
 **Undo Last Writing Edit** restores the selected plain text from your latest confirmed **Edit selected text** action. It also tries to restore the original selection. There is one step, held in memory until RJT quits.
 
@@ -26,7 +26,7 @@ A newer RJT editor mutation attempt retires the previous receipt, even when that
 
 Undo settles a pending confirmed forward-paste restoration before changing the selection, honoring its original restoration deadline. Writing Paste and ordinary clipboard Paste share that restoration owner. Undo's menu-Paste route preserves the current clipboard even when ordinary paste restoration is disabled. Snapshots retain every readable item format; an unreadable format stops preparation. Generation and session checks leave a newer clipboard copy untouched. A failed restoration stops the next paste while that clipboard generation remains current. Canceling a waiting Undo does not cancel the earlier paste's restoration.
 
-The [known-bad clipboard run](research/competitors/evidence/clipboard-lease-40602002286/independent-audit.json) reproduced three overlapping-restoration failures and passed two controls. Candidate execution of those same cases and the immediate-Undo interaction remain pending.
+The [matched clipboard check](research/competitors/evidence/clipboard-lease-40605378358/README.md) reproduced three failures on the old code and passed all five cases on the candidate, including both controls. It uses actual clipboard formats and timers with controlled menu/document access. Native product Undo remains a separate check.
 
 Cancellation before the inverse text attempt leaves the field text unchanged. If RJT temporarily selected the inserted span, it restores the prior caret only while the field still matches that intermediate state. Once an inverse text mutation is attempted, the receipt is consumed; RJT does not repeat it or guess whether another attempt would help.
 

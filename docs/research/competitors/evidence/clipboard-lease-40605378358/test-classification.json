@@ -1,0 +1,39 @@
+{
+  "errors": [],
+  "exit_code": 0,
+  "failure_lines": [],
+  "issues": [],
+  "lane": "candidate",
+  "started_tests": [
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+    "singleWritingPasteHonorsDefaultRestorationDeadline",
+    "newerClipboardCopySurvivesWritingRestorationDeadline"
+  ],
+  "summary": [
+    [
+      "5",
+      "1",
+      "passed"
+    ]
+  ],
+  "test_results": {
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard": [
+      "passed"
+    ],
+    "newerClipboardCopySurvivesWritingRestorationDeadline": [
+      "passed"
+    ],
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload": [
+      "passed"
+    ],
+    "singleWritingPasteHonorsDefaultRestorationDeadline": [
+      "passed"
+    ],
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard": [
+      "passed"
+    ]
+  },
+  "valid": true
+}

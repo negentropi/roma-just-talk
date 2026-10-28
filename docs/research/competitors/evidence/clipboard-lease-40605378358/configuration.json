@@ -1,0 +1,27 @@
+{
+  "argument_domain_seed_keys": [
+    "CurrentTranscriptionModel",
+    "IsAudioCleanupEnabled",
+    "IsTranscriptionCleanupEnabled",
+    "PrewarmModelOnWake",
+    "enableAnnouncements",
+    "hasCompletedOnboarding",
+    "isAIEnhancementEnabled"
+  ],
+  "credential_contract": "Actual LOCAL_BUILD routes KeychainService to fresh lane UserDefaults; no saved Keychain query. Source/configuration assurance, not SecItem tracing.",
+  "isolated_sha256": "c4c92cba50328a52bb4fabcc2d1dbabb68aa4cbbe4c9da399a53a55fbcf7c847",
+  "isolated_user_home": "/Users/runner/work/_temp/clipboard-lease-proof/isolated-user",
+  "original_sha256": "b98a9e4f1435c0fc9a4a1cfe53604fdb0e5fe44f51a4f0384b7d89a5ff075025",
+  "provider_preference_source": "Isolated plist only; XCTest may split the spaced provider label in argv.",
+  "scope": "Actual NSPasteboard with existing controlled menu/document seam; no external editor/AX authorization. Normal startup pre-roll receives one exact signed-host microphone grant.",
+  "seed_preferences": {
+    "CurrentTranscriptionModel": "whisper-large-v3-turbo",
+    "IsAudioCleanupEnabled": false,
+    "IsTranscriptionCleanupEnabled": false,
+    "PrewarmModelOnWake": false,
+    "enableAnnouncements": false,
+    "hasCompletedOnboarding": true,
+    "isAIEnhancementEnabled": false,
+    "selectedAIProvider": "Local CLI"
+  }
+}

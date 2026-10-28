@@ -1,0 +1,97 @@
+{
+  "acceptance": "candidate boundary; matched oracle identity must also be verified against retained old run",
+  "canonical_lock_sha256": "bfb9034a29dce69e0c9197557726fd20b17dfc018e626ebb431e306982cfb98f",
+  "cases": [
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+    "singleWritingPasteHonorsDefaultRestorationDeadline",
+    "newerClipboardCopySurvivesWritingRestorationDeadline"
+  ],
+  "classification": "candidate-boundary-passed",
+  "failure_sites": {
+    "18": "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+    "31": "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+    "45": "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload"
+  },
+  "known_bad_paster_sha256": "c704ce58da8110738596c84ac580ba552ab53e5169571f4f8bd6893249494ba0",
+  "lane": "candidate",
+  "limits": [
+    "Clipboard restoration only; controlled menu/document seam, no actual editor delivery or Undo command.",
+    "Baseline reproduction is not a fixed candidate. Candidate requires same-oracle comparison with retained baseline.",
+    "Normal app startup may start microphone pre-roll. No speech recognition, physical keyboard, model quality, rich-text editor, saved Keychain or real customer data exercised."
+  ],
+  "observations": {
+    "nestedWritingPastesRestoreOriginalAllFormatClipboard": {
+      "elapsed_seconds": 4.380186208333271,
+      "original_restored": true,
+      "postcondition_passed": true
+    },
+    "newerClipboardCopySurvivesWritingRestorationDeadline": {
+      "elapsed_seconds": 2.3711459583332726,
+      "original_restored": false,
+      "postcondition_passed": true
+    },
+    "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload": {
+      "elapsed_seconds": 4.3787455416666035,
+      "original_restored": true,
+      "postcondition_passed": true
+    },
+    "singleWritingPasteHonorsDefaultRestorationDeadline": {
+      "elapsed_seconds": 2.374932583333475,
+      "original_restored": true,
+      "postcondition_passed": true
+    },
+    "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard": {
+      "elapsed_seconds": 6.477357916666733,
+      "original_restored": true,
+      "postcondition_passed": true
+    }
+  },
+  "oracle_sha256": "3bba815e11a289c96061f16db9967123272bd6916b29439e066f123435ac9d6a",
+  "paster_sha256": "0954eaa9465d0725278c5f955600ce3338a426d00915d08f6803401319e26342",
+  "scope": "clipboard restoration only; controlled menu/document access",
+  "source_sha": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "test_classification": {
+    "errors": [],
+    "exit_code": 0,
+    "failure_lines": [],
+    "issues": [],
+    "lane": "candidate",
+    "started_tests": [
+      "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+      "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+      "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+      "singleWritingPasteHonorsDefaultRestorationDeadline",
+      "newerClipboardCopySurvivesWritingRestorationDeadline"
+    ],
+    "summary": [
+      [
+        "5",
+        "1",
+        "passed"
+      ]
+    ],
+    "test_results": {
+      "nestedWritingPastesRestoreOriginalAllFormatClipboard": [
+        "passed"
+      ],
+      "newerClipboardCopySurvivesWritingRestorationDeadline": [
+        "passed"
+      ],
+      "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload": [
+        "passed"
+      ],
+      "singleWritingPasteHonorsDefaultRestorationDeadline": [
+        "passed"
+      ],
+      "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard": [
+        "passed"
+      ]
+    },
+    "valid": true
+  },
+  "test_host_verifier_sha256": "06f41eccd462fb46ff2fea1419f6f88103e4a6f9be2dff5238b7330edcf548a5",
+  "test_host_verifier_tests_sha256": "3b74b785210bd5452f8f11247897c44f340d9b26fa1aa5efb52cfad8e7826855",
+  "valid": true
+}

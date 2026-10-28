@@ -1,0 +1,70 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -xctestrun /Users/runner/work/_temp/clipboard-lease-proof/isolated.xctestrun -destination platform=macOS -parallel-testing-enabled NO "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/nestedWritingPastesRestoreOriginalAllFormatClipboard()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/singleWritingPasteHonorsDefaultRestorationDeadline()" "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/newerClipboardCopySurvivesWritingRestorationDeadline()" -enumerate-tests -test-enumeration-style flat -test-enumeration-format json -test-enumeration-output-path /Users/runner/work/_temp/clipboard-lease-proof/selection/selected-tests.json
+
+2026-10-28 00:14:18.753 xcodebuild[43917:113260] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-28 00:14:18.762 xcodebuild[43917:113260] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64e, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:arm64, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:x86_64, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Mac Catalyst, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:DriverKit, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:arm64e, variant:Designed for [iPad,iPhone], id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:1608204d51a7d9ea359f0a70eecd07c4059e5ce4, name:My Mac }
+2026-10-28 00:14:23.619 xcodebuild[43917:113260] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-28 00:14:24.118 xcodebuild[43917:113260] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-10-28 00:14:25.696963+0000 roma just talk[43952:113452] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x9bc8a18c0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-28 00:14:25.921446+0000 roma just talk[43952:113452] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-28 00:14:25.923072+0000 roma just talk[43952:113452] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-28 00:14:25.923268+0000 roma just talk[43952:113452] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-28 00:14:25.924697+0000 roma just talk[43952:113452] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-28 00:14:25.924752+0000 roma just talk[43952:113452] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-28 00:14:25.933223+0000 roma just talk[43952:113554] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:25.938998+0000 roma just talk[43952:113501] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:25.939601+0000 roma just talk[43952:113501] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:25.939584+0000 roma just talk[43952:113553] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-28 00:14:25.937594+0000 roma just talk[43952:113554] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:25.942382+0000 roma just talk[43952:113501] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:25.942430+0000 roma just talk[43952:113501] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:25.942932+0000 roma just talk[43952:113502] [SessionMetricMigrationService] Completed stats migration with 0 session metric(s)
+2026-10-28 00:14:25.943709+0000 roma just talk[43952:113501] [Connection] Will NOT re-try to establish the connection
+2026-10-28 00:14:25.944006+0000 roma just talk[43952:113557] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:25.944033+0000 roma just talk[43952:113557] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 00:14:28.593505+0000 roma just talk[43952:113452] [ContentView] ContentView appeared
+2026-10-28 00:14:28.672078+0000 roma just talk[43952:113452] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-28 00:14:28.672729+0000 roma just talk[43952:113452] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-28 00:14:28.672870+0000 roma just talk[43952:113452] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-28 00:14:28.924774+0000 roma just talk[43952:113452] [AudioDeviceManager] 🎙️ Current device unavailable, selecting new device...
+2026-10-28 00:14:28.926546+0000 roma just talk[43952:113452] [AudioDeviceManager] 🎙️ Auto-selecting new device: Apple Virtual Sound Device
+2026-10-28 00:14:28.939776+0000 roma just talk[43952:113452] [RecorderUIManager] Resetting recording state on launch
+2026-10-28 00:14:28.940474+0000 roma just talk[43952:113452] [Recorder] stopRecording called
+2026-10-28 00:14:28.940867+0000 roma just talk[43952:113452] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 00:14:28.940892+0000 roma just talk[43952:113452] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 00:14:28.940997+0000 roma just talk[43952:113452] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 00:14:28.941668+0000 roma just talk[43952:113452] [WindowManager] configureWindow: registering main window
+2026-10-28 00:14:29.107014+0000 roma just talk[43952:113452] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-28 00:14:29.117562+0000 roma just talk[43952:113452] [ShortcutMonitor] installEventTap: listen-event access is not granted
+2026-10-28 00:14:29.486058+0000 roma just talk[43952:113452] [Window] Warning: -[NSWindow makeKeyWindow] called on <NSPanel: 0x9bd95d900> windowNumber=1e which returned NO from -[NSWindow canBecomeKeyWindow].
+2026-10-28 00:14:29.642531+0000 roma just talk[43952:113452] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 00:14:29.642554+0000 roma just talk[43952:113502] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 00:14:29.642613+0000 roma just talk[43952:113502] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 81
+2026-10-28 00:14:29.643657+0000 roma just talk[43952:113502] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice
+2026-10-28 00:14:29.643745+0000 roma just talk[43952:113502] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 00:14:29.644231+0000 roma just talk[43952:113502] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-28 00:14:29.882730+0000 roma just talk[43952:113502] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-28 00:14:29.882768+0000 roma just talk[43952:113502] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-28 00:14:29.887833+0000 roma just talk[43952:113502] [carc] Reporter disconnected. { function=sendMessage, reporterID=188772402593793 }
+2026-10-28 00:14:29.963635+0000 roma just talk[43952:113502] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-28 00:14:29.963670+0000 roma just talk[43952:113502] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-28 00:14:29.963679+0000 roma just talk[43952:113502] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-28 00:14:32.106384+0000 roma just talk[43952:113452] [Recorder] startPreRollBuffering: active on deviceID=81
+2026-10-28 00:14:32.106480+0000 roma just talk[43952:113452] [Recorder] startPreRollBuffering: active on deviceID=81
+
+Test session results, code coverage, and logs:
+	/Users/runner/Library/Developer/Xcode/DerivedData/VoiceInk-hbjcjrshxislxcejtrflrnwmlkpw/Logs/Test/Test-VoiceInk-2026.10.28_00-14-18-+0000.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+

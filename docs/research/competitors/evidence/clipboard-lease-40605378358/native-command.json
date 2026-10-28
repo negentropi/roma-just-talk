@@ -1,0 +1,19 @@
+{
+  "arguments": [
+    "xcodebuild",
+    "test-without-building",
+    "-xctestrun",
+    "/Users/runner/work/_temp/clipboard-lease-proof/isolated.xctestrun",
+    "-destination",
+    "platform=macOS",
+    "-parallel-testing-enabled",
+    "NO",
+    "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/nestedWritingPastesRestoreOriginalAllFormatClipboard()",
+    "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard()",
+    "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload()",
+    "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/singleWritingPasteHonorsDefaultRestorationDeadline()",
+    "-only-testing:VoiceInkTests/ClipboardRestorationLeaseTests/newerClipboardCopySurvivesWritingRestorationDeadline()",
+    "-resultBundlePath",
+    "/Users/runner/work/_temp/clipboard-lease-proof/Native.xcresult"
+  ]
+}

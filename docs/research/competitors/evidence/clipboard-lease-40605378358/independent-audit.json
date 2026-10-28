@@ -1,0 +1,83 @@
+{
+  "classification": "actual-controlled-clipboard-matched-red-green",
+  "runID": 40605378358,
+  "sourceSHA": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "githubRunConclusion": "success",
+  "knownBadRunID": 40602002286,
+  "knownBadWorkflowConclusion": "failure; benign Recorder OSLog falsely classified as skipped test; raw outcomes independently accepted",
+  "sameOracleSHA256": "3bba815e11a289c96061f16db9967123272bd6916b29439e066f123435ac9d6a",
+  "selectedStartedPassed": 5,
+  "candidateIssues": 0,
+  "candidateSkips": 0,
+  "caseComparisons": [
+    {
+      "test": "nestedWritingPastesRestoreOriginalAllFormatClipboard",
+      "elapsedSeconds": 4.380186208333271,
+      "oldPostconditionPassed": false,
+      "candidatePostconditionPassed": true,
+      "originalAllFormatsRestored": true
+    },
+    {
+      "test": "writingThenOrdinaryPasteRestoresOriginalAllFormatClipboard",
+      "elapsedSeconds": 6.477357916666733,
+      "oldPostconditionPassed": false,
+      "candidatePostconditionPassed": true,
+      "originalAllFormatsRestored": true
+    },
+    {
+      "test": "preparedOrdinaryPasteDoesNotRestoreRetiredWritingPayload",
+      "elapsedSeconds": 4.3787455416666035,
+      "oldPostconditionPassed": false,
+      "candidatePostconditionPassed": true,
+      "originalAllFormatsRestored": true
+    },
+    {
+      "test": "singleWritingPasteHonorsDefaultRestorationDeadline",
+      "elapsedSeconds": 2.374932583333475,
+      "oldPostconditionPassed": true,
+      "candidatePostconditionPassed": true,
+      "originalAllFormatsRestored": true
+    },
+    {
+      "test": "newerClipboardCopySurvivesWritingRestorationDeadline",
+      "elapsedSeconds": 2.3711459583332726,
+      "oldPostconditionPassed": true,
+      "candidatePostconditionPassed": true,
+      "originalAllFormatsRestored": false
+    }
+  ],
+  "liveExactHostPID": 44287,
+  "hostExitObserved": true,
+  "signatureFlags": "0x2(adhoc)",
+  "strictSignatureVerified": true,
+  "unchangedPreparedAppSHA256": "6249b761ceb95af64611a3debac6987d8c8e9997a00270f164991a115eb5e2b6",
+  "actualGitSourceInputsVerified": 655,
+  "canonicalActualPackagePins": 41,
+  "toolchainSameAsKnownBad": true,
+  "staticWhisper86HashesEqual": false,
+  "staticWhisperHashDifferences": 9,
+  "artifactDownloadsOnce": [
+    {
+      "id": 12781910823,
+      "bytes": 184602,
+      "sha256": "e8988ed80e6b64b618ff63d0b68ae106456952c5ecc90b41b519ed88ad5ca435",
+      "members": 47,
+      "CRCValid": true,
+      "path": "/data/rjt-writing-check-01a17bef/40605378358/evidence.zip"
+    },
+    {
+      "id": 12781031711,
+      "bytes": 718922,
+      "sha256": "9389d19935033857a767de43988fafbffac95b009d32a29de01e592d1ccf281e",
+      "members": 55,
+      "CRCValid": true,
+      "path": "/data/rjt-writing-check-01a17bef/40605378358/app-artifact.zip"
+    }
+  ],
+  "limits": [
+    "Actual NSPasteboard and timers with controlled menu/document access; no native editor delivery or product Undo command.",
+    "New five ownership tests are compiled but not selected in this five-case run; normal full-suite execution remains separate.",
+    "Static Whisper platform archives were rebuilt and differ; no ASR or whole-app parity claim.",
+    "No physical input, provider/model quality, CloudKit or user-store upgrade proof."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "status": "clean",
+  "reviewer": "/root/literal_rule_checks/literal_driver_review",
+  "independent_child_agrees": true,
+  "recorded_at": "2026-10-28T00:09:20.111601+00:00",
+  "run_id": 40605454144,
+  "head": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "verified": [
+    "Raw ordered 1758 PASS names; every registration once; prior1753 preserved and five exact Undo additions",
+    "Native exit0; one Executed1758 marker; product build completed",
+    "Exact run/head/ref/artifact association and all11 retained member hashes",
+    "All160 source hashes independently read from pinned Git plus every afterOK",
+    "Unchanged Core/NVIDIA/Mac lock bytes22/22/41",
+    "Scope excludes app/runtime/matched-regression/checkout-tree/post-toolchain proof"
+  ],
+  "review_actions": {
+    "read_only": true,
+    "analyzer_recomputed": true,
+    "receipt_write_suppressed": true,
+    "artifact_downloads": 0,
+    "swift_builds": 0
+  },
+  "reviewed_file_sha256": {
+    "analyze-result.py": "95ee3d27ff7b2eb3fb5ec7bc9b3dfb4cdd85a7c61508c9bdd41550b71690cb43",
+    "receipt.json": "54bee63e2a087c078c5a3d04fa7226eda4282050d4ec7daf2b76d40049b0f01d",
+    "run.json": "965ef632b5ca01c883f9358f19b6024f6442a6ba362df62eae0af0105dd970ce",
+    "artifact.json": "0b8793780d63111fcb1c2cb2af592fc748ae903d462bb6b9ccedfe5868a9efd7",
+    "download-receipt.json": "30edce60be23718b04fff98a8c00b76638dc8f37d601919395cd14117a43e8cc",
+    "README.md": "a1301db636bb837b3cb87139718a573bc9fa6a72c0360b58a59db5cb3af1c268"
+  }
+}

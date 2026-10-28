@@ -1,0 +1,15 @@
+{
+  "run_id": 40605454144,
+  "expected_head": "794fa2595f943ae501bbe3407a9dd1120c678f76",
+  "remote": "https://github.com/negentropi/roma-just-talk.git",
+  "transport_ref": "ci/rjt-core-check-undo-794fa259-01a17bef",
+  "workflow": "Verify shared Core checks",
+  "event": "push",
+  "git_author": "Felix C. Order <171460575+negentropi@users.noreply.github.com>",
+  "git_committer": "Felix C. Order <171460575+negentropi@users.noreply.github.com>",
+  "github_writer": "negentropi",
+  "remote_execution": "GitHub Actions macos-26",
+  "local_builds": 0,
+  "artifact_policy": "One evidence artifact download directly to /data; no iOS Simulator app download",
+  "scope": "Core native policy/codec checks"
+}

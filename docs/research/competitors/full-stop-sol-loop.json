@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "scope": "Final task-only Mac competitor-feature integration",
+  "base": "bf9ed37c19f6f381a0bde485da254dbeafb6234f",
+  "archive": "99d0ebba40cfcd0f04a1536b4118cabe3a96a075",
+  "reviewer": "/root/full_stop_sol_loop",
+  "route": "native_subagent",
+  "selectedModel": "gpt-6.1-sol",
+  "selectedReasoningEffort": "medium",
+  "usage": "Not exposed; not estimated.",
+  "roundBudget": 3,
+  "diffCommand": "git diff bf9ed37c19f6f381a0bde485da254dbeafb6234f -- . ':!docs/research/competitors/full-stop-pr-readiness.md' ':!docs/research/competitors/full-stop-sol-loop.json'",
+  "rounds": [
+    {
+      "round": 1,
+      "head": "d5d12e4fe93687a845b91baa49855c393dd4f41d",
+      "verdict": "CHANGES",
+      "diff": { "files": 211, "insertions": 52613, "deletions": 1187 },
+      "findings": [
+        {
+          "id": "S1",
+          "severity": "should",
+          "status": "resolved",
+          "file": "scripts/tests/dictation-store-schema-canonicalization.test.py:15",
+          "finding": "Moving historical evidence out of the PR also omitted immutable JSON and WAV inputs consumed by executable tests and native verification workflows.",
+          "fix": "Restore only the consumed fixture closure with original bytes, hashes and provenance, then rerun the affected checks without weakening assertions."
+        }
+      ],
+      "sourceAssessment": "No additional reachable product-source defect identified. Source approval withheld for S1; fresh exact-candidate Mac CI separately required.",
+      "usage": "Not exposed."
+    },
+    {
+      "round": 2,
+      "head": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e",
+      "verdict": "APPROVE",
+      "diff": { "files": 252, "insertions": 71296, "deletions": 1210 },
+      "findings": [],
+      "resolved": ["S1"],
+      "independentChecks": "All 35 fixture inputs match the archive by content, SHA-256 and Git object identity. Schema fixture loading and metadata-store, correction-store, Local CLI and polish self-tests passed unchanged. Shell syntax and diff checks passed.",
+      "limits": "Source approval only. Full Swift canonicalization and fresh candidate Mac/iOS/native gates remain required.",
+      "usage": "Not exposed."
+    }
+  ],
+  "openFindings": [],
+  "round2Brief": {
+    "sourceHead": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e",
+    "changedSinceRound1": [
+      "35 immutable fixture inputs, provenance manifest and full Mac fixture-preflight step",
+      "Hosted Mac/iOS runners, toolchain setup and independent workflow/ref queues; existing assertions preserved",
+      "C collation for the existing pinned model-path digest",
+      "Previously verified capture-readiness and physical-path distribution-launch fixture fixes"
+    ],
+    "proof": "Five original missing-input failures reproduced; six available restored-fixture controls passed. Native Swift schema test pending disposable Mac CI. Model digest has a matched en_US.UTF-8 failure and C-collation success on the same 22 paths.",
+    "status": "approved"
+  },
+  "declinedFindings": [],
+  "finalSourceVerdict": "APPROVE",
+  "sourceReviewCovers": "bf56ab606e59e4620806ebe34f49d3a9ec962b1e and subsequent metadata-only commits with identical behavior files",
+  "pushed": false,
+  "mergePolicy": "Full-stop: never merge, enable auto-merge, enter a merge queue or publish a release."
+}

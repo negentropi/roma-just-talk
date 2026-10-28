@@ -70,12 +70,14 @@ struct ClipboardRestorationOwnershipTests {
                 shouldCancel: { false }, pasteboard: board, restoreClipboard: true, restorationDelay: 0.25,
                 onConfirmed: { confirmations += 1 })
         }
-        defer { work.cancel() }
-        for _ in 0..<100 where access.reads == 0 { try await Task.sleep(for: .milliseconds(5)) }
-        try #require(access.reads == 1)
-        access.deliverReadback()
-        work.cancel()
+        // Cancel after the attempt, before production can start its exact readback.
+        access.onAttempt = {
+            access.deliverReadback()
+            work.cancel()
+        }
+        defer { access.onAttempt = nil; work.cancel() }
         let result = try await work.value
+        #expect(access.reads == 1)
         #expect(result == .confirmed)
         #expect(confirmations == 1)
         #expect(access.attempts == 1)
@@ -153,6 +155,7 @@ private final class ClipboardOwnershipAccess: CursorPaster.WritingPasteAccess {
     private(set) var attempts = 0
     private(set) var reads = 0
     var delayReadback = false
+    var onAttempt: (() -> Void)?
     private var value = "before"
     init(board: NSPasteboard, gate: ClipboardOwnershipGate? = nil) { self.board = board; self.gate = gate }
     func validateTarget() throws { }
@@ -165,6 +168,7 @@ private final class ClipboardOwnershipAccess: CursorPaster.WritingPasteAccess {
         willAttempt()
         attempts += 1
         if !delayReadback { deliverReadback() }
+        onAttempt?()
         return .attempted(.success)
     }
 }

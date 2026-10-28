@@ -526,7 +526,8 @@ private final class PolishRecordingFixture {
         VoiceInkUserDefaultsKey.prewarmModelOnWake, VoiceInkUserDefaultsKey.isTranscriptionCleanupEnabled,
         VoiceInkUserDefaultsKey.isAudioCleanupEnabled, PunctuationCleanupMode.userDefaultsKey,
         PunctuationCleanupMode.legacyRemovePunctuationKey,
-        VoiceInkPasteMethod.userDefaultsKey, VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey,
+        VoiceInkPasteMethod.userDefaultsKey, VoiceInkPasteMethod.legacyAppleScriptPasteKey,
+        VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey,
         VoiceInkUserDefaultsKey.activePowerModeConfigurationId, VoiceInkUserDefaultsKey.powerModePersistConfig
     ]
 

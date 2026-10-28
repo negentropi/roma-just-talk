@@ -73,6 +73,7 @@ private final class SpokenSnippetPipelineFixture {
         PunctuationCleanupMode.userDefaultsKey,
         PunctuationCleanupMode.legacyRemovePunctuationKey,
         VoiceInkPasteMethod.userDefaultsKey,
+        VoiceInkPasteMethod.legacyAppleScriptPasteKey,
         VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey,
         VoiceInkUserDefaultsKey.selectedAIProvider,
         VoiceInkUserDefaultsKey.isAIEnhancementEnabled,
@@ -109,8 +110,9 @@ private final class SpokenSnippetPipelineFixture {
             qwenRuntimeResult: .failure(SnippetFixtureError.unusedRuntime)
         )
         let defaults = UserDefaults.standard
+        let domain = Bundle.main.bundleIdentifier.flatMap { defaults.persistentDomain(forName: $0) } ?? [:]
         savedDefaults = Dictionary(uniqueKeysWithValues: Self.keys.compactMap { key in
-            defaults.object(forKey: key).map { (key, $0) }
+            domain[key].map { (key, $0) }
         })
         savedPowerMode = PowerModeManager.shared.activeConfiguration
         savedSoundEnabled = SoundManager.shared.isEnabled

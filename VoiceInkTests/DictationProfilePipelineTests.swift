@@ -220,7 +220,9 @@ extension VoiceInkTests {
     }
     @Test @MainActor func canceledQueuedDictationPasteDoesNotWriteTheTarget() async {
         let defaults = UserDefaults.standard
-        let previousMethod = defaults.object(forKey: VoiceInkPasteMethod.userDefaultsKey)
+        let keys = [VoiceInkPasteMethod.userDefaultsKey, VoiceInkPasteMethod.legacyAppleScriptPasteKey]
+        let domain = Bundle.main.bundleIdentifier.flatMap { defaults.persistentDomain(forName: $0) } ?? [:]
+        let previousValues = Dictionary(uniqueKeysWithValues: keys.compactMap { key in domain[key].map { (key, $0) } })
         var writes: [String] = []
         VoiceInkPasteMethod.setCurrent(.standard)
         CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in
@@ -229,10 +231,12 @@ extension VoiceInkTests {
         }
         defer {
             CursorPaster.configureAccessibilityTextInserterForTesting()
-            if let previousMethod {
-                defaults.set(previousMethod, forKey: VoiceInkPasteMethod.userDefaultsKey)
-            } else {
-                defaults.removeObject(forKey: VoiceInkPasteMethod.userDefaultsKey)
+            for key in keys {
+                if let value = previousValues[key] {
+                    defaults.set(value, forKey: key)
+                } else {
+                    defaults.removeObject(forKey: key)
+                }
             }
         }
 
@@ -259,6 +263,7 @@ private final class DictationProfilePipelineFixture {
         PunctuationCleanupMode.userDefaultsKey,
         PunctuationCleanupMode.legacyRemovePunctuationKey,
         VoiceInkPasteMethod.userDefaultsKey,
+        VoiceInkPasteMethod.legacyAppleScriptPasteKey,
         VoiceInkRecordingFeedbackPreference.isSoundFeedbackEnabledKey,
         VoiceInkUserDefaultsKey.selectedAIProvider,
         VoiceInkUserDefaultsKey.isAIEnhancementEnabled,
@@ -311,8 +316,9 @@ private final class DictationProfilePipelineFixture {
         context.insert(WordReplacement(originalText: "Roma", replacementText: "CHANGED REPLACEMENT"))
         try context.save()
         let defaults = UserDefaults.standard
+        let domain = Bundle.main.bundleIdentifier.flatMap { defaults.persistentDomain(forName: $0) } ?? [:]
         savedDefaults = Dictionary(uniqueKeysWithValues: Self.keys.compactMap { key in
-            defaults.object(forKey: key).map { (key, $0) }
+            domain[key].map { (key, $0) }
         })
         savedPowerMode = PowerModeManager.shared.activeConfiguration
         savedSoundEnabled = SoundManager.shared.isEnabled

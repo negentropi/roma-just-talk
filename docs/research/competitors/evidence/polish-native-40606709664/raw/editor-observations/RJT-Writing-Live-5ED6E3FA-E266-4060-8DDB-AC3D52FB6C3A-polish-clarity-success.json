@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "polish-clarity-success",
+  "date" : "2026-10-28T00:28:01Z",
+  "expected" : "Before 👩🏽‍💻 \n  <think>Literal é 🧪<\/think> $5 \\path\r\n   after 🧑‍🚀.\n",
+  "observed" : "Before 👩🏽‍💻 \n  <think>Literal é 🧪<\/think> $5 \\path\r\n   after 🧑‍🚀.\n",
+  "processIdentifier" : 36038,
+  "token" : "RJT-Writing-Live-5ED6E3FA-E266-4060-8DDB-AC3D52FB6C3A"
+}

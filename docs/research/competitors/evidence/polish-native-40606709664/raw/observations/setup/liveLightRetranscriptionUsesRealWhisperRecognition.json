@@ -1,0 +1,29 @@
+{
+  "snapshots" : [
+    {
+      "aiCommandIsConfigured" : true,
+      "aiCommandMatchesFixture" : true,
+      "apiKeyIsEmpty" : true,
+      "argumentDomainProvider" : null,
+      "commandArgumentDomainKeyExists" : false,
+      "commandPreferenceMatchesFixture" : true,
+      "isAPIKeyValid" : true,
+      "provider" : "Local CLI",
+      "stage" : "after-ai-init",
+      "standardDefaultsProvider" : "Local CLI"
+    },
+    {
+      "aiCommandIsConfigured" : true,
+      "aiCommandMatchesFixture" : true,
+      "apiKeyIsEmpty" : true,
+      "argumentDomainProvider" : null,
+      "commandArgumentDomainKeyExists" : false,
+      "commandPreferenceMatchesFixture" : true,
+      "isAPIKeyValid" : true,
+      "provider" : "Local CLI",
+      "stage" : "after-enhancement-init",
+      "standardDefaultsProvider" : "Local CLI"
+    }
+  ],
+  "testName" : "liveLightRetranscriptionUsesRealWhisperRecognition"
+}

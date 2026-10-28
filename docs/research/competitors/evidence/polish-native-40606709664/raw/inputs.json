@@ -1,0 +1,16 @@
+{
+  "audio_bytes": 165984,
+  "audio_path": "/Users/runner/work/_temp/dictation-polish-native-proof/inputs/input.wav",
+  "audio_sha256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805",
+  "audio_shape": {
+    "channels": 1,
+    "frames": 80944,
+    "rate": 16000,
+    "sample_width": 2
+  },
+  "audio_source": "docs/research/competitors/evidence/none-matched-40532555248/import/input.wav",
+  "model_bytes": 147951465,
+  "model_path": "/Users/runner/work/_temp/dictation-polish-native-proof/inputs/ggml-base.bin",
+  "model_sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+  "model_source": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+}

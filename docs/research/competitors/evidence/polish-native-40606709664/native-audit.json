@@ -1,0 +1,132 @@
+{
+  "classification": "actual-current-integration-native-acceptance-passed",
+  "auditorCorrection": "Initial checker expected both whole-file oracle hashes identical. Corrected after verifying intentional old writing-target test API adaptations and helper visibility outside the unchanged polish oracle block; no product source or raw artifact changed.",
+  "runID": 40606709664,
+  "sourceSHA": "af566f88c1c67b0b6c0a1dd3ed0aee2093b8929e",
+  "gitHubConclusion": "success",
+  "actualTestCount": 5,
+  "actualTestsEachStartedAndPassedOnce": true,
+  "actualNativeExit": 0,
+  "actualTestDurationSeconds": 44.432,
+  "actualWhisperFileOperations": [
+    {
+      "testName": "liveClarityImportQueueUsesRealWhisperRecognition",
+      "recordID": "A2A06B77-7088-4C1F-95AF-868BB79FAB13",
+      "profile": "clarity",
+      "warningCount": 1,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383"
+    },
+    {
+      "testName": "liveClarityRetranscriptionUsesRealWhisperRecognition",
+      "recordID": "14470FF9-9CB2-403C-B405-82DC08D5326D",
+      "profile": "clarity",
+      "warningCount": 0,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+    },
+    {
+      "testName": "liveLightImportQueueUsesRealWhisperRecognition",
+      "recordID": "96339E5B-7BE7-42AD-9525-3790F1ECA06B",
+      "profile": "light",
+      "warningCount": 0,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "bdfadc160c02089528a8103d0dd0b1a122b976c1c7777508e56488ca16401383"
+    },
+    {
+      "testName": "liveLightRetranscriptionUsesRealWhisperRecognition",
+      "recordID": "90A6D883-535D-4972-8A7D-670973A4E42D",
+      "profile": "light",
+      "warningCount": 0,
+      "realWhisperDispatches": 1,
+      "processedWAVSHA256": "a9f5d6fad663dccaaf1a3a72487ae8653cac36b88c8d81e470a0702dc30ad805"
+    }
+  ],
+  "actualTextEditScenarios": [
+    {
+      "scenario": "light",
+      "recordID": "EC4580EE-DC73-4F81-A3D3-DBAF5BA20B74",
+      "caret": {
+        "length": 0,
+        "location": 54
+      },
+      "warningCount": 0,
+      "actualCLIRequests": 0
+    },
+    {
+      "scenario": "clarity-success",
+      "recordID": "E594B460-38F5-40FE-A77A-2D2AC767373D",
+      "caret": {
+        "length": 0,
+        "location": 59
+      },
+      "warningCount": 0,
+      "actualCLIRequests": 1
+    },
+    {
+      "scenario": "clarity-fallback",
+      "recordID": "53EAAAE4-C25B-4B44-A43C-8576F4B49F65",
+      "caret": {
+        "length": 0,
+        "location": 40
+      },
+      "warningCount": 1,
+      "actualCLIRequests": 1
+    }
+  ],
+  "pipelineRecognition": "Fixed synthetic ASR session; actual pipeline, actual Local CLI child and native TextEdit values/caret.",
+  "fileRecognition": "Actual pinned Whisper base and committed synthetic WAV; actual registry superclass dispatch and same loaded context return.",
+  "literalOutput": "Actual NFD, emoji, CRLF, tags, dollars and backslashes preserved in appropriate file/editor results.",
+  "actualCLIChildPIDs": [
+    35700,
+    36034,
+    36084,
+    36091
+  ],
+  "providerLaunchFixedActualSnapshots": 10,
+  "sourceCensus": 655,
+  "sourceMatchesPinnedGit": true,
+  "sourceBeforeAfterEqual": true,
+  "commonPolishOracleBlocksEqualPreUndoRun40604273757": true,
+  "oracleFileScope": "Import file identical; whole WritingTargetLive file changed only existing writing-target tests to the typed delivery API plus LiveWritingEditor access visibility. New polish method and fixture assertions unchanged.",
+  "signedAppAndTestIdentityBeforeAfterEqual": true,
+  "actualDebugSignature": {
+    "app_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+    "bundle_relative_libraries": [
+      "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+      "@rpath/Sparkle.framework/Versions/B/Sparkle",
+      "@rpath/libswiftCompatibilitySpan.dylib"
+    ],
+    "classification": "verified-adhoc-macos-test-host",
+    "executable_path": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+    "executable_sha256": "f1206dfc8199c88786b59711f3c28804c00498ed02e015661f0d44d2e7c81cfe",
+    "library_validation_disabled": true,
+    "numeric_code_directory_flags": 2,
+    "raw_code_directory_flags": "0x2(adhoc)",
+    "scope": "Xcode build-for-testing host. Raw flags retained; Hardened Runtime is not required because Xcode disables it for ad-hoc test signing. No signing mutation or release-policy change.",
+    "signature": "adhoc",
+    "strict_deep_verification_passed": true
+  },
+  "actualCanonicalDependencyPinsBefore": 41,
+  "testHostPID": 34475,
+  "hostClosurePassed": true,
+  "textEditOwnedWindowsClosed": 3,
+  "clipboardGeneration": "Unchanged generation asserted after each actual direct-AX scenario and at fixture close; numeric generations not separately retained.",
+  "artifact": {
+    "id": 12781483801,
+    "bytes": 948433,
+    "sha256": "ab83b387122f350de0d1a277bdeaa7831796d9e6c70831a4b1b61c71bf28e3a2",
+    "members": 91,
+    "crcValid": true,
+    "downloads": 1,
+    "path": "/data/rjt-writing-check-01a17bef/40606709664/evidence.zip"
+  },
+  "secondArtifactDownloaded": false,
+  "limits": [
+    "This establishes ordinary Light/Clarity compatibility after Undo integration, not execution of Undo itself.",
+    "Synthetic WAV is not human speech or microphone accuracy proof; editor cases use synthetic ASR and deterministic CLI output, not real model quality.",
+    "Fresh ModelContext reads use retained in-memory stores; no crash/relaunch persistence or CloudKit claim.",
+    "Actual app startup attempted pre-roll; no microphone inactivity claim.",
+    "Source af566 integration is exact; later commits retain separate gates."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "actual_whisper_file_operations": 4,
+  "classification": "passed",
+  "limits": [
+    "No microphone or real-speaker proof.",
+    "Local CLI responses are deterministic fixtures, not model-quality evidence.",
+    "Native editor insertion applies only to the three pipeline scenarios.",
+    "No release, CloudKit or general editor compatibility claim."
+  ],
+  "native_textedit_scenarios": 3,
+  "result_sha256": "a178d57705af741b7535ba5c8b675f2ffe16872435dadd8fe3630c59c6091888",
+  "source_sha": "af566f88c1c67b0b6c0a1dd3ed0aee2093b8929e",
+  "tests": [
+    "liveLightImportQueueUsesRealWhisperRecognition",
+    "liveClarityImportQueueUsesRealWhisperRecognition",
+    "liveLightRetranscriptionUsesRealWhisperRecognition",
+    "liveClarityRetranscriptionUsesRealWhisperRecognition",
+    "liveDictationPolishPipelineDeliversLiteralTextToTextEdit"
+  ]
+}

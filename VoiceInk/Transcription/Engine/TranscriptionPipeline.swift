@@ -380,6 +380,16 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         }
 
+        if VoiceInkEmptyTranscriptionPolicy.isEmptyCompletion(
+            status: transcription.transcriptionState,
+            rawText: transcription.text,
+            enhancedText: transcription.enhancedText
+        ) {
+            discardEmptyTranscription(transcription, audioURL: audioURL)
+            latencyTrace.finish(event: "pipeline.empty_discarded", token: traceToken)
+            return
+        }
+
         if transcription.transcriptionState == .completed,
            transcription.duration <= 0 {
             let durationSpan = latencyTrace.begin("pipeline.audio_duration", token: traceToken)
@@ -401,5 +411,18 @@ class TranscriptionPipeline {
             details: "state=\(transcription.transcriptionState) finalChars=\(finalPastedText?.count ?? 0)",
             token: traceToken
         )
+    }
+
+    /// An empty result is treated as if nothing was recorded: no History row, no audio, no metrics.
+    private func discardEmptyTranscription(_ transcription: Transcription, audioURL: URL) {
+        VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(for: audioURL.absoluteString) { message in
+            logger.error("\(message, privacy: .public)")
+        }
+        modelContext.delete(transcription)
+        do {
+            try modelContext.save()
+        } catch {
+            logger.error("Failed to discard empty transcription: \(error.localizedDescription, privacy: .public)")
+        }
     }
 }

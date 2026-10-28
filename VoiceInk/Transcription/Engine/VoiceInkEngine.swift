@@ -7,6 +7,13 @@ import os
 import VoiceInkCore
 import VoiceInkQwen
 
+enum RecordingCancellation {
+    /// Esc, the cancel button, or dismissing the recorder: History keeps a canceled row with its audio.
+    case userRequested
+    /// The recording shortcut turned out to be part of a larger key chord: leave no row and no audio.
+    case accidentalShortcut
+}
+
 @MainActor
 class VoiceInkEngine: NSObject, ObservableObject {
     @Published var recordingState: VoiceInkRecordingState = .idle
@@ -547,7 +554,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 )
             } else {
                 latencyTrace.event("engine.stop_pipeline.cancelled", token: traceToken)
-                await finishActiveRecorderCancellation(latencyTraceToken: traceToken)
+                await finishActiveRecorderCancellation(.userRequested, latencyTraceToken: traceToken)
             }
         } else {
             latencyTrace.event("engine.stop_pipeline.missing_file", token: traceToken)
@@ -661,7 +668,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     // MARK: - Cancellation
 
-    func cancelRecording() async {
+    func cancelRecording(_ cancellation: RecordingCancellation) async {
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTrace.currentToken()
         latencyTrace.event(
@@ -682,7 +689,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 requestRecordingCancellation()
             },
             finishActiveRecorderCancellation: {
-                await finishActiveRecorderCancellation(latencyTraceToken: traceToken)
+                await finishActiveRecorderCancellation(cancellation, latencyTraceToken: traceToken)
             },
             clearPartialTranscript: {
                 partialTranscript = ""
@@ -729,6 +736,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func finishActiveRecorderCancellation(
+        _ cancellation: RecordingCancellation,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async {
         let latencyTrace = VoiceInkLatencyTrace.shared
@@ -736,7 +744,14 @@ class VoiceInkEngine: NSObject, ObservableObject {
         activeRecordingStartID = nil
         stopRequestedDuringStart = false
         await recorder.stopRecording(latencyTraceToken: traceToken)
-        await saveCanceledRecording(latencyTraceToken: traceToken)
+        switch cancellation {
+        case .userRequested:
+            await saveCanceledRecording(latencyTraceToken: traceToken)
+        case .accidentalShortcut:
+            VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(for: recordedFile?.absoluteString) { message in
+                logger.error("\(message, privacy: .public)")
+            }
+        }
         recordedFile = nil
         partialTranscript = ""
         recordingState = .idle
@@ -887,7 +902,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         requestRecordingCancellation()
         Task { [weak self] in
             guard let self, shouldCancelRecording else { return }
-            await cancelRecording()
+            await cancelRecording(.userRequested)
         }
     }
 

@@ -3,6 +3,7 @@
 ## v1.95.2 - Unreleased
 
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
+- Keep History clean of accidental recordings: a recording canceled because its shortcut became part of a larger key chord, or one that transcribes to nothing, no longer saves a History entry or audio file. Esc and the cancel button still keep canceled recordings.
 
 ## v1.95.1 - 2026-09-11
 

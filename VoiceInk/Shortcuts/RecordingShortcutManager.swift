@@ -133,7 +133,7 @@ class RecordingShortcutManager: ObservableObject {
                 await recorderUIManager.toggleMiniRecorder(powerModeId: powerModeId)
             },
             cancelRecording: {
-                await recorderUIManager.cancelRecording()
+                await recorderUIManager.cancelRecording(.accidentalShortcut)
             }
         )
 

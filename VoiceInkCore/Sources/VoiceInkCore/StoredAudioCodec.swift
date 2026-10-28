@@ -223,12 +223,15 @@ public enum VoiceInkStoredAudioCodec {
         ))
         // ExtAudioFile only picks up converter changes after its config is reset.
         var config: CFArray?
-        try check("kExtAudioFileProperty_ConverterConfig", ExtAudioFileSetProperty(
-            file,
-            kExtAudioFileProperty_ConverterConfig,
-            UInt32(MemoryLayout<CFArray?>.size),
-            &config
-        ))
+        let status = withUnsafeMutablePointer(to: &config) { pointer in
+            ExtAudioFileSetProperty(
+                file,
+                kExtAudioFileProperty_ConverterConfig,
+                UInt32(MemoryLayout<CFArray?>.size),
+                pointer
+            )
+        }
+        try check("kExtAudioFileProperty_ConverterConfig", status)
     }
 
     private static func readChunks(
@@ -282,7 +285,7 @@ public enum VoiceInkStoredAudioCompression {
         }
 
         let opusURL = try await Task.detached(priority: .utility) {
-            try VoiceInkStoredAudioCodec.encodeOpusSibling(of: wavURL)
+            try VoiceInkStoredAudioCodec.encodeOpusSibling(of: wavURL, fileManager: fileManager)
         }.value
 
         // The record can be deleted, cleaned up, or repointed while encoding runs.

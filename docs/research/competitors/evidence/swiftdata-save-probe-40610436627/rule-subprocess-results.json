@@ -1,0 +1,842 @@
+[
+  {
+    "recipe": "update/writable/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.059506541999994056,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05189095800000132,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05553633399999569,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06295941599999821,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04949712500000203,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.14799504200000513,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04780649999999298,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05499233300000128,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.0502514580000053,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04796666699999719,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.047063000000008515,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/writable/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.12495420800000545,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04590170800000237,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.0502021669999948,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04702670900000783,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.055400083000009204,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04537420799999836,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.1393637919999975,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.07053133299999104,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.055680082999998604,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.055309249999993426,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04843766700000174,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.049973833000009904,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "update/readonly/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.15021500000000287,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04949612499999034,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.044109915999996474,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.06160570800000187,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.1103694589999975,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05534175000001085,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.13385683299999585,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04635224999999821,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.07541979199999105,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04591587500000571,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04752729099999442,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.0473016250000029,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/writable/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.12935604200001194,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04983949999999027,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04892508300000031,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.047966542000011714,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04858999999999014,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05718387499999267,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.14411366699999917,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05750662500000203,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.050129584000004,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.050322166000000834,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04943820899998741,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04871054200000913,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "toggle/readonly/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.1432501660000014,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04999545799999794,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04828766699999676,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.07353566700000158,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04839454199999693,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04732612499999789,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.14189316700000631,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04614362499999913,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04828204199999675,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05389537499999619,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.048958291999994685,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04576812499999505,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/writable/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.1200068750000014,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04838654200000292,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04483766599999228,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04200966700000208,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04326458300000979,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04410424999998952,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.139060041999997,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05138895800000398,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.0506639999999976,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04376166699999828,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.0482749589999969,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.048502249999998526,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "delete/readonly/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.13685683300001017,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04256650000000661,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05086391599999729,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.041344541000000845,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04252187500000559,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04243287500000292,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.13624312499999292,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03708983299999602,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04495716700000685,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04189941699999622,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04510937500000978,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04205174999999883,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/writable/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.13307858399998906,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04180320799999038,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.040006042000001685,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03736399999999662,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03622158299999967,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.036005583000005004,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.1111271250000101,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03979454200000987,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04165349999999535,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04835412499998881,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.040257792000005566,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04135237500000244,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "create/readonly/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.12635283299999855,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03971445899999537,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04366612500000144,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03997787500000527,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04115416600001254,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03857816599999353,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.10863812499999881,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.03569650000000024,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.050363415999996164,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.046651624999995533,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05332783400000096,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05306395799999564,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/writable/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.14259074999999655,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/main/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.0446990830000118,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/main/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04556733299999394,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/main/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04396929199999988,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/main/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04433820799999921,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/main/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04404683300001011,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/main/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.13925133299999004,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/explicit/fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.05361741699999811,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/explicit/persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.052159708999994336,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/explicit/pending-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04348270799999909,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/explicit/pending-persisted",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04610733299999481,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/explicit/model",
+    "exitCode": 0,
+    "elapsedSeconds": 0.04270087500000841,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  },
+  {
+    "recipe": "batch/readonly/explicit/runloop-fetch",
+    "exitCode": 0,
+    "elapsedSeconds": 0.08368166599998972,
+    "receiptPresent": true,
+    "lastRecordedStage": "completed"
+  }
+]

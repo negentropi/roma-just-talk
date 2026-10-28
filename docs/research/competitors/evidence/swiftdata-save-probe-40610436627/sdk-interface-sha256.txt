@@ -1,0 +1,1 @@
+6aa63be453b2bca19f3427e1a3f172ba134efab8440ee514157fa731664fbcd6  /Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/SwiftData.framework/Modules/SwiftData.swiftmodule/arm64e-apple-macos.swiftinterface

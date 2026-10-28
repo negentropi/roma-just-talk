@@ -1,0 +1,25 @@
+{
+  "total_count": 1,
+  "artifacts": [
+    {
+      "id": 12783035841,
+      "node_id": "MDg6QXJ0aWZhY3QxMjc4MzAzNTg0MQ==",
+      "name": "roma.swiftdata-save-cleanup-probe",
+      "size_in_bytes": 316309,
+      "url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12783035841",
+      "archive_download_url": "https://api.github.com/repos/negentropi/roma-just-talk/actions/artifacts/12783035841/zip",
+      "expired": false,
+      "digest": "sha256:534582b39fc9582b9728ab25ac48f7a883bc9200f055eb1456358a03b39e7b08",
+      "created_at": "2026-10-28T00:42:45Z",
+      "updated_at": "2026-10-28T00:42:45Z",
+      "expires_at": "2027-01-26T00:42:12Z",
+      "workflow_run": {
+        "id": 40610436627,
+        "repository_id": 1253985786,
+        "head_repository_id": 1253985786,
+        "head_branch": "ci/rjt-swiftdata-save-probe-reader-24aefe58",
+        "head_sha": "24aefe58af68787223bba974859b6ecf321145ca"
+      }
+    }
+  ]
+}

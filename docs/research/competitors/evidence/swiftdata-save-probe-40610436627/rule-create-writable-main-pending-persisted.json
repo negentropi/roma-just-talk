@@ -1,0 +1,343 @@
+{
+  "allowsSave" : true,
+  "autosaveEnabled" : false,
+  "callerAfterFirstQuery" : {
+    "AIdentifierUnchanged" : true,
+    "B" : "saved-B",
+    "BIdentifierUnchanged" : true,
+    "hasChanges" : true,
+    "word" : "caller-unsaved-word"
+  },
+  "callerAfterLaterQueries" : {
+    "A" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-A",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMiIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AyIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-A",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "B" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMSIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "hasChanges" : true,
+    "word" : "caller-unsaved-word"
+  },
+  "callerBeforeWrite" : {
+    "A" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-A",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiUHJvYmVSdWxlIiwiaXNUZW1wb3JhcnkiOmZhbHNlLCJwcmltYXJ5S2V5IjoicDIiLCJzdG9yZUlkZW50aWZpZXIiOiJDMDg3NkQyRC0yMEIxLTQ1QjUtODBENS04MDdCODRBNjM2NzgiLCJ1cmlSZXByZXNlbnRhdGlvbiI6IngtY29yZWRhdGE6XC9cL0MwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OFwvUHJvYmVSdWxlXC9wMiJ9fQ==",
+      "replacementText" : "replacement-saved-A",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "B" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "caller-unsaved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsImVudGl0eU5hbWUiOiJQcm9iZVJ1bGUiLCJwcmltYXJ5S2V5IjoicDEiLCJ1cmlSZXByZXNlbnRhdGlvbiI6IngtY29yZWRhdGE6XC9cL0MwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OFwvUHJvYmVSdWxlXC9wMSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "hasChanges" : true,
+    "word" : "caller-unsaved-word"
+  },
+  "callerKind" : "main",
+  "callerSaveOrRollbackPerformed" : false,
+  "callerWarmedRuleIDs" : [
+    "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+    "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB"
+  ],
+  "didSaveNotifications" : [
+    {
+      "name" : "ModelContextDidSave",
+      "userInfo" : [
+        {
+          "identifiersBase64" : [
+
+          ],
+          "key" : "deleted",
+          "type" : "Array<PersistentIdentifier>"
+        },
+        {
+          "identifiersBase64" : [
+            "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDMiLCJlbnRpdHlOYW1lIjoiUHJvYmVSdWxlIiwic3RvcmVJZGVudGlmaWVyIjoiQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4IiwidXJpUmVwcmVzZW50YXRpb24iOiJ4LWNvcmVkYXRhOlwvXC9DMDg3NkQyRC0yMEIxLTQ1QjUtODBENS04MDdCODRBNjM2NzhcL1Byb2JlUnVsZVwvcDMiLCJpc1RlbXBvcmFyeSI6ZmFsc2V9fQ=="
+          ],
+          "key" : "inserted",
+          "type" : "Array<PersistentIdentifier>"
+        },
+        {
+          "identifiersBase64" : [
+
+          ],
+          "key" : "updated",
+          "type" : "Array<PersistentIdentifier>"
+        }
+      ]
+    }
+  ],
+  "firstQuery" : {
+    "count" : 3,
+    "includesRetainedAReference" : true,
+    "includesRetainedBReference" : true
+  },
+  "firstQueryRows" : [
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-A",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMiIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AyIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-A",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMSIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "CCCCCCCC-CCCC-4CCC-8CCC-CCCCCCCCCCCC",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "writer-created-C",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMyIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AzIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-writer-created-C",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    }
+  ],
+  "freshContextRules" : [
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-A",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMiIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AyIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-A",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMSIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "CCCCCCCC-CCCC-4CCC-8CCC-CCCCCCCCCCCC",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "writer-created-C",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMyIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AzIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-writer-created-C",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    }
+  ],
+  "freshContextWords" : [
+    "saved-word"
+  ],
+  "headSHA" : "24aefe58af68787223bba974859b6ecf321145ca",
+  "laterPersistedPredicateMembership" : {
+    "oldA" : [
+      "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA"
+    ],
+    "updatedA" : [
+
+    ]
+  },
+  "limits" : [
+    "Standalone same-scalar-shape SDK probe, not application services or UI regression proof.",
+    "A fresh store and separate process for every operation\/save\/reader\/first-query combination.",
+    "Retained deleted-object property reads may abort a process; stage receipts and subprocess exit remain evidence.",
+    "No caller save\/rollback, KVC, Core Data unwrapping or private refresh API."
+  ],
+  "noSDKStateInspectionAfterWriterCleanupBeforeFirstObservation" : true,
+  "pid" : 1565,
+  "recipe" : "create\/writable\/main\/pending-persisted",
+  "retainedAAfterFirstQuery" : {
+    "approvalOriginRawValue" : null,
+    "dateAdded" : 1700000000,
+    "hasModelContext" : true,
+    "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+    "isDeleted" : false,
+    "isEnabled" : true,
+    "literalOriginalText" : null,
+    "literalReplacementText" : null,
+    "matchingKindRawValue" : null,
+    "originalText" : "saved-A",
+    "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJlbnRpdHlOYW1lIjoiUHJvYmVSdWxlIiwidXJpUmVwcmVzZW50YXRpb24iOiJ4LWNvcmVkYXRhOlwvXC9DMDg3NkQyRC0yMEIxLTQ1QjUtODBENS04MDdCODRBNjM2NzhcL1Byb2JlUnVsZVwvcDIiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCIsInByaW1hcnlLZXkiOiJwMiJ9fQ==",
+    "replacementText" : "replacement-saved-A",
+    "sourceTranscriptionID" : null,
+    "sourceVariantRawValue" : null
+  },
+  "retainedBAfterFirstQuery" : {
+    "approvalOriginRawValue" : null,
+    "dateAdded" : 1700000000,
+    "hasModelContext" : true,
+    "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+    "isDeleted" : false,
+    "isEnabled" : true,
+    "literalOriginalText" : null,
+    "literalReplacementText" : null,
+    "matchingKindRawValue" : null,
+    "originalText" : "saved-B",
+    "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMSIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+    "replacementText" : "replacement-saved-B",
+    "sourceTranscriptionID" : null,
+    "sourceVariantRawValue" : null
+  },
+  "ruleStoredFieldCount" : 11,
+  "selectedFirstObservation" : "pending-persisted",
+  "separateContainerRules" : [
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-A",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMiIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AyIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-A",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMSIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "CCCCCCCC-CCCC-4CCC-8CCC-CCCCCCCCCCCC",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "writer-created-C",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInByaW1hcnlLZXkiOiJwMyIsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzA4NzZEMkQtMjBCMS00NUI1LTgwRDUtODA3Qjg0QTYzNjc4XC9Qcm9iZVJ1bGVcL3AzIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwODc2RDJELTIwQjEtNDVCNS04MEQ1LTgwN0I4NEE2MzY3OCJ9fQ==",
+      "replacementText" : "replacement-writer-created-C",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    }
+  ],
+  "separateContainerWords" : [
+    "saved-word"
+  ],
+  "sourceSHA256" : "1382aa75d3d682e0e752c2a2eb2a8ddc356f83b0a16111b4b2be833b381cb624",
+  "stage" : "completed",
+  "storeURL" : "\/Users\/runner\/work\/_temp\/swiftdata-save-probe\/stores\/rule-create-writable-main-pending-persisted\/rule.store",
+  "version" : 1,
+  "writer" : {
+    "operation" : "create",
+    "rollbackPerformed" : false,
+    "saveAttempted" : true,
+    "saveSucceeded" : true,
+    "weakWriterAliveAfterRelease" : false
+  },
+  "writerDeallocatedBeforeFirstObservation" : true,
+  "writerLocalStrongReferenceDroppedBeforeFirstObservation" : true
+}

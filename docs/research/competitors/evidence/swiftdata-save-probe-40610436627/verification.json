@@ -1,0 +1,44 @@
+{
+  "classification": "actual-sdk-private-rule-transaction-matrix-audited",
+  "runID": 40610436627,
+  "testedHead": "24aefe58af68787223bba974859b6ecf321145ca",
+  "runURL": "https://github.com/negentropi/roma-just-talk/actions/runs/40610436627",
+  "artifact": {
+    "id": 12783035841,
+    "bytes": 316309,
+    "sha256": "534582b39fc9582b9728ab25ac48f7a883bc9200f055eb1456358a03b39e7b08",
+    "entries": 256,
+    "crcBadMember": null
+  },
+  "artifactFetches": 1,
+  "failedLogFetches": 0,
+  "sourceSHA256": "1382aa75d3d682e0e752c2a2eb2a8ddc356f83b0a16111b4b2be833b381cb624",
+  "caseCount": 120,
+  "childExitZeroCount": 120,
+  "completedStageCount": 120,
+  "uniqueProcessStoreAndStoreIdentifierCount": 120,
+  "independentAssertions": 7148,
+  "independentFailures": 0,
+  "readerKinds": [
+    "container.mainContext",
+    "explicit ModelContext"
+  ],
+  "observedFacts": [
+    "Default full fetch refreshed updated/toggled A in the same retained object while preserving unsaved B and Word values.",
+    "Default full fetch excluded successfully deleted A and included inserted C; held deleted A remained attached, old-valued and isDeleted false.",
+    "First model(for:) returned stale cached A after update/toggle and returned held A after deletion.",
+    "All40 first persisted-only fetches replaced unsaved same-entity B with saved-B while unrelated Word stayed unsaved and caller.hasChanges stayed true.",
+    "All60 readonly saves failed with NSCocoaErrorDomain513; private rollback/release left separate-container A+B unchanged and ordinary first caller fetch preserved unsaved bystanders.",
+    "All60 writable saves persisted exact requested operations; all120 private writer contexts deallocated before first caller observation.",
+    "Successful saves emitted one ModelContext.didSave with expected identifiers; failed saves emitted none."
+  ],
+  "limits": [
+    "Standalone SwiftData SDK boundary with eleven Rule scalar fields, not application models/services or SwiftUI @Query proof.",
+    "Separate-container durable-state read is in the same process, not a closed-process reopen.",
+    "No caller save/rollback, private ORM, KVC or unsupported refresh API.",
+    "No visible UI, CloudKit, concurrency stress or future-SDK guarantee.",
+    "First observation receipts precede later predicate queries, SDK state getters and separate-container reads."
+  ],
+  "remoteFullArchivePath": "/data/rjt-writing-check-01a17bef/40610436627/roma.swiftdata-save-cleanup-probe.zip",
+  "independentAuditSHA256": "7aa461953b61cd2f31cecb221cc9b4e6858dfcd8490c34a661ae3dd60ce5af02"
+}

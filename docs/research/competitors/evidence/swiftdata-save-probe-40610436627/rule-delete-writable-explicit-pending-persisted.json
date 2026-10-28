@@ -1,0 +1,247 @@
+{
+  "allowsSave" : true,
+  "autosaveEnabled" : false,
+  "callerAfterFirstQuery" : {
+    "AIdentifierUnchanged" : true,
+    "B" : "saved-B",
+    "BIdentifierUnchanged" : true,
+    "hasChanges" : true,
+    "word" : "caller-unsaved-word"
+  },
+  "callerAfterLaterQueries" : {
+    "A" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-A",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDIiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AyIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ==",
+      "replacementText" : "replacement-saved-A",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "B" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDEiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "hasChanges" : true,
+    "word" : "caller-unsaved-word"
+  },
+  "callerBeforeWrite" : {
+    "A" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-A",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJpc1RlbXBvcmFyeSI6ZmFsc2UsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiIsInByaW1hcnlLZXkiOiJwMiIsImVudGl0eU5hbWUiOiJQcm9iZVJ1bGUiLCJ1cmlSZXByZXNlbnRhdGlvbiI6IngtY29yZWRhdGE6XC9cL0MwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNlwvUHJvYmVSdWxlXC9wMiJ9fQ==",
+      "replacementText" : "replacement-saved-A",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "B" : {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "caller-unsaved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJzdG9yZUlkZW50aWZpZXIiOiJDMEFENjE2Qy1DNzRBLTQzQzItOTI5MS1CMkVGRENEQzIyQjYiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsImVudGl0eU5hbWUiOiJQcm9iZVJ1bGUiLCJwcmltYXJ5S2V5IjoicDEiLCJ1cmlSZXByZXNlbnRhdGlvbiI6IngtY29yZWRhdGE6XC9cL0MwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNlwvUHJvYmVSdWxlXC9wMSJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    },
+    "hasChanges" : true,
+    "word" : "caller-unsaved-word"
+  },
+  "callerKind" : "explicit",
+  "callerSaveOrRollbackPerformed" : false,
+  "callerWarmedRuleIDs" : [
+    "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+    "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB"
+  ],
+  "didSaveNotifications" : [
+    {
+      "name" : "ModelContextDidSave",
+      "userInfo" : [
+        {
+          "identifiersBase64" : [
+            "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDIiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AyIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ=="
+          ],
+          "key" : "deleted",
+          "type" : "Array<PersistentIdentifier>"
+        },
+        {
+          "identifiersBase64" : [
+
+          ],
+          "key" : "inserted",
+          "type" : "Array<PersistentIdentifier>"
+        },
+        {
+          "identifiersBase64" : [
+
+          ],
+          "key" : "updated",
+          "type" : "Array<PersistentIdentifier>"
+        }
+      ]
+    }
+  ],
+  "firstQuery" : {
+    "count" : 1,
+    "includesRetainedAReference" : false,
+    "includesRetainedBReference" : true
+  },
+  "firstQueryRows" : [
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDEiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    }
+  ],
+  "freshContextRules" : [
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDEiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    }
+  ],
+  "freshContextWords" : [
+    "saved-word"
+  ],
+  "headSHA" : "24aefe58af68787223bba974859b6ecf321145ca",
+  "laterPersistedPredicateMembership" : {
+    "oldA" : [
+
+    ],
+    "updatedA" : [
+
+    ]
+  },
+  "limits" : [
+    "Standalone same-scalar-shape SDK probe, not application services or UI regression proof.",
+    "A fresh store and separate process for every operation\/save\/reader\/first-query combination.",
+    "Retained deleted-object property reads may abort a process; stage receipts and subprocess exit remain evidence.",
+    "No caller save\/rollback, KVC, Core Data unwrapping or private refresh API."
+  ],
+  "noSDKStateInspectionAfterWriterCleanupBeforeFirstObservation" : true,
+  "pid" : 1543,
+  "recipe" : "delete\/writable\/explicit\/pending-persisted",
+  "retainedAAfterFirstQuery" : {
+    "approvalOriginRawValue" : null,
+    "dateAdded" : 1700000000,
+    "hasModelContext" : true,
+    "id" : "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA",
+    "isDeleted" : false,
+    "isEnabled" : true,
+    "literalOriginalText" : null,
+    "literalReplacementText" : null,
+    "matchingKindRawValue" : null,
+    "originalText" : "saved-A",
+    "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDIiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AyIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ==",
+    "replacementText" : "replacement-saved-A",
+    "sourceTranscriptionID" : null,
+    "sourceVariantRawValue" : null
+  },
+  "retainedBAfterFirstQuery" : {
+    "approvalOriginRawValue" : null,
+    "dateAdded" : 1700000000,
+    "hasModelContext" : true,
+    "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+    "isDeleted" : false,
+    "isEnabled" : true,
+    "literalOriginalText" : null,
+    "literalReplacementText" : null,
+    "matchingKindRawValue" : null,
+    "originalText" : "saved-B",
+    "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDEiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ==",
+    "replacementText" : "replacement-saved-B",
+    "sourceTranscriptionID" : null,
+    "sourceVariantRawValue" : null
+  },
+  "ruleStoredFieldCount" : 11,
+  "selectedFirstObservation" : "pending-persisted",
+  "separateContainerRules" : [
+    {
+      "approvalOriginRawValue" : null,
+      "dateAdded" : 1700000000,
+      "hasModelContext" : true,
+      "id" : "BBBBBBBB-BBBB-4BBB-8BBB-BBBBBBBBBBBB",
+      "isDeleted" : false,
+      "isEnabled" : true,
+      "literalOriginalText" : null,
+      "literalReplacementText" : null,
+      "matchingKindRawValue" : null,
+      "originalText" : "saved-B",
+      "persistentIDBase64" : "eyJpbXBsZW1lbnRhdGlvbiI6eyJwcmltYXJ5S2V5IjoicDEiLCJpc1RlbXBvcmFyeSI6ZmFsc2UsInVyaVJlcHJlc2VudGF0aW9uIjoieC1jb3JlZGF0YTpcL1wvQzBBRDYxNkMtQzc0QS00M0MyLTkyOTEtQjJFRkRDREMyMkI2XC9Qcm9iZVJ1bGVcL3AxIiwiZW50aXR5TmFtZSI6IlByb2JlUnVsZSIsInN0b3JlSWRlbnRpZmllciI6IkMwQUQ2MTZDLUM3NEEtNDNDMi05MjkxLUIyRUZEQ0RDMjJCNiJ9fQ==",
+      "replacementText" : "replacement-saved-B",
+      "sourceTranscriptionID" : null,
+      "sourceVariantRawValue" : null
+    }
+  ],
+  "separateContainerWords" : [
+    "saved-word"
+  ],
+  "sourceSHA256" : "1382aa75d3d682e0e752c2a2eb2a8ddc356f83b0a16111b4b2be833b381cb624",
+  "stage" : "completed",
+  "storeURL" : "\/Users\/runner\/work\/_temp\/swiftdata-save-probe\/stores\/rule-delete-writable-explicit-pending-persisted\/rule.store",
+  "version" : 1,
+  "writer" : {
+    "operation" : "delete",
+    "rollbackPerformed" : false,
+    "saveAttempted" : true,
+    "saveSucceeded" : true,
+    "weakWriterAliveAfterRelease" : false
+  },
+  "writerDeallocatedBeforeFirstObservation" : true,
+  "writerLocalStrongReferenceDroppedBeforeFirstObservation" : true
+}

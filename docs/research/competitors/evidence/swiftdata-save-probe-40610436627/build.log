@@ -1,0 +1,17 @@
+scripts/probe-swiftdata-owned-save-cleanup.swift:118:18: warning: weak variable 'weakWriteContext' was never mutated; consider changing to 'let' constant [#WeakMutability]
+116 |         if recipe.dirtyWord { bystander.text = expectedWord }
+117 |         var writeContext: ModelContext? = recipe.cleanup == .isolatedRollback ? ModelContext(container) : uiContext
+118 |         weak var weakWriteContext = writeContext
+    |                  `- warning: weak variable 'weakWriteContext' was never mutated; consider changing to 'let' constant [#WeakMutability]
+119 |         writeContext!.autosaveEnabled = false
+120 |         let owned = ProbeTranscription(text: "owned-probe-transcription")
+
+scripts/probe-swiftdata-owned-save-cleanup.swift:410:18: warning: weak variable 'weakWriter' was never mutated; consider changing to 'let' constant [#WeakMutability]
+408 |     private static func performWrite(operation: String, container: ModelContainer) throws -> [String: Any] {
+409 |         var writer: ModelContext? = ModelContext(container)
+410 |         weak var weakWriter = writer
+    |                  `- warning: weak variable 'weakWriter' was never mutated; consider changing to 'let' constant [#WeakMutability]
+411 |         writer!.autosaveEnabled = false
+412 |         try mutate(operation: operation, writer: writer!)
+
+[#WeakMutability]: <https://docs.swift.org/compiler/documentation/diagnostics/weak-mutability>

@@ -1,0 +1,84 @@
+public class ModelContext : Swift.Equatable, Swift.SendableMetatype {
+  @available(swift 5.9)
+  @available(macOS 15, iOS 18, tvOS 18, watchOS 11, visionOS 2, *)
+  public var author: Swift.String? {
+    get
+    set
+  }
+  public var undoManager: Foundation.UndoManager? {
+    get
+    set
+  }
+  public var insertedModelsArray: [any SwiftData.PersistentModel] {
+    get
+  }
+  public var changedModelsArray: [any SwiftData.PersistentModel] {
+    get
+  }
+  public var deletedModelsArray: [any SwiftData.PersistentModel] {
+    get
+  }
+  @available(swift 5.9)
+  @available(macOS 15, iOS 18, tvOS 18, watchOS 11, visionOS 2, *)
+  public var editingState: SwiftData.EditingState
+  public var container: SwiftData.ModelContainer {
+    get
+  }
+  public var autosaveEnabled: Swift.Bool {
+    get
+    set
+  }
+  public init(_ container: SwiftData.ModelContainer)
+  @objc deinit
+  public static func == (lhs: SwiftData.ModelContext, rhs: SwiftData.ModelContext) -> Swift.Bool
+  public var hasChanges: Swift.Bool {
+    get
+  }
+  public func model(for persistentModelID: SwiftData.PersistentIdentifier) -> any SwiftData.PersistentModel
+  public func registeredModel<T>(for persistentModelID: SwiftData.PersistentIdentifier) -> T? where T : SwiftData.PersistentModel
+  public func insert<T>(_ model: T) where T : SwiftData.PersistentModel
+  public func rollback()
+  public func processPendingChanges()
+  public func delete<T>(model: T.Type, where predicate: Foundation.Predicate<T>? = nil, includeSubclasses: Swift.Bool = true) throws where T : SwiftData.PersistentModel
+  public func delete<T>(_ model: T) where T : SwiftData.PersistentModel
+  public func transaction(block: () throws -> Swift.Void) throws
+  public func save() throws
+  public func enumerate<T>(_ fetch: SwiftData.FetchDescriptor<T>, batchSize: Swift.Int = 5000, allowEscapingMutations: Swift.Bool = false, block: (_ model: T) throws -> Swift.Void) throws where T : SwiftData.PersistentModel
+  public func fetch<T>(_ descriptor: SwiftData.FetchDescriptor<T>) throws -> [T] where T : SwiftData.PersistentModel
+  public func fetchCount<T>(_ descriptor: SwiftData.FetchDescriptor<T>) throws -> Swift.Int where T : SwiftData.PersistentModel
+  public func fetch<T>(_ descriptor: SwiftData.FetchDescriptor<T>, batchSize: Swift.Int) throws -> SwiftData.FetchResultsCollection<T> where T : SwiftData.PersistentModel
+  public func fetchIdentifiers<T>(_ descriptor: SwiftData.FetchDescriptor<T>) throws -> [SwiftData.PersistentIdentifier] where T : SwiftData.PersistentModel
+  public func fetchIdentifiers<T>(_ descriptor: SwiftData.FetchDescriptor<T>, batchSize: Swift.Int) throws -> SwiftData.FetchResultsCollection<SwiftData.PersistentIdentifier> where T : SwiftData.PersistentModel
+  public static let willSave: Foundation.Notification.Name
+  public static let didSave: Foundation.Notification.Name
+  public enum NotificationKey : Swift.String {
+    case queryGeneration
+    case invalidatedAllIdentifiers
+    case insertedIdentifiers
+    case updatedIdentifiers
+    case deletedIdentifiers
+    public init?(rawValue: Swift.String)
+    @available(swift 5.9)
+    @available(iOS 17, tvOS 17, watchOS 10, macOS 14, *)
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  @available(swift 5.9)
+  @available(macOS 15, iOS 18, tvOS 18, watchOS 11, visionOS 2, *)
+  public func fetchHistory<T>(_ descriptor: SwiftData.HistoryDescriptor<T>) throws -> [T] where T : SwiftData.HistoryTransaction
+  @available(swift 5.9)
+  @available(macOS 15, iOS 18, tvOS 18, watchOS 11, visionOS 2, *)
+  public func deleteHistory<T>(_ descriptor: SwiftData.HistoryDescriptor<T>) throws where T : SwiftData.HistoryTransaction
+}
+public struct FetchDescriptor<T> where T : SwiftData.PersistentModel {
+  public var predicate: Foundation.Predicate<T>?
+  public var sortBy: [Foundation.SortDescriptor<T>]
+  public var fetchLimit: Swift.Int?
+  public var fetchOffset: Swift.Int?
+  public var includePendingChanges: Swift.Bool
+  public var propertiesToFetch: [Swift.PartialKeyPath<T>]
+  public var relationshipKeyPathsForPrefetching: [Swift.PartialKeyPath<T>]
+  public init(predicate: Foundation.Predicate<T>? = nil, sortBy: [Foundation.SortDescriptor<T>] = [])
+}

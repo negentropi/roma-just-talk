@@ -1,0 +1,93 @@
+{
+  "conclusion": "success",
+  "databaseId": 40610436627,
+  "headBranch": "ci/rjt-swiftdata-save-probe-reader-24aefe58",
+  "headSha": "24aefe58af68787223bba974859b6ecf321145ca",
+  "jobs": [
+    {
+      "completedAt": "2026-10-28T00:42:48Z",
+      "conclusion": "success",
+      "databaseId": 122560388879,
+      "name": "probe",
+      "startedAt": "2026-10-28T00:42:15Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-28T00:42:17Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-28T00:42:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:21Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-28T00:42:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:26Z",
+          "conclusion": "success",
+          "name": "Select Xcode and record exact probe source",
+          "number": 3,
+          "startedAt": "2026-10-28T00:42:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:33Z",
+          "conclusion": "success",
+          "name": "Compile standalone two-model probe",
+          "number": 4,
+          "startedAt": "2026-10-28T00:42:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:34Z",
+          "conclusion": "success",
+          "name": "Observe isolated stores without prescribing a result",
+          "number": 5,
+          "startedAt": "2026-10-28T00:42:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:42Z",
+          "conclusion": "success",
+          "name": "Observe registered caller rows after isolated rule transactions",
+          "number": 6,
+          "startedAt": "2026-10-28T00:42:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:44Z",
+          "conclusion": "success",
+          "name": "Retain source, toolchain and raw observations",
+          "number": 7,
+          "startedAt": "2026-10-28T00:42:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:45Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 14,
+          "startedAt": "2026-10-28T00:42:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T00:42:45Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-10-28T00:42:45Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40610436627/job/122560388879"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40610436627"
+}

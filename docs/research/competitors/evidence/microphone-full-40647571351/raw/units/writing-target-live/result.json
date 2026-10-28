@@ -1,0 +1,12 @@
+{
+  "expectation": "fixed",
+  "exit_code": 0,
+  "tests": {
+    "liveWritingTargetTextEditPreservesUnicodeOutsideSelection": "passed",
+    "liveWritingTargetTextEditRefusesRangeTextAndFocusDrift": "passed",
+    "liveWritingTargetSafariTextareaReplacesOnlySelection": "passed",
+    "liveWritingActionPipelineUsesLocalCLIAndRetainsFailure": "passed",
+    "liveWritingStartupContextRespectsOwnerAfterCancellation": "passed",
+    "liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges": "passed"
+  }
+}

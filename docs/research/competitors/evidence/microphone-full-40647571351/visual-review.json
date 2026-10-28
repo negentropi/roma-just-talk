@@ -1,0 +1,916 @@
+{
+  "run_id": 40647571351,
+  "artifact_id": 12800552002,
+  "source_sha_from_export": "9afb1ed848ea2c12c4a00d6173871d67d13bfb45",
+  "scope": "Read-only original-image audit plus supplied attachment/hash metadata and two microphone AX census receipts. No source review, app/runtime/build/CI/network/download. Only this visual-review.json written.",
+  "review_method": "All 45 original PNGs opened individually with view_image; no montage/OCR/derivative substituted.",
+  "origins": {
+    "selected_proof_manifest": "/tmp/rjt-polish-ui-selected-40647571351/selected-proof-manifest.json",
+    "selected_proof_manifest_sha256": "10f290085aee8c0e90201dda100d84193c7d66cdcb4ca2bae8ea74ef2193ad14",
+    "attachment_manifest": "/tmp/rjt-polish-ui-selected-40647571351/selected-proof/candidate/screenshots/manifest.json",
+    "attachment_manifest_sha256": "df8911f210418db395f958faaa941e34edba3e2910f44676447bf3b91af0add3",
+    "screenshot_export": "/tmp/rjt-polish-ui-selected-40647571351/selected-proof/candidate/screenshot-export.json",
+    "screenshot_export_sha256": "8907159408cf2da8ee9f032bdde71416e6582a6ddcb1da13a31582fb4afda1ab",
+    "whole_archive_sha256_as_supplied": "16983e0155a55a2887479bc36409e1aecafb2fe654741edbd1be65319e5c2837",
+    "archive_independently_rehashed": false,
+    "all_45_png_hashes_sizes_match": true,
+    "all_45_filenames_match_attachment_manifest_and_export": true
+  },
+  "findings": [],
+  "prior_P2": {
+    "status": "Visually corrected in exposed current Done state",
+    "evidence": [
+      "F8756E2B-10B4-4F97-94D7-A4BE8704AC8F.png",
+      "3FEC2C26-9113-4813-B567-D02F230AECB5.png"
+    ],
+    "observation": "F8756E2B Done-only view shows Correction preview and green Saved to Dictionary; previous nothing-saved-until-Approve caption absent there. 3FEC2C26 preapproval view retains that caption with actual Approve button.",
+    "limit": "50F68FCA Done-only image cuts off lower caption; it cannot independently verify the fix. Static screenshots prove visible state wording, not persistence or source condition outcome==nil."
+  },
+  "readability_result": "No new actionable readability, overlapping-content or blocked-primary-control defect observed in these captured viewports. Scroll-edge clipping remains bounded to partially exposed body content; scroll reachability untested.",
+  "microphone_frame_comparison": [
+    {
+      "png": "C1ACFE11-E041-46B6-AD1F-A3C023AFFF25.png",
+      "census_file": "96CEF69D-C1D4-4E30-9138-ECE4A0751877.json",
+      "census_sha256": "d3e2571e76fb7a86a4a94de3da66a8fa8f8375fc0d82ca39bc032551e7df7a83",
+      "census_manifest_match": true,
+      "dialog_as_recorded": {
+        "elementType": 8,
+        "frame": "{{382, 119}, {260, 250}}",
+        "identifier": "_NS:87",
+        "label": "alert",
+        "title": "",
+        "value": "Optional()"
+      },
+      "buttons_as_recorded": [
+        {
+          "enabled": true,
+          "frame": "{{601, 130}, {30, 30}}",
+          "hittable": true,
+          "identifier": "_NS:30",
+          "label": "Help"
+        },
+        {
+          "enabled": true,
+          "frame": "{{397, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-2",
+          "label": ""
+        },
+        {
+          "enabled": true,
+          "frame": "{{515, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-1",
+          "label": ""
+        }
+      ],
+      "static_texts_as_recorded": [
+        {
+          "frame": "{{403, 218}, {218, 34}}",
+          "label": "",
+          "value": "Optional(“roma just talk” would like to access the Microphone.)"
+        },
+        {
+          "frame": "{{403, 260}, {218, 50}}",
+          "label": "",
+          "value": "Optional(roma-just-talk needs access to your microphone to record audio for transcription.)"
+        }
+      ],
+      "recognized_as_recorded": false,
+      "reject_reason_as_recorded": "Allow button is not unique",
+      "visual_observation": "Right visible Allow and left visible Don’t Allow, both readable/unobstructed. Dialog PNG dimensions 260x250 match recorded dialog size.",
+      "frame_comparison": "Subtract dialog origin (382,119): action-button-1 global (515,324,112,30) maps to local (133,205,112,30), aligning to visible right Allow. action-button-2 global (397,324,112,30) maps to local (15,205,112,30), aligning to visible left Don’t Allow. Help global (601,130,30,30) maps to local (219,11,30,30), aligning to upper-right question-mark control.",
+      "semantic_limit": "This is a spatial/pixel correspondence. Both action button labels are empty in supplied census; no native button title/value recorded. Visual text does not fill those absent AX fields or prove permission grant."
+    },
+    {
+      "png": "ED4605DE-6561-497F-BC6A-8B8F4C5587BC.png",
+      "census_file": "2C082615-C93C-435E-A5AE-0CF633389A56.json",
+      "census_sha256": "d3e2571e76fb7a86a4a94de3da66a8fa8f8375fc0d82ca39bc032551e7df7a83",
+      "census_manifest_match": true,
+      "dialog_as_recorded": {
+        "elementType": 8,
+        "frame": "{{382, 119}, {260, 250}}",
+        "identifier": "_NS:87",
+        "label": "alert",
+        "title": "",
+        "value": "Optional()"
+      },
+      "buttons_as_recorded": [
+        {
+          "enabled": true,
+          "frame": "{{601, 130}, {30, 30}}",
+          "hittable": true,
+          "identifier": "_NS:30",
+          "label": "Help"
+        },
+        {
+          "enabled": true,
+          "frame": "{{397, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-2",
+          "label": ""
+        },
+        {
+          "enabled": true,
+          "frame": "{{515, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-1",
+          "label": ""
+        }
+      ],
+      "static_texts_as_recorded": [
+        {
+          "frame": "{{403, 218}, {218, 34}}",
+          "label": "",
+          "value": "Optional(“roma just talk” would like to access the Microphone.)"
+        },
+        {
+          "frame": "{{403, 260}, {218, 50}}",
+          "label": "",
+          "value": "Optional(roma-just-talk needs access to your microphone to record audio for transcription.)"
+        }
+      ],
+      "recognized_as_recorded": false,
+      "reject_reason_as_recorded": "Allow button is not unique",
+      "visual_observation": "Right visible Allow and left visible Don’t Allow, both readable/unobstructed. Dialog PNG dimensions 260x250 match recorded dialog size.",
+      "frame_comparison": "Subtract dialog origin (382,119): action-button-1 global (515,324,112,30) maps to local (133,205,112,30), aligning to visible right Allow. action-button-2 global (397,324,112,30) maps to local (15,205,112,30), aligning to visible left Don’t Allow. Help global (601,130,30,30) maps to local (219,11,30,30), aligning to upper-right question-mark control.",
+      "semantic_limit": "This is a spatial/pixel correspondence. Both action button labels are empty in supplied census; no native button title/value recorded. Visual text does not fill those absent AX fields or prove permission grant."
+    }
+  ],
+  "limits": [
+    "No full-gate or native-post approval. Parent reports eight UI tests passed and native-post blocked by microphone state 0; not independently validated in this image audit.",
+    "No permission grant/click result, recording, ASR/provider quality or physical dictation proven. Images show microphone access request; no inference about unrecorded native button title/value fields.",
+    "No VoiceOver/accessibility correctness conclusion. Census empty labels remain empty despite visually readable labels.",
+    "No exact Unicode bytes/normalization/invisible whitespace/newline preservation inferred from glyphs.",
+    "Attachment descriptions identify claimed scenarios; screenshots alone do not establish relaunch/persistence/deletion transitions.",
+    "No dynamic scrolling, keyboard, focus, hitbox or behavior test; partly offscreen content not assumed reachable.",
+    "Remote artifact origin/archive hash accepted as supplied metadata; only extracted local files were rehashed."
+  ],
+  "screenshots": [
+    {
+      "order": 1,
+      "file": "candidate/screenshots/014647DB-7AD4-40AD-98B1-40D49606B70B.png",
+      "sha256": "b37e99007723005597d9c97ff858a19971e7640954ac960e0e36544363547895",
+      "bytes": 224069,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/014647DB-7AD4-40AD-98B1-40D49606B70B.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "Enhancement settings native sheet_0_A4D934B8-AA5B-45DE-9622-A303D8E9026C.png",
+      "attachment_timestamp": 1793173031.019,
+      "individually_viewed": true,
+      "observation": "Enhancement Settings: context toggles, timeout and shortcut rows readable; close control bounded."
+    },
+    {
+      "order": 2,
+      "file": "candidate/screenshots/0CCD7B37-3D6C-4F35-91A2-98159901B8FC.png",
+      "sha256": "6ccb572db92a74d6379ea0ab4060451adf52f6299dd6b30139d4de853e937edc",
+      "bytes": 218036,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/0CCD7B37-3D6C-4F35-91A2-98159901B8FC.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "Prompt editor unsaved native sheet_0_0592BCBC-D319-4E59-9D32-EB6B1E58DC6B.png",
+      "attachment_timestamp": 1793173047.795,
+      "individually_viewed": true,
+      "observation": "New Prompt: long name horizontally scrolled within field; instructions, system template toggle and Cancel/disabled Save Changes fit."
+    },
+    {
+      "order": 3,
+      "file": "candidate/screenshots/1516E46E-7DCF-4847-BEE3-A082D72D8451.png",
+      "sha256": "755a8ea4e50c701e4d7f0cdbddad48940884b4d2b0e9a83918a16121f76eb3bd",
+      "bytes": 135268,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/1516E46E-7DCF-4847-BEE3-A082D72D8451.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History RJT History fallback original_0_BC391ECA-3AEC-4745-9AF7-191A615DFA37.png",
+      "attachment_timestamp": 1793173587.432,
+      "individually_viewed": true,
+      "observation": "History fallback: yellow cleanup-failed banner, raw text, cleanup badge and correction action readable without overlap."
+    },
+    {
+      "order": 4,
+      "file": "candidate/screenshots/2008D7F4-5B76-46EC-8328-205D74099A97.png",
+      "sha256": "9e4231fb97bd521d64c77fd6b4f0e298f562c89abefe2993210a0304eae59637",
+      "bytes": 233208,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/2008D7F4-5B76-46EC-8328-205D74099A97.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "attachment_name": "Approved literal correction edited while disabled_0_9ABCA342-63C1-4D61-BEE0-21F40AFD8089.png",
+      "attachment_timestamp": 1793173456.282,
+      "individually_viewed": true,
+      "observation": "Edit Word Replacement: Off state, provenance, original and edited replacement fields visible; Cancel/Save bounded."
+    },
+    {
+      "order": 5,
+      "file": "candidate/screenshots/23052E1A-6BE8-48AF-8884-796C22F95328.png",
+      "sha256": "25f9b61f6cab2b1dded82189294c7596ba0e3a31fba6716507ab15e8ed38962e",
+      "bytes": 270912,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/23052E1A-6BE8-48AF-8884-796C22F95328.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Clarity profile and retained library settings_0_CFEC31D0-AECC-436D-A24A-B688E519FC0B.png",
+      "attachment_timestamp": 1793173150.158,
+      "individually_viewed": true,
+      "observation": "Clarity Natural profile and explanation readable; styles and close control bounded."
+    },
+    {
+      "order": 6,
+      "file": "candidate/screenshots/25CA8F3C-3680-4C5D-AF6D-6EECB5716E1B.png",
+      "sha256": "2986fe5728b19da6e6adbbba715b463ec919804af31f578d5b30477a0c9f8704",
+      "bytes": 126385,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/25CA8F3C-3680-4C5D-AF6D-6EECB5716E1B.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History RJT History recognized enhanced_0_43363D23-264F-4AC1-8D1E-3BFC63200A3B.png",
+      "attachment_timestamp": 1793173568.802,
+      "individually_viewed": true,
+      "observation": "History Enhanced selected: polished text, Clarity Formal badge and correction action readable."
+    },
+    {
+      "order": 7,
+      "file": "candidate/screenshots/28B9F09A-0364-4CE9-800D-21D88DAFF4EC.png",
+      "sha256": "f738c18aadbcfd47588f76670c2f87b88a601605832fea3ea58809d3bb0756a8",
+      "bytes": 214905,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/28B9F09A-0364-4CE9-800D-21D88DAFF4EC.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "Dictionary settings native sheet_0_12C3F511-843E-4200-9E5E-C82410E2EEA3.png",
+      "attachment_timestamp": 1793173021.054,
+      "individually_viewed": true,
+      "observation": "Dictionary Settings: shortcut row and close control visible; blank sheet remainder."
+    },
+    {
+      "order": 8,
+      "file": "candidate/screenshots/2CB587A2-BB9E-4701-A8CC-791B2F980E4F.png",
+      "sha256": "e4fef199fd679c82c00c87d3fd94966d8d2617441ac1de6f260e6bc7715a6f70",
+      "bytes": 182415,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/2CB587A2-BB9E-4701-A8CC-791B2F980E4F.png",
+      "attachment_test": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+      "attachment_name": "Writing actions and ordered translation targets_0_A2F12635-F283-456F-8209-91DDEFD54BA4.png",
+      "attachment_timestamp": 1793173796.506,
+      "individually_viewed": true,
+      "observation": "Writing Actions and Translation Target: French current target, language controls and disabled Record buttons visible; bottom help continues below viewport."
+    },
+    {
+      "order": 9,
+      "file": "candidate/screenshots/33280FA3-FB97-4316-B089-73B544104D57.png",
+      "sha256": "8baf33f4179e226080774bdfb9b878df68d523b4bf9a50959d2317c237a03677",
+      "bytes": 252648,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/33280FA3-FB97-4316-B089-73B544104D57.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "attachment_name": "Correction preview cancelled without adding a Dictionary entry_0_71CFBD24-8179-47B3-A97A-4D36876EB69E.png",
+      "attachment_timestamp": 1793173366.741,
+      "individually_viewed": true,
+      "observation": "Dictionary replacement list: enabled Orbit entry and orange source-deleted provenance readable; more rows below viewport."
+    },
+    {
+      "order": 10,
+      "file": "candidate/screenshots/3FEC2C26-9113-4813-B567-D02F230AECB5.png",
+      "sha256": "7119d5707a1e299d87bbfc3fcb3b5f37112b10a84abe825205f87d4c97f76cdd",
+      "bytes": 217098,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/3FEC2C26-9113-4813-B567-D02F230AECB5.png",
+      "attachment_test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "attachment_name": "Explicit History correction preview RJT Correction retained_0_CDBE71F5-8D94-4FA2-B7CF-098CB3F718C3.png",
+      "attachment_timestamp": 1793172679.477,
+      "individually_viewed": true,
+      "observation": "Preapproval Correction preview: literal Orbit/replacement chips, metadata and nothing-saved-until-Approve caption visible with Approve button."
+    },
+    {
+      "order": 11,
+      "file": "candidate/screenshots/4323844D-86B8-43EE-A0BC-7FF497496F19.png",
+      "sha256": "6601ceda7494c99f185eab45627ccc20003ecb6278920b1b5beb293265acd59f",
+      "bytes": 271578,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/4323844D-86B8-43EE-A0BC-7FF497496F19.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Clarity Casual style_0_57BEBC95-0082-4EC4-AEEC-8D6FBC9A0E12.png",
+      "attachment_timestamp": 1793173162.484,
+      "individually_viewed": true,
+      "observation": "Clarity Casual style selected; explanation and close control readable."
+    },
+    {
+      "order": 12,
+      "file": "candidate/screenshots/4CEFAA2E-CBC9-4665-8257-20926C6664BB.png",
+      "sha256": "25f9b61f6cab2b1dded82189294c7596ba0e3a31fba6716507ab15e8ed38962e",
+      "bytes": 270912,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/4CEFAA2E-CBC9-4665-8257-20926C6664BB.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Clarity Natural style_0_67A9022A-A7E7-4DD7-9E29-888E9B11E5C7.png",
+      "attachment_timestamp": 1793173155.955,
+      "individually_viewed": true,
+      "observation": "Clarity Natural style selected; explanation and close control readable."
+    },
+    {
+      "order": 13,
+      "file": "candidate/screenshots/50F68FCA-77FD-4C7A-A881-BDEC482AC8A5.png",
+      "sha256": "114d2bf79f90d6c86d53eadb1b5ec8d4bc7b77496dbc1054be207898d20d5eae",
+      "bytes": 211221,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/50F68FCA-77FD-4C7A-A881-BDEC482AC8A5.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "attachment_name": "Correction saved only after explicit approval_0_81345F0A-2240-421A-A7F4-27803AF08E56.png",
+      "attachment_timestamp": 1793173427.577,
+      "individually_viewed": true,
+      "observation": "Done-only correction state: Correction preview heading and replacement visible; lower caption is outside viewport, so this capture alone cannot verify caption fix."
+    },
+    {
+      "order": 14,
+      "file": "candidate/screenshots/5642ED37-70C1-4E01-9092-0E4639062E02.png",
+      "sha256": "db6ac95235b47966a39b9dedd8dbf806d3841f0a2d79fd9d30ab250f1b0ae432",
+      "bytes": 252784,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/5642ED37-70C1-4E01-9092-0E4639062E02.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "Custom formatting restored without changing saved values_0_598EA81A-3CB1-4874-A693-4C8D416CC9E8.png",
+      "attachment_timestamp": 1793173008.369,
+      "individually_viewed": true,
+      "observation": "Custom formatting/advanced scrolled sheet: complete visible controls fit; neighboring content partly outside viewport."
+    },
+    {
+      "order": 15,
+      "file": "candidate/screenshots/5A8686D7-E677-4677-8342-C516798E62E3.png",
+      "sha256": "ec18785a5f819c24fcc3122008ae1961a4ebb5e1bcfdfa75d6a7343ae9f5ce29",
+      "bytes": 214712,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/5A8686D7-E677-4677-8342-C516798E62E3.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "attachment_name": "Explicit History correction preview RJT Correction managed_0_FBA90E6F-780F-4041-9F45-182166E36231.png",
+      "attachment_timestamp": 1793173359.643,
+      "individually_viewed": true,
+      "observation": "Preapproval managed Correction preview: literal Acme/replacement and metadata readable; Cancel/Preview/Approve bounded."
+    },
+    {
+      "order": 16,
+      "file": "candidate/screenshots/6285427A-6953-4576-B9CC-619BAF6A8A86.png",
+      "sha256": "4ee45db995495b3013b7a7ac7ea985ded835deca00f97eb41cef470650467a43",
+      "bytes": 122403,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/6285427A-6953-4576-B9CC-619BAF6A8A86.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History RJT History legacy enhanced_0_B0249C84-2150-4648-8DB3-8BFE89DEF610.png",
+      "attachment_timestamp": 1793173536.733,
+      "individually_viewed": true,
+      "observation": "History legacy Enhanced selected: tabs, enhanced text and correction action readable."
+    },
+    {
+      "order": 17,
+      "file": "candidate/screenshots/65875362-7B53-436C-8D37-F4BBF9058E05.png",
+      "sha256": "4f18badcc895ed0044b921ad65e30623199f85ed3ed770579f97d5d6409fca00",
+      "bytes": 260419,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/65875362-7B53-436C-8D37-F4BBF9058E05.png",
+      "attachment_test": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+      "attachment_name": "Spoken snippets library_0_534B4F73-9DFC-4ACF-9619-7490AFE96FC7.png",
+      "attachment_timestamp": 1793173659.99,
+      "individually_viewed": true,
+      "observation": "Snippets list: long trigger fits first row; search horizontally scrolled within field; Import/Export/New Snippet and row controls visible."
+    },
+    {
+      "order": 18,
+      "file": "candidate/screenshots/6886338D-147C-41DA-B6F2-66425C0AD874.png",
+      "sha256": "81868deeab1392c8807693a466b65057ce6c55ee1c000be16c2cfcaaf303fde8",
+      "bytes": 246362,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/6886338D-147C-41DA-B6F2-66425C0AD874.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Profile switching preserves the seeded vocabulary library_0_DDB3FDB1-D71F-47E5-B717-7F3016DE1DB9.png",
+      "attachment_timestamp": 1793173091.419,
+      "individually_viewed": true,
+      "observation": "Vocabulary section: single token, add field and token removal control visible."
+    },
+    {
+      "order": 19,
+      "file": "candidate/screenshots/68E83650-5F08-4F48-A526-0D94A2DB99CB.png",
+      "sha256": "811dbc5219c5c97bc7f5fdbc6f2a3c593f66659857d09e7889d8e75886f26d2f",
+      "bytes": 270068,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/68E83650-5F08-4F48-A526-0D94A2DB99CB.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "None dictation cleanup selected_0_EA10DD88-FA64-4C9E-8434-985027E0D25F.png",
+      "attachment_timestamp": 1793172920.882,
+      "individually_viewed": true,
+      "observation": "None selected: explanation and disabled Clarity style controls visible; saved-choice note readable."
+    },
+    {
+      "order": 20,
+      "file": "candidate/screenshots/7ECD2FAD-8A18-484E-93DE-97FEB7875702.png",
+      "sha256": "a8f80285d0c9f86edcea259717e81a87fd03df9717c1c4976c87e1a2a8dacae9",
+      "bytes": 176570,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/7ECD2FAD-8A18-484E-93DE-97FEB7875702.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "Power Mode reorder native sheet_0_E7BF3F90-9515-4A13-9787-668E12DC44A6.png",
+      "attachment_timestamp": 1793173066.555,
+      "individually_viewed": true,
+      "observation": "Reorder Power Modes sheet: title/close visible, blank body; pixels do not determine whether empty collection is intended."
+    },
+    {
+      "order": 21,
+      "file": "candidate/screenshots/8746A067-0BB1-4055-BB3F-0A4D21603489.png",
+      "sha256": "6fda3eadbcd88dad9232337b7b7e65f408d78aca8ff0c35cba939e7c2503d2a6",
+      "bytes": 123732,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/8746A067-0BB1-4055-BB3F-0A4D21603489.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History RJT History legacy original_0_0EDD4765-0A19-4463-A16C-0E213A903D8F.png",
+      "attachment_timestamp": 1793173529.79,
+      "individually_viewed": true,
+      "observation": "History legacy Original selected: tabs, two-line text and correction action readable."
+    },
+    {
+      "order": 22,
+      "file": "candidate/screenshots/88000132-F427-4671-9533-067E2F5F4383.png",
+      "sha256": "dce4823c2779dab707f9afe5a56947e604243106ab2595b8cccb1e1691124afb",
+      "bytes": 273037,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/88000132-F427-4671-9533-067E2F5F4383.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Clarity Formal style_0_FE88E041-59F2-4B14-BBA0-D5CA32690B4F.png",
+      "attachment_timestamp": 1793173168.587,
+      "individually_viewed": true,
+      "observation": "Clarity Formal style selected; explanation and close control readable."
+    },
+    {
+      "order": 23,
+      "file": "candidate/screenshots/93AF8740-B534-4E06-B44B-309A3DF2D341.png",
+      "sha256": "301699b6855ba65552e6dc77e2223aef739519d5a462b73c588a788356c59e7c",
+      "bytes": 213259,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/93AF8740-B534-4E06-B44B-309A3DF2D341.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "attachment_name": "Explicit History correction preview RJT Correction managed_0_041D919A-2746-4B50-B2F2-D6CB5686871D.png",
+      "attachment_timestamp": 1793173425.495,
+      "individually_viewed": true,
+      "observation": "Preapproval managed correction: input and Correction preview visible with Cancel/Preview/Approve; lower metadata below viewport."
+    },
+    {
+      "order": 24,
+      "file": "candidate/screenshots/9AC91162-EFDD-4AC1-968B-46099B830290.png",
+      "sha256": "0335e3a523dd408d81b4473c7e26649d6389b2cf93da99154f303f94b6db24ad",
+      "bytes": 241162,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/9AC91162-EFDD-4AC1-968B-46099B830290.png",
+      "attachment_test": "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()",
+      "attachment_name": "CSV current and imported multiline preview_0_DD028843-4732-4B5A-BC25-142746CAFA32.png",
+      "attachment_timestamp": 1793172834.786,
+      "individually_viewed": true,
+      "observation": "CSV Import: expanded library/imported multiline comparison, conflict choices and Cancel/disabled Import all bounded."
+    },
+    {
+      "order": 25,
+      "file": "candidate/screenshots/A6B2B739-9C51-4D54-9E5F-C149E9733CC2.png",
+      "sha256": "f98c0b661dd94645ab72cd7bcc2ec0b5c7a62d1264a30ddc2999946692b45585",
+      "bytes": 126816,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/A6B2B739-9C51-4D54-9E5F-C149E9733CC2.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History captured Clarity Formal survives relaunch_0_95070305-141B-4843-863D-017E9830E8F8.png",
+      "attachment_timestamp": 1793173621.396,
+      "individually_viewed": true,
+      "observation": "History Original selected with Clarity Formal badge; text and correction action visible. Attachment name claims relaunch; transition not proven by pixels."
+    },
+    {
+      "order": 26,
+      "file": "candidate/screenshots/B4E5B018-C2C8-4F01-893C-BB35182AA97A.png",
+      "sha256": "dcfbfce9931cf1f409c7905796c191c07b0dfe509d86a8606e13f6a03312fe31",
+      "bytes": 270517,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/B4E5B018-C2C8-4F01-893C-BB35182AA97A.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Light profile and retained library settings_0_9EEDE49C-C207-410D-AFFD-C524AE5C7FF3.png",
+      "attachment_timestamp": 1793173142.371,
+      "individually_viewed": true,
+      "observation": "Light selected: explanation, disabled Clarity controls and saved-choice note readable."
+    },
+    {
+      "order": 27,
+      "file": "candidate/screenshots/B83863FA-2D3F-49CD-8674-B54DF6FC7035.png",
+      "sha256": "a09a92325e20ac474c3de4a5b521780b3c909a173d5717e6130a3314cab66ea4",
+      "bytes": 121555,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/B83863FA-2D3F-49CD-8674-B54DF6FC7035.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History RJT History unknown original_0_FFBEE633-7D1D-46B5-8850-E45A6FAA5E35.png",
+      "attachment_timestamp": 1793173602.048,
+      "individually_viewed": true,
+      "observation": "History unknown row: two-line text and correction action visible; no version tabs displayed."
+    },
+    {
+      "order": 28,
+      "file": "candidate/screenshots/B95CEEF5-F349-44BD-876E-8D87BEBF448D.png",
+      "sha256": "f0c85184c64a76f306d1326b2f1f8938bde267a2f4245aa071d8619fcedd9512",
+      "bytes": 252700,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/B95CEEF5-F349-44BD-876E-8D87BEBF448D.png",
+      "attachment_test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "attachment_name": "Saved correction keeps provenance after its History source is deleted_0_F95888FE-1A42-4365-8570-5A8FF008F1C3.png",
+      "attachment_timestamp": 1793172726.161,
+      "individually_viewed": true,
+      "observation": "Dictionary list: enabled Orbit entry with orange From History / Recognized / source deleted provenance visible."
+    },
+    {
+      "order": 29,
+      "file": "candidate/screenshots/BD852FCD-173E-4BF1-8DB7-7D1C955F96BA.png",
+      "sha256": "6487e0abd1fc3d946084b28978e90f530c74efb9ef00f21018b09d386d68c4f7",
+      "bytes": 126942,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/BD852FCD-173E-4BF1-8DB7-7D1C955F96BA.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History RJT History recognized recognized_0_D3151C99-68FD-43FB-8E2E-9AD0447801E9.png",
+      "attachment_timestamp": 1793173554.847,
+      "individually_viewed": true,
+      "observation": "History Recognized selected: two-line text, version tabs and Clarity Formal badge readable."
+    },
+    {
+      "order": 30,
+      "file": "candidate/screenshots/BE4005F4-3167-45A6-B0E6-731916E13315.png",
+      "sha256": "ae8fd54403379fbb119550d6fd3d6e1a99459a977bebff2caf90d95dbdf286f7",
+      "bytes": 246385,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/BE4005F4-3167-45A6-B0E6-731916E13315.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Profile switching preserves the seeded vocabulary library_0_5503BD3F-BE86-482A-A428-1F7E3C036F33.png",
+      "attachment_timestamp": 1793173268.409,
+      "individually_viewed": true,
+      "observation": "Vocabulary section: single token, add field and remove control visible."
+    },
+    {
+      "order": 31,
+      "file": "candidate/screenshots/C1ACFE11-E041-46B6-AD1F-A3C023AFFF25.png",
+      "sha256": "0e7ebfa5a97aa5388963c7f775a24faf050d94065fd5fec1d6601a491b038ecf",
+      "bytes": 28982,
+      "dimensions": [
+        260,
+        250
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/C1ACFE11-E041-46B6-AD1F-A3C023AFFF25.png",
+      "attachment_test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "attachment_name": "Microphone consent interruption_0_09FBFB6D-833B-4AA9-8414-4A9325D2442A.png",
+      "attachment_timestamp": 1793172631.254,
+      "individually_viewed": true,
+      "observation": "Microphone dialog-only capture: title/purpose text readable; Don’t Allow left, Allow right; neither button obstructed. See microphone_frame_comparison."
+    },
+    {
+      "order": 32,
+      "file": "candidate/screenshots/CBA76CFB-71C6-4DEF-8585-30A1E316B663.png",
+      "sha256": "e9aa87ac7fb1444cdc2fe2d0497064c7a7feeb894198693b74396632c10a0d40",
+      "bytes": 126890,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/CBA76CFB-71C6-4DEF-8585-30A1E316B663.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "attachment_name": "History RJT History recognized original_0_3225B96C-5429-4620-A30E-60D817B5C31A.png",
+      "attachment_timestamp": 1793173562.178,
+      "individually_viewed": true,
+      "observation": "History Original selected: version tabs, two-line text and Clarity Formal badge readable."
+    },
+    {
+      "order": 33,
+      "file": "candidate/screenshots/CC9CE3E0-D9F8-47ED-84EA-7068BF3BE310.png",
+      "sha256": "cd7134b535a9fcc8faac6311c4c5a192fc92fb67e6e8b7ad4811aa38efa5140e",
+      "bytes": 251596,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/CC9CE3E0-D9F8-47ED-84EA-7068BF3BE310.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "Custom dictation cleanup settings_0_8723E19A-F98A-4A7D-A652-2A03DEB14377.png",
+      "attachment_timestamp": 1793172914.541,
+      "individually_viewed": true,
+      "observation": "Custom formatting/advanced scrolled sheet: visible controls bounded; next row partly below viewport."
+    },
+    {
+      "order": 34,
+      "file": "candidate/screenshots/CD0E650B-0FB8-4E65-AF66-E8B0F8B92D6A.png",
+      "sha256": "09cf4924c0da797a109ee7635efa947d956dbd5d8c148814b5c305780e011366",
+      "bytes": 247298,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/CD0E650B-0FB8-4E65-AF66-E8B0F8B92D6A.png",
+      "attachment_test": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+      "attachment_name": "Snippet deletion confirmation_0_C5858ECE-43FB-4AED-AB72-02D8542425EC.png",
+      "attachment_timestamp": 1793173679.23,
+      "individually_viewed": true,
+      "observation": "Snippet delete confirmation: long trigger wraps; warning and Delete Snippet/Cancel controls fit."
+    },
+    {
+      "order": 35,
+      "file": "candidate/screenshots/CE2CA797-9B9B-4076-A3BC-9B49F7D8250F.png",
+      "sha256": "f583f45ee7caaa7fb8d944f81bd8b4fff65cdc98cdc8b7e13020c2847d8c1da1",
+      "bytes": 182515,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/CE2CA797-9B9B-4076-A3BC-9B49F7D8250F.png",
+      "attachment_test": "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()",
+      "attachment_name": "Translation target persisted after relaunch_0_98D287DC-07A9-43BF-9F7D-21328D247314.png",
+      "attachment_timestamp": 1793173817.865,
+      "individually_viewed": true,
+      "observation": "French current Translation Target and Writing Actions visible; bottom helper text partly below viewport. Relaunch claim is attachment metadata only."
+    },
+    {
+      "order": 36,
+      "file": "candidate/screenshots/D15ACBD2-B29F-4FFC-A656-1464EC74C3A9.png",
+      "sha256": "dee1b97f049f65897b56c07a3999be73ec031d6185d3977010042f1b1c7dda7e",
+      "bytes": 205348,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D15ACBD2-B29F-4FFC-A656-1464EC74C3A9.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "Power Mode unsaved native sheet_0_4AF1EDD0-1FA2-46CC-96AC-5DCEAE2409F4.png",
+      "attachment_timestamp": 1793173060.647,
+      "individually_viewed": true,
+      "observation": "Add Power Mode: long name scrolls within field; application/website sections visible; lower settings extend below viewport; Cancel/Save Changes visible."
+    },
+    {
+      "order": 37,
+      "file": "candidate/screenshots/D1FE20E4-64A6-471D-A059-BEB7E67F2F5C.png",
+      "sha256": "f3e29468661bc2cb077afcae8e177642966e38c1526284180379f0b501101cbf",
+      "bytes": 233594,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D1FE20E4-64A6-471D-A059-BEB7E67F2F5C.png",
+      "attachment_test": "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()",
+      "attachment_name": "Literal multiline snippet editor_0_E74E321D-DB3F-4172-977C-A3DF6152A153.png",
+      "attachment_timestamp": 1793173668.985,
+      "individually_viewed": true,
+      "observation": "Edit Snippet: long trigger, multiline inserted text and counters readable; toggle and Cancel/Save visible."
+    },
+    {
+      "order": 38,
+      "file": "candidate/screenshots/D3C67995-0268-4417-B6A9-AACB01F59E06.png",
+      "sha256": "55d98e1bf8dddf926415ebc65b8f925aeb757dc49728d092e581d5ae550fa572",
+      "bytes": 234945,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D3C67995-0268-4417-B6A9-AACB01F59E06.png",
+      "attachment_test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "attachment_name": "Correction remains editable after deleted-source relaunch_0_F1945C03-E216-49C2-A64B-F296B59FE831.png",
+      "attachment_timestamp": 1793172755.917,
+      "individually_viewed": true,
+      "observation": "Edit Word Replacement: On state and orange source-deleted provenance readable; original/replacement fields and Cancel/Save bounded."
+    },
+    {
+      "order": 39,
+      "file": "candidate/screenshots/D49440CF-E40B-4CFB-A9F0-1B4AF75C8BCA.png",
+      "sha256": "5ae4ca65d4c2c11cfac3cec3764b5617e0d18e251f64c795f44e203feb6216fc",
+      "bytes": 270078,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D49440CF-E40B-4CFB-A9F0-1B4AF75C8BCA.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "None profile and retained library settings_0_17D93ABD-FD87-479A-A198-CFC501EDACE4.png",
+      "attachment_timestamp": 1793173134.972,
+      "individually_viewed": true,
+      "observation": "None profile: explanation, disabled Clarity controls and saved-choice note readable."
+    },
+    {
+      "order": 40,
+      "file": "candidate/screenshots/D4AADB2C-DAF4-41AC-897D-4E76E1297769.png",
+      "sha256": "d0ec311e8a312e5075529ce3a9fb3585deace6d9f13ef9e05bd7e86780ba7795",
+      "bytes": 274460,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/D4AADB2C-DAF4-41AC-897D-4E76E1297769.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+      "attachment_name": "Clarity Formal persisted after relaunch_0_014A6052-0270-4463-B437-1024F100FEE8.png",
+      "attachment_timestamp": 1793173251.82,
+      "individually_viewed": true,
+      "observation": "Clarity Formal selected; explanation and close control readable. Relaunch claim is attachment metadata only."
+    },
+    {
+      "order": 41,
+      "file": "candidate/screenshots/E2B7A758-7B58-403E-9B18-253FBD5505DF.png",
+      "sha256": "13bc5196458407353b208000e326991279efcdc3cbca676793c9368daac9a997",
+      "bytes": 233373,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/E2B7A758-7B58-403E-9B18-253FBD5505DF.png",
+      "attachment_test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "attachment_name": "Edited disabled correction retains identity after relaunch_0_FBC14B14-9E0E-40AD-835E-86CF5FF52B55.png",
+      "attachment_timestamp": 1793173485.182,
+      "individually_viewed": true,
+      "observation": "Edit Word Replacement: Off state, provenance, original and edited replacement visible; actions bounded. Persistence transition not inferred."
+    },
+    {
+      "order": 42,
+      "file": "candidate/screenshots/E7E6718F-329A-4270-8C7E-846282987413.png",
+      "sha256": "d5aa2080429339fadfc85c74ff1f83799130a911b18a54a55ff8f2fea8cfe30a",
+      "bytes": 254123,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/E7E6718F-329A-4270-8C7E-846282987413.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "None preserves inactive Custom formatting_0_B54394A3-6F9A-4BC4-90C5-4A88A949D2B8.png",
+      "attachment_timestamp": 1793172928.675,
+      "individually_viewed": true,
+      "observation": "None formatting: inactive settings visually faded; saved-for-Custom and skipped-space notes readable; VAD shown active."
+    },
+    {
+      "order": 43,
+      "file": "candidate/screenshots/ED4605DE-6561-497F-BC6A-8B8F4C5587BC.png",
+      "sha256": "5c1fdc447e54f6a6136b6b0fdf7e02cec6d23cf6841c9c31c76a1e690e392a57",
+      "bytes": 28984,
+      "dimensions": [
+        260,
+        250
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/ED4605DE-6561-497F-BC6A-8B8F4C5587BC.png",
+      "attachment_test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "attachment_name": "Microphone consent interruption_0_FA6C06F8-B62F-40C2-ADBD-9F353F1CF91F.png",
+      "attachment_timestamp": 1793172633.755,
+      "individually_viewed": true,
+      "observation": "Microphone dialog-only capture: title/purpose text readable; Don’t Allow left, Allow right; neither button obstructed. See microphone_frame_comparison."
+    },
+    {
+      "order": 44,
+      "file": "candidate/screenshots/F8756E2B-10B4-4F97-94D7-A4BE8704AC8F.png",
+      "sha256": "2f1eac74b2688fb6dd437569fe8048ddc8e5b60ef37e48a6f8e27da14942613d",
+      "bytes": 213882,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/F8756E2B-10B4-4F97-94D7-A4BE8704AC8F.png",
+      "attachment_test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "attachment_name": "Correction saved only after explicit approval_0_37F329F1-AAE1-461C-AEB5-62B65100ED25.png",
+      "attachment_timestamp": 1793172681.433,
+      "individually_viewed": true,
+      "observation": "Done-only correction state: Correction preview heading, literal Orbit/replacement metadata and green Saved to Dictionary confirmation visible. Prior preapproval caption absent. Confirmation sits at lower scroll edge; Done fully visible."
+    },
+    {
+      "order": 45,
+      "file": "candidate/screenshots/F951034F-44A0-4DC9-9C52-91030FC40D03.png",
+      "sha256": "909bf57996ebda13bdfdfde3130392394748fcd0c802cf20a1435de5a5b8c52d",
+      "bytes": 271474,
+      "dimensions": [
+        1024,
+        768
+      ],
+      "manifest_match": true,
+      "archive_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/screenshots/F951034F-44A0-4DC9-9C52-91030FC40D03.png",
+      "attachment_test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+      "attachment_name": "None dictation cleanup persisted after relaunch_0_806C5598-8E59-4131-AD01-5D884C10B081.png",
+      "attachment_timestamp": 1793172986.18,
+      "individually_viewed": true,
+      "observation": "None profile: explanation, disabled Clarity style controls and saved-choice note readable."
+    }
+  ]
+}

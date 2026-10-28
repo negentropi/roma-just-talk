@@ -1,0 +1,28 @@
+{
+  "run": {
+    "conclusion": "",
+    "createdAt": "2026-10-28T07:02:52Z",
+    "databaseId": 40647571351,
+    "displayTitle": "Verify Mac writing actions (full)",
+    "event": "push",
+    "headBranch": "ci/rjt-writing-check-complete-5ebb28bf-01a17bef",
+    "headSha": "9afb1ed848ea2c12c4a00d6173871d67d13bfb45",
+    "status": "in_progress",
+    "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40647571351"
+  },
+  "mode": "normal-full",
+  "source_pins": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "b32c269aa0832b5ed4ab8827fbd45105a9fe315d79432e8f1b310e66e9664346",
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift": "029344ea9e7c2ca821a8429c93a48e25bdce522ef13117f96b911a043e192b55",
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec",
+    "scripts/run-writing-feature-regression.sh": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e",
+    ".github/workflows/voiceink-writing-actions-check.yml": "184fed3f02e09b6abcb326fbccf3c70abf39d9073ef21f5d6d1f3b23eccbe1b0",
+    "VoiceInk/Info.plist": "11b2a01024c6cef1780278fdede8d0d6479ef04ef8f5eb70f94880b804ce22c5"
+  },
+  "previous_full": 40639673814,
+  "previous_boundary": "All8UIpassed;nativepostpreflightMic2\u21920samecsreq;XCTestimplicitDontAllow;actualoldtitles/servicesunrecorded.",
+  "candidate": "ScopedownedappMicinterruptionmonitor+boundedcensus/publicAllow;newcapturewillproveornotrecognition. Saved-stateplanStatuscopyfix.",
+  "all8_bodies_and8_helpers_unchanged": true,
+  "Sol_loop": "SameR5/5APPROVE,base6927;budgetusednoreset",
+  "runtime": "pending callbackthread/recognizedorunknown/actualtitle/Allow outcome/auth2/nativepost/Release;noacceptance"
+}

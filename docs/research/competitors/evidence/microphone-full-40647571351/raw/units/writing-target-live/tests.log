@@ -1,0 +1,532 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination platform=macOS -parallel-testing-enabled NO -derivedDataPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build -xcconfig /Users/runner/work/roma-just-talk/roma-just-talk/LocalBuild.xcconfig -clonedSourcePackagesDirPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS=/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD" "-only-testing:VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()" "-only-testing:VoiceInkTests/VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()" "-only-testing:VoiceInkTests/VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()" "-only-testing:VoiceInkTests/VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()" "-only-testing:VoiceInkTests/VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()" "-only-testing:VoiceInkTests/VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()" -resultBundlePath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-target-live/Live.xcresult
+
+Build settings from command line:
+    CODE_SIGN_ENTITLEMENTS = /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    CODE_SIGNING_REQUIRED = NO
+    DEVELOPMENT_TEAM = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Build settings from configuration file '/Users/runner/work/roma-just-talk/roma-just-talk/LocalBuild.xcconfig':
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGN_STYLE = Manual
+    DEVELOPMENT_TEAM = 
+    PROVISIONING_PROFILE_SPECIFIER = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  VoiceInkQwen: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkQwen @ local
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  VoiceInkNVIDIA: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkNVIDIA @ local
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  VoiceInkCore: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore @ local
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+
+Writing result bundle at path:
+	/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-target-live/Live.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:9bbe570010e853478157dcf8e5bf26c9a2100cc5, name:My Mac }
+{ platform:macOS, arch:x86_64, id:9bbe570010e853478157dcf8e5bf26c9a2100cc5, name:My Mac }
+2026-10-28 07:17:01.573959+0000 roma just talk[30186:91550] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x99887ea00> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-28 07:17:01.678152+0000 roma just talk[30186:91550] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-28 07:17:01.679099+0000 roma just talk[30186:91550] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-28 07:17:01.679166+0000 roma just talk[30186:91550] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-28 07:17:01.679883+0000 roma just talk[30186:91550] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-28 07:17:01.679893+0000 roma just talk[30186:91550] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-28 07:17:01.686883+0000 roma just talk[30186:91601] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-28 07:17:01.687354+0000 roma just talk[30186:91596] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:01.687389+0000 roma just talk[30186:91596] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:01.687915+0000 roma just talk[30186:91573] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:01.687940+0000 roma just talk[30186:91573] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:01.689434+0000 roma just talk[30186:91572] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:01.689459+0000 roma just talk[30186:91572] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:01.689832+0000 roma just talk[30186:91572] [Connection] Will NOT re-try to establish the connection
+2026-10-28 07:17:01.689869+0000 roma just talk[30186:91573] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:01.689884+0000 roma just talk[30186:91573] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 07:17:02.440570+0000 roma just talk[30186:91550] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-28 07:17:02.441136+0000 roma just talk[30186:91550] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-28 07:17:02.441211+0000 roma just talk[30186:91550] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-28 07:17:02.491732+0000 roma just talk[30186:91550] [RecorderUIManager] Resetting recording state on launch
+2026-10-28 07:17:02.492000+0000 roma just talk[30186:91550] [Recorder] stopRecording called
+2026-10-28 07:17:02.492140+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 07:17:02.492149+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 07:17:02.492216+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 07:17:02.708966+0000 roma just talk[30186:91550] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-28 07:17:02.719981+0000 roma just talk[30186:91550] [ShortcutMonitor] installEventTap: installed
+Test Suite 'Selected tests' started at 2026-10-28 07:17:02.744.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-28 07:17:02.744.
+Test Suite 'VoiceInkTests.xctest' passed at 2026-10-28 07:17:02.744.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-28 07:17:02.745.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+2026-10-28 07:17:02.749624+0000 roma just talk[30186:91596] unable to find air64_v27 slice or a compatible one in binary archive 'file:///System/Library/PrivateFrameworks/RenderBox.framework/Resources/archive.metallib' 
+ available slices: applegpu_g15g, applegpu_g15s, applegpu_g15d, applegpu_g15d, applegpu_g15g, applegpu_g16s, applegpu_g13g, applegpu_g17p, applegpu_g17g, applegpu_g17s, applegpu_g14g, applegpu_g16g, applegpu_g15s, applegpu_g14s, applegpu_g16s, applegpu_g14d, applegpu_g13s, applegpu_g13d,
+2026-10-28 07:17:02.778401+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 07:17:02.801343+0000 roma just talk[30186:91596] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:02.801404+0000 roma just talk[30186:91596] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-28 07:17:02.801727+0000 roma just talk[30186:91596] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-28 07:17:02.801748+0000 roma just talk[30186:91596] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 07:17:02.801884+0000 roma just talk[30186:91596] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VoiceInkTests started.
+◇ Test liveWritingTargetTextEditPreservesUnicodeOutsideSelection() started.
+2026-10-28 07:17:02.821956+0000 roma just talk[30186:91596] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-28 07:17:02.843787+0000 roma just talk[30186:91596] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+2026-10-28 07:17:02.848085+0000 roma just talk[30186:91596] [carc] Reporter disconnected. { function=sendMessage, reporterID=129647882797057 }
+2026-10-28 07:17:02.872300+0000 roma just talk[30186:91596] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-28 07:17:02.872328+0000 roma just talk[30186:91596] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-28 07:17:02.872334+0000 roma just talk[30186:91596] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-28 07:17:02.970581+0000 roma just talk[30186:91550] [Recorder] startPreRollBuffering: active on deviceID=87
+✔ Test liveWritingTargetTextEditPreservesUnicodeOutsideSelection() passed after 2.576 seconds.
+◇ Test liveWritingTargetTextEditRefusesRangeTextAndFocusDrift() started.
+2026-10-28 07:17:05.801460+0000 roma just talk[30186:91550] [ModelPrewarm] Prewarm disabled by user
+✔ Test liveWritingTargetTextEditRefusesRangeTextAndFocusDrift() passed after 1.985 seconds.
+◇ Test liveWritingTargetSafariTextareaReplacesOnlySelection() started.
+✔ Test liveWritingTargetSafariTextareaReplacesOnlySelection() passed after 9.713 seconds.
+◇ Test liveWritingActionPipelineUsesLocalCLIAndRetainsFailure() started.
+2026-10-28 07:17:17.122967+0000 roma just talk[30186:91601] [AQ]        LoudnessManager.mm:1261  GetHardwarePlatformKey: cannot get acoustic ID
+2026-10-28 07:17:19.445659+0000 roma just talk[30186:91550] [SessionMetricRecorder] Recorded session metric for transcription A933FA3E-A371-46E6-8BC9-2BEEC89B8685
+2026-10-28 07:17:21.735430+0000 roma just talk[30186:91550] [Window] Warning: -[NSWindow makeKeyWindow] called on <NSPanel: 0x999c8b200> windowNumber=69 which returned NO from -[NSWindow canBecomeKeyWindow].
+✔ Test liveWritingActionPipelineUsesLocalCLIAndRetainsFailure() passed after 4.845 seconds.
+◇ Test liveWritingStartupContextRespectsOwnerAfterCancellation() started.
+2026-10-28 07:17:22.318381+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=0 t=0.0ms delta=0.0ms event=engine.toggle_requested source=non_shortcut state=idle
+2026-10-28 07:17:22.318482+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=1 t=0.3ms delta=0.3ms event=engine.toggle.enter state=idle
+2026-10-28 07:17:22.318542+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord called – state=idle
+2026-10-28 07:17:22.318666+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=2 t=0.5ms delta=0.2ms event=engine.start_path.enter
+2026-10-28 07:17:22.318684+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: entering start-recording branch
+2026-10-28 07:17:22.318768+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=3 t=0.6ms delta=0.1ms event=engine.start_lifecycle.begin
+2026-10-28 07:17:22.318811+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=4 t=0.6ms delta=0.0ms event=engine.permission.request
+2026-10-28 07:17:22.324930+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=5 t=6.7ms delta=6.1ms event=engine.permission.callback granted=true
+2026-10-28 07:17:22.324959+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=6 t=6.8ms delta=0.1ms event=engine.start_authorized.enter
+2026-10-28 07:17:22.325007+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=7 t=6.8ms delta=0.0ms event=engine.audio_relay.created
+2026-10-28 07:17:22.325609+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=8 t=7.4ms delta=0.6ms event=engine.state.starting
+2026-10-28 07:17:22.325628+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: state=starting, starting audio hardware
+2026-10-28 07:17:22.325680+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=9 t=7.5ms delta=0.1ms event=engine.start_orchestration.plan resolvePowerMode=false prepareSessionBeforeRecorder=true
+2026-10-28 07:17:22.325692+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=10 t=7.5ms delta=0.0ms event=power_mode.resolve.skipped reason=no_configurations
+2026-10-28 07:17:22.325784+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=11 t=7.6ms delta=0.1ms event=streaming_session.created model=RJT-Context-31C565A8-40BF-4D1E-AB34-E5859675CADF
+2026-10-28 07:17:22.325795+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=12 t=7.6ms delta=0.0ms event=streaming_session.prepare.begin
+2026-10-28 07:17:22.325834+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=13 t=7.6ms delta=0.0ms event=streaming_session.prepare.end durationMs=0.0 result=success hasAudioSink=false
+2026-10-28 07:17:22.325872+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=14 t=7.7ms delta=0.0ms event=audio_relay.cleared chunks=0
+2026-10-28 07:17:22.325991+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=15 t=7.8ms delta=0.1ms event=recorder.start.begin
+2026-10-28 07:17:22.326040+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=16 t=7.8ms delta=0.0ms event=recorder.start.enter
+2026-10-28 07:17:22.326124+0000 roma just talk[30186:91550] [Recorder] startRecording called – deviceID=87, file=03FB7211-5267-4305-AB5B-DB72EAFB4BFF.wav
+2026-10-28 07:17:22.326143+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=17 t=7.9ms delta=0.1ms event=recorder.device_lookup.begin
+2026-10-28 07:17:22.326161+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=18 t=8.0ms delta=0.0ms event=recorder.device_lookup.end durationMs=0.0 deviceID=87
+2026-10-28 07:17:22.343468+0000 roma just talk[30186:91550] [Window] Warning: -[NSWindow makeKeyWindow] called on <NSPanel: 0x999d90000> windowNumber=6d which returned NO from -[NSWindow canBecomeKeyWindow].
+2026-10-28 07:17:22.350898+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=19 t=32.7ms delta=24.7ms event=recorder.audio_setup_queue.schedule_start
+2026-10-28 07:17:22.351033+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=20 t=32.8ms delta=0.2ms event=recorder.audio_setup_queue.start.begin
+2026-10-28 07:17:22.351834+0000 roma just talk[30186:91601] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.351863+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-28 07:17:22.354174+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-28 07:17:22.354310+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 07:17:22.354504+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-28 07:17:22.395090+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-28 07:17:22.395123+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-28 07:17:22.395134+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-28 07:17:22.403047+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Starting recording from device 87
+2026-10-28 07:17:22.403129+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=21 t=84.9ms delta=52.1ms event=core_audio.output_file.create.begin
+2026-10-28 07:17:22.412028+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=22 t=93.8ms delta=8.9ms event=core_audio.output_file.create.end durationMs=8.9 result=success
+2026-10-28 07:17:22.412064+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=23 t=93.9ms delta=0.0ms event=core_audio.pre_roll.snapshot_and_write.begin
+2026-10-28 07:17:22.412127+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=24 t=93.9ms delta=0.1ms event=core_audio.pre_roll.snapshot_and_write.end durationMs=0.1 result=success bytes=340
+2026-10-28 07:17:22.412139+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=25 t=93.9ms delta=0.0ms event=core_audio.pre_roll.emit_to_stream.begin
+2026-10-28 07:17:22.412170+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=26 t=94.0ms delta=0.0ms event=core_audio.pre_roll.emit_to_stream.end durationMs=0.0 bytes=340
+2026-10-28 07:17:22.412177+0000 roma just talk[30186:91601] [CoreAudioRecorder] 🎙️ Wrote pre-roll buffer bytes=340
+2026-10-28 07:17:22.412264+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=27 t=94.1ms delta=0.1ms event=recorder.audio_setup_queue.start.end durationMs=61.2 result=success
+2026-10-28 07:17:22.412287+0000 roma just talk[30186:91601] [LatencyTrace] [LATENCY] trace=85866AFB seq=28 t=94.1ms delta=0.0ms event=recorder.audio_setup_queue.start_continuation.executor_enqueued
+2026-10-28 07:17:22.412383+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=29 t=94.2ms delta=0.1ms event=recorder.audio_setup_queue.start_continuation.executor_resumed queueDelayMs=0.1
+2026-10-28 07:17:22.412400+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=30 t=94.2ms delta=0.0ms event=recorder.audio_setup_queue.start_resumed
+2026-10-28 07:17:22.412408+0000 roma just talk[30186:91550] [Recorder] startRecording: CoreAudioRecorder started successfully
+2026-10-28 07:17:22.412926+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=31 t=94.6ms delta=0.4ms event=recorder.start.end durationMs=86.7 result=success
+2026-10-28 07:17:22.412998+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=32 t=94.8ms delta=0.2ms event=engine.state.recording
+2026-10-28 07:17:22.413287+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: recording started successfully, state=recording
+2026-10-28 07:17:22.413331+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=33 t=95.1ms delta=0.3ms event=engine.start_authorized.complete
+2026-10-28 07:17:22.413347+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=34 t=95.2ms delta=0.0ms event=engine.start_lifecycle.end durationMs=94.6
+2026-10-28 07:17:22.428733+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=35 t=110.5ms delta=15.3ms event=recorder.pause_media.begin
+2026-10-28 07:17:22.428966+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=36 t=110.8ms delta=0.3ms event=recorder.pause_media.end durationMs=0.3
+2026-10-28 07:17:22.429933+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=37 t=111.7ms delta=0.9ms event=engine.cancel_requested state=recording
+2026-10-28 07:17:22.430024+0000 roma just talk[30186:91550] [VoiceInkEngine] cancelRecording called – state=recording
+2026-10-28 07:17:22.430364+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=38 t=112.1ms delta=0.5ms event=recorder.stop.enter
+2026-10-28 07:17:22.430417+0000 roma just talk[30186:91550] [Recorder] stopRecording called
+2026-10-28 07:17:22.430517+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=39 t=112.3ms delta=0.1ms event=recorder.audio_setup_queue.schedule_stop
+2026-10-28 07:17:22.430556+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=40 t=112.4ms delta=0.1ms event=recorder.audio_setup_queue.stop.begin
+2026-10-28 07:17:22.430582+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=41 t=112.4ms delta=0.0ms event=core_audio.finish_recording.begin
+2026-10-28 07:17:22.431331+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=42 t=113.1ms delta=0.7ms event=core_audio.pcm_recording nativeRate=48000.0 nativeChannels=2 nativeFrames=1024 conversionCallbacks=2 minCallbackFrames=512 maxCallbackFrames=512 rejectedNativeFrames=0 conversionRejects=0 tailConversionRejects=0 preRollPCMFrames=170 livePCMFrames=342 tailPCMFrames=0 inputClockStart=512 inputClockCut=1536 outputClockStart=170 outputClockCut=512 mixedFormat=false streamingContinuous=false
+2026-10-28 07:17:22.431430+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=43 t=113.2ms delta=0.1ms event=core_audio.finish_recording.end durationMs=0.8 keepCapturing=true
+2026-10-28 07:17:22.431517+0000 roma just talk[30186:91550] [CoreAudioRecorder] finishRecording completed keepCapturing=true elapsed=0.001s
+2026-10-28 07:17:22.431568+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=44 t=113.4ms delta=0.2ms event=recorder.audio_setup_queue.stop.end durationMs=1.0
+2026-10-28 07:17:22.432264+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=45 t=114.1ms delta=0.7ms event=recorder.audio_setup_queue.stop_completed
+2026-10-28 07:17:22.432301+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=46 t=114.1ms delta=0.1ms event=recorder.restore_audio.task.executor_enqueued
+2026-10-28 07:17:22.437293+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=47 t=118.9ms delta=4.8ms event=recorder.restore_audio.task.executor_resumed queueDelayMs=4.8
+2026-10-28 07:17:22.437345+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=48 t=119.1ms delta=0.2ms event=recorder.restore_audio.begin
+2026-10-28 07:17:22.439924+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=49 t=121.7ms delta=2.5ms event=recorder.restore_audio.end durationMs=2.5
+2026-10-28 07:17:22.450564+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=85866AFB seq=50 t=132.3ms delta=10.6ms event=engine.cancel_audio_duration.executor_enqueued
+2026-10-28 07:17:22.451076+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=51 t=132.8ms delta=0.5ms event=engine.cancel_audio_duration.executor_resumed queueDelayMs=0.5
+2026-10-28 07:17:22.458152+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 07:17:22.458196+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 07:17:22.458221+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 07:17:22.459230+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 07:17:22.459412+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=85866AFB seq=52 t=141.1ms delta=8.3ms event=engine.recording_cancelled
+2026-10-28 07:17:22.611191+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: stopping core audio recorder
+2026-10-28 07:17:22.646502+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.660200+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=0 t=0.0ms delta=0.0ms event=engine.toggle_requested source=non_shortcut state=idle
+2026-10-28 07:17:22.660324+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=1 t=0.2ms delta=0.2ms event=engine.toggle.enter state=idle
+2026-10-28 07:17:22.660379+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord called – state=idle
+2026-10-28 07:17:22.660425+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=2 t=0.3ms delta=0.1ms event=engine.start_path.enter
+2026-10-28 07:17:22.660439+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: entering start-recording branch
+2026-10-28 07:17:22.660628+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=3 t=0.5ms delta=0.2ms event=engine.start_lifecycle.begin
+2026-10-28 07:17:22.660659+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=4 t=0.5ms delta=0.1ms event=engine.permission.request
+2026-10-28 07:17:22.660696+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=5 t=0.6ms delta=0.0ms event=engine.permission.callback granted=true
+2026-10-28 07:17:22.660722+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=6 t=0.6ms delta=0.0ms event=engine.start_authorized.enter
+2026-10-28 07:17:22.660850+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=7 t=0.7ms delta=0.1ms event=engine.audio_relay.created
+2026-10-28 07:17:22.661235+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=8 t=1.1ms delta=0.4ms event=engine.state.starting
+2026-10-28 07:17:22.661248+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: state=starting, starting audio hardware
+2026-10-28 07:17:22.661264+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=9 t=1.1ms delta=0.0ms event=engine.start_orchestration.plan resolvePowerMode=false prepareSessionBeforeRecorder=true
+2026-10-28 07:17:22.661274+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=10 t=1.1ms delta=0.0ms event=power_mode.resolve.skipped reason=no_configurations
+2026-10-28 07:17:22.661307+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=11 t=1.2ms delta=0.0ms event=streaming_session.created model=RJT-Context-0F788480-605B-4F13-A15D-81461DFF63F5
+2026-10-28 07:17:22.661319+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=12 t=1.2ms delta=0.0ms event=streaming_session.prepare.begin
+2026-10-28 07:17:22.661484+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=13 t=1.3ms delta=0.1ms event=streaming_session.prepare.end durationMs=0.1 result=success hasAudioSink=false
+2026-10-28 07:17:22.661566+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=14 t=1.4ms delta=0.1ms event=audio_relay.cleared chunks=0
+2026-10-28 07:17:22.661606+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=15 t=1.5ms delta=0.0ms event=recorder.start.begin
+2026-10-28 07:17:22.661640+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=16 t=1.5ms delta=0.0ms event=recorder.start.enter
+2026-10-28 07:17:22.661700+0000 roma just talk[30186:91550] [Recorder] startRecording called – deviceID=87, file=91015431-2F2E-4242-9D71-1B3F17B0EF6F.wav
+2026-10-28 07:17:22.661733+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=17 t=1.6ms delta=0.1ms event=recorder.device_lookup.begin
+2026-10-28 07:17:22.661879+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=18 t=1.7ms delta=0.1ms event=recorder.device_lookup.end durationMs=0.0 deviceID=87
+2026-10-28 07:17:22.661951+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=19 t=1.8ms delta=0.2ms event=recorder.audio_setup_queue.schedule_start
+2026-10-28 07:17:22.662021+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=20 t=1.9ms delta=0.1ms event=recorder.audio_setup_queue.start.begin
+2026-10-28 07:17:22.662045+0000 roma just talk[30186:91630] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.662053+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-28 07:17:22.662402+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-28 07:17:22.662413+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 07:17:22.662475+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-28 07:17:22.678154+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-28 07:17:22.678188+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-28 07:17:22.678196+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-28 07:17:22.684519+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Starting recording from device 87
+2026-10-28 07:17:22.684589+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=21 t=24.4ms delta=22.6ms event=core_audio.output_file.create.begin
+2026-10-28 07:17:22.686079+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=22 t=25.9ms delta=1.5ms event=core_audio.output_file.create.end durationMs=1.5 result=success
+2026-10-28 07:17:22.686111+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=23 t=26.0ms delta=0.0ms event=core_audio.pre_roll.snapshot_and_write.begin
+2026-10-28 07:17:22.686141+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=24 t=26.0ms delta=0.0ms event=core_audio.pre_roll.snapshot_and_write.end durationMs=0.0 result=success bytes=0
+2026-10-28 07:17:22.686156+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=25 t=26.0ms delta=0.0ms event=recorder.audio_setup_queue.start.end durationMs=24.1 result=success
+2026-10-28 07:17:22.686167+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=26 t=26.0ms delta=0.0ms event=recorder.audio_setup_queue.start_continuation.executor_enqueued
+2026-10-28 07:17:22.686244+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=27 t=26.1ms delta=0.1ms event=recorder.audio_setup_queue.start_continuation.executor_resumed queueDelayMs=0.1
+2026-10-28 07:17:22.686258+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=28 t=26.1ms delta=0.0ms event=recorder.audio_setup_queue.start_resumed
+2026-10-28 07:17:22.686266+0000 roma just talk[30186:91550] [Recorder] startRecording: CoreAudioRecorder started successfully
+2026-10-28 07:17:22.686308+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=29 t=26.2ms delta=0.0ms event=recorder.start.end durationMs=24.7 result=success
+2026-10-28 07:17:22.686791+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=30 t=26.6ms delta=0.4ms event=engine.state.recording
+2026-10-28 07:17:22.686823+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: recording started successfully, state=recording
+2026-10-28 07:17:22.686909+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=31 t=26.8ms delta=0.2ms event=engine.start_authorized.complete
+2026-10-28 07:17:22.686926+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=32 t=26.8ms delta=0.0ms event=engine.start_lifecycle.end durationMs=26.3
+2026-10-28 07:17:22.687028+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=33 t=26.9ms delta=0.1ms event=recorder.pause_media.begin
+2026-10-28 07:17:22.687138+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=34 t=27.0ms delta=0.1ms event=recorder.pause_media.end durationMs=0.1
+2026-10-28 07:17:22.687289+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=35 t=27.2ms delta=0.1ms event=engine.cancel_requested state=recording
+2026-10-28 07:17:22.687313+0000 roma just talk[30186:91550] [VoiceInkEngine] cancelRecording called – state=recording
+2026-10-28 07:17:22.687350+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=36 t=27.2ms delta=0.1ms event=recorder.stop.enter
+2026-10-28 07:17:22.687357+0000 roma just talk[30186:91550] [Recorder] stopRecording called
+2026-10-28 07:17:22.687383+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=37 t=27.3ms delta=0.0ms event=recorder.audio_setup_queue.schedule_stop
+2026-10-28 07:17:22.687766+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=38 t=27.6ms delta=0.3ms event=recorder.audio_setup_queue.stop.begin
+2026-10-28 07:17:22.687808+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=39 t=27.7ms delta=0.1ms event=core_audio.finish_recording.begin
+2026-10-28 07:17:22.687974+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=40 t=27.8ms delta=0.2ms event=core_audio.pcm_recording nativeRate=48000.0 nativeChannels=2 nativeFrames=0 conversionCallbacks=0 minCallbackFrames=0 maxCallbackFrames=0 rejectedNativeFrames=0 conversionRejects=0 tailConversionRejects=0 preRollPCMFrames=0 livePCMFrames=0 tailPCMFrames=0 inputClockStart=0 inputClockCut=0 outputClockStart=0 outputClockCut=0 mixedFormat=false streamingContinuous=false
+2026-10-28 07:17:22.688045+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=41 t=27.9ms delta=0.0ms event=core_audio.finish_recording.end durationMs=0.2 keepCapturing=true
+2026-10-28 07:17:22.688384+0000 roma just talk[30186:91550] [CoreAudioRecorder] finishRecording completed keepCapturing=true elapsed=0.001s
+2026-10-28 07:17:22.688478+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=42 t=28.3ms delta=0.4ms event=recorder.audio_setup_queue.stop.end durationMs=0.7
+2026-10-28 07:17:22.688530+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=43 t=28.4ms delta=0.1ms event=recorder.audio_setup_queue.stop_completed
+2026-10-28 07:17:22.688601+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=44 t=28.5ms delta=0.1ms event=recorder.restore_audio.task.executor_enqueued
+2026-10-28 07:17:22.688765+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=45 t=28.6ms delta=0.2ms event=recorder.restore_audio.task.executor_resumed queueDelayMs=0.2
+2026-10-28 07:17:22.688781+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=46 t=28.7ms delta=0.0ms event=recorder.restore_audio.begin
+2026-10-28 07:17:22.689046+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=47 t=28.9ms delta=0.3ms event=recorder.restore_audio.end durationMs=0.3
+2026-10-28 07:17:22.690072+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=48 t=29.9ms delta=1.0ms event=engine.cancel_audio_duration.executor_enqueued
+2026-10-28 07:17:22.690488+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=49 t=30.3ms delta=0.4ms event=engine.cancel_audio_duration.executor_resumed queueDelayMs=0.4
+2026-10-28 07:17:22.692934+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 07:17:22.692971+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 07:17:22.692985+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 07:17:22.693147+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 07:17:22.693195+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=B7DFBF7D seq=50 t=33.0ms delta=2.7ms event=engine.recording_cancelled
+2026-10-28 07:17:22.694982+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: stopping core audio recorder
+2026-10-28 07:17:22.731665+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.740017+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=0 t=0.0ms delta=0.0ms event=engine.toggle_requested source=non_shortcut state=idle
+2026-10-28 07:17:22.740065+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=1 t=0.1ms delta=0.1ms event=engine.toggle.enter state=idle
+2026-10-28 07:17:22.740079+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord called – state=idle
+2026-10-28 07:17:22.740094+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=2 t=0.1ms delta=0.0ms event=engine.start_path.enter
+2026-10-28 07:17:22.740099+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: entering start-recording branch
+2026-10-28 07:17:22.740138+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=3 t=0.2ms delta=0.0ms event=engine.start_lifecycle.begin
+2026-10-28 07:17:22.740147+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=4 t=0.2ms delta=0.0ms event=engine.permission.request
+2026-10-28 07:17:22.740160+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=5 t=0.2ms delta=0.0ms event=engine.permission.callback granted=true
+2026-10-28 07:17:22.740168+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=6 t=0.2ms delta=0.0ms event=engine.start_authorized.enter
+2026-10-28 07:17:22.740180+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=7 t=0.2ms delta=0.0ms event=engine.audio_relay.created
+2026-10-28 07:17:22.740481+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=8 t=0.5ms delta=0.3ms event=engine.state.starting
+2026-10-28 07:17:22.740492+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: state=starting, starting audio hardware
+2026-10-28 07:17:22.740510+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=9 t=0.5ms delta=0.0ms event=engine.start_orchestration.plan resolvePowerMode=false prepareSessionBeforeRecorder=true
+2026-10-28 07:17:22.740522+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=10 t=0.5ms delta=0.0ms event=power_mode.resolve.skipped reason=no_configurations
+2026-10-28 07:17:22.740551+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=11 t=0.6ms delta=0.0ms event=streaming_session.created model=RJT-Context-5D2C2460-FD06-4338-BD52-E99A5BCCF006
+2026-10-28 07:17:22.740562+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=12 t=0.6ms delta=0.0ms event=streaming_session.prepare.begin
+2026-10-28 07:17:22.740583+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=13 t=0.6ms delta=0.0ms event=streaming_session.prepare.end durationMs=0.0 result=success hasAudioSink=false
+2026-10-28 07:17:22.740600+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=14 t=0.6ms delta=0.0ms event=audio_relay.cleared chunks=0
+2026-10-28 07:17:22.740610+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=15 t=0.6ms delta=0.0ms event=recorder.start.begin
+2026-10-28 07:17:22.740619+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=16 t=0.6ms delta=0.0ms event=recorder.start.enter
+2026-10-28 07:17:22.740643+0000 roma just talk[30186:91550] [Recorder] startRecording called – deviceID=87, file=A068C7F1-2BD2-470E-BF0D-B554A01B3906.wav
+2026-10-28 07:17:22.740656+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=17 t=0.7ms delta=0.0ms event=recorder.device_lookup.begin
+2026-10-28 07:17:22.740812+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=18 t=0.8ms delta=0.2ms event=recorder.device_lookup.end durationMs=0.1 deviceID=87
+2026-10-28 07:17:22.740854+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=19 t=0.9ms delta=0.0ms event=recorder.audio_setup_queue.schedule_start
+2026-10-28 07:17:22.740895+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=20 t=0.9ms delta=0.0ms event=recorder.audio_setup_queue.start.begin
+2026-10-28 07:17:22.740935+0000 roma just talk[30186:91630] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.740954+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-28 07:17:22.741320+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-28 07:17:22.741329+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 07:17:22.741406+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-28 07:17:22.757260+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-28 07:17:22.757328+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-28 07:17:22.757345+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-28 07:17:22.765751+0000 roma just talk[30186:91630] [CoreAudioRecorder] 🎙️ Starting recording from device 87
+2026-10-28 07:17:22.765824+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=21 t=25.8ms delta=24.9ms event=core_audio.output_file.create.begin
+2026-10-28 07:17:22.766692+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=22 t=26.7ms delta=0.9ms event=core_audio.output_file.create.end durationMs=0.9 result=success
+2026-10-28 07:17:22.766736+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=23 t=26.7ms delta=0.0ms event=core_audio.pre_roll.snapshot_and_write.begin
+2026-10-28 07:17:22.766814+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=24 t=26.8ms delta=0.1ms event=core_audio.pre_roll.snapshot_and_write.end durationMs=0.0 result=success bytes=0
+2026-10-28 07:17:22.766851+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=25 t=26.9ms delta=0.1ms event=recorder.audio_setup_queue.start.end durationMs=25.9 result=success
+2026-10-28 07:17:22.766870+0000 roma just talk[30186:91630] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=26 t=26.9ms delta=0.0ms event=recorder.audio_setup_queue.start_continuation.executor_enqueued
+2026-10-28 07:17:22.766946+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=27 t=26.9ms delta=0.1ms event=recorder.audio_setup_queue.start_continuation.executor_resumed queueDelayMs=0.1
+2026-10-28 07:17:22.766965+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=28 t=27.0ms delta=0.0ms event=recorder.audio_setup_queue.start_resumed
+2026-10-28 07:17:22.767782+0000 roma just talk[30186:91550] [Recorder] startRecording: CoreAudioRecorder started successfully
+2026-10-28 07:17:22.767868+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=29 t=27.9ms delta=0.9ms event=recorder.start.end durationMs=27.2 result=success
+2026-10-28 07:17:22.767907+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=30 t=27.9ms delta=0.0ms event=engine.state.recording
+2026-10-28 07:17:22.767915+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: recording started successfully, state=recording
+2026-10-28 07:17:22.767936+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=31 t=28.0ms delta=0.0ms event=engine.start_authorized.complete
+2026-10-28 07:17:22.767947+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=32 t=28.0ms delta=0.0ms event=engine.start_lifecycle.end durationMs=27.8
+2026-10-28 07:17:22.768433+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=33 t=28.4ms delta=0.5ms event=recorder.pause_media.begin
+2026-10-28 07:17:22.768531+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=34 t=28.5ms delta=0.1ms event=recorder.pause_media.end durationMs=0.1
+2026-10-28 07:17:22.769182+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=35 t=29.2ms delta=0.6ms event=engine.cancel_requested state=recording
+2026-10-28 07:17:22.769205+0000 roma just talk[30186:91550] [VoiceInkEngine] cancelRecording called – state=recording
+2026-10-28 07:17:22.769240+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=36 t=29.3ms delta=0.1ms event=recorder.stop.enter
+2026-10-28 07:17:22.769246+0000 roma just talk[30186:91550] [Recorder] stopRecording called
+2026-10-28 07:17:22.769274+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=37 t=29.3ms delta=0.0ms event=recorder.audio_setup_queue.schedule_stop
+2026-10-28 07:17:22.769674+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=38 t=29.7ms delta=0.4ms event=recorder.audio_setup_queue.stop.begin
+2026-10-28 07:17:22.769691+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=39 t=29.7ms delta=0.0ms event=core_audio.finish_recording.begin
+2026-10-28 07:17:22.770251+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=40 t=30.2ms delta=0.5ms event=core_audio.pcm_recording nativeRate=48000.0 nativeChannels=2 nativeFrames=512 conversionCallbacks=1 minCallbackFrames=512 maxCallbackFrames=512 rejectedNativeFrames=0 conversionRejects=0 tailConversionRejects=0 preRollPCMFrames=0 livePCMFrames=170 tailPCMFrames=0 inputClockStart=0 inputClockCut=512 outputClockStart=0 outputClockCut=170 mixedFormat=false streamingContinuous=false
+2026-10-28 07:17:22.770345+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=41 t=30.4ms delta=0.2ms event=core_audio.finish_recording.end durationMs=0.6 keepCapturing=true
+2026-10-28 07:17:22.770376+0000 roma just talk[30186:91550] [CoreAudioRecorder] finishRecording completed keepCapturing=true elapsed=0.001s
+2026-10-28 07:17:22.770458+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=42 t=30.4ms delta=0.1ms event=recorder.audio_setup_queue.stop.end durationMs=0.7
+2026-10-28 07:17:22.770580+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=43 t=30.6ms delta=0.1ms event=recorder.audio_setup_queue.stop_completed
+2026-10-28 07:17:22.770666+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=44 t=30.6ms delta=0.1ms event=recorder.restore_audio.task.executor_enqueued
+2026-10-28 07:17:22.770883+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=45 t=30.9ms delta=0.3ms event=recorder.restore_audio.task.executor_resumed queueDelayMs=0.3
+2026-10-28 07:17:22.770900+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=46 t=30.9ms delta=0.0ms event=recorder.restore_audio.begin
+2026-10-28 07:17:22.771166+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=47 t=31.2ms delta=0.2ms event=recorder.restore_audio.end durationMs=0.2
+2026-10-28 07:17:22.772775+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=48 t=32.7ms delta=1.6ms event=engine.cancel_audio_duration.executor_enqueued
+2026-10-28 07:17:22.773232+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=49 t=33.2ms delta=0.5ms event=engine.cancel_audio_duration.executor_resumed queueDelayMs=0.5
+2026-10-28 07:17:22.774645+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 07:17:22.774678+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 07:17:22.774693+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 07:17:22.774865+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 07:17:22.775017+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=0DD6E275 seq=50 t=34.9ms delta=1.7ms event=engine.recording_cancelled
+2026-10-28 07:17:22.776027+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: stopping core audio recorder
+2026-10-28 07:17:22.812913+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+✔ Test liveWritingStartupContextRespectsOwnerAfterCancellation() passed after 0.888 seconds.
+◇ Test liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges() started.
+2026-10-28 07:17:22.854569+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=0 t=0.0ms delta=0.0ms event=engine.toggle_requested source=non_shortcut state=idle
+2026-10-28 07:17:22.854619+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=1 t=0.1ms delta=0.1ms event=engine.toggle.enter state=idle
+2026-10-28 07:17:22.854633+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord called – state=idle
+2026-10-28 07:17:22.854648+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=2 t=0.1ms delta=0.0ms event=engine.start_path.enter
+2026-10-28 07:17:22.854654+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: entering start-recording branch
+2026-10-28 07:17:22.854905+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=3 t=0.3ms delta=0.1ms event=engine.start_lifecycle.begin
+2026-10-28 07:17:22.854919+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=4 t=0.4ms delta=0.1ms event=engine.permission.request
+2026-10-28 07:17:22.856271+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=5 t=1.7ms delta=1.3ms event=engine.permission.callback granted=true
+2026-10-28 07:17:22.856309+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=6 t=1.8ms delta=0.1ms event=engine.start_authorized.enter
+2026-10-28 07:17:22.856331+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=7 t=1.8ms delta=0.0ms event=engine.audio_relay.created
+2026-10-28 07:17:22.856434+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=8 t=1.9ms delta=0.1ms event=engine.state.starting
+2026-10-28 07:17:22.856442+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: state=starting, starting audio hardware
+2026-10-28 07:17:22.856470+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=9 t=1.9ms delta=0.0ms event=engine.start_orchestration.plan resolvePowerMode=false prepareSessionBeforeRecorder=true
+2026-10-28 07:17:22.856486+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=10 t=2.0ms delta=0.0ms event=power_mode.resolve.skipped reason=no_configurations
+2026-10-28 07:17:22.856521+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=11 t=2.0ms delta=0.0ms event=streaming_session.created model=RJT-Context-A3AC683B-572F-42A8-BAFB-FB0FD6E89807
+2026-10-28 07:17:22.856669+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=12 t=2.1ms delta=0.1ms event=streaming_session.prepare.begin
+2026-10-28 07:17:22.856685+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=13 t=2.2ms delta=0.0ms event=streaming_session.prepare.end durationMs=0.0 result=success hasAudioSink=false
+2026-10-28 07:17:22.856702+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=14 t=2.2ms delta=0.0ms event=audio_relay.cleared chunks=0
+2026-10-28 07:17:22.856713+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=15 t=2.2ms delta=0.0ms event=recorder.start.begin
+2026-10-28 07:17:22.856722+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=16 t=2.2ms delta=0.0ms event=recorder.start.enter
+2026-10-28 07:17:22.856923+0000 roma just talk[30186:91550] [Recorder] startRecording called – deviceID=87, file=A834F2C9-6166-4F94-94F4-6A1D83DB339A.wav
+2026-10-28 07:17:22.856936+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=17 t=2.4ms delta=0.2ms event=recorder.device_lookup.begin
+2026-10-28 07:17:22.856952+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=18 t=2.4ms delta=0.0ms event=recorder.device_lookup.end durationMs=0.0 deviceID=87
+2026-10-28 07:17:22.862483+0000 roma just talk[30186:91550] [Window] Warning: -[NSWindow makeKeyWindow] called on <NSPanel: 0x999d90c80> windowNumber=6e which returned NO from -[NSWindow canBecomeKeyWindow].
+2026-10-28 07:17:22.866414+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=19 t=11.9ms delta=9.4ms event=recorder.audio_setup_queue.schedule_start
+2026-10-28 07:17:22.866569+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=20 t=12.0ms delta=0.1ms event=recorder.audio_setup_queue.start.begin
+2026-10-28 07:17:22.866621+0000 roma just talk[30186:91624] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.866640+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-28 07:17:22.867245+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-28 07:17:22.867259+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 07:17:22.867349+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-28 07:17:22.894005+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-28 07:17:22.894078+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-28 07:17:22.894100+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-28 07:17:22.905010+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Starting recording from device 87
+2026-10-28 07:17:22.905094+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=21 t=50.5ms delta=38.6ms event=core_audio.output_file.create.begin
+2026-10-28 07:17:22.906486+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=22 t=51.9ms delta=1.3ms event=core_audio.output_file.create.end durationMs=1.3 result=success
+2026-10-28 07:17:22.906572+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=23 t=52.0ms delta=0.1ms event=core_audio.pre_roll.snapshot_and_write.begin
+2026-10-28 07:17:22.906596+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=24 t=52.1ms delta=0.0ms event=core_audio.pre_roll.snapshot_and_write.end durationMs=0.0 result=success bytes=0
+2026-10-28 07:17:22.906610+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=25 t=52.1ms delta=0.0ms event=recorder.audio_setup_queue.start.end durationMs=40.1 result=success
+2026-10-28 07:17:22.906853+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=26 t=52.1ms delta=0.0ms event=recorder.audio_setup_queue.start_continuation.executor_enqueued
+2026-10-28 07:17:22.910568+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=27 t=55.9ms delta=3.8ms event=recorder.audio_setup_queue.start_continuation.executor_resumed queueDelayMs=3.8
+2026-10-28 07:17:22.910695+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=28 t=56.1ms delta=0.2ms event=recorder.audio_setup_queue.start_resumed
+2026-10-28 07:17:22.910729+0000 roma just talk[30186:91550] [Recorder] startRecording: CoreAudioRecorder started successfully
+2026-10-28 07:17:22.910872+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=29 t=56.3ms delta=0.2ms event=recorder.start.end durationMs=54.1 result=success
+2026-10-28 07:17:22.910967+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=30 t=56.4ms delta=0.1ms event=engine.state.recording
+2026-10-28 07:17:22.910991+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: recording started successfully, state=recording
+2026-10-28 07:17:22.911071+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=31 t=56.5ms delta=0.1ms event=engine.start_authorized.complete
+2026-10-28 07:17:22.911135+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=32 t=56.6ms delta=0.1ms event=engine.start_lifecycle.end durationMs=56.3
+2026-10-28 07:17:22.911340+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=33 t=56.8ms delta=0.2ms event=recorder.pause_media.begin
+2026-10-28 07:17:22.911561+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=34 t=57.0ms delta=0.3ms event=recorder.pause_media.end durationMs=0.2
+2026-10-28 07:17:22.912899+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=35 t=58.3ms delta=1.3ms event=engine.cancel_requested state=recording
+2026-10-28 07:17:22.912926+0000 roma just talk[30186:91550] [VoiceInkEngine] cancelRecording called – state=recording
+2026-10-28 07:17:22.912965+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=36 t=58.4ms delta=0.1ms event=recorder.stop.enter
+2026-10-28 07:17:22.912972+0000 roma just talk[30186:91550] [Recorder] stopRecording called
+2026-10-28 07:17:22.913005+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=37 t=58.5ms delta=0.0ms event=recorder.audio_setup_queue.schedule_stop
+2026-10-28 07:17:22.913020+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=38 t=58.5ms delta=0.0ms event=recorder.audio_setup_queue.stop.begin
+2026-10-28 07:17:22.913032+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=39 t=58.5ms delta=0.0ms event=core_audio.finish_recording.begin
+2026-10-28 07:17:22.913662+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=40 t=59.1ms delta=0.5ms event=core_audio.pcm_recording nativeRate=48000.0 nativeChannels=2 nativeFrames=512 conversionCallbacks=1 minCallbackFrames=512 maxCallbackFrames=512 rejectedNativeFrames=0 conversionRejects=0 tailConversionRejects=0 preRollPCMFrames=0 livePCMFrames=170 tailPCMFrames=0 inputClockStart=0 inputClockCut=512 outputClockStart=0 outputClockCut=170 mixedFormat=false streamingContinuous=false
+2026-10-28 07:17:22.913729+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=41 t=59.2ms delta=0.1ms event=core_audio.finish_recording.end durationMs=0.7 keepCapturing=true
+2026-10-28 07:17:22.913760+0000 roma just talk[30186:91550] [CoreAudioRecorder] finishRecording completed keepCapturing=true elapsed=0.000s
+2026-10-28 07:17:22.913799+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=42 t=59.3ms delta=0.1ms event=recorder.audio_setup_queue.stop.end durationMs=0.8
+2026-10-28 07:17:22.913830+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=43 t=59.3ms delta=0.0ms event=recorder.audio_setup_queue.stop_completed
+2026-10-28 07:17:22.913892+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=44 t=59.4ms delta=0.1ms event=recorder.restore_audio.task.executor_enqueued
+2026-10-28 07:17:22.916433+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=45 t=61.7ms delta=2.3ms event=engine.cancel_audio_duration.executor_enqueued
+2026-10-28 07:17:22.919444+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=46 t=64.9ms delta=3.2ms event=recorder.restore_audio.task.executor_resumed queueDelayMs=5.5
+2026-10-28 07:17:22.919625+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=47 t=65.0ms delta=0.2ms event=recorder.restore_audio.begin
+2026-10-28 07:17:22.919734+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=48 t=65.2ms delta=0.1ms event=engine.cancel_audio_duration.executor_resumed queueDelayMs=3.5
+2026-10-28 07:17:22.924552+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 07:17:22.924603+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 07:17:22.924632+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 07:17:22.924780+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 07:17:22.924828+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=49 t=70.3ms delta=5.1ms event=engine.recording_cancelled
+2026-10-28 07:17:22.943993+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=1BF94EDB seq=50 t=89.4ms delta=19.2ms event=recorder.restore_audio.end durationMs=24.3
+2026-10-28 07:17:22.944082+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: stopping core audio recorder
+2026-10-28 07:17:22.975836+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.975960+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=0 t=0.0ms delta=0.0ms event=engine.toggle_requested source=non_shortcut state=idle
+2026-10-28 07:17:22.975981+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=1 t=0.1ms delta=0.1ms event=engine.toggle.enter state=idle
+2026-10-28 07:17:22.975999+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord called – state=idle
+2026-10-28 07:17:22.976014+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=2 t=0.1ms delta=0.0ms event=engine.start_path.enter
+2026-10-28 07:17:22.976019+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: entering start-recording branch
+2026-10-28 07:17:22.976079+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=3 t=0.1ms delta=0.1ms event=engine.start_lifecycle.begin
+2026-10-28 07:17:22.976091+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=4 t=0.2ms delta=0.0ms event=engine.permission.request
+2026-10-28 07:17:22.976621+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=5 t=0.7ms delta=0.5ms event=engine.permission.callback granted=true
+2026-10-28 07:17:22.976646+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=6 t=0.7ms delta=0.0ms event=engine.start_authorized.enter
+2026-10-28 07:17:22.976666+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=7 t=0.7ms delta=0.0ms event=engine.audio_relay.created
+2026-10-28 07:17:22.976764+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=8 t=0.8ms delta=0.1ms event=engine.state.starting
+2026-10-28 07:17:22.976771+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: state=starting, starting audio hardware
+2026-10-28 07:17:22.976787+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=9 t=0.9ms delta=0.0ms event=engine.start_orchestration.plan resolvePowerMode=false prepareSessionBeforeRecorder=true
+2026-10-28 07:17:22.976797+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=10 t=0.9ms delta=0.0ms event=power_mode.resolve.skipped reason=no_configurations
+2026-10-28 07:17:22.976828+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=11 t=0.9ms delta=0.0ms event=streaming_session.created model=RJT-Context-CF6CBEED-F801-4341-9943-CF0B06D125F5
+2026-10-28 07:17:22.976839+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=12 t=0.9ms delta=0.0ms event=streaming_session.prepare.begin
+2026-10-28 07:17:22.976852+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=13 t=0.9ms delta=0.0ms event=streaming_session.prepare.end durationMs=0.0 result=success hasAudioSink=false
+2026-10-28 07:17:22.976867+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=14 t=0.9ms delta=0.0ms event=audio_relay.cleared chunks=0
+2026-10-28 07:17:22.976880+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=15 t=1.0ms delta=0.0ms event=recorder.start.begin
+2026-10-28 07:17:22.976891+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=16 t=1.0ms delta=0.0ms event=recorder.start.enter
+2026-10-28 07:17:22.976983+0000 roma just talk[30186:91550] [Recorder] startRecording called – deviceID=87, file=87110486-05F8-42A3-B1C0-E3E087695D81.wav
+2026-10-28 07:17:22.977003+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=17 t=1.1ms delta=0.1ms event=recorder.device_lookup.begin
+2026-10-28 07:17:22.977022+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=18 t=1.1ms delta=0.0ms event=recorder.device_lookup.end durationMs=0.0 deviceID=87
+2026-10-28 07:17:22.977061+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=19 t=1.1ms delta=0.0ms event=recorder.audio_setup_queue.schedule_start
+2026-10-28 07:17:22.977101+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=20 t=1.2ms delta=0.0ms event=recorder.audio_setup_queue.start.begin
+2026-10-28 07:17:22.977115+0000 roma just talk[30186:91624] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:22.977160+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 87
+2026-10-28 07:17:22.977546+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice 2
+2026-10-28 07:17:22.977560+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 07:17:22.977642+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+2026-10-28 07:17:22.988851+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Device format: sampleRate=48000.000000, channels=2, bitsPerChannel=32
+2026-10-28 07:17:22.988889+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Output format: sampleRate=16000.000000, channels=1, bitsPerChannel=16
+2026-10-28 07:17:22.988897+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Converting: 48000Hz → 16000Hz
+2026-10-28 07:17:22.993716+0000 roma just talk[30186:91624] [CoreAudioRecorder] 🎙️ Starting recording from device 87
+2026-10-28 07:17:22.993784+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=21 t=17.8ms delta=16.7ms event=core_audio.output_file.create.begin
+2026-10-28 07:17:22.994491+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=22 t=18.5ms delta=0.7ms event=core_audio.output_file.create.end durationMs=0.7 result=success
+2026-10-28 07:17:22.994696+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=23 t=18.8ms delta=0.2ms event=core_audio.pre_roll.snapshot_and_write.begin
+2026-10-28 07:17:22.994743+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=24 t=18.8ms delta=0.1ms event=core_audio.pre_roll.snapshot_and_write.end durationMs=0.0 result=success bytes=0
+2026-10-28 07:17:22.994777+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=25 t=18.8ms delta=0.0ms event=recorder.audio_setup_queue.start.end durationMs=17.7 result=success
+2026-10-28 07:17:22.994827+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=26 t=18.9ms delta=0.0ms event=recorder.audio_setup_queue.start_continuation.executor_enqueued
+2026-10-28 07:17:22.994982+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=27 t=19.0ms delta=0.2ms event=recorder.audio_setup_queue.start_continuation.executor_resumed queueDelayMs=0.2
+2026-10-28 07:17:22.995019+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=28 t=19.1ms delta=0.1ms event=recorder.audio_setup_queue.start_resumed
+2026-10-28 07:17:22.995035+0000 roma just talk[30186:91550] [Recorder] startRecording: CoreAudioRecorder started successfully
+2026-10-28 07:17:22.995123+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=29 t=19.2ms delta=0.1ms event=recorder.start.end durationMs=18.2 result=success
+2026-10-28 07:17:22.995182+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=30 t=19.2ms delta=0.1ms event=engine.state.recording
+2026-10-28 07:17:22.995194+0000 roma just talk[30186:91550] [VoiceInkEngine] toggleRecord: recording started successfully, state=recording
+2026-10-28 07:17:22.995239+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=31 t=19.3ms delta=0.1ms event=engine.start_authorized.complete
+2026-10-28 07:17:22.995394+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=32 t=19.5ms delta=0.2ms event=engine.start_lifecycle.end durationMs=19.3
+2026-10-28 07:17:22.995551+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=33 t=19.6ms delta=0.2ms event=recorder.pause_media.begin
+2026-10-28 07:17:22.995703+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=34 t=19.8ms delta=0.2ms event=recorder.pause_media.end durationMs=0.1
+2026-10-28 07:17:22.996370+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=35 t=20.4ms delta=0.6ms event=engine.cancel_requested state=recording
+2026-10-28 07:17:22.996431+0000 roma just talk[30186:91550] [VoiceInkEngine] cancelRecording called – state=recording
+2026-10-28 07:17:22.996522+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=36 t=20.6ms delta=0.2ms event=recorder.stop.enter
+2026-10-28 07:17:22.996540+0000 roma just talk[30186:91550] [Recorder] stopRecording called
+2026-10-28 07:17:22.996603+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=37 t=20.7ms delta=0.1ms event=recorder.audio_setup_queue.schedule_stop
+2026-10-28 07:17:22.996635+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=38 t=20.7ms delta=0.0ms event=recorder.audio_setup_queue.stop.begin
+2026-10-28 07:17:22.996663+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=39 t=20.7ms delta=0.0ms event=core_audio.finish_recording.begin
+2026-10-28 07:17:22.996883+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=40 t=20.9ms delta=0.2ms event=core_audio.pcm_recording nativeRate=48000.0 nativeChannels=2 nativeFrames=0 conversionCallbacks=0 minCallbackFrames=0 maxCallbackFrames=0 rejectedNativeFrames=0 conversionRejects=0 tailConversionRejects=0 preRollPCMFrames=0 livePCMFrames=0 tailPCMFrames=0 inputClockStart=0 inputClockCut=0 outputClockStart=0 outputClockCut=0 mixedFormat=false streamingContinuous=false
+2026-10-28 07:17:22.996956+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=41 t=21.0ms delta=0.1ms event=core_audio.finish_recording.end durationMs=0.3 keepCapturing=true
+2026-10-28 07:17:22.996979+0000 roma just talk[30186:91550] [CoreAudioRecorder] finishRecording completed keepCapturing=true elapsed=0.000s
+2026-10-28 07:17:22.997012+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=42 t=21.1ms delta=0.1ms event=recorder.audio_setup_queue.stop.end durationMs=0.4
+2026-10-28 07:17:22.997039+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=43 t=21.1ms delta=0.0ms event=recorder.audio_setup_queue.stop_completed
+2026-10-28 07:17:22.997082+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=44 t=21.1ms delta=0.0ms event=recorder.restore_audio.task.executor_enqueued
+2026-10-28 07:17:22.997950+0000 roma just talk[30186:91624] [LatencyTrace] [LATENCY] trace=7900D6AD seq=45 t=22.0ms delta=0.8ms event=engine.cancel_audio_duration.executor_enqueued
+2026-10-28 07:17:23.003473+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=46 t=27.4ms delta=5.4ms event=recorder.restore_audio.task.executor_resumed queueDelayMs=6.2
+2026-10-28 07:17:23.003595+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=47 t=27.6ms delta=0.3ms event=recorder.restore_audio.begin
+2026-10-28 07:17:23.003631+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=48 t=27.7ms delta=0.1ms event=engine.cancel_audio_duration.executor_resumed queueDelayMs=5.7
+2026-10-28 07:17:23.005344+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 07:17:23.005427+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 07:17:23.005450+0000 roma just talk[30186:91550] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 07:17:23.005584+0000 roma just talk[30186:91550] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 07:17:23.005622+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=49 t=29.7ms delta=2.0ms event=engine.recording_cancelled
+✔ Test liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges() passed after 0.191 seconds.
+2026-10-28 07:17:23.012386+0000 roma just talk[30186:91550] [LatencyTrace] [LATENCY] trace=7900D6AD seq=50 t=36.5ms delta=6.8ms event=recorder.restore_audio.end durationMs=8.8
+2026-10-28 07:17:23.012412+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: stopping core audio recorder
+✔ Suite VoiceInkTests passed after 20.203 seconds.
+✔ Test run with 6 tests in 1 suite passed after 20.204 seconds.
+2026-10-28 07:17:23.049642+0000 roma just talk[30186:91550] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 07:17:23.551 xcodebuild[29126:88147] [MT] IDETestOperationsObserverDebug: 23.624 elapsed -- Testing started completed.
+2026-10-28 07:17:23.552 xcodebuild[29126:88147] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-28 07:17:23.552 xcodebuild[29126:88147] [MT] IDETestOperationsObserverDebug: 23.624 sec, +23.624 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/onboarding-test-evidence/writing-target-live/Live.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

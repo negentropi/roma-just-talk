@@ -1,0 +1,74 @@
+{
+  "checks": {
+    "system-tcc.json": {
+      "query_exit_code": 0,
+      "cmp_exit_code": 0,
+      "expected": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014B061C5CCC9ECA5676A46A3EA50CAA8FA19C99B26"
+        }
+      ],
+      "actual": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014B061C5CCC9ECA5676A46A3EA50CAA8FA19C99B26"
+        }
+      ],
+      "raw_bytes_equal": true,
+      "expected_signed_grant": [
+        {
+          "service": "kTCCServiceAccessibility",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014B061C5CCC9ECA5676A46A3EA50CAA8FA19C99B26"
+        }
+      ],
+      "valid": true
+    },
+    "microphone-tcc.json": {
+      "query_exit_code": 0,
+      "cmp_exit_code": 1,
+      "expected": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014B061C5CCC9ECA5676A46A3EA50CAA8FA19C99B26"
+        }
+      ],
+      "actual": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 0,
+          "csreq": "FADE0C0000000028000000010000000800000014B061C5CCC9ECA5676A46A3EA50CAA8FA19C99B26"
+        }
+      ],
+      "raw_bytes_equal": false,
+      "expected_signed_grant": [
+        {
+          "service": "kTCCServiceMicrophone",
+          "client": "com.negentropi.RomaJustTalk",
+          "client_type": 0,
+          "auth_value": 2,
+          "csreq": "FADE0C0000000028000000010000000800000014B061C5CCC9ECA5676A46A3EA50CAA8FA19C99B26"
+        }
+      ],
+      "valid": false
+    }
+  },
+  "phase_limit": "Permissions read before seed and before verify after UI; no after-seed read. Exact native initiating call is not traced.",
+  "current_observed_cause": "Two actual owned-app microphone dialogs; scoped handler returned false because zero action labels equaled Allow; default XCTest clicked denial twice.",
+  "native_button_semantics": "Both PNGs visibly map right Allow to action-button-1 frame515,324,112,30; left Don’t Allow to action-button-2 frame397,324,112,30. Native button title/value were not captured.",
+  "no_store_test_failure": "Native post-verification host test not attempted; permission preflight failed."
+}

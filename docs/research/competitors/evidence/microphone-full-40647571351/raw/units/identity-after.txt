@@ -1,0 +1,3 @@
+66f43191c4b53e42b085ac3e13b07688387a7d8d84e3d10a918dc4c42c5c7126  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk
+75364546060b8995540fe38045a70d7c5fa854b3ca17d09dd57f8889c8740c8c  /tmp/roma-onboarding-diagnostic/ExternalAXProbe
+cdhash H"b061c5ccc9eca5676a46a3ea50caa8fa19c99b26"

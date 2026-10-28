@@ -1,0 +1,290 @@
+[
+  {
+    "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+    "filename": "History delete confirmation Sheet census_0_564D2B3D-2F13-4423-8E9D-3A1F3499F59F.txt",
+    "lifetime": "keepAlways",
+    "name": "History delete confirmation Sheet census",
+    "payloadRef": {
+      "id": "0~5W8KWVZE6qWbAVR5nmvz5wYVJjpxAOtJT6bjPfQ7tFattRSZzufyyCXi6i_I_IsdMzV3YfFTbFzkSjXOW_3dgA=="
+    },
+    "payloadSize": "439",
+    "timestamp": "2026-10-28T07:31:54.844+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "AF00FCCE-3EF1-441E-8BA4-7393B067F3DE",
+    "activity_title": "Added attachment named 'History delete confirmation Sheet census'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~5W8KWVZE6qWbAVR5nmvz5wYVJjpxAOtJT6bjPfQ7tFattRSZzufyyCXi6i_I_IsdMzV3YfFTbFzkSjXOW_3dgA==",
+    "payload_sha256": "499d725694cd66160e24e15baffaa5ba18f43877e263384e138666c9e73f40e1"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy before-opening_0_4D9BB7BE-759E-4B02-B296-8A047E55C3ED.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy before-opening",
+    "payloadRef": {
+      "id": "0~gmU1D-8oJ6_2jUTjgJPeyNFmFe_gioAFAB3ZJmQLEVacEHKDurNlrtsEUk3yNRfwyu8_PQIT0-twAzX8ra6S2A=="
+    },
+    "payloadSize": "49069",
+    "timestamp": "2026-10-28T07:34:49.723+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "ED34833A-082C-48E7-BC7D-69206FA9D2CB",
+    "activity_title": "Added attachment named 'Model settings hierarchy before-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~gmU1D-8oJ6_2jUTjgJPeyNFmFe_gioAFAB3ZJmQLEVacEHKDurNlrtsEUk3yNRfwyu8_PQIT0-twAzX8ra6S2A==",
+    "payload_sha256": "11a5e2c79a42384c57f4731fe5a82f97f2950fb3976e050e749b0d9555bd4ad6"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy after-opening_0_29A7DEF8-CC5A-411B-A845-E2854C96486E.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-opening",
+    "payloadRef": {
+      "id": "0~CrSkYjRHyfEe7uJz8WBtDOuTHc5wRX1Nkk_dhFhhrWeXciFbYJVzwg-RRFbujXzIcCL8jImt8KyIasvA8ybzFQ=="
+    },
+    "payloadSize": "55823",
+    "timestamp": "2026-10-28T07:34:58.985+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "9CD18440-DD26-4AF4-A683-9665EBCF5E9D",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~CrSkYjRHyfEe7uJz8WBtDOuTHc5wRX1Nkk_dhFhhrWeXciFbYJVzwg-RRFbujXzIcCL8jImt8KyIasvA8ybzFQ==",
+    "payload_sha256": "a1f294cd80a866d71c67bd2c35ba12e552a8a6b8bdde3c9470b44bfb4e32dd46"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy after-background-pointer_0_07BF3367-C415-4E20-ACDE-4A5AC1139000.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-background-pointer",
+    "payloadRef": {
+      "id": "0~kcks_nk_CZc0yX_Ir1x30QuivftzaZn9fCalTqrRtpF15QYniuGRE7NTBxdfzcoo9qo5bD9kQ9XzSCe-_UTUYA=="
+    },
+    "payloadSize": "55823",
+    "timestamp": "2026-10-28T07:35:06.094+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "0A321EE4-E62F-463F-A2C1-42E8E451F26E",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-background-pointer'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~kcks_nk_CZc0yX_Ir1x30QuivftzaZn9fCalTqrRtpF15QYniuGRE7NTBxdfzcoo9qo5bD9kQ9XzSCe-_UTUYA==",
+    "payload_sha256": "3fc68c9972bb78ae23d60ca78fa478a9e2723ccce75d81c0c609553ad413c350"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy after-closing_0_60438092-36FD-4266-BA89-85C338C8A7FE.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-closing",
+    "payloadRef": {
+      "id": "0~pPxdJC-Azw3JODXtfe-ooZUQEmx8X_u6Crm3S4SqvGXpv8OEewDKmxOVcN_U_BOaBCH3LSOCpr1j-ClP2xg7Bg=="
+    },
+    "payloadSize": "49069",
+    "timestamp": "2026-10-28T07:35:34.967+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "9CA29D0D-5341-4C1D-B20E-6DA16C2F225B",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-closing'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~pPxdJC-Azw3JODXtfe-ooZUQEmx8X_u6Crm3S4SqvGXpv8OEewDKmxOVcN_U_BOaBCH3LSOCpr1j-ClP2xg7Bg==",
+    "payload_sha256": "20e206607996b2cc7816cbdbe8edf74732b2080958ab7f40b73069e9c662dee0"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy before-opening_0_5D4A5ACB-489B-4261-BE4E-D4217F121521.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy before-opening",
+    "payloadRef": {
+      "id": "0~DKwyXTrh7BvyWtPaKf2GW-_hqkh_rSIh0t7bMLxlTx-ByEXtYaHAEF7PI4V8Efaqh6uk_twzjE4tHrclcP3Mug=="
+    },
+    "payloadSize": "49069",
+    "timestamp": "2026-10-28T07:35:41.972+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "4C6C2362-2BF1-4EBB-874D-AC28131DF3EF",
+    "activity_title": "Added attachment named 'Model settings hierarchy before-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~DKwyXTrh7BvyWtPaKf2GW-_hqkh_rSIh0t7bMLxlTx-ByEXtYaHAEF7PI4V8Efaqh6uk_twzjE4tHrclcP3Mug==",
+    "payload_sha256": "20d6e7e6571e775cd1de0d8d05bed86c6326a109d110edd1da6be2e34281c69c"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy after-opening_0_985742AC-3EFB-479B-B2B0-4E48ED355C0C.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-opening",
+    "payloadRef": {
+      "id": "0~TXD0v5HSsdN849c3LdbN7HEUTaLf0E2Z1B5vfN3lFqFyjYUYZiHu9ZcsZTmD0pXSwbMowpEEbsuVj_RFFeNYwA=="
+    },
+    "payloadSize": "56318",
+    "timestamp": "2026-10-28T07:35:50.762+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "FA5A061D-875F-4B12-AD55-0D1845ABE464",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~TXD0v5HSsdN849c3LdbN7HEUTaLf0E2Z1B5vfN3lFqFyjYUYZiHu9ZcsZTmD0pXSwbMowpEEbsuVj_RFFeNYwA==",
+    "payload_sha256": "34dfd9a71ae316e6f99891f2ebaffc930a521daa248532c71e5372f6d7ee02ee"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy before-opening_0_CD5C0600-7680-41B8-90BB-D22D9A936110.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy before-opening",
+    "payloadRef": {
+      "id": "0~uJe9pUNQJmksx6lhOSeh2HWtMklySigfoKjPlB2aTqKNVZqbUBw0OqTHWSSZdKIv7s3wtILpl06tLFgtqwZODA=="
+    },
+    "payloadSize": "49068",
+    "timestamp": "2026-10-28T07:36:16.312+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "51E597F8-F486-44FB-BB16-63A4CAA7B967",
+    "activity_title": "Added attachment named 'Model settings hierarchy before-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~uJe9pUNQJmksx6lhOSeh2HWtMklySigfoKjPlB2aTqKNVZqbUBw0OqTHWSSZdKIv7s3wtILpl06tLFgtqwZODA==",
+    "payload_sha256": "344eda47f57e7685ff2d8ece0f258d7665b0176131a61ce9b45c5875be0202fa"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy after-opening_0_745DE974-F860-4321-AA80-70A82E1A104C.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-opening",
+    "payloadRef": {
+      "id": "0~xk01Ay1sNGpSW2xNwo2uQw8aco429U9r09yXEoxUjEpHd1Ltp-SEXKj3uLCc903imvPcdhMGJa1vCOcvd7TcaQ=="
+    },
+    "payloadSize": "56317",
+    "timestamp": "2026-10-28T07:36:25.382+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "EA39475E-85CD-496A-9F9D-1410F1979CAE",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~xk01Ay1sNGpSW2xNwo2uQw8aco429U9r09yXEoxUjEpHd1Ltp-SEXKj3uLCc903imvPcdhMGJa1vCOcvd7TcaQ==",
+    "payload_sha256": "4963c68d53bde91824bc26a69e09ce0e3912758fb02caedf50dfe5b940c89d6d"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()",
+    "filename": "Model settings hierarchy after-closing_0_49524F9C-7B02-43FA-82B1-8E195843B4BC.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-closing",
+    "payloadRef": {
+      "id": "0~tv1MMQl8M5avTX34J91Jv7SYIuo6_0mFTLPPxlXhy9N0Rij1dHXEqSa1sjm5HsUMapHrycqLFf8w_1QYHG-29A=="
+    },
+    "payloadSize": "49068",
+    "timestamp": "2026-10-28T07:36:53.387+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "36C7F95A-95B0-4316-B1EE-7DE2F93C91E3",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-closing'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~tv1MMQl8M5avTX34J91Jv7SYIuo6_0mFTLPPxlXhy9N0Rij1dHXEqSa1sjm5HsUMapHrycqLFf8w_1QYHG-29A==",
+    "payload_sha256": "612529534e9ff98639cca6de6ed3f1d79dd8b9b3e0079ca5db41c7878ac0e1e5"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy before-opening_0_87684A39-C04B-4A56-A666-5E222D2D9395.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy before-opening",
+    "payloadRef": {
+      "id": "0~GExeR5yecWt2K_nqEsyb_2k1xA4xiIaI5nbcPhBDOdYllLI2BJmpi8B0kTP0961ctKRg1v3uJA80QdfpYKw4Yw=="
+    },
+    "payloadSize": "49069",
+    "timestamp": "2026-10-28T07:38:34.950+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "4A485500-1638-4151-95DA-F2ED5A82C26F",
+    "activity_title": "Added attachment named 'Model settings hierarchy before-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~GExeR5yecWt2K_nqEsyb_2k1xA4xiIaI5nbcPhBDOdYllLI2BJmpi8B0kTP0961ctKRg1v3uJA80QdfpYKw4Yw==",
+    "payload_sha256": "e53c1acc2bb22af966f8c92f0cbe537a42ca86a167c3cd82c920c31eaf96d870"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy after-opening_0_F01FCDDD-B1C4-41C5-AB4E-1A419DE3F6CD.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-opening",
+    "payloadRef": {
+      "id": "0~Nw_Rp7MAqmCP28pR-4dxtzvRztEXvOy-C61Y0xFJYMHO2fyX9kQkyuRqLKQ2kYKT2-6p1Tcy1GrzvecM5aEZeQ=="
+    },
+    "payloadSize": "55823",
+    "timestamp": "2026-10-28T07:38:43.246+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "66AC9DE1-CE8C-4A34-B902-556CEE5AC867",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~Nw_Rp7MAqmCP28pR-4dxtzvRztEXvOy-C61Y0xFJYMHO2fyX9kQkyuRqLKQ2kYKT2-6p1Tcy1GrzvecM5aEZeQ==",
+    "payload_sha256": "576803e1c47550bd41ca3c165d93ea2bf5832cbeb50a8f2469eb3f04890f6894"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy after-closing_0_A3EA9234-300D-4154-9EE0-595F115E27CB.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-closing",
+    "payloadRef": {
+      "id": "0~RYzziGLwWYcVJH-V6AjYOqnJ5sD7A_PH6A8pDENd7ddnGzV43bcvjtWr51N6tXh6jqBuYgamzuIAApAFG8NHNA=="
+    },
+    "payloadSize": "49069",
+    "timestamp": "2026-10-28T07:40:00.599+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "1473C645-67DF-4CF0-9AF5-5974350095F5",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-closing'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~RYzziGLwWYcVJH-V6AjYOqnJ5sD7A_PH6A8pDENd7ddnGzV43bcvjtWr51N6tXh6jqBuYgamzuIAApAFG8NHNA==",
+    "payload_sha256": "10bd9c3df48c3a33f540acc8cac034d390b6073611fbcaa9e44e02aa400d144b"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy before-opening_0_B438611F-8EAE-4275-AA08-62C2778A15F7.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy before-opening",
+    "payloadRef": {
+      "id": "0~FepSW5Fa4QUl1Xi_ybikEC0hccix0er0N0vtK9VSIhxpgHNPBWxYC7P0EPU0QuUTATTrnXrEXR0s3jSPviDFjQ=="
+    },
+    "payloadSize": "49069",
+    "timestamp": "2026-10-28T07:40:07.190+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "2CE5D2CE-D62D-42A7-A479-F43E23203C75",
+    "activity_title": "Added attachment named 'Model settings hierarchy before-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~FepSW5Fa4QUl1Xi_ybikEC0hccix0er0N0vtK9VSIhxpgHNPBWxYC7P0EPU0QuUTATTrnXrEXR0s3jSPviDFjQ==",
+    "payload_sha256": "8690f06a711f51978afeabd8502f31838c74fb45803207266ab1340776939fe8"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy after-opening_0_3258A0BC-905C-407E-AB35-F3637D2105E5.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-opening",
+    "payloadRef": {
+      "id": "0~_hbycp9K7_MyFtEyuOkTb_rDYZPm4oAOQrL5cU80tfMw4YPJQNlVNqozu-uim3hKmXzFY4dWWz13js74nZ_0fw=="
+    },
+    "payloadSize": "56077",
+    "timestamp": "2026-10-28T07:40:16.086+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "574E20E8-857A-4A49-9425-5B108233DE37",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~_hbycp9K7_MyFtEyuOkTb_rDYZPm4oAOQrL5cU80tfMw4YPJQNlVNqozu-uim3hKmXzFY4dWWz13js74nZ_0fw==",
+    "payload_sha256": "7eafead1c9abbb40382337c8791087d4b92830dfde13a85def99d550431d1f7d"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy before-opening_0_E6FBBE4D-B2DF-4DC7-B748-F0E5FEFC81FF.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy before-opening",
+    "payloadRef": {
+      "id": "0~vBfzQLeQI50qPv5BYl_5VcYe96RtV_Jed4pWuwSR9PXBMSCP9Rkox92B1mJMdvVojHOY_kajutFUDHRtdEmUwQ=="
+    },
+    "payloadSize": "49068",
+    "timestamp": "2026-10-28T07:40:38.428+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "F7681EA1-AC48-497B-92AC-C9AD8C2CC5DA",
+    "activity_title": "Added attachment named 'Model settings hierarchy before-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~vBfzQLeQI50qPv5BYl_5VcYe96RtV_Jed4pWuwSR9PXBMSCP9Rkox92B1mJMdvVojHOY_kajutFUDHRtdEmUwQ==",
+    "payload_sha256": "cab32b11fe745c15582692d8771025561e31ec8012e3df1bc0f9db3b1a2856c2"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy after-opening_0_510068ED-53D7-40D6-8527-FD4B875A6764.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-opening",
+    "payloadRef": {
+      "id": "0~cv6RzfqENsxT4kJaUS-0sgMTESeOVBNMp22RQu4oDyi4CSierQvsZi3pRZCyeE6hE8_mFO6WqKRboAN1_nMnZA=="
+    },
+    "payloadSize": "56076",
+    "timestamp": "2026-10-28T07:40:47.152+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "2379AA29-9FCF-4AA2-93BF-D004874005B5",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-opening'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~cv6RzfqENsxT4kJaUS-0sgMTESeOVBNMp22RQu4oDyi4CSierQvsZi3pRZCyeE6hE8_mFO6WqKRboAN1_nMnZA==",
+    "payload_sha256": "c4f03455a0d210eb6a568cb699640d11c5ecad15ff304158cbf19994d2bdf82a"
+  },
+  {
+    "test": "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()",
+    "filename": "Model settings hierarchy after-closing_0_9EAB1E84-4632-4106-88E8-57FD5EF9738A.txt",
+    "lifetime": "keepAlways",
+    "name": "Model settings hierarchy after-closing",
+    "payloadRef": {
+      "id": "0~fexrWO4GhMR5yBneEpKDxDfNmGN0DOEm8lPpXB9taOCvW6xlal8bkVGJ19SixjfucQVFoBXy82R9ZEwrLDEMeQ=="
+    },
+    "payloadSize": "49068",
+    "timestamp": "2026-10-28T07:40:56.880+0000",
+    "uniformTypeIdentifier": "public.plain-text",
+    "uuid": "BE0FB352-A9C5-4668-B370-AA9218970B87",
+    "activity_title": "Added attachment named 'Model settings hierarchy after-closing'",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~fexrWO4GhMR5yBneEpKDxDfNmGN0DOEm8lPpXB9taOCvW6xlal8bkVGJ19SixjfucQVFoBXy82R9ZEwrLDEMeQ==",
+    "payload_sha256": "d7ec804ae8ade93fef04c2808eb2e50dbbd90abeb35c6d333399184a26b5d286"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "path": "VoiceInk/Transcription/Engine/VoiceInkEngine.swift",
+  "original_sha256": "e559a078d380d58a0ce9bb9a789925bf7c04146362bc0f09f67dbaca7305357b",
+  "instrumented_sha256": "93b9b4d11c5c01b7b3b5424243ae3316085fdf3d779164f18b9129f4594b1f4f",
+  "patch_sha256": "0e77b9e53521e786425172bd695e859a6b05cebddb6469c558578b3e49db7b48",
+  "added_lines": [
+    "    var recordPermissionRequestForTesting: (() async -> Bool)?",
+    "    var recordingStartupPreparationForTesting: (() async throws -> Void)?",
+    "        if let recordPermissionRequestForTesting { return await recordPermissionRequestForTesting() }"
+  ],
+  "scope": "optional hook at existing permission callback; no startup-preparation await or ownership fix"
+}

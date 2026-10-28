@@ -1,0 +1,66 @@
+{
+  "run": 40647571351,
+  "source_sha": "9afb1ed848ea2c12c4a00d6173871d67d13bfb45",
+  "mode": "normal-full",
+  "classification": "eight UI passed; native post-verification permission preflight failed",
+  "UI": {
+    "once": 8,
+    "passed": 8,
+    "failed": 0,
+    "raw_duration_seconds": 1206.532
+  },
+  "Copy": {
+    "complete": 11,
+    "exact_UTF8_UTF16": true,
+    "source": "independently retained real-factory seed"
+  },
+  "StaticText": {
+    "paired": 11,
+    "additional": 10,
+    "exact": 21,
+    "audit": "independent-native-ui-audit.json"
+  },
+  "native_History": {
+    "seedPID": 63369,
+    "seedPassed": true,
+    "normalFactoryReused": true,
+    "six_rows_twenty_fields": true,
+    "WordReplacement_eleven_fields_and_canonical_DTO": true,
+    "physical_closed_afterUI": true,
+    "semantic_verify_test_attempted": false,
+    "blocked_at": "native-permissions",
+    "mic_preSeed": 2,
+    "mic_postUI_preVerify": 0,
+    "same_client_csreq": true,
+    "AX_unchanged": 2
+  },
+  "microphone_monitor": {
+    "callbacks": 2,
+    "recognized": 0,
+    "Allow_clicks": 0,
+    "default_denials": 2,
+    "actual_owned_PID": 65317,
+    "exact_service_captured": "Microphone",
+    "button_label_Allow_matches": 0,
+    "native_button_title_value": "unrecorded; unknown"
+  },
+  "Core_unit_package_native6_matched": "See independently reviewed unit-failure-checkpoint.",
+  "Release": "skipped; no app package/publication claim",
+  "artifact": {
+    "id": 12800552002,
+    "bytes": 378106443,
+    "sha256": "16983e0155a55a2887479bc36409e1aecafb2fe654741edbd1be65319e5c2837",
+    "members": 8583,
+    "allCRCverified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40647571351/evidence.zip",
+    "whole_ZIP_local": false,
+    "duplicate_screenshot_ZIP_fetched": false
+  },
+  "limits": [
+    "Final hidden-field semantic verification did not run.",
+    "Startup input request call/order untraced; native consent dialogs and default denials are now directly captured.",
+    "No real ASR/provider/editor-delivery/VoiceOver proof from fixture-driven History UI.",
+    "This tested source used five review rounds; the next candidate is separate under an explicitly authorized extension.",
+    "Full gate remains failed."
+  ]
+}

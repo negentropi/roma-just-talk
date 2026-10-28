@@ -1,0 +1,5 @@
+{
+  "expected-rows.json": "42123c600012b10c741fe4e96e907cbe1457925dad0685b51e5b597b3d39e5c2",
+  "expected-libraries.json": "94ed6d99b99d06983c81b6f8adc145cf257cbc8d788d2bae78be39986ff040e6",
+  "expected-stats.json": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+}

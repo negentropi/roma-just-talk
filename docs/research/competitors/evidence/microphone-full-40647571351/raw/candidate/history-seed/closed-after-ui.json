@@ -1,0 +1,13 @@
+{
+  "valid": true,
+  "appExecutable": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+  "ownedAppExited": true,
+  "ownedAppPIDs": [],
+  "normalStorePaths": [
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store",
+    "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+  ],
+  "normalStoresHaveNoOpenDescriptors": true,
+  "checkedBeforeCorrectionFreeze": true
+}

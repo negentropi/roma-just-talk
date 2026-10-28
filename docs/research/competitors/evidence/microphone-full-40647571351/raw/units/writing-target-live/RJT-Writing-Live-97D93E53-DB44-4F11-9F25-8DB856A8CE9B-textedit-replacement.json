@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "textedit-replacement",
+  "date" : "2026-10-28T07:17:05Z",
+  "expected" : "Before 👩🏽‍💻 Rewritten 台灣\nSecond line after 🧑‍🚀.\n",
+  "observed" : "Before 👩🏽‍💻 Rewritten 台灣\nSecond line after 🧑‍🚀.\n",
+  "processIdentifier" : 30190,
+  "token" : "RJT-Writing-Live-97D93E53-DB44-4F11-9F25-8DB856A8CE9B"
+}

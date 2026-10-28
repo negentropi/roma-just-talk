@@ -1,0 +1,18 @@
+{
+  "run_id": 40647571351,
+  "head_sha": "9afb1ed848ea2c12c4a00d6173871d67d13bfb45",
+  "mode": "full",
+  "core_pass": 1758,
+  "canonical_pins": 41,
+  "focused_unit_success": 44,
+  "correction_success": 29,
+  "overlap": 7,
+  "unique_swift_identifiers": {
+    "Success": 299,
+    "Skipped": 31
+  },
+  "onboarding_xctest_success": 9,
+  "literal_snippet_regression": "two old failures plus one passing control; three candidate passes",
+  "release": "skipped",
+  "whole_workflow": "failed later UI/persistence permission preflight"
+}

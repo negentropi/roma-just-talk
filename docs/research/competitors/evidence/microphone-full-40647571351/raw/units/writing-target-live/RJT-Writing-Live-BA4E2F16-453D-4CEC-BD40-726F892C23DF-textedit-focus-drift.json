@@ -1,0 +1,9 @@
+{
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "textedit-focus-drift",
+  "date" : "2026-10-28T07:17:07Z",
+  "expected" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+  "observed" : "Before 👩🏽‍💻 target é after 🧑‍🚀.\n",
+  "processIdentifier" : 30190,
+  "token" : "RJT-Writing-Live-BA4E2F16-453D-4CEC-BD40-726F892C23DF"
+}

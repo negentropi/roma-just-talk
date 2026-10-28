@@ -1,0 +1,9 @@
+{
+  "expectation": "fixed",
+  "exit_code": 0,
+  "tests": {
+    "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "passed",
+    "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "passed",
+    "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+  }
+}

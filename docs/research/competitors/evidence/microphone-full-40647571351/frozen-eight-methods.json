@@ -1,0 +1,16 @@
+{
+  "baseline_source": "3f62c6da2fd98361d48305c9c5e0d01bed980f82",
+  "candidate_source": "9afb1ed848ea2c12c4a00d6173871d67d13bfb45",
+  "all_eight_method_bodies_byte_equal": true,
+  "method_sha256": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "14c9911f29f6c7b317dc34a9c3ad4c284fba4b2077a61aa3ba6f778f36b34b61",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": "5df0f3cb7b3afa77a71a00743a7aaa6867717dc685ed89efd4d7bd7861c2aea8",
+    "testTranslationTargetsReorderSelectAndPersist": "c07646262a4ca04d144df43362f68261975ba07831bdaacdba25679302d69f06",
+    "testDictationProfilePreservesCustomSettingsAndPersists": "2dbeddbeda7d7d583fb6aa5c5a0ce0421ac1cbfee3772cfbe98061624d5c0ea4",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": "ec685883153f5f3096d441ed3f7c985a521dc393b7eeb2c53b98c424e67815b6",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": "cb45d90a55115b71f278011f144764b3f0e6e77180cf037a09aa8922f2c501a3",
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": "a95ec15b51cdbd66fa6500a5524dddd8234c6f0f06a8fd9e403cb84f3f4e648f",
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": "fc8146f7ad9184240cf4960238b35b4d315da9df501fabc1fca6a7480302e18e"
+  },
+  "scope": "Only eight test method bodies; helper/class changes are separately source-pinned."
+}

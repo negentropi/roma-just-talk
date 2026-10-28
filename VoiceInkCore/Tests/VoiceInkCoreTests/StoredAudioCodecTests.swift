@@ -126,13 +126,18 @@ final class StoredAudioCodecTests: XCTestCase {
         let wavURL = try writeSpeechLikeWAV(seconds: 1, in: directory)
         let record = StoredAudioRecordFixture(audioFileURL: wavURL.absoluteString)
 
+        var livenessChecks = 0
         let result = try await VoiceInkStoredAudioCompression.compressStoredWAV(
             of: record,
-            isLive: { _ in false },
-            save: { XCTFail("deleted record is not saved") }
+            isLive: { _ in
+                livenessChecks += 1
+                return livenessChecks == 1
+            },
+            save: { XCTFail("record deleted during encoding is not saved") }
         )
 
         XCTAssertNil(result)
+        XCTAssertEqual(livenessChecks, 2, "liveness is checked again after encoding")
         XCTAssertEqual(record.audioFileURL, wavURL.absoluteString)
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: directory.path), [wavURL.lastPathComponent])
     }

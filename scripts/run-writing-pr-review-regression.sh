@@ -200,7 +200,7 @@ if subprocess.run(['git', '-C', str(repo), 'cat-file', '-e', bad + '^{commit}'],
     require(run(['git', 'fetch', '--no-tags', '--depth=1', 'origin', bad], out / 'fetch-known-bad.log', timeout=180) == 0,
         'Exact known-bad source revision is unavailable')
 source_head = git('rev-parse', 'HEAD').decode().strip()
-product_ref = os.environ.get('RJT_PR_REVIEW_PRODUCT_REF', source_head)
+product_ref = os.environ.get('RJT_PR_REVIEW_PRODUCT_REF') or source_head
 require(re.fullmatch(r'[0-9a-f]{40}', product_ref) is not None, 'Product source must be an immutable full SHA')
 subprocess.run(['git', '-C', str(repo), 'merge-base', '--is-ancestor', product_ref, 'HEAD'], check=True)
 subprocess.run(['git', '-C', str(repo), 'diff', '--exit-code', product_ref, 'HEAD', '--', *roots], check=True)

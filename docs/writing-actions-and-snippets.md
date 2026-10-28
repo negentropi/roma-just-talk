@@ -46,6 +46,8 @@ When a dictation contains a snippet trigger, its surrounding words stay as recog
 
 Disable a snippet to keep it in the library without expanding it. Delete removes it from the library.
 
+If the saved library cannot be read, edits and imports stop with an error and preserve the stored data. Restore a valid settings backup before making changes.
+
 ## Transfer snippets as CSV
 
 Use **Export CSV** to save the library. Use **Import CSV** to review a file before merging it. The header is `trigger,content,enabled`; `enabled` is optional and defaults to `true`.

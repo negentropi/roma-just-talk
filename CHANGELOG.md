@@ -4,6 +4,10 @@
 
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
 
+- Keep Paste Last from interrupting an active text delivery or Undo.
+- Preserve unreadable saved snippets when editing or importing, and show an error before changing the library.
+- Reset Translate, Edit, Draft and Undo shortcuts completely when resetting all settings.
+
 - Add Undo Last Writing Edit in the menu and as an optional shortcut for the latest confirmed selected-text rewrite, guarded by the same editor, text and caret.
 - Preserve the clipboard across overlapping pastes and Undo, and retain Writing Action results and request metadata when cancellation follows an editor attempt.
 

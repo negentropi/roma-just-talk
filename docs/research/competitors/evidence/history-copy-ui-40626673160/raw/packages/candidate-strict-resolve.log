@@ -1,0 +1,299 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild -resolvePackageDependencies -project /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj -scheme VoiceInk -derivedDataPath /Users/runner/work/_temp/writing-package-derived-candidate -clonedSourcePackagesDirPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates
+
+Resolve Package Graph
+
+Fetching from https://github.com/grpc/grpc-swift-2.git (cached)
+
+Fetching from https://github.com/apple/swift-log.git (cached)
+
+Fetching from https://github.com/negentropi/mlx-audio-swift.git (cached)
+
+Fetching from https://github.com/apple/swift-crypto.git (cached)
+
+Fetching from https://github.com/ibireme/yyjson.git (cached)
+
+Fetching from https://github.com/apple/swift-asn1.git (cached)
+
+Fetching from https://github.com/apple/swift-nio-transport-services.git (cached)
+
+Fetching from https://github.com/jaywcjlove/PermissionFlow (cached)
+
+Fetching from https://github.com/apple/swift-protobuf.git (cached)
+
+Fetching from https://github.com/apple/swift-collections.git (cached)
+
+Fetching from https://github.com/swift-server/swift-service-lifecycle.git (cached)
+
+Fetching from https://github.com/apple/swift-nio-ssl.git (cached)
+
+Fetching from https://github.com/Beingpax/mediaremote-adapter (cached)
+
+Fetching from https://github.com/jordanbaird/KeySender (cached)
+
+Fetching from https://github.com/apple/swift-http-types.git (cached)
+
+Fetching from https://github.com/ml-explore/mlx-swift-lm.git (cached)
+
+Fetching from https://github.com/grpc/grpc-swift-protobuf.git (cached)
+
+Fetching from https://github.com/marmelroy/Zip (cached)
+
+Fetching from https://github.com/huggingface/swift-jinja.git (cached)
+
+Fetching from https://github.com/apple/swift-async-algorithms.git (cached)
+
+Fetching from https://github.com/Beingpax/LLMkit.git (cached)
+
+Fetching from https://github.com/negentropi/grpc-swift-nio-transport.git (cached)
+
+Fetching from https://github.com/sindresorhus/LaunchAtLogin-Modern (cached)
+
+Fetching from https://github.com/negentropi/FluidAudio.git (cached)
+
+Fetching from https://github.com/swiftlang/swift-syntax.git (cached)
+
+Fetching from https://github.com/apple/swift-system.git (cached)
+
+Fetching from https://github.com/huggingface/swift-transformers.git (cached)
+
+Fetching from https://github.com/apple/swift-certificates.git (cached)
+
+Fetching from https://github.com/apple/swift-numerics (cached)
+
+Fetching from https://github.com/mattt/EventSource.git (cached)
+
+Fetching from https://github.com/apple/swift-atomics.git (cached)
+
+Fetching from https://github.com/apple/swift-algorithms.git (cached)
+
+Fetching from https://github.com/ml-explore/mlx-swift.git (cached)
+
+Fetching from https://github.com/tisfeng/AXSwift.git (cached)
+
+Fetching from https://github.com/apple/swift-nio-http2.git (cached)
+
+Fetching from https://github.com/apple/swift-nio.git (cached)
+
+Fetching from https://github.com/apple/swift-http-structured-headers.git (cached)
+
+Fetching from https://github.com/sparkle-project/Sparkle (cached)
+
+Fetching from https://github.com/tisfeng/SelectedTextKit (cached)
+
+Fetching from https://github.com/huggingface/swift-huggingface.git (cached)
+
+Fetching from https://github.com/apple/swift-nio-extras.git (cached)
+
+Creating working copy of package ‘grpc-swift-2’
+
+Creating working copy of package ‘swift-log’
+
+Creating working copy of package ‘mlx-audio-swift’
+
+Checking out ec81d1d8b6e82be73751a515dafe695d2588da1f of package ‘mlx-audio-swift’
+
+Checking out 2.4.3 of package ‘grpc-swift-2’
+
+Checking out 1.16.2 of package ‘swift-log’
+
+Creating working copy of package ‘swift-crypto’
+
+Checking out 4.5.2 of package ‘swift-crypto’
+
+Creating working copy of package ‘yyjson’
+
+Checking out 0.12.0 of package ‘yyjson’
+
+Creating working copy of package ‘swift-asn1’
+
+Checking out 1.7.2 of package ‘swift-asn1’
+
+Creating working copy of package ‘swift-nio-transport-services’
+
+Creating working copy of package ‘PermissionFlow’
+
+Checking out 1.28.0 of package ‘swift-nio-transport-services’
+
+Checking out 2.4.0 of package ‘PermissionFlow’
+
+Creating working copy of package ‘swift-collections’
+
+Creating working copy of package ‘swift-protobuf’
+
+Creating working copy of package ‘swift-service-lifecycle’
+
+Checking out 1.6.0 of package ‘swift-collections’
+
+Checking out 1.38.1 of package ‘swift-protobuf’
+
+Checking out 2.13.0 of package ‘swift-service-lifecycle’
+
+Creating working copy of package ‘swift-nio-ssl’
+
+Checking out 2.37.5 of package ‘swift-nio-ssl’
+
+Creating working copy of package ‘mediaremote-adapter’
+
+Checking out master (b97fa53) of package ‘mediaremote-adapter’
+
+Creating working copy of package ‘KeySender’
+
+Creating working copy of package ‘swift-http-types’
+
+Checking out 0.0.5 of package ‘KeySender’
+
+Creating working copy of package ‘mlx-swift-lm’
+
+Checking out 1.8.0 of package ‘swift-http-types’
+
+Checking out 3.31.4 of package ‘mlx-swift-lm’
+
+Creating working copy of package ‘grpc-swift-protobuf’
+
+Creating working copy of package ‘Zip’
+
+Checking out 2.1.2 of package ‘Zip’
+
+Checking out 2.4.1 of package ‘grpc-swift-protobuf’
+
+Creating working copy of package ‘swift-jinja’
+
+Creating working copy of package ‘swift-async-algorithms’
+
+Checking out 2.5.0 of package ‘swift-jinja’
+
+Checking out 1.1.5 of package ‘swift-async-algorithms’
+
+Creating working copy of package ‘grpc-swift-nio-transport’
+
+Creating working copy of package ‘LLMkit’
+
+Checking out 65adb0bc4721a6c4695e1956af9552970c06a59f of package ‘grpc-swift-nio-transport’
+
+Checking out main (adc2239) of package ‘LLMkit’
+
+Creating working copy of package ‘LaunchAtLogin-Modern’
+
+Creating working copy of package ‘FluidAudio’
+
+Checking out main (a04ec1c) of package ‘LaunchAtLogin-Modern’
+
+Creating working copy of package ‘swift-syntax’
+
+Checking out 56c9c2167efa4363690243709dda4a84f29e5f49 of package ‘FluidAudio’
+
+Creating working copy of package ‘swift-system’
+
+Checking out 1.8.1 of package ‘swift-system’
+
+Checking out 603.0.2 of package ‘swift-syntax’
+
+Creating working copy of package ‘swift-transformers’
+
+Checking out 1.3.4 of package ‘swift-transformers’
+
+Creating working copy of package ‘swift-certificates’
+
+Checking out 1.21.1 of package ‘swift-certificates’
+
+Creating working copy of package ‘swift-numerics’
+
+Checking out 1.1.1 of package ‘swift-numerics’
+
+Creating working copy of package ‘EventSource’
+
+Checking out 1.5.1 of package ‘EventSource’
+
+Creating working copy of package ‘swift-atomics’
+
+Creating working copy of package ‘mlx-swift’
+
+Creating working copy of package ‘swift-algorithms’
+
+Checking out 1.3.0 of package ‘swift-atomics’
+
+Checking out 0.31.4 of package ‘mlx-swift’
+
+Checking out 1.2.1 of package ‘swift-algorithms’
+
+Creating working copy of package ‘swift-nio-http2’
+
+Creating working copy of package ‘AXSwift’
+
+Checking out 1.46.0 of package ‘swift-nio-http2’
+
+Checking out 0.3.6 of package ‘AXSwift’
+
+Creating working copy of package ‘swift-nio’
+
+Checking out 2.104.0 of package ‘swift-nio’
+
+Creating working copy of package ‘swift-http-structured-headers’
+
+Checking out 1.7.0 of package ‘swift-http-structured-headers’
+
+Creating working copy of package ‘Sparkle’
+
+Creating working copy of package ‘SelectedTextKit’
+
+Checking out 2.6.2 of package ‘SelectedTextKit’
+
+Checking out 2.9.1 of package ‘Sparkle’
+
+Creating working copy of package ‘swift-huggingface’
+
+Checking out 0.10.0 of package ‘swift-huggingface’
+
+Creating working copy of package ‘swift-nio-extras’
+
+Checking out 1.35.2 of package ‘swift-nio-extras’
+
+
+Resolved source packages:
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  VoiceInkQwen: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkQwen @ local
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  VoiceInkNVIDIA: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkNVIDIA @ local
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  VoiceInkCore: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore @ local
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+
+resolved source packages: SwiftProtobuf, swift-algorithms, swift-transformers, swift-syntax, swift-atomics, swift-nio-transport-services, swift-async-algorithms, swift-collections, LLMkit, grpc-swift-2, Jinja, AXSwift, swift-crypto, MLXAudio, swift-asn1, swift-nio, LaunchAtLogin, mlx-swift, swift-system, swift-certificates, Sparkle, grpc-swift-nio-transport, EventSource, VoiceInkQwen, grpc-swift-protobuf, swift-nio-ssl, mlx-swift-lm, VoiceInkNVIDIA, swift-huggingface, MediaRemoteAdapter, swift-numerics, swift-log, KeySender, swift-nio-http2, swift-http-types, SelectedTextKit, yyjson, FluidAudio, VoiceInkCore, swift-http-structured-headers, Zip, swift-service-lifecycle, PermissionFlow, swift-nio-extras

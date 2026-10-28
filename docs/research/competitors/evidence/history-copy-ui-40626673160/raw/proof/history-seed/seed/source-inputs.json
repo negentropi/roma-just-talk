@@ -1,0 +1,24 @@
+{
+  "sha256": {
+    "VoiceInk/Models/SessionMetric.swift": "dc29ab6e8bf70b82d055a189c2f09994514b37104564e889a55de805ca49fea8",
+    "VoiceInk/Models/Transcription.swift": "7a33f68bd7235304e195fab40518679e6481a077fe61ea851187b284e481039c",
+    "VoiceInk/Models/VocabularyWord.swift": "b90fbd19b9b5f8e1a99a2388c0429bbe3fcfa3ca278f9c0e7e8aabc39751684b",
+    "VoiceInk/Models/WordReplacement.swift": "034a015173fe1484f20c6fdb13b9bf423686150954fbe7abed8e9cc47e9c7d3d",
+    "VoiceInk/Services/DictionaryService.swift": "9e22d94ff4e3c5ad86bd782205d7f00349d3b40fd44211619f41e21437682d6a",
+    "VoiceInk/Services/HistoryCorrectionApprovalService.swift": "751e137c2019eff9339fea588605c7b24ef3adf0aeb4d830605129495b6374b0",
+    "VoiceInk/Views/Dictionary/EditReplacementSheet.swift": "860a500f862da0d864b6a92d2cdf1a9fb9086b1fdb71af6bf3c0631dc3c7bb4d",
+    "VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift": "6386578bbe5e82af28def8cf6d1c65b28cd021c44f4bc930c940b295dd1a8510",
+    "VoiceInk/Views/Dictionary/WordReplacementView.swift": "dc8ed7f716e9e7db451c30d3defeccca8cee1462118c0ed1637753a14852f67c",
+    "VoiceInk/Views/History/HistoryProcessingViews.swift": "5d14f3f74d63e662a6befd9a0d5202a4241076df84ac6b4bc1401718811929b1",
+    "VoiceInk/Views/History/InlineHistoryView.swift": "6f2a9cb0ab945de004fb791cddab9e7ec952443d215e741d3dd40e03ca17bea4",
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift": "542d6bbb5bb1259c5f7abdda8acd680db8aa5992165b1af6ed5a451bd828fd66",
+    "VoiceInk/Views/History/TranscriptionDetailView.swift": "3b5b38ddf071072c7961806ac4cd8311a0f4ccd4010350c8ddace9913951107f",
+    "VoiceInk/VoiceInk.swift": "3e80d99bc3c8558b7a73c6ae9bfee68769e3e6f9f77fa31f8cf14fba6827c51c",
+    "VoiceInkCore/Sources/VoiceInkCore/DictionaryPolicy.swift": "5ed4974691a8ceeb85c63a4b2f8c8a1357ad223469d3705ce4baca677f2a270d",
+    "VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift": "ead5a0df90449b0f7fbd9cc6573c490a219abb2ce09e4fe13015ec0f19106cde",
+    "VoiceInkCore/Sources/VoiceInkCore/TranscriptionRecord.swift": "af172491a2c5e51f98102d51f80b5951e8d76d04c20a0249f2fa709eff8c628d",
+    "VoiceInkCore/Sources/VoiceInkCore/WordReplacementLibrary.swift": "5eb84b0bf7818dee5e1c6fca95c24b64639432d19280dfb568738a8238a2c64c",
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec"
+  },
+  "sourceSHA": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e"
+}

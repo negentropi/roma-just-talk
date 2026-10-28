@@ -1,0 +1,55 @@
+{
+  "source_sha": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e",
+  "files": [
+    {
+      "path": "VoiceInkUITests/WritingFeaturesUITests.swift",
+      "sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
+      "bytes": 115663
+    },
+    {
+      "path": "VoiceInkTests/DictationHistoryUISeedLiveTests.swift",
+      "sha256": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec",
+      "bytes": 40351
+    },
+    {
+      "path": "VoiceInk/Views/History/SaveCorrectionSheet.swift",
+      "sha256": "542d6bbb5bb1259c5f7abdda8acd680db8aa5992165b1af6ed5a451bd828fd66",
+      "bytes": 22294
+    },
+    {
+      "path": "VoiceInk/Views/History/HistoryProcessingViews.swift",
+      "sha256": "5d14f3f74d63e662a6befd9a0d5202a4241076df84ac6b4bc1401718811929b1",
+      "bytes": 8131
+    },
+    {
+      "path": "VoiceInk/Views/History/InlineHistoryView.swift",
+      "sha256": "6f2a9cb0ab945de004fb791cddab9e7ec952443d215e741d3dd40e03ca17bea4",
+      "bytes": 28567
+    },
+    {
+      "path": "VoiceInk/Views/History/TranscriptionDetailView.swift",
+      "sha256": "3b5b38ddf071072c7961806ac4cd8311a0f4ccd4010350c8ddace9913951107f",
+      "bytes": 6631
+    },
+    {
+      "path": "VoiceInk/Views/Components/SlidingPanel.swift",
+      "sha256": "e2172bf91ff6c98755406726c11796793f10edbb907671cfb093675e3e665862",
+      "bytes": 2395
+    },
+    {
+      "path": ".github/workflows/voiceink-writing-actions-check.yml",
+      "sha256": "184fed3f02e09b6abcb326fbccf3c70abf39d9073ef21f5d6d1f3b23eccbe1b0",
+      "bytes": 10471
+    },
+    {
+      "path": "scripts/run-writing-feature-regression.sh",
+      "sha256": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e",
+      "bytes": 58437
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "a344c016de2dc833702b9591acdd0d852312a3f93af290803bd5afec1b9dd99f",
+      "bytes": 42018
+    }
+  ]
+}

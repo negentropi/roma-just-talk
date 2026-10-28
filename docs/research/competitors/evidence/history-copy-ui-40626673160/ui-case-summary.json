@@ -1,0 +1,67 @@
+{
+  "tests": {
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testDictationProfilePreservesCustomSettingsAndPersists": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": {
+      "results": [
+        "failed"
+      ],
+      "starts": 1
+    },
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testTranslationTargetsReorderSelectAndPersist": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    }
+  },
+  "failures": [
+    {
+      "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "line": 648,
+      "message": "XCTAssertTrue failed",
+      "timestamp": "2026-10-28T03:43:44.862+0000"
+    },
+    {
+      "test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "line": 648,
+      "message": "XCTAssertTrue failed",
+      "timestamp": "2026-10-28T03:59:44.448+0000"
+    }
+  ],
+  "decoder_source_sha256": "3a9af0662ee7d5d97880ccc3194e3af2631e5831ab3d0d95bbff373b0f444850"
+}

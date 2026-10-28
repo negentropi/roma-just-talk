@@ -1,0 +1,217 @@
+{
+  "conclusion": "cancelled",
+  "createdAt": "2026-10-28T03:52:52Z",
+  "databaseId": 40629169956,
+  "displayTitle": "Verify Mac writing actions (full)",
+  "event": "push",
+  "headBranch": "ci/rjt-writing-check-complete-5ebb28bf-01a17bef",
+  "headSha": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e",
+  "jobs": [
+    {
+      "completedAt": "2026-10-28T04:08:04Z",
+      "conclusion": "cancelled",
+      "databaseId": 122621231384,
+      "name": "macos",
+      "startedAt": "2026-10-28T03:52:54Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-28T03:52:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-28T03:52:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T03:53:02Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 2,
+          "startedAt": "2026-10-28T03:52:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T03:53:02Z",
+          "conclusion": "success",
+          "name": "Retain the verification scope",
+          "number": 3,
+          "startedAt": "2026-10-28T03:53:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T03:53:02Z",
+          "conclusion": "success",
+          "name": "Keep the disposable desktop awake",
+          "number": 4,
+          "startedAt": "2026-10-28T03:53:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T03:53:11Z",
+          "conclusion": "success",
+          "name": "Select Xcode and Metal toolchain",
+          "number": 5,
+          "startedAt": "2026-10-28T03:53:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T03:53:11Z",
+          "conclusion": "success",
+          "name": "Run actions/cache/restore@v4",
+          "number": 6,
+          "startedAt": "2026-10-28T03:53:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T03:54:22Z",
+          "conclusion": "success",
+          "name": "Verify the canonical package graph before compiling",
+          "number": 7,
+          "startedAt": "2026-10-28T03:53:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T03:56:10Z",
+          "conclusion": "success",
+          "name": "Shared core checks",
+          "number": 8,
+          "startedAt": "2026-10-28T03:54:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:01:46Z",
+          "conclusion": "success",
+          "name": "Prepare and verify static Whisper dependencies",
+          "number": 9,
+          "startedAt": "2026-10-28T03:56:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:01:57Z",
+          "conclusion": "success",
+          "name": "Preserve verified dependencies for test retries",
+          "number": 10,
+          "startedAt": "2026-10-28T04:01:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:01:57Z",
+          "conclusion": "success",
+          "name": "Configure the disposable app defaults",
+          "number": 11,
+          "startedAt": "2026-10-28T04:01:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:57Z",
+          "conclusion": "cancelled",
+          "name": "Full Mac unit suite with fresh CI permissions",
+          "number": 12,
+          "startedAt": "2026-10-28T04:01:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:57Z",
+          "conclusion": "skipped",
+          "name": "Live TextEdit and Safari selection transactions",
+          "number": 13,
+          "startedAt": "2026-10-28T04:07:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:57Z",
+          "conclusion": "skipped",
+          "name": "Upload the native check checkpoint",
+          "number": 14,
+          "startedAt": "2026-10-28T04:07:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:57Z",
+          "conclusion": "skipped",
+          "name": "Matched snippet regression",
+          "number": 15,
+          "startedAt": "2026-10-28T04:07:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:57Z",
+          "conclusion": "skipped",
+          "name": "Upload the matched regression checkpoint",
+          "number": 16,
+          "startedAt": "2026-10-28T04:07:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:57Z",
+          "conclusion": "skipped",
+          "name": "Writing, snippet and dictation settings UI",
+          "number": 17,
+          "startedAt": "2026-10-28T04:07:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:58Z",
+          "conclusion": "success",
+          "name": "Preserve test evidence before the Release build",
+          "number": 18,
+          "startedAt": "2026-10-28T04:07:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:07:58Z",
+          "conclusion": "skipped",
+          "name": "Release build and packaging contracts",
+          "number": 19,
+          "startedAt": "2026-10-28T04:07:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:08:01Z",
+          "conclusion": "success",
+          "name": "Upload verification evidence",
+          "number": 20,
+          "startedAt": "2026-10-28T04:07:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:08:01Z",
+          "conclusion": "success",
+          "name": "Upload settings screenshots",
+          "number": 21,
+          "startedAt": "2026-10-28T04:08:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:08:01Z",
+          "conclusion": "skipped",
+          "name": "Upload verified release app",
+          "number": 22,
+          "startedAt": "2026-10-28T04:08:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:08:02Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 44,
+          "startedAt": "2026-10-28T04:08:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-28T04:08:03Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 45,
+          "startedAt": "2026-10-28T04:08:02Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40629169956/job/122621231384"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-10-28T04:08:05Z",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40629169956"
+}

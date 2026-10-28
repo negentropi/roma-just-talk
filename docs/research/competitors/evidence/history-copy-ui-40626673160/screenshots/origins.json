@@ -1,0 +1,80 @@
+[
+  {
+    "file": "screenshots/rjt-correction-retained-preview-40626673160.png",
+    "sha256": "5e60edc3063ccf15d820b481dd509e24f5a535b5882a16613ecdf2205c8b9364",
+    "bytes": 198460,
+    "source_kind": "derived lossless PNG frame from original failed XCTest screen recording; not original screenshot",
+    "timestamp_seconds": 61.5,
+    "source_video_local": "/tmp/rjt-polish-ui-selected-40626673160/diagnosis/testapprovedhistorycorrectionsurvivessourcedeletion-0.mp4",
+    "source_video_sha256": "7223a2f15e180baa2d04af05673a08e2c9dde43b07c14dcd182d0a540fbc6192",
+    "source_video_bytes": 5733856,
+    "dimensions_pixels": [
+      1024,
+      768
+    ],
+    "observation": "Save Correction starts at y83 and continues beyond visible lower screen; footer buttons are entirely absent. Dock at lower edge; no AX control rectangles retained by passive isHittable assertion.",
+    "original_xcresult_attachment": {
+      "filename": "kXCTAttachmentScreenRecording_0_550D76FA-E22D-46C3-906A-3883655AD87E.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~bQNCqBkXoWwPyJQfmfxEd2gE5SnjXoStUBTvo5wdeUzCSgXY0Msp8IKggRJUZijwk0pntIpG-lSuKOrfkZ_YrA=="
+      },
+      "payloadSize": "5733856",
+      "timestamp": "2026-10-28T03:42:43.133+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "051B3115-63A9-4572-A51E-8E4A28829D6B",
+      "activity_title": "Start Test at 2026-10-28 03:42:42.186",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~bQNCqBkXoWwPyJQfmfxEd2gE5SnjXoStUBTvo5wdeUzCSgXY0Msp8IKggRJUZijwk0pntIpG-lSuKOrfkZ_YrA==",
+      "payload_sha256": "7223a2f15e180baa2d04af05673a08e2c9dde43b07c14dcd182d0a540fbc6192"
+    },
+    "extraction_command": "ffmpeg -ss <timestamp_seconds> -i <originalrecording.mp4> -frames:v 1 <output.png>"
+  },
+  {
+    "file": "screenshots/rjt-correction-managed-preview-40626673160.png",
+    "sha256": "8cf8e982562c8e63a8df687dde053f98a868060d89b3b7f7b6bedc69affa5597",
+    "bytes": 202311,
+    "source_kind": "derived lossless PNG frame from original failed XCTest screen recording; not original screenshot",
+    "timestamp_seconds": 52.9,
+    "source_video_local": "/tmp/rjt-polish-ui-selected-40626673160/diagnosis/testhistorycorrectionpreviewapprovalanddictionarymanagement-0.mp4",
+    "source_video_sha256": "fba48e4631f6df8412c4fd5e1d71cb52254a9acfbe7ad3b9a893cf4099507914",
+    "source_video_bytes": 5262521,
+    "dimensions_pixels": [
+      1024,
+      768
+    ],
+    "observation": "Save Correction starts at y83 and continues beyond visible lower screen; footer buttons are entirely absent. Dock at lower edge; no AX control rectangles retained by passive isHittable assertion.",
+    "original_xcresult_attachment": {
+      "filename": "kXCTAttachmentScreenRecording_0_481B8EEE-2510-42BC-8E24-AAB605BBBC84.mp4",
+      "lifetime": "deleteOnSuccess",
+      "name": "kXCTAttachmentScreenRecording",
+      "payloadRef": {
+        "id": "0~iGLgOHn9LAYekD3ko1q4Sg8YesgzFlx0h_Cf0CNiMgi16d5-8HUI-j4AdMUntWiiP4tSLohWifGJv2K5bIRrXA=="
+      },
+      "payloadSize": "5262521",
+      "timestamp": "2026-10-28T03:58:50.856+0000",
+      "uniformTypeIdentifier": "public.mpeg-4",
+      "userInfo": {
+        "storage": [
+          {
+            "key": "scale",
+            "value": "1"
+          }
+        ]
+      },
+      "uuid": "E730A88E-376E-4386-9E04-B67EF13E64D0",
+      "activity_title": "Start Test at 2026-10-28 03:58:50.750",
+      "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~iGLgOHn9LAYekD3ko1q4Sg8YesgzFlx0h_Cf0CNiMgi16d5-8HUI-j4AdMUntWiiP4tSLohWifGJv2K5bIRrXA==",
+      "payload_sha256": "fba48e4631f6df8412c4fd5e1d71cb52254a9acfbe7ad3b9a893cf4099507914"
+    },
+    "extraction_command": "ffmpeg -ss <timestamp_seconds> -i <originalrecording.mp4> -frames:v 1 <output.png>"
+  }
+]

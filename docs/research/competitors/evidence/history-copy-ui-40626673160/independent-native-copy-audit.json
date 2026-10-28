@@ -1,0 +1,256 @@
+{
+  "run_id": 40626673160,
+  "source_sha": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e",
+  "mode": "UI only",
+  "verdict": "CLEAN bounded evidence audit; UI FAILED 6/8. Observed Copy9/required11 exact; no full acceptance.",
+  "method": "Existing local original decoded xcresult and selected seed/source/identity/grant files. Raw byte and UTF arrays independently compared; no normalization tolerance, source review, downloads/builds/runtime/archive fetch.",
+  "seed": {
+    "hostPID": 34111,
+    "actual_test_log": "◇ Test liveDictationHistoryUISeed() started.\n✔ Test liveDictationHistoryUISeed() passed after 0.795 seconds.\n✔ Test run with 1 test in 1 suite passed after 0.796 seconds.",
+    "rows": 6,
+    "fields_each": 20,
+    "WordReplacement_raw_fields": 11,
+    "canonical_DTO": true,
+    "VocabularyWord_rows": 1,
+    "stats_baseline": [],
+    "raw_expected_comparisons": {
+      "rows": {
+        "raw_equal": true,
+        "sha256": "edc26fc39a5d38b76d43e4a50eda7c15785e0bc003b5e606256d076e9b67cab2"
+      },
+      "libraries": {
+        "raw_equal": true,
+        "sha256": "82b6573db70597f514027c98a3b07fa89c8c75483ccd9063ba4d937eefd0867f"
+      },
+      "stats": {
+        "raw_equal": true,
+        "sha256": "ace810d7e2cbb4f8c40ce09dc8e191ae466adb4e1a7d49c59f2215b411d38b05"
+      }
+    },
+    "normal_factory": "VoiceInkApp.createPersistentContainer(schema:logger:)",
+    "factory_body_sha256": "e7b262d01bcdeb97f61e6e93b26bad665f379cb69c0fcc229f307e59aaee9896",
+    "normal_three_configurations": [
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "Transcription"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "default",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/default.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "VocabularyWord",
+          "WordReplacement"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "dictionary",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/dictionary.store"
+      },
+      {
+        "cloudKitContainerIdentifier": null,
+        "entities": [
+          "SessionMetric"
+        ],
+        "groupAppContainerIdentifier": null,
+        "isStoredInMemoryOnly": false,
+        "name": "stats",
+        "url": "/Users/runner/Library/Application Support/com.negentropi.RomaJustTalk/stats.store"
+      }
+    ],
+    "host_observed_three_paths": true,
+    "closed_before_UI": true,
+    "host_exited_no_store_handles": true,
+    "app_and_bundle_phase_identity_equal": true,
+    "phase_identities": [
+      "dc8cb5ada1ad5015b0350f45a5b34689f2b83c301f98528996ae7ad4b6cc37a3  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+      "2ac6185650be7f08a2880cbbda295a84a1b3a1197c54389ce582dbe435ae6a7a  /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/PlugIns/VoiceInkTests.xctest/Contents/MacOS/VoiceInkTests"
+    ],
+    "source_inputs_SHA": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e",
+    "source_preflight_overlap_exact": {
+      "VoiceInk/Views/History/HistoryProcessingViews.swift": "5d14f3f74d63e662a6befd9a0d5202a4241076df84ac6b4bc1401718811929b1",
+      "VoiceInk/Views/History/InlineHistoryView.swift": "6f2a9cb0ab945de004fb791cddab9e7ec952443d215e741d3dd40e03ca17bea4",
+      "VoiceInk/Views/History/TranscriptionDetailView.swift": "3b5b38ddf071072c7961806ac4cd8311a0f4ccd4010350c8ddace9913951107f",
+      "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec"
+    }
+  },
+  "TCC": {
+    "initial_seed_expected_raw_bytes_equal": true,
+    "rows": {
+      "system-tcc.json": {
+        "service": "kTCCServiceAccessibility",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C0000000028000000010000000800000014CD4D28A895DC76F4FCC873798AC98FF00E3309D9"
+      },
+      "microphone-tcc.json": {
+        "service": "kTCCServiceMicrophone",
+        "client": "com.negentropi.RomaJustTalk",
+        "client_type": 0,
+        "auth_value": 2,
+        "csreq": "FADE0C0000000028000000010000000800000014CD4D28A895DC76F4FCC873798AC98FF00E3309D9"
+      }
+    }
+  },
+  "observed_Copy": [
+    {
+      "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+      "rowID": "A1000000-0000-4000-8000-000000000006",
+      "variant": "recognized",
+      "seed_field": "recognitionText",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        1,
+        2
+      ],
+      "attachment_sha256": "4ea637bab2569ca51037dc0b32c712072effb830ce602f7fc63704860602b642"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+      "rowID": "A1000000-0000-4000-8000-000000000005",
+      "variant": "recognized",
+      "seed_field": "recognitionText",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        10,
+        11
+      ],
+      "attachment_sha256": "ba879433d27f810228d2211fb8a2540476e5b41a68e5498a0f49a2d50545b6e7"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000001",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        15,
+        16
+      ],
+      "attachment_sha256": "c4249a8cda8ab655a1b1a975efce5521ce49b7c919a2d4c1e438ee2bca2da938"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000001",
+      "variant": "enhanced",
+      "seed_field": "enhancedText",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        17,
+        18
+      ],
+      "attachment_sha256": "35ec416f6a94860837287fa810d4f013ac3528f5c14ea8f52c9fa839c29c5978"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "recognized",
+      "seed_field": "recognitionText",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        19,
+        20
+      ],
+      "attachment_sha256": "1d98f581cb3ca093eb17ab4de8c8ca59a2590c017131d2729b130615633adcb1"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        21,
+        22
+      ],
+      "attachment_sha256": "2ade1caa700e41faad5e454b8ecee17ad8b5b887b55e72de06ebe3e32aa13df5"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000002",
+      "variant": "enhanced",
+      "seed_field": "enhancedText",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        23,
+        24
+      ],
+      "attachment_sha256": "caf3a945213771783bedf2a28ddf2a66aab9cefe61e35437e3796966c40e0fb4"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000003",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        25,
+        26
+      ],
+      "attachment_sha256": "22fcba73fe8c365068476216ab606dac54a194d56a02413f268140e842ba9683"
+    },
+    {
+      "case": "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()",
+      "rowID": "A1000000-0000-4000-8000-000000000004",
+      "variant": "original",
+      "seed_field": "text",
+      "UTF8_UTF16_exact": true,
+      "pasteboard_generation": [
+        27,
+        28
+      ],
+      "attachment_sha256": "73c75e2514b2b60bdee5e4af1456c67dfafaf7336e3f7a36644ef12e79c1dcd1"
+    }
+  ],
+  "StaticText_AX": {
+    "paired_with_Copy_receipts": 9,
+    "paired_receipts_raw_UTF8_UTF16_exact_to_independent_seed": true,
+    "retained_audit_attachment_content_verified": true,
+    "total_static_attachments": 11,
+    "limit": "Two additional StaticText traces beyond paired Copy9 not counted as additional copied variants."
+  },
+  "UI": {
+    "statuses": {
+      "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()": "Failure",
+      "WritingFeaturesUITests/testCSVImportPreviewsMultilineContentBeforeReplacing()": "Success",
+      "WritingFeaturesUITests/testDictationProfilePreservesCustomSettingsAndPersists()": "Success",
+      "WritingFeaturesUITests/testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings()": "Success",
+      "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()": "Failure",
+      "WritingFeaturesUITests/testHistoryPreservesRecognizedFallbackAndLegacyVariants()": "Success",
+      "WritingFeaturesUITests/testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch()": "Success",
+      "WritingFeaturesUITests/testTranslationTargetsReorderSelectAndPersist()": "Success"
+    },
+    "all_eight_started_once": true,
+    "failures": [
+      {
+        "case": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "line": 648,
+        "message": "XCTAssertTrue failed"
+      },
+      {
+        "case": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "line": 648,
+        "message": "XCTAssertTrue failed"
+      }
+    ],
+    "boundary": "Preview.isHittable line648; full approval/persistence paths incomplete."
+  },
+  "post_UI_native_verify": {
+    "classification": "blocked",
+    "attempted": false
+  },
+  "limits": [
+    "Observed Copy7 History +1managed +1retained all exact; required second managed/retained copies absent (9/11).",
+    "No final native correction/store durability readback. Seed phase post-UI false fields are not attempted verification results.",
+    "No post-UI identity/TCC receipts; no after-UI stability claim.",
+    "UI-only mode proves no ordinary units/full native6/regression/Release gate.",
+    "Synthetic seed proves no ASR/provider/migration/editor delivery.",
+    "Archive SHA/2286 CRC inherited from owner verification; not repeated."
+  ],
+  "findings_in_evidence_audit": []
+}

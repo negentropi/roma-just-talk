@@ -1,0 +1,76 @@
+{
+  "run": 40626673160,
+  "source_sha": "5ebb28bf7cdf9eab80b33032543e5af36d769a3e",
+  "mode": "UI only",
+  "classification": "copy-regression-green-over-observed-boundary-correction-sheet-offscreen",
+  "strictUI": {
+    "cases_once": 8,
+    "passed": 6,
+    "failed": 2,
+    "failures": [
+      {
+        "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+        "line": 648,
+        "message": "XCTAssertTrue failed",
+        "timestamp": "2026-10-28T03:43:44.862+0000"
+      },
+      {
+        "test": "WritingFeaturesUITests/testHistoryCorrectionPreviewApprovalAndDictionaryManagement()",
+        "line": 648,
+        "message": "XCTAssertTrue failed",
+        "timestamp": "2026-10-28T03:59:44.448+0000"
+      }
+    ],
+    "oracle700_unchanged": true
+  },
+  "Copy_and_raw_StaticText": {
+    "observed": 9,
+    "all_independent_seed_UTF8_UTF16_exact": true,
+    "prior3_known_red_boundaries_now_green": true,
+    "complete_required": 11,
+    "complete": false,
+    "limits": "Later2copies not reached; no full correction roundtrip claim.",
+    "additional_captured_source_fields": 2,
+    "all11observed_StaticText_exact": true
+  },
+  "native_History": {
+    "seed_passed": true,
+    "hostPID": 34111,
+    "closed_beforeUI": true,
+    "postverify": "blocked/notattempted becauseUIred",
+    "independent_review": "independent-native-copy-audit.json"
+  },
+  "shortcut_censuses": {
+    "cases": 8,
+    "snapshots": 37,
+    "before_restored_equal": true,
+    "all_synchronized": true
+  },
+  "visible_failure": {
+    "native_sheet_source": "620x720 fixed SaveCorrectionSheet body in pinned source",
+    "screenshots": "screenshots/origins.json",
+    "pixels": [
+      1024,
+      768
+    ],
+    "sheet_top_y_approx": 83,
+    "footer_buttons": "Absent below viewport; sourcefooteroutsideForm; actualenabled Preview nothittable beforeclick.",
+    "AX_limit": "No retained fullAXgeometry at passive isHittableassert; no invented controlrects."
+  },
+  "artifact": {
+    "id": 12791331548,
+    "bytes": 208589192,
+    "sha256": "c9161c0ba44ace3716755e91a70a3d5ca7b71d68690452cf82fb98538b96953c",
+    "members": 2286,
+    "allCRCverified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40626673160/evidence.zip",
+    "fullZIP_local": false,
+    "duplicate_screenshotZIP": "notdownloaded"
+  },
+  "scope_limits": [
+    "UI-only intentionallyskippedCore/ordinaryunits/native6/matched/Release.",
+    "No ASR/provider or editor-deliveryproof fromsyntheticnativeHistoryseed.",
+    "No postUIidentity/grantstabilityclaim; UIredblocksphase.",
+    "Normalfullgatestillrequired."
+  ]
+}

@@ -22,14 +22,21 @@ enum DictionaryBackup {
             wordReplacementLibrary = backup.wordReplacementLibrary
         }
 
-        fileprivate func rows(using context: ModelContext) throws -> Rows {
-            let existingWords = vocabularyWords == nil ? [] : try context.fetch(FetchDescriptor<VocabularyWord>()).map(\.word)
+        fileprivate func rows(
+            using context: ModelContext,
+            additionalExistingWords: [String] = [],
+            additionalExistingRecords: [VoiceInkWordReplacementRecord] = []
+        ) throws -> Rows {
+            let existingWords = vocabularyWords == nil ? []
+                : try context.fetch(FetchDescriptor<VocabularyWord>()).map(\.word) + additionalExistingWords
             let words = vocabularyWords.map {
                 VoiceInkDictionaryPolicy.vocabularyWordsToInsert(from: $0, existingWords: existingWords)
             } ?? []
 
+            var existing = wordReplacementLibrary == nil && legacyWordReplacements == nil ? []
+                : try DictionaryService.snapshotWordReplacementRecords(using: context)
+            for record in additionalExistingRecords where !existing.contains(record) { existing.append(record) }
             if let wordReplacementLibrary {
-                let existing = try DictionaryService.snapshotWordReplacementRecords(using: context)
                 let plan = wordReplacementLibrary.preflightImport(existingRecords: existing)
                 guard plan.canApply else { throw DictionaryService.LibraryConflictError(conflicts: plan.conflicts) }
                 return Rows(vocabulary: words, replacements: plan.recordsToInsert, skippedInvalid: 0)
@@ -38,7 +45,7 @@ enum DictionaryBackup {
             guard let legacyWordReplacements else {
                 return Rows(vocabulary: words, replacements: [], skippedInvalid: 0)
             }
-            let existingOriginals = try DictionaryService.snapshotWordReplacementRecords(using: context).map(\.originalText)
+            let existingOriginals = existing.map(\.originalText)
             let plan = VoiceInkDictionaryPolicy.wordReplacementBackupImportPlan(
                 from: legacyWordReplacements, existingOriginalTexts: existingOriginals
             )
@@ -53,7 +60,26 @@ enum DictionaryBackup {
 
         func apply(using context: ModelContext) throws {
             // Review and application may be separated by UI; recheck conflicts before any insertion.
-            let rows = try rows(using: context)
+            _ = try rows(using: context)
+            let callerWords = vocabularyWords == nil ? [] : try context.fetch(FetchDescriptor<VocabularyWord>()).map(\.word)
+            let callerRecords = wordReplacementLibrary == nil && legacyWordReplacements == nil ? []
+                : try DictionaryService.snapshotWordReplacementRecords(using: context)
+            let rows = try DictionaryPersistence.commit(in: context.container, saveFailure: {
+                VoiceInkSettingsBackupImportError.saveFailed(
+                    item: "dictionary entries", localizedDescription: $0.localizedDescription
+                )
+            }) { writer in
+                // Both pending UI entries and newer stored entries constrain this additive import.
+                let rows = try rows(
+                    using: writer, additionalExistingWords: callerWords, additionalExistingRecords: callerRecords
+                )
+                rows.vocabulary.forEach { writer.insert(VocabularyWord(word: $0)) }
+                rows.replacements.forEach { writer.insert(WordReplacement(record: $0)) }
+                return rows
+            }
+            if !rows.replacements.isEmpty || !rows.vocabulary.isEmpty {
+                _ = try DictionaryPersistence.refresh(in: context, vocabulary: !rows.vocabulary.isEmpty)
+            }
             if vocabularyWords == nil { print(VoiceInkSettingsBackupImportDiagnostics.noVocabularyWordsMessage) }
             if wordReplacementLibrary == nil && legacyWordReplacements == nil {
                 print(VoiceInkSettingsBackupImportDiagnostics.noWordReplacementsMessage)
@@ -66,22 +92,8 @@ enum DictionaryBackup {
                 return
             }
 
-            let insertedWords = rows.vocabulary.map { VocabularyWord(word: $0) }
-            let insertedReplacements = rows.replacements.map { WordReplacement(record: $0) }
-            insertedWords.forEach(context.insert)
-            insertedReplacements.forEach(context.insert)
-            do {
-                try context.save()
-            } catch {
-                // A failed import owns these insertions, not unrelated unsaved work in this context.
-                insertedWords.forEach(context.delete)
-                insertedReplacements.forEach(context.delete)
-                throw VoiceInkSettingsBackupImportError.saveFailed(
-                    item: "dictionary entries", localizedDescription: error.localizedDescription
-                )
-            }
             print(VoiceInkSettingsBackupImportDiagnostics.dictionaryEntriesImportedMessage(
-                vocabularyWordCount: insertedWords.count, wordReplacementCount: insertedReplacements.count
+                vocabularyWordCount: rows.vocabulary.count, wordReplacementCount: rows.replacements.count
             ))
             if rows.skippedInvalid > 0 {
                 print(VoiceInkSettingsBackupImportDiagnostics.skippedInvalidReplacementsMessage(count: rows.skippedInvalid))

@@ -28,6 +28,18 @@ enum DictionaryService {
         var errorDescription: String? { "This replacement changed while it was open. Reopen it to review the current values." }
     }
 
+    enum LibraryEntryError: LocalizedError, Equatable {
+        case unavailable
+        case changed
+
+        var errorDescription: String? {
+            switch self {
+            case .unavailable: "This replacement could not be found. Reopen the Dictionary to review the current entries."
+            case .changed: "This replacement changed while it was open. Reopen it to review the current values."
+            }
+        }
+    }
+
     // MARK: - Vocabulary
 
     @discardableResult
@@ -97,6 +109,7 @@ enum DictionaryService {
         replacementText: String,
         context: ModelContext
     ) throws {
+        try requireOwned(entry, context: context)
         let previous = try entry.record
         guard previous == expectedRecord else { throw LibraryRevisionError(expected: expectedRecord, current: previous) }
         let source: String
@@ -117,16 +130,18 @@ enum DictionaryService {
             dateAdded: previous.dateAdded, isEnabled: previous.isEnabled,
             matchingKind: previous.matchingKind, provenance: previous.provenance
         )
-        guard updated != previous else { return }
         try validateInsertion(updated, excluding: entry.id, context: context)
-        setText(of: entry, from: updated)
-
-        do {
-            try context.save()
-        } catch {
-            setText(of: entry, from: previous)
-            throw error
+        try DictionaryPersistence.commit(in: context.container) { writer in
+            let stored = try storedReplacement(id: previous.id, using: writer)
+            let current = try stored.record
+            guard current == expectedRecord else {
+                throw LibraryRevisionError(expected: expectedRecord, current: current)
+            }
+            guard updated != current else { return }
+            try validateInsertion(updated, excluding: previous.id, context: writer)
+            setText(of: stored, from: updated)
         }
+        _ = try DictionaryPersistence.refresh(in: context)
     }
 
     static func setWordReplacementEnabled(
@@ -134,30 +149,36 @@ enum DictionaryService {
         isEnabled: Bool,
         context: ModelContext
     ) throws {
-        guard entry.isEnabled != isEnabled else { return }
+        try requireOwned(entry, context: context)
+        let previous = DictionaryPersistence.StoredRevision(entry)
         if isEnabled { try validateInsertion(entry.record, excluding: entry.id, context: context) }
-        let previous = entry.isEnabled
-        entry.isEnabled = isEnabled
-        do {
-            try context.save()
-        } catch {
-            entry.isEnabled = previous
-            throw error
+        try DictionaryPersistence.commit(in: context.container) { writer in
+            let stored = try storedReplacement(id: previous.id, using: writer)
+            guard previous.matches(stored) else { throw LibraryEntryError.changed }
+            guard stored.isEnabled != isEnabled else { return }
+            if isEnabled { try validateInsertion(stored.record, excluding: previous.id, context: writer) }
+            stored.isEnabled = isEnabled
         }
+        _ = try DictionaryPersistence.refresh(in: context)
     }
 
     static func removeWordReplacement(
         _ replacement: WordReplacement,
         context: ModelContext
     ) -> VoiceInkDictionaryAlertPresentation? {
-        context.delete(replacement)
-
         do {
-            try context.save()
+            try requireOwned(replacement, context: context)
+            let previous = DictionaryPersistence.StoredRevision(replacement)
+            try DictionaryPersistence.commit(in: context.container) { writer in
+                let stored = try storedReplacement(id: previous.id, using: writer)
+                guard previous.matches(stored) else { throw LibraryEntryError.changed }
+                writer.delete(stored)
+            }
+            _ = try DictionaryPersistence.refresh(in: context)
             return nil
+        } catch let error as DictionaryPersistence.RefreshFailure {
+            return .wordReplacement(message: error.localizedDescription)
         } catch {
-            // Undo only this pending deletion; another editor may have unsaved changes.
-            context.insert(replacement)
             return .wordReplacement(
                 message: VoiceInkDictionaryAlertPresentation.failedToRemoveWordReplacement(
                     localizedDescription: error.localizedDescription
@@ -212,14 +233,31 @@ enum DictionaryService {
         context: ModelContext
     ) throws -> WordReplacement {
         try validateInsertion(record, excluding: nil, context: context)
-        let entry = WordReplacement(record: record)
-        context.insert(entry)
-        do {
-            try context.save()
-            return entry
-        } catch {
-            context.delete(entry)
-            throw error
+        let savedID = try DictionaryPersistence.commit(in: context.container) { writer in
+            try validateInsertion(record, excluding: nil, context: writer)
+            let entry = WordReplacement(record: record)
+            writer.insert(entry)
+            // Resolve the caller's model by value identity only after the writer saves.
+            return entry.id
         }
+        return try savedReplacement(id: savedID, using: context)
+    }
+
+    private static func requireOwned(_ entry: WordReplacement, context: ModelContext) throws {
+        guard !entry.isDeleted, entry.modelContext === context else { throw LibraryEntryError.unavailable }
+    }
+
+    private static func storedReplacement(id: UUID, using context: ModelContext) throws -> WordReplacement {
+        let entries = try context.fetch(FetchDescriptor<WordReplacement>()).filter { $0.id == id }
+        guard entries.count == 1, let entry = entries.first else { throw LibraryEntryError.unavailable }
+        return entry
+    }
+
+    static func savedReplacement(id: UUID, using context: ModelContext) throws -> WordReplacement {
+        let entries = try DictionaryPersistence.refresh(in: context).filter { $0.id == id }
+        guard entries.count == 1, let entry = entries.first else {
+            throw DictionaryPersistence.RefreshFailure(underlying: LibraryEntryError.unavailable)
+        }
+        return entry
     }
 }

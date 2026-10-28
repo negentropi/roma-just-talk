@@ -1,0 +1,55 @@
+{
+  "classification": "supplemental-two-literal-copy-authorship-and-source-review",
+  "requested_model": "claude-opus-5-5",
+  "reported_assistant_models": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.310",
+  "raw_jsonl_sha256": "5e46ccca09924dc6420e00353130b3e789e1c2ec2c182e5105ef93b097699971",
+  "result": {
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 40369,
+    "total_cost_usd": 0.12106700000000001
+  },
+  "copy_scope": [
+    {
+      "path": "VoiceInk/Services/DictionaryPersistence.swift",
+      "member": "RefreshFailure.errorDescription",
+      "before_sha256": "1b56b5c74bde54910053e526754d49f5665b047b597205c68bb240a0865f38d0",
+      "historical_copy_after_sha256": "96ced8455dee409564b29f654da221be362d5f31a09badfca43e1557879b5a6d",
+      "literal": "Your changes were saved, but the Dictionary list could not refresh. Reopen the Dictionary to review it before making more changes. \\(underlying.localizedDescription)",
+      "outside_one_literal_identical_at_copy_review": true,
+      "dynamic_suffix_preserved": true
+    },
+    {
+      "path": "VoiceInk/Services/DictionaryService.swift",
+      "member": "LibraryEntryError.unavailable",
+      "before_sha256": "7e6353ae03f2d31de085b50b83d07fc59ded9d3f21d3968023f5b2dd49cf8ba2",
+      "historical_copy_after_sha256": "796580f32576aacaac4db9970cbf263eb0bc5ed5b77cab12b6fee437f0b9526c",
+      "literal": "This replacement could not be found. Reopen the Dictionary to review the current entries.",
+      "outside_one_literal_identical_at_copy_review": true,
+      "changed_case_existing_copy_untouched": true
+    }
+  ],
+  "separate_backend_change": {
+    "path": "VoiceInk/Services/DictionaryService.swift",
+    "composite_after_sha256": "9e22d94ff4e3c5ad86bd782205d7f00349d3b40fd44211619f41e21437682d6a",
+    "scope": "After the copy lock was released, the backend owner separately moved StoredRevision capture before caller preflight. Both Opus-authored literals remain exact. This composite hash does not attribute that logic change to Opus."
+  },
+  "review": {
+    "requested_model": "gpt-6.1-sol",
+    "actual_model": "gpt-6.1-sol",
+    "status": "clean for the two historical literal-only deltas",
+    "semantic_boundary": "RefreshFailure follows a durable save: saved data is retained; only displayed-list refresh failed. Copy advises reopen/review, never repeating a write or claiming nothing imported. Unavailable entry does not assert deletion or mention clipboard.",
+    "code_boundary": "Exactly one literal per file changed; interpolations, logic, logs, APIs and older copy unchanged at author time.",
+    "native_limit": "Source-only; no compilation or native/runtime proof from this copy task."
+  },
+  "checks": {
+    "inverse_literal_comparison": "passed for both historical copy deltas",
+    "swift_frontend_parse": "passed",
+    "git_diff_check": "passed"
+  },
+  "related_historical_ui_receipt": "../correction-ui-source/authorship-and-review.json",
+  "raw_log_policy": "Raw JSONL remains outside repository; only model/status/cost/timing/hash retained."
+}

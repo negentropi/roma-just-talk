@@ -23,6 +23,11 @@ enum HistoryCorrectionApprovalService {
         case alreadyExists(UUID)
     }
 
+    private enum CommittedApproval {
+        case inserted(UUID)
+        case alreadyExists(UUID)
+    }
+
     enum ApprovalError: LocalizedError, Equatable {
         case sourceUnavailable
         case sourceChanged
@@ -117,8 +122,26 @@ enum HistoryCorrectionApprovalService {
             existingRecords: try DictionaryService.snapshotWordReplacementRecords(using: context)
         )
         guard plan.canApply else { throw DictionaryService.LibraryConflictError(conflicts: plan.conflicts) }
-        if let duplicate = plan.duplicates.first { return .alreadyExists(duplicate.existingID) }
-        return .inserted(try DictionaryService.insertWordReplacement(preview.record, context: context))
+        let committed = try DictionaryPersistence.commit(in: context.container) { writer in
+            try validate(preview.source, range: preview.range, using: writer)
+            let storedPlan = VoiceInkWordReplacementLibrary(records: [preview.record]).preflightImport(
+                existingRecords: try DictionaryService.snapshotWordReplacementRecords(using: writer)
+            )
+            guard storedPlan.canApply else { throw DictionaryService.LibraryConflictError(conflicts: storedPlan.conflicts) }
+            if let duplicate = plan.duplicates.first {
+                guard storedPlan.duplicates.contains(where: { $0.existingID == duplicate.existingID }) else {
+                    throw DictionaryService.LibraryEntryError.changed
+                }
+                return CommittedApproval.alreadyExists(duplicate.existingID)
+            }
+            if let duplicate = storedPlan.duplicates.first { return CommittedApproval.alreadyExists(duplicate.existingID) }
+            writer.insert(WordReplacement(record: preview.record))
+            return CommittedApproval.inserted(preview.record.id)
+        }
+        switch committed {
+        case .alreadyExists(let id): return .alreadyExists(id)
+        case .inserted(let id): return .inserted(try DictionaryService.savedReplacement(id: id, using: context))
+        }
     }
 
     static func sourceExists(

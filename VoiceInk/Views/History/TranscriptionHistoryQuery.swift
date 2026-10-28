@@ -3,6 +3,11 @@ import SwiftData
 import VoiceInkCore
 
 enum TranscriptionHistoryQuery {
+    /// Rows deleted elsewhere (discarded empty results, auto-cleanup) must not stay selected.
+    static func isLive(_ transcription: Transcription) -> Bool {
+        !transcription.isDeleted && transcription.modelContext != nil
+    }
+
     static func latestIndicatorDescriptor() -> FetchDescriptor<Transcription> {
         var descriptor = FetchDescriptor<Transcription>(
             sortBy: [SortDescriptor(\.timestamp, order: .reverse)]

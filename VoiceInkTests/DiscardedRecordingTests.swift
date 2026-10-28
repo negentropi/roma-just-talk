@@ -30,7 +30,7 @@ struct DiscardedRecordingTests {
 
     @Test @MainActor func emptyTranscriptionLeavesNoHistoryRowAudioOrMetric() async throws {
         let fixture = try RecordingFixture()
-        fixture.beginRecording(session: FixedTextSession(text: " \n "))
+        fixture.beginRecording(session: GatedTextSession(text: " \n ", released: true))
 
         await fixture.engine.toggleRecord()
 
@@ -39,14 +39,69 @@ struct DiscardedRecordingTests {
         #expect(!fixture.audioExists)
         #expect(fixture.engine.recordingState == .idle)
     }
+
+    @Test @MainActor func accidentalShortcutCancelDuringTranscriptionLeavesNoHistoryRowOrAudio() async throws {
+        let fixture = try RecordingFixture()
+        let session = GatedTextSession(text: "hello", released: false)
+        fixture.beginRecording(session: session)
+
+        let stop = Task { await fixture.engine.toggleRecord() }
+        await session.waitUntilTranscribing()
+        await fixture.engine.cancelRecording(.accidentalShortcut)
+        session.release()
+        await stop.value
+
+        #expect(try fixture.transcriptionCount() == 0)
+        #expect(!fixture.audioExists)
+    }
+
+    @Test @MainActor func accidentalShortcutCancelDuringStartupStartsNoCapture() async throws {
+        let gate = SelectionDrainGate()
+        let qwen = QwenModelManager(runtimeResult: .failure(FixtureError.unusedRuntime)) { await gate.drain() }
+        let fixture = try RecordingFixture(qwenModelManager: qwen)
+        fixture.models.currentTranscriptionModel = QwenModel()
+        // Hold startup inside session preparation, where a quick Shift+Control chord lands.
+        qwen.recordingSelectionChanged(isSelected: false)
+        await gate.waitUntilEntered()
+
+        let start = Task { await fixture.engine.toggleRecord() }
+        let startupFile = try #require(await fixture.engine.recordedFileOnceStarting())
+        defer { try? FileManager.default.removeItem(at: startupFile) }
+        await fixture.engine.cancelRecording(.accidentalShortcut)
+        gate.release()
+        await start.value
+        let leakedSession = fixture.engine.currentSession
+        await fixture.engine.recorder.stopRecording()
+
+        #expect(!FileManager.default.fileExists(atPath: startupFile.path))
+        #expect(leakedSession == nil)
+        #expect(fixture.engine.recordingState == .idle)
+        #expect(try fixture.transcriptionCount() == 0)
+    }
+
+    @Test @MainActor func historySelectionDropsDeletedRows() throws {
+        let fixture = try RecordingFixture()
+        let kept = Transcription(text: "kept", duration: 1)
+        let discarded = Transcription(text: "", duration: 1)
+        fixture.context.insert(kept)
+        fixture.context.insert(discarded)
+        try fixture.context.save()
+
+        fixture.context.delete(discarded)
+        try fixture.context.save()
+
+        #expect(Set([kept, discarded]).filter(TranscriptionHistoryQuery.isLive) == [kept])
+    }
 }
 
 @MainActor private final class RecordingFixture {
     let context: ModelContext
+    let models: TranscriptionModelManager
     let engine: VoiceInkEngine
     let audioURL: URL
+    private let qwenModelManager: QwenModelManager?
 
-    init() throws {
+    init(qwenModelManager: QwenModelManager? = nil) throws {
         let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
         // Mirror the app's named stores; the host app binds SessionMetric to "stats" process-wide.
         let container = try ModelContainer(for: schema, configurations: [
@@ -55,10 +110,15 @@ struct DiscardedRecordingTests {
             ModelConfiguration("stats", schema: Schema([SessionMetric.self]), isStoredInMemoryOnly: true),
         ])
         context = ModelContext(container)
+        self.qwenModelManager = qwenModelManager
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let whisper = WhisperModelManager(modelsDirectory: directory.appendingPathComponent("models"))
-        let models = TranscriptionModelManager(whisperModelManager: whisper, fluidAudioModelManager: FluidAudioModelManager())
+        models = TranscriptionModelManager(
+            whisperModelManager: whisper,
+            fluidAudioModelManager: FluidAudioModelManager(),
+            qwenModelManager: qwenModelManager
+        )
         models.currentTranscriptionModel = TranscriptionModelRegistry.defaultMacOSFluidAudioModel
         engine = VoiceInkEngine(modelContext: context, whisperModelManager: whisper,
             transcriptionModelManager: models, qwenRuntimeResult: .failure(FixtureError.unusedRuntime))
@@ -87,12 +147,65 @@ struct DiscardedRecordingTests {
     }
 }
 
+private extension VoiceInkEngine {
+    func recordedFileOnceStarting() async -> URL? {
+        for _ in 0..<500 {
+            if recordingState == .starting, let recordedFile { return recordedFile }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return nil
+    }
+}
+
 private enum FixtureError: Error { case unusedRuntime }
 
-@MainActor private final class FixedTextSession: TranscriptionSession {
+@MainActor private final class GatedTextSession: TranscriptionSession {
     private let text: String
-    init(text: String) { self.text = text }
+    private var released: Bool
+    private var gate: CheckedContinuation<Void, Never>?
+    private var entered: CheckedContinuation<Void, Never>?
+    private var isTranscribing = false
+
+    init(text: String, released: Bool) {
+        self.text = text
+        self.released = released
+    }
+
     func prepare(model: any TranscriptionModel, latencyTraceToken: VoiceInkLatencyTrace.Token?) async throws -> ((Data) -> Void)? { nil }
-    func transcribe(audioURL: URL) async throws -> String { text }
-    func cancel() {}
+
+    func transcribe(audioURL: URL) async throws -> String {
+        isTranscribing = true
+        entered?.resume(); entered = nil
+        if !released { await withCheckedContinuation { gate = $0 } }
+        return text
+    }
+
+    func cancel() { release() }
+
+    func release() { released = true; gate?.resume(); gate = nil }
+
+    func waitUntilTranscribing() async {
+        if isTranscribing { return }
+        await withCheckedContinuation { entered = $0 }
+    }
+}
+
+@MainActor private final class SelectionDrainGate {
+    private var entered: CheckedContinuation<Void, Never>?
+    private var held: CheckedContinuation<Void, Never>?
+    private var released = false
+    private var calls = 0
+
+    func drain() async {
+        calls += 1
+        entered?.resume(); entered = nil
+        if !released { await withCheckedContinuation { held = $0 } }
+    }
+
+    func waitUntilEntered() async {
+        if calls > 0 { return }
+        await withCheckedContinuation { entered = $0 }
+    }
+
+    func release() { released = true; held?.resume(); held = nil }
 }

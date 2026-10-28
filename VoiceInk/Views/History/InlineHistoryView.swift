@@ -108,6 +108,7 @@ struct InlineHistoryView: View {
             performHistoryRefresh(VoiceInkHistoryRefreshPolicy.searchTextDidChange())
         }
         .onChange(of: latestTranscriptionIndicator.first?.id) { oldId, newId in
+            selectedTranscriptions = selectedTranscriptions.filter(TranscriptionHistoryQuery.isLive)
             performHistoryRefresh(
                 VoiceInkHistoryRefreshPolicy.latestItemDidChange(
                     oldID: oldId,

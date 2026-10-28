@@ -121,6 +121,10 @@ struct TranscriptionHistoryView: View {
             performHistoryRefresh(VoiceInkHistoryRefreshPolicy.searchTextDidChange())
         }
         .onChange(of: latestTranscriptionIndicator.first?.id) { oldId, newId in
+            if let selectedTranscription, !TranscriptionHistoryQuery.isLive(selectedTranscription) {
+                self.selectedTranscription = nil
+            }
+            selectedTranscriptions = selectedTranscriptions.filter(TranscriptionHistoryQuery.isLive)
             performHistoryRefresh(
                 VoiceInkHistoryRefreshPolicy.latestItemDidChange(
                     oldID: oldId,

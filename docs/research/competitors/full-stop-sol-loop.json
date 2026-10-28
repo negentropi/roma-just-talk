@@ -116,5 +116,16 @@
     "costUSD": 0.1279172,
     "receipt": "/tmp/rjt-pr30-snippets-authorship.json",
     "note": "Actual first-party Claude CLI output; no UI authored by the parent."
+  },
+  "projection": {
+    "approvedProductSource": "2b165a5c960817f2b1ea4d5683c8f64e2109de3b",
+    "qaCheckpoint": "69f9a2a3801b97d910520942a86ddb5c675ca94d",
+    "keepPaths": 136,
+    "deferredTaskAddedPaths": 121,
+    "behaviorChanges": "None: product, resources, project/configuration, dependencies and compiled tests retained byte-for-byte.",
+    "publishedArchive": "codex/rjt-pr30-verification-20261028",
+    "automaticCI": "Must execute the actual projected PR head.",
+    "extendedCI": "Runs on a verification descendant of PR source; actual SHA retained. Exact product trees and normal-app/UI compiler inputs must be independently verified.",
+    "sourceReviewLimit": "Round3 approved source and projection conditions; it does not assert execution success on an unseen projected commit."
   }
 }

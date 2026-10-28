@@ -45,7 +45,7 @@ Three backend owners work on separate files while Claude owns Views. The shared 
 
 The [52-capability ledger](rjt-parity.md) remains the full inventory. Current polish, corrections and Undo acceptance is tracked below. Remaining feature work includes automatic correction learning, per-mode cleanup/style overrides, durable transform review/history, local notes, and context and developer workflows. Mobile, meetings, account sync and team administration retain separate acceptance contracts. Hosted features require concrete service and operating decisions before their dependent implementation.
 
-The decision trail is [implementation-decisions.tsv](implementation-decisions.tsv). Record results as VERIFIED, NOT VERIFIED, or INCONCLUSIVE.
+The decision trail is [implementation-decisions.tsv](https://github.com/negentropi/roma-just-talk/blob/69f9a2a3801b97d910520942a86ddb5c675ca94d/docs/research/competitors/implementation-decisions.tsv). Record results as VERIFIED, NOT VERIFIED, or INCONCLUSIVE.
 
 ## Current verification status
 
@@ -103,8 +103,8 @@ TextEdit's tested target boundary is established on `2c5058fe`; the separate mat
 
 ## Following Mac units
 
-1. Add per-mode cleanup/style overrides and automatic correction learning only under their [profile](clarity-run-plan-design.md) and [attribution](correction-learning-design.md) contracts. Unrelated typing must not become training input.
-2. Add [durable transform review/history](transform-undo-design.md), stored originals/results and retry from the original. The implemented latest-edit Undo is memory-only and does not establish those workflows.
+1. Add per-mode cleanup/style overrides and automatic correction learning only under their [profile](https://github.com/negentropi/roma-just-talk/blob/69f9a2a3801b97d910520942a86ddb5c675ca94d/docs/research/competitors/clarity-run-plan-design.md) and [attribution](https://github.com/negentropi/roma-just-talk/blob/69f9a2a3801b97d910520942a86ddb5c675ca94d/docs/research/competitors/correction-learning-design.md) contracts. Unrelated typing must not become training input.
+2. Add [durable transform review/history](https://github.com/negentropi/roma-just-talk/blob/69f9a2a3801b97d910520942a86ddb5c675ca94d/docs/research/competitors/transform-undo-design.md), stored originals/results and retry from the original. The implemented latest-edit Undo is memory-only and does not establish those workflows.
 3. Add a local scratchpad with durable drafts and versions. Sync, image storage, meetings and organization features keep their separate contracts.
 
 The first Mac and global Custom/None units passed their full gates. The selected polish, approved-corrections and latest-edit Undo batch now also has an accepted normal full gate, native editor checks and component-host controls proof. No release was published. The [52-capability ledger](rjt-parity.md) still includes the remaining competitor gaps.

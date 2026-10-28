@@ -1,0 +1,57 @@
+{
+  "scope": "QA-onlymetadataUUIDreaderandnoninteractiveFormexposure; no productionUI change.",
+  "known_runtime": {
+    "run": 40631384054,
+    "source": "49336a35f96c03bac10ccbee8643395e1fbc0587",
+    "strict8": "6passed2failedat725",
+    "prior_footer_boundary": "Preview648hittable/clickedandApproveenabled; footerwholeinside1024x768",
+    "ID_census_limit": "No ownnativeIDvalue/label/type orAXhierarchy retained atpassiveassert; emptyStringorchildexposurecause remains unproved."
+  },
+  "before_oracle_sha256": "a0b75a5c18ad2e56f3cb1dd0923b317ca28af62160d5b4681b00c757258f1a74",
+  "candidate_oracle_sha256": "7f3dc95cc0531b4844d8c606d51da16452a94723a6bc28321935e0b911ae4f2e",
+  "all8_method_bodies_unchanged": {
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": "14c9911f29f6c7b317dc34a9c3ad4c284fba4b2077a61aa3ba6f778f36b34b61",
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": "5df0f3cb7b3afa77a71a00743a7aaa6867717dc685ed89efd4d7bd7861c2aea8",
+    "testTranslationTargetsReorderSelectAndPersist": "c07646262a4ca04d144df43362f68261975ba07831bdaacdba25679302d69f06",
+    "testDictationProfilePreservesCustomSettingsAndPersists": "2dbeddbeda7d7d583fb6aa5c5a0ce0421ac1cbfee3772cfbe98061624d5c0ea4",
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": "ec685883153f5f3096d441ed3f7c985a521dc393b7eeb2c53b98c424e67815b6",
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": "cb45d90a55115b71f278011f144764b3f0e6e77180cf037a09aa8922f2c501a3",
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": "a95ec15b51cdbd66fa6500a5524dddd8234c6f0f06a8fd9e403cb84f3f4e648f",
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": "2839e6c4dfc17efb78f073f183e2a9281cada95865c405f46394d34685d0d758"
+  },
+  "unchanged_byte_editor_copy_approval_helpers": {
+    "assertExactHistoryCopy": "08cd49f9606b2fa9c06e1950f33ef0720af4eff83b2b25ff91f1e2d78e9385fb",
+    "assertHistoryStaticTextPresentation": "421e30c19150bab323c7e443589f9541de41cc2b8242847f676b585094c0b3a0",
+    "pasteLiteralText": "dfe63be46e4308042579d0eaed4474155ddbd3f0b654eb71c4cbf20f3ffd7d10",
+    "assertExactEditor": "3299daa95c6dd78d40a8ffc574287c8ce4881cb0196610a16a145752a4bb3f2b",
+    "approveCorrection": "babcbf35ba92448ec8ff44f77f4932dee6ac6774e217ee77d9dec8e7f735f161",
+    "previewCorrection": "d77858ff99275321c5eb800f8b57f9c5bf315a25d1160335f063c88b5b983661"
+  },
+  "reader_contract": [
+    "One exact identifiedentryfield; no global/card/store/sourceTranscriptUUIDlookup.",
+    "Retain before/after native ownlabel/value/type/role/frame/visiblebounds and bounded directchildren.",
+    "ForPreviewID expose noninteractivefieldframe fullyinside existingForm viewport using existingboundednativewheelreceivers; actiontargets still requirehittability.",
+    "Reconcile ownlabel+Stringvalue andonlydirectStaticText labelID/valuepair intooneDISTINCTvalidUUID; rejectzero/conflicts; canonicalUUIDcasing.",
+    "DictionaryeditorIDgets sameclosedreaderwithout newscrollfallback."
+  ],
+  "source_metadata_HStacks": {
+    "VoiceInk/Views/Dictionary/WordReplacementReviewViews.swift": "6386578bbe5e82af28def8cf6d1c65b28cd021c44f4bc930c940b295dd1a8510",
+    "VoiceInk/Views/Dictionary/EditReplacementSheet.swift": "860a500f862da0d864b6a92d2cdf1a9fb9086b1fdb71af6bf3c0631dc3c7bb4d"
+  },
+  "checks": {
+    "swift_frontend_parse": "passed",
+    "diffcheck": "passed",
+    "local_XCTest_typecheck": "notrun;selectedCommandLineTools lacksXCTestframework, no installs/build attempted",
+    "native_runtime": "pending; source/parsercalibration is notappregressionproof."
+  },
+  "review": {
+    "model": "gpt-6.1-sol",
+    "effort": "medium",
+    "same_reviewer": "/root/none_profile_ui_checks/history_copy_sol_loop",
+    "same_base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+    "round": 3,
+    "budget": 3,
+    "verdict": "APPROVE",
+    "usage": "unavailable"
+  }
+}

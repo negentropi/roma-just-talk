@@ -717,15 +717,69 @@ final class WritingFeaturesUITests: XCTestCase {
     }
 
     @MainActor private func metadataUUID(_ identifier: String, in element: XCUIElement) throws -> String {
-        let value = identified(identifier, in: element)
-        XCTAssertTrue(value.waitForExistence(timeout: 5))
-        let text = value.value as? String ?? value.label
-        let pattern = "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}"
-        let matches = try NSRegularExpression(pattern: pattern).matches(in: text, range: NSRange(text.startIndex..., in: text))
-        XCTAssertEqual(matches.count, 1, "The actual preview did not expose one entry identity.")
-        let match = try XCTUnwrap(matches.first)
-        let range = try XCTUnwrap(Range(match.range, in: text))
-        return try XCTUnwrap(UUID(uuidString: String(text[range]))).uuidString
+        let fields = element.descendants(matching: .any).matching(identifier: identifier)
+        let appeared = fields.firstMatch.waitForExistence(timeout: 5)
+        func observation(_ field: XCUIElement) -> [String: Any] {
+            let value = field.value
+            return ["identifier": field.identifier, "role": field.elementType.rawValue,
+                    "label": field.label, "value": value.map { String(describing: $0) as Any } ?? NSNull(),
+                    "stringValue": (value as? String).map { $0 as Any } ?? NSNull(),
+                    "valueType": value.map { String(reflecting: type(of: $0)) } ?? "nil",
+                    "frame": NSStringFromRect(field.frame), "enabled": field.isEnabled,
+                    "hittable": field.isHittable]
+        }
+        func census(_ phase: String) throws -> [[String: Any]] {
+            let rows = fields.allElementsBoundByIndex.prefix(8).map { field -> [String: Any] in
+                var row = observation(field)
+                let children = field.children(matching: .any).allElementsBoundByIndex
+                row["childCount"] = children.count
+                row["children"] = children.prefix(8).map(observation)
+                return row
+            }
+            let forms = element.scrollViews.containing(.any, identifier: "history.correction.phrase")
+                .containing(.any, identifier: "history.correction.output")
+            let viewport = forms.count == 1 ? forms.firstMatch.frame.intersection(element.frame) : element.frame
+            let payload: [String: Any] = ["identifier": identifier, "phase": phase,
+                "fieldCount": fields.count, "scopeFrame": NSStringFromRect(element.frame),
+                "visibleBounds": NSStringFromRect(viewport), "fields": rows]
+            let attachment = XCTAttachment(data: try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+                                           uniformTypeIdentifier: "public.json")
+            attachment.name = "Entry UUID field " + phase + " " + identifier
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            return rows
+        }
+        _ = try census("before-exposure")
+        XCTAssertTrue(appeared)
+        XCTAssertEqual(fields.count, 1, "The entry identity must have one exact identified field.")
+        let field = try XCTUnwrap(fields.allElementsBoundByIndex.first)
+        var exposed = true
+        if identifier == "history.correction.preview.record.id" {
+            exposed = revealCorrectionControl(field, requiresHittable: false, in: element)
+        }
+        let row = try XCTUnwrap(census("after-exposure").first)
+        XCTAssertTrue(exposed, "The actual preview entry identity row could not be exposed in its Form.")
+        XCTAssertLessThanOrEqual(row["childCount"] as? Int ?? 0, 8, "The entry identity field exceeded its bounded child census.")
+        func strings(_ item: [String: Any]) -> [String] {
+            [item["label"] as? String, item["stringValue"] as? String].compactMap { $0 }
+        }
+        var texts = strings(row)
+        let children = (row["children"] as? [[String: Any]] ?? []).filter {
+            $0["role"] as? UInt == XCUIElement.ElementType.staticText.rawValue
+        }
+        // Both production metadata rows contain an ID label and one value Text.
+        if children.count == 2, children.filter({ strings($0).contains("ID") }).count == 1 {
+            texts += children.flatMap(strings)
+        }
+        let regex = try NSRegularExpression(pattern: "(?<![0-9A-Fa-f])[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}(?![0-9A-Fa-f])")
+        let identities = Set(texts.flatMap { text in
+            regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).compactMap { match -> String? in
+                guard let range = Range(match.range, in: text) else { return nil }
+                return UUID(uuidString: String(text[range]))?.uuidString
+            }
+        })
+        XCTAssertEqual(identities.count, 1, "The exact entry field must expose one distinct valid identity.")
+        return try XCTUnwrap(identities.first)
     }
 
     @MainActor private func nativeHistoryCheckbox(_ identifiedControl: XCUIElement) throws -> XCUIElement {
@@ -736,9 +790,9 @@ final class WritingFeaturesUITests: XCTestCase {
         return try XCTUnwrap(checkboxes.allElementsBoundByIndex.first)
     }
 
-    @MainActor private func revealCorrectionControl(
-        _ target: XCUIElement, towardTop: Bool = false, in sheet: XCUIElement
-    ) {
+    @MainActor @discardableResult private func revealCorrectionControl(
+        _ target: XCUIElement, towardTop: Bool = false, requiresHittable: Bool = true, in sheet: XCUIElement
+    ) -> Bool {
         XCTAssertTrue(target.exists)
         let forms = sheet.scrollViews.containing(.any, identifier: "history.correction.phrase")
             .containing(.any, identifier: "history.correction.output")
@@ -746,7 +800,12 @@ final class WritingFeaturesUITests: XCTestCase {
         let form = forms.firstMatch
         let anchorIDs = ["history.correction.phrase", "history.correction.output", "history.correction.occurrence.0",
                          "history.correction.occurrence.1", "history.correction.preview.record.original"]
-        for _ in 0..<12 where !target.isHittable {
+        func isExposed() -> Bool {
+            if requiresHittable { return target.isHittable }
+            let viewport = form.frame.intersection(sheet.frame)
+            return !target.frame.isEmpty && !viewport.isEmpty && viewport.contains(target.frame)
+        }
+        for _ in 0..<12 where !isExposed() {
             let anchors = anchorIDs.map { identified($0, in: form) }
             let receiver = form.isHittable ? form : anchors.first {
                 $0.exists && $0.isEnabled && $0.isHittable && !$0.frame.isEmpty && form.frame.contains($0.frame)
@@ -756,12 +815,14 @@ final class WritingFeaturesUITests: XCTestCase {
                 attachment.name = "Correction Form has no native wheel receiver"
                 attachment.lifetime = .keepAlways
                 add(attachment)
-                XCTFail("The correction Form has no visible enabled native control to receive scrolling.")
-                return
+                if requiresHittable { XCTFail("The correction Form has no visible enabled native control to receive scrolling.") }
+                return false
             }
             receiver.scroll(byDeltaX: 0, deltaY: towardTop ? 160 : -160)
         }
-        XCTAssertTrue(target.isHittable, "The actual correction control could not be reached in its Form.")
+        let exposed = isExposed()
+        if requiresHittable { XCTAssertTrue(exposed, "The actual correction control could not be reached in its Form.") }
+        return exposed
     }
 
     @MainActor private func selectProfile(

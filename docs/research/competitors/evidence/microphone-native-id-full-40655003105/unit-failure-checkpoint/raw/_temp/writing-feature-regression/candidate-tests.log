@@ -1,0 +1,142 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination platform=macOS -parallel-testing-enabled NO -derivedDataPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build -xcconfig /Users/runner/work/roma-just-talk/roma-just-talk/LocalBuild.xcconfig -clonedSourcePackagesDirPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS=/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements "SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD" "-only-testing:VoiceInkTests/VoiceInkTests/spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt()" "-only-testing:VoiceInkTests/VoiceInkTests/spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs()" "-only-testing:VoiceInkTests/VoiceInkTests/spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath()" -resultBundlePath /Users/runner/work/_temp/writing-feature-regression/Candidate.xcresult
+
+Build settings from command line:
+    CODE_SIGN_ENTITLEMENTS = /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk/VoiceInk.local.entitlements
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGNING_ALLOWED = YES
+    CODE_SIGNING_REQUIRED = NO
+    DEVELOPMENT_TEAM = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Build settings from configuration file '/Users/runner/work/roma-just-talk/roma-just-talk/LocalBuild.xcconfig':
+    CODE_SIGN_IDENTITY = -
+    CODE_SIGN_STYLE = Manual
+    DEVELOPMENT_TEAM = 
+    PROVISIONING_PROFILE_SPECIFIER = 
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) LOCAL_BUILD
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+  VoiceInkCore: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore @ local
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  VoiceInkNVIDIA: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkNVIDIA @ local
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  VoiceInkQwen: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkQwen @ local
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+
+Writing result bundle at path:
+	/Users/runner/work/_temp/writing-feature-regression/Candidate.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:aa0332c16e9a0459ac751c2ef85cd3eb5a3ec1c1, name:My Mac }
+{ platform:macOS, arch:x86_64, id:aa0332c16e9a0459ac751c2ef85cd3eb5a3ec1c1, name:My Mac }
+2026-10-28 08:37:46.625489+0000 roma just talk[55559:163364] [plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0xa04866c00> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-28 08:37:46.732890+0000 roma just talk[55559:163364] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-28 08:37:46.733826+0000 roma just talk[55559:163364] [WindowManager] resolveMainWindow: weak ref is nil, searching 0 windows by identifier
+2026-10-28 08:37:46.733888+0000 roma just talk[55559:163364] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 0, identifiers:
+2026-10-28 08:37:46.735380+0000 roma just talk[55559:163364] [ModelPrewarm] ModelPrewarmService initialized - listening for wake and app launch
+2026-10-28 08:37:46.735408+0000 roma just talk[55559:163364] [ModelPrewarm] App launched, scheduling prewarm
+2026-10-28 08:37:46.742235+0000 roma just talk[55559:163489] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:46.742443+0000 roma just talk[55559:163489] [Application] Error registering app with intents framework: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:46.743031+0000 roma just talk[55559:163457] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:46.743649+0000 roma just talk[55559:163457] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:46.744755+0000 roma just talk[55559:163489] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:46.744787+0000 roma just talk[55559:163489] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:46.745399+0000 roma just talk[55559:163489] [Connection] Will NOT re-try to establish the connection
+2026-10-28 08:37:46.745544+0000 roma just talk[55559:163488] [General] Failed to connect to linkd to request update AppShortcut parameters, error: Couldn’t communicate with a helper application.
+2026-10-28 08:37:46.745565+0000 roma just talk[55559:163492] [Connection] Unable to get synchronousRemoteObjectProxy, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:46.745611+0000 roma just talk[55559:163492] [Connection] Unable to re-register with Process Instance Registry, error: Error Domain=NSCocoaErrorDomain Code=4097 "connection to service named com.apple.linkd.autoShortcut" UserInfo={NSDebugDescription=connection to service named com.apple.linkd.autoShortcut}
+2026-10-28 08:37:47.562478+0000 roma just talk[55559:163364] [MenuBarManager] updateAppActivationPolicy: switching to .accessory (dock icon hidden)
+2026-10-28 08:37:47.562945+0000 roma just talk[55559:163364] [WindowManager] resolveMainWindow: weak ref is nil, searching 2 windows by identifier
+2026-10-28 08:37:47.563036+0000 roma just talk[55559:163364] [WindowManager] resolveMainWindow: FAILED — no window found with main identifier. Total windows: 2, identifiers: main-AppWindow-1, nil
+2026-10-28 08:37:47.657412+0000 roma just talk[55559:163364] [RecorderUIManager] Resetting recording state on launch
+2026-10-28 08:37:47.658619+0000 roma just talk[55559:163364] [Recorder] stopRecording called
+2026-10-28 08:37:47.659012+0000 roma just talk[55559:163364] [VoiceInkEngine] cleanupResources: releasing model resources
+2026-10-28 08:37:47.659047+0000 roma just talk[55559:163364] [WhisperModelManager] WhisperModelManager.cleanupResources: releasing whisper context
+2026-10-28 08:37:47.659201+0000 roma just talk[55559:163364] [WhisperModelManager] WhisperModelManager.cleanupResources: completed
+2026-10-28 08:37:47.915139+0000 roma just talk[55559:163364] [ShortcutMonitor] start: installing event tap for 1 shortcut(s)
+2026-10-28 08:37:47.923355+0000 roma just talk[55559:163364] [ShortcutMonitor] installEventTap: installed
+2026-10-28 08:37:47.945495+0000 roma just talk[55559:163455] unable to find air64_v27 slice or a compatible one in binary archive 'file:///System/Library/PrivateFrameworks/RenderBox.framework/Resources/archive.metallib' 
+ available slices: applegpu_g15g, applegpu_g15s, applegpu_g15d, applegpu_g15d, applegpu_g15g, applegpu_g16s, applegpu_g13g, applegpu_g17p, applegpu_g17g, applegpu_g17s, applegpu_g14g, applegpu_g16g, applegpu_g15s, applegpu_g14s, applegpu_g16s, applegpu_g14d, applegpu_g13s, applegpu_g13d,
+2026-10-28 08:37:47.962654+0000 roma just talk[55559:163364] [VoiceInkEngine] cleanupResources: completed
+2026-10-28 08:37:47.964109+0000 roma just talk[55559:163492] [CoreAudioRecorder] stopRecording: skipped, not recording and no audio unit
+2026-10-28 08:37:47.964148+0000 roma just talk[55559:163492] [CoreAudioRecorder] 🎙️ Starting pre-roll buffering from device 81
+2026-10-28 08:37:47.964459+0000 roma just talk[55559:163492] [CoreAudioRecorder] 🎙️ Device info: name=Apple Virtual Sound Device, uid=AVIODevice
+2026-10-28 08:37:47.964469+0000 roma just talk[55559:163492] [CoreAudioRecorder] 🎙️ Device details: transport=Built-in, manufacturer=Apple Inc.
+2026-10-28 08:37:47.964574+0000 roma just talk[55559:163492] [CoreAudioRecorder] 🎙️ Buffer size: 512 frames, ~latency: 10.7ms
+Test Suite 'Selected tests' started at 2026-10-28 08:37:47.987.
+Test Suite 'VoiceInkTests.xctest' started at 2026-10-28 08:37:47.988.
+2026-10-28 08:37:47.987964+0000 roma just talk[55559:163492] [logging-persist] cannot open file at line 51044 of [f0ca7bba1c]
+2026-10-28 08:37:47.987980+0000 roma just talk[55559:163492] [logging-persist] os_unix.c:51044: (2) open(/private/var/db/DetachedSignatures) - No such file or directory
+Test Suite 'VoiceInkTests.xctest' passed at 2026-10-28 08:37:47.988.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-28 08:37:47.989.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+2026-10-28 08:37:47.990230+0000 roma just talk[55559:163492] [carc] Reporter disconnected. { function=sendMessage, reporterID=238624087998465 }
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite VoiceInkTests started.
+◇ Test spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt() started.
+2026-10-28 08:37:48.233079+0000 roma just talk[55559:163455] [AQ]        LoudnessManager.mm:1261  GetHardwarePlatformKey: cannot get acoustic ID
+2026-10-28 08:37:48.282197+0000 roma just talk[55559:163364] [SessionMetricRecorder] Recorded session metric for transcription DF5D5A1B-A4C3-4937-BE95-E223C362382F
+✔ Test spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt() passed after 0.124 seconds.
+◇ Test spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs() started.
+2026-10-28 08:37:48.320724+0000 roma just talk[55559:163364] [SessionMetricRecorder] Recorded session metric for transcription 4891AD72-72EF-4FCF-B1A0-F7010333874F
+✔ Test spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs() passed after 0.034 seconds.
+◇ Test spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath() started.
+2026-10-28 08:37:48.368354+0000 roma just talk[55559:163364] [SessionMetricRecorder] Recorded session metric for transcription 4E35BCBB-BFAA-4335-9AE6-4F5FD1EE12FE
+✔ Test spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath() passed after 0.044 seconds.
+✔ Suite VoiceInkTests passed after 0.222 seconds.
+✔ Test run with 3 tests in 1 suite passed after 0.223 seconds.
+2026-10-28 08:37:48.810 xcodebuild[54990:161859] [MT] IDETestOperationsObserverDebug: 3.703 elapsed -- Testing started completed.
+2026-10-28 08:37:48.810 xcodebuild[54990:161859] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-10-28 08:37:48.810 xcodebuild[54990:161859] [MT] IDETestOperationsObserverDebug: 3.703 sec, +3.703 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/_temp/writing-feature-regression/Candidate.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

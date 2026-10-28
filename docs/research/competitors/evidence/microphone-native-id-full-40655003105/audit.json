@@ -1,0 +1,75 @@
+{
+  "run": 40655003105,
+  "source_sha": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+  "mode": "normal-full",
+  "classification": "accepted normal full Mac gate: raw UI, semantic store, permissions, packages, tests and CI packaging verified",
+  "UI": {
+    "once": 8,
+    "passed": 8,
+    "failed": 0,
+    "raw_duration_seconds": 1616.347
+  },
+  "Copy": {
+    "complete": 11,
+    "exact_UTF8_UTF16": true,
+    "source": "independent real-factory seed"
+  },
+  "StaticText": {
+    "paired": 11,
+    "additional": 10,
+    "exact": 21,
+    "independent_audit": "independent-native-ui-audit.json"
+  },
+  "native_History": {
+    "seedPID": 61651,
+    "verifyPID": 24035,
+    "seed_succeeded": true,
+    "verification_succeeded": true,
+    "normal_factory_reused": true,
+    "verification_read_only": true,
+    "counts": {
+      "Transcription": 5,
+      "WordReplacement": 2,
+      "VocabularyWord": 1,
+      "SessionMetric": 0
+    },
+    "corrections_receipts_unchanged": true,
+    "physical_and_semantic_afterUI_closure": true,
+    "managed_rule_deleted_source_retained": true,
+    "retained_rule_present_source_deleted": true,
+    "no_foreign_rows": true,
+    "stats_unchanged": true,
+    "both_signed_TCC_grants_2_preserved": true
+  },
+  "microphone_monitor": {
+    "callbacks": 2,
+    "recognized": 2,
+    "Allow_clicks_dismissed": 2,
+    "default_denial_log_lines": 0,
+    "actual_owned_PID": 63805,
+    "actual_native_title": "Allow / Don\u2019t Allow; labels empty"
+  },
+  "Core_unit_package_native6_matched_Release": "See independently audited unit-failure-checkpoint.",
+  "Release": "CI build/packaging succeeded; no GitHub Release, notarization, installation or publication claim",
+  "artifact": {
+    "id": 12805191372,
+    "bytes": 523564594,
+    "sha256": "8762dad83fb991ed3c05655eadfc3ee74a56d2f5dc0de35e302895dcbe31927f",
+    "members": 8912,
+    "allCRCverified": true,
+    "remote_path": "/data/rjt-writing-check-01a17bef/40655003105/evidence.zip",
+    "whole_ZIP_local": false,
+    "duplicate_screenshot_ZIP_fetched": false
+  },
+  "limits": [
+    "Synthetic normal-store History seeding proves real UI/storage boundaries, not ASR/provider or migration behavior.",
+    "No VoiceOver or real external-editor insertion claim from these eight UI cases.",
+    "Native initiating microphone-request call was not instrumented.",
+    "App ZIP artifact metadata retained; app binary not downloaded or installed."
+  ],
+  "independent_reviews": {
+    "native_UI_store": "ACCEPT; independent-native-ui-audit.json",
+    "original_45_PNGs": "CLEAN; visual-review.json",
+    "unit_Core_packages_native6_Release": "APPROVE; unit-failure-checkpoint/independent-review.md"
+  }
+}

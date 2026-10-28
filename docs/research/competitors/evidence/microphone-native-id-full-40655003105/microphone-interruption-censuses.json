@@ -1,0 +1,176 @@
+[
+  {
+    "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+    "name": "Microphone consent interruption census",
+    "content": {
+      "bundleDisplayName": "roma just talk",
+      "bundlePurpose": "roma-just-talk needs access to your microphone to record audio for transcription.",
+      "buttonCount": 3,
+      "buttonLimit": 8,
+      "buttons": [
+        {
+          "choices": [
+            "Help"
+          ],
+          "enabled": true,
+          "frame": "{{601, 130}, {30, 30}}",
+          "hittable": true,
+          "identifier": "_NS:30",
+          "label": "Help",
+          "title": "",
+          "value": "Optional()",
+          "valueType": "__NSCFConstantString"
+        },
+        {
+          "choices": [
+            "Don’t Allow"
+          ],
+          "enabled": true,
+          "frame": "{{397, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-2",
+          "label": "",
+          "title": "Don’t Allow",
+          "value": "Optional()",
+          "valueType": "__NSCFConstantString"
+        },
+        {
+          "choices": [
+            "Allow"
+          ],
+          "enabled": true,
+          "frame": "{{515, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-1",
+          "label": "",
+          "title": "Allow",
+          "value": "Optional()",
+          "valueType": "__NSCFConstantString"
+        }
+      ],
+      "dialog": {
+        "elementType": 8,
+        "frame": "{{382, 119}, {260, 250}}",
+        "identifier": "_NS:87",
+        "label": "alert",
+        "title": "",
+        "value": "Optional()"
+      },
+      "expectedPurpose": "roma-just-talk needs access to your microphone to record audio for transcription.",
+      "owner": {
+        "bundleURL": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+        "executableURL": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "infoBundleIdentifier": "com.negentropi.RomaJustTalk",
+        "infoExecutable": "roma just talk",
+        "launchDate": 1793176826.492429,
+        "ownedLaunches": 1,
+        "pid": 63805,
+        "runningCount": 1
+      },
+      "recognized": true,
+      "rejectReason": null,
+      "selector": "identifier == action-button-1 (companion action-button-2)",
+      "staticTextCount": 2,
+      "staticTextLimit": 16,
+      "staticTexts": [
+        {
+          "frame": "{{403, 218}, {218, 34}}",
+          "label": "",
+          "value": "Optional(“roma just talk” would like to access the Microphone.)"
+        },
+        {
+          "frame": "{{403, 260}, {218, 50}}",
+          "label": "",
+          "value": "Optional(roma-just-talk needs access to your microphone to record audio for transcription.)"
+        }
+      ]
+    }
+  },
+  {
+    "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+    "name": "Microphone consent interruption census",
+    "content": {
+      "bundleDisplayName": "roma just talk",
+      "bundlePurpose": "roma-just-talk needs access to your microphone to record audio for transcription.",
+      "buttonCount": 3,
+      "buttonLimit": 8,
+      "buttons": [
+        {
+          "choices": [
+            "Help"
+          ],
+          "enabled": true,
+          "frame": "{{601, 130}, {30, 30}}",
+          "hittable": true,
+          "identifier": "_NS:30",
+          "label": "Help",
+          "title": "",
+          "value": "Optional()",
+          "valueType": "__NSCFConstantString"
+        },
+        {
+          "choices": [
+            "Don’t Allow"
+          ],
+          "enabled": true,
+          "frame": "{{397, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-2",
+          "label": "",
+          "title": "Don’t Allow",
+          "value": "Optional()",
+          "valueType": "__NSCFConstantString"
+        },
+        {
+          "choices": [
+            "Allow"
+          ],
+          "enabled": true,
+          "frame": "{{515, 324}, {112, 30}}",
+          "hittable": true,
+          "identifier": "action-button-1",
+          "label": "",
+          "title": "Allow",
+          "value": "Optional()",
+          "valueType": "__NSCFConstantString"
+        }
+      ],
+      "dialog": {
+        "elementType": 8,
+        "frame": "{{382, 119}, {260, 250}}",
+        "identifier": "_NS:87",
+        "label": "alert",
+        "title": "",
+        "value": "Optional()"
+      },
+      "expectedPurpose": "roma-just-talk needs access to your microphone to record audio for transcription.",
+      "owner": {
+        "bundleURL": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app",
+        "executableURL": "/Users/runner/work/roma-just-talk/roma-just-talk/.local-build/Build/Products/Debug/roma just talk.app/Contents/MacOS/roma just talk",
+        "infoBundleIdentifier": "com.negentropi.RomaJustTalk",
+        "infoExecutable": "roma just talk",
+        "launchDate": 1793176826.492429,
+        "ownedLaunches": 1,
+        "pid": 63805,
+        "runningCount": 1
+      },
+      "recognized": true,
+      "rejectReason": null,
+      "selector": "identifier == action-button-1 (companion action-button-2)",
+      "staticTextCount": 2,
+      "staticTextLimit": 16,
+      "staticTexts": [
+        {
+          "frame": "{{403, 218}, {218, 34}}",
+          "label": "",
+          "value": "Optional(“roma just talk” would like to access the Microphone.)"
+        },
+        {
+          "frame": "{{403, 260}, {218, 50}}",
+          "label": "",
+          "value": "Optional(roma-just-talk needs access to your microphone to record audio for transcription.)"
+        }
+      ]
+    }
+  }
+]

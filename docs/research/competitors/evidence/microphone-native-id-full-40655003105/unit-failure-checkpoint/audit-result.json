@@ -1,0 +1,20 @@
+{
+  "run_id": 40655003105,
+  "head_sha": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+  "mode": "full",
+  "core_pass": 1758,
+  "canonical_pins": 41,
+  "focused_unit_success": 44,
+  "correction_success": 29,
+  "overlap": 7,
+  "unique_swift_identifiers": {
+    "Success": 299,
+    "Skipped": 31
+  },
+  "onboarding_xctest_success": 9,
+  "literal_snippet_regression": "two old failures plus one passing control; three candidate passes",
+  "native_case_success": 6,
+  "recorded_app_zip_sha256": "e4f31cfa5dca2cd9c0ba130dc0d80c53f00d5ba05200e496f3784cc577cc34b6",
+  "release": "CI packaging verified",
+  "whole_workflow": "success"
+}

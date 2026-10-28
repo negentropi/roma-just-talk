@@ -123,5 +123,33 @@
     "findings": [],
     "usage": "unavailable"
   },
-  "runtime": "Pending. Known-bad all8 UI green is distinct from new consent/strict postverification required proof."
+  "runtime": {
+    "run": 40655003105,
+    "source_sha": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+    "mode": "normal-full",
+    "verdict": "accepted after actual raw/independent evidence audit",
+    "source_ui_sha256": "88dd1c608e9d35cb565378e801691da7f65222158964b63ed552fe2739e61ded",
+    "UI_methods_once_passed": 8,
+    "Copy_exact_UTF8_UTF16": 11,
+    "Static_exact": 21,
+    "microphone_callbacks_recognized": 2,
+    "native_Allow_clicks_and_dismissals": 2,
+    "default_denial_handler_lines": 0,
+    "both_signed_auth2_grants_preserved": true,
+    "native_seed_PID": 61651,
+    "native_readonly_verify_PID": 24035,
+    "native_final_counts": {
+      "Transcription": 5,
+      "WordReplacement": 2,
+      "VocabularyWord": 1,
+      "SessionMetric": 0
+    },
+    "Core_named_pass": 1758,
+    "focused_unit_pass": 44,
+    "native_selection_pass": 6,
+    "Release_CI_build_packaging": "passed; not published/notarized/installed",
+    "app_zip_sha256": "e4f31cfa5dca2cd9c0ba130dc0d80c53f00d5ba05200e496f3784cc577cc34b6",
+    "evidence": "docs/research/competitors/evidence/microphone-native-id-full-40655003105/",
+    "no_new_source_behavior_review_round": true
+  }
 }

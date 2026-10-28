@@ -1,0 +1,5 @@
+{
+  "observedAtUTC": "2026-10-28T09:07:15.211312+00:00",
+  "exitCode": 1,
+  "stderr": "failed to get run: Get \"https://api.github.com/repos/negentropi/roma-just-talk/actions/runs/40655003105?exclude_pull_requests=true\": dial tcp 20.27.177.116:443: i/o timeout"
+}

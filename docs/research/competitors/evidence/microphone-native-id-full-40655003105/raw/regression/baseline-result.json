@@ -1,0 +1,9 @@
+{
+  "expectation": "known-bad",
+  "exit_code": 65,
+  "tests": {
+    "spokenSnippetPipelineInsertsExactWholeTriggerContentAndSavesIt": "failed",
+    "spokenSnippetPipelinePreservesInlineCapitalsPunctuationAndParagraphs": "failed",
+    "spokenSnippetPipelineLeavesUnmatchedDictationOnItsExistingFormattingPath": "passed"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "run_id": 40655003105,
+  "head_sha": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+  "make_log_member": "_temp/writing-release-build.log",
+  "make_log_bytes": 4863549,
+  "make_log_sha256": "bb1689ce52b91363b0f9dfb28157a0aefe24a0da54c77e36432ae62bcdaebbbf",
+  "identical_duplicate_make_log_member": "roma-just-talk/roma-just-talk/.local-build/writing-check-evidence/release-build.log",
+  "app_hash_member": "roma-just-talk/roma-just-talk/.local-build/writing-check-evidence/app-sha256.txt",
+  "recorded_app_zip_sha256": "e4f31cfa5dca2cd9c0ba130dc0d80c53f00d5ba05200e496f3784cc577cc34b6",
+  "xcodebuild_release": true,
+  "coverage_disabled": true,
+  "build_succeeded": true,
+  "static_whisper_macho_count": 8,
+  "library_validation_contract": "@rpath/MediaRemoteAdapter.framework/Versions/A/MediaRemoteAdapter",
+  "postmake_checks_evidence": "Exact workflow source plus successful Release step metadata; stdout not separately retained; no independent packaged-binary inspection"
+}

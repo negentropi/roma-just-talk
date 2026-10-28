@@ -1,0 +1,15 @@
+{
+  "observedAtUTC": "2026-10-28T08:14:33Z",
+  "databaseId": 40655003105,
+  "headSha": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+  "headBranch": "ci/rjt-writing-check-complete-5ebb28bf-01a17bef",
+  "displayTitle": "Verify Mac writing actions (full)",
+  "status": "in_progress",
+  "currentStep": {
+    "number": 8,
+    "name": "Shared core checks",
+    "status": "in_progress",
+    "startedAt": "2026-10-28T08:13:31Z"
+  },
+  "source": "initial gh run view metadata observed by delegated watcher; remaining raw snapshots retain complete returned metadata"
+}

@@ -1,0 +1,54 @@
+{
+  "runId": 40655003105,
+  "headSha": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+  "displayTitle": "Verify Mac writing actions (full)",
+  "headBranch": "ci/rjt-writing-check-complete-5ebb28bf-01a17bef",
+  "url": "https://github.com/negentropi/roma-just-talk/actions/runs/40655003105",
+  "status": "completed",
+  "conclusion": "success",
+  "terminalObservedAtUTC": "2026-10-28T09:24:31.796922+00:00",
+  "snapshotCount": 35,
+  "rawMetadataSnapshots": 32,
+  "metadataErrors": 2,
+  "minimumObservationIntervalSeconds": 121.000899,
+  "terminalSnapshot": "20261028T092431Z.json",
+  "terminalSnapshotSHA256": "3f35dfcc480ac6f22b41bdcc112e0226f53bc244c9717decfec2c7df21d6ef73",
+  "steps": [
+    {
+      "name": "Full Mac unit suite with fresh CI permissions",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T08:17:15Z",
+      "completedAt": "2026-10-28T08:27:04Z"
+    },
+    {
+      "name": "Live TextEdit and Safari selection transactions",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T08:27:04Z",
+      "completedAt": "2026-10-28T08:28:20Z"
+    },
+    {
+      "name": "Matched snippet regression",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T08:28:22Z",
+      "completedAt": "2026-10-28T08:38:12Z"
+    },
+    {
+      "name": "Writing, snippet and dictation settings UI",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T08:38:14Z",
+      "completedAt": "2026-10-28T09:08:58Z"
+    },
+    {
+      "name": "Release build and packaging contracts",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-28T09:09:01Z",
+      "completedAt": "2026-10-28T09:22:44Z"
+    }
+  ],
+  "scope": "Metadata only. No logs, artifacts, case counts, microphone consent, or native post-state audit."
+}

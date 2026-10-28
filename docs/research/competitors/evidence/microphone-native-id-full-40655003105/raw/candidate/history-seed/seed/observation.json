@@ -1,0 +1,20 @@
+{
+  "appSupportDirectory" : "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk",
+  "bundleIdentifier" : "com.negentropi.RomaJustTalk",
+  "classification" : "passed",
+  "executablePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/.local-build\/Build\/Products\/Debug\/roma just talk.app\/Contents\/MacOS\/roma just talk",
+  "explicitSaveCompleted" : true,
+  "hostPID" : 61651,
+  "phase" : "seed",
+  "scope" : "Synthetic row creation and normal-store History rendering input; no ASR, provider, migration or editor-delivery proof.",
+  "sourcePath" : "\/Users\/runner\/work\/roma-just-talk\/roma-just-talk\/VoiceInkTests\/DictationHistoryUISeedLiveTests.swift",
+  "sourceSHA" : "0184f9a1552d281cd6b416446b92e091b6bdad29",
+  "storePaths" : [
+    "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk\/default.store",
+    "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk\/dictionary.store",
+    "\/Users\/runner\/Library\/Application Support\/com.negentropi.RomaJustTalk\/stats.store"
+  ],
+  "testName" : "liveDictationHistoryUISeed",
+  "verificationReadOnly" : false,
+  "version" : 1
+}

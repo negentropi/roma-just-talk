@@ -1,0 +1,55 @@
+{
+  "tests": {
+    "testApprovedHistoryCorrectionSurvivesSourceDeletion": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testCSVImportPreviewsMultilineContentBeforeReplacing": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testDictationProfilePreservesCustomSettingsAndPersists": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testDictationProfilesAndClarityStylesPersistWithoutChangingCustomSettings": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testHistoryCorrectionPreviewApprovalAndDictionaryManagement": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testHistoryPreservesRecognizedFallbackAndLegacyVariants": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testSnippetLibraryPreservesLiteralContentAcrossEditAndRelaunch": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    },
+    "testTranslationTargetsReorderSelectAndPersist": {
+      "results": [
+        "passed"
+      ],
+      "starts": 1
+    }
+  },
+  "failures": [],
+  "decoded_source_sha256": "c63dbb170f07e5b84052f6a19372c1e9ae0a71208dcbfeb6289171df05c464a6",
+  "actual_raw_duration_seconds": 1616.347
+}

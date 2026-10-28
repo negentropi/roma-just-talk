@@ -1,0 +1,18 @@
+[
+  {
+    "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+    "timestamp": "2026-10-28T08:40:42.113+0000",
+    "text": "clicked Allow (action-button-1); dialog dismissed: true",
+    "exported": "candidate/screenshots/0593BB11-7A00-46D4-B544-88A291B586EC.txt",
+    "sha256": "af3b7f63972da4de5f98c1b5e291727a712df73d0bdc04f0dc4af2633be1695d",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~ZT5tJtNm6fxFiWJ7ok85VpofSQRUSCJvPC81MAhMCKfS5nXJ8gi4Gg6IsP6FVs6v8Pxxa-wV8waffAClinm0Lw=="
+  },
+  {
+    "test": "WritingFeaturesUITests/testApprovedHistoryCorrectionSurvivesSourceDeletion()",
+    "timestamp": "2026-10-28T08:40:49.463+0000",
+    "text": "clicked Allow (action-button-1); dialog dismissed: true",
+    "exported": "candidate/screenshots/2D25E700-7239-4F9C-B117-D370BBB59E81.txt",
+    "sha256": "af3b7f63972da4de5f98c1b5e291727a712df73d0bdc04f0dc4af2633be1695d",
+    "zip_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-ui/UI.xcresult/Data/data.0~ZT5tJtNm6fxFiWJ7ok85VpofSQRUSCJvPC81MAhMCKfS5nXJ8gi4Gg6IsP6FVs6v8Pxxa-wV8waffAClinm0Lw=="
+  }
+]

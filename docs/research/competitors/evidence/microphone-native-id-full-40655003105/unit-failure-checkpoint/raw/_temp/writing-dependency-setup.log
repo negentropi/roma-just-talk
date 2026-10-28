@@ -1,0 +1,4 @@
+Static whisper.xcframework already built in /Users/runner/VoiceInk-Dependencies, skipping build
+Verified static Whisper XCFramework: 7 slices
+Whisper framework is ready at /Users/runner/VoiceInk-Dependencies/whisper.cpp/build-apple/whisper.xcframework
+Please ensure your Xcode project references the framework from this new location.

@@ -1,0 +1,175 @@
+{
+  "seed_checks": {
+    "valid": true,
+    "sourceSHA": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+    "phase": "seed",
+    "checks": {
+      "system-tcc.json": {
+        "query_exit_code": 0,
+        "cmp_exit_code": 0,
+        "expected": [
+          {
+            "service": "kTCCServiceAccessibility",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "actual": [
+          {
+            "service": "kTCCServiceAccessibility",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "raw_bytes_equal": true,
+        "expected_signed_grant": [
+          {
+            "service": "kTCCServiceAccessibility",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "valid": true
+      },
+      "microphone-tcc.json": {
+        "query_exit_code": 0,
+        "cmp_exit_code": 0,
+        "expected": [
+          {
+            "service": "kTCCServiceMicrophone",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "actual": [
+          {
+            "service": "kTCCServiceMicrophone",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "raw_bytes_equal": true,
+        "expected_signed_grant": [
+          {
+            "service": "kTCCServiceMicrophone",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "valid": true
+      }
+    }
+  },
+  "verify_checks": {
+    "valid": true,
+    "sourceSHA": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+    "phase": "verify",
+    "checks": {
+      "system-tcc.json": {
+        "query_exit_code": 0,
+        "cmp_exit_code": 0,
+        "expected": [
+          {
+            "service": "kTCCServiceAccessibility",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "actual": [
+          {
+            "service": "kTCCServiceAccessibility",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "raw_bytes_equal": true,
+        "expected_signed_grant": [
+          {
+            "service": "kTCCServiceAccessibility",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "valid": true
+      },
+      "microphone-tcc.json": {
+        "query_exit_code": 0,
+        "cmp_exit_code": 0,
+        "expected": [
+          {
+            "service": "kTCCServiceMicrophone",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "actual": [
+          {
+            "service": "kTCCServiceMicrophone",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "raw_bytes_equal": true,
+        "expected_signed_grant": [
+          {
+            "service": "kTCCServiceMicrophone",
+            "client": "com.negentropi.RomaJustTalk",
+            "client_type": 0,
+            "auth_value": 2,
+            "csreq": "FADE0C0000000028000000010000000800000014E9A19CA5FA20BF352B4C6103D9D75991AA2409C5"
+          }
+        ],
+        "valid": true
+      }
+    }
+  },
+  "monitor_callbacks": 2,
+  "recognized": 2,
+  "Allow_clicks": 2,
+  "dialog_dismissed": 2,
+  "default_denial_handler_log_lines": 0,
+  "current_owned_PID": 63805,
+  "actual_native_titles": {
+    "action-button-1": "Allow",
+    "action-button-2": "Don’t Allow"
+  },
+  "labels": "empty",
+  "values": "empty native String (__NSCFConstantString)",
+  "old_known_bad": {
+    "run": 40647571351,
+    "Allow_label_matches": 0,
+    "recognized": 0,
+    "default_denials": 2,
+    "post_Mic_auth": 0,
+    "native_verify_attempted": false
+  },
+  "candidate": {
+    "run": 40655003105,
+    "Mic_and_AX_auth2_preserved": true,
+    "native_verify_attempted": true,
+    "native_verify_passed": true
+  },
+  "limit": "Exact native input-request call and why there were two prompts remain untraced; no claim about startup HAL versus explicit recording cause."
+}

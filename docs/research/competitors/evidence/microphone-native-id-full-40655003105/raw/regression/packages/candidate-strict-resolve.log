@@ -1,0 +1,53 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild -resolvePackageDependencies -project /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInk.xcodeproj -scheme VoiceInk -derivedDataPath /Users/runner/work/_temp/writing-package-derived-candidate -clonedSourcePackagesDirPath /Users/runner/work/roma-just-talk/roma-just-talk/.local-build/SourcePackages -disableAutomaticPackageResolution -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  swift-syntax: https://github.com/swiftlang/swift-syntax.git @ 603.0.2
+  grpc-swift-nio-transport: https://github.com/negentropi/grpc-swift-nio-transport.git @ 65adb0b
+  MLXAudio: https://github.com/negentropi/mlx-audio-swift.git @ ec81d1d
+  swift-asn1: https://github.com/apple/swift-asn1.git @ 1.7.2
+  swift-log: https://github.com/apple/swift-log.git @ 1.16.2
+  grpc-swift-2: https://github.com/grpc/grpc-swift-2.git @ 2.4.3
+  swift-nio-http2: https://github.com/apple/swift-nio-http2.git @ 1.46.0
+  SelectedTextKit: https://github.com/tisfeng/SelectedTextKit @ 2.6.2
+  LLMkit: https://github.com/Beingpax/LLMkit.git @ main (adc2239)
+  swift-atomics: https://github.com/apple/swift-atomics.git @ 1.3.0
+  grpc-swift-protobuf: https://github.com/grpc/grpc-swift-protobuf.git @ 2.4.1
+  swift-crypto: https://github.com/apple/swift-crypto.git @ 4.5.2
+  swift-nio-ssl: https://github.com/apple/swift-nio-ssl.git @ 2.37.5
+  Zip: https://github.com/marmelroy/Zip @ 2.1.2
+  MediaRemoteAdapter: https://github.com/Beingpax/mediaremote-adapter @ master (b97fa53)
+  FluidAudio: https://github.com/negentropi/FluidAudio.git @ 56c9c21
+  Sparkle: https://github.com/sparkle-project/Sparkle @ 2.9.1
+  swift-http-types: https://github.com/apple/swift-http-types.git @ 1.8.0
+  swift-nio-transport-services: https://github.com/apple/swift-nio-transport-services.git @ 1.28.0
+  swift-collections: https://github.com/apple/swift-collections.git @ 1.6.0
+  VoiceInkNVIDIA: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkNVIDIA @ local
+  SwiftProtobuf: https://github.com/apple/swift-protobuf.git @ 1.38.1
+  swift-nio: https://github.com/apple/swift-nio.git @ 2.104.0
+  VoiceInkQwen: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkQwen @ local
+  PermissionFlow: https://github.com/jaywcjlove/PermissionFlow @ 2.4.0
+  AXSwift: https://github.com/tisfeng/AXSwift.git @ 0.3.6
+  swift-huggingface: https://github.com/huggingface/swift-huggingface.git @ 0.10.0
+  swift-system: https://github.com/apple/swift-system.git @ 1.8.1
+  swift-certificates: https://github.com/apple/swift-certificates.git @ 1.21.1
+  swift-nio-extras: https://github.com/apple/swift-nio-extras.git @ 1.35.2
+  yyjson: https://github.com/ibireme/yyjson.git @ 0.12.0
+  swift-http-structured-headers: https://github.com/apple/swift-http-structured-headers.git @ 1.7.0
+  Jinja: https://github.com/huggingface/swift-jinja.git @ 2.5.0
+  KeySender: https://github.com/jordanbaird/KeySender @ 0.0.5
+  mlx-swift: https://github.com/ml-explore/mlx-swift.git @ 0.31.4
+  swift-transformers: https://github.com/huggingface/swift-transformers.git @ 1.3.4
+  LaunchAtLogin: https://github.com/sindresorhus/LaunchAtLogin-Modern @ main (a04ec1c)
+  swift-numerics: https://github.com/apple/swift-numerics @ 1.1.1
+  swift-service-lifecycle: https://github.com/swift-server/swift-service-lifecycle.git @ 2.13.0
+  VoiceInkCore: /Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkCore @ local
+  EventSource: https://github.com/mattt/EventSource.git @ 1.5.1
+  swift-async-algorithms: https://github.com/apple/swift-async-algorithms.git @ 1.1.5
+  mlx-swift-lm: https://github.com/ml-explore/mlx-swift-lm.git @ 3.31.4
+  swift-algorithms: https://github.com/apple/swift-algorithms.git @ 1.2.1
+
+resolved source packages: swift-syntax, grpc-swift-nio-transport, MLXAudio, swift-asn1, swift-log, grpc-swift-2, swift-nio-http2, SelectedTextKit, LLMkit, swift-atomics, grpc-swift-protobuf, swift-crypto, swift-nio-ssl, Zip, MediaRemoteAdapter, FluidAudio, Sparkle, swift-http-types, swift-nio-transport-services, swift-collections, VoiceInkNVIDIA, SwiftProtobuf, swift-nio, VoiceInkQwen, PermissionFlow, AXSwift, swift-huggingface, swift-system, swift-certificates, swift-nio-extras, yyjson, swift-http-structured-headers, Jinja, KeySender, mlx-swift, swift-transformers, LaunchAtLogin, swift-numerics, swift-service-lifecycle, VoiceInkCore, EventSource, swift-async-algorithms, mlx-swift-lm, swift-algorithms

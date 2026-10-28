@@ -1,0 +1,64 @@
+{
+  "run_id": 40655003105,
+  "scope": "live",
+  "aggregate_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~_1ntYroUjEnpT19UX3_AFnTZ0EU7hhaBWjTJpycyqvjErCd3QBa447RiSa5rpg4WhRiYbTnLTRIQLr8hCgMMcQ==",
+  "case_details": [
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetTextEditPreservesUnicodeOutsideSelection()",
+      "status": "Success",
+      "summary_reference": "0~3Iug8_Ij5KLoFXbW3Y1jNa9UJBuxnK0YZWL7hhgpIKymvP1lrMNfB8SsLWr7_RHVe_g_cPGc8KHDUKS_QISxHQ==",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~3Iug8_Ij5KLoFXbW3Y1jNa9UJBuxnK0YZWL7hhgpIKymvP1lrMNfB8SsLWr7_RHVe_g_cPGc8KHDUKS_QISxHQ==",
+      "decoded_summary_sha256": "54a692897bff26a37df45584d3d7e57384a2112ade67faf1e523ca8d4cb634c5",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetTextEditRefusesRangeTextAndFocusDrift()",
+      "status": "Success",
+      "summary_reference": "0~7SQ53uNYzpNMxNeSL-V6wQHmbtj0X5g2_yIfIdImg3Xq5nGFF29Lwxm6J7UsfhM2jx_EfqHp8WFJAJGKvNpzNA==",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~7SQ53uNYzpNMxNeSL-V6wQHmbtj0X5g2_yIfIdImg3Xq5nGFF29Lwxm6J7UsfhM2jx_EfqHp8WFJAJGKvNpzNA==",
+      "decoded_summary_sha256": "e7fad5fc5c43505f84003bbec379984b7b4fa6c96f672622656be19da36ce0f8",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingTargetSafariTextareaReplacesOnlySelection()",
+      "status": "Success",
+      "summary_reference": "0~QYfB1i6kQzs_z6OBkviFcHClpqRVigYus3Oz0W8ZEZb1HWc0MgmUeUrzyEqqazTPArrdsWyCo6AE464bsRJ7UA==",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~QYfB1i6kQzs_z6OBkviFcHClpqRVigYus3Oz0W8ZEZb1HWc0MgmUeUrzyEqqazTPArrdsWyCo6AE464bsRJ7UA==",
+      "decoded_summary_sha256": "521e58a4f05dbfa0e5384afd5c0caaed011f7d1280ad29a2e3baed434a5f5f52",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingActionPipelineUsesLocalCLIAndRetainsFailure()",
+      "status": "Success",
+      "summary_reference": "0~gI6ZOet5sBvXshkZlRm9KYmDEH0MhmKX0mQbOP734wepjiYxuUOc7EgpEP0qOI2K5lXEX-gbxx-S-GngLMuFhQ==",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~gI6ZOet5sBvXshkZlRm9KYmDEH0MhmKX0mQbOP734wepjiYxuUOc7EgpEP0qOI2K5lXEX-gbxx-S-GngLMuFhQ==",
+      "decoded_summary_sha256": "429812d2c9c993668b6801f33b38ee0d76305b76781542771b038c1dcac7173c",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveWritingStartupContextRespectsOwnerAfterCancellation()",
+      "status": "Success",
+      "summary_reference": "0~ktuGfb8G2u30trIVhk76h7z3pQxdvBwhZv4ExoX0ZmW9FsqH3ttIWmqxUjI2ychKHHWnz2bj4N33xM77e4kHpg==",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~ktuGfb8G2u30trIVhk76h7z3pQxdvBwhZv4ExoX0ZmW9FsqH3ttIWmqxUjI2ychKHHWnz2bj4N33xM77e4kHpg==",
+      "decoded_summary_sha256": "5152b3b4c491a1964b18935939c9d1174fb86c886b2c089884148ad05bb3bfac",
+      "failure_summaries": [],
+      "attachments": []
+    },
+    {
+      "identifier": "VoiceInkTests/liveDictationProfileKeepsContextEligibilityAcrossPreferenceChanges()",
+      "status": "Success",
+      "summary_reference": "0~UQY7xLa2PQ5S66F00H5MgI7nDzxs9HU3rFViB6GFpvwjhnWE6ZIQfqNniAVbzKWhs922iukLGqFb9N37FYH0Ag==",
+      "summary_member": "_temp/writing-proof-snapshot/onboarding-test-evidence/writing-target-live/Live.xcresult/Data/data.0~UQY7xLa2PQ5S66F00H5MgI7nDzxs9HU3rFViB6GFpvwjhnWE6ZIQfqNniAVbzKWhs922iukLGqFb9N37FYH0Ag==",
+      "decoded_summary_sha256": "13165ed24068c3e6d5224998181f2b6bf6636277b93b71a4013395712ad7485f",
+      "failure_summaries": [],
+      "attachments": []
+    }
+  ],
+  "boundaries": [],
+  "external_ax_reports": [],
+  "poststate_limit": "AX fixtureWindows trees come from before action unless the report explicitly says otherwise. UI boundary reports reflect their named observation phases."
+}

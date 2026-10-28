@@ -1,0 +1,27 @@
+{
+  "run_id": 40655003105,
+  "source_sha": "0184f9a1552d281cd6b416446b92e091b6bdad29",
+  "mode": "normal-full",
+  "source_pins": {
+    "VoiceInkUITests/WritingFeaturesUITests.swift": "88dd1c608e9d35cb565378e801691da7f65222158964b63ed552fe2739e61ded",
+    "VoiceInk/Views/History/SaveCorrectionSheet.swift": "029344ea9e7c2ca821a8429c93a48e25bdce522ef13117f96b911a043e192b55",
+    "VoiceInkTests/DictationHistoryUISeedLiveTests.swift": "30b30aecf21276e4a2296aff61b9e737e114dd07add359145583eab7571c98ec",
+    "scripts/run-writing-feature-regression.sh": "7dabc1bbd69a8bc1afe380bb13622a0cc603fa4413e7451025d2911ad8f2982e",
+    ".github/workflows/voiceink-writing-actions-check.yml": "184fed3f02e09b6abcb326fbccf3c70abf39d9073ef21f5d6d1f3b23eccbe1b0",
+    "VoiceInk/Info.plist": "11b2a01024c6cef1780278fdede8d0d6479ef04ef8f5eb70f94880b804ce22c5"
+  },
+  "previous_full": 40647571351,
+  "previous_boundary": "Eight UI cases passed. Both owned microphone dialogs exposed empty action labels; label-only selector matched zero Allow controls, returned false; default denial twice; strict final native permission preflight failed on Mic0/samecsreq.",
+  "candidate": "Measured scoped native action IDs1/2 with companion/frame/conflicting humantext guard; title/value/type diagnostics. No product/regrant/shortcut or test-body changes.",
+  "all8_bodies_and8_helpers_unchanged": true,
+  "Sol_loop": {
+    "same_base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
+    "same_reviewer": "/root/none_profile_ui_checks/history_copy_sol_loop",
+    "round": 6,
+    "budget": 7,
+    "verdict": "APPROVE",
+    "extension": "Direct human choice Finish both checks (Recommended); no reset."
+  },
+  "runtime": "Pending actual selection/title/value/consent outcomes/auth2/native post-store verification/full Release. No acceptance from source.",
+  "metadata_origin": "docs/research/competitors/evidence/microphone-native-id-full-40655003105/watch/20261028T081433Z-initial.json"
+}

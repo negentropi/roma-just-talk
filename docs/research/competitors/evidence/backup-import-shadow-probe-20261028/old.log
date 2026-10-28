@@ -1,0 +1,9 @@
+/tmp/rjt-backup-rows-shadow-01a17bef.old.swift:10:28: error: cannot reference invalid declaration 'rows'
+ 7 |     }
+ 8 |     func apply() throws -> [Int] {
+ 9 |         let rows = try commit { writer in
+   |             `- note: 'rows' declared here
+10 |             let rows = try rows(using: writer, additionalExistingWords: [], additionalExistingRecords: [])
+   |                            `- error: cannot reference invalid declaration 'rows'
+11 |             return rows
+12 |         }

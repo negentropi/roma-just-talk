@@ -1,0 +1,9 @@
+{
+  "boundary": "Swift outer local / member lookup in nested commit closure, not app tests",
+  "oldExit": 1,
+  "newExit": 0,
+  "oldSourceSHA256": "0cd8157ca04c65344ea37cba0e486efe4a3e7e5658ea19b5a448380f16d0698c",
+  "newSourceSHA256": "e28c2af3287c57edb42ced9a45825f0ba9ef79866a39713ac5fded8a65950517",
+  "oldLogSHA256": "459236e54b62fdea558f13e06d877f5b0e000974c231438444e8f29d085bcce1",
+  "newLogSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

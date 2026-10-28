@@ -70,7 +70,7 @@ enum DictionaryBackup {
                 )
             }) { writer in
                 // Both pending UI entries and newer stored entries constrain this additive import.
-                let rows = try rows(
+                let rows = try self.rows(
                     using: writer, additionalExistingWords: callerWords, additionalExistingRecords: callerRecords
                 )
                 rows.vocabulary.forEach { writer.insert(VocabularyWord(word: $0)) }

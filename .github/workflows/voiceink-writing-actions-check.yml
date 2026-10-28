@@ -13,6 +13,11 @@ on:
         required: true
         default: b4df0b236592fe701e45b249856a4b731e96b104
         type: string
+      product_ref:
+        description: Immutable feature PR SHA with identical app, tests and dependencies
+        required: false
+        default: ""
+        type: string
   push:
     branches:
       - "ci/rjt-writing-check-*"
@@ -31,6 +36,7 @@ jobs:
     env:
       BASELINE_REF: ${{ inputs.baseline_ref || 'b4df0b236592fe701e45b249856a4b731e96b104' }}
       RJT_UI_ONLY: ${{ inputs.ui_only && 'true' || 'false' }}
+      RJT_PR_REVIEW_PRODUCT_REF: ${{ inputs.product_ref || '' }}
     steps:
       - uses: actions/checkout@v4
         with:

@@ -43,7 +43,8 @@ busy = ['pasteLastWhileDeliveryIsBusyPreservesOwnerAndStillPastesWhenIdle',
 markers = ['Paste Last must not replace the active delivery owner',
     'Paste Last must not interrupt an active Undo']
 roots = ['VoiceInk', 'VoiceInkCore', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInkTests',
-    'VoiceInkUITests', 'VoiceInk.xcodeproj', 'iOS', 'Makefile', 'LocalBuild.xcconfig']
+    'VoiceInkUITests', 'VoiceInk.xcodeproj', 'VoiceInk.xcworkspace', 'iOS', 'Tools',
+    'Package.swift', 'Package.resolved', 'Makefile', 'LocalBuild.xcconfig']
 
 def require(ok, message):
     if not ok: raise RuntimeError(message)

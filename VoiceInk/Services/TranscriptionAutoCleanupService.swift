@@ -153,13 +153,17 @@ class TranscriptionAutoCleanupService {
             guard FileManager.default.fileExists(atPath: recordingsDirectory.path) else { return }
             let filesInDirectory = try FileManager.default.contentsOfDirectory(
                 at: recordingsDirectory,
-                includingPropertiesForKeys: nil
+                includingPropertiesForKeys: [.contentModificationDateKey]
             )
+            // Files written after the snapshot (a new recording, or its Opus copy
+            // replacing the WAV) are not orphans yet.
+            let recentCutoff = Date().addingTimeInterval(-600)
 
             var deletedCount = 0
             for fileURL in filesInDirectory {
                 let fileName = fileURL.lastPathComponent
-                if !referencedFiles.contains(fileName) {
+                let modifiedAt = (try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+                if !referencedFiles.contains(fileName), modifiedAt.map({ $0 < recentCutoff }) ?? true {
                     try? FileManager.default.removeItem(at: fileURL)
                     deletedCount += 1
                 }

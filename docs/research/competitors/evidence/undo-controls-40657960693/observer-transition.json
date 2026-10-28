@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "boundary": "Actual shortcut recorder capture followed by read-only display/storage/ownership validation. QA observer correction, no product behavior change.",
+  "known_bad_observer": {
+    "run_id": 40635627619,
+    "head_sha": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
+    "evidence": "../undo-controls-40635627619/failure-diagnosis.json",
+    "observed": "One local two-event recorder input saved the exact public chord and displayed keycaps, but the retained old AX reference expired(-25202). Display wait failed before any global Undo case. Fresh-node PID/window not retained."
+  },
+  "candidate_observer": {
+    "run_id": 40657960693,
+    "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+    "retained_reference_expired": true,
+    "current_reference_differs": true,
+    "current_reference_owned_and_same_verified_window": true,
+    "current_host_pid": 20807,
+    "current_appkit_window_number": 28,
+    "display_source": "current-control",
+    "readback_polls": 1,
+    "cases_completed": [
+      "textedit-menu",
+      "textedit-shortcut",
+      "safari-menu",
+      "safari-shortcut"
+    ],
+    "states_passed": [
+      "busy",
+      "focusRefusal",
+      "unavailable"
+    ]
+  },
+  "shared_capture_conditions": {
+    "local_input_route": "CGEvent.postToPid",
+    "native_events": 2,
+    "key_code": 32,
+    "modifier_flags": 1835008,
+    "stored_bytes": 59,
+    "stored_sha256": "75a1d420f30742ac962223b6c84387a8ca6381c8c0d47e0489168cf6594dac68",
+    "fallback_or_input_retry": false
+  },
+  "limits": [
+    "The two full candidate binaries are different heads; no whole-binary equivalence claim.",
+    "This demonstrates the stale-observer failure and the current-control acceptance boundary. No production Undo defect or fix is asserted.",
+    "Global Undo actions are separate real menu/native-HID cases, not the local recorder configuration input."
+  ]
+}

@@ -143,8 +143,8 @@
       "usage_status": "Not exposed; not estimated."
     }
   ],
-  "native_runtime_status": "Actual40635627619 at8f2e99ead: full CI build and222 compiler inputs passed; unavailable menu/dismissal1of3 states passed; local postToPid chord saved exactly with fresh visible keycaps. Display wait failed on expired retained AX reference; fresh-node PID/window unretained. Zero menu/shortcut Undo cases or global Undo dispatch; overall native acceptance failed.",
-  "status": "round6-source-approved-native-pending",
+  "native_runtime_status": "Actual40657960693 at18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9: full CI build and222 compiler inputs passed; current exact-ID/PID/same-verified-AXWindow recorder readback passed while old reference expired(-25202). All4 genuine menu/configured-global-shortcut cases and3 safety states passed;15 original PNGs independently reviewed CLEAN by actual GPT6.1Sol medium. Source/signature/five TCC before/after and hostexit0/closure verified by independent Data artifact audit. Component-host acceptance only; no normal app composition, physical keyboard or full pipeline claim.",
+  "status": "round6-source-approved-component-native-accepted",
   "rounds_used": 6,
   "open_blockers_or_shoulds": [],
   "fixed_findings": [
@@ -160,35 +160,59 @@
   "code_diff_shortstat_after_review": "6 files changed, 4928 insertions(+)",
   "code_diff_sha256_after_review": "73767950960c7ca84ba4aa2760a19da9a29ae95dd77fd1d9637491fbe4d77b83",
   "scoped_files_frozen_through_terminal_verdict": true,
-  "post_review_changes": "Round6 approved the user-authorized post-capture observer/verifier behavior delta. After frozen approval only verdict/ledger/authorship metadata changed; no behavior edits. Historical post-round5 compiler-only annotation remains separately recorded.",
+  "post_review_changes": "Round6 approved the user-authorized post-capture observer/verifier behavior delta. After frozen approval only verdict/ledger/authorship/runtime-evidence metadata changed; no behavior edits. Historical post-round5 compiler-only annotation remains separately recorded. Actual40657960693 component-host acceptance and fresh factual/15PNG review add no source-review round.",
   "runtime_findings": [
     {
       "id": "RUNTIME1",
       "severity": "should",
       "provenance": "actual run40624443133 exactb2c82ce6e",
       "claim": "Pre-input exact-one-display guard refused; raw rectangles/display/root facts missing, so no cause known.",
-      "outcome": "resolved-source / pending-native; raw geometry and bounded pre-input readiness experiment retained, actual cause unproven"
+      "outcome": "resolved-source / pending-native; raw geometry and bounded pre-input readiness experiment retained, actual cause unproven",
+      "verified_native_resolution": {
+        "run_id": 40657960693,
+        "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+        "evidence": "../undo-controls-40657960693/README.md",
+        "observed": "Actual initial partly-offscreen status frame was rejected without input; second bounded pre-input observation passed exact display/owned-hit guard and all real menu cases completed."
+      }
     },
     {
       "id": "RUNTIME2",
       "severity": "should",
       "provenance": "actual40627170433 at1639a273c",
       "claim": "Real opened native AXMenuItem exacttitle exposes emptyidentifier; oldIDselectorcannotfindit.",
-      "outcome": "resolved-source / pending-native; scoped title/role/retained-status native-menu contract implemented with full proof bindings"
+      "outcome": "resolved-source / pending-native; scoped title/role/retained-status native-menu contract implemented with full proof bindings",
+      "verified_native_resolution": {
+        "run_id": 40657960693,
+        "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+        "evidence": "../undo-controls-40657960693/README.md",
+        "observed": "Actual disabled menu item has empty ID; enabled actions expose menuAction:. Same retained-status downward exact-title/role/PID contract and fresh native center-hit activation passed."
+      }
     },
     {
       "id": "RUNTIME3",
       "severity": "should",
       "provenance": "actual40629369072 at5ee7c9fee",
       "claim": "Native menu downward subtree is owned/unique, but AXMenu parent returns a host AXMenuBar rather than the retained status AXMenuBarItem. Reciprocal-tree expectation refused before any Undo.",
-      "outcome": "resolved-source / pending-native; schema2 downward identity remains strict, nonreciprocal upward graph retained as diagnostics only"
+      "outcome": "resolved-source / pending-native; schema2 downward identity remains strict, nonreciprocal upward graph retained as diagnostics only",
+      "verified_native_resolution": {
+        "run_id": 40657960693,
+        "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+        "evidence": "../undo-controls-40657960693/README.md",
+        "observed": "Nonreciprocal upward native AX graph remains diagnostic only; authoritative unique readable retained-status downward proof passed for disabled/enabled states and both menu activations."
+      }
     },
     {
       "id": "RUNTIME4",
       "severity": "should",
       "provenance": "actual40631248324 at994a98e87161afc31d2086ffe2e6408f78dee397",
       "claim": "Unavailable menu and dismissal passed; real recorder click reached capture mode, but exact chord not observed after self-host HID input. No delivery diagnostics establish cause.",
-      "outcome": "resolved-source / pending-native; recorder-only owned-PID capture protocol, exact focused state/readback and unchanged global dispatch remain required"
+      "outcome": "resolved-source / pending-native; recorder-only owned-PID capture protocol, exact focused state/readback and unchanged global dispatch remain required",
+      "verified_native_resolution": {
+        "run_id": 40657960693,
+        "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+        "evidence": "../undo-controls-40657960693/README.md",
+        "observed": "One local focused-recorder postToPid pair saved exact59B U32/flags1835008; separate unchanged global HID Undo invocations passed both editors, busy and focus-refusal checks. No physical-keyboard claim."
+      }
     },
     {
       "id": "RUNTIME5",
@@ -198,14 +222,16 @@
       "evidence": "../undo-controls-40635627619/failure-diagnosis.json",
       "proposed_fix": "Read-only reacquire one visible exact-ID AXButton with actual host PID and same verified setup AXWindow; require exact expected public stored value and idle display before global cases. Preserve pre-input proof, input routes, event counts and guards; no new input/retry, shortcut writes, private handlers or product changes.",
       "applied": true,
-      "outcome": "Resolved-source / pending-native; same actualSol round6 APPROVE. Current exact-ID host/window/display/store proof required; no new native acceptance yet."
+      "outcome": "resolved-source and observed-native; independent raw/15PNG factual review CLEAN. See verified_native_resolution.",
+      "verified_native_resolution": {
+        "run_id": 40657960693,
+        "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+        "evidence": "../undo-controls-40657960693/README.md",
+        "observed": "Old reference actually expired(-25202); current unique enabled same-ID AXButton PID20807 belonged to the same retained verified AXWindow and key/focused NSWindow28. Exact public storage/display passed; all4cases/3states completed."
+      }
     }
   ],
-  "open_native_requirements": [
-    "Actual current post-capture recorder PID/window/display ownership under the round6-approved observer correction; native verification pending.",
-    "Four native menu/shortcut cases and remaining busy/focus states, exact editor/range/selection/focus/notice and closed-host proof.",
-    "15 actual case/state screenshots and native visual review, plus complete post-run source/signature/TCC receipts."
-  ],
+  "open_native_requirements": [],
   "code_diff_shortstat_after_round2": "6 files changed, 3518 insertions(+)",
   "code_diff_shortstat_after_round3": "6 files changed, 3986 insertions(+)",
   "budget_extension": {
@@ -232,9 +258,9 @@
   "code_diff_after_review_scope": "Last completed source review, round6. Initial3095 and rounds1\u20135 snapshots remain historical; current post-review verdict metadata is separate.",
   "current_scoped_diff_snapshot": {
     "base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
-    "shortstat": "6 files changed, 4928 insertions(+)",
-    "sha256": "bd86f5d02145a2bde1b4d19d2dce55a1ad3e3e1021b4b10f3d06b2cf7366bde0",
-    "scope": "Exact existing six-path diff_command after round6 verdict metadata; behavior hashes match frozen round6. Ledger and compiler-annotation.json remain outside original six-path scope."
+    "shortstat": "6 files changed, 4948 insertions(+)",
+    "sha256": "94961d78016457ac7c0b0a973b2a9bdda29a90015369c8db4fe110ea224f4461",
+    "scope": "Exact existing six-path diff_command after runtime-verdict metadata; all five behavior files retain frozen round6 hashes. Ledger/runtime evidence remain outside original six-path scope."
   },
   "pending_user_review_budget_request": {
     "additional_focused_rounds": 2,
@@ -247,9 +273,9 @@
   },
   "recorded_ci_transport_push": {
     "ref": "ci/rjt-writing-undo-controls-01a17bef-794fa259",
-    "head": "8f2e99ead66682c9b387c8682a5d2442f0043aeb",
-    "scope": "Earlier verified disposable CI transport push only; no normal work-branch push or release claim.",
-    "run_id": 40635627619
+    "head": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+    "scope": "Verified disposable CI transport only, pushed by root after writer/author checks. No normal work-branch push or release claim.",
+    "run_id": 40657960693
   },
   "user_authorized_budget_extension": {
     "from": 5,
@@ -261,5 +287,25 @@
     "previous_controls_only_question": "Superseded by the answered broader question.",
     "no_reset": true
   },
-  "code_diff_shortstat_after_round6": "6 files changed, 4928 insertions(+)"
+  "code_diff_shortstat_after_round6": "6 files changed, 4928 insertions(+)",
+  "current_runtime_evidence": {
+    "run_id": 40657960693,
+    "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+    "workflow_conclusion": "success",
+    "offline_audit": "passed",
+    "evidence": "../undo-controls-40657960693/README.md",
+    "source_review_rounds_used": 6,
+    "source_review_budget": 7,
+    "source_behavior_changed_since_round6": false,
+    "independent_visual_review": "CLEAN, actual GPT6.1Sol medium fresh fork-none factual review; no source round consumed",
+    "review": "../undo-controls-40657960693/visual-and-boundary-review.json"
+  },
+  "runtime_scope_limits": [
+    "Isolated component host and bridge only; normal VoiceInkApp composition excluded.",
+    "Synthetic native mouse/HID input, not physical keyboard proof.",
+    "No ASR, provider, full recording pipeline, rich text or general editor compatibility proof.",
+    "Clipboard policy and pending-restoration settle observed; no per-case old clipboard bytes/types retained.",
+    "Offline signature/TCC/compile checks bind retained attestations, not a new binary verification.",
+    "15-second stack sampler timed out; no stack evidence."
+  ]
 }

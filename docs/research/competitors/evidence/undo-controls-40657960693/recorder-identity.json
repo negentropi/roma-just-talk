@@ -1,0 +1,282 @@
+{
+  "schemaVersion": 1,
+  "host_pid": 20807,
+  "pre_input": {
+    "appKit": {
+      "appKeyWindowIsSetup": true,
+      "isActive": true,
+      "isKeyWindow": true,
+      "isVisible": true,
+      "titledWindowCount": 1,
+      "uniqueSameWindow": true,
+      "windowNumber": 28
+    },
+    "axWindow": {
+      "axError": 0,
+      "focusedWindowAXError": 0,
+      "focusedWindowIsSetupWindow": true,
+      "pid": 20807,
+      "present": true,
+      "role": "AXWindow",
+      "title": "RJT Undo control check",
+      "titledCount": 1,
+      "uniqueSameReference": true,
+      "windowsAXError": 0
+    },
+    "conflictCheck": {
+      "action": "undoLastWritingEdit",
+      "api": "ShortcutValidator.validationError",
+      "conflictFree": true,
+      "expected": {
+        "displayString": "⌃ + ⌥ + ⌘ + U",
+        "keyCode": 32,
+        "kind": "key",
+        "modifierFlagsRawValue": 1835008
+      },
+      "issue": null
+    },
+    "expectedPlaceholder": "Press shortcut",
+    "hostPID": 20807,
+    "inputPosted": false,
+    "kind": "recorder-capture-proof",
+    "ownShortcut": {
+      "action": "undoLastWritingEdit",
+      "clearedValue": true,
+      "clearedValueKind": "true",
+      "dataPresent": false,
+      "effective": null,
+      "effectiveEqualsExpected": false,
+      "isShortcutCleared": true,
+      "phase": "final-preinput"
+    },
+    "phase": "final-preinput",
+    "readOnly": true,
+    "ready": true,
+    "reasons": [],
+    "recorder": {
+      "description": "Press shortcut",
+      "enabled": true,
+      "help": "Press shortcut",
+      "identifier": "shortcutRecorder.undoLastWritingEdit",
+      "labelIsRecordingPlaceholder": true,
+      "pid": 20807,
+      "role": "AXButton",
+      "sameReferenceAsLookup": true,
+      "title": null,
+      "uniqueCount": 1
+    },
+    "schemaVersion": 1,
+    "systemFocus": {
+      "focusedApplicationAXError": 0,
+      "focusedApplicationPID": 20807,
+      "focusedElementAXError": 0,
+      "focusedElementInSetupWindow": false,
+      "focusedElementIsRecorder": false,
+      "focusedElementPID": 20807,
+      "focusedElementPresent": true,
+      "focusedElementRole": "AXWindow",
+      "frontmostPID": 20807
+    },
+    "systemUptime": 699.3604185
+  },
+  "capture_input": {
+    "contract": "focused-recorder-capture-postToPid",
+    "eventCount": 2,
+    "eventFlagsRawValue": 1835008,
+    "events": [
+      {
+        "flagsRawValue": 1835008,
+        "keyCode": 32,
+        "type": "keyDown"
+      },
+      {
+        "flagsRawValue": 1835008,
+        "keyCode": 32,
+        "type": "keyUp"
+      }
+    ],
+    "eventsExact": true,
+    "eventSource": "nil",
+    "eventTypes": [
+      "keyDown",
+      "keyUp"
+    ],
+    "fallbackUsed": false,
+    "finalProofReady": true,
+    "hostPID": 20807,
+    "inputPosted": true,
+    "keyCode": 32,
+    "laterGlobalInvocationRoute": "postChord-cghidEventTap-unchanged",
+    "modifierFlagsRawValue": 1835008,
+    "pattern": "LiveWritingEditor.key",
+    "physicalKeyboard": false,
+    "retryUsed": false,
+    "route": "CGEvent.postToPid",
+    "targetPID": 20807
+  },
+  "public_storage": {
+    "afterReadback": {
+      "action": "undoLastWritingEdit",
+      "clearedValue": null,
+      "clearedValueKind": "nil",
+      "dataBytes": 59,
+      "dataPresent": true,
+      "dataSHA256": "75a1d420f30742ac962223b6c84387a8ca6381c8c0d47e0489168cf6594dac68",
+      "decoded": {
+        "displayString": "⌃ + ⌥ + ⌘ + U",
+        "keyCode": 32,
+        "kind": "key",
+        "modifierFlagsRawValue": 1835008
+      },
+      "decodeSucceeded": true,
+      "effective": {
+        "displayString": "⌃ + ⌥ + ⌘ + U",
+        "keyCode": 32,
+        "kind": "key",
+        "modifierFlagsRawValue": 1835008
+      },
+      "effectiveEqualsExpected": true,
+      "isShortcutCleared": false,
+      "phase": "after-readback"
+    },
+    "beforeClick": {
+      "action": "undoLastWritingEdit",
+      "clearedValue": null,
+      "clearedValueKind": "nil",
+      "dataPresent": false,
+      "effective": null,
+      "effectiveEqualsExpected": false,
+      "isShortcutCleared": false,
+      "phase": "before-click"
+    },
+    "beforeInput": {
+      "action": "undoLastWritingEdit",
+      "clearedValue": true,
+      "clearedValueKind": "true",
+      "dataPresent": false,
+      "effective": null,
+      "effectiveEqualsExpected": false,
+      "isShortcutCleared": true,
+      "phase": "before-input"
+    }
+  },
+  "post_capture_readback": {
+    "currentControlReadback": {
+      "appKit": {
+        "appKeyWindowIsSetup": true,
+        "expectedWindowNumber": 28,
+        "frontmostPID": 20807,
+        "isActive": true,
+        "isKeyWindow": true,
+        "isVisible": true,
+        "titledWindowCount": 1,
+        "uniqueSameWindow": true,
+        "windowNumber": 28
+      },
+      "currentControl": {
+        "currentDiffersFromRetained": true,
+        "description": "⌃ + ⌥ + ⌘ + U",
+        "descriptionAXError": 0,
+        "enabled": true,
+        "enabledAXError": 0,
+        "exactIDCount": 1,
+        "help": "⌃ + ⌥ + ⌘ + U",
+        "identifier": "shortcutRecorder.undoLastWritingEdit",
+        "identifierAXError": 0,
+        "idleDisplayMatches": true,
+        "pid": 20807,
+        "present": true,
+        "role": "AXButton",
+        "roleAXError": 0,
+        "title": null,
+        "visibleExactIDCount": 1,
+        "windowAXError": 0,
+        "windowPresent": true,
+        "windowSameAsVerifiedSetupAXWindow": true
+      },
+      "expectedDisplay": "⌃ + ⌥ + ⌘ + U",
+      "globalTitleFallbackUsed": false,
+      "hostPID": 20807,
+      "identityAuthority": "current-exact-id-host-pid-same-verified-setup-axwindow",
+      "kind": "recorder-post-capture-readback",
+      "postsInput": false,
+      "readOnly": true,
+      "ready": true,
+      "reasons": [],
+      "retainedReferenceUsedForIdentity": false,
+      "schemaVersion": 1,
+      "store": {
+        "decodedEqualsExpected": true,
+        "effectiveEqualsExpected": true,
+        "isShortcutCleared": false,
+        "ownShortcut": {
+          "action": "undoLastWritingEdit",
+          "clearedValue": null,
+          "clearedValueKind": "nil",
+          "dataBytes": 59,
+          "dataPresent": true,
+          "dataSHA256": "75a1d420f30742ac962223b6c84387a8ca6381c8c0d47e0489168cf6594dac68",
+          "decoded": {
+            "displayString": "⌃ + ⌥ + ⌘ + U",
+            "keyCode": 32,
+            "kind": "key",
+            "modifierFlagsRawValue": 1835008
+          },
+          "decodeSucceeded": true,
+          "effective": {
+            "displayString": "⌃ + ⌥ + ⌘ + U",
+            "keyCode": 32,
+            "kind": "key",
+            "modifierFlagsRawValue": 1835008
+          },
+          "effectiveEqualsExpected": true,
+          "isShortcutCleared": false,
+          "phase": "post-capture-readback"
+        }
+      },
+      "systemUptime": 699.4425176666667,
+      "verifiedSetupAXWindow": {
+        "focusedWindowAXError": 0,
+        "focusedWindowIsSetupWindow": true,
+        "pid": 20807,
+        "role": "AXWindow",
+        "roleAXError": 0,
+        "title": "RJT Undo control check",
+        "titleAXError": 0,
+        "titledCount": 1,
+        "uniqueSameReference": true,
+        "windowsAXError": 0
+      }
+    },
+    "currentReadbackPolls": 1,
+    "displaySource": "current-control",
+    "recorderDescription": "⌃ + ⌥ + ⌘ + U",
+    "recorderIdleDisplayMatches": true,
+    "retainedReferenceAfterCapture": {
+      "description": {
+        "axError": -25202,
+        "present": false,
+        "string": null
+      },
+      "getPidPID": 20807,
+      "identifier": {
+        "axError": -25202,
+        "present": false,
+        "string": null
+      },
+      "role": {
+        "axError": -25202,
+        "present": false,
+        "string": null
+      },
+      "window": {
+        "axError": -25202,
+        "present": false,
+        "string": null
+      }
+    },
+    "storeEqualsExpected": true
+  },
+  "raw_native_result_sha256": "20e9557a49b07ae66bfdc2c01fc5cc2c60ab2b2822d40b22b22174923cb21b3c",
+  "boundary": "One focused-recorder postToPid pair; read-only current exact-ID/PID/same-verified-AXWindow lookup; later global Undo uses unchanged HID route. No input retry or direct Undo command. No direct harness assignment of the captured chord; the real recorder initial cleared-state setup remains."
+}

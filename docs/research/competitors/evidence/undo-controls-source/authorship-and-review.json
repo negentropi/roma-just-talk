@@ -1,6 +1,6 @@
 {
   "classification": "source-authorship-and-review-only",
-  "implementation_status": "Same-loop round6 approved the user-authorized current-control observer and verifier; budget6of7 used, no reset. Latest actual8frun remains failed at old retained AX readback with no Undo case; new native verification pending.",
+  "implementation_status": "Same-loop round6 approved the user-authorized current-control observer/verifier;6of7 authorized source rounds used, no reset. Actual40657960693 exact18d component-host build/native acceptance passed:4cases/3states/15PNGs and fresh recorder ownership. Independent actualSolMEDIUM raw/visual audit CLEAN. No production behavior edits or source round7.",
   "author_cli": {
     "binary": "claude",
     "version": "2.1.310",
@@ -687,5 +687,25 @@
       "native_runtime": "pending"
     },
     "source_review": "Round6 APPROVE, same actualGPT6.1Sol MEDIUM/fixed6927base/six-path diff, no findings, usage unavailable. User-authorized continuation6of7 used; RUNTIME5 resolved-source/pending-native. No behavior edits after frozen approval."
+  },
+  "runtime_acceptance": {
+    "run_id": 40657960693,
+    "head_sha": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9",
+    "evidence": "../undo-controls-40657960693/README.md",
+    "classification": "passed-component-host",
+    "actual_independent_factual_reviewer": "gpt-6.1-sol",
+    "effort": "medium",
+    "factual_review": "CLEAN; all15 original PNGs and exact raw state/case/ownership/lifecycle facts. Not source-loop review.",
+    "formal_source_review_rounds_used": 6,
+    "formal_source_review_budget": 7,
+    "source_behavior_changed_after_round6": false,
+    "limits": [
+      "Isolated component host and bridge only; normal VoiceInkApp composition excluded.",
+      "Synthetic native mouse/HID input, not physical keyboard proof.",
+      "No ASR, provider, full recording pipeline, rich text or general editor compatibility proof.",
+      "Clipboard policy and pending-restoration settle observed; no per-case old clipboard bytes/types retained.",
+      "Offline signature/TCC/compile checks bind retained attestations, not a new binary verification.",
+      "15-second stack sampler timed out; no stack evidence."
+    ]
   }
 }

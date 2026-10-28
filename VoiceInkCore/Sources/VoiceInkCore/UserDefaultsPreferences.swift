@@ -5288,12 +5288,10 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkRecordingShortcutPreference.clear(from: defaults)
         defaults.removeObject(forKey: VoiceInkSpokenSnippets.userDefaultsKey)
         defaults.removeObject(forKey: VoiceInkWritingActionPreferences.storageKey)
-        for action in [VoiceInkShortcutActionIdentifier.translateRecording, .rewriteSelectionRecording, .draftRecording] {
-            defaults.removeObject(forKey: action.shortcutStorageKey)
+        for action in [VoiceInkShortcutActionIdentifier.translateRecording, .rewriteSelectionRecording,
+                       .draftRecording, .undoLastWritingEdit] {
+            VoiceInkShortcutStoragePreference.removeShortcutStorage(for: action.shortcutStorageKey, from: defaults)
         }
-        VoiceInkShortcutStoragePreference.removeShortcutStorage(
-            for: VoiceInkShortcutActionIdentifier.undoLastWritingEdit.shortcutStorageKey, from: defaults
-        )
         VoiceInkAudioInputPreference.clearLastUsedMicrophoneDeviceID(from: defaults)
     }
 }

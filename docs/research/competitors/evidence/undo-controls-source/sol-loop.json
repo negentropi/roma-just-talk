@@ -255,7 +255,7 @@
     "full_ci_build_evidence": "../undo-controls-40635627619/compiler-transition.json",
     "scope": "Historical compiler-only annotation candidate at8f2e99ead; subsequent user-authorized post-capture observer behavior change is tracked in round6, not covered by that annotation equivalence claim."
   },
-  "code_diff_after_review_scope": "Last completed source review, round6. Initial3095 and rounds1\u20135 snapshots remain historical; current post-review verdict metadata is separate.",
+  "code_diff_after_review_scope": "Last completed source review, round6. Initial3095 and rounds1–5 snapshots remain historical; current post-review verdict metadata is separate.",
   "current_scoped_diff_snapshot": {
     "base": "6927b4e52040b41b96f2d8fdbc36be6337af59c6",
     "shortstat": "6 files changed, 4948 insertions(+)",
@@ -307,5 +307,27 @@
     "Clipboard policy and pending-restoration settle observed; no per-case old clipboard bytes/types retained.",
     "Offline signature/TCC/compile checks bind retained attestations, not a new binary verification.",
     "15-second stack sampler timed out; no stack evidence."
-  ]
+  ],
+  "final_transport_closeout": {
+    "normal_work_branch_pushed": false,
+    "release_published": false,
+    "only_disposable_ci_transport_pushed": true,
+    "temporary_refs_deleted_and_verified_absent": [
+      "ci/rjt-writing-check-polish-01a17bef",
+      "ci/rjt-writing-check-complete-5ebb28bf-01a17bef",
+      "ci/rjt-writing-undo-controls-01a17bef-794fa259"
+    ],
+    "accepted_full_run": {
+      "id": 40655003105,
+      "head": "0184f9a1552d281cd6b416446b92e091b6bdad29"
+    },
+    "accepted_controls_run": {
+      "id": 40657960693,
+      "head": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9"
+    },
+    "source_review_rounds_used_per_unit": 6,
+    "source_review_rounds_authorized_per_unit": 7,
+    "source_behavior_unchanged_after_acceptance": true,
+    "usage": "Native Sol source-review usage unavailable; not estimated."
+  }
 }

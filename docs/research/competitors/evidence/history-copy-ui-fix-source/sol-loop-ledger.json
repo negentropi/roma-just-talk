@@ -43,10 +43,10 @@
       "blocker_should_open": 0,
       "findings": [],
       "usage": "unavailable",
-      "scope": "Full5pathbase6927\u2192WT741insertions79deletions",
+      "scope": "Full5pathbase6927→WT741insertions79deletions",
       "limits": [
         "Candidatecompile/runtimepending",
-        "StrictCopy3caseknownred\u2192candidategreenpending",
+        "StrictCopy3caseknownred→candidategreenpending",
         "Correctionpersistence/nativepost+fullgaterequired"
       ]
     },
@@ -60,7 +60,7 @@
       "usage": "unavailable",
       "limits": [
         "Candidatecompile/runtimepending",
-        "Knownbad5ebb footerred\u2192candidategreenpending underidentical700oracle",
+        "Knownbad5ebb footerred→candidategreenpending underidentical700oracle",
         "Full8UI+nativepostandnormalfullgaterequired"
       ]
     },
@@ -128,8 +128,8 @@
     "deletions": 79
   },
   "diff_size_after": {
-    "files": 6,
-    "insertions": 1286,
+    "files": 7,
+    "insertions": 3665,
     "deletions": 79
   },
   "pushed": false,
@@ -146,7 +146,7 @@
     "insertions": 77,
     "deletions": 16
   },
-  "diff_size_after_scope_note": "7 files changed, 3636 insertions(+), 79 deletions(-)",
+  "diff_size_after_scope_note": "7 files changed, 3665 insertions(+), 79 deletions(-); cumulative fixed-base scope includes the later full UI test file and prior shared changelog work, not only production code.",
   "budget_extension": {
     "from": 3,
     "to": 5,
@@ -162,7 +162,7 @@
   },
   "permission_boundary_round5": {
     "evidence_run": 40639673814,
-    "reason": "ActualnativepostblockedbyMic2\u21920 plusXCTestimplicitdeny. Finalbudgetedsafety/permissionboundarycandidate;source/titlesunrecordedsoonlystrictnewcapturedownedMicconsenthandled.Noreset."
+    "reason": "ActualnativepostblockedbyMic2→0 plusXCTestimplicitdeny. Finalbudgetedsafety/permissionboundarycandidate;source/titlesunrecordedsoonlystrictnewcapturedownedMicconsenthandled.Noreset."
   },
   "candidate_microphone_consent_sha256": "b32c269aa0832b5ed4ab8827fbd45105a9fe315d79432e8f1b310e66e9664346",
   "diff_size_round5": {
@@ -224,5 +224,34 @@
     "app_zip_sha256": "e4f31cfa5dca2cd9c0ba130dc0d80c53f00d5ba05200e496f3784cc577cc34b6",
     "evidence": "docs/research/competitors/evidence/microphone-native-id-full-40655003105/",
     "no_new_source_behavior_review_round": true
+  },
+  "diff_size_after_round2_scope": {
+    "files": 6,
+    "insertions": 1286,
+    "deletions": 79
+  },
+  "diff_size_after_round5_scope_note": "7 files changed, 3636 insertions(+), 79 deletions(-)",
+  "pushed_field_scope": "pushed=false describes the normal work branch; disposable CI-only transport is recorded separately.",
+  "final_transport_closeout": {
+    "normal_work_branch_pushed": false,
+    "release_published": false,
+    "only_disposable_ci_transport_pushed": true,
+    "temporary_refs_deleted_and_verified_absent": [
+      "ci/rjt-writing-check-polish-01a17bef",
+      "ci/rjt-writing-check-complete-5ebb28bf-01a17bef",
+      "ci/rjt-writing-undo-controls-01a17bef-794fa259"
+    ],
+    "accepted_full_run": {
+      "id": 40655003105,
+      "head": "0184f9a1552d281cd6b416446b92e091b6bdad29"
+    },
+    "accepted_controls_run": {
+      "id": 40657960693,
+      "head": "18d53e8f5bc1f94e15a87f2fdc2e9202f9431ab9"
+    },
+    "source_review_rounds_used_per_unit": 6,
+    "source_review_rounds_authorized_per_unit": 7,
+    "source_behavior_unchanged_after_acceptance": true,
+    "usage": "Native Sol source-review usage unavailable; not estimated."
   }
 }

@@ -1,0 +1,212 @@
+{
+  "classification": "invalid-or-failed",
+  "details": {
+    "artifact-integrity": {
+      "logs": {
+        "artifact_id": 12785117394,
+        "crc_verified_independently": true,
+        "members": 9,
+        "zip_bytes": 238694,
+        "zip_sha256": "1315c5e4a49c38345b670ef6443c7888f344240c089063aad3e896a69f5179e8"
+      },
+      "observations": {
+        "artifact_id": 12785082441,
+        "crc_verified_independently": true,
+        "members": 36,
+        "zip_bytes": 238427,
+        "zip_sha256": "ec62753cc3c4c4e430c32bb8c7f78a0fbfb95a9e97c15c7d365282451d2dd81f"
+      }
+    },
+    "candidate-source-censuses": [
+      {
+        "added": [
+          "default.profraw"
+        ],
+        "after_count": 607,
+        "before_count": 606,
+        "cause": "unknown; no changed-file contents establish a cause",
+        "changed": [],
+        "member": "candidate-source-mismatch-native.json",
+        "mode": "native",
+        "removed": []
+      },
+      {
+        "added": [
+          "default.profraw"
+        ],
+        "after_count": 607,
+        "before_count": 606,
+        "cause": "unknown; no changed-file contents establish a cause",
+        "changed": [],
+        "member": "candidate-source-mismatch-verify.json",
+        "mode": "verify",
+        "removed": []
+      }
+    ],
+    "compile": {
+      "actual_architecture_response_paths": {
+        "arm64": "Build/Intermediates.noindex/VoiceInk.build/Debug/VoiceInk.build/Objects-normal/arm64/roma just talk.SwiftFileList"
+      },
+      "excluded_main_only": true,
+      "limit": "File-list contents are remote driver attestations; this audit independently binds their exact paths to the raw Xcode settings.",
+      "raw_build_settings_bound": true,
+      "swift_sources": 222
+    },
+    "dependencies": {
+      "canonical_pins": 41,
+      "git_trees_and_recursive_links_recorded": true,
+      "limit": "Tree/link hashes are retained runtime attestations; expected input supplies revisions, not an independent checkout.",
+      "static_whisper_files": 86
+    },
+    "prepared-source": {
+      "candidate_files": 606,
+      "direct_fake_undo_calls": 0,
+      "generated_swift_files": 3,
+      "source_files": 613
+    }
+  },
+  "diagnostics": {
+    "bounded_build_or_native_errors": [],
+    "build_log_observed_boundary": "build-succeeded",
+    "candidate_source_mismatches": [
+      {
+        "added": [
+          "default.profraw"
+        ],
+        "after_count": 607,
+        "before_count": 606,
+        "cause": "unknown; no changed-file contents establish a cause",
+        "changed": [],
+        "member": "candidate-source-mismatch-native.json",
+        "mode": "native",
+        "removed": []
+      },
+      {
+        "added": [
+          "default.profraw"
+        ],
+        "after_count": 607,
+        "before_count": 606,
+        "cause": "unknown; no changed-file contents establish a cause",
+        "changed": [],
+        "member": "candidate-source-mismatch-verify.json",
+        "mode": "verify",
+        "removed": []
+      }
+    ],
+    "case_observation_errors": [],
+    "cleanup_failure_is_product_undo_failure": null,
+    "editor_cleanup_issues": [],
+    "failure_receipts": [
+      {
+        "member": "failure-native.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "Control host exited with code -15; inspect host.log and host-outcome.json",
+          "mode": "native"
+        }
+      },
+      {
+        "member": "failure-verify.json",
+        "receipt": {
+          "classification": "invalid-or-failed",
+          "error": "Disposable candidate source changed; inspect /Users/runner/work/_temp/writing-undo-controls-proof/candidate-source-mismatch-verify.json",
+          "mode": "verify"
+        }
+      }
+    ],
+    "highest_observed_stage": "host-launched",
+    "host_outcome": {
+      "candidate_error": "Disposable candidate source changed; inspect /Users/runner/work/_temp/writing-undo-controls-proof/candidate-source-mismatch-native.json",
+      "classification": "invalid-or-failed",
+      "closure_error": null,
+      "exit_code": -15,
+      "mapped_host_observed": true,
+      "monitor_error": "Control host exceeded bounded deadline",
+      "native_failure": null,
+      "native_issues": [],
+      "observed_completed_cases": []
+    },
+    "independently_validated_case_observations": [],
+    "native_completed_flag": null,
+    "native_failure_boundary": null,
+    "native_primary_failure": null,
+    "no_completed_cases_promoted_to_success": true,
+    "observed_case_ids": [],
+    "observed_completed_native_cases": 0,
+    "other_oracle_issues": [],
+    "runtime_receipt_present": false,
+    "transport_errors": {
+      "candidate_error": "Disposable candidate source changed; inspect /Users/runner/work/_temp/writing-undo-controls-proof/candidate-source-mismatch-native.json",
+      "monitor_error": "Control host exceeded bounded deadline"
+    }
+  },
+  "errors": [
+    {
+      "reason": "No source-after receipt: prepared source does not establish post-run source fidelity",
+      "stage": "postrun-source"
+    },
+    {
+      "reason": "Retained candidate-source mismatch; exact changed paths/hashes remain in artifacts, cause unknown",
+      "stage": "candidate-mismatch-receipts"
+    },
+    {
+      "reason": "Missing observation: identity-after.json",
+      "stage": "signature"
+    },
+    {
+      "reason": "Missing observation: tcc-after.json",
+      "stage": "fresh-tcc"
+    },
+    {
+      "reason": "No exact live mapped successful host",
+      "stage": "host-lifecycle"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "public-policy-bootstrap"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "native-controls"
+    },
+    {
+      "reason": "Missing observation: native/textedit-menu-forward.png",
+      "stage": "screenshots"
+    },
+    {
+      "reason": "Missing observation: native/result.json",
+      "stage": "result-bindings"
+    },
+    {
+      "reason": "GitHub workflow is not completed successfully on the exact head",
+      "stage": "workflow-run"
+    }
+  ],
+  "limits": [
+    "Offline source/compile/signature/TCC/runtime artifact audit only; no execution or network.",
+    "Signatures, actual compile lists and fresh TCC are retained runtime attestations bound by artifact hashes; absent original binary is not reverified here.",
+    "No shipping app composition/full pipeline/ASR/provider/physical-keyboard/rich-format proof.",
+    "Screenshot semantic review belongs to actual Sol; PNG integrity alone does not verify visual meaning."
+  ],
+  "run_id": 40613522241,
+  "schemaVersion": 1,
+  "source_sha": "53d62fb11fbdb425781e1cab3b087a627c18dfc1",
+  "stages": {
+    "artifact-integrity": "passed",
+    "candidate-mismatch-receipts": "failed-or-missing",
+    "compile": "passed",
+    "dependencies": "passed",
+    "fresh-tcc": "failed-or-missing",
+    "host-lifecycle": "failed-or-missing",
+    "native-controls": "failed-or-missing",
+    "postrun-source": "failed-or-missing",
+    "prepared-source": "passed",
+    "public-policy-bootstrap": "failed-or-missing",
+    "result-bindings": "failed-or-missing",
+    "screenshots": "failed-or-missing",
+    "signature": "failed-or-missing",
+    "workflow-run": "failed-or-missing"
+  },
+  "valid": false
+}

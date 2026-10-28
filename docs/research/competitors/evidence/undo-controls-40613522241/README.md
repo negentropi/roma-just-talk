@@ -1,0 +1,11 @@
+# Undo controls run 40613522241
+
+[Exact run](https://github.com/negentropi/roma-just-talk/actions/runs/40613522241), head `53d62fb11fbdb425781e1cab3b087a627c18dfc1`, built successfully. Independent artifact audit binds all 222 actual compiler inputs to the retained Xcode response-path settings, the prepared 613 source inputs and 606 candidate files to Git objects, and all 41 canonical package revisions.
+
+The ad-hoc signature passed strict deep verification before launch, five fresh TCC rows were recorded, and the exact executable mapped as PID 24716. After 900 seconds the driver terminated that same process. The executable census and open-descriptor checks then passed. The host log is empty; no native result, progress checkpoint, policy readback, screenshot or hierarchy was retained. The first stalled operation is unknown. Initialization, view mounting, Oracle execution and failure capture cannot be distinguished from these artifacts.
+
+The strict source guard separately failed on one added zero-byte `default.profraw`. Every baseline candidate file remained unchanged. Retained build settings enable coverage, compile commands contain profiling flags, and the host ran with the candidate as its working directory without an explicit profile path. That matches LLVM's documented default profile-output behavior. It supports profiling as the added-file cause, but does not identify the stall's cause or exclusively attribute the file's writer. See [LLVM coverage documentation](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html).
+
+No Undo case or state check completed. No claim about menu commands, configured chords, editor restoration, selection, focus, feedback or clipboard-policy bootstrap follows from this run. No screenshot exists for visual review. Post-run source, signature and TCC receipts were not reached.
+
+Both archives downloaded once to `/data/rjt-writing-check-01a17bef/undo-controls-40613522241/`; GitHub digests, sizes and every member CRC verified. `failure-diagnosis.json` records the observed limits, `profile-output-proof.json` the retained profiling settings and exact mismatch census, and `audit.json` all strict missing-proof failures. Raw archives remain on the remote server.

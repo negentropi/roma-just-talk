@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "ENABLE_CODE_COVERAGE": "YES",
+    "CLANG_COVERAGE_MAPPING": "YES",
+    "CLANG_PROFILE_DATA_DIRECTORY": "/Users/runner/work/_temp/writing-undo-controls-proof/derived/Build/ProfileData"
+  },
+  "compile_flags": [
+    "-fprofile-instr-generate",
+    "-profile-coverage-mapping",
+    "-profile-generate"
+  ],
+  "launch_working_directory": "candidate",
+  "launch_environment_has_explicit_LLVM_PROFILE_FILE": false,
+  "census_added": {
+    "candidate-source-mismatch-native.json": {
+      "default.profraw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "candidate-source-mismatch-verify.json": {
+      "default.profraw": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "census_changed": {
+    "candidate-source-mismatch-native.json": {},
+    "candidate-source-mismatch-verify.json": {}
+  },
+  "census_removed": {
+    "candidate-source-mismatch-native.json": {},
+    "candidate-source-mismatch-verify.json": {}
+  },
+  "llvm_documentation": "https://clang.llvm.org/docs/SourceBasedCodeCoverage.html",
+  "interpretation": "Instrumented runtime with no explicit profile path and candidate working directory supports profiler output as the added-file cause. No exclusive writer attribution or connection to the stall is established."
+}

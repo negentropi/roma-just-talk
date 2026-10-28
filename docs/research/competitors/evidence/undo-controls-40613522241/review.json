@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "review_model": "gpt-6.1-sol",
+  "review_type": "read-only actual failure evidence, retained raw artifacts and official LLVM documentation",
+  "result": "clean-with-runtime-limits",
+  "reviewed_files_sha256": {
+    "audit.json": "bbf7be033fbd513ce69123c777527da9271ddde3c815a1c6d296f869eaca111c",
+    "README.md": "5be6b26bf37caccee0c1d9be93d0e04ef12fbdd74da27132202e5702e08d3213",
+    "profile-output-proof.json": "85715504e8c05cc5d5e4f9e776b544e9244cce8a9185816aa5eb88dd1dc87011",
+    "failure-diagnosis.json": "68714cfa3fea1b3ce12d1009789c37371789f1f8f3a7a0ada72b41312aae3e5a",
+    "artifacts.json": "d0d57ec0e11541e4fc00b31aeb58d665e4c7fc724abd30231c795e4fe65ba3c9"
+  },
+  "observed_boundary": "Successful compiler/signature/fresh-TCC setup and mapped exact host, then 900-second deadline; first stalled operation unknown.",
+  "native_completed_cases": 0,
+  "visual_review_performed": false,
+  "reason_no_visual_review": "No screenshot exists in either artifact.",
+  "findings": [],
+  "confirmed_limits": [
+    "222 actual compiler inputs verified; no post-run source, identity or TCC receipts.",
+    "No native policy/bootstrap, control, external editor, restoration, range, focus or feedback evidence.",
+    "Only added zero-byte default.profraw with every baseline candidate file unchanged. Profiling flags and documented default output support the profiling-file explanation, not a stall cause."
+  ]
+}

@@ -1,0 +1,31 @@
+native	Build once, isolate process termination, then execute remaining five cases	﻿2026-10-28T00:34:07.3100560Z ##[group]Run bash scripts/run-writing-undo-native-check.sh native
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:34:07.3101230Z ^[[36;1mbash scripts/run-writing-undo-native-check.sh native^[[0m
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:34:07.3139980Z shell: /bin/bash -e {0}
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:34:07.3140260Z ##[endgroup]
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:34:14.0731340Z Running xcodebuild; log /Users/runner/work/_temp/writing-undo-native-proof/build-settings.json
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:34:35.9790530Z Running xcodebuild; log /Users/runner/work/_temp/writing-undo-native-proof/build.log
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:43:08.2021290Z Running bash; log /Users/runner/work/_temp/writing-undo-native-proof/static-app.log
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:43:17.2333990Z Running bash; log /Users/runner/work/_temp/writing-undo-native-proof/signing.log
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:43:22.7125620Z Running xcodebuild; log /Users/runner/work/_temp/writing-undo-native-proof/process/discovery/enumeration.log
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:43:38.9648620Z Running xcodebuild; log /Users/runner/work/_temp/writing-undo-native-proof/process/selection/enumeration.log
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:43:50.7903580Z Running xcodebuild; log /Users/runner/work/_temp/writing-undo-native-proof/process/tests.log
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:44:34.9950160Z Traceback (most recent call last):
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:44:34.9953440Z   File "<stdin>", line 769, in <module>
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:44:34.9953960Z   File "<stdin>", line 577, in execute_phase
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:44:34.9955390Z   File "<stdin>", line 62, in require
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:44:34.9957260Z RuntimeError: process: Every selected method must pass exactly once; One exact positive passed summary and exit zero are required; Issues, skips, cancellation, crashes and compilation/launch failures cannot pass; liveWritingUndoTextEditRejectsTerminatedProcess: Incomplete or wrong method/schema receipt; liveWritingUndoTextEditRejectsTerminatedProcess: Actual case checks missing or false; liveWritingUndoTextEditRejectsTerminatedProcess: Exact unique actual stage set required
+native	Build once, isolate process termination, then execute remaining five cases	2026-10-28T00:44:35.0782670Z ##[error]Process completed with exit code 1.
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	﻿2026-10-28T00:44:35.1523510Z ##[group]Run bash scripts/run-writing-undo-native-check.sh verify
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:35.1525700Z ^[[36;1mbash scripts/run-writing-undo-native-check.sh verify^[[0m
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:35.4274000Z shell: /bin/bash -e {0}
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:35.4274870Z ##[endgroup]
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3635440Z Traceback (most recent call last):
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3662280Z   File "<stdin>", line 780, in <module>
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3671040Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 986, in read_text
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3686580Z     with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3687730Z          ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3688600Z   File "/opt/homebrew/Cellar/python@3.15/3.15.0_1/Frameworks/Python.framework/Versions/3.15/lib/python3.15/pathlib/__init__.py", line 970, in open
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3689430Z     return io.open(self, mode, buffering, encoding, errors, newline)
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3690220Z            ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3690870Z FileNotFoundError: [Errno 2] No such file or directory: '/Users/runner/work/_temp/writing-undo-native-proof/identity-after.json'
+native	Recheck six receipts, closed execution and discovery hosts, frozen signed app	2026-10-28T00:44:36.3738450Z ##[error]Process completed with exit code 1.

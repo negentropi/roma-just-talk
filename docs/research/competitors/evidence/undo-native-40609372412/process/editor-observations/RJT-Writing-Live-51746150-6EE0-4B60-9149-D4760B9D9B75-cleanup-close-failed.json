@@ -1,0 +1,24 @@
+{
+  "actions" : {
+
+  },
+  "applicationTerminated" : false,
+  "bundleApplicationCount" : 1,
+  "bundleIdentifier" : "com.apple.TextEdit",
+  "checkpoint" : "close-failed",
+  "confirmedSavedUTF16" : null,
+  "currentApplicationInstanceMatches" : true,
+  "exactWindowPresent" : true,
+  "failure" : "The fixture cannot prove ownership of the document to save.",
+  "ownedDocumentURLMatches" : false,
+  "ownsFocusedWindow" : true,
+  "previousWindowCount" : 0,
+  "previousWindowsPreserved" : true,
+  "processIdentifier" : 26423,
+  "systemUptime" : 807.88243950000003,
+  "token" : "RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75",
+  "tokenWindowCount" : 1,
+  "windowCount" : 1,
+  "windowReadAXError" : 0,
+  "windowReadIsArray" : true
+}

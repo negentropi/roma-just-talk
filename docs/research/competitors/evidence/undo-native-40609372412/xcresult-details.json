@@ -1,0 +1,220 @@
+{
+  "run_id": 40609372412,
+  "scope": "unit",
+  "aggregate_member": "writing-undo-native-proof/process/Native.xcresult/Data/data.0~2CL_nAzqpaqoeM_KUuqm59wLkHxtgwGp80hO7OEEJLtDLxBTWT3tecCGX8-WOrb73TQ6x8XEqSUarZa_R9mdnA==",
+  "case_details": [
+    {
+      "identifier": "VoiceInkTests/liveWritingUndoTextEditRejectsTerminatedProcess()",
+      "status": "Failure",
+      "summary_reference": "0~juOqDB8uQfMiKqTMTk_JhjtItoq4ubWOnvYKStftSUGd5Sy8z0-3r0Cq1pMm2cwZB3ci9EHBMqhep8BxdmsmUg==",
+      "summary_member": "writing-undo-native-proof/process/Native.xcresult/Data/data.0~juOqDB8uQfMiKqTMTk_JhjtItoq4ubWOnvYKStftSUGd5Sy8z0-3r0Cq1pMm2cwZB3ci9EHBMqhep8BxdmsmUg==",
+      "decoded_summary_sha256": "8c876ac404301c30a579751bae03aff2d701e6c35c55e0ed663624afe2dcb223",
+      "failure_summaries": [
+        {
+          "_n": "Array"
+        },
+        {
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Assertion Failure",
+          "lineNumber": "1129",
+          "message": "Issue recorded: Live writing cleanup failed: The fixture cannot prove ownership of the document to save.; preserved /var/folders/n6/hn37q6pj7sj_9dmqqc2113800000gn/T/RJT-Writing-Live-51746150-6EE0-4B60-9149-D4760B9D9B75.",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4645576020"
+              },
+              {
+                "addressString": "4645574283"
+              },
+              {
+                "addressString": "4645118267"
+              },
+              {
+                "addressString": "4775292143",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+                    "lineNumber": "1129"
+                  },
+                  "symbolName": "LiveWritingEditor.close()"
+                }
+              },
+              {
+                "addressString": "4775591095",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "16"
+                  },
+                  "symbolName": "$defer #2 () in VoiceInkTests.liveWritingUndoTextEditRejectsTerminatedProcess()"
+                }
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4645345092"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4644677792"
+              },
+              {
+                "addressString": "4644605892"
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "10994089668"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+              "lineNumber": "1129"
+            }
+          },
+          "timestamp": "2026-10-28T00:44:08.702+0000",
+          "uuid": "698B7631-5E10-4329-9291-0BD68DD3CAFD"
+        },
+        {
+          "associatedError": {
+            "code": "1",
+            "domain": "Testing.ErrorSnapshot",
+            "userInfo": [
+              {
+                "_n": "SortedKeyValueArray"
+              }
+            ]
+          },
+          "fileName": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+          "isTopLevelFailure": "true",
+          "issueType": "Thrown Error",
+          "lineNumber": "1213",
+          "message": "Caught error: Refusing termination without one exact saved fixture window in the retained application instance.",
+          "sourceCodeContext": {
+            "callStack": [
+              {
+                "addressString": "4645576020"
+              },
+              {
+                "addressString": "4645574283"
+              },
+              {
+                "addressString": "4645579363"
+              },
+              {
+                "addressString": "6934361023"
+              },
+              {
+                "addressString": "4775312147",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+                    "lineNumber": "1213"
+                  },
+                  "symbolName": "LiveWritingEditor.requireExclusiveOwnedApplication()"
+                }
+              },
+              {
+                "addressString": "4775308659",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+                    "lineNumber": "1139"
+                  },
+                  "symbolName": "LiveWritingEditor.terminateOwnedApplication()"
+                }
+              },
+              {
+                "addressString": "4775580235",
+                "symbolInfo": {
+                  "imageName": "VoiceInkTests",
+                  "location": {
+                    "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingUndoLiveTests.swift",
+                    "lineNumber": "26"
+                  },
+                  "symbolName": "VoiceInkTests.liveWritingUndoTextEditRejectsTerminatedProcess()"
+                }
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4645345092"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4644677792"
+              },
+              {
+                "addressString": "4644605892"
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "4644681980"
+              },
+              {
+                "addressString": "4644681984"
+              },
+              {
+                "addressString": "10994089668"
+              }
+            ],
+            "location": {
+              "filePath": "/Users/runner/work/roma-just-talk/roma-just-talk/VoiceInkTests/WritingTargetLiveTests.swift",
+              "lineNumber": "1213"
+            }
+          },
+          "timestamp": "2026-10-28T00:44:10.760+0000",
+          "uuid": "4B1BB5E4-B7A8-4627-BB0D-1D2C33DA208E"
+        }
+      ],
+      "attachments": []
+    }
+  ],
+  "boundaries": [],
+  "external_ax_reports": [],
+  "poststate_limit": "AX fixtureWindows trees come from before action unless the report explicitly says otherwise. UI boundary reports reflect their named observation phases."
+}

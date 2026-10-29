@@ -28,6 +28,17 @@ struct DiscardedRecordingTests {
         #expect(fixture.audioExists)
     }
 
+    // A failed startup keeps audio only if a row references it. An explicit cancel inserts its
+    // row before awaiting the duration, so that unsaved row must already count as a reference.
+    @Test @MainActor func unsavedCanceledRowCountsAsAudioReference() throws {
+        let fixture = try RecordingFixture()
+        let storedURL: String? = fixture.audioURL.absoluteString
+        fixture.context.insert(Transcription(text: "", duration: 0, audioFileURL: storedURL))
+
+        let referencing = FetchDescriptor<Transcription>(predicate: #Predicate { $0.audioFileURL == storedURL })
+        #expect(try fixture.context.fetchCount(referencing) == 1)
+    }
+
     @Test @MainActor func emptyTranscriptionLeavesNoHistoryRowAudioOrMetric() async throws {
         let fixture = try RecordingFixture()
         fixture.beginRecording(session: GatedTextSession(text: " \n ", released: true))

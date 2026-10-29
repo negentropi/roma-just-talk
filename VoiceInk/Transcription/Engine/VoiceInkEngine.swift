@@ -783,18 +783,18 @@ class VoiceInkEngine: NSObject, ObservableObject {
               FileManager.default.fileExists(atPath: recordedFile.path)
         else { return }
 
+        // Insert before awaiting the duration: a failed startup resuming in that await only
+        // keeps audio that a row references, and pending inserts count as references.
+        let transcription = makeCanceledRecordingTranscription(for: recordedFile, duration: 0)
+        modelContext.insert(transcription)
+
         let durationResult = await AudioFileMetadata.tracedDuration(
             for: recordedFile,
             executorName: "engine.cancel_audio_duration",
             latencyTraceToken: latencyTraceToken
         )
         VoiceInkLatencyTrace.shared.executorResumed(durationResult.executorCheckpoint)
-        let transcription = makeCanceledRecordingTranscription(
-            for: recordedFile,
-            duration: durationResult.seconds
-        )
-
-        modelContext.insert(transcription)
+        transcription.duration = durationResult.seconds
 
         do {
             try modelContext.save()

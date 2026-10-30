@@ -17,6 +17,9 @@ class CursorPaster {
     @MainActor private static var pasteCommandPosterForTesting: ((Bool) async -> PasteResult)?
     @MainActor private static var accessibilityTextInserterForTesting:
         ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
+    #if DEBUG
+    @MainActor private static var pasteSessionPreparedForTesting: (() async -> Void)?
+    #endif
 
     struct PreparedPasteContext {
         fileprivate let changeCount: Int
@@ -90,6 +93,13 @@ class CursorPaster {
         accessibilityTextInserterForTesting = inserter
     }
 
+    #if DEBUG
+    @MainActor
+    static func configurePasteSessionPreparedForTesting(_ preparation: (() async -> Void)? = nil) {
+        pasteSessionPreparedForTesting = preparation
+    }
+    #endif
+
     @MainActor
     @discardableResult
     static func startPasteAtCursor(
@@ -148,6 +158,12 @@ class CursorPaster {
         } else {
             nil as CursorTextContextReader.PreparedContext?
         }
+        #if DEBUG
+        if let pasteSessionPreparedForTesting {
+            await pasteSessionPreparedForTesting()
+        }
+        #endif
+        guard !Task.isCancelled else { return .commandNotPosted }
         latencyTrace.event(
             "paste_session.enter",
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",

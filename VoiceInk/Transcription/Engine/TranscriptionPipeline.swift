@@ -356,15 +356,25 @@ class TranscriptionPipeline {
                 await finishCanceledTranscription()
                 return
             }
-            let pasteResult = await CursorPaster.startPasteAtCursor(
+            let pasteTask = CursorPaster.startPasteAtCursor(
                 pastedText,
                 preparedCursorTextContext: preparedCursorTextContext,
                 latencyTraceToken: traceToken
-            ).value
+            )
+            // Awaiting an unstructured task does not forward cancellation.
+            let pasteResult = await withTaskCancellationHandler {
+                await pasteTask.value
+            } onCancel: {
+                pasteTask.cancel()
+            }
             latencyTrace.end(
                 pasteSpan,
                 details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"
             )
+            if !pasteResult.didDeliverText, shouldCancel() || Task.isCancelled {
+                await finishCanceledTranscription()
+                return
+            }
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
             let stopSoundSpan = latencyTrace.begin("pipeline.stop_sound", token: traceToken)
             SoundManager.shared.play(.stop)

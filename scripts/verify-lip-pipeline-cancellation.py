@@ -32,9 +32,17 @@ for span in ("pastePreparationSpan", "pasteSpan"):
     if bad.count(guard) != 1:
         raise SystemExit("Expected one cancellation guard at each real preparation boundary.")
     bad = bad.replace(guard, "", 1)
+forwarding = '''            let pasteResult = await withTaskCancellationHandler {
+                await pasteTask.value
+            } onCancel: {
+                pasteTask.cancel()
+            }
+'''
+assert bad.count(forwarding) == 1
+bad = bad.replace(forwarding, "            let pasteResult = await pasteTask.value\n", 1)
 
 
-pipeline_selection = "VoiceInkTests/VoiceInkTests/canceledPipelineCannotPasteAfterPreparation"
+pipeline_selection = "VoiceInkTests/VoiceInkTests/canceledPipelineCannotPasteAfterPreparation(boundary:)"
 hardware_suite = "VoiceInkTests/RecorderMicrophonePrivacyTests"
 
 
@@ -68,7 +76,7 @@ finally:
     assert hashlib.sha256(source.read_bytes()).hexdigest() == candidate_hash
 
 assert red_exit != 0, "Known-bad guards must permit the canceled paste and fail."
-assert red["failedTests"] == 2 and red["totalTestCount"] == 2, red
+assert red["failedTests"] == 3 and red["totalTestCount"] == 3, red
 assert all("canceledPipelineCannotPasteAfterPreparation" in failure["testIdentifierString"]
            for failure in red["testFailures"]), red
 
@@ -104,10 +112,10 @@ for label, bad_source, test in (
 
 green_exit, green = run("candidate", (pipeline_selection, hardware_suite))
 assert green_exit == 0 and green["failedTests"] == 0, green
-assert green["passedTests"] == 6 and green["totalTestCount"] == 6, green
+assert green["passedTests"] == 7 and green["totalTestCount"] == 7, green
 (evidence / "receipt.json").write_text(json.dumps({
     "candidateSourceSHA256": candidate_hash,
-    "knownBadChange": "Remove only the two post-preparation cancellation guards.",
+    "knownBadChange": "Remove the two post-preparation cancellation guards and cancellation forwarding into the real paste task.",
     "boundary": "Actual pipeline, held preparation completion, cancellation, clipboard and persisted history.",
     "knownBadFailedCases": red["failedTests"],
     "microphoneControls": hardware_red,

@@ -24,6 +24,8 @@ extension VoiceInkTests {
             // Skip the cursor await so cancellation lands at authorization.
             UserDefaults.standard.set(true, forKey: VoiceInkUserDefaultsKey.lowercaseTranscription)
             fixture.pipeline.pasteAuthorizationPreparedForTesting = { await barrier.hold() }
+        case .pasteSession:
+            CursorPaster.configurePasteSessionPreparedForTesting { await barrier.hold() }
         }
 
         let completed = AsyncStream<Void>.makeStream()
@@ -55,6 +57,7 @@ extension VoiceInkTests {
         #expect(await barrier.waitUntilHeld())
         #expect(transcription.transcriptionState == .completed)
         cancellationRequested = true
+        if case .pasteSession = boundary { run.cancel() }
         barrier.release()
         await run.value
 
@@ -64,12 +67,52 @@ extension VoiceInkTests {
         #expect(stored.duration == 2.5)
         #expect(cancelCount == 1)
         #expect(dismissCount == 0)
+        #expect(fixture.accessibilityInsertionCount == 0)
         #expect(fixture.insertedTexts.isEmpty)
         #expect(fixture.pasteCommandCount == 0)
         #expect(NSPasteboard.general.changeCount == clipboardChangeCount)
         #expect(try fixture.readMetrics().isEmpty)
     }
     #endif
+
+    @Test @MainActor func pipelinePreservesDeliveredHistoryAfterLateCancellation() async throws {
+        let fixture = try PipelineFixture()
+        defer { fixture.restore() }
+        let transcription = fixture.insertTranscription()
+        var cancellationRequested = false
+        var run: Task<Void, Never>?
+        CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in
+            fixture.accessibilityInsertionCount += 1
+            fixture.insertedTexts.append(text)
+            cancellationRequested = true
+            run?.cancel()
+            return .inserted
+        }
+        let pipelineRun = Task { @MainActor in
+            await fixture.pipeline.run(
+                transcription: transcription,
+                modelDisplayName: "Camera recognition",
+                recognize: { "camera history survives" },
+                captureDuration: { 2.5 },
+                latencyTraceToken: nil,
+                onStateChange: { _ in },
+                shouldCancel: { cancellationRequested },
+                onCancel: { Issue.record("Delivered text was recorded as canceled") },
+                onDismiss: {}
+            )
+        }
+        run = pipelineRun
+        await pipelineRun.value
+
+        let stored = try #require(fixture.readTranscriptions().first)
+        #expect(stored.transcriptionState == .completed)
+        #expect(stored.text == "camera history survives")
+        #expect(stored.duration == 2.5)
+        #expect(fixture.accessibilityInsertionCount == 1)
+        #expect(fixture.insertedTexts.count == 1)
+        #expect(fixture.pasteCommandCount == 0)
+        #expect(try fixture.readMetrics().count == 1)
+    }
 
     @Test(arguments: [false, true])
     @MainActor func pipelineStoresCaptureDurationAndSharedTextWithoutRequiringAudio(
@@ -185,6 +228,7 @@ extension VoiceInkTests {
 enum PipelinePreparationBoundary: CaseIterable, Sendable {
     case cursorContext
     case pasteAuthorization
+    case pasteSession
 }
 
 private enum PipelineRecognitionFailure: Error {
@@ -217,6 +261,7 @@ private final class PipelinePreparationBarrier {
 private final class PipelineFixture {
     let container: ModelContainer
     let pipeline: TranscriptionPipeline
+    var accessibilityInsertionCount = 0
     var insertedTexts: [String] = []
     var pasteCommandCount = 0
     private let readContext: ModelContext
@@ -254,6 +299,7 @@ private final class PipelineFixture {
         DictionaryService.invalidateWordReplacementCache()
         SpecialShortcutEmptyTranscriptionFallback.resetForTesting()
         CursorPaster.configureAccessibilityTextInserterForTesting { [weak self] text, _ in
+            self?.accessibilityInsertionCount += 1
             guard insertDirectly else { return .notApplied }
             self?.insertedTexts.append(text)
             return .inserted
@@ -281,6 +327,9 @@ private final class PipelineFixture {
     func restore() {
         CursorPaster.configureAccessibilityTextInserterForTesting()
         CursorPaster.configurePasteCommandPosterForTesting()
+        #if DEBUG
+        CursorPaster.configurePasteSessionPreparedForTesting()
+        #endif
         DictionaryService.invalidateWordReplacementCache()
         PowerModeManager.shared.activeConfiguration = activeConfiguration
         for (key, value) in savedDefaults {

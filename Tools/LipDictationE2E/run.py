@@ -173,6 +173,16 @@ def prepare_screen_capture(evidence, app, driver, name, run):
 
 
 def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup):
+    visual_config = evidence / 'visual-config.json'
+    write(visual_config, configuration)
+    control_report = evidence / 'negative-controls.json'
+    code = run('run-negative-controls', ['/usr/bin/open', '-W', '-n', '--env', 'GITHUB_ACTIONS=' + os.environ['GITHUB_ACTIONS'], '--env', 'RUNNER_ENVIRONMENT=' + os.environ['RUNNER_ENVIRONMENT'], '-o', str(evidence / 'negative-controls.stdout.log'), '--stderr', str(evidence / 'negative-controls.stderr.log'), helper, '--args', '--config', visual_config, '--output', control_report, '--scenario', 'negative-controls', '--app-log', evidence / 'app.log'], timeout=90, required=False)
+    controls = json.loads(control_report.read_text()) if control_report.is_file() else {}
+    controls_passed = code == 0 and controls.get('passed') is True and controls.get('unchangedObservation') == 'readableUnchanged' and controls.get('changedObservation') == 'changed' and controls.get('closedObservation') == 'unreadable' and controls.get('closedTargetReadable') is False and controls.get('acceptedStates') == ['readableUnchanged'] and controls.get('rejectedStates') == ['changed', 'unreadable']
+    cases = [{'scenario': 'negative-controls', 'passed': controls_passed, 'report': control_report.name}]
+    if not controls_passed:
+        write(evidence / 'visual-summary.json', {'passed': False, 'cases': cases})
+        raise RuntimeError('Actual negative-observation controls failed')
     camera_summary = args.obs_summary or Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/summary.json'
     if args.obs_summary is None:
         run('provision-supported-camera', ['env', 'LIP_CAMERA_PROBE_KEEP_OBS_RUNNING=1', 'python3', ROOT / 'Tools/LipCameraProbe/run.py'], timeout=1000)
@@ -203,9 +213,6 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         if any(stream.readframes(stream.getnframes())):
             raise RuntimeError('The fallback test audio contains nonzero PCM')
     write(evidence / 'visual-fixture-hashes.json', {'staticVideoSHA256': sha256(still), 'silentMotionVideoSHA256': sha256(video), 'speechAudioSHA256': sha256(audio_fixture), 'zeroAudioSHA256': sha256(silence), 'zeroAudioPCMVerified': True})
-    visual_config = evidence / 'visual-config.json'
-    write(visual_config, configuration)
-    cases = []
     for scenario in ['setup', 'combined', 'combined-silent', 'lips', 'cancel', 'disable', 'quit']:
         enabled = scenario != 'setup'
         lips_only = scenario in ['lips', 'cancel', 'disable', 'quit']

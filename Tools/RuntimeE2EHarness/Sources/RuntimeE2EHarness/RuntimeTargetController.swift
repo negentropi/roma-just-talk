@@ -174,6 +174,23 @@ final class RuntimePreparedTarget {
         }
     }
 
+    func readFullText() -> String? {
+        guard let application = NSRunningApplication(processIdentifier: info.processIdentifier),
+              !application.isTerminated, application.bundleIdentifier == info.bundleIdentifier,
+              let currentWindow = RuntimeAX.window(containing: info.windowTitleToken, in: appElement),
+              CFEqual(currentWindow, windowElement),
+              let currentTextElement = RuntimeAX.editableElement(
+                in: currentWindow,
+                identifying: target.kind == .browser
+                    ? RuntimeTargetIsolationPlan.browserEditableLabel(windowTitleToken: info.windowTitleToken)
+                    : info.windowTitleToken
+              ) ?? (target.kind == .browser ? nil : RuntimeAX.firstEditableElement(in: currentWindow)),
+              let textWindow = RuntimeAX.window(for: currentTextElement), CFEqual(textWindow, currentWindow),
+              ownedCodeWindow?.stillContainsTarget() ?? true else { return nil }
+        textElement = currentTextElement
+        return RuntimeAX.text(from: currentTextElement)
+    }
+
     func waitForVisibleText(
         keyUpAtSystemUptime: TimeInterval,
         timeoutSeconds: TimeInterval

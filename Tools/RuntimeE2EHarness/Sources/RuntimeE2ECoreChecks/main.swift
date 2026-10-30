@@ -92,6 +92,21 @@ do {
         existingTextScenario.insertedText(from: "dictated text") == nil,
         "existing-text cases must fail if either side is lost"
     )
+    let seededTarget = existingTextScenario.initialText
+    try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: seededTarget) == .readableUnchanged,
+                "cancellation succeeds only when the readable full target is unchanged")
+    try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: nil) == .unreadable,
+                "failed final AX reads cannot prove cancellation left the target unchanged")
+    try require(RuntimeNegativeTextObservation.classify(baseline: nil, finalText: seededTarget) == .unreadable,
+                "a missing readable seed cannot prove the target unchanged")
+    for changedTarget in [existingTextScenario.prefix + "unexpected insertion" + existingTextScenario.suffix,
+                          "replacement lost both markers", seededTarget + " "] {
+        try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: changedTarget) == .changed,
+                    "insertions, broken markers, and any full-target change fail cancellation proof")
+    }
+    try require(RuntimeNegativeTextObservation.classify(baseline: "", finalText: "") == .readableUnchanged,
+                "readable empty text remains distinct from an unreadable target")
+    print("PASS negative observations require readable exact full-target equality")
     let singlePasteProof = RuntimeDOMPasteProof.parse(
         from: "Roma Runtime E2E Paste Proof pasteEvents=1 pasteInputs=1"
     )

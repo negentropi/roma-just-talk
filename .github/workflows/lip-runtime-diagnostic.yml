@@ -1,0 +1,67 @@
+name: Diagnose actual lip dictation runtime
+
+on:
+  push:
+    branches:
+      - "ci/lip-runtime-diagnostic-*"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  runtime-diagnostic:
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH: "1"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Select native toolchain
+        run: |
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$latest"
+          /usr/bin/caffeinate -d -i -u -t 2100 </dev/null >/dev/null 2>&1 &
+          xcodebuild -version
+          sw_vers
+
+      - name: Retrieve exact earlier Release artifact for diagnosis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/lip-runtime-source" "$HOME/Applications"
+          gh api repos/negentropi/roma-just-talk/actions/artifacts/12969342874 > "$RUNNER_TEMP/lip-runtime-source/artifact.json"
+          python3 - <<'PY'
+          import json, os, pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-runtime-source/artifact.json'
+          a=json.loads(p.read_text())
+          assert not a['expired']
+          assert a['workflow_run']['head_sha']=='6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1'
+          assert a['name']=='roma.just.talk.app'
+          PY
+          gh api repos/negentropi/roma-just-talk/actions/artifacts/12969342874/zip > "$RUNNER_TEMP/lip-runtime-source/artifact.zip"
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib
+          p=pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-runtime-source'
+          a=json.loads((p/'artifact.json').read_text())
+          assert a['digest']=='sha256:'+hashlib.file_digest((p/'artifact.zip').open('rb'),'sha256').hexdigest()
+          PY
+          unzip -q "$RUNNER_TEMP/lip-runtime-source/artifact.zip" -d "$RUNNER_TEMP/lip-runtime-source/unpacked"
+          ditto -x -k "$RUNNER_TEMP/lip-runtime-source/unpacked/roma.just.talk.app.zip" "$HOME/Applications"
+
+      - name: Exercise actual app and record focus boundaries
+        run: python3 Tools/LipDictationE2E/run.py --app "$HOME/Applications/roma just talk.app" --app-source-head 6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1 --visual
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: lip-runtime-diagnostic-evidence
+          path: |
+            ${{ runner.temp }}/lip-dictation-e2e/**
+            ${{ runner.temp }}/lip-runtime-source/artifact.json
+            ${{ runner.temp }}/lip-camera-probe/*.json
+            ${{ runner.temp }}/lip-camera-probe/*.log
+            ${{ runner.temp }}/lip-camera-probe/*.png
+          if-no-files-found: error

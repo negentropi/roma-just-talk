@@ -1,0 +1,58 @@
+[
+  {
+    "case": "a-intact",
+    "max_abs_error": 0.0,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "original_text": "DON'T FORGET A CHINA",
+    "dynamic_text": "DON'T FORGET A CHINA",
+    "ids_match": true
+  },
+  {
+    "case": "a-frozen",
+    "max_abs_error": 0.0,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "original_text": "",
+    "dynamic_text": "",
+    "ids_match": true
+  },
+  {
+    "case": "b-intact",
+    "max_abs_error": 0.0,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "original_text": "I'M ON MY WAY TO THE ME I",
+    "dynamic_text": "I'M ON MY WAY TO THE ME I",
+    "ids_match": true
+  },
+  {
+    "case": "b-frozen",
+    "max_abs_error": 0.0,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "original_text": "",
+    "dynamic_text": "",
+    "ids_match": true
+  },
+  {
+    "case": "c-intact",
+    "max_abs_error": 0.0,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "original_text": "IT'S 11 O'CLOCK",
+    "dynamic_text": "IT'S 11 O'CLOCK",
+    "ids_match": true
+  },
+  {
+    "case": "c-frozen",
+    "max_abs_error": 0.0,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "original_text": "",
+    "dynamic_text": "",
+    "ids_match": true
+  },
+  {
+    "case": "dynamic-73",
+    "max_abs_error": 0.0,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "original_text": "DON'T FORGET A CHINA DON'T FORGET",
+    "dynamic_text": "DON'T FORGET A CHINA DON'T FORGET",
+    "ids_match": true
+  }
+]

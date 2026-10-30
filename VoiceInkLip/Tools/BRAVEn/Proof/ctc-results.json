@@ -1,0 +1,127 @@
+{
+  "checkpoint": {
+    "url": "https://drive.usercontent.google.com/download?id=1bU-bFxEiXNXNoOLKaAz6_9j7XuE7f_6r&export=download&confirm=t",
+    "publisher_page": "https://drive.google.com/file/d/1bU-bFxEiXNXNoOLKaAz6_9j7XuE7f_6r/view?usp=sharing",
+    "bytes": 1975266407,
+    "sha256": "8dd3bbf4e8d6287e87e7c3d9bc65f6238b4d75b12040e10f5589e3c6e76bda8f",
+    "elapsed_seconds": 70.6151438630186,
+    "utc": "2026-10-30T07:45:41.619893+00:00"
+  },
+  "parameters": 493680370,
+  "torch_version": "2.5.1+cpu",
+  "cpu_threads": 4,
+  "address_space_limit_gib": 8,
+  "results": [
+    {
+      "input": "a-frozen",
+      "tensor_shape": [
+        1,
+        50,
+        88,
+        88
+      ],
+      "ctc_greedy": "",
+      "ids": [],
+      "elapsed_seconds": 0.284,
+      "maxrss_kib": 4147432
+    },
+    {
+      "input": "a-intact",
+      "tensor_shape": [
+        1,
+        50,
+        88,
+        88
+      ],
+      "ctc_greedy": "DON'T FORGET A CHINA",
+      "ids": [
+        442,
+        2,
+        217,
+        514,
+        115,
+        217,
+        260,
+        367,
+        135,
+        59
+      ],
+      "elapsed_seconds": 0.291,
+      "maxrss_kib": 4147432
+    },
+    {
+      "input": "b-frozen",
+      "tensor_shape": [
+        1,
+        58,
+        88,
+        88
+      ],
+      "ctc_greedy": "",
+      "ids": [],
+      "elapsed_seconds": 0.332,
+      "maxrss_kib": 4147432
+    },
+    {
+      "input": "b-intact",
+      "tensor_shape": [
+        1,
+        58,
+        88,
+        88
+      ],
+      "ctc_greedy": "I'M ON MY WAY TO THE ME I",
+      "ids": [
+        580,
+        2,
+        170,
+        732,
+        699,
+        1004,
+        955,
+        934,
+        669,
+        580
+      ],
+      "elapsed_seconds": 0.333,
+      "maxrss_kib": 4147432
+    },
+    {
+      "input": "c-frozen",
+      "tensor_shape": [
+        1,
+        56,
+        88,
+        88
+      ],
+      "ctc_greedy": "",
+      "ids": [],
+      "elapsed_seconds": 0.322,
+      "maxrss_kib": 4147432
+    },
+    {
+      "input": "c-intact",
+      "tensor_shape": [
+        1,
+        56,
+        88,
+        88
+      ],
+      "ctc_greedy": "IT'S 11 O'CLOCK",
+      "ids": [
+        603,
+        2,
+        213,
+        251,
+        5,
+        722,
+        2,
+        85,
+        167,
+        90
+      ],
+      "elapsed_seconds": 0.325,
+      "maxrss_kib": 4147432
+    }
+  ]
+}

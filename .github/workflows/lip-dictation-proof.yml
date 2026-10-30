@@ -1,0 +1,216 @@
+name: Native lip dictation proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/lip-dictation-proof-*"
+    paths:
+      - ".github/workflows/lip-dictation-proof.yml"
+      - "VoiceInkLip/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-lip-proof-${{ github.ref }}
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  native-proof:
+    if: startsWith(github.ref, 'refs/heads/ci/')
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      LIP_PROOF_DIR: ${{ runner.temp }}/lip-dictation-proof
+      LIP_MODEL_DIR: ${{ runner.temp }}/lip-dictation-model
+      LIP_BUILD_DIR: ${{ runner.temp }}/lip-dictation-build
+
+    steps:
+      - name: Checkout exact proof head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Record native environment and model resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$RUNNER_OS" = macOS
+          mkdir -p "$LIP_PROOF_DIR/receipts" "$LIP_PROOF_DIR/logs" "$LIP_PROOF_DIR/mouth" "$LIP_PROOF_DIR/fixtures"
+          latest_xcode="$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)"
+          sudo xcode-select -s "$latest_xcode"
+          {
+            git rev-parse HEAD
+            sw_vers
+            uname -m
+            xcodebuild -version
+            swift --version
+            sysctl hw.memsize hw.ncpu
+          } > "$LIP_PROOF_DIR/environment.txt" 2>&1
+          cp VoiceInkLip/Sources/VoiceInkLip/Resources/manifest.json "$LIP_PROOF_DIR/model-manifest.json"
+          shasum -a 256 VoiceInkLip/Sources/VoiceInkLip/Resources/{manifest.json,tokens.json,visual-ctc.onnx,face-alignment.json} \
+            > "$LIP_PROOF_DIR/model-resource-sha256.txt"
+
+      - name: Compile and test the actual native package
+        shell: bash
+        run: |
+          set -euo pipefail
+          swift test --package-path VoiceInkLip --scratch-path "$LIP_BUILD_DIR" --jobs 4 \
+            2>&1 | tee "$LIP_PROOF_DIR/logs/swift-test.log"
+          swift build --package-path VoiceInkLip --scratch-path "$LIP_BUILD_DIR" \
+            --configuration release --product LipDictationProof --jobs 4 \
+            2>&1 | tee "$LIP_PROOF_DIR/logs/swift-build.log"
+          binary_dir="$(swift build --package-path VoiceInkLip --scratch-path "$LIP_BUILD_DIR" \
+            --configuration release --show-bin-path)"
+          test -x "$binary_dir/LipDictationProof"
+          printf 'LIP_PROOF_BIN=%s/LipDictationProof\n' "$binary_dir" >> "$GITHUB_ENV"
+
+      - name: Prepare pinned public clips, silent videos and frozen controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null; then
+            brew install ffmpeg 2>&1 | tee "$LIP_PROOF_DIR/logs/ffmpeg-install.log"
+          fi
+          ffmpeg -version > "$LIP_PROOF_DIR/ffmpeg-version.txt"
+          fixture_revision=1658cd342dff90010aa843eaeebd53610a08b1dc
+          fixture_base="https://media.githubusercontent.com/media/CheyneyComputerScience/CREMA-D/$fixture_revision/VideoFlash"
+          while read -r label filename expected_sha; do
+            original="$LIP_PROOF_DIR/fixtures/$label.flv"
+            curl --fail --location --retry 3 --connect-timeout 30 \
+              "$fixture_base/$filename" --output "$original"
+            printf '%s  %s\n' "$expected_sha" "$original" | shasum -a 256 --check
+            printf '%s\t%s\t%s\t%s\n' "$label" "$filename" "$expected_sha" "$fixture_revision" \
+              >> "$LIP_PROOF_DIR/fixture-provenance.tsv"
+            ffmpeg -hide_banner -loglevel error -y -i "$original" -map 0:v:0 -an \
+              -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/$label-silent.mp4"
+            duration="$(ffprobe -v error -select_streams v:0 -show_entries stream=duration \
+              -of default=noprint_wrappers=1:nokey=1 "$LIP_PROOF_DIR/fixtures/$label-silent.mp4")"
+            ffmpeg -hide_banner -loglevel error -y -i "$original" -map 0:v:0 \
+              -frames:v 1 "$LIP_PROOF_DIR/fixtures/$label-first.png"
+            ffmpeg -hide_banner -loglevel error -y -loop 1 -framerate 25 \
+              -i "$LIP_PROOF_DIR/fixtures/$label-first.png" -t "$duration" -an \
+              -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/$label-frozen.mp4"
+            for kind in silent frozen; do
+              clip="$LIP_PROOF_DIR/fixtures/$label-$kind.mp4"
+              test -z "$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$clip")"
+              ffprobe -v error -show_streams -show_format -of json "$clip" \
+                > "$LIP_PROOF_DIR/fixtures/$label-$kind.ffprobe.json"
+              shasum -a 256 "$clip" >> "$LIP_PROOF_DIR/silent-control-sha256.txt"
+            done
+            ffmpeg -hide_banner -loglevel error -i "$LIP_PROOF_DIR/fixtures/$label-frozen.mp4" \
+              -map 0:v:0 -f framemd5 "$LIP_PROOF_DIR/fixtures/$label-frozen.framemd5"
+            test "$(awk -F, '!/^#/ {gsub(/ /,"",$6); print $6}' \
+              "$LIP_PROOF_DIR/fixtures/$label-frozen.framemd5" | sort -u | wc -l | tr -d ' ')" = 1
+          done <<'FIXTURES'
+          a 1001_DFA_NEU_XX.flv a2b374bcd195d7320437c944eef2208dedd2c22725d09d65e8c31bf6c1eeb286
+          b 1002_IOM_NEU_XX.flv 6286c7253aa45ed91984a7ae405704bafac4aa148aa7d3287d767194a5812abd
+          c 1003_IEO_NEU_XX.flv db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc
+          FIXTURES
+          curl --fail --location --retry 3 \
+            "https://raw.githubusercontent.com/CheyneyComputerScience/CREMA-D/$fixture_revision/README.md" \
+            --output "$LIP_PROOF_DIR/CREMA-D-source-README.md"
+
+      - name: Install verified original publisher weights
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/time -l "$LIP_PROOF_BIN" install --model-directory "$LIP_MODEL_DIR" \
+            --receipt "$LIP_PROOF_DIR/receipts/install.json" \
+            > "$LIP_PROOF_DIR/logs/install.stdout.log" \
+            2> "$LIP_PROOF_DIR/logs/install.stderr.log"
+
+      - name: Recognize silent motion and frozen controls with native Vision and ORT
+        shell: bash
+        run: |
+          set -euo pipefail
+          for label in a b c; do
+            for kind in silent frozen; do
+              case_name="$label-$kind"
+              outcome=0
+              /usr/bin/time -l "$LIP_PROOF_BIN" infer \
+                --model-directory "$LIP_MODEL_DIR" \
+                --video "$LIP_PROOF_DIR/fixtures/$case_name.mp4" \
+                --mouth-dump "$LIP_PROOF_DIR/mouth/$case_name.float32" \
+                --receipt "$LIP_PROOF_DIR/receipts/$case_name.json" \
+                > "$LIP_PROOF_DIR/logs/$case_name.stdout.log" \
+                2> "$LIP_PROOF_DIR/logs/$case_name.stderr.log" || outcome=$?
+              printf '%s\t%s\n' "$case_name" "$outcome" >> "$LIP_PROOF_DIR/exit-codes.tsv"
+            done
+          done
+
+      - name: Compare frozen outputs with withheld human references
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib, re
+          root = pathlib.Path(os.environ['LIP_PROOF_DIR'])
+          references = {
+              'a': "Don't forget a jacket",
+              'b': "I'm on my way to the meeting",
+              'c': "It's eleven o'clock",
+          }
+          def words(text):
+              return re.findall(r"[a-z0-9]+(?:'[a-z0-9]+)*", text.lower())
+          def edits(reference, prediction):
+              row = list(range(len(prediction) + 1))
+              for i, expected in enumerate(reference, 1):
+                  current = [i]
+                  for j, actual in enumerate(prediction, 1):
+                      current.append(min(current[-1] + 1, row[j] + 1, row[j-1] + (expected != actual)))
+                  row = current
+              return row[-1]
+          results = []
+          acceptance_errors = []
+          for label, reference in references.items():
+              pair = {'fixture': label, 'withheldReference': reference, 'results': {}}
+              for kind in ('silent', 'frozen'):
+                  receipt = json.loads((root / 'receipts' / f'{label}-{kind}.json').read_text())
+                  predicted = receipt.get('text', '')
+                  expected_words = words(reference)
+                  result = {
+                      'status': receipt['status'], 'text': predicted,
+                      'errorCode': receipt.get('errorCode'),
+                      'wordErrorRate': edits(expected_words, words(predicted)) / len(expected_words),
+                      'receipt': f'receipts/{label}-{kind}.json',
+                  }
+                  pair['results'][kind] = result
+                  if kind == 'silent' and (receipt['status'] != 'success' or not predicted.strip()):
+                      acceptance_errors.append(f'{label}: motion must succeed with nonempty text')
+                  if kind == 'frozen' and not (
+                      receipt['status'] == 'error'
+                      and receipt.get('errorCode') == 'lipRuntime.noSpeech'
+                      and predicted == ''
+                  ):
+                      acceptance_errors.append(f'{label}: frozen must abstain with LipRuntimeError.noSpeech and empty text')
+              pair['motionEqualsFrozen'] = pair['results']['silent']['text'] == pair['results']['frozen']['text']
+              if pair['motionEqualsFrozen']:
+                  acceptance_errors.append(f'{label}: motion text must differ from frozen text')
+              results.append(pair)
+          summary = {
+              'schemaVersion': 1,
+              'inferenceBoundary': 'Swift AVFoundation + Vision mouth preprocessing + native CPU ONNX Runtime',
+              'referenceBoundary': 'Human references accessed only after every inference process exited',
+              'fixtureRevision': '1658cd342dff90010aa843eaeebd53610a08b1dc',
+              'qualityAcceptance': 'WER is an observation; no accuracy threshold was preselected.',
+              'controlAcceptance': 'Motion must succeed with nonempty text; frozen must return specific noSpeech with empty text; outputs must differ.',
+              'controlAcceptancePassed': not acceptance_errors,
+              'acceptanceErrors': acceptance_errors,
+              'results': results,
+          }
+          (root / 'comparison.json').write_text(json.dumps(summary, indent=2) + '\n')
+          print(json.dumps(summary, indent=2))
+          if acceptance_errors:
+              raise SystemExit('Native motion/frozen acceptance failed: ' + '; '.join(acceptance_errors))
+          PY
+
+      - name: Upload exact-head receipts, native tensors, controls and logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-lip-proof-${{ github.sha }}
+          path: ${{ runner.temp }}/lip-dictation-proof
+          if-no-files-found: error
+          retention-days: 7

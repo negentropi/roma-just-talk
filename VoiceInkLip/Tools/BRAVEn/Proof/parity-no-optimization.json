@@ -1,0 +1,121 @@
+[
+  {
+    "optimization": "disabled",
+    "frame_argmax_match": true,
+    "case": "a-intact",
+    "shape": [
+      1,
+      50,
+      1049
+    ],
+    "max_abs_error": 0.000141143798828125,
+    "mean_abs_error": 1.837182389863301e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "DON'T FORGET A CHINA",
+    "inference_seconds": 0.8922885979991406,
+    "peak_rss_kib": 2708480
+  },
+  {
+    "optimization": "disabled",
+    "frame_argmax_match": true,
+    "case": "a-frozen",
+    "shape": [
+      1,
+      50,
+      1049
+    ],
+    "max_abs_error": 4.100799560546875e-05,
+    "mean_abs_error": 6.165623744891491e-06,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "",
+    "inference_seconds": 0.8786429709289223,
+    "peak_rss_kib": 3836096
+  },
+  {
+    "optimization": "disabled",
+    "frame_argmax_match": true,
+    "case": "b-intact",
+    "shape": [
+      1,
+      58,
+      1049
+    ],
+    "max_abs_error": 0.00014162063598632812,
+    "mean_abs_error": 1.9065260858042166e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "I'M ON MY WAY TO THE ME I",
+    "inference_seconds": 0.786217572982423,
+    "peak_rss_kib": 3855472
+  },
+  {
+    "optimization": "disabled",
+    "frame_argmax_match": true,
+    "case": "b-frozen",
+    "shape": [
+      1,
+      58,
+      1049
+    ],
+    "max_abs_error": 0.004675865173339844,
+    "mean_abs_error": 8.78669525263831e-05,
+    "allclose_rtol1e-4_atol1e-4": false,
+    "decoded_ids_match": true,
+    "transcript": "",
+    "inference_seconds": 0.7768388730473816,
+    "peak_rss_kib": 3867144
+  },
+  {
+    "optimization": "disabled",
+    "frame_argmax_match": true,
+    "case": "c-intact",
+    "shape": [
+      1,
+      56,
+      1049
+    ],
+    "max_abs_error": 0.0001850128173828125,
+    "mean_abs_error": 1.958299253601581e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "IT'S 11 O'CLOCK",
+    "inference_seconds": 0.769795194035396,
+    "peak_rss_kib": 3868296
+  },
+  {
+    "optimization": "disabled",
+    "frame_argmax_match": true,
+    "case": "c-frozen",
+    "shape": [
+      1,
+      56,
+      1049
+    ],
+    "max_abs_error": 8.96453857421875e-05,
+    "mean_abs_error": 9.758889063959941e-06,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "",
+    "inference_seconds": 0.761427734978497,
+    "peak_rss_kib": 3868296
+  },
+  {
+    "optimization": "disabled",
+    "frame_argmax_match": true,
+    "case": "dynamic-73",
+    "shape": [
+      1,
+      73,
+      1049
+    ],
+    "max_abs_error": 0.000133514404296875,
+    "mean_abs_error": 1.7132811990450136e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "DON'T FORGET A CHINA DON'T FORGET",
+    "inference_seconds": 0.8638598800171167,
+    "peak_rss_kib": 3883516
+  }
+]

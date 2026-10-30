@@ -1,0 +1,69 @@
+{
+  "source_package_sha256": "32781778a60eb77fec19fc5c54dfdf5659bab41148fd1e175da3d559d17c19e6",
+  "source_repository": "https://github.com/ahaliassos/raven",
+  "source_revision": "9fd9a3743c41ba93532258b340d123c20fe25432",
+  "publisher_checkpoint": {
+    "url": "https://drive.usercontent.google.com/download?id=1bU-bFxEiXNXNoOLKaAz6_9j7XuE7f_6r&export=download&confirm=t",
+    "publisher_page": "https://drive.google.com/file/d/1bU-bFxEiXNXNoOLKaAz6_9j7XuE7f_6r/view?usp=sharing",
+    "bytes": 1975266407,
+    "sha256": "8dd3bbf4e8d6287e87e7c3d9bc65f6238b4d75b12040e10f5589e3c6e76bda8f",
+    "elapsed_seconds": 70.6151438630186,
+    "utc": "2026-10-30T07:45:41.619893+00:00"
+  },
+  "publisher_sources": {
+    "LICENSE": {
+      "url": "https://github.com/ahaliassos/raven/blob/9fd9a3743c41ba93532258b340d123c20fe25432/LICENSE",
+      "sha256": "a853e9e1620d9c176a101e6f321e1cbd13055fd202c10f265e5b4437b3bec1b5"
+    },
+    "README.md": {
+      "url": "https://github.com/ahaliassos/raven/blob/9fd9a3743c41ba93532258b340d123c20fe25432/README.md",
+      "sha256": "688e7f17cec2d5aaecabf9602be57c6204bf5380e670f42073f7d005db4cd09c"
+    },
+    "20words_mean_face.npy": {
+      "url": "https://github.com/ahaliassos/raven/blob/9fd9a3743c41ba93532258b340d123c20fe25432/preprocessing/20words_mean_face.npy",
+      "sha256": "dbf68b2044171e1160716df7c53e8bbfaa0ee8c61fb41171d04cb6092bb81422"
+    },
+    "unigram1000_units.txt": {
+      "url": "https://github.com/ahaliassos/raven/blob/9fd9a3743c41ba93532258b340d123c20fe25432/labels/unigram1000_units.txt",
+      "sha256": "ead1469024d34194e1c7abfe2ca0457f06d5afee78267af2a0cbdea946f359f4"
+    }
+  },
+  "face_alignment": {
+    "source": "https://github.com/ahaliassos/raven/blob/9fd9a3743c41ba93532258b340d123c20fe25432/preprocessing/20words_mean_face.npy",
+    "source_sha256": "dbf68b2044171e1160716df7c53e8bbfaa0ee8c61fb41171d04cb6092bb81422",
+    "format": "Exact float64 coordinates converted from original NumPy reference to JSON.",
+    "json_sha256": "87bcdc53e6684a44db62baf8d79e4f85c007edb9fbb0a856619dad55a7c6d7a4"
+  },
+  "runtime_license_sources": {
+    "onnxruntime-LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.24.2/LICENSE",
+      "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+      "bytes": 1073
+    },
+    "onnxruntime-ThirdPartyNotices.txt": {
+      "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.24.2/ThirdPartyNotices.txt",
+      "sha256": "0e07b95f3a8d6230037707c5c4a2b554d12c4cb67369669ac255635528ffcee2",
+      "bytes": 325054
+    },
+    "onnxruntime-SPM-Package.swift": {
+      "url": "https://raw.githubusercontent.com/microsoft/onnxruntime-swift-package-manager/1.24.2/Package.swift",
+      "sha256": "69197b92ed27e3363dc3b264b1f1d936c6371a889c15334d83b4a0ea0c798aff",
+      "bytes": 5112
+    }
+  },
+  "model_artifacts": {
+    "visual-ctc.onnx": {
+      "bytes": 910911,
+      "sha256": "0d98db3a949252b205cbc1fc57dee372ed61243aaf917ec684fde26c05e39f29"
+    },
+    "manifest.json": {
+      "bytes": 501769,
+      "sha256": "2566514e02af9cde64eb3c50ca390af705d18e1c41ef415c436b0f0f9487b547"
+    },
+    "tokens.json": {
+      "bytes": 13297,
+      "sha256": "321e7811a7fe76f120fef55bb1f0b1c166631c1aa7aa8a2858b0c525dbc28411"
+    }
+  },
+  "verification_scope": "Remote CPU Torch2.5.1/ORT1.20.1. Native runtime dependency is ORT1.24.2 and requires parent integration verification. No native macOS camera-to-text proof claimed."
+}

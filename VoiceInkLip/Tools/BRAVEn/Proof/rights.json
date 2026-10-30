@@ -1,0 +1,18 @@
+{
+  "publisher_checkpoint": "https://drive.google.com/file/d/1bU-bFxEiXNXNoOLKaAz6_9j7XuE7f_6r/view?usp=sharing",
+  "publisher_file_title": "vsr_prelrs3vox2avs_large_ftlrs3vox2avs_selftrain_braven.pth - Google \u96f2\u7aef\u786c\u789f",
+  "publisher_readme": "https://github.com/ahaliassos/raven/blob/9fd9a3743c41ba93532258b340d123c20fe25432/README.md#braven-high-resource",
+  "source_revision": "9fd9a3743c41ba93532258b340d123c20fe25432",
+  "root_license": "MIT",
+  "root_license_sha256": "a853e9e1620d9c176a101e6f321e1cbd13055fd202c10f265e5b4437b3bec1b5",
+  "facts": [
+    "Original publisher README high-resource BRAVEn table links this Large self-trained checkpoint. Pre-training dataset listed LRS3+Vox2-en+AVS.",
+    "Same original RAVEn project MIT, copyright 2023 ahaliassos. Vendored model code contains Apache 2.0 headers.",
+    "No separate restriction or code-only carveout appeared in README, root LICENSE or this inspected publisher file view. No model weights from USR2, AVHuBERT or another project are used.",
+    "Dataset labels alone were not used as an inference of model-use restrictions."
+  ],
+  "inferences": [
+    "Applying the project MIT license to its linked standalone weights remains an inference. No independent blanket legal guarantee is asserted."
+  ],
+  "page_restriction_matches": []
+}

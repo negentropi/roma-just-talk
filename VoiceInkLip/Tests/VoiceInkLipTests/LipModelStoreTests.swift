@@ -163,17 +163,33 @@ final class LipModelStoreTests: XCTestCase {
         defer { fixture.cleanUp() }
         let model = try await fixture.store().install()
         let storage = model.deletingLastPathComponent().appendingPathComponent("storages/0.bin")
-        try Data(repeating: 0, count: Fixture.storage.count).write(to: storage)
+        let corruptedStorage = Data(repeating: 0, count: Fixture.storage.count)
+        try corruptedStorage.write(to: storage)
+        let unrelated = fixture.directory.appendingPathComponent("unrelated")
+        try Data("keep".utf8).write(to: unrelated)
         let restarted = fixture.store()
+        let installedBeforeVerification = await restarted.isInstalled()
+        XCTAssertTrue(installedBeforeVerification, "Metadata cannot detect same-size corruption")
         do {
             _ = try await restarted.modelURL()
             XCTFail("A completion receipt must not bypass first-inference verification")
         } catch let error as LipModelStoreError {
             XCTAssertEqual(error, .verificationFailed)
         }
+        let installedAfterVerification = await restarted.isInstalled()
+        XCTAssertFalse(installedAfterVerification, "Failed integrity verification must expose installation retry")
+        let installedAfterRestart = await fixture.store().isInstalled()
+        XCTAssertFalse(installedAfterRestart, "Invalidation must survive another store instance")
+        XCTAssertEqual(try Data(contentsOf: storage), corruptedStorage, "Integrity failure must preserve model files")
+        XCTAssertEqual(try Data(contentsOf: unrelated), Data("keep".utf8))
         let repaired = try await restarted.install()
         XCTAssertEqual(repaired, model)
         XCTAssertEqual(try Data(contentsOf: storage), Fixture.storage)
+        let usableModel = try await restarted.modelURL()
+        XCTAssertEqual(usableModel, model)
+        let installedAfterRepair = await fixture.store().isInstalled()
+        XCTAssertTrue(installedAfterRepair)
+        XCTAssertEqual(try Data(contentsOf: unrelated), Data("keep".utf8))
     }
 
     func testMissingStorageAndSymlinkedStorageAreNotInstalled() async throws {

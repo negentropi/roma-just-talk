@@ -69,7 +69,14 @@ final class LipDictationManager: ObservableObject {
 
     func transcribe(_ clip: LipCaptureClip) async throws -> String {
         try Task.checkCancellation()
-        return try await runtime.transcribe(videoURL: clip.url)
+        do {
+            return try await runtime.transcribe(videoURL: clip.url)
+        } catch let error as LipModelStoreError {
+            if error == .notInstalled || error == .verificationFailed {
+                readiness = .failed(message: error.localizedDescription)
+            }
+            throw error
+        }
     }
 
     func shutDown() async {

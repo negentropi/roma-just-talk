@@ -90,7 +90,16 @@ public actor LipModelStore {
             guard Self.hasReceipt(in: installed, manifest: manifest) else {
                 throw LipModelStoreError.notInstalled
             }
-            try Self.verifyInstallation(at: installed, manifest: manifest)
+            do {
+                try Self.verifyInstallation(at: installed, manifest: manifest)
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                try Task.checkCancellation()
+                // Failed integrity must survive settings refresh without deleting model data.
+                try FileManager.default.removeItem(at: installed.appendingPathComponent("complete"))
+                throw error
+            }
             return installed.appendingPathComponent("visual-ctc.onnx")
         })
         self.operation = operation
@@ -115,7 +124,10 @@ public actor LipModelStore {
             verifiedURL = url
             return url
         } catch {
-            if self.operation?.id == operation.id { self.operation = nil }
+            if self.operation?.id == operation.id {
+                self.operation = nil
+                verifiedURL = nil
+            }
             if error is CancellationError || operation.task.isCancelled { throw CancellationError() }
             throw (error as? LipModelStoreError) ?? .installationFailed
         }

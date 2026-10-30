@@ -71,11 +71,12 @@ struct UIProbe {
                 let cameraContext = labels.localizedCaseInsensitiveContains("camera") || labels.localizedCaseInsensitiveContains("extension")
                 let probeContext = (labels.localizedCaseInsensitiveContains("Lip Camera Probe") || labels.localizedCaseInsensitiveContains("LipCameraProbe")) && labels.localizedCaseInsensitiveContains("camera")
                 let isSettings = app.bundleIdentifier == "com.apple.systempreferences"
+                let obsMicrophonePrompt = app.bundleIdentifier == "com.apple.UserNotificationCenter" && labels.contains("“OBS”") && labels.localizedCaseInsensitiveContains("microphone") && ["Don’t Allow", "Don't Allow"].contains(label) && role == kAXButtonRole
                 let obsPermissionReview = app.bundleIdentifier == "com.obsproject.obs-studio" && labels.contains("Review App Permissions") && label == "Continue" && role == kAXButtonRole
                 let settingsNavigation = isSettings && label == "Camera Extensions" && [kAXButtonRole, "AXLink"].contains(role)
                 let allowedButton = role == kAXButtonRole && ((obsContext && ["Open System Settings", "Allow"].contains(label)) || (probeContext && label == "Allow"))
                 let offOBSToggle = isSettings && label == "OBS" && integer == 0 && [kAXCheckBoxRole, "AXSwitch"].contains(role)
-                if obsPermissionReview || settingsNavigation || (allowedButton && (cameraContext || label == "Open System Settings")) || offOBSToggle {
+                if obsMicrophonePrompt || obsPermissionReview || settingsNavigation || (allowedButton && (cameraContext || label == "Open System Settings")) || offOBSToggle {
                     let result = AXUIElementPerformAction(element, kAXPressAction as CFString)
                     actions.append(["bundleIdentifier": app.bundleIdentifier ?? "", "label": label, "result": result.rawValue])
                     break

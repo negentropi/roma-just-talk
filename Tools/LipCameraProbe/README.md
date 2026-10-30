@@ -15,3 +15,5 @@ Sources:
 - [Apple system-extension requirements](https://developer.apple.com/documentation/systemextensions).
 
 Run only through `.github/workflows/lip-camera-probe.yml` on its disposable `ci/lip-camera-probe-*` branch. No heavyweight local build is needed.
+
+Set `LIP_CAMERA_PROBE_KEEP_OBS_RUNNING=1` to retain OBS and its feed after a successful device probe for a following app E2E step. The receipt records `obsRetainedForE2E`. Blocked probes still request normal shutdown. The local OBS WebSocket configuration contains a private random password; subsequent local tooling may read it, but must never log or upload it.

@@ -197,7 +197,10 @@ except Exception as error:
 finally:
     if started_obs:
         run('obs-log-copy', ['/bin/cp', '-R', str(Path.home() / 'Library/Application Support/obs-studio/logs'), str(OUT / 'obs-logs')])
-        run('close-obs', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=12)
+        keep_obs = os.environ.get('LIP_CAMERA_PROBE_KEEP_OBS_RUNNING') == '1' and summary['status'] == 'supportedDeviceReady'
+        summary['obsRetainedForE2E'] = keep_obs
+        if not keep_obs:
+            run('close-obs', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=12)
     run('extensions-final', ['/usr/bin/systemextensionsctl', 'list'])
     run('extension-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', 'process == "sysextd" AND eventMessage CONTAINS[c] "obsproject"'], timeout=25)
     if mounted:

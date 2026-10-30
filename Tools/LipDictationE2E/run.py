@@ -9,6 +9,7 @@ from pathlib import Path
 import platform
 import plistlib
 import shutil
+import signal
 import sqlite3
 import subprocess
 import sys
@@ -112,6 +113,65 @@ def build_visual_driver(evidence, run):
     return helper
 
 
+def prepare_screen_capture(evidence, app, driver, name, run):
+    app, driver = app.resolve(), driver.resolve()
+    capture = evidence / (name + '-capture.json')
+    consent = evidence / (name + '-consent.json')
+    ready = consent.with_suffix('.ready.json')
+    if any(path.exists() for path in [capture, consent, ready]):
+        raise RuntimeError('Screen preflight requires fresh receipt paths: ' + name)
+    configuration = evidence / (name + '-consent-config.json')
+    write(configuration, {'appPath': str(app.resolve()), 'captureReport': str(capture), 'readyReport': str(ready)})
+    launch_environment = []
+    for key in ['GITHUB_ACTIONS', 'RUNNER_ENVIRONMENT']:
+        launch_environment.extend(['--env', key + '=' + os.environ[key]])
+    driver_command = ['/usr/bin/open', '-W', '-n', *launch_environment, '-o', str(evidence / (name + '-driver.stdout.log')), '--stderr', str(evidence / (name + '-driver.stderr.log')), driver, '--args', '--screen-consent-driver', configuration, '--output', consent]
+    code, consent_code = None, None
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            approval = pool.submit(run, name + '-consent-driver', driver_command, timeout=55, required=False)
+            try:
+                deadline = time.monotonic() + 10
+                while not ready.is_file() and time.monotonic() < deadline and not approval.done():
+                    time.sleep(0.1)
+                if not ready.is_file() or json.loads(ready.read_text()).get('ready') is not True:
+                    raise RuntimeError('The native screen consent driver was not ready: ' + name)
+                code = run(name + '-capture', ['/usr/bin/open', '-W', '-n', *launch_environment, '-o', str(evidence / (name + '-capture.stdout.log')), '--stderr', str(evidence / (name + '-capture.stderr.log')), app, '--args', '--screen-capture-check', '--json-output', capture, '--consent-result', consent], timeout=60, required=False)
+            finally:
+                consent_code = approval.result()
+    finally:
+        if code != 0 or consent_code != 0:
+            for receipt, bundle in [(capture, app), (ready, driver)]:
+                if not receipt.is_file():
+                    continue
+                identity = json.loads(receipt.read_text())
+                pid = identity.get('pid')
+                if not isinstance(pid, int) or pid <= 1 or identity.get('bundlePath') != str(bundle):
+                    continue
+                bundle_info = plistlib.loads((bundle / 'Contents/Info.plist').read_bytes())
+                executable_path = str(bundle / 'Contents/MacOS' / bundle_info['CFBundleExecutable'])
+                for sig in [signal.SIGTERM, signal.SIGKILL]:
+                    observed = subprocess.run(['/bin/ps', '-p', str(pid), '-ww', '-o', 'comm='], capture_output=True, text=True, timeout=3)
+                    if observed.returncode != 0 or observed.stdout.strip() != executable_path:
+                        break
+                    try:
+                        os.kill(pid, sig)
+                    except ProcessLookupError:
+                        break
+                    time.sleep(0.2)
+    if not capture.is_file() or not consent.is_file():
+        raise RuntimeError('Screen capture or consent receipt missing: ' + name)
+    actual = json.loads(capture.read_text())
+    approved = json.loads(consent.read_text())
+    info = plistlib.loads((app / 'Contents/Info.plist').read_bytes())
+    executable = app / 'Contents/MacOS' / info['CFBundleExecutable']
+    screenshot = capture.with_suffix('.png')
+    passed = code == 0 and consent_code == 0 and actual.get('passed') is True and actual.get('consentAcknowledged') is True and approved.get('passed') is True and approved.get('promptGone') is True and approved.get('allowPressCount') == 1 and actual.get('bundleID') == info['CFBundleIdentifier'] and actual.get('bundlePath') == str(app.resolve()) and actual.get('executableSHA256') == sha256(executable) and screenshot.is_file() and screenshot.stat().st_size > 0 and actual.get('pngSHA256') == sha256(screenshot)
+    if not passed:
+        raise RuntimeError('Actual screen capture and normal OS consent preflight failed: ' + name)
+    return {'passed': True, 'captureReport': capture.name, 'consentReport': consent.name, 'screenshot': screenshot.name, 'allowPressCount': approved['allowPressCount'], 'boundary': 'Real ScreenCaptureKit capture, exact owned-helper OS prompt observed, ordinary Allow exactly once, and prompt absent before dictation fixtures'}
+
+
 def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant):
     camera_summary = args.obs_summary or Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/summary.json'
     if args.obs_summary is None:
@@ -127,12 +187,6 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
     websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
     if not websocket.is_file():
         raise RuntimeError('The probe-owned private OBS WebSocket configuration is unavailable')
-
-    grant(helper, 'com.negentropi.LipDictationE2E', ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
-    grant(app, APP_ID, [], ['kTCCServiceCamera'])
-    run('refresh-visual-tcc-user', ['killall', 'tccd'], required=False)
-    run('refresh-visual-tcc-system', ['sudo', '-n', 'killall', 'tccd'], required=False)
-    time.sleep(2)
 
     still = evidence / 'clock-still.mp4'
     first_frame = evidence / 'clock-first.png'
@@ -274,7 +328,7 @@ def main():
                 run('grant-' + identifier + '-' + service + ('-system' if system else '-user'), command)
 
     try:
-        visual_helper = build_visual_driver(evidence, run) if args.build_helper_only or args.visual else None
+        visual_helper = build_visual_driver(evidence, run)
         if args.build_helper_only:
             summary.pop('declaredAppSourceHead')
             summary.pop('appSourceBoundary')
@@ -303,11 +357,16 @@ def main():
         if not helper.is_dir():
             run('build-existing-harness', ['make', 'runtime-e2e-app'], timeout=300)
         run('verify-helper-signature', ['codesign', '--verify', '--deep', '--strict', helper])
-        grant(app, APP_ID, ['kTCCServiceAccessibility', 'kTCCServiceListenEvent', 'kTCCServicePostEvent'], ['kTCCServiceMicrophone'])
+        grant(app, APP_ID, ['kTCCServiceAccessibility', 'kTCCServiceListenEvent', 'kTCCServicePostEvent'], ['kTCCServiceMicrophone'] + (['kTCCServiceCamera'] if args.visual else []))
         grant(helper, HELPER_ID, ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
+        grant(visual_helper, 'com.negentropi.LipDictationE2E', ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
         run('refresh-tcc-user', ['killall', 'tccd'], required=False)
         run('refresh-tcc-system', ['sudo', '-n', 'killall', 'tccd'], required=False)
         time.sleep(2)
+        summary['screenCapturePreflight'] = [
+            prepare_screen_capture(evidence, helper, visual_helper, 'runtime-screen', run),
+            prepare_screen_capture(evidence, visual_helper, visual_helper, 'visual-screen', run),
+        ]
 
         model = Path.home() / 'Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2'
         manifest = ROOT / 'scripts/runtime-e2e-parakeet-v2.manifest'

@@ -12,6 +12,17 @@ struct LipVisualCases {
             print("PASS native lip dictation helper loaded")
             return
         }
+        let early = Array(CommandLine.arguments.dropFirst())
+        if early.count == 5, early[0] == "--screen-capture-check", early[1] == "--json-output", early[3] == "--consent-result" {
+            exit(RuntimeScreenCaptureCheck.capture(
+                reportURL: URL(fileURLWithPath: early[2]), consentResultURL: URL(fileURLWithPath: early[4])
+            ) ? 0 : 1)
+        }
+        if early.count == 4, early[0] == "--screen-consent-driver", early[2] == "--output" {
+            exit(RuntimeScreenCaptureCheck.approveConsent(
+                configurationURL: URL(fileURLWithPath: early[1]), reportURL: URL(fileURLWithPath: early[3])
+            ) ? 0 : 1)
+        }
         var report: [String: Any] = ["passed": false]
         var output: URL?
         var session: RuntimeVoiceInkSession?

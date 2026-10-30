@@ -3,6 +3,7 @@
 ## v1.95.2 - Unreleased
 
 - Add optional English lip dictation, off by default, with simultaneous voice and camera capture and a Lips Only setting that suspends microphone capture.
+- Cancel pending auto-send when its dictation is canceled, disabled, or replaced.
 
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
 

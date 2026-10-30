@@ -68,10 +68,7 @@ class PowerModeManager: ObservableObject {
         self.objectWillChange.send()
     }
 
-    func activateConfiguration(
-        _ config: PowerModeConfig?,
-        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
-    ) async {
+    func activateConfiguration(_ config: PowerModeConfig?) async {
         await VoiceInkPowerModeActivationPlan.activating(config).applyRuntimeState(
             setActiveConfiguration: { config in
                 await MainActor.run {
@@ -79,7 +76,7 @@ class PowerModeManager: ObservableObject {
                 }
             },
             beginSession: { config in
-                await PowerModeSessionManager.shared.beginSession(with: config, applicationScope: applicationScope)
+                await PowerModeSessionManager.shared.beginSession(with: config)
             }
         )
     }

@@ -8,8 +8,10 @@ class PowerModeSessionManager {
 
     private weak var stateProvider: (any PowerModeStateProvider)?
     private var enhancementService: AIEnhancementService?
+    private let defaults: UserDefaults
 
-    private init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         recoverSession()
     }
 
@@ -19,15 +21,13 @@ class PowerModeSessionManager {
         self.enhancementService = enhancementService
     }
 
-    func beginSession(
-        with config: PowerModeConfig,
-        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
-    ) async {
+    func beginSession(with config: PowerModeConfig) async {
         guard let stateProvider = stateProvider, let enhancementService = enhancementService else {
             print(VoiceInkPowerModeSessionDiagnostics.notConfiguredMessage)
             return
         }
 
+        let applicationScope = VoiceInkPowerModeSessionApplicationScope(dictationMode: stateProvider.currentDictationMode)
         let beginPlan = VoiceInkPowerModeSessionBeginPlan.plan(
             activeSession: loadSession(), applicationScope: applicationScope
         )
@@ -59,7 +59,7 @@ class PowerModeSessionManager {
 
         NotificationCenter.default.removeObserver(self, name: .AppSettingsDidChange, object: nil)
 
-        VoiceInkPowerModeSessionPreference.clear()
+        VoiceInkPowerModeSessionPreference.clear(from: defaults)
     }
 
     @objc func updateSessionSnapshot() {
@@ -235,7 +235,7 @@ class PowerModeSessionManager {
 
     private func saveSession(_ session: VoiceInkPowerModeSession) {
         do {
-            try VoiceInkPowerModeSessionPreference.saveActiveSession(session)
+            try VoiceInkPowerModeSessionPreference.saveActiveSession(session, to: defaults)
         } catch {
             print(
                 VoiceInkPowerModeSessionDiagnostics.saveFailedMessage(
@@ -247,7 +247,7 @@ class PowerModeSessionManager {
 
     private func loadSession() -> VoiceInkPowerModeSession? {
         do {
-            return try VoiceInkPowerModeSessionPreference.loadActiveSession()
+            return try VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults)
         } catch {
             print(
                 VoiceInkPowerModeSessionDiagnostics.loadFailedMessage(

@@ -291,9 +291,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             if let configuration = recording.powerModeResolution {
                 let resolved = await configuration.value
                 try checkRecording(recording)
-                await PowerModeManager.shared.activateConfiguration(
-                    resolved, applicationScope: .init(dictationMode: recording.mode)
-                )
+                await PowerModeManager.shared.activateConfiguration(resolved)
                 try checkRecording(recording)
                 if recording.mode.usesMicrophone {
                     recording.model = transcriptionModelManager.currentTranscriptionModel

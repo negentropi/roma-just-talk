@@ -13,6 +13,10 @@ struct RuntimeRenderedTextChangeResult: Codable {
 }
 
 final class RuntimeRenderedTextObserver {
+    static func captureScreenForPreflight() throws -> CGImage {
+        try RuntimeScreenshotCaptureSession(captureRect: CGDisplayBounds(CGMainDisplayID())).captureImage()
+    }
+
     private let captureSession: RuntimeScreenshotCaptureSession
     private var baseline: RuntimeRGBAFrame?
     private var baselineError: String?
@@ -195,7 +199,7 @@ private final class RuntimeScreenshotCaptureSession {
         return RuntimeRGBAFrame(bytes: bytes)
     }
 
-    private func captureImage() throws -> CGImage {
+    fileprivate func captureImage() throws -> CGImage {
         let state = RuntimeScreenshotCaptureState()
         SCScreenshotManager.captureImage(
             contentFilter: filter,

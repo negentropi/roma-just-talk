@@ -41,6 +41,7 @@ struct UIProbe {
                 requiresAuthentication = requiresAuthentication || secure
                 let integer = [kAXCheckBoxRole, "AXSwitch"].contains(role) ? (read(kAXValueAttribute) as? NSNumber)?.intValue : nil
                 var node: [String: Any] = ["role": role, "title": title, "description": description, "secureField": secure]
+                if let enabled = read(kAXEnabledAttribute) as? NSNumber { node["enabled"] = enabled.boolValue }
                 if !staticText.isEmpty { node["staticText"] = staticText }
                 if let integer { node["toggleValue"] = integer }
                 nodes.append(node)
@@ -89,6 +90,39 @@ struct UIProbe {
                 }
                 return false
             }
+            func clickToggleCenter(_ element: AXUIElement) -> [String: Any] {
+                var report: [String: Any] = ["method": "ordinaryPointerClick", "posted": false, "postEventTrusted": CGPreflightPostEventAccess()]
+                func value(_ attribute: String) -> CFTypeRef? {
+                    var result: CFTypeRef?
+                    return AXUIElementCopyAttributeValue(element, attribute as CFString, &result) == .success ? result : nil
+                }
+                guard let enabled = value(kAXEnabledAttribute) as? NSNumber, enabled.boolValue else {
+                    report["reason"] = "checkboxDisabledOrUnknown"
+                    return report
+                }
+                guard CGPreflightPostEventAccess(),
+                      let positionValue = value(kAXPositionAttribute), CFGetTypeID(positionValue) == AXValueGetTypeID(),
+                      let sizeValue = value(kAXSizeAttribute), CFGetTypeID(sizeValue) == AXValueGetTypeID() else {
+                    report["reason"] = "postEventPermissionOrFrameUnavailable"
+                    return report
+                }
+                var position = CGPoint.zero
+                var size = CGSize.zero
+                guard AXValueGetValue(positionValue as! AXValue, .cgPoint, &position),
+                      AXValueGetValue(sizeValue as! AXValue, .cgSize, &size),
+                      size.width > 0, size.height > 0 else { return report }
+                let point = CGPoint(x: position.x + size.width / 2, y: position.y + size.height / 2)
+                report["x"] = point.x
+                report["y"] = point.y
+                for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+                    guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else { return report }
+                    event.setIntegerValueField(.mouseEventClickState, value: 1)
+                    event.post(tap: .cghidEventTap)
+                    Thread.sleep(forTimeInterval: 0.05)
+                }
+                report["posted"] = true
+                return report
+            }
             let ordered = elements.sorted { left, right in
                 func rank(_ item: (AXUIElement, String, String, Int?)) -> Int {
                     if item.1 == "OBS" && item.3 == 0 { return 0 }
@@ -108,13 +142,21 @@ struct UIProbe {
                 let allowedButton = role == kAXButtonRole && ((obsContext && ["Open System Settings", "Allow"].contains(label)) || (probeContext && label == "Allow"))
                 let offOBSToggle = isSettings && labels.contains("Camera Extensions") && integer == 0 && [kAXCheckBoxRole, "AXSwitch"].contains(role) && isOnlyToggleInOBSRow(element)
                 if obsMicrophonePrompt || obsPermissionReview || settingsNavigation || (allowedButton && (cameraContext || label == "Open System Settings")) || offOBSToggle {
-                    let result = AXUIElementPerformAction(element, kAXPressAction as CFString)
-                    actions.append(["bundleIdentifier": app.bundleIdentifier ?? "", "label": offOBSToggle ? "OBS Virtual Camera row toggle" : label, "rowIdentityVerified": offOBSToggle, "result": result.rawValue])
+                    if offOBSToggle {
+                        var action = clickToggleCenter(element)
+                        action["bundleIdentifier"] = app.bundleIdentifier ?? ""
+                        action["label"] = "OBS Virtual Camera row toggle"
+                        action["rowIdentityVerified"] = true
+                        actions.append(action)
+                    } else {
+                        let result = AXUIElementPerformAction(element, kAXPressAction as CFString)
+                        actions.append(["bundleIdentifier": app.bundleIdentifier ?? "", "label": label, "rowIdentityVerified": false, "method": "AXPress", "result": result.rawValue])
+                    }
                     break
                 }
             }
         }
-        let report: [String: Any] = ["accessibilityTrusted": trusted, "screenCapturePreflight": CGPreflightScreenCaptureAccess(), "authenticationRequired": requiresAuthentication, "actions": actions, "applications": applications]
+        let report: [String: Any] = ["accessibilityTrusted": trusted, "postEventTrusted": CGPreflightPostEventAccess(), "screenCapturePreflight": CGPreflightScreenCaptureAccess(), "authenticationRequired": requiresAuthentication, "actions": actions, "applications": applications]
         if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
             try? data.write(to: URL(fileURLWithPath: args[1]), options: .atomic)
         }

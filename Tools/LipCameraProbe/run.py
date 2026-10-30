@@ -69,6 +69,8 @@ try:
         ('gatekeeper', ['/usr/sbin/spctl', '--status']), ('console-owner', ['/usr/bin/stat', '-f', '%Su', '/dev/console']),
         ('extensions-before', ['/usr/bin/systemextensionsctl', 'list']),
         ('desktop-before', ['/usr/sbin/system_profiler', 'SPDisplaysDataType']),
+        ('account-groups', ['/usr/bin/id', '-Gn']),
+        ('account-secure-token', ['/usr/sbin/sysadminctl', '-secureTokenStatus', os.environ.get('USER', '')]),
     ]:
         run(name, arguments)
     for source in ['UIProbe', 'OBSControl', 'CameraProbe']:
@@ -102,6 +104,15 @@ try:
     else:
         summary['testHelperAccessibilityGrantInstalled'] = False
         summary['accessibilityProvisioningBlocker'] = 'Scoped test-host TCC write unavailable or helper row unexpectedly pre-existing; existing grants preserved'
+    post_query = "SELECT count(*) FROM access WHERE service='kTCCServicePostEvent' AND client='" + client + "';"
+    post_preflight = run('post-event-grant-preflight', ['sudo', '-n', '/usr/bin/sqlite3', database, post_query])
+    if post_preflight == 0 and (OUT / 'post-event-grant-preflight.log').read_text().strip() == '0':
+        post_sql = "INSERT INTO access(service,client,client_type,auth_value,auth_reason,auth_version,csreq,indirect_object_identifier_type,indirect_object_identifier,flags) VALUES('kTCCServicePostEvent','" + client + "',0,2,4,1,X'" + csreq.read_bytes().hex() + "',0,'UNUSED',0);"
+        summary['testHelperPostEventGrantInstalled'] = run('provision-helper-post-event', ['sudo', '-n', '/usr/bin/sqlite3', database, post_sql]) == 0
+        run('refresh-post-event-tcc-cache', ['sudo', '-n', '/usr/bin/killall', 'tccd'])
+        time.sleep(2)
+    else:
+        summary['testHelperPostEventGrantInstalled'] = False
     ui('helper-accessibility-check')
     helper = json.loads((OUT / 'helper-accessibility-check.json').read_text())
     summary['testHelperAccessibilityTrusted'] = helper.get('accessibilityTrusted', False)
@@ -203,6 +214,7 @@ finally:
             run('close-obs', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=12)
     run('extensions-final', ['/usr/bin/systemextensionsctl', 'list'])
     run('extension-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', 'process == "sysextd" AND eventMessage CONTAINS[c] "obsproject"'], timeout=25)
+    run('approval-ui-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', '(process == "System Settings" OR process == "SecurityAgent" OR process == "authd" OR process == "authorizationhost" OR process == "coreauthd") AND (eventMessage CONTAINS[c] "obs" OR eventMessage CONTAINS[c] "extension" OR eventMessage CONTAINS[c] "authenticate" OR eventMessage CONTAINS[c] "authoriz")'], timeout=25)
     if mounted:
         run('unmount-obs', ['/usr/bin/hdiutil', 'detach', str(OUT / 'obs-mount')], timeout=15)
     (OUT / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')

@@ -7,6 +7,7 @@ struct UIProbe {
     static func main() {
         let args = CommandLine.arguments
         guard args.count >= 2 else { return }
+        let authenticating = args.count > 2 && args[2] == "authenticate-host-autologin"
         let attempting = args.count > 2 && args[2] == "approve"
         let targets = Set(["com.obsproject.obs-studio", "com.apple.systempreferences", "com.apple.SecurityAgent", "com.apple.UserNotificationCenter", "com.apple.CoreServicesUIAgent", "com.apple.LocalAuthentication.UIAgent", "com.apple.systemuiserver"])
         var applications: [[String: Any]] = []
@@ -58,6 +59,11 @@ struct UIProbe {
                 return [title, description, text].joined(separator: " ")
             }.joined(separator: " ")
             applications.append(["bundleIdentifier": app.bundleIdentifier ?? "", "pid": app.processIdentifier, "nodes": nodes])
+            if authenticating, trusted, app.bundleIdentifier == "com.apple.SecurityAgent" {
+                let authentication = SystemExtensionAuthentication.submit(application: app, elements: elements.map { $0.0 }, reportURL: URL(fileURLWithPath: args[1]), deadline: deadline)
+                actions.append(authentication)
+                continue
+            }
             guard attempting, trusted, !requiresAuthentication else { continue }
             func isOnlyToggleInOBSRow(_ element: AXUIElement) -> Bool {
                 func value(_ element: AXUIElement, _ attribute: String) -> CFTypeRef? {

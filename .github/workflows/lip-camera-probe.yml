@@ -23,6 +23,7 @@ jobs:
     timeout-minutes: 25
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
+      LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH: "1"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 

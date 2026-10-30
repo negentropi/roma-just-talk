@@ -52,15 +52,17 @@ def screenshot(name):
     run(name, ['/usr/sbin/screencapture', '-x', str(OUT / (name + '.png'))], timeout=12)
 
 
-def ui(name, approve=False):
-    command = ['/usr/bin/open', '-W', '-n', str(UI_APP), '--args', str(OUT / (name + '.json'))]
-    if approve:
+def ui(name, approve=False, authenticate=False):
+    command = ['/usr/bin/open', '-W', '-n', '--env', 'GITHUB_ACTIONS=true', '--env', 'RUNNER_OS=macOS', str(UI_APP), '--args', str(OUT / (name + '.json'))]
+    if authenticate:
+        command.append('authenticate-host-autologin')
+    elif approve:
         command.append('approve')
     run(name, command, timeout=20)
 
 
 try:
-    if os.environ.get('GITHUB_ACTIONS') != 'true' or sys.platform != 'darwin':
+    if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_OS') != 'macOS' or sys.platform != 'darwin':
         raise RuntimeError('Run only on a disposable macOS GitHub Actions host')
     if subprocess.check_output(['uname', '-m'], text=True).strip() != 'arm64':
         raise RuntimeError('Pinned OBS artifact requires arm64')
@@ -74,7 +76,10 @@ try:
     ]:
         run(name, arguments)
     for source in ['UIProbe', 'OBSControl', 'CameraProbe']:
-        run('compile-' + source, ['xcrun', 'swiftc', '-parse-as-library', str(ROOT / 'Tools/LipCameraProbe' / (source + '.swift')), '-o', str(BIN / source)], timeout=90, required=True)
+        sources = [str(ROOT / 'Tools/LipCameraProbe' / (source + '.swift'))]
+        if source == 'UIProbe':
+            sources.append(str(ROOT / 'Tools/LipCameraProbe/SystemExtensionAuthentication.swift'))
+        run('compile-' + source, ['xcrun', 'swiftc', '-parse-as-library', *sources, '-o', str(BIN / source)], timeout=90, required=True)
     (UI_APP / 'Contents/MacOS').mkdir(parents=True)
     shutil.copy2(BIN / 'UIProbe', UI_APP / 'Contents/MacOS/UIProbe')
     shutil.copy2(ROOT / 'Tools/LipCameraProbe/UIProbe-Info.plist', UI_APP / 'Contents/Info.plist')
@@ -174,7 +179,30 @@ try:
         ui('approval-' + str(attempt), approve=True)
         screenshot('approval-' + str(attempt))
         report = json.loads((OUT / ('approval-' + str(attempt) + '.json')).read_text())
-        if report.get('authenticationRequired') or not report.get('accessibilityTrusted'):
+        if report.get('authenticationRequired'):
+            summary['administratorAuthenticationRequired'] = True
+            if os.environ.get('LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH') != '1':
+                raise RuntimeError('Actual SecurityAgent System Extensions password prompt requires documented host authentication opt-in')
+            ui('host-authentication', authenticate=True)
+            authentication = json.loads((OUT / 'host-authentication.json').read_text())
+            actions = authentication.get('actions', [])
+            summary['hostAuthentication'] = actions
+            if not any(action.get('accountVerified') and action.get('authenticationAttempted') and action.get('submitted') for action in actions):
+                raise RuntimeError('Documented same-host authentication unavailable; see value-free authentication receipt')
+            enabled = False
+            for check in range(4):
+                time.sleep(3)
+                name = 'extensions-post-auth-' + str(check)
+                run(name, ['/usr/bin/systemextensionsctl', 'list'])
+                state = (OUT / (name + '.log')).read_text()
+                if any('com.obsproject.obs-studio.mac-camera-extension' in line and '[activated enabled]' in line for line in state.splitlines()):
+                    enabled = True
+                    break
+            summary['extensionEnabledAfterAuthentication'] = enabled
+            if not enabled:
+                raise RuntimeError('Ordinary credential submission did not enable the camera extension; no further authentication attempt')
+            break
+        if not report.get('accessibilityTrusted'):
             break
         time.sleep(2)
     run('extensions-after-approval', ['/usr/bin/systemextensionsctl', 'list'])

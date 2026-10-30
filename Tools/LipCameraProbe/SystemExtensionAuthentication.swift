@@ -1,0 +1,162 @@
+import AppKit
+import ApplicationServices
+import Darwin
+import Foundation
+import OpenDirectory
+import Security
+
+struct SystemExtensionAuthentication {
+    static func submit(
+        application: NSRunningApplication,
+        elements: [AXUIElement],
+        reportURL: URL,
+        deadline: TimeInterval
+    ) -> [String: Any] {
+        var result: [String: Any] = [
+            "method": "normalSecurityAgentAuthentication", "accountVerified": false,
+            "authenticationAttempted": false, "submitted": false
+        ]
+        guard ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == "true",
+              ProcessInfo.processInfo.environment["RUNNER_OS"] == "macOS",
+              application.bundleIdentifier == "com.apple.SecurityAgent",
+              application.bundleURL?.path == "/System/Library/CoreServices/SecurityAgent.app",
+              CGPreflightPostEventAccess() else {
+            result["reason"] = "disposableHostOrSecurityAgentIdentityUnavailable"
+            return result
+        }
+        var code: SecStaticCode?
+        var requirement: SecRequirement?
+        let flags = SecCSFlags(rawValue: 0)
+        guard SecStaticCodeCreateWithPath(application.bundleURL! as CFURL, flags, &code) == errSecSuccess,
+              SecRequirementCreateWithString("anchor apple and identifier \"com.apple.SecurityAgent\"" as CFString, flags, &requirement) == errSecSuccess,
+              let code, let requirement,
+              SecStaticCodeCheckValidity(code, SecCSFlags(rawValue: kSecCSStrictValidate), requirement) == errSecSuccess else {
+            result["reason"] = "securityAgentSignatureRejected"
+            return result
+        }
+        result["securityAgentIdentityVerified"] = true
+        func value(_ element: AXUIElement, _ attribute: String) -> CFTypeRef? {
+            guard ProcessInfo.processInfo.systemUptime < deadline else { return nil }
+            var result: CFTypeRef?
+            return AXUIElementCopyAttributeValue(element, attribute as CFString, &result) == .success ? result : nil
+        }
+        let text = Set(elements.compactMap { element -> String? in
+            guard value(element, kAXRoleAttribute) as? String == kAXStaticTextRole else { return nil }
+            return value(element, kAXValueAttribute) as? String
+        })
+        guard text.contains("System Extensions"),
+              text.contains("System Extensions is trying to modify a System Extension."),
+              text.contains("Enter your password to allow this.") else {
+            result["reason"] = "unmatchedAuthenticationPrompt"
+            return result
+        }
+        let fields = elements.filter { value($0, kAXRoleAttribute) as? String == kAXTextFieldRole }
+        let secureFields = fields.filter { value($0, kAXSubroleAttribute) as? String == kAXSecureTextFieldSubrole }
+        let userFields = fields.filter { value($0, kAXSubroleAttribute) as? String != kAXSecureTextFieldSubrole }
+        let buttons = elements.filter {
+            value($0, kAXRoleAttribute) as? String == kAXButtonRole && value($0, kAXTitleAttribute) as? String == "OK"
+        }
+        guard secureFields.count == 1, userFields.count == 1, buttons.count == 1,
+              let shownUser = value(userFields[0], kAXValueAttribute) as? String,
+              [NSUserName(), NSFullUserName()].contains(where: { !$0.isEmpty && $0.caseInsensitiveCompare(shownUser) == .orderedSame }) else {
+            result["reason"] = "authenticationAccountOrFieldsDoNotMatch"
+            return result
+        }
+        result["currentAccountMatchesPrompt"] = true
+        let marker = reportURL.deletingLastPathComponent().appendingPathComponent(".host-auth-attempted")
+        let descriptor = Darwin.open(marker.path, O_CREAT | O_EXCL | O_WRONLY, 0o600)
+        guard descriptor >= 0 else {
+            result["reason"] = "authenticationAlreadyAttempted"
+            return result
+        }
+        close(descriptor)
+        do {
+            let credentialURL = URL(fileURLWithPath: "/etc/kcpassword")
+            let metadata = try FileManager.default.attributesOfItem(atPath: credentialURL.path)
+            guard metadata[.type] as? FileAttributeType == .typeRegular,
+                  (metadata[.ownerAccountID] as? NSNumber)?.intValue == 0,
+                  let permissions = metadata[.posixPermissions] as? NSNumber, permissions.intValue & 0o077 == 0,
+                  let credentialSize = metadata[.size] as? NSNumber, credentialSize.intValue > 0, credentialSize.intValue <= 1024 else {
+                result["reason"] = "documentedHostCredentialUnavailable"
+                return result
+            }
+            let process = Process()
+            let pipe = Pipe()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
+            process.arguments = ["-n", "/bin/cat", credentialURL.path]
+            process.standardOutput = pipe
+            process.standardError = FileHandle.nullDevice
+            try process.run()
+            var encoded = pipe.fileHandleForReading.readDataToEndOfFile()
+            process.waitUntilExit()
+            defer { encoded.resetBytes(in: encoded.startIndex..<encoded.endIndex) }
+            guard process.terminationStatus == 0, !encoded.isEmpty, encoded.count <= 1024 else {
+                result["reason"] = "documentedHostCredentialReadDenied"
+                return result
+            }
+            let key: [UInt8] = [125, 137, 82, 35, 210, 188, 221, 234, 163, 185, 31]
+            var decoded = encoded.enumerated().map { $0.element ^ key[$0.offset % key.count] }
+            defer { _ = decoded.withUnsafeMutableBytes { $0.initializeMemory(as: UInt8.self, repeating: 0) } }
+            let end = decoded.firstIndex(of: 0) ?? decoded.endIndex
+            guard let password = String(bytes: decoded[..<end], encoding: .utf8), !password.isEmpty else {
+                result["reason"] = "documentedHostCredentialFormatRejected"
+                return result
+            }
+            let node = try ODNode(session: ODSession.default(), name: "/Local/Default")
+            let account = try node.record(withRecordType: kODRecordTypeUsers, name: NSUserName(), attributes: [kODAttributeTypeUniqueID])
+            let identifiers = try account.values(forAttribute: kODAttributeTypeUniqueID) as? [String]
+            guard identifiers?.contains(String(geteuid())) == true else {
+                result["reason"] = "localAccountIdentifierMismatch"
+                return result
+            }
+            try account.verifyPassword(password)
+            result["accountVerified"] = true
+            guard let positionValue = value(buttons[0], kAXPositionAttribute), CFGetTypeID(positionValue) == AXValueGetTypeID(),
+                  let sizeValue = value(buttons[0], kAXSizeAttribute), CFGetTypeID(sizeValue) == AXValueGetTypeID() else {
+                result["reason"] = "submitButtonFrameUnavailable"
+                return result
+            }
+            var position = CGPoint.zero
+            var size = CGSize.zero
+            guard AXValueGetValue(positionValue as! AXValue, .cgPoint, &position),
+                  AXValueGetValue(sizeValue as! AXValue, .cgSize, &size), size.width > 0, size.height > 0 else { return result }
+            let point = CGPoint(x: position.x + size.width / 2, y: position.y + size.height / 2)
+            guard ProcessInfo.processInfo.systemUptime < deadline else {
+                result["reason"] = "authenticationDeadlinePassed"
+                return result
+            }
+            guard AXUIElementSetAttributeValue(secureFields[0], kAXFocusedAttribute as CFString, kCFBooleanTrue) == .success else {
+                result["reason"] = "secureFieldFocusRejected"
+                return result
+            }
+            var focused: CFTypeRef?
+            guard AXUIElementCopyAttributeValue(AXUIElementCreateSystemWide(), kAXFocusedUIElementAttribute as CFString, &focused) == .success,
+                  let focused, CFEqual(focused, secureFields[0]) else {
+                result["reason"] = "secureFieldFocusNotConfirmed"
+                return result
+            }
+            var units = Array(password.utf16)
+            defer { _ = units.withUnsafeMutableBytes { $0.initializeMemory(as: UInt8.self, repeating: 0) } }
+            guard let down = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true),
+                  let up = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else { return result }
+            units.withUnsafeBufferPointer { down.keyboardSetUnicodeString(stringLength: $0.count, unicodeString: $0.baseAddress!) }
+            result["authenticationAttempted"] = true
+            down.post(tap: .cghidEventTap)
+            up.post(tap: .cghidEventTap)
+            Thread.sleep(forTimeInterval: 0.15)
+            for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+                guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else { return result }
+                event.setIntegerValueField(.mouseEventClickState, value: 1)
+                event.post(tap: .cghidEventTap)
+                Thread.sleep(forTimeInterval: 0.05)
+            }
+            result["submitted"] = true
+        } catch {
+            let error = error as NSError
+            result["reason"] = "localCredentialVerificationFailed"
+            result["errorDomain"] = error.domain
+            result["errorCode"] = error.code
+        }
+        return result
+    }
+}

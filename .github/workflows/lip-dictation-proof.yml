@@ -63,6 +63,10 @@ jobs:
           test -x "$binary_dir/LipDictationProof"
           printf 'LIP_PROOF_BIN=%s/LipDictationProof\n' "$binary_dir" >> "$GITHUB_ENV"
 
+      - name: Prove model integrity repair with actual hosted XCTest
+        shell: bash
+        run: python3 VoiceInkLip/Tools/verify_store_integrity.py
+
       - name: Prepare pinned public clips, silent videos and frozen controls
         shell: bash
         run: |

@@ -952,9 +952,8 @@ public struct RuntimeRenderedTextAssociationTracker: Sendable {
     public private(set) var associationError: String?
 
     public init(baseline: [UInt8]) {
-        self.baseline = baseline
+        // Initial pixels establish dimensions, not their pre-insertion AX identity.
         previousFrame = baseline
-        latencyTracker = RuntimeRenderedTextLatencyTracker(baseline: baseline)
     }
 
     public mutating func observe(
@@ -975,21 +974,11 @@ public struct RuntimeRenderedTextAssociationTracker: Sendable {
         }
         guard let accessibilityText else {
             // Unknown text cannot label a frame as either pre-insertion or inserted text.
-            baseline = nil
-            latencyTracker = nil
-            insertedText = nil
-            acceptedSample = nil
-            acceptedFrame = nil
-            associationError = "AX text was unreadable; no confirmed pre-insertion frame"
+            rejectUnreadableFrame("AX text was unreadable for the captured frame")
             return nil
         }
         guard let precedingAccessibilityText else {
-            baseline = nil
-            latencyTracker = nil
-            insertedText = nil
-            acceptedSample = nil
-            acceptedFrame = nil
-            associationError = "AX text before capture was unreadable; no confirmed pre-insertion frame"
+            rejectUnreadableFrame("AX text before capture was unreadable")
             return nil
         }
         guard precedingAccessibilityText == accessibilityText else {
@@ -1053,6 +1042,19 @@ public struct RuntimeRenderedTextAssociationTracker: Sendable {
         self.latencyTracker = latencyTracker
         associationError = sample == nil ? "Incompatible rendered frames" : nil
         return sample
+    }
+
+    private mutating func rejectUnreadableFrame(_ error: String) {
+        // Keep only an AX-bracketed empty baseline from before the first text epoch.
+        // The unreadable frame cannot contribute pixels or a render timestamp.
+        if insertedText != nil {
+            baseline = nil
+        }
+        latencyTracker = baseline.map { RuntimeRenderedTextLatencyTracker(baseline: $0) }
+        insertedText = nil
+        acceptedSample = nil
+        acceptedFrame = nil
+        associationError = error
     }
 }
 

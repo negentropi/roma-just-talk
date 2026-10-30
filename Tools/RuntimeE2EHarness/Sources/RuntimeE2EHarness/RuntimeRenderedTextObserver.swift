@@ -34,18 +34,25 @@ final class RuntimeRenderedTextObserver {
         }
         let captureSession = try RuntimeScreenshotCaptureSession(captureRect: captureRect)
         self.captureSession = captureSession
-        let baseline = try captureSession.captureRGBA()
-        self.baseline = baseline
-        latencyTracker = RuntimeRenderedTextAssociationTracker(baseline: baseline.bytes)
     }
 
-    func refreshBaseline() -> String? {
+    func refreshBaseline(accessibilityText: () -> String?) -> String? {
         do {
-            baseline = try captureSession.captureRGBA()
-            baselineError = nil
-            latencyTracker = baseline.map {
-                RuntimeRenderedTextAssociationTracker(baseline: $0.bytes)
+            let precedingText = accessibilityText()
+            let frame = try captureSession.captureRGBA()
+            let followingText = accessibilityText()
+            guard let precedingText, let followingText, precedingText == followingText,
+                  followingText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw RuntimeRenderedTextObserverError.baselineUnavailable(
+                    "Pre-insertion capture requires matching readable empty AX text before and after capture"
+                )
             }
+            baseline = frame
+            baselineError = nil
+            var tracker = RuntimeRenderedTextAssociationTracker(baseline: frame.bytes)
+            _ = tracker.observe(current: frame.bytes, atSystemUptime: ProcessInfo.processInfo.systemUptime,
+                                accessibilityText: followingText, precedingAccessibilityText: precedingText)
+            latencyTracker = tracker
             lastSample = nil
         } catch {
             baseline = nil
@@ -57,10 +64,9 @@ final class RuntimeRenderedTextObserver {
     }
 
     func beginObservation() -> String? {
-        guard let baseline else {
+        guard baseline != nil, latencyTracker != nil else {
             return baselineError ?? "Rendered-text baseline is unavailable"
         }
-        latencyTracker = RuntimeRenderedTextAssociationTracker(baseline: baseline.bytes)
         lastSample = nil
         return nil
     }

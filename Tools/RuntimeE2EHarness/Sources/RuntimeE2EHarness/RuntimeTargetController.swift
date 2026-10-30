@@ -169,7 +169,9 @@ final class RuntimePreparedTarget {
     }
 
     func refreshRenderedBaseline() -> String? {
-        renderedTextObserver.refreshBaseline()
+        renderedTextObserver.refreshBaseline {
+            RuntimeAX.text(from: textElement).flatMap { textScenario.insertedText(from: $0) }
+        }
     }
 
     func waitForVisibleText(
@@ -581,7 +583,7 @@ enum RuntimeTargetController {
                 throw RuntimeTargetControllerError.renderObservationUnavailable(String(describing: error))
             }
 
-            return RuntimePreparedTarget(
+            let preparedTarget = RuntimePreparedTarget(
                 target: target,
                 appURL: appURL,
                 appElement: surface.appElement,
@@ -599,6 +601,10 @@ enum RuntimeTargetController {
                 previousFrontmostApplication: previousFrontmostApplication,
                 renderedTextObserver: renderedTextObserver
             )
+            if let error = preparedTarget.refreshRenderedBaseline() {
+                throw RuntimeTargetControllerError.renderObservationUnavailable(error)
+            }
+            return preparedTarget
         } catch {
             cleanupFailedPreparation(
                 target: target,

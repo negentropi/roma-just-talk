@@ -29,18 +29,19 @@ jobs:
           if ! command -v ffmpeg >/dev/null; then HOMEBREW_NO_AUTO_UPDATE=1 brew install ffmpeg; fi
           ffmpeg -version >> "$output/environment.txt"
           revision=1658cd342dff90010aa843eaeebd53610a08b1dc
+          # ffmpeg must not read the fixture heredoc owned by this loop.
           while read -r label filename expected; do
             original="$output/fixtures/$label.flv"
             curl --fail --location --retry 2 "https://media.githubusercontent.com/media/CheyneyComputerScience/CREMA-D/$revision/VideoFlash/$filename" -o "$original"
             printf '%s  %s\n' "$expected" "$original" | shasum -a 256 --check
-            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
+            ffmpeg -nostdin -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
               -c:v libx264 -crf 0 -pix_fmt yuv420p "$output/fixtures/$label-lossless.mp4"
-            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
+            ffmpeg -nostdin -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
               -c:v libx264 -profile:v main -crf 16 -bf 0 -pix_fmt yuv420p "$output/fixtures/$label-main.mp4"
-            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
+            ffmpeg -nostdin -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
               -c:v prores_ks -profile:v 3 -pix_fmt yuv422p10le "$output/fixtures/$label-prores.mov"
-            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -frames:v 1 "$output/fixtures/$label-first.png"
-            ffmpeg -hide_banner -loglevel error -loop 1 -framerate 25 -i "$output/fixtures/$label-first.png" \
+            ffmpeg -nostdin -hide_banner -loglevel error -i "$original" -map 0:v:0 -frames:v 1 "$output/fixtures/$label-first.png"
+            ffmpeg -nostdin -hide_banner -loglevel error -loop 1 -framerate 25 -i "$output/fixtures/$label-first.png" \
               -t 1 -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$output/fixtures/$label-frozen.mp4"
             for kind in lossless main prores frozen; do
               suffix=mp4

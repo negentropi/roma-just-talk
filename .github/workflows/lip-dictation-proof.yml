@@ -77,6 +77,7 @@ jobs:
           ffmpeg -version > "$LIP_PROOF_DIR/ffmpeg-version.txt"
           fixture_revision=1658cd342dff90010aa843eaeebd53610a08b1dc
           fixture_base="https://media.githubusercontent.com/media/CheyneyComputerScience/CREMA-D/$fixture_revision/VideoFlash"
+          # ffmpeg must not read the fixture heredoc owned by this loop.
           while read -r label filename expected_sha; do
             original="$LIP_PROOF_DIR/fixtures/$label.flv"
             curl --fail --location --retry 3 --connect-timeout 30 \
@@ -84,13 +85,13 @@ jobs:
             printf '%s  %s\n' "$expected_sha" "$original" | shasum -a 256 --check
             printf '%s\t%s\t%s\t%s\n' "$label" "$filename" "$expected_sha" "$fixture_revision" \
               >> "$LIP_PROOF_DIR/fixture-provenance.tsv"
-            ffmpeg -hide_banner -loglevel error -y -i "$original" -map 0:v:0 -an \
+            ffmpeg -nostdin -hide_banner -loglevel error -y -i "$original" -map 0:v:0 -an \
               -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/$label-silent.mp4"
             duration="$(ffprobe -v error -select_streams v:0 -show_entries stream=duration \
               -of default=noprint_wrappers=1:nokey=1 "$LIP_PROOF_DIR/fixtures/$label-silent.mp4")"
-            ffmpeg -hide_banner -loglevel error -y -i "$original" -map 0:v:0 \
+            ffmpeg -nostdin -hide_banner -loglevel error -y -i "$original" -map 0:v:0 \
               -frames:v 1 "$LIP_PROOF_DIR/fixtures/$label-first.png"
-            ffmpeg -hide_banner -loglevel error -y -loop 1 -framerate 25 \
+            ffmpeg -nostdin -hide_banner -loglevel error -y -loop 1 -framerate 25 \
               -i "$LIP_PROOF_DIR/fixtures/$label-first.png" -t "$duration" -an \
               -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/$label-frozen.mp4"
             for kind in silent frozen; do
@@ -100,7 +101,7 @@ jobs:
                 > "$LIP_PROOF_DIR/fixtures/$label-$kind.ffprobe.json"
               shasum -a 256 "$clip" >> "$LIP_PROOF_DIR/silent-control-sha256.txt"
             done
-            ffmpeg -hide_banner -loglevel error -i "$LIP_PROOF_DIR/fixtures/$label-frozen.mp4" \
+            ffmpeg -nostdin -hide_banner -loglevel error -i "$LIP_PROOF_DIR/fixtures/$label-frozen.mp4" \
               -map 0:v:0 -f framemd5 "$LIP_PROOF_DIR/fixtures/$label-frozen.framemd5"
             test "$(awk -F, '!/^#/ {gsub(/ /,"",$6); print $6}' \
               "$LIP_PROOF_DIR/fixtures/$label-frozen.framemd5" | sort -u | wc -l | tr -d ' ')" = 1
@@ -112,13 +113,13 @@ jobs:
           curl --fail --location --retry 3 \
             "https://raw.githubusercontent.com/CheyneyComputerScience/CREMA-D/$fixture_revision/README.md" \
             --output "$LIP_PROOF_DIR/CREMA-D-source-README.md"
-          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=black:s=480x360:r=25 \
+          ffmpeg -nostdin -hide_banner -loglevel error -f lavfi -i color=c=black:s=480x360:r=25 \
             -t 2 -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/no-face.mp4"
-          ffmpeg -hide_banner -loglevel error -loop 1 -framerate 25 -i "$LIP_PROOF_DIR/fixtures/a-first.png" \
+          ffmpeg -nostdin -hide_banner -loglevel error -loop 1 -framerate 25 -i "$LIP_PROOF_DIR/fixtures/a-first.png" \
             -f lavfi -i color=c=black:s=480x360:r=25 \
             -filter_complex '[0:v]trim=end_frame=12,setpts=PTS-STARTPTS[face];[1:v]trim=end_frame=25,setpts=PTS-STARTPTS[blank];[face][blank]concat=n=2:v=1:a=0[out]' \
             -map '[out]' -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/face-lost.mp4"
-          ffmpeg -hide_banner -loglevel error -i "$LIP_PROOF_DIR/fixtures/c-silent.mp4" \
+          ffmpeg -nostdin -hide_banner -loglevel error -i "$LIP_PROOF_DIR/fixtures/c-silent.mp4" \
             -filter_complex '[0:v]split=2[left][right];[left][right]hstack=inputs=2[out]' \
             -map '[out]' -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/multiple-faces.mp4"
 

@@ -19,13 +19,18 @@ class PowerModeSessionManager {
         self.enhancementService = enhancementService
     }
 
-    func beginSession(with config: PowerModeConfig) async {
+    func beginSession(
+        with config: PowerModeConfig,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
+    ) async {
         guard let stateProvider = stateProvider, let enhancementService = enhancementService else {
             print(VoiceInkPowerModeSessionDiagnostics.notConfiguredMessage)
             return
         }
 
-        let beginPlan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: loadSession())
+        let beginPlan = VoiceInkPowerModeSessionBeginPlan.plan(
+            activeSession: loadSession(), applicationScope: applicationScope
+        )
         beginPlan.applyRuntimeState(
             id: UUID(),
             startTime: Date(),
@@ -41,15 +46,15 @@ class PowerModeSessionManager {
 
         // Always apply the new configuration
         isApplyingPowerModeConfig = true
-        await applyConfiguration(config)
+        await applyConfiguration(config, applicationScope: applicationScope)
         isApplyingPowerModeConfig = false
     }
 
-    func endSession() async {
+    func endSession(applicationScope: VoiceInkPowerModeSessionApplicationScope? = nil) async {
         guard let session = loadSession() else { return }
 
         isApplyingPowerModeConfig = true
-        await restoreState(session.originalState)
+        await restoreState(session.originalState, applicationScope: applicationScope ?? session.applicationScope)
         isApplyingPowerModeConfig = false
 
         NotificationCenter.default.removeObserver(self, name: .AppSettingsDidChange, object: nil)
@@ -92,27 +97,35 @@ class PowerModeSessionManager {
         )
     }
 
-    private func applyConfiguration(_ config: PowerModeConfig) async {
+    private func applyConfiguration(
+        _ config: PowerModeConfig,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope
+    ) async {
         guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
         await applySessionApplicationPlan(
             VoiceInkPowerModeSessionApplicationPlan.applying(
                 config: config,
-                facts: sessionApplicationFacts(stateProvider: stateProvider)
+                facts: sessionApplicationFacts(stateProvider: stateProvider),
+                applicationScope: applicationScope
             ),
             stateProvider: stateProvider
         )
     }
 
-    private func restoreState(_ state: VoiceInkPowerModeApplicationState) async {
+    private func restoreState(
+        _ state: VoiceInkPowerModeApplicationState,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope
+    ) async {
         guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
         await applySessionApplicationPlan(
             VoiceInkPowerModeSessionApplicationPlan.restoring(
                 state: state,
-                facts: sessionApplicationFacts(stateProvider: stateProvider)
+                facts: sessionApplicationFacts(stateProvider: stateProvider),
+                applicationScope: applicationScope
             ),
             stateProvider: stateProvider
         )

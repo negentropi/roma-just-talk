@@ -57,6 +57,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private var activeRecording: Recording?
+    var currentDictationMode: VoiceInkDictationMode {
+        activeRecording?.mode ?? VoiceInkLipDictationPreference.mode(in: .standard)
+    }
     private var inputPolicyTask: (id: UUID, task: Task<Void, Never>)?
     private var shutdownTask: Task<Void, Never>?
     private var resetTask: Task<Void, Never>?
@@ -288,7 +291,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
             if let configuration = recording.powerModeResolution {
                 let resolved = await configuration.value
                 try checkRecording(recording)
-                await PowerModeManager.shared.activateConfiguration(resolved)
+                await PowerModeManager.shared.activateConfiguration(
+                    resolved, applicationScope: .init(dictationMode: recording.mode)
+                )
                 try checkRecording(recording)
                 if recording.mode.usesMicrophone {
                     recording.model = transcriptionModelManager.currentTranscriptionModel
@@ -598,7 +603,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
         qwenRecordingSession = nil
         qwenRecordingModelName = nil
-        await finishRecorderSession()
+        await finishRecorderSession(applicationScope: .init(dictationMode: recording.mode))
         guard activeRecording === recording else { return }
         if recording.canceled {
             await cleanupResources()
@@ -770,12 +775,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
     }
 
-    private func finishRecorderSession() async {
+    private func finishRecorderSession(applicationScope: VoiceInkPowerModeSessionApplicationScope? = nil) async {
         enhancementService?.clearCapturedContexts()
         await VoiceInkPowerModeRecordingFinishPlan.finishingRecording(
             shouldPersistConfiguredPreferences: VoiceInkPowerModePreference.shouldPersistConfiguredPreferences()
         ).applyRuntimeState(
-            endSession: { await PowerModeSessionManager.shared.endSession() },
+            endSession: { await PowerModeSessionManager.shared.endSession(applicationScope: applicationScope) },
             clearActiveConfiguration: { PowerModeManager.shared.setActiveConfiguration(nil) }
         )
     }

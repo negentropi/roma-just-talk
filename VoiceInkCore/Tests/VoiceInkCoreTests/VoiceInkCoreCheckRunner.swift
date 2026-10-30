@@ -10,6 +10,10 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "PowerModeLipDictationTests.testLipOnlyAppliesTextPreferencesWithoutSelectingOrLoadingAudioModel", run: { await PowerModeLipDictationTests().testLipOnlyAppliesTextPreferencesWithoutSelectingOrLoadingAudioModel() }),
+            VoiceInkCoreCheck(name: "PowerModeLipDictationTests.testVoiceCombinedAndManualPowerModeKeepAudioModelApplicationAndRestoration", run: { await PowerModeLipDictationTests().testVoiceCombinedAndManualPowerModeKeepAudioModelApplicationAndRestoration() }),
+            VoiceInkCoreCheck(name: "PowerModeLipDictationTests.testReusedAndRecoveredLipSessionRetainsTextOnlyRestoration", run: { try await PowerModeLipDictationTests().testReusedAndRecoveredLipSessionRetainsTextOnlyRestoration() }),
+            VoiceInkCoreCheck(name: "PowerModeLipDictationTests.testLegacySavedSessionRestoresAudioModel", run: { try await PowerModeLipDictationTests().testLegacySavedSessionRestoresAudioModel() }),
             VoiceInkCoreCheck(name: "LipDictationPreferenceTests.testFreshPreferencesKeepVoiceOnlyAndCameraClosed", run: { LipDictationPreferenceTests().testFreshPreferencesKeepVoiceOnlyAndCameraClosed() }),
             VoiceInkCoreCheck(name: "LipDictationPreferenceTests.testEnablingLipDictationActivatesVoiceAndCameraTogether", run: { LipDictationPreferenceTests().testEnablingLipDictationActivatesVoiceAndCameraTogether() }),
             VoiceInkCoreCheck(name: "LipDictationPreferenceTests.testLipOnlySelectionDisablesMicrophoneUntilMasterIsOff", run: { LipDictationPreferenceTests().testLipOnlySelectionDisablesMicrophoneUntilMasterIsOff() }),

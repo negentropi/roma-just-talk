@@ -32,6 +32,24 @@ struct ModelPrewarmServiceTests {
         await task.value
         #expect(fixture.state.loadedNames.isEmpty)
     }
+
+    @Test @MainActor func lipOnlyPrewarmNeverLoadsAnInstalledAudioModel() async throws {
+        let fixture = try PrewarmFixture()
+        defer { fixture.restorePreference() }
+        fixture.state.installed = true
+        fixture.state.dictationMode = .lips
+
+        await fixture.service.performPrewarm()
+        #expect(fixture.state.loadedNames.isEmpty)
+
+        fixture.state.dictationMode = .voiceAndLips
+        await fixture.service.performPrewarm()
+        #expect(fixture.state.loadedNames == [fixture.model.name])
+
+        fixture.state.dictationMode = .voice
+        await fixture.service.performPrewarm()
+        #expect(fixture.state.loadedNames == [fixture.model.name, fixture.model.name])
+    }
 }
 
 private enum PrewarmFixtureError: Error { case unusedRuntime }
@@ -40,6 +58,7 @@ private enum PrewarmFixtureError: Error { case unusedRuntime }
     final class State {
         var installed = false
         var loadedNames: [String] = []
+        var dictationMode: VoiceInkDictationMode = .voice
     }
 
     let state: State
@@ -68,6 +87,7 @@ private enum PrewarmFixtureError: Error { case unusedRuntime }
         models.currentTranscriptionModel = model
         service = ModelPrewarmService(transcriptionModelManager: models, whisperModelManager: whisper,
             modelContext: ModelContext(container), qwenRuntimeResult: .failure(PrewarmFixtureError.unusedRuntime),
+            dictationMode: { state.dictationMode },
             loadFluidAudioModel: { state.loadedNames.append($0.name) })
         VoiceInkModelRuntimePreference.saveShouldPrewarmModelOnWake(true)
     }

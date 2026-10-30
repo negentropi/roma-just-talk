@@ -1611,15 +1611,24 @@ public struct VoiceInkPowerModeSessionApplicationFacts: Equatable, Sendable {
     }
 }
 
+public enum VoiceInkPowerModeSessionApplicationScope: String, Codable, Sendable {
+    case full
+    case textOnly
+
+    public init(dictationMode: VoiceInkDictationMode) {
+        self = dictationMode.usesMicrophone ? .full : .textOnly
+    }
+}
+
 public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
     private var preferenceApplication: VoiceInkPowerModePreferenceApplication
-    private var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan
+    private var modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan?
     private var languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan
     private var shouldPostConfigurationApplied: Bool
 
     private init(
         preferenceApplication: VoiceInkPowerModePreferenceApplication,
-        modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan,
+        modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan?,
         languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan,
         shouldPostConfigurationApplied: Bool
     ) {
@@ -1636,7 +1645,9 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
         postConfigurationApplied: () -> Void
     ) async {
         applyPreferenceApplication(preferenceApplication)
-        await applyModelResourcePlan(modelResourcePlan)
+        if let modelResourcePlan {
+            await applyModelResourcePlan(modelResourcePlan)
+        }
         applyLanguageApplicationPlan(languageApplicationPlan)
 
         if shouldPostConfigurationApplied {
@@ -1646,26 +1657,30 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
 
     public static func applying(
         config: PowerModeConfig,
-        facts: VoiceInkPowerModeSessionApplicationFacts
+        facts: VoiceInkPowerModeSessionApplicationFacts,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
     ) -> Self {
         plan(
             preferenceApplication: config.powerModePreferenceApplication,
             selectedModelName: config.selectedTranscriptionModelName,
             selectedLanguage: config.selectedLanguage,
             facts: facts,
+            applicationScope: applicationScope,
             shouldPostConfigurationApplied: true
         )
     }
 
     public static func restoring(
         state: VoiceInkPowerModeApplicationState,
-        facts: VoiceInkPowerModeSessionApplicationFacts
+        facts: VoiceInkPowerModeSessionApplicationFacts,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
     ) -> Self {
         plan(
             preferenceApplication: state.powerModePreferenceRestore,
             selectedModelName: state.transcriptionModelName,
             selectedLanguage: state.selectedLanguage,
             facts: facts,
+            applicationScope: applicationScope,
             shouldPostConfigurationApplied: false
         )
     }
@@ -1675,11 +1690,12 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
         selectedModelName: String?,
         selectedLanguage: String?,
         facts: VoiceInkPowerModeSessionApplicationFacts,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope,
         shouldPostConfigurationApplied: Bool
     ) -> Self {
         Self(
             preferenceApplication: preferenceApplication,
-            modelResourcePlan: VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
+            modelResourcePlan: applicationScope == .textOnly ? nil : VoiceInkPowerModeTranscriptionModelResourcePlan.plan(
                 selectedModelName: selectedModelName,
                 currentModelName: facts.currentModelName,
                 availableModels: facts.availableModelResourceFacts,
@@ -1955,27 +1971,57 @@ public struct VoiceInkPowerModeSession: Codable, Equatable, Sendable {
     public let id: UUID
     public let startTime: Date
     public var originalState: VoiceInkPowerModeApplicationState
+    public var applicationScope: VoiceInkPowerModeSessionApplicationScope
 
-    public init(id: UUID, startTime: Date, originalState: VoiceInkPowerModeApplicationState) {
+    private enum CodingKeys: String, CodingKey {
+        case id, startTime, originalState, applicationScope
+    }
+
+    public init(
+        id: UUID,
+        startTime: Date,
+        originalState: VoiceInkPowerModeApplicationState,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
+    ) {
         self.id = id
         self.startTime = startTime
         self.originalState = originalState
+        self.applicationScope = applicationScope
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        startTime = try container.decode(Date.self, forKey: .startTime)
+        originalState = try container.decode(VoiceInkPowerModeApplicationState.self, forKey: .originalState)
+        // Saved sessions from before lip dictation restore the complete configuration.
+        applicationScope = try container.decodeIfPresent(VoiceInkPowerModeSessionApplicationScope.self, forKey: .applicationScope) ?? .full
     }
 }
 
 public struct VoiceInkPowerModeSessionBeginPlan: Equatable, Sendable {
-    private var startsNewSession: Bool
+    private var activeSession: VoiceInkPowerModeSession?
+    private var applicationScope: VoiceInkPowerModeSessionApplicationScope
+
+    private var startsNewSession: Bool { activeSession == nil }
 
     private var shouldInstallSettingsObserver: Bool {
         startsNewSession
     }
 
-    fileprivate init(startsNewSession: Bool) {
-        self.startsNewSession = startsNewSession
+    fileprivate init(
+        activeSession: VoiceInkPowerModeSession?,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope
+    ) {
+        self.activeSession = activeSession
+        self.applicationScope = applicationScope
     }
 
-    public static func plan(activeSession: VoiceInkPowerModeSession?) -> Self {
-        Self(startsNewSession: activeSession == nil)
+    public static func plan(
+        activeSession: VoiceInkPowerModeSession?,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
+    ) -> Self {
+        Self(activeSession: activeSession, applicationScope: applicationScope)
     }
 
     private func sessionToSave(
@@ -1983,11 +2029,16 @@ public struct VoiceInkPowerModeSessionBeginPlan: Equatable, Sendable {
         startTime: Date,
         originalState: @autoclosure () -> VoiceInkPowerModeApplicationState
     ) -> VoiceInkPowerModeSession? {
-        guard startsNewSession else { return nil }
+        if var activeSession {
+            guard activeSession.applicationScope != applicationScope else { return nil }
+            activeSession.applicationScope = applicationScope
+            return activeSession
+        }
         return VoiceInkPowerModeSession(
             id: id,
             startTime: startTime,
-            originalState: originalState()
+            originalState: originalState(),
+            applicationScope: applicationScope
         )
     }
 

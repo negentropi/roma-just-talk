@@ -175,6 +175,7 @@ struct VoiceInkApp: App {
             whisperModelManager: whisperModelManager,
             modelContext: resolvedContainer.mainContext,
             qwenRuntimeResult: qwenModelManager.runtimeResult,
+            dictationMode: { engine.currentDictationMode },
             serviceRegistry: engine.serviceRegistry
         )
         _prewarmService = StateObject(wrappedValue: prewarmService)

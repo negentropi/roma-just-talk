@@ -16,6 +16,7 @@ final class ModelPrewarmService: ObservableObject {
     )
     private let serviceRegistry: TranscriptionServiceRegistry
     private let loadFluidAudioModel: (FluidAudioModel) async throws -> Void
+    private let dictationMode: () -> VoiceInkDictationMode
     private var prewarmTask: Task<Void, Never>?
 
     init(
@@ -23,12 +24,14 @@ final class ModelPrewarmService: ObservableObject {
         whisperModelManager: WhisperModelManager,
         modelContext: ModelContext,
         qwenRuntimeResult: Result<QwenRuntime, Error>,
+        dictationMode: @escaping () -> VoiceInkDictationMode,
         serviceRegistry: TranscriptionServiceRegistry? = nil,
         loadFluidAudioModel: ((FluidAudioModel) async throws -> Void)? = nil
     ) {
         self.transcriptionModelManager = transcriptionModelManager
         self.whisperModelManager = whisperModelManager
         self.modelContext = modelContext
+        self.dictationMode = dictationMode
         let registry = serviceRegistry ?? TranscriptionServiceRegistry(
             modelProvider: whisperModelManager,
             modelsDirectory: whisperModelManager.modelsDirectory,
@@ -93,6 +96,7 @@ final class ModelPrewarmService: ObservableObject {
     // MARK: - Core Prewarming Logic
 
     func performPrewarm() async {
+        guard dictationMode().usesMicrophone else { return }
         let currentModel = transcriptionModelManager.currentTranscriptionModel
         let prewarmPlan = VoiceInkModelPrewarmPlan.plan(
             isEnabled: VoiceInkModelRuntimePreference.shouldPrewarmModelOnWake(),

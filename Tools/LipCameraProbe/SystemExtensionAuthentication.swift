@@ -49,6 +49,24 @@ struct SystemExtensionAuthentication {
             var result: CFTypeRef?
             return AXUIElementCopyAttributeValue(element, attribute as CFString, &result) == .success ? result : nil
         }
+        func center(_ element: AXUIElement) -> CGPoint? {
+            guard let positionValue = value(element, kAXPositionAttribute), CFGetTypeID(positionValue) == AXValueGetTypeID(),
+                  let sizeValue = value(element, kAXSizeAttribute), CFGetTypeID(sizeValue) == AXValueGetTypeID() else { return nil }
+            var position = CGPoint.zero
+            var size = CGSize.zero
+            guard AXValueGetValue(positionValue as! AXValue, .cgPoint, &position),
+                  AXValueGetValue(sizeValue as! AXValue, .cgSize, &size), size.width > 0, size.height > 0 else { return nil }
+            return CGPoint(x: position.x + size.width / 2, y: position.y + size.height / 2)
+        }
+        func click(_ point: CGPoint) -> Bool {
+            for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+                guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else { return false }
+                event.setIntegerValueField(.mouseEventClickState, value: 1)
+                event.post(tap: .cghidEventTap)
+                Thread.sleep(forTimeInterval: 0.05)
+            }
+            return true
+        }
         let text = Set(elements.compactMap { element -> String? in
             guard value(element, kAXRoleAttribute) as? String == kAXStaticTextRole else { return nil }
             return value(element, kAXValueAttribute) as? String
@@ -120,27 +138,33 @@ struct SystemExtensionAuthentication {
             }
             try account.verifyPassword(password)
             result["accountVerified"] = true
-            guard let positionValue = value(buttons[0], kAXPositionAttribute), CFGetTypeID(positionValue) == AXValueGetTypeID(),
-                  let sizeValue = value(buttons[0], kAXSizeAttribute), CFGetTypeID(sizeValue) == AXValueGetTypeID() else {
-                result["reason"] = "submitButtonFrameUnavailable"
+            guard let submitPoint = center(buttons[0]), let securePoint = center(secureFields[0]) else {
+                result["reason"] = "authenticationControlFrameUnavailable"
                 return result
             }
-            var position = CGPoint.zero
-            var size = CGSize.zero
-            guard AXValueGetValue(positionValue as! AXValue, .cgPoint, &position),
-                  AXValueGetValue(sizeValue as! AXValue, .cgSize, &size), size.width > 0, size.height > 0 else { return result }
-            let point = CGPoint(x: position.x + size.width / 2, y: position.y + size.height / 2)
             guard ProcessInfo.processInfo.systemUptime < deadline else {
                 result["reason"] = "authenticationDeadlinePassed"
                 return result
             }
-            guard AXUIElementSetAttributeValue(secureFields[0], kAXFocusedAttribute as CFString, kCFBooleanTrue) == .success else {
-                result["reason"] = "secureFieldFocusRejected"
+            guard click(securePoint) else {
+                result["reason"] = "secureFieldPointerFocusFailed"
                 return result
             }
+            Thread.sleep(forTimeInterval: 0.2)
             var focused: CFTypeRef?
-            guard AXUIElementCopyAttributeValue(AXUIElementCreateSystemWide(), kAXFocusedUIElementAttribute as CFString, &focused) == .success,
-                  let focused, CFEqual(focused, secureFields[0]) else {
+            let focusStatus = AXUIElementCopyAttributeValue(AXUIElementCreateSystemWide(), kAXFocusedUIElementAttribute as CFString, &focused)
+            var focusProbe: [String: Any] = ["globalFocusError": focusStatus.rawValue, "expectedPID": application.processIdentifier]
+            if let focused, CFGetTypeID(focused) == AXUIElementGetTypeID() {
+                let focusedElement = focused as! AXUIElement
+                var pid: pid_t = 0
+                focusProbe["focusedPIDError"] = AXUIElementGetPid(focusedElement, &pid).rawValue
+                focusProbe["focusedPID"] = pid
+                focusProbe["role"] = value(focusedElement, kAXRoleAttribute) as? String ?? ""
+                focusProbe["subrole"] = value(focusedElement, kAXSubroleAttribute) as? String ?? ""
+                focusProbe["sameElement"] = CFEqual(focused, secureFields[0])
+            }
+            result["focusProbe"] = focusProbe
+            guard focusStatus == .success, let focused, CFEqual(focused, secureFields[0]) else {
                 result["reason"] = "secureFieldFocusNotConfirmed"
                 return result
             }
@@ -153,13 +177,7 @@ struct SystemExtensionAuthentication {
             down.post(tap: .cghidEventTap)
             up.post(tap: .cghidEventTap)
             Thread.sleep(forTimeInterval: 0.15)
-            for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
-                guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else { return result }
-                event.setIntegerValueField(.mouseEventClickState, value: 1)
-                event.post(tap: .cghidEventTap)
-                Thread.sleep(forTimeInterval: 0.05)
-            }
-            result["submitted"] = true
+            result["submitted"] = click(submitPoint)
         } catch {
             let error = error as NSError
             result["reason"] = "localCredentialVerificationFailed"

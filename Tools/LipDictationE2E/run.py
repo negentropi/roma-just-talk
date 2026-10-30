@@ -338,7 +338,7 @@ def main():
             ('hasCompletedOnboarding', '-bool', 'true'), (VOICE_MODEL_PREFERENCE_KEY, '-string', 'parakeet-tdt-0.6b-v2'),
             ('PrewarmModelOnWake', '-bool', 'true'), ('isSoundFeedbackEnabled', '-bool', 'false'),
             ('enableAnnouncements', '-bool', 'false'), ('restoreClipboardAfterPaste', '-bool', 'false'),
-            ('appendTrailingSpace', '-bool', 'false'), ('isEnhancementEnabled', '-bool', 'false'),
+            ('appendTrailingSpace', '-bool', 'false'), ('isAIEnhancementEnabled', '-bool', 'false'),
             ('LipDictationEnabled', '-bool', 'false'), ('LipDictationLipOnly', '-bool', 'false'),
         ]:
             run('preference-' + key, ['defaults', 'write', APP_ID, key, kind, value])

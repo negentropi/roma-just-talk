@@ -1,0 +1,63 @@
+name: Inspect native lip video decoding
+
+on:
+  push:
+    branches:
+      - "ci/lip-video-frame-probe-*"
+    paths:
+      - ".github/workflows/lip-video-frame-probe.yml"
+      - "Tools/LipVideoFrameProbe.swift"
+
+permissions:
+  contents: read
+
+jobs:
+  native-frames:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Decode original test encoding and camera-compatible variants
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$RUNNER_TEMP/lip-video-frame-probe"
+          mkdir -p "$output/fixtures"
+          sw_vers > "$output/environment.txt"
+          git rev-parse HEAD >> "$output/environment.txt"
+          xcrun swiftc -parse-as-library Tools/LipVideoFrameProbe.swift -o "$output/LipVideoFrameProbe"
+          if ! command -v ffmpeg >/dev/null; then HOMEBREW_NO_AUTO_UPDATE=1 brew install ffmpeg; fi
+          ffmpeg -version >> "$output/environment.txt"
+          revision=1658cd342dff90010aa843eaeebd53610a08b1dc
+          while read -r label filename expected; do
+            original="$output/fixtures/$label.flv"
+            curl --fail --location --retry 2 "https://media.githubusercontent.com/media/CheyneyComputerScience/CREMA-D/$revision/VideoFlash/$filename" -o "$original"
+            printf '%s  %s\n' "$expected" "$original" | shasum -a 256 --check
+            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
+              -c:v libx264 -crf 0 -pix_fmt yuv420p "$output/fixtures/$label-lossless.mp4"
+            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
+              -c:v libx264 -profile:v main -crf 16 -bf 0 -pix_fmt yuv420p "$output/fixtures/$label-main.mp4"
+            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -an \
+              -c:v prores_ks -profile:v 3 -pix_fmt yuv422p10le "$output/fixtures/$label-prores.mov"
+            ffmpeg -hide_banner -loglevel error -i "$original" -map 0:v:0 -frames:v 1 "$output/fixtures/$label-first.png"
+            ffmpeg -hide_banner -loglevel error -loop 1 -framerate 25 -i "$output/fixtures/$label-first.png" \
+              -t 1 -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$output/fixtures/$label-frozen.mp4"
+            for kind in lossless main prores frozen; do
+              suffix=mp4
+              if [[ "$kind" == prores ]]; then suffix=mov; fi
+              video="$output/fixtures/$label-$kind.$suffix"
+              ffprobe -v error -show_streams -show_format -of json "$video" > "$output/fixtures/$label-$kind.ffprobe.json"
+              "$output/LipVideoFrameProbe" "$video" "$output/$label-$kind" 3
+            done
+          done <<'FIXTURES'
+          a 1001_DFA_NEU_XX.flv a2b374bcd195d7320437c944eef2208dedd2c22725d09d65e8c31bf6c1eeb286
+          b 1002_IOM_NEU_XX.flv 6286c7253aa45ed91984a7ae405704bafac4aa148aa7d3287d767194a5812abd
+          c 1003_IEO_NEU_XX.flv db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc
+          FIXTURES
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: lip-video-frame-probe-${{ github.sha }}
+          path: ${{ runner.temp }}/lip-video-frame-probe
+          if-no-files-found: error
+          retention-days: 7

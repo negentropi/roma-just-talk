@@ -394,11 +394,43 @@ struct LipVisualCases {
         reopen.arguments = [appPath]
         try reopen.run()
         reopen.waitUntilExit()
-        app.activate()
-        let deadline = Date().addingTimeInterval(10)
+        actions.append(activationState(app, phase: "afterOpen").merging(["openExitCode": reopen.terminationStatus]) { _, value in value })
+        let deadline = Date().addingTimeInterval(15)
+        var activationAttempts = 0
+        var activationClicked = false
         var pressed = false
         var clicked = false
         while Date() < deadline {
+            guard !app.isTerminated else { throw ProofError.appMissing }
+            if NSWorkspace.shared.frontmostApplication?.processIdentifier != app.processIdentifier || !app.isActive {
+                if activationAttempts < 3 {
+                    activationAttempts += 1
+                    var attempt = activationState(app, phase: "activationRequest")
+                    attempt["attempt"] = activationAttempts
+                    attempt["unhideAllowed"] = app.unhide()
+                    attempt["activateAllowed"] = app.activate(options: [.activateAllWindows])
+                    if let settings = exactSettingsElement(app), let window = RuntimeAX.window(for: settings) {
+                        attempt["raiseResult"] = AXUIElementPerformAction(window, kAXRaiseAction as CFString).rawValue
+                        if let frame = RuntimeAX.frame(of: window), finiteFrame(frame) { attempt["windowFrame"] = frameReceipt(frame) }
+                    } else { attempt["raiseRejected"] = "uniqueSettingsWindowUnavailable" }
+                    actions.append(attempt)
+                    wait(0.3)
+                    actions.append(activationState(app, phase: "afterActivationRequest"))
+                    continue
+                }
+                if !activationClicked {
+                    activationClicked = true
+                    var evidence = activationState(app, phase: "ownedWindowActivationClick")
+                    let posted = activateByOwnedWindowClick(app, evidence: &evidence)
+                    evidence["posted"] = posted
+                    actions.append(evidence)
+                    wait(0.3)
+                    actions.append(activationState(app, phase: "afterActivationClick"))
+                }
+                wait(0.2)
+                continue
+            }
+            actions.append(activationState(app, phase: "activeNavigation"))
             if let control = find(app, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]) {
                 let visible = revealControl(control, in: app, actions: &actions)
                 actions.append(["lipControlsObserved": true, "lipControlsVisible": visible])
@@ -418,7 +450,8 @@ struct LipVisualCases {
                     wait(0.5)
                     continue
                 }
-                if !clicked, let frame = verifiedFrame(settings, in: app), CGPreflightPostEventAccess() {
+                let checked = verifiedFrame(settings, in: app)
+                if !clicked, let frame = checked.frame, CGPreflightPostEventAccess() {
                     clicked = true
                     let point = CGPoint(x: frame.midX, y: frame.midY)
                     for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
@@ -428,11 +461,81 @@ struct LipVisualCases {
                         wait(0.05)
                     }
                     actions.append(["method": "ordinaryPointerClick", "label": "Settings", "frame": frameReceipt(frame)])
+                } else if !clicked {
+                    actions.append(activationState(app, phase: "settingsClickRejected").merging([
+                        "reason": checked.rejection ?? "postEventPermissionUnavailable"
+                    ]) { _, value in value })
                 }
             }
             wait(0.2)
         }
         throw ProofError.settingControl
+    }
+    static func activationState(_ app: NSRunningApplication, phase: String) -> [String: Any] {
+        let frontmost = NSWorkspace.shared.frontmostApplication
+        return ["phase": phase, "expectedPID": app.processIdentifier,
+                "expectedBundleID": app.bundleIdentifier.map { $0 as Any } ?? NSNull(),
+                "frontmostPID": frontmost.map { $0.processIdentifier as Any } ?? NSNull(),
+                "frontmostBundleID": frontmost?.bundleIdentifier.map { $0 as Any } ?? NSNull(),
+                "appActive": app.isActive, "activationPolicy": app.activationPolicy.rawValue]
+    }
+    static func activateByOwnedWindowClick(_ app: NSRunningApplication, evidence: inout [String: Any]) -> Bool {
+        guard CGPreflightPostEventAccess(), let settings = exactSettingsElement(app),
+              let window = RuntimeAX.window(for: settings), let frame = RuntimeAX.frame(of: window), finiteFrame(frame) else {
+            evidence["rejected"] = "postEventPermissionOrOwnedWindowUnavailable"; return false
+        }
+        var pid: pid_t = 0
+        guard AXUIElementGetPid(window, &pid) == .success, pid == app.processIdentifier else {
+            evidence["rejected"] = "windowOwnerMismatch"; return false
+        }
+        evidence["windowFrame"] = frameReceipt(frame)
+        var closeValue: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(window, kAXCloseButtonAttribute as CFString, &closeValue) == .success,
+              let closeValue, CFGetTypeID(closeValue) == AXUIElementGetTypeID(),
+              let closeFrame = RuntimeAX.frame(of: closeValue as! AXUIElement), finiteFrame(closeFrame),
+              frame.contains(closeFrame), frame.width > closeFrame.width * 4 else {
+            evidence["rejected"] = "observedTitlebarControlFrameUnavailable"; return false
+        }
+        // Use the observed titlebar control's row, away from its window buttons.
+        let point = CGPoint(x: frame.midX, y: closeFrame.midY)
+        evidence["titlebarControlFrame"] = frameReceipt(closeFrame)
+        evidence["point"] = ["x": point.x, "y": point.y]
+        guard CGDisplayBounds(CGMainDisplayID()).contains(point),
+              let windows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]] else {
+            evidence["rejected"] = "offscreenOrWindowOrderUnavailable"; return false
+        }
+        for candidate in windows {
+            guard let alpha = candidate[kCGWindowAlpha as String] as? NSNumber,
+                  let owner = candidate[kCGWindowOwnerPID as String] as? NSNumber,
+                  let bounds = candidate[kCGWindowBounds as String] as? [String: NSNumber],
+                  let x = bounds["X"], let y = bounds["Y"], let width = bounds["Width"], let height = bounds["Height"] else {
+                evidence["rejected"] = "windowOrderMetadataIncomplete"; return false
+            }
+            if alpha.doubleValue <= 0 { continue }
+            let candidateFrame = CGRect(x: x.doubleValue, y: y.doubleValue, width: width.doubleValue, height: height.doubleValue)
+            guard finiteFrame(candidateFrame) else { evidence["rejected"] = "windowOrderFrameInvalid"; return false }
+            if !candidateFrame.contains(point) { continue }
+            evidence["topmostPID"] = owner
+            evidence["topmostWindowID"] = candidate[kCGWindowNumber as String]
+            evidence["topmostLayer"] = candidate[kCGWindowLayer as String]
+            evidence["topmostFrame"] = frameReceipt(candidateFrame)
+            guard owner.int32Value == app.processIdentifier,
+                  abs(candidateFrame.minX - frame.minX) <= 1, abs(candidateFrame.minY - frame.minY) <= 1,
+                  abs(candidateFrame.width - frame.width) <= 1, abs(candidateFrame.height - frame.height) <= 1 else {
+                evidence["rejected"] = "ownedWindowNotTopmostAtObservedTitlebarPoint"; return false
+            }
+            for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+                guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else {
+                    evidence["rejected"] = "pointerEventUnavailable"; return false
+                }
+                event.setIntegerValueField(.mouseEventClickState, value: 1)
+                event.post(tap: .cghidEventTap)
+                wait(0.05)
+            }
+            return true
+        }
+        evidence["rejected"] = "noVisibleWindowAtObservedTitlebarPoint"
+        return false
     }
     static func exactSettingsElement(_ app: NSRunningApplication) -> AXUIElement? {
         let root = AXUIElementCreateApplication(app.processIdentifier)
@@ -457,29 +560,32 @@ struct LipVisualCases {
         }
         return queue.isEmpty && matches.count == 1 ? matches[0] : nil
     }
-    static func verifiedFrame(_ element: AXUIElement, in app: NSRunningApplication) -> CGRect? {
+    static func verifiedFrame(_ element: AXUIElement, in app: NSRunningApplication) -> (frame: CGRect?, rejection: String?) {
         var pid: pid_t = 0
-        guard AXUIElementGetPid(element, &pid) == .success, pid == app.processIdentifier,
-              NSWorkspace.shared.frontmostApplication?.processIdentifier == pid,
-              let window = RuntimeAX.window(for: element), let windowFrame = RuntimeAX.frame(of: window),
-              let frame = RuntimeAX.frame(of: element), frame.width > 0, frame.height > 0,
-              [frame.minX, frame.minY, frame.maxX, frame.maxY].allSatisfy(\.isFinite),
-              windowFrame.contains(frame), CGDisplayBounds(CGMainDisplayID()).contains(frame) else { return nil }
-        return frame
+        guard AXUIElementGetPid(element, &pid) == .success, pid == app.processIdentifier else { return (nil, "elementOwnerMismatch") }
+        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == pid, app.isActive else { return (nil, "targetNotActiveFrontmost") }
+        guard let window = RuntimeAX.window(for: element), let windowFrame = RuntimeAX.frame(of: window), finiteFrame(windowFrame) else { return (nil, "ownedWindowFrameUnavailable") }
+        guard let frame = RuntimeAX.frame(of: element), finiteFrame(frame) else { return (nil, "elementFrameUnavailable") }
+        guard windowFrame.contains(frame) else { return (nil, "elementOutsideOwnedWindow") }
+        guard CGDisplayBounds(CGMainDisplayID()).contains(frame) else { return (nil, "elementOffscreen") }
+        return (frame, nil)
+    }
+    static func finiteFrame(_ frame: CGRect) -> Bool {
+        frame.width > 0 && frame.height > 0 && [frame.minX, frame.minY, frame.maxX, frame.maxY].allSatisfy(\.isFinite)
     }
     static func frameReceipt(_ frame: CGRect) -> [String: Double] {
         ["x": frame.minX, "y": frame.minY, "width": frame.width, "height": frame.height]
     }
     static func revealControl(_ control: AXUIElement, in app: NSRunningApplication, actions: inout [[String: Any]]) -> Bool {
-        if verifiedFrame(control, in: app) != nil { return true }
+        if verifiedFrame(control, in: app).frame != nil { return true }
         let result = AXUIElementPerformAction(control, "AXScrollToVisible" as CFString)
         actions.append(["method": "AXScrollToVisible", "result": result.rawValue])
         wait(0.2)
-        if verifiedFrame(control, in: app) != nil { return true }
+        if verifiedFrame(control, in: app).frame != nil { return true }
         var ancestor = control
         for _ in 0..<24 {
             if RuntimeAX.stringAttribute(kAXRoleAttribute, from: ancestor) == kAXScrollAreaRole,
-               let frame = verifiedFrame(ancestor, in: app), CGPreflightPostEventAccess() {
+               let frame = verifiedFrame(ancestor, in: app).frame, CGPreflightPostEventAccess() {
                 for _ in 0..<4 {
                     guard let controlFrame = RuntimeAX.frame(of: control) else { return false }
                     let delta: Int32 = controlFrame.midY > frame.midY ? -400 : 400
@@ -490,7 +596,7 @@ struct LipVisualCases {
                     scroll.post(tap: .cghidEventTap)
                     actions.append(["method": "ownedScroll", "frame": frameReceipt(frame), "delta": delta])
                     wait(0.2)
-                    if let visible = verifiedFrame(control, in: app), frame.contains(visible) { return true }
+                    if let visible = verifiedFrame(control, in: app).frame, frame.contains(visible) { return true }
                 }
                 return false
             }

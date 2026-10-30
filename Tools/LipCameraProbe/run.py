@@ -147,6 +147,13 @@ try:
     time.sleep(8)
     ui('obs-first-ui')
     screenshot('obs-first')
+    for attempt in range(3):
+        ui('obs-startup-' + str(attempt), approve=True)
+        startup = json.loads((OUT / ('obs-startup-' + str(attempt) + '.json')).read_text())
+        if startup.get('authenticationRequired') or not startup.get('accessibilityTrusted'):
+            break
+        time.sleep(2)
+    screenshot('obs-after-startup')
     run('configure-and-request-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-first.json')], timeout=25)
     time.sleep(3)
     run('extensions-requested', ['/usr/bin/systemextensionsctl', 'list'])

@@ -24,7 +24,7 @@ struct UIProbe {
             var visited: [AXUIElement] = []
             while !queue.isEmpty && nodes.count < 600 && ProcessInfo.processInfo.systemUptime < deadline {
                 let (element, depth) = queue.removeFirst()
-                guard depth <= 12, !visited.contains(where: { CFEqual($0, element) }) else { continue }
+                guard depth <= 20, !visited.contains(where: { CFEqual($0, element) }) else { continue }
                 visited.append(element)
                 AXUIElementSetMessagingTimeout(element, 0.15)
                 func read(_ key: String) -> CFTypeRef? {
@@ -34,20 +34,28 @@ struct UIProbe {
                 }
                 let role = read(kAXRoleAttribute) as? String ?? ""
                 let title = read(kAXTitleAttribute) as? String ?? ""
+                let staticText = role == kAXStaticTextRole ? (read(kAXValueAttribute) as? String ?? "") : ""
                 let description = read(kAXDescriptionAttribute) as? String ?? ""
                 let label = !title.isEmpty ? title : description
                 let secure = role == kAXTextFieldRole && (read(kAXSubroleAttribute) as? String) == kAXSecureTextFieldSubrole
                 requiresAuthentication = requiresAuthentication || secure
                 let integer = [kAXCheckBoxRole, "AXSwitch"].contains(role) ? (read(kAXValueAttribute) as? NSNumber)?.intValue : nil
                 var node: [String: Any] = ["role": role, "title": title, "description": description, "secureField": secure]
+                if !staticText.isEmpty { node["staticText"] = staticText }
                 if let integer { node["toggleValue"] = integer }
                 nodes.append(node)
                 elements.append((element, label, role, integer))
-                if let children = read(kAXChildrenAttribute) as? [AXUIElement] {
+                if ![kAXMenuBarRole, kAXMenuBarItemRole, kAXMenuItemRole].contains(role),
+                   let children = read(kAXChildrenAttribute) as? [AXUIElement] {
                     queue.append(contentsOf: children.prefix(100).map { ($0, depth + 1) })
                 }
             }
-            let labels = nodes.compactMap { (($0["title"] as? String) ?? "") + " " + (($0["description"] as? String) ?? "") }.joined(separator: " ")
+            let labels = nodes.map { node in
+                let title = node["title"] as? String ?? ""
+                let description = node["description"] as? String ?? ""
+                let text = node["staticText"] as? String ?? ""
+                return [title, description, text].joined(separator: " ")
+            }.joined(separator: " ")
             applications.append(["bundleIdentifier": app.bundleIdentifier ?? "", "pid": app.processIdentifier, "nodes": nodes])
             guard attempting, trusted, !requiresAuthentication else { continue }
             let ordered = elements.sorted { left, right in
@@ -61,12 +69,13 @@ struct UIProbe {
             for (element, label, role, integer) in ordered {
                 let obsContext = labels.localizedCaseInsensitiveContains("OBS")
                 let cameraContext = labels.localizedCaseInsensitiveContains("camera") || labels.localizedCaseInsensitiveContains("extension")
-                let probeContext = labels.localizedCaseInsensitiveContains("Lip Camera Probe") && labels.localizedCaseInsensitiveContains("camera")
+                let probeContext = (labels.localizedCaseInsensitiveContains("Lip Camera Probe") || labels.localizedCaseInsensitiveContains("LipCameraProbe")) && labels.localizedCaseInsensitiveContains("camera")
                 let isSettings = app.bundleIdentifier == "com.apple.systempreferences"
+                let obsPermissionReview = app.bundleIdentifier == "com.obsproject.obs-studio" && labels.contains("Review App Permissions") && label == "Continue" && role == kAXButtonRole
                 let settingsNavigation = isSettings && label == "Camera Extensions" && [kAXButtonRole, "AXLink"].contains(role)
                 let allowedButton = role == kAXButtonRole && ((obsContext && ["Open System Settings", "Allow"].contains(label)) || (probeContext && label == "Allow"))
                 let offOBSToggle = isSettings && label == "OBS" && integer == 0 && [kAXCheckBoxRole, "AXSwitch"].contains(role)
-                if settingsNavigation || (allowedButton && (cameraContext || label == "Open System Settings")) || offOBSToggle {
+                if obsPermissionReview || settingsNavigation || (allowedButton && (cameraContext || label == "Open System Settings")) || offOBSToggle {
                     let result = AXUIElementPerformAction(element, kAXPressAction as CFString)
                     actions.append(["bundleIdentifier": app.bundleIdentifier ?? "", "label": label, "result": result.rawValue])
                     break

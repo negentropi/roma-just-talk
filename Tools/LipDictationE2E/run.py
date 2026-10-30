@@ -183,23 +183,7 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
     if not controls_passed:
         write(evidence / 'visual-summary.json', {'passed': False, 'cases': cases})
         raise RuntimeError('Actual negative-observation controls failed')
-    camera_summary = args.obs_summary or Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/summary.json'
-    if args.obs_summary is None:
-        run('provision-supported-camera', ['env', 'LIP_CAMERA_PROBE_KEEP_OBS_RUNNING=1', 'python3', ROOT / 'Tools/LipCameraProbe/run.py'], timeout=1000)
-    if not camera_summary.is_file():
-        raise RuntimeError('The actual virtual-camera probe wrote no receipt')
-    camera = json.loads(camera_summary.read_text())
-    if camera.get('status') != 'supportedDeviceReady' or camera.get('obsRetainedForE2E') is not True:
-        raise RuntimeError('A moving supported OBS camera and retained running OBS process are required')
-    if camera.get('sourceHead') != args.app_source_head:
-        raise RuntimeError('The reused camera receipt must belong to this exact proof head')
-    # Cleanup ownership transfers only after accepting the successful retained-producer receipt.
-    owned_obs_cleanup['accepted'] = True
-    write(evidence / 'supported-camera.json', camera)
     websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
-    if not websocket.is_file():
-        raise RuntimeError('The probe-owned private OBS WebSocket configuration is unavailable')
-
     still = evidence / 'clock-still.mp4'
     first_frame = evidence / 'clock-first.png'
     video = evidence / 'clock-padded-silent.mp4'
@@ -214,6 +198,22 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             raise RuntimeError('The fallback test audio contains nonzero PCM')
     write(evidence / 'visual-fixture-hashes.json', {'staticVideoSHA256': sha256(still), 'silentMotionVideoSHA256': sha256(video), 'speechAudioSHA256': sha256(audio_fixture), 'zeroAudioSHA256': sha256(silence), 'zeroAudioPCMVerified': True})
     for scenario in ['setup', 'combined', 'combined-silent', 'lips', 'cancel', 'disable', 'quit']:
+        if scenario == 'combined':
+            camera_summary = args.obs_summary or Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/summary.json'
+            if args.obs_summary is None:
+                run('provision-supported-camera', ['env', 'LIP_CAMERA_PROBE_KEEP_OBS_RUNNING=1', 'python3', ROOT / 'Tools/LipCameraProbe/run.py'], timeout=1000)
+            if not camera_summary.is_file():
+                raise RuntimeError('The actual virtual-camera probe wrote no receipt')
+            camera = json.loads(camera_summary.read_text())
+            if camera.get('status') != 'supportedDeviceReady' or camera.get('obsRetainedForE2E') is not True:
+                raise RuntimeError('A moving supported OBS camera and retained running OBS process are required')
+            if camera.get('sourceHead') != args.app_source_head:
+                raise RuntimeError('The reused camera receipt must belong to this exact proof head')
+            # Cleanup ownership transfers only after accepting the successful retained-producer receipt.
+            owned_obs_cleanup['accepted'] = True
+            write(evidence / 'supported-camera.json', camera)
+            if not websocket.is_file():
+                raise RuntimeError('The probe-owned private OBS WebSocket configuration is unavailable')
         enabled = scenario != 'setup'
         lips_only = scenario in ['lips', 'cancel', 'disable', 'quit']
         for key, value in [('LipDictationEnabled', enabled), ('LipDictationLipOnly', lips_only)]:

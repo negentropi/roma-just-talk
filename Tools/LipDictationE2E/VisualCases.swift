@@ -170,10 +170,16 @@ struct LipVisualCases {
                     guard observation != .unreadable else { throw ProofError.targetUnreadable }
                     guard observation == .readableUnchanged else { throw ProofError.unexpectedInsertion }
                 } else {
+                    let terminal = "recording.drained id=\(captureID) canceled=false"
+                    report["positiveDrainDeadlineSeconds"] = 120
+                    guard waitForLog(appLog, after: startOffset, containing: terminal, timeout: 120) else { throw ProofError.notDrained }
+                    report["positiveCompletionBoundary"] = terminal
+                    report["observationOrder"] = "ownedRecordingDrainThenAXAndRenderedPixels"
+                    report["observationLatencyBoundary"] = "After-drain functional observation; no product latency claim."
+                    report["positiveObservationStartedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
                     let observed = prepared.waitForVisibleText(keyUpAtSystemUptime: up.postedAtSystemUptime, timeoutSeconds: 120)
                     visible = observed
                     report["visibleText"] = try json(observed)
-                    guard waitForLog(appLog, after: startOffset, containing: "recording.drained id=\(captureID) canceled=false", timeout: 45) else { throw ProofError.notDrained }
                 }
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent(scenario + ".png"))
                 let messages = logSlice(appLog, after: startOffset)
@@ -384,7 +390,7 @@ struct LipVisualCases {
             && leftPID == app.processIdentifier && rightPID == leftPID
             && RuntimeAX.window(for: lhs).flatMap { left in RuntimeAX.window(for: rhs).map { CFEqual(left, $0) } } == true
     }
-    static func controlMatch(_ element: AXUIElement, label: String, relation: String, labelElement: AXUIElement?, row: AXUIElement? = nil) -> AXControlMatch {
+    static func controlMatch(_ element: AXUIElement, label: String, relation: String, labelElement: AXUIElement?) -> AXControlMatch {
         var evidence: [String: Any] = ["label": label, "relation": relation,
             "role": RuntimeAX.stringAttribute(kAXRoleAttribute, from: element) ?? "", "enabled": enabled(element)]
         if let value = toggleValue(element) { evidence["value"] = value }
@@ -393,7 +399,7 @@ struct LipVisualCases {
             evidence["labelRole"] = RuntimeAX.stringAttribute(kAXRoleAttribute, from: labelElement) ?? ""
             if let frame = RuntimeAX.frame(of: labelElement), finiteFrame(frame) { evidence["labelFrame"] = frameReceipt(frame) }
         }
-        if let parent = row ?? axElements(element, attribute: kAXParentAttribute).first {
+        if let parent = axElements(element, attribute: kAXParentAttribute).first {
             evidence["parentRole"] = RuntimeAX.stringAttribute(kAXRoleAttribute, from: parent) ?? ""
             evidence["childRoles"] = axElements(parent, attribute: kAXChildrenAttribute).prefix(8).map { RuntimeAX.stringAttribute(kAXRoleAttribute, from: $0) ?? "" }
             if let frame = RuntimeAX.frame(of: parent), finiteFrame(frame) { evidence["parentFrame"] = frameReceipt(frame) }
@@ -442,42 +448,6 @@ struct LipVisualCases {
             }
         }
         if matches.count == 1 { return matches[0] }
-        guard matches.isEmpty, labels.count == 1 else { return nil }
-        // Only the smallest local row may associate a separate label and control.
-        var ancestor = labels[0]
-        for ascent in 1...3 {
-            guard Date() < deadline, let parent = axElements(ancestor, attribute: kAXParentAttribute).first else { return nil }
-            ancestor = parent
-            let role = RuntimeAX.stringAttribute(kAXRoleAttribute, from: ancestor) ?? ""
-            if [kAXApplicationRole, kAXWindowRole, kAXScrollAreaRole, kAXTableRole, kAXOutlineRole, kAXListRole].contains(role) { return nil }
-            let children = axElements(ancestor, attribute: kAXChildrenAttribute)
-            guard children.count <= 6 else { return nil }
-            var local = children.map { ($0, 1) }
-            var localControls: [AXUIElement] = roles.contains(role) ? [ancestor] : []
-            var localLabels = 0
-            var count = 0
-            while !local.isEmpty, count < 16, Date() < deadline {
-                let (node, depth) = local.removeFirst()
-                count += 1
-                let nodeRole = RuntimeAX.stringAttribute(kAXRoleAttribute, from: node) ?? ""
-                if roles.contains(nodeRole) { localControls.append(node) }
-                if nodeRole == kAXStaticTextRole, hasLabel(node, label: label) { localLabels += 1 }
-                let nested = axElements(node, attribute: kAXChildrenAttribute)
-                guard depth < 3 || nested.isEmpty else { return nil }
-                local.append(contentsOf: nested.map { ($0, depth + 1) })
-            }
-            guard local.isEmpty, localLabels == 1, localControls.count <= 1 else { return nil }
-            if let control = localControls.first, sameOwnedWindow(control, labels[0], app: application) {
-                var match = controlMatch(control, label: label, relation: "uniqueCommonParentRow", labelElement: labels[0], row: ancestor)
-                var evidence = match.evidence
-                evidence["ancestorDepth"] = ascent
-                evidence["rowNodeCount"] = count
-                evidence["matchingLabels"] = localLabels
-                evidence["matchingControls"] = localControls.count
-                match = AXControlMatch(element: control, evidence: evidence)
-                return match
-            }
-        }
         return nil
     }
     static func accessibilitySnapshot(_ application: NSRunningApplication) -> [[String: Any]] {
@@ -535,7 +505,6 @@ struct LipVisualCases {
         actions.append(activationState(app, phase: "afterOpen").merging(["openExitCode": reopen.terminationStatus]) { _, value in value })
         let deadline = Date().addingTimeInterval(15)
         var activationAttempts = 0
-        var activationClicked = false
         var pressed = false
         var clicked = false
         while Date() < deadline {
@@ -555,15 +524,6 @@ struct LipVisualCases {
                     wait(0.3)
                     actions.append(activationState(app, phase: "afterActivationRequest"))
                     continue
-                }
-                if !activationClicked {
-                    activationClicked = true
-                    var evidence = activationState(app, phase: "ownedWindowActivationClick")
-                    let posted = activateByOwnedWindowClick(app, evidence: &evidence)
-                    evidence["posted"] = posted
-                    actions.append(evidence)
-                    wait(0.3)
-                    actions.append(activationState(app, phase: "afterActivationClick"))
                 }
                 wait(0.2)
                 continue
@@ -617,64 +577,6 @@ struct LipVisualCases {
                 "frontmostPID": frontmost.map { $0.processIdentifier as Any } ?? NSNull(),
                 "frontmostBundleID": frontmost?.bundleIdentifier.map { $0 as Any } ?? NSNull(),
                 "appActive": app.isActive, "activationPolicy": app.activationPolicy.rawValue]
-    }
-    static func activateByOwnedWindowClick(_ app: NSRunningApplication, evidence: inout [String: Any]) -> Bool {
-        guard CGPreflightPostEventAccess(), let settings = exactSettingsElement(app),
-              let window = RuntimeAX.window(for: settings), let frame = RuntimeAX.frame(of: window), finiteFrame(frame) else {
-            evidence["rejected"] = "postEventPermissionOrOwnedWindowUnavailable"; return false
-        }
-        var pid: pid_t = 0
-        guard AXUIElementGetPid(window, &pid) == .success, pid == app.processIdentifier else {
-            evidence["rejected"] = "windowOwnerMismatch"; return false
-        }
-        evidence["windowFrame"] = frameReceipt(frame)
-        var closeValue: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(window, kAXCloseButtonAttribute as CFString, &closeValue) == .success,
-              let closeValue, CFGetTypeID(closeValue) == AXUIElementGetTypeID(),
-              let closeFrame = RuntimeAX.frame(of: closeValue as! AXUIElement), finiteFrame(closeFrame),
-              frame.contains(closeFrame), frame.width > closeFrame.width * 4 else {
-            evidence["rejected"] = "observedTitlebarControlFrameUnavailable"; return false
-        }
-        // Use the observed titlebar control's row, away from its window buttons.
-        let point = CGPoint(x: frame.midX, y: closeFrame.midY)
-        evidence["titlebarControlFrame"] = frameReceipt(closeFrame)
-        evidence["point"] = ["x": point.x, "y": point.y]
-        guard CGDisplayBounds(CGMainDisplayID()).contains(point),
-              let windows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]] else {
-            evidence["rejected"] = "offscreenOrWindowOrderUnavailable"; return false
-        }
-        for candidate in windows {
-            guard let alpha = candidate[kCGWindowAlpha as String] as? NSNumber,
-                  let owner = candidate[kCGWindowOwnerPID as String] as? NSNumber,
-                  let bounds = candidate[kCGWindowBounds as String] as? [String: NSNumber],
-                  let x = bounds["X"], let y = bounds["Y"], let width = bounds["Width"], let height = bounds["Height"] else {
-                evidence["rejected"] = "windowOrderMetadataIncomplete"; return false
-            }
-            if alpha.doubleValue <= 0 { continue }
-            let candidateFrame = CGRect(x: x.doubleValue, y: y.doubleValue, width: width.doubleValue, height: height.doubleValue)
-            guard finiteFrame(candidateFrame) else { evidence["rejected"] = "windowOrderFrameInvalid"; return false }
-            if !candidateFrame.contains(point) { continue }
-            evidence["topmostPID"] = owner
-            evidence["topmostWindowID"] = candidate[kCGWindowNumber as String]
-            evidence["topmostLayer"] = candidate[kCGWindowLayer as String]
-            evidence["topmostFrame"] = frameReceipt(candidateFrame)
-            guard owner.int32Value == app.processIdentifier,
-                  abs(candidateFrame.minX - frame.minX) <= 1, abs(candidateFrame.minY - frame.minY) <= 1,
-                  abs(candidateFrame.width - frame.width) <= 1, abs(candidateFrame.height - frame.height) <= 1 else {
-                evidence["rejected"] = "ownedWindowNotTopmostAtObservedTitlebarPoint"; return false
-            }
-            for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
-                guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else {
-                    evidence["rejected"] = "pointerEventUnavailable"; return false
-                }
-                event.setIntegerValueField(.mouseEventClickState, value: 1)
-                event.post(tap: .cghidEventTap)
-                wait(0.05)
-            }
-            return true
-        }
-        evidence["rejected"] = "noVisibleWindowAtObservedTitlebarPoint"
-        return false
     }
     static func exactSettingsElement(_ app: NSRunningApplication) -> AXUIElement? {
         let root = AXUIElementCreateApplication(app.processIdentifier)

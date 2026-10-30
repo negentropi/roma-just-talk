@@ -19,6 +19,7 @@ class CursorPaster {
         ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
     #if DEBUG
     @MainActor private static var pasteSessionPreparedForTesting: (() async -> Void)?
+    @MainActor private static var autoSendPosterForTesting: ((VoiceInkAutoSendKey) -> Void)?
     #endif
 
     struct PreparedPasteContext {
@@ -97,6 +98,11 @@ class CursorPaster {
     @MainActor
     static func configurePasteSessionPreparedForTesting(_ preparation: (() async -> Void)? = nil) {
         pasteSessionPreparedForTesting = preparation
+    }
+
+    @MainActor
+    static func configureAutoSendPosterForTesting(_ poster: ((VoiceInkAutoSendKey) -> Void)? = nil) {
+        autoSendPosterForTesting = poster
     }
     #endif
 
@@ -561,8 +567,15 @@ class CursorPaster {
 
     // MARK: - Auto Send Keys
 
+    @MainActor
     static func performAutoSend(_ key: VoiceInkAutoSendKey) {
         guard key.isEnabled else { return }
+        #if DEBUG
+        if let autoSendPosterForTesting {
+            autoSendPosterForTesting(key)
+            return
+        }
+        #endif
         guard AXIsProcessTrusted() else { return }
 
         let source = CGEventSource(stateID: .privateState)

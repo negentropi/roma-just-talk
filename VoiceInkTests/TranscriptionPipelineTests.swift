@@ -73,6 +73,77 @@ extension VoiceInkTests {
         #expect(NSPasteboard.general.changeCount == clipboardChangeCount)
         #expect(try fixture.readMetrics().isEmpty)
     }
+
+    @Test(.timeLimit(.minutes(1)), arguments: PipelineAutoSendScenario.allCases)
+    @MainActor func pipelineOwnsDelayedAutoSendUntilCompletion(scenario: PipelineAutoSendScenario) async throws {
+        let fixture = try PipelineFixture()
+        defer { fixture.restore() }
+        PowerModeManager.shared.activeConfiguration = PowerModeConfig(
+            name: "Auto-send test", emoji: "", isAIEnhancementEnabled: false, autoSendKey: .enter
+        )
+        let transcription = fixture.insertTranscription()
+        let delayStarted = AsyncStream<Void>.makeStream()
+        defer { delayStarted.continuation.finish() }
+        let clock = ContinuousClock()
+        var delayStartedAt: ContinuousClock.Instant?
+        var sentAt: ContinuousClock.Instant?
+        var sentKeys: [VoiceInkAutoSendKey] = []
+        var cancellationRequested = false
+        var didFinishPipeline = false
+        fixture.pipeline.autoSendDelayStartedForTesting = {
+            delayStartedAt = clock.now
+            delayStarted.continuation.yield(())
+            delayStarted.continuation.finish()
+        }
+        CursorPaster.configureAutoSendPosterForTesting { key in
+            sentKeys.append(key)
+            sentAt = clock.now
+            #expect(!didFinishPipeline)
+        }
+        let run = Task { @MainActor in
+            await fixture.pipeline.run(
+                transcription: transcription,
+                modelDisplayName: "Camera recognition",
+                recognize: { "camera history survives" },
+                captureDuration: { 2.5 },
+                latencyTraceToken: nil,
+                onStateChange: { _ in },
+                shouldCancel: { cancellationRequested },
+                onCancel: { Issue.record("Delivered text was recorded as canceled") },
+                onDismiss: {}
+            )
+            didFinishPipeline = true
+        }
+        for await _ in delayStarted.stream { break }
+        #expect(!didFinishPipeline)
+        if scenario != .send {
+            cancellationRequested = true
+        }
+        if scenario == .cancelTask {
+            run.cancel()
+        }
+        await run.value
+        let completedAt = clock.now
+        // Keep the key interceptor installed while a known-bad escaped timer could still fire.
+        try await Task.sleep(nanoseconds: VoiceInkAutoSendPolicy.defaultDelayAfterPasteNanoseconds + 50_000_000)
+
+        #expect(didFinishPipeline)
+        #expect(sentKeys == (scenario == .send ? [.enter] : []))
+        if scenario == .send {
+            let started = try #require(delayStartedAt)
+            let sent = try #require(sentAt)
+            #expect(started.duration(to: sent) >= .milliseconds(120))
+        } else if scenario == .obsoleteOwner {
+            let started = try #require(delayStartedAt)
+            #expect(started.duration(to: completedAt) >= .milliseconds(120))
+        }
+        let stored = try #require(fixture.readTranscriptions().first)
+        #expect(stored.transcriptionState == .completed)
+        #expect(stored.text == "camera history survives")
+        #expect(stored.duration == 2.5)
+        #expect(fixture.insertedTexts.count == 1)
+        #expect(try fixture.readMetrics().count == 1)
+    }
     #endif
 
     @Test @MainActor func pipelinePreservesDeliveredHistoryAfterLateCancellation() async throws {
@@ -231,6 +302,12 @@ enum PipelinePreparationBoundary: CaseIterable, Sendable {
     case pasteSession
 }
 
+enum PipelineAutoSendScenario: CaseIterable, Equatable, Sendable {
+    case send
+    case cancelTask
+    case obsoleteOwner
+}
+
 private enum PipelineRecognitionFailure: Error {
     case unavailable
 }
@@ -308,6 +385,11 @@ private final class PipelineFixture {
             self?.pasteCommandCount += 1
             return .commandNotPosted
         }
+        #if DEBUG
+        CursorPaster.configureAutoSendPosterForTesting { _ in
+            Issue.record("Unexpected auto-send")
+        }
+        #endif
     }
 
     func insertTranscription(duration: TimeInterval = 0, audioFileURL: String? = nil) -> Transcription {
@@ -329,6 +411,7 @@ private final class PipelineFixture {
         CursorPaster.configurePasteCommandPosterForTesting()
         #if DEBUG
         CursorPaster.configurePasteSessionPreparedForTesting()
+        CursorPaster.configureAutoSendPosterForTesting()
         #endif
         DictionaryService.invalidateWordReplacementCache()
         PowerModeManager.shared.activeConfiguration = activeConfiguration

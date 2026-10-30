@@ -16,6 +16,7 @@ class TranscriptionPipeline {
     #if DEBUG
     var cursorContextPreparedForTesting: (() async -> Void)?
     var pasteAuthorizationPreparedForTesting: (() async -> Void)?
+    var autoSendDelayStartedForTesting: (() -> Void)?
     #endif
 
     init(
@@ -65,9 +66,8 @@ class TranscriptionPipeline {
             }
         }
 
-        func restorePromptDetectionSettingsAndDismiss(afterRestore: () -> Void = {}) async {
+        func restorePromptDetectionSettingsAndDismiss() async {
             await restorePromptDetectionSettingsIfNeeded()
-            afterRestore()
             await onDismiss()
         }
 
@@ -380,17 +380,23 @@ class TranscriptionPipeline {
             SoundManager.shared.play(.stop)
             latencyTrace.end(stopSoundSpan)
             let dismissSpan = latencyTrace.begin("pipeline.dismiss_recorder", token: traceToken)
-            await restorePromptDetectionSettingsAndDismiss {
-                if pasteResult.didDeliverText,
-                   let autoSendKey,
-                   let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
-                    Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: delayAfterPaste)
+            await restorePromptDetectionSettingsAndDismiss()
+            latencyTrace.end(dismissSpan)
+            if pasteResult.didDeliverText,
+               let autoSendKey,
+               let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
+                #if DEBUG
+                autoSendDelayStartedForTesting?()
+                #endif
+                do {
+                    try await Task.sleep(nanoseconds: delayAfterPaste)
+                    if !Task.isCancelled, !shouldCancel() {
                         CursorPaster.performAutoSend(autoSendKey)
                     }
+                } catch {
+                    latencyTrace.event("pipeline.auto_send_cancelled", token: traceToken)
                 }
             }
-            latencyTrace.end(dismissSpan)
         } else {
             latencyTrace.event(
                 "pipeline.no_paste",

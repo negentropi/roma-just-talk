@@ -306,11 +306,21 @@ except Exception as error:
     summary['failure'] = str(error)
 finally:
     if started_obs:
-        run('obs-log-copy', ['/bin/cp', '-R', str(Path.home() / 'Library/Application Support/obs-studio/logs'), str(OUT / 'obs-logs')])
         keep_obs = os.environ.get('LIP_CAMERA_PROBE_KEEP_OBS_RUNNING') == '1' and summary['status'] == 'supportedDeviceReady'
         summary['obsRetainedForE2E'] = keep_obs
         if not keep_obs:
-            run('close-obs', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=12)
+            try:
+                receipt = OUT / 'obs-cleanup.json'
+                code = run('close-obs', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(receipt), 'stop-and-quit'], timeout=55)
+                cleanup = json.loads(receipt.read_text()) if receipt.is_file() else {}
+                summary['obsCleanup'] = cleanup
+                if code != 0 or cleanup.get('closed') is not True:
+                    raise RuntimeError('Owned OBS cleanup did not verify inactive output and process exit; inspect obs-cleanup.json')
+            except Exception as error:
+                summary['cleanupFailure'] = str(error)
+                summary.setdefault('failure', str(error))
+                summary['status'] = 'blocked'
+        run('obs-log-copy', ['/bin/cp', '-R', str(Path.home() / 'Library/Application Support/obs-studio/logs'), str(OUT / 'obs-logs')])
     run('extensions-final', ['/usr/bin/systemextensionsctl', 'list'])
     run('extension-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', 'process == "sysextd" AND eventMessage CONTAINS[c] "obsproject"'], timeout=25)
     run('approval-ui-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', '(process == "System Settings" OR process == "SecurityAgent" OR process == "authd" OR process == "authorizationhost" OR process == "coreauthd") AND (eventMessage CONTAINS[c] "obs" OR eventMessage CONTAINS[c] "extension" OR eventMessage CONTAINS[c] "authenticate" OR eventMessage CONTAINS[c] "authoriz")'], timeout=25)

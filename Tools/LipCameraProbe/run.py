@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import socket
 import subprocess
 import sys
 import time
@@ -59,6 +60,23 @@ def ui(name, approve=False, authenticate=False):
     elif approve:
         command.append('approve')
     run(name, command, timeout=20)
+
+
+def obs_process_ids():
+    result = subprocess.run(['/usr/bin/pgrep', '-x', 'OBS'], capture_output=True, text=True, timeout=5)
+    if result.returncode == 1:
+        return []
+    if result.returncode != 0:
+        raise RuntimeError('Could not inspect the probe-owned OBS process')
+    verified = []
+    for identifier in result.stdout.split():
+        process = subprocess.run(['/bin/ps', '-p', identifier, '-o', 'comm='], capture_output=True, text=True, timeout=5)
+        if process.returncode != 0:
+            continue
+        if process.stdout.strip() != '/Applications/OBS.app/Contents/MacOS/OBS':
+            raise RuntimeError('An OBS-named process is outside the probe-owned application')
+        verified.append(int(identifier))
+    return verified
 
 
 try:
@@ -224,17 +242,42 @@ try:
     if not extension_ready:
         raise RuntimeError('Verified camera toggle did not reach enabled state or a ready authentication dialog before the bounded approval deadline')
     run('extensions-after-approval', ['/usr/bin/systemextensionsctl', 'list'])
-    run('restart-obs-quit', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15, required=True)
-    for check in range(20):
-        processes = subprocess.run(['/usr/bin/pgrep', '-x', 'OBS'], stdout=subprocess.DEVNULL)
-        if processes.returncode == 1:
+    restart = {'processIDsBefore': obs_process_ids()}
+    summary['obsRestart'] = restart
+    # OBS can return AppleEvent -128 after starting shutdown; process exit is authoritative.
+    restart['quitRequestExitCode'] = run('restart-obs-quit', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15)
+    exit_deadline = time.monotonic() + 15
+    while time.monotonic() < exit_deadline:
+        restart['remainingProcessIDs'] = obs_process_ids()
+        if not restart['remainingProcessIDs']:
+            restart['exitObserved'] = True
             break
         time.sleep(0.25)
     else:
+        ui('obs-restart-exit-blocked')
+        screenshot('obs-restart-exit-blocked')
         raise RuntimeError('OBS did not exit for its documented camera-extension restart')
     run('restart-obs-open', ['/usr/bin/open', '-a', str(installed), '--args', '--profile', 'RJTLipProof', '--disable-updater'], required=True)
-    time.sleep(3)
-    run('retry-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-retry.json'), 'require-output'], timeout=30, required=True)
+    websocket_deadline = time.monotonic() + 25
+    while time.monotonic() < websocket_deadline:
+        restart['processIDsAfter'] = obs_process_ids()
+        try:
+            with socket.create_connection(('127.0.0.1', 4455), timeout=0.5):
+                restart['webSocketPortReady'] = bool(restart['processIDsAfter'])
+            if restart['webSocketPortReady']:
+                break
+        except OSError:
+            pass
+        time.sleep(0.5)
+    else:
+        ui('obs-restart-endpoint-blocked')
+        screenshot('obs-restart-endpoint-blocked')
+        raise RuntimeError('Restarted OBS did not expose its WebSocket endpoint before the bounded deadline')
+    retry = run('retry-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-retry.json'), 'require-output'], timeout=60)
+    if retry != 0:
+        ui('obs-restart-output-blocked')
+        screenshot('obs-restart-output-blocked')
+        raise RuntimeError('Restarted OBS did not activate virtual camera output; see authenticated RPC receipt')
     app = OUT / 'LipCameraProbe.app'
     (app / 'Contents/MacOS').mkdir(parents=True)
     shutil.copy2(BIN / 'CameraProbe', app / 'Contents/MacOS/LipCameraProbe')

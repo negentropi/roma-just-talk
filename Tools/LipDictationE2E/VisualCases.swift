@@ -2,6 +2,7 @@ import AppKit
 import ApplicationServices
 import AVFoundation
 import CryptoKit
+import Darwin
 import Foundation
 import RuntimeE2ECore
 
@@ -39,6 +40,13 @@ struct LipVisualCases {
                   let scenario = values["--scenario"], let appLog = values["--app-log"] else { throw ProofError.invalidArguments }
             output = URL(fileURLWithPath: outputPath)
             let configuration = try JSONDecoder().decode(RuntimeHarnessConfiguration.self, from: Data(contentsOf: URL(fileURLWithPath: configPath)))
+            if scenario == "negative-controls" {
+                report["scenario"] = scenario
+                try runNegativeControls(configuration: configuration, report: &report, directory: output!.deletingLastPathComponent())
+                let data = try JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys])
+                try data.write(to: output!, options: .atomic)
+                return
+            }
             let preflight = RuntimePreflight.run(configuration: configuration)
             report["preflight"] = try json(preflight)
             guard preflight.passed, let audioDevice = preflight.requestedAudioDevice else { throw ProofError.preflight }
@@ -49,7 +57,7 @@ struct LipVisualCases {
             report["scenario"] = scenario
             let application = try runningApp(configuration.voiceInkBundleIdentifier)
             if scenario == "setup" {
-                try openSettings(application, appPath: session!.info.selectedAppPath)
+                try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
                 if let setup = find(application, label: "Set Up", roles: [kAXButtonRole]) {
                     try press(setup)
                     report["actualSetupButtonPressed"] = true
@@ -78,6 +86,7 @@ struct LipVisualCases {
                 report["actualModeControlsChanged"] = true
                 report["passed"] = true
             } else {
+                let negative = ["cancel", "disable", "quit"].contains(scenario)
                 guard let websocket = values["--obs-config"], let still = values["--still"],
                       let video = values["--video"], let audio = values["--audio"] else { throw ProofError.invalidArguments }
                 let obs = try OBSClient(configurationURL: URL(fileURLWithPath: websocket))
@@ -86,7 +95,7 @@ struct LipVisualCases {
                 try await obs.media(path: still, looping: true)
                 var disableControl: AXUIElement?
                 if scenario == "disable" {
-                    try openSettings(application, appPath: session!.info.selectedAppPath)
+                    try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
                     disableControl = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"])
                     guard let disableControl, toggleValue(disableControl) == 1 else { throw ProofError.settingControl }
                 }
@@ -97,10 +106,18 @@ struct LipVisualCases {
                 )
                 target = prepared
                 report["target"] = try json(prepared.info)
+                let seededFullText = negative ? prepared.readFullText() : nil
+                if negative {
+                    guard let seededFullText else { throw ProofError.targetUnreadable }
+                    guard seededFullText == RuntimeTextScenario.existingText.initialText else { throw ProofError.unexpectedInsertion }
+                    report["negativeSeededFullText"] = seededFullText
+                }
                 let down = try RuntimeShortcutInjector.postLeftShiftDown()
                 modifierHeld = true
                 report["shortcutDown"] = try json(down)
                 guard waitForLog(appLog, after: startOffset, containing: "event=engine.state.recording", timeout: 45) else { throw ProofError.recordingStart }
+                guard let captureID = captureIdentifier(logSlice(appLog, after: startOffset)) else { throw ProofError.captureEvidence }
+                report["captureID"] = captureID
                 guard prepared.refreshRenderedBaseline() == nil else { throw ProofError.renderedBaseline }
                 try await obs.media(path: video, looping: false)
                 let audioURL = URL(fileURLWithPath: audio)
@@ -109,17 +126,15 @@ struct LipVisualCases {
                 let playing = RuntimeAudioPlayback(fixtureURL: audioURL, device: audioDevice, expectedDurationSeconds: duration)
                 playback = playing
                 _ = try playing.start()
-                let negative = ["cancel", "disable", "quit"].contains(scenario)
                 if scenario == "disable" {
                     wait(0.5)
                     try press(disableControl!)
-                    guard waitForLog(appLog, after: startOffset, containing: "canceled=true", timeout: 45) else { throw ProofError.cancellation }
                 } else if scenario == "quit" {
                     wait(0.5)
                     guard application.terminate() else { throw ProofError.quit }
                     let deadline = Date().addingTimeInterval(45)
-                    while !application.isTerminated, Date() < deadline { wait(0.1) }
-                    guard application.isTerminated else { throw ProofError.quit }
+                    while !processExited(application), Date() < deadline { wait(0.1) }
+                    guard processExited(application) else { throw ProofError.quit }
                 } else {
                     report["audioPlayback"] = try json(playing.waitUntilFinished())
                     wait(0.3)
@@ -133,21 +148,35 @@ struct LipVisualCases {
                     wait(0.1)
                     guard RuntimeAX.postKey(keyCode: 53, flags: []) else { throw ProofError.cancellation }
                 }
-                let visible = prepared.waitForVisibleText(keyUpAtSystemUptime: up.postedAtSystemUptime, timeoutSeconds: negative ? 15 : 120)
-                report["visibleText"] = try json(visible)
-                screenshot(output!.deletingLastPathComponent().appendingPathComponent(scenario + ".png"))
-                if scenario != "quit" {
-                    guard waitForLog(appLog, after: startOffset, containing: "recording.drained id=", timeout: 45) else { throw ProofError.notDrained }
+                var visible: RuntimeVisibleTextResult?
+                if negative {
+                    if scenario == "quit" {
+                        guard processExited(application) else { throw ProofError.quit }
+                        report["negativeCompletionBoundary"] = "ownedAppProcessTerminated"
+                        report["terminatedAppPID"] = application.processIdentifier
+                    } else {
+                        let terminal = "recording.drained id=\(captureID) canceled=true"
+                        guard waitForLog(appLog, after: startOffset, containing: terminal, timeout: 45) else { throw ProofError.notDrained }
+                        report["negativeCompletionBoundary"] = terminal
+                    }
+                    let finalFullText = prepared.readFullText()
+                    let observation = RuntimeNegativeTextObservation.classify(baseline: seededFullText, finalText: finalFullText)
+                    report["negativeTextObservation"] = observation.rawValue
+                    report["negativeFinalFullText"] = finalFullText.map { $0 as Any } ?? NSNull()
+                    guard observation != .unreadable else { throw ProofError.targetUnreadable }
+                    guard observation == .readableUnchanged else { throw ProofError.unexpectedInsertion }
+                } else {
+                    let observed = prepared.waitForVisibleText(keyUpAtSystemUptime: up.postedAtSystemUptime, timeoutSeconds: 120)
+                    visible = observed
+                    report["visibleText"] = try json(observed)
+                    guard waitForLog(appLog, after: startOffset, containing: "recording.drained id=\(captureID) canceled=false", timeout: 45) else { throw ProofError.notDrained }
                 }
+                screenshot(output!.deletingLastPathComponent().appendingPathComponent(scenario + ".png"))
                 let messages = logSlice(appLog, after: startOffset)
                 report["appMessages"] = messages
                 let starts = messages.split(separator: "\n").filter { $0.contains("capture.start id=") }
                 let recordingStarts = messages.split(separator: "\n").filter { $0.contains("event=engine.state.recording") }
-                let captureID = starts.first.flatMap { line -> String? in
-                    guard let start = line.range(of: "capture.start id=") else { return nil }
-                    return line[start.upperBound...].split(separator: " ").first.map(String.init)
-                }
-                let closed = captureID.map { messages.contains("capture.closed id=\($0)") } ?? false
+                let closed = messages.contains("capture.closed id=\(captureID)")
                 let micClosed = messages.contains("recording=false pre_roll=false audio_unit=false")
                 let micStarted = messages.contains("startRecording called") || messages.contains("Starting pre-roll buffering")
                 let noFinishDeadline = !messages.contains("capture.finish_deadline")
@@ -161,13 +190,12 @@ struct LipVisualCases {
                 guard starts.count == 1, recordingStarts.count == 1,
                       starts.allSatisfy({ $0.contains("audio_inputs=0") }) else { throw ProofError.captureEvidence }
                 if negative {
-                    guard visible.text == nil || visible.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true else { throw ProofError.unexpectedInsertion }
-                    guard closed, noFinishDeadline, messages.contains("canceled=true") else { throw ProofError.cancellation }
+                    guard closed, noFinishDeadline else { throw ProofError.cancellation }
                 } else {
+                    guard let visible else { throw ProofError.dictation }
                     let expected = "its eleven oclock"
                     guard normalized(visible.text ?? "") == expected, visible.keyUpToVisibleMilliseconds != nil else { throw ProofError.dictation }
                     guard starts.count == 1, closed, noFinishDeadline, messages.contains("recognition.start"), messages.contains("canceled=false") else { throw ProofError.captureEvidence }
-                    guard let captureID else { throw ProofError.captureEvidence }
                     let selectedSource = scenario == "combined" ? "voice" : "lips"
                     let selected = "recognition.selected id=\(captureID) source=\(selectedSource)"
                     guard messages.contains(selected) else { throw ProofError.captureEvidence }
@@ -183,6 +211,9 @@ struct LipVisualCases {
             }
         } catch {
             report["error"] = String(describing: error)
+            if let output {
+                report["failureScreenshot"] = screenshot(output.deletingPathExtension().appendingPathExtension("failure.png"))
+            }
             if let app = try? runningApp("com.negentropi.RomaJustTalk") {
                 report["appAccessibilitySnapshot"] = accessibilitySnapshot(app)
             }
@@ -212,11 +243,59 @@ struct LipVisualCases {
     static func json<T: Encodable>(_ value: T) throws -> Any {
         try JSONSerialization.jsonObject(with: JSONEncoder().encode(value))
     }
+    static func runNegativeControls(configuration: RuntimeHarnessConfiguration, report: inout [String: Any], directory: URL) throws {
+        let environment = ProcessInfo.processInfo.environment
+        guard environment["GITHUB_ACTIONS"] == "true", environment["RUNNER_ENVIRONMENT"] == "github-hosted",
+              getuid() != 0, let target = configuration.targets.first,
+              target.bundleIdentifier == "com.apple.TextEdit" else { throw ProofError.invalidArguments }
+        let prepared = try RuntimeTargetController.prepare(
+            target: target, textScenario: .existingText,
+            runID: "negative-controls-\(UUID().uuidString)", settleSeconds: configuration.targetSettleSeconds,
+            availabilityPolicy: .launchIfNeeded
+        )
+        var cleanedUp = false
+        defer {
+            if !cleanedUp { report["targetCleanup"] = try? json(prepared.cleanup()) }
+        }
+        report["target"] = try json(prepared.info)
+        guard let baseline = prepared.readFullText(), baseline == RuntimeTextScenario.existingText.initialText,
+              let unchangedText = prepared.readFullText() else { throw ProofError.targetUnreadable }
+        let unchanged = RuntimeNegativeTextObservation.classify(baseline: baseline, finalText: unchangedText)
+        report["unchangedObservation"] = unchanged.rawValue
+        report["unchangedFullText"] = unchangedText
+        guard unchanged == .readableUnchanged else { throw ProofError.negativeControl }
+        report["unchangedScreenshot"] = screenshot(directory.appendingPathComponent("negative-controls-unchanged.png"))
+        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == prepared.info.processIdentifier,
+              RuntimeAX.postKey(keyCode: 0, flags: .maskCommand, processIdentifier: prepared.info.processIdentifier),
+              RuntimeAX.postKey(keyCode: 51, flags: [], processIdentifier: prepared.info.processIdentifier) else { throw ProofError.negativeControl }
+        wait(0.2)
+        guard let changedText = prepared.readFullText() else { throw ProofError.targetUnreadable }
+        let changed = RuntimeNegativeTextObservation.classify(baseline: baseline, finalText: changedText)
+        report["changedObservation"] = changed.rawValue
+        report["changedFullText"] = changedText
+        report["changedScreenshot"] = screenshot(directory.appendingPathComponent("negative-controls-changed.png"))
+        guard changed == .changed else { throw ProofError.negativeControl }
+        let cleanup = prepared.cleanup()
+        cleanedUp = true
+        report["targetCleanup"] = try json(cleanup)
+        guard cleanup.passed else { throw ProofError.negativeControl }
+        let closedText = prepared.readFullText()
+        let closed = RuntimeNegativeTextObservation.classify(baseline: baseline, finalText: closedText)
+        report["closedObservation"] = closed.rawValue
+        report["closedTargetReadable"] = closedText != nil
+        guard closedText == nil, closed == .unreadable else { throw ProofError.negativeControl }
+        report["acceptedStates"] = [unchanged.rawValue]
+        report["rejectedStates"] = [changed.rawValue, closed.rawValue]
+        report["passed"] = true
+    }
     static func normalized(_ text: String) -> String {
         let words = text.lowercased().replacingOccurrences(of: "'", with: "").replacingOccurrences(of: "’", with: "").split { !$0.isLetter && !$0.isNumber }
         return words.map { $0 == "11" ? "eleven" : String($0) }.joined(separator: " ")
     }
     static func wait(_ seconds: TimeInterval) { RunLoop.current.run(until: Date().addingTimeInterval(seconds)) }
+    static func processExited(_ application: NSRunningApplication) -> Bool {
+        application.isTerminated && kill(application.processIdentifier, 0) == -1 && errno == ESRCH
+    }
     static func logSlice(_ path: String, after offset: Int) -> String {
         guard let file = try? FileHandle(forReadingFrom: URL(fileURLWithPath: path)) else { return "" }
         defer { try? file.close() }
@@ -224,6 +303,13 @@ struct LipVisualCases {
             try file.seek(toOffset: UInt64(offset))
             return String(decoding: try file.readToEnd() ?? Data(), as: UTF8.self)
         } catch { return "" }
+    }
+    static func captureIdentifier(_ messages: String) -> String? {
+        let starts = messages.split(separator: "\n").filter { $0.contains("capture.start id=") }
+        guard starts.count == 1, let marker = starts[0].range(of: "capture.start id="),
+              let value = starts[0][marker.upperBound...].split(separator: " ").first,
+              UUID(uuidString: String(value)) != nil else { return nil }
+        return String(value)
     }
     static func waitForLog(_ path: String, after offset: Int, containing marker: String, timeout: TimeInterval) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
@@ -300,36 +386,146 @@ struct LipVisualCases {
         }
         return result
     }
-    static func openSettings(_ app: NSRunningApplication, appPath: String) throws {
+    static func openSettings(_ app: NSRunningApplication, appPath: String, report: inout [String: Any]) throws {
+        var actions: [[String: Any]] = []
+        defer { report["settingsNavigation"] = actions }
         let reopen = Process()
         reopen.executableURL = URL(fileURLWithPath: "/usr/bin/open")
         reopen.arguments = [appPath]
         try reopen.run()
         reopen.waitUntilExit()
-        app.activate(options: [.activateIgnoringOtherApps])
+        app.activate()
         let deadline = Date().addingTimeInterval(10)
+        var pressed = false
+        var clicked = false
         while Date() < deadline {
-            if let settings = find(app, label: "Settings", roles: [kAXButtonRole, kAXRowRole, "AXLink"]) {
-                if AXUIElementPerformAction(settings, kAXPressAction as CFString) != .success {
-                    _ = AXUIElementSetAttributeValue(settings, kAXSelectedAttribute as CFString, kCFBooleanTrue)
+            if let control = find(app, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]) {
+                let visible = revealControl(control, in: app, actions: &actions)
+                actions.append(["lipControlsObserved": true, "lipControlsVisible": visible])
+                guard visible else { throw ProofError.settingControl }
+                return
+            }
+            if let settings = exactSettingsElement(app) {
+                if !pressed {
+                    pressed = true
+                    var names: CFArray?
+                    let supported = AXUIElementCopyActionNames(settings, &names) == .success
+                        && (names as? [String] ?? []).contains(kAXPressAction)
+                    let result = supported ? AXUIElementPerformAction(settings, kAXPressAction as CFString) : .actionUnsupported
+                    actions.append(["method": "AXPress", "supported": supported, "result": result.rawValue,
+                                    "role": RuntimeAX.stringAttribute(kAXRoleAttribute, from: settings) ?? "",
+                                    "label": "Settings"])
+                    wait(0.5)
+                    continue
                 }
-                wait(0.5)
-                if find(app, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]) != nil { return }
+                if !clicked, let frame = verifiedFrame(settings, in: app), CGPreflightPostEventAccess() {
+                    clicked = true
+                    let point = CGPoint(x: frame.midX, y: frame.midY)
+                    for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+                        guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else { throw ProofError.settingControl }
+                        event.setIntegerValueField(.mouseEventClickState, value: 1)
+                        event.post(tap: .cghidEventTap)
+                        wait(0.05)
+                    }
+                    actions.append(["method": "ordinaryPointerClick", "label": "Settings", "frame": frameReceipt(frame)])
+                }
             }
             wait(0.2)
         }
         throw ProofError.settingControl
     }
-    static func screenshot(_ url: URL) {
+    static func exactSettingsElement(_ app: NSRunningApplication) -> AXUIElement? {
+        let root = AXUIElementCreateApplication(app.processIdentifier)
+        guard let windows = RuntimeAX.readWindows(in: root) else { return nil }
+        var queue = windows.map { ($0, 0) }
+        var visited: [AXUIElement] = []
+        var matches: [AXUIElement] = []
+        let deadline = Date().addingTimeInterval(1)
+        while !queue.isEmpty, visited.count < 1000, Date() < deadline {
+            let (element, depth) = queue.removeFirst()
+            guard depth <= 24, !visited.contains(where: { CFEqual($0, element) }) else { continue }
+            visited.append(element)
+            AXUIElementSetMessagingTimeout(element, 0.1)
+            let role = RuntimeAX.stringAttribute(kAXRoleAttribute, from: element) ?? ""
+            let labels = [kAXTitleAttribute, kAXDescriptionAttribute].compactMap { RuntimeAX.stringAttribute($0, from: element) }
+            if [kAXButtonRole, kAXRowRole, "AXLink", "AXUnknown"].contains(role), labels.contains("Settings"), enabled(element) {
+                matches.append(element)
+            }
+            var children: CFTypeRef?
+            if AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &children) == .success,
+               let children = children as? [AXUIElement] { queue.append(contentsOf: children.map { ($0, depth + 1) }) }
+        }
+        return queue.isEmpty && matches.count == 1 ? matches[0] : nil
+    }
+    static func verifiedFrame(_ element: AXUIElement, in app: NSRunningApplication) -> CGRect? {
+        var pid: pid_t = 0
+        guard AXUIElementGetPid(element, &pid) == .success, pid == app.processIdentifier,
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == pid,
+              let window = RuntimeAX.window(for: element), let windowFrame = RuntimeAX.frame(of: window),
+              let frame = RuntimeAX.frame(of: element), frame.width > 0, frame.height > 0,
+              [frame.minX, frame.minY, frame.maxX, frame.maxY].allSatisfy(\.isFinite),
+              windowFrame.contains(frame), CGDisplayBounds(CGMainDisplayID()).contains(frame) else { return nil }
+        return frame
+    }
+    static func frameReceipt(_ frame: CGRect) -> [String: Double] {
+        ["x": frame.minX, "y": frame.minY, "width": frame.width, "height": frame.height]
+    }
+    static func revealControl(_ control: AXUIElement, in app: NSRunningApplication, actions: inout [[String: Any]]) -> Bool {
+        if verifiedFrame(control, in: app) != nil { return true }
+        let result = AXUIElementPerformAction(control, "AXScrollToVisible" as CFString)
+        actions.append(["method": "AXScrollToVisible", "result": result.rawValue])
+        wait(0.2)
+        if verifiedFrame(control, in: app) != nil { return true }
+        var ancestor = control
+        for _ in 0..<24 {
+            if RuntimeAX.stringAttribute(kAXRoleAttribute, from: ancestor) == kAXScrollAreaRole,
+               let frame = verifiedFrame(ancestor, in: app), CGPreflightPostEventAccess() {
+                for _ in 0..<4 {
+                    guard let controlFrame = RuntimeAX.frame(of: control) else { return false }
+                    let delta: Int32 = controlFrame.midY > frame.midY ? -400 : 400
+                    let point = CGPoint(x: frame.midX, y: frame.midY)
+                    guard let move = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left),
+                          let scroll = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: delta, wheel2: 0, wheel3: 0) else { return false }
+                    move.post(tap: .cghidEventTap)
+                    scroll.post(tap: .cghidEventTap)
+                    actions.append(["method": "ownedScroll", "frame": frameReceipt(frame), "delta": delta])
+                    wait(0.2)
+                    if let visible = verifiedFrame(control, in: app), frame.contains(visible) { return true }
+                }
+                return false
+            }
+            var parent: CFTypeRef?
+            guard AXUIElementCopyAttributeValue(ancestor, kAXParentAttribute as CFString, &parent) == .success,
+                  let parent, CFGetTypeID(parent) == AXUIElementGetTypeID() else { return false }
+            ancestor = parent as! AXUIElement
+        }
+        return false
+    }
+    @discardableResult static func screenshot(_ url: URL) -> [String: Any] {
+        var receipt: [String: Any] = ["file": url.lastPathComponent, "captured": false]
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
-        process.arguments = ["-x", url.path]
-        do { try process.run(); process.waitUntilExit() }
-        catch { }
+        process.arguments = ["-x", "-m", url.path]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        let finished = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in finished.signal() }
+        do {
+            try process.run()
+            if finished.wait(timeout: .now() + 5) == .timedOut {
+                process.terminate()
+                if finished.wait(timeout: .now() + 1) == .timedOut { kill(process.processIdentifier, SIGKILL) }
+                receipt["error"] = "five-second capture deadline"
+            } else {
+                receipt["exitCode"] = process.terminationStatus
+                receipt["captured"] = process.terminationStatus == 0 && FileManager.default.fileExists(atPath: url.path)
+            }
+        } catch { receipt["error"] = String(describing: error) }
+        return receipt
     }
     enum ProofError: Error {
         case invalidArguments, preflight, appMissing, setup, settingControl, recordingStart, renderedBaseline
-        case inferenceStart, notDrained, dictation, captureEvidence, unexpectedInsertion, microphone, cancellation, quit
+        case inferenceStart, notDrained, dictation, captureEvidence, unexpectedInsertion, targetUnreadable, negativeControl, microphone, cancellation, quit
     }
 }
 

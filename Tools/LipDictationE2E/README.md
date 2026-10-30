@@ -50,7 +50,9 @@ The actual settings UI installs the model. The camera receives a static face whi
 - Turning the actual settings toggle off while recording.
 - Quitting the actual app while recording.
 
-Each positive case requires one camera session with no audio input, a matching camera close, an actual rendered/AX insertion, the logged selected recognizer, one completed history row, and no native writer timeout. Negative cases require no inserted text and no completed history row. The last gate rejects remaining private movie files.
+Each positive case requires one camera session with no audio input, a matching camera close, an actual rendered/AX insertion, the logged selected recognizer, one completed history row, and no native writer timeout. Negative cases require a fresh, readable AX snapshot of the complete seeded target after the matching canceled session drains or the app exits. The text must equal its readable pre-shortcut baseline. Unreadable or changed text fails. No completed history row may remain. The last gate rejects remaining private movie files.
+
+Before camera setup, `negative-controls.json` verifies that distinction against an owned TextEdit document. The helper reads unchanged text, changes it through ordinary Command-A and Delete, then closes the document through the existing cleanup path. The unchanged snapshot must pass. Changed text and the unavailable closed target must fail acceptance. These controls do not start a recording or supply recognition text.
 
 The microphone-denied fixture applies only to the positive lip-only case. It uses the app's exact signed requirement, records the authorized row before the case and the denied row before/after dictation, then restores and verifies the authorized row in `finally` before later cases. These receipts describe observed SQL fixture state. They do not claim to query the app's authorization API. The actual dictation result and hardware diagnostics provide the separate behavioral proof.
 

@@ -134,6 +134,17 @@ public enum RuntimeTextScenario: String, Codable, CaseIterable, Sendable {
     }
 }
 
+public enum RuntimeNegativeTextObservation: String, Codable, Sendable {
+    case readableUnchanged
+    case changed
+    case unreadable
+
+    public static func classify(baseline: String?, finalText: String?) -> Self {
+        guard let baseline, let finalText else { return .unreadable }
+        return finalText == baseline ? .readableUnchanged : .changed
+    }
+}
+
 public struct RuntimeDOMPasteProof: Codable, Equatable, Sendable {
     public let pasteEventCount: Int
     public let pasteInputCount: Int

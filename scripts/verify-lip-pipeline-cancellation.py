@@ -230,8 +230,11 @@ start = recorder_text.index("    func startPreRollBuffering(")
 end = recorder_text.index("    func ", start + 10)
 pre_roll = recorder_text[start:end]
 pattern = r",\n\s+captureGeneration\.load\(ordering: \.acquiring\) == generation"
-require(len(re.findall(pattern, pre_roll)) == 2, "Expected two pre-roll generation guards")
-old_generation = recorder_text[:start] + re.sub(pattern, "", pre_roll, count=2) + recorder_text[end:]
+require(len(re.findall(pattern, pre_roll)) == 4, "Expected four pre-roll generation guards")
+# Retain failed-start and caller checks; revert only queued setup and successful-start checks.
+old_pre_roll = re.sub(pattern, "", pre_roll, count=2)
+require(len(re.findall(pattern, old_pre_roll)) == 2, "Expected two retained pre-roll generation guards")
+old_generation = recorder_text[:start] + old_pre_roll + recorder_text[end:]
 prewarm_text = candidates[prewarm].decode()
 prewarm_guard = "        guard dictationMode().usesMicrophone else { return }\n"
 require(prewarm_text.count(prewarm_guard) == 1, "Expected one microphone-only prewarm guard")
@@ -273,7 +276,7 @@ try:
     ):
         red_control(recorder, mutant, label, hardware_suite + "/" + test, 1,
                     "Use deferred microphone finish instead of synchronous stop." if label.endswith("incomplete-stop")
-                    else "Remove both pre-roll capture-generation rechecks.")
+                    else "Remove queued pre-roll generation checks before setup and after successful start.")
     red_control(source, escaped_timer, "known-bad-auto-send", auto_send_selection, 3,
                 "Run the real delay and key post in an unstructured task; ignore sleep cancellation.")
     red_control(prewarm, audio_prewarm, "known-bad-audio-prewarm", prewarm_selection, 1,

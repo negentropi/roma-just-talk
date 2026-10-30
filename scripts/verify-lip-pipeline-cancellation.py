@@ -212,6 +212,20 @@ def red_control(path, mutant, label, selection, count, change):
     require(summary["testFailures"] and all(
         identity in failure["testIdentifierString"] for failure in summary["testFailures"]
     ), f"{label} failed outside its selected regression: {summary}")
+    hardware_case = {"known-bad-incomplete-stop": "queued_pre_roll",
+                     "known-bad-stale-generation": "off_on_generation"}.get(label)
+    if hardware_case:
+        receipts = [json.loads(line[line.index("{"):]) for line in (evidence / f"{label}.log").read_text().splitlines()
+                    if "microphone_privacy_proof" in line]
+        matching = [entry for entry in receipts if entry.get("event") == "microphone_privacy_proof"
+                    and entry.get("case") == hardware_case and entry.get("phase") == "hardware_precondition"]
+        require(len(matching) == 1, f"{label} requires one matching actual microphone precondition")
+        hardware = record["hardwarePrecondition"] = matching[0]
+        save_receipt()
+        require(hardware.get("required") is True and hardware.get("hasAudioUnit") is True
+                and hardware.get("isPreBuffering") is True and type(hardware.get("bufferedPCMBytes")) is int
+                and hardware["bufferedPCMBytes"] > 0,
+                f"{label} lacks required live microphone/PCM evidence: {hardware}")
     record["expectedFailureConfirmed"] = True
     save_receipt()
     print(f"{label}: one function, {count}/{count} expected failed invocations; source restored", flush=True)

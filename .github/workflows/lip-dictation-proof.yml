@@ -24,9 +24,9 @@ jobs:
     timeout-minutes: 90
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
-      LIP_PROOF_DIR: ${{ runner.temp }}/lip-dictation-proof
-      LIP_MODEL_DIR: ${{ runner.temp }}/lip-dictation-model
-      LIP_BUILD_DIR: ${{ runner.temp }}/lip-dictation-build
+      LIP_PROOF_DIR: ${{ github.workspace }}/.local-build/lip-dictation-proof
+      LIP_MODEL_DIR: ${{ github.workspace }}/.local-build/lip-dictation-model
+      LIP_BUILD_DIR: ${{ github.workspace }}/.local-build/lip-dictation-build
 
     steps:
       - name: Checkout exact proof head

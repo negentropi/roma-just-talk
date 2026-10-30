@@ -36,10 +36,16 @@ struct MiniRecorderView<S: RecorderStateProvider & ObservableObject>: View {
 
             Spacer(minLength: 0)
 
-            RecorderStatusDisplay(
-                currentState: stateProvider.recordingState,
-                audioMeter: recorder.audioMeter
-            )
+            HStack(spacing: 6) {
+                if stateProvider.showsCameraBadge {
+                    RecorderCameraBadge()
+                }
+                RecorderStatusDisplay(
+                    currentState: stateProvider.recordingState,
+                    dictationMode: stateProvider.dictationMode,
+                    audioMeter: recorder.audioMeter
+                )
+            }
 
             Spacer(minLength: 0)
 

@@ -399,6 +399,7 @@ final class CoreAudioRecorder: @unchecked Sendable {
 
     var isCurrentlyRecording: Bool { isRecording }
     var isPreBuffering: Bool { isCapturing && !isRecording }
+    var hasAudioUnit: Bool { audioUnit != nil }
     var currentRecordingURL: URL? { recordingURL }
     var currentDevice: AudioDeviceID { currentDeviceID }
 

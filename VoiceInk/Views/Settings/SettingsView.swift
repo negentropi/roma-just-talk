@@ -11,6 +11,8 @@ struct SettingsView: View {
     @EnvironmentObject private var launchAtLoginController: LaunchAtLoginController
     @EnvironmentObject private var recordingShortcutManager: RecordingShortcutManager
     @EnvironmentObject private var recorderUIManager: RecorderUIManager
+    @EnvironmentObject private var engine: VoiceInkEngine
+    @ObservedObject private var lipDictation = LipDictationManager.shared
     @EnvironmentObject private var transcriptionModelManager: TranscriptionModelManager
     @EnvironmentObject private var enhancementService: AIEnhancementService
     @StateObject private var deviceManager = AudioDeviceManager.shared
@@ -227,6 +229,15 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.menu)
             }
+
+            // MARK: - Lip Dictation
+            LipDictationSettingsView(
+                readiness: lipDictation.readiness,
+                downloadDescription: lipDictation.downloadDescription,
+                isCapturing: engine.recordingState.isRecorderCaptureInProgress,
+                refresh: lipDictation.refresh,
+                setUp: lipDictation.setUp
+            )
 
             // MARK: - Power Mode
             PowerModeSection()

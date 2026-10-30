@@ -2,7 +2,7 @@
 
 Research snapshot: 2026-10-27, Asia/Taipei. RJT source inspected at `9e35e991`.
 
-Lip dictation is not implemented. No approach has yet passed the commercial-rights, recognition-quality, and app-runtime checks. The initial specialist-model search did not cover every route. Subsequent probes use commercially permissive test weights and public video on the remote server. No app camera was activated and no commercial-access inquiry was sent.
+This document preserves the initial research and rejected routes. Implementation now lives in the native `VoiceInkLip` package and the shared recorder lifecycle. See [lip dictation setup and limits](../LIP_DICTATION.md) for current behavior and model provenance. Native recognition, application capture, and commercial license scope have separate evidence gates; the initial probes below do not establish app readiness.
 
 ## Requested behavior
 

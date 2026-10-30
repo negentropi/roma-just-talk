@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A10000012FA0000000000001 /* VoiceInkCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000032FA0000000000001 /* VoiceInkCore */; };
 		A20000012FA0000000000001 /* VoiceInkQwen in Frameworks */ = {isa = PBXBuildFile; productRef = A20000032FA0000000000001 /* VoiceInkQwen */; };
+		A30000012FA0000000000001 /* VoiceInkLip in Frameworks */ = {isa = PBXBuildFile; productRef = A30000032FA0000000000001 /* VoiceInkLip */; };
 		E1342C1F2EB4844800CED8A2 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = E1342C1E2EB4844800CED8A2 /* Atomics */; };
 		DB672CD88F0C8CA5F6DA24AC /* PermissionFlow in Frameworks */ = {isa = PBXBuildFile; productRef = 59D57CC06F203BC2048581CA /* PermissionFlow */; };
 		E161D4A12F41ECB90086F83D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E161D4A02F41ECB90086F83D /* CloudKit.framework */; };
@@ -101,6 +102,7 @@
 				DB672CD88F0C8CA5F6DA24AC /* PermissionFlow in Frameworks */,
 				A10000012FA0000000000001 /* VoiceInkCore in Frameworks */,
 				A20000012FA0000000000001 /* VoiceInkQwen in Frameworks */,
+				A30000012FA0000000000001 /* VoiceInkLip in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +187,7 @@
 				59D57CC06F203BC2048581CA /* PermissionFlow */,
 				A10000032FA0000000000001 /* VoiceInkCore */,
 				A20000032FA0000000000001 /* VoiceInkQwen */,
+				A30000032FA0000000000001 /* VoiceInkLip */,
 			);
 			productName = "roma just talk";
 			productReference = E11473B02CBE0F0A00318EE4 /* roma just talk.app */;
@@ -280,6 +283,7 @@
 				4045DE7D23A97F889C27B330 /* XCRemoteSwiftPackageReference "PermissionFlow" */,
 				A10000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkCore" */,
 				A20000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkQwen" */,
+				A30000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkLip" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E11473B12CBE0F0A00318EE4 /* Products */;
@@ -751,6 +755,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		A30000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkLip" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = VoiceInkLip;
+		};
 		A10000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkCore" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = VoiceInkCore;
@@ -762,6 +770,11 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A30000032FA0000000000001 /* VoiceInkLip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A30000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkLip" */;
+			productName = VoiceInkLip;
+		};
 		A20000032FA0000000000001 /* VoiceInkQwen */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A20000022FA0000000000001 /* XCLocalSwiftPackageReference "VoiceInkQwen" */;

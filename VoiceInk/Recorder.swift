@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import CoreAudio
+import Atomics
 import os
 import VoiceInkCore
 
@@ -19,8 +20,13 @@ class Recorder: NSObject, ObservableObject {
     private let audioMeterQueue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).audiometer", qos: .userInteractive)
     /// Dedicated serial queue for hardware setup.
     private let audioSetupQueue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).audioSetup", qos: .userInitiated)
+    private let microphoneCaptureEnabled = ManagedAtomic(
+        VoiceInkLipDictationPreference.mode(in: .standard).usesMicrophone
+    )
+    private let microphoneCaptureGeneration = ManagedAtomic<UInt64>(0)
     private var audioMuteTask: Task<Void, Never>?
     private var audioRestorationTask: Task<Void, Never>?
+    private var activeRecordingID: UUID?
     private var activeLatencyTraceToken: VoiceInkLatencyTrace.Token?
     private let smoothedValuesLock = NSLock()
     private var smoothedAverage: Float = 0
@@ -64,11 +70,12 @@ class Recorder: NSObject, ObservableObject {
     }
 
     private func handleAudioDeviceChanged() async {
-        guard !deviceManager.isRecordingActive else { return }
+        guard microphoneCaptureEnabled.load(ordering: .acquiring), !deviceManager.isRecordingActive else { return }
         await startPreRollBuffering()
     }
 
     private func handleDeviceSwitchRequired(_ notification: Notification) async {
+        guard microphoneCaptureEnabled.load(ordering: .acquiring) else { return }
         guard !isReconfiguring else { return }
         guard let recorder = recorder else { return }
         guard let newDeviceID = VoiceInkMacOSAudioDeviceChangeRequest.newDeviceID(from: notification) else {
@@ -82,17 +89,41 @@ class Recorder: NSObject, ObservableObject {
 
         logger.notice("🎙️ Device switch required: switching to device \(newDeviceID, privacy: .public)")
 
+        let captureEnabled = microphoneCaptureEnabled
+        let captureGeneration = microphoneCaptureGeneration
+        let generation = captureGeneration.load(ordering: .acquiring)
+        let recordingID = activeRecordingID
         do {
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let switched = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Bool, Error>) in
                 audioSetupQueue.async {
+                    guard captureEnabled.load(ordering: .acquiring),
+                          captureGeneration.load(ordering: .acquiring) == generation else {
+                        continuation.resume(returning: false)
+                        return
+                    }
                     do {
                         try recorder.switchDevice(to: newDeviceID)
-                        continuation.resume()
+                        guard captureEnabled.load(ordering: .acquiring),
+                              captureGeneration.load(ordering: .acquiring) == generation else {
+                            recorder.stopRecording()
+                            continuation.resume(returning: false)
+                            return
+                        }
+                        continuation.resume(returning: true)
                     } catch {
+                        guard captureEnabled.load(ordering: .acquiring),
+                              captureGeneration.load(ordering: .acquiring) == generation else {
+                            recorder.stopRecording()
+                            continuation.resume(returning: false)
+                            return
+                        }
                         continuation.resume(throwing: error)
                     }
                 }
             }
+            guard switched, microphoneCaptureEnabled.load(ordering: .acquiring),
+                  captureGeneration.load(ordering: .acquiring) == generation,
+                  activeRecordingID == recordingID else { return }
 
             // Notify user about the switch
             if let deviceName = deviceManager.availableDevices.first(where: { $0.id == newDeviceID })?.name {
@@ -108,6 +139,9 @@ class Recorder: NSObject, ObservableObject {
 
             logger.notice("🎙️ Successfully switched recording to device \(newDeviceID, privacy: .public)")
         } catch {
+            guard microphoneCaptureEnabled.load(ordering: .acquiring),
+                  captureGeneration.load(ordering: .acquiring) == generation,
+                  activeRecordingID == recordingID else { return }
             logger.error("❌ Failed to switch device: \(error.localizedDescription, privacy: .public)")
 
             // If switch fails, stop recording and notify user
@@ -118,17 +152,63 @@ class Recorder: NSObject, ObservableObject {
     func scheduleSystemMute(
         afterDelayNanoseconds delay: UInt64 = VoiceInkRecordingFeedbackPreference.defaultSystemMuteScheduleDelayNanoseconds
     ) {
+        guard microphoneCaptureEnabled.load(ordering: .acquiring) else { return }
         // ponytail: Evaluate once per recording; observe route changes only if mid-recording switching matters.
         audioMuteTask?.cancel()
         audioMuteTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: delay)
-            guard !Task.isCancelled, let self else { return }
+            guard !Task.isCancelled, let self,
+                  self.microphoneCaptureEnabled.load(ordering: .acquiring) else { return }
             _ = await self.mediaController.muteSystemAudio()
         }
     }
 
+    func setMicrophoneCaptureEnabled(_ enabled: Bool) async {
+        if !enabled {
+            microphoneCaptureGeneration.wrappingIncrement(ordering: .acquiringAndReleasing)
+        }
+        let wasEnabled = microphoneCaptureEnabled.exchange(enabled, ordering: .acquiringAndReleasing)
+        if enabled {
+            if !wasEnabled { await startPreRollBuffering() }
+            return
+        }
+
+        audioMuteTask?.cancel()
+        audioMuteTask = nil
+        audioMeterUpdateTimer?.cancel()
+        audioMeterUpdateTimer = nil
+        onAudioChunk = nil
+        activeRecordingID = nil
+        deviceManager.isRecordingActive = false
+        let currentRecorder = recorder
+        // Advancing the generation also rejects old starts if permission is restored before they execute.
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            audioSetupQueue.async {
+                currentRecorder?.onAudioChunk = nil
+                currentRecorder?.stopRecording()
+                continuation.resume()
+            }
+        }
+        if !microphoneCaptureEnabled.load(ordering: .acquiring) {
+            audioMeter = AudioMeter(averagePower: 0, peakPower: 0)
+        }
+    }
+
+    func microphoneCaptureStatus() async -> (isRecording: Bool, isPreBuffering: Bool, hasAudioUnit: Bool) {
+        let currentRecorder = recorder
+        return await withCheckedContinuation { continuation in
+            audioSetupQueue.async {
+                continuation.resume(returning: (
+                    isRecording: currentRecorder?.isCurrentlyRecording ?? false,
+                    isPreBuffering: currentRecorder?.isPreBuffering ?? false,
+                    hasAudioUnit: currentRecorder?.hasAudioUnit ?? false
+                ))
+            }
+        }
+    }
+
     func startPreRollBuffering() async {
-        guard !deviceManager.isRecordingActive else { return }
+        guard microphoneCaptureEnabled.load(ordering: .acquiring), !deviceManager.isRecordingActive else { return }
 
         let deviceID = deviceManager.getCurrentDevice()
         guard deviceID != 0 else {
@@ -140,17 +220,39 @@ class Recorder: NSObject, ObservableObject {
         recorder = coreAudioRecorder
         coreAudioRecorder.onAudioChunk = nil
 
+        let captureEnabled = microphoneCaptureEnabled
+        let captureGeneration = microphoneCaptureGeneration
+        let generation = captureGeneration.load(ordering: .acquiring)
         do {
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let started = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Bool, Error>) in
                 audioSetupQueue.async {
+                    guard captureEnabled.load(ordering: .acquiring),
+                          captureGeneration.load(ordering: .acquiring) == generation else {
+                        continuation.resume(returning: false)
+                        return
+                    }
                     do {
                         try coreAudioRecorder.startPreBuffering(deviceID: deviceID)
-                        continuation.resume()
+                        guard captureEnabled.load(ordering: .acquiring),
+                              captureGeneration.load(ordering: .acquiring) == generation else {
+                            coreAudioRecorder.stopRecording()
+                            continuation.resume(returning: false)
+                            return
+                        }
+                        continuation.resume(returning: true)
                     } catch {
+                        guard captureEnabled.load(ordering: .acquiring),
+                              captureGeneration.load(ordering: .acquiring) == generation else {
+                            coreAudioRecorder.stopRecording()
+                            continuation.resume(returning: false)
+                            return
+                        }
                         continuation.resume(throwing: error)
                     }
                 }
             }
+            guard started, microphoneCaptureEnabled.load(ordering: .acquiring),
+                  captureGeneration.load(ordering: .acquiring) == generation else { return }
             logger.notice("startPreRollBuffering: active on deviceID=\(deviceID, privacy: .public)")
         } catch {
             logger.error("startPreRollBuffering failed: \(error.localizedDescription, privacy: .public)")
@@ -161,6 +263,11 @@ class Recorder: NSObject, ObservableObject {
         toOutputFile url: URL,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async throws {
+        guard microphoneCaptureEnabled.load(ordering: .acquiring) else {
+            throw RecorderError.couldNotStartRecording
+        }
+        let recordingID = UUID()
+        activeRecordingID = recordingID
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
         activeLatencyTraceToken = traceToken
@@ -192,21 +299,34 @@ class Recorder: NSObject, ObservableObject {
         scheduleSystemMute()
 
         let coreAudioRecorder = recorder ?? CoreAudioRecorder()
-        coreAudioRecorder.onAudioChunk = onAudioChunk
+        let audioChunkHandler = onAudioChunk
         recorder = coreAudioRecorder
 
+        let captureEnabled = microphoneCaptureEnabled
+        let captureGeneration = microphoneCaptureGeneration
+        let generation = captureGeneration.load(ordering: .acquiring)
         do {
             // Offload initialization to avoid shortcut lag.
             latencyTrace.event("recorder.audio_setup_queue.schedule_start", token: traceToken)
             let startResumeCheckpoint = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<VoiceInkLatencyTrace.ExecutorCheckpoint?, Error>) in
                 audioSetupQueue.async {
+                    guard captureEnabled.load(ordering: .acquiring),
+                          captureGeneration.load(ordering: .acquiring) == generation else {
+                        continuation.resume(throwing: RecorderError.couldNotStartRecording)
+                        return
+                    }
                     let queueSpan = latencyTrace.begin("recorder.audio_setup_queue.start", token: traceToken)
                     do {
+                        coreAudioRecorder.onAudioChunk = audioChunkHandler
                         try coreAudioRecorder.startRecording(
                             toOutputFile: url,
                             deviceID: deviceID,
                             latencyTraceToken: traceToken
                         )
+                        guard captureEnabled.load(ordering: .acquiring),
+                              captureGeneration.load(ordering: .acquiring) == generation else {
+                            throw RecorderError.couldNotStartRecording
+                        }
                         latencyTrace.end(queueSpan, details: "result=success")
                         let checkpoint = latencyTrace.executorEnqueued(
                             "recorder.audio_setup_queue.start_continuation",
@@ -214,6 +334,10 @@ class Recorder: NSObject, ObservableObject {
                         )
                         continuation.resume(returning: checkpoint)
                     } catch {
+                        if !captureEnabled.load(ordering: .acquiring)
+                            || captureGeneration.load(ordering: .acquiring) != generation {
+                            coreAudioRecorder.stopRecording()
+                        }
                         latencyTrace.end(
                             queueSpan,
                             details: "result=failure error=\(String(describing: type(of: error)))"
@@ -223,17 +347,25 @@ class Recorder: NSObject, ObservableObject {
                 }
             }
             latencyTrace.executorResumed(startResumeCheckpoint)
+            guard microphoneCaptureEnabled.load(ordering: .acquiring),
+                  captureGeneration.load(ordering: .acquiring) == generation,
+                  activeRecordingID == recordingID else {
+                throw CancellationError()
+            }
             latencyTrace.event("recorder.audio_setup_queue.start_resumed", token: traceToken)
             logger.notice("startRecording: CoreAudioRecorder started successfully")
 
             startAudioMeterTimer()
             Task { [weak self] in
-                guard let self else { return }
+                guard let self, self.microphoneCaptureEnabled.load(ordering: .acquiring),
+                      captureGeneration.load(ordering: .acquiring) == generation,
+                      self.activeRecordingID == recordingID else { return }
                 let span = latencyTrace.begin("recorder.pause_media", token: traceToken)
                 await self.playbackController.pauseMedia()
                 latencyTrace.end(span)
             }
         } catch {
+            guard activeRecordingID == recordingID else { throw CancellationError() }
             logger.error("Failed to start recording: \(error.localizedDescription, privacy: .public)")
             await stopRecording(latencyTraceToken: traceToken)
             throw RecorderError.couldNotStartRecording
@@ -241,6 +373,7 @@ class Recorder: NSObject, ObservableObject {
     }
 
     func stopRecording(latencyTraceToken: VoiceInkLatencyTrace.Token? = nil) async {
+        activeRecordingID = nil
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken ?? activeLatencyTraceToken
         latencyTrace.event("recorder.stop.enter", token: traceToken)
@@ -251,12 +384,17 @@ class Recorder: NSObject, ObservableObject {
         audioMeterUpdateTimer = nil
 
         let currentRecorder = self.recorder
+        let captureEnabled = microphoneCaptureEnabled
         latencyTrace.event("recorder.audio_setup_queue.schedule_stop", token: traceToken)
         // The hardware stop is already serialized and measured as sub-millisecond.
         // Finish inline so key-up does not pay a MainActor continuation-resume delay.
         audioSetupQueue.sync {
             let queueSpan = latencyTrace.begin("recorder.audio_setup_queue.stop", token: traceToken)
-            currentRecorder?.finishRecording(latencyTraceToken: traceToken)
+            if captureEnabled.load(ordering: .acquiring) {
+                currentRecorder?.finishRecording(latencyTraceToken: traceToken)
+            } else {
+                currentRecorder?.stopRecording()
+            }
             currentRecorder?.onAudioChunk = nil
             latencyTrace.end(queueSpan)
         }

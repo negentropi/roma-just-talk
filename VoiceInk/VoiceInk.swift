@@ -180,11 +180,12 @@ struct VoiceInkApp: App {
         _prewarmService = StateObject(wrappedValue: prewarmService)
 
         appDelegate.menuBarManager = menuBarManager
+        appDelegate.engine = engine
 
         // Ensure no lingering recording state from previous runs
         Task {
             await recorderUIManager.resetOnLaunch()
-            await engine.recorder.startPreRollBuffering()
+            await engine.prepareDictationInputs()
             DictionaryService.warmWordReplacementCache(using: resolvedContainer.mainContext)
         }
 

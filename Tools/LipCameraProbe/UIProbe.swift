@@ -1,12 +1,20 @@
 import AppKit
 import ApplicationServices
 import Foundation
+import Security
 
 @main
 struct UIProbe {
     static func main() {
         let args = CommandLine.arguments
         guard args.count >= 2 else { return }
+        if args.count == 3 && args[2] == "acknowledge-obs-camera-alert" {
+            let report = acknowledgeOBSCameraAlert()
+            if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
+                try? data.write(to: URL(fileURLWithPath: args[1]), options: .atomic)
+            }
+            return
+        }
         let authenticating = args.count > 2 && args[2] == "authenticate-host-autologin"
         let attempting = args.count > 2 && args[2] == "approve"
         let targets = Set(["com.obsproject.obs-studio", "com.apple.systempreferences", "com.apple.SecurityAgent", "com.apple.UserNotificationCenter", "com.apple.CoreServicesUIAgent", "com.apple.LocalAuthentication.UIAgent", "com.apple.systemuiserver"])
@@ -170,5 +178,112 @@ struct UIProbe {
         if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
             try? data.write(to: URL(fileURLWithPath: args[1]), options: .atomic)
         }
+    }
+
+    private static func acknowledgeOBSCameraAlert() -> [String: Any] {
+        var report: [String: Any] = ["status": "identityUnavailable", "alertAbsentObserved": false, "actionAttempted": false, "accessibilityTrusted": AXIsProcessTrusted()]
+        let environment = ProcessInfo.processInfo.environment
+        let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.obsproject.obs-studio")
+        guard environment["GITHUB_ACTIONS"] == "true", environment["RUNNER_OS"] == "macOS", AXIsProcessTrusted(), apps.count == 1,
+              let app = apps.first, app.processIdentifier > 1,
+              let bundle = app.bundleURL?.resolvingSymlinksInPath(), bundle.path == "/Applications/OBS.app",
+              app.executableURL?.resolvingSymlinksInPath().path == "/Applications/OBS.app/Contents/MacOS/OBS" else { return report }
+        var code: SecStaticCode?
+        var requirement: SecRequirement?
+        let flags = SecCSFlags(rawValue: 0)
+        guard SecStaticCodeCreateWithPath(bundle as CFURL, flags, &code) == errSecSuccess,
+              SecRequirementCreateWithString("anchor apple generic and certificate leaf[subject.OU] = \"2MMRE5MTB8\" and identifier \"com.obsproject.obs-studio\"" as CFString, flags, &requirement) == errSecSuccess,
+              let code, let requirement,
+              SecStaticCodeCheckValidity(code, SecCSFlags(rawValue: kSecCSStrictValidate), requirement) == errSecSuccess else {
+            report["status"] = "publisherSignatureRejected"
+            return report
+        }
+        report["signedOBSIdentityVerified"] = true
+        report["pid"] = app.processIdentifier
+        let expectedText = "The virtual camera is not installed.\n\nPlease allow OBS to install the camera system extension in System Settings → General → Login Items & Extensions → Camera Extensions.\n\nYou may need to restart OBS if this message still appears afterward."
+        let deadline = ProcessInfo.processInfo.systemUptime + 6
+        let root = AXUIElementCreateApplication(app.processIdentifier)
+        AXUIElementSetMessagingTimeout(root, 0.15)
+        var readFailed = false
+        func value(_ element: AXUIElement, _ attribute: String) -> CFTypeRef? {
+            guard ProcessInfo.processInfo.systemUptime < deadline else { readFailed = true; return nil }
+            AXUIElementSetMessagingTimeout(element, 0.15)
+            var result: CFTypeRef?
+            let error = AXUIElementCopyAttributeValue(element, attribute as CFString, &result)
+            if ![AXError.success, .attributeUnsupported, .noValue].contains(error) { readFailed = true }
+            return result
+        }
+        func inspect() -> (String, AXUIElement?) {
+            readFailed = false
+            guard let windows = value(root, kAXWindowsAttribute) as? [AXUIElement] else { return ("windowsQueryFailed", nil) }
+            var alerts: [AXUIElement] = []
+            for window in windows {
+                guard value(window, kAXRoleAttribute) as? String == kAXWindowRole,
+                      let description = value(window, kAXDescriptionAttribute) as? String else { return ("windowIdentityUnavailable", nil) }
+                if description == "alert" { alerts.append(window) }
+            }
+            report["observedAlertCount"] = alerts.count
+            if readFailed { return ("AXReadFailed", nil) }
+            if alerts.isEmpty { return ("absent", nil) }
+            guard alerts.count == 1 else { return ("unexpectedOBSAlerts", nil) }
+            var pending: [(AXUIElement, Int)] = [(alerts[0], 0)]
+            var visited: [AXUIElement] = []
+            var exactTextCount = 0, criticalImageCount = 0, buttonCount = 0
+            var buttons: [AXUIElement] = []
+            while !pending.isEmpty && visited.count < 64 {
+                let (element, depth) = pending.removeFirst()
+                guard depth <= 6 else { return ("alertTreeIncomplete", nil) }
+                if visited.contains(where: { CFEqual($0, element) }) { continue }
+                visited.append(element)
+                let role = value(element, kAXRoleAttribute) as? String ?? ""
+                if role == kAXStaticTextRole, value(element, kAXValueAttribute) as? String == expectedText { exactTextCount += 1 }
+                if role == kAXImageRole, value(element, kAXDescriptionAttribute) as? String == "OBS critical alert" { criticalImageCount += 1 }
+                if role == kAXButtonRole {
+                    buttonCount += 1
+                    if value(element, kAXTitleAttribute) as? String == "OK", (value(element, kAXEnabledAttribute) as? NSNumber)?.boolValue == true { buttons.append(element) }
+                }
+                if let children = value(element, kAXChildrenAttribute) as? [AXUIElement] {
+                    guard children.count <= 30 else { return ("alertTreeIncomplete", nil) }
+                    pending.append(contentsOf: children.map { ($0, depth + 1) })
+                }
+            }
+            report["exactTextCount"] = exactTextCount
+            report["criticalImageCount"] = criticalImageCount
+            report["buttonCount"] = buttonCount
+            report["enabledOKCount"] = buttons.count
+            guard !readFailed, pending.isEmpty else { return ("alertTreeIncomplete", nil) }
+            guard exactTextCount == 1, criticalImageCount == 1, buttonCount == 1, buttons.count == 1 else { return ("unmatchedOBSAlert", nil) }
+            var pid: pid_t = 0
+            guard AXUIElementGetPid(buttons[0], &pid) == .success, pid == app.processIdentifier else { return ("buttonProcessMismatch", nil) }
+            return ("present", buttons[0])
+        }
+        let (initial, button) = inspect()
+        report["initialState"] = initial
+        guard initial == "present", let button else {
+            report["status"] = initial
+            report["alertAbsentObserved"] = initial == "absent"
+            return report
+        }
+        report["actionAttempted"] = true
+        let pressed = AXUIElementPerformAction(button, kAXPressAction as CFString)
+        report["pressResult"] = pressed.rawValue
+        guard pressed == .success else { report["status"] = "acknowledgementRejected"; return report }
+        // One acknowledgement only; subsequent reads verify disappearance without another action.
+        var observations = 0
+        repeat {
+            let (state, _) = inspect()
+            observations += 1
+            report["absenceObservationCount"] = observations
+            report["finalState"] = state
+            if state == "absent" {
+                report["status"] = "acknowledged"
+                report["alertAbsentObserved"] = true
+                return report
+            }
+            guard state == "present" else { report["status"] = state; return report }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while ProcessInfo.processInfo.systemUptime < deadline
+        report["status"] = "alertRemainedAfterAcknowledgement"
+        return report
     }
 }

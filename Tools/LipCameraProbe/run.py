@@ -53,9 +53,11 @@ def screenshot(name):
     run(name, ['/usr/sbin/screencapture', '-x', str(OUT / (name + '.png'))], timeout=12)
 
 
-def ui(name, approve=False, authenticate=False):
+def ui(name, approve=False, authenticate=False, acknowledge_obs_alert=False):
     command = ['/usr/bin/open', '-W', '-n', '--env', 'GITHUB_ACTIONS=true', '--env', 'RUNNER_OS=macOS', str(UI_APP), '--args', str(OUT / (name + '.json'))]
-    if authenticate:
+    if acknowledge_obs_alert:
+        command.append('acknowledge-obs-camera-alert')
+    elif authenticate:
         command.append('authenticate-host-autologin')
     elif approve:
         command.append('approve')
@@ -77,6 +79,17 @@ def obs_process_ids():
             raise RuntimeError('An OBS-named process is outside the probe-owned application')
         verified.append(int(identifier))
     return verified
+
+
+def observe_obs_exit(restart):
+    deadline = time.monotonic() + 15
+    while time.monotonic() < deadline:
+        restart['remainingProcessIDs'] = obs_process_ids()
+        if not restart['remainingProcessIDs']:
+            restart['exitObserved'] = True
+            return True
+        time.sleep(0.25)
+    return False
 
 
 try:
@@ -241,22 +254,40 @@ try:
         time.sleep(2)
     if not extension_ready:
         raise RuntimeError('Verified camera toggle did not reach enabled state or a ready authentication dialog before the bounded approval deadline')
-    run('extensions-after-approval', ['/usr/bin/systemextensionsctl', 'list'])
-    restart = {'processIDsBefore': obs_process_ids()}
+    run('extensions-after-approval', ['/usr/bin/systemextensionsctl', 'list'], required=True)
+    enabled_state = (OUT / 'extensions-after-approval.log').read_text()
+    if not any('com.obsproject.obs-studio.mac-camera-extension' in line and '[activated enabled]' in line for line in enabled_state.splitlines()):
+        raise RuntimeError('OBS extension was not enabled in the final pre-restart receipt')
+    ui('obs-camera-alert-before-restart', acknowledge_obs_alert=True)
+    alert_receipt = OUT / 'obs-camera-alert-before-restart.json'
+    alert = json.loads(alert_receipt.read_text()) if alert_receipt.is_file() else {'status': 'helperReceiptMissing'}
+    summary['obsCameraAlertBeforeRestart'] = alert
+    acknowledged = alert.get('status') == 'acknowledged' and alert.get('actionAttempted') is True and alert.get('pressResult') == 0
+    absent = alert.get('status') == 'absent' and alert.get('actionAttempted') is False
+    if alert.get('signedOBSIdentityVerified') is not True or alert.get('alertAbsentObserved') is not True or not (acknowledged or absent):
+        screenshot('obs-camera-alert-before-restart-blocked')
+        raise RuntimeError('OBS camera-alert acknowledgement did not verify absence: ' + str(alert.get('status')))
+    restart = {'processIDsBefore': obs_process_ids(), 'exitObserved': False,
+               'alertStateBeforeQuit': alert['status'], 'alertAcknowledgementCount': int(alert.get('actionAttempted') is True)}
     summary['obsRestart'] = restart
     # OBS can return AppleEvent -128 after starting shutdown; process exit is authoritative.
     restart['quitRequestExitCode'] = run('restart-obs-quit', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15)
-    exit_deadline = time.monotonic() + 15
-    while time.monotonic() < exit_deadline:
-        restart['remainingProcessIDs'] = obs_process_ids()
-        if not restart['remainingProcessIDs']:
-            restart['exitObserved'] = True
-            break
-        time.sleep(0.25)
-    else:
+    exited = observe_obs_exit(restart)
+    if not exited and restart['alertAcknowledgementCount'] == 0:
+        # A delayed alert can appear after the preflight; another quit requires this exact observed state.
+        ui('obs-camera-alert-after-blocked-quit', acknowledge_obs_alert=True)
+        delayed_path = OUT / 'obs-camera-alert-after-blocked-quit.json'
+        delayed = json.loads(delayed_path.read_text()) if delayed_path.is_file() else {'status': 'helperReceiptMissing'}
+        summary['obsCameraAlertAfterBlockedQuit'] = delayed
+        restart['alertAcknowledgementCount'] += int(delayed.get('actionAttempted') is True)
+        if delayed.get('signedOBSIdentityVerified') is True and delayed.get('status') == 'acknowledged' and delayed.get('alertAbsentObserved') is True and delayed.get('actionAttempted') is True and delayed.get('pressResult') == 0:
+            restart['quitAfterAcknowledgementExitCode'] = run('restart-obs-quit-after-alert', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15)
+            exited = observe_obs_exit(restart)
+    if not exited:
         ui('obs-restart-exit-blocked')
         screenshot('obs-restart-exit-blocked')
-        raise RuntimeError('OBS did not exit for its documented camera-extension restart')
+        state = summary.get('obsCameraAlertAfterBlockedQuit', alert).get('status')
+        raise RuntimeError('OBS did not exit for its documented camera-extension restart; camera-alert state=' + str(state) + ', acknowledgement attempts=' + str(restart['alertAcknowledgementCount']))
     run('restart-obs-open', ['/usr/bin/open', '-a', str(installed), '--args', '--profile', 'RJTLipProof', '--disable-updater'], required=True)
     websocket_deadline = time.monotonic() + 25
     while time.monotonic() < websocket_deadline:

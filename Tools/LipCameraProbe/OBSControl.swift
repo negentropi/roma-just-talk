@@ -13,6 +13,16 @@ struct OBSControl {
         let reportURL = URL(fileURLWithPath: args[3])
         var results: [[String: Any]] = []
         var virtualCameraActive = false
+        var frontendReady = false
+        var phase = "connecting"
+        func writeReport() {
+            var report: [String: Any] = ["requests": results, "virtualCameraActive": virtualCameraActive, "phase": phase]
+            if requireOutput { report["frontendReady"] = frontendReady }
+            if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
+                try? data.write(to: reportURL, options: .atomic)
+            }
+        }
+        writeReport()
         do {
             let config = try JSONSerialization.jsonObject(with: Data(contentsOf: configurationURL)) as! [String: Any]
             let password = config["server_password"] as! String
@@ -45,6 +55,8 @@ struct OBSControl {
             try await send(["op": 1, "d": identify])
             let identified = try await receive()
             guard identified["op"] as? Int == 2 else { throw ControlError.protocolFailure }
+            phase = "authenticated"
+            writeReport()
             @discardableResult
             func request(_ name: String, _ data: [String: Any] = [:]) async throws -> [String: Any] {
                 let id = UUID().uuidString
@@ -54,16 +66,35 @@ struct OBSControl {
                     guard response["op"] as? Int == 7,
                           let details = response["d"] as? [String: Any], details["requestId"] as? String == id else { continue }
                     results.append(["request": name, "status": details["requestStatus"] ?? [:], "data": details["responseData"] ?? [:]])
+                    writeReport()
                     return details
                 }
                 throw ControlError.protocolFailure
             }
+            if requireOutput {
+                phase = "waitingForFrontend"
+                for check in 0..<20 {
+                    if check > 0 { try await Task.sleep(for: .seconds(1)) }
+                    let state = try await request("GetSceneList")
+                    frontendReady = (state["requestStatus"] as? [String: Any])?["result"] as? Bool == true
+                    if frontendReady { break }
+                }
+                guard frontendReady else { throw ControlError.frontendNotReady }
+            }
+            phase = "configuringSource"
             try await request("SetVideoSettings", ["baseWidth": 640, "baseHeight": 480, "outputWidth": 640, "outputHeight": 480, "fpsNumerator": 25, "fpsDenominator": 1])
             try await request("CreateScene", ["sceneName": "RJTLipProof"])
             try await request("CreateInput", ["sceneName": "RJTLipProof", "inputName": "PublicSilentVideo", "inputKind": "ffmpeg_source", "inputSettings": ["is_local_file": true, "local_file": fixture, "looping": true, "restart_on_activate": true, "clear_on_media_end": false], "sceneItemEnabled": true])
             try await request("SetInputMute", ["inputName": "PublicSilentVideo", "inputMuted": true])
             try await request("SetCurrentProgramScene", ["sceneName": "RJTLipProof"])
             try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"])
+            if requireOutput {
+                try await request("GetCurrentProgramScene")
+                try await request("GetSceneItemList", ["sceneName": "RJTLipProof"])
+                try await request("GetInputSettings", ["inputName": "PublicSilentVideo"])
+                try await request("GetMediaInputStatus", ["inputName": "PublicSilentVideo"])
+            }
+            phase = "startingVirtualCamera"
             try await request("StartVirtualCam")
             for check in 0..<(requireOutput ? 15 : 1) {
                 if check > 0 { try await Task.sleep(for: .seconds(1)) }
@@ -71,13 +102,12 @@ struct OBSControl {
                 virtualCameraActive = (state["responseData"] as? [String: Any])?["outputActive"] as? Bool == true
                 if virtualCameraActive { break }
             }
+            phase = virtualCameraActive ? "active" : "inactive"
         } catch {
             results.append(["error": String(describing: error)])
         }
-        if let data = try? JSONSerialization.data(withJSONObject: ["requests": results, "virtualCameraActive": virtualCameraActive], options: [.prettyPrinted, .sortedKeys]) {
-            try? data.write(to: reportURL, options: .atomic)
-        }
+        writeReport()
         if requireOutput && !virtualCameraActive { exit(1) }
     }
-    enum ControlError: Error { case protocolFailure }
+    enum ControlError: Error { case protocolFailure, frontendNotReady }
 }

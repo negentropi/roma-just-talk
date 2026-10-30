@@ -1,15 +1,18 @@
 import CryptoKit
+import Darwin
 import Foundation
 
 @main
 struct OBSControl {
     static func main() async {
         let args = CommandLine.arguments
-        guard args.count == 4 else { return }
+        guard args.count == 4 || (args.count == 5 && args[4] == "require-output") else { return }
+        let requireOutput = args.count == 5
         let configurationURL = URL(fileURLWithPath: args[1])
         let fixture = args[2]
         let reportURL = URL(fileURLWithPath: args[3])
         var results: [[String: Any]] = []
+        var virtualCameraActive = false
         do {
             let config = try JSONSerialization.jsonObject(with: Data(contentsOf: configurationURL)) as! [String: Any]
             let password = config["server_password"] as! String
@@ -42,7 +45,8 @@ struct OBSControl {
             try await send(["op": 1, "d": identify])
             let identified = try await receive()
             guard identified["op"] as? Int == 2 else { throw ControlError.protocolFailure }
-            func request(_ name: String, _ data: [String: Any] = [:]) async throws {
+            @discardableResult
+            func request(_ name: String, _ data: [String: Any] = [:]) async throws -> [String: Any] {
                 let id = UUID().uuidString
                 try await send(["op": 6, "d": ["requestType": name, "requestId": id, "requestData": data]])
                 for _ in 0..<20 {
@@ -50,7 +54,7 @@ struct OBSControl {
                     guard response["op"] as? Int == 7,
                           let details = response["d"] as? [String: Any], details["requestId"] as? String == id else { continue }
                     results.append(["request": name, "status": details["requestStatus"] ?? [:], "data": details["responseData"] ?? [:]])
-                    return
+                    return details
                 }
                 throw ControlError.protocolFailure
             }
@@ -61,13 +65,19 @@ struct OBSControl {
             try await request("SetCurrentProgramScene", ["sceneName": "RJTLipProof"])
             try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"])
             try await request("StartVirtualCam")
-            try await request("GetVirtualCamStatus")
+            for check in 0..<(requireOutput ? 15 : 1) {
+                if check > 0 { try await Task.sleep(for: .seconds(1)) }
+                let state = try await request("GetVirtualCamStatus")
+                virtualCameraActive = (state["responseData"] as? [String: Any])?["outputActive"] as? Bool == true
+                if virtualCameraActive { break }
+            }
         } catch {
             results.append(["error": String(describing: error)])
         }
-        if let data = try? JSONSerialization.data(withJSONObject: ["requests": results], options: [.prettyPrinted, .sortedKeys]) {
+        if let data = try? JSONSerialization.data(withJSONObject: ["requests": results, "virtualCameraActive": virtualCameraActive], options: [.prettyPrinted, .sortedKeys]) {
             try? data.write(to: reportURL, options: .atomic)
         }
+        if requireOutput && !virtualCameraActive { exit(1) }
     }
     enum ControlError: Error { case protocolFailure }
 }

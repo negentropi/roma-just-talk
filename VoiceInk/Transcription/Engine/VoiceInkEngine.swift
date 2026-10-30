@@ -505,9 +505,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let lips = await recording.lipRecognition?.result
         try checkRecording(recording)
         if case .success(let text) = voice, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            logger.notice("recognition.selected id=\(recording.id.uuidString, privacy: .public) source=voice chars=\(text.count, privacy: .public)")
             return text
         }
         if case .success(let text) = lips, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            logger.notice("recognition.selected id=\(recording.id.uuidString, privacy: .public) source=lips chars=\(text.count, privacy: .public)")
             return text
         }
         if case .failure(let error) = voice, recording.mode == .voice { throw error }

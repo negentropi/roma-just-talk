@@ -41,7 +41,7 @@ python3 Tools/LipDictationE2E/run.py \
 
 The visual helper compiles the existing runtime helper sources with one extra entry point. It reuses the real shortcut injector, owned TextEdit targets, AX/rendered observer, application identity checks, playback, output routing, and restoration. No app-specific fake camera input, recognition result, insertion hook, or private command is introduced. A small authenticated localhost OBS client changes only the probe-owned `PublicSilentVideo` input. Its private random password stays on the host and never enters logs or artifacts.
 
-The actual settings UI installs the model. The camera receives a static face while capture starts. Once the app reports recording, OBS plays the complete public motion clip with a one-second still lead. Matched audio contains the same one-second silence lead. The cases cover:
+The default full sequence installs the model through the actual settings UI before provisioning OBS. Setup needs camera permission and model storage, so its UI check runs separately from camera-device provisioning. The camera then receives a static face while capture starts. Once the app reports recording, OBS plays the complete public motion clip with a one-second still lead. Matched audio contains the same one-second silence lead. The cases cover:
 
 - Voice plus lips, requiring the voice result to be selected.
 - Voice plus lips with independently verified zero PCM audio, requiring the visual result to be selected.

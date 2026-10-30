@@ -90,6 +90,19 @@ struct SystemExtensionAuthentication {
             return result
         }
         result["currentAccountMatchesPrompt"] = true
+        var fieldPID: pid_t = 0
+        let fieldPIDStatus = AXUIElementGetPid(secureFields[0], &fieldPID)
+        result["secureFieldPID"] = fieldPID
+        result["secureFieldPIDError"] = fieldPIDStatus.rawValue
+        var settable = DarwinBoolean(false)
+        let settableStatus = AXUIElementIsAttributeSettable(secureFields[0], kAXValueAttribute as CFString, &settable)
+        result["secureValueSettable"] = settable.boolValue
+        result["secureValueSettableError"] = settableStatus.rawValue
+        guard fieldPIDStatus == .success, fieldPID == application.processIdentifier,
+              settableStatus == .success, settable.boolValue else {
+            result["reason"] = "verifiedSecureFieldValueNotSettable"
+            return result
+        }
         let marker = reportURL.deletingLastPathComponent().appendingPathComponent(".host-auth-attempted")
         let descriptor = Darwin.open(marker.path, O_CREAT | O_EXCL | O_WRONLY, 0o600)
         guard descriptor >= 0 else {
@@ -138,7 +151,7 @@ struct SystemExtensionAuthentication {
             }
             try account.verifyPassword(password)
             result["accountVerified"] = true
-            guard let submitPoint = center(buttons[0]), let securePoint = center(secureFields[0]) else {
+            guard let submitPoint = center(buttons[0]) else {
                 result["reason"] = "authenticationControlFrameUnavailable"
                 return result
             }
@@ -146,36 +159,14 @@ struct SystemExtensionAuthentication {
                 result["reason"] = "authenticationDeadlinePassed"
                 return result
             }
-            guard click(securePoint) else {
-                result["reason"] = "secureFieldPointerFocusFailed"
-                return result
-            }
-            Thread.sleep(forTimeInterval: 0.2)
-            var focused: CFTypeRef?
-            let focusStatus = AXUIElementCopyAttributeValue(AXUIElementCreateSystemWide(), kAXFocusedUIElementAttribute as CFString, &focused)
-            var focusProbe: [String: Any] = ["globalFocusError": focusStatus.rawValue, "expectedPID": application.processIdentifier]
-            if let focused, CFGetTypeID(focused) == AXUIElementGetTypeID() {
-                let focusedElement = focused as! AXUIElement
-                var pid: pid_t = 0
-                focusProbe["focusedPIDError"] = AXUIElementGetPid(focusedElement, &pid).rawValue
-                focusProbe["focusedPID"] = pid
-                focusProbe["role"] = value(focusedElement, kAXRoleAttribute) as? String ?? ""
-                focusProbe["subrole"] = value(focusedElement, kAXSubroleAttribute) as? String ?? ""
-                focusProbe["sameElement"] = CFEqual(focused, secureFields[0])
-            }
-            result["focusProbe"] = focusProbe
-            guard focusStatus == .success, let focused, CFEqual(focused, secureFields[0]) else {
-                result["reason"] = "secureFieldFocusNotConfirmed"
-                return result
-            }
-            var units = Array(password.utf16)
-            defer { _ = units.withUnsafeMutableBytes { $0.initializeMemory(as: UInt8.self, repeating: 0) } }
-            guard let down = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true),
-                  let up = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false) else { return result }
-            units.withUnsafeBufferPointer { down.keyboardSetUnicodeString(stringLength: $0.count, unicodeString: $0.baseAddress!) }
+            result["inputMethod"] = "AXSetValueOnVerifiedSecureField"
             result["authenticationAttempted"] = true
-            down.post(tap: .cghidEventTap)
-            up.post(tap: .cghidEventTap)
+            let inputStatus = AXUIElementSetAttributeValue(secureFields[0], kAXValueAttribute as CFString, password as CFString)
+            result["secureValueWriteError"] = inputStatus.rawValue
+            guard inputStatus == .success else {
+                result["reason"] = "verifiedSecureFieldValueWriteRejected"
+                return result
+            }
             Thread.sleep(forTimeInterval: 0.15)
             result["submitted"] = click(submitPoint)
         } catch {

@@ -41,6 +41,31 @@ class Recorder: NSObject, ObservableObject {
     enum RecorderError: Error {
         case couldNotStartRecording
     }
+
+    #if DEBUG
+    enum MicrophoneOperationForTesting: Equatable {
+        case preRoll, recording, deviceSwitch, suspension, status
+    }
+    var microphoneOperationEnqueuedForTesting: ((MicrophoneOperationForTesting) -> Void)?
+
+    func holdAudioSetupQueueForTesting() async -> DispatchSemaphore {
+        let release = DispatchSemaphore(value: 0)
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            audioSetupQueue.async {
+                continuation.resume()
+                release.wait()
+            }
+        }
+        return release
+    }
+
+    func switchMicrophoneDeviceForTesting(to deviceID: AudioDeviceID) async {
+        await handleDeviceSwitchRequired(Notification(
+            name: .audioDeviceSwitchRequired,
+            userInfo: VoiceInkMacOSAudioDeviceChangeRequest.switchRequiredUserInfo(deviceID: deviceID)
+        ))
+    }
+    #endif
     
     override init() {
         super.init()
@@ -120,6 +145,9 @@ class Recorder: NSObject, ObservableObject {
                         continuation.resume(throwing: error)
                     }
                 }
+                #if DEBUG
+                microphoneOperationEnqueuedForTesting?(.deviceSwitch)
+                #endif
             }
             guard switched, microphoneCaptureEnabled.load(ordering: .acquiring),
                   captureGeneration.load(ordering: .acquiring) == generation,
@@ -188,22 +216,33 @@ class Recorder: NSObject, ObservableObject {
                 currentRecorder?.stopRecording()
                 continuation.resume()
             }
+            #if DEBUG
+            microphoneOperationEnqueuedForTesting?(.suspension)
+            #endif
         }
         if !microphoneCaptureEnabled.load(ordering: .acquiring) {
             audioMeter = AudioMeter(averagePower: 0, peakPower: 0)
         }
     }
 
-    func microphoneCaptureStatus() async -> (isRecording: Bool, isPreBuffering: Bool, hasAudioUnit: Bool) {
+    func microphoneCaptureStatus() async -> (
+        isRecording: Bool, isPreBuffering: Bool, hasAudioUnit: Bool,
+        bufferedPCMBytes: Int, hasAudioChunkHandler: Bool
+    ) {
         let currentRecorder = recorder
         return await withCheckedContinuation { continuation in
             audioSetupQueue.async {
                 continuation.resume(returning: (
                     isRecording: currentRecorder?.isCurrentlyRecording ?? false,
                     isPreBuffering: currentRecorder?.isPreBuffering ?? false,
-                    hasAudioUnit: currentRecorder?.hasAudioUnit ?? false
+                    hasAudioUnit: currentRecorder?.hasAudioUnit ?? false,
+                    bufferedPCMBytes: currentRecorder?.bufferedPCMBytes ?? 0,
+                    hasAudioChunkHandler: currentRecorder?.onAudioChunk != nil
                 ))
             }
+            #if DEBUG
+            microphoneOperationEnqueuedForTesting?(.status)
+            #endif
         }
     }
 
@@ -250,6 +289,9 @@ class Recorder: NSObject, ObservableObject {
                         continuation.resume(throwing: error)
                     }
                 }
+                #if DEBUG
+                microphoneOperationEnqueuedForTesting?(.preRoll)
+                #endif
             }
             guard started, microphoneCaptureEnabled.load(ordering: .acquiring),
                   captureGeneration.load(ordering: .acquiring) == generation else { return }
@@ -345,6 +387,9 @@ class Recorder: NSObject, ObservableObject {
                         continuation.resume(throwing: error)
                     }
                 }
+                #if DEBUG
+                microphoneOperationEnqueuedForTesting?(.recording)
+                #endif
             }
             latencyTrace.executorResumed(startResumeCheckpoint)
             guard microphoneCaptureEnabled.load(ordering: .acquiring),

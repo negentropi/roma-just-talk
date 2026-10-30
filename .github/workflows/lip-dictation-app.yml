@@ -76,11 +76,12 @@ jobs:
         timeout-minutes: 25
         env:
           RJT_REQUIRE_MICROPHONE_PRIVACY_PROOF: "1"
+          TEST_RUNNER_RJT_REQUIRE_MICROPHONE_PRIVACY_PROOF: "1"
         run: bash scripts/run-macos-ci-unit-tests.sh
 
-      - name: Prove cancellation across both paste preparation awaits
+      - name: Prove microphone teardown and paste cancellation regressions
         if: ${{ !cancelled() && steps.unit.outcome == 'success' }}
-        timeout-minutes: 20
+        timeout-minutes: 35
         run: python3 scripts/verify-lip-pipeline-cancellation.py
 
       - name: Package app

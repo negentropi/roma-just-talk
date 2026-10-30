@@ -37,6 +37,12 @@ jobs:
           fi
           xcrun metal --version
 
+      - name: Verify runtime harness core checks
+        run: |
+          set -o pipefail
+          mkdir -p .local-build
+          swift run --package-path Tools/RuntimeE2EHarness --scratch-path .local-build/RuntimeE2EHarness RuntimeE2ECoreChecks 2>&1 | tee .local-build/runtime-e2e-core-checks.log
+
       - name: Compile and load the actual runtime proof helper
         run: python3 Tools/LipDictationE2E/run.py --build-helper-only --out "$RUNNER_TEMP/lip-helper-preflight"
 
@@ -83,7 +89,7 @@ jobs:
           TEST_RUNNER_RJT_REQUIRE_MICROPHONE_PRIVACY_PROOF: "1"
         run: bash scripts/run-macos-ci-unit-tests.sh
 
-      - name: Prove microphone, paste, auto-send, and prewarm regressions
+      - name: Prove microphone, paste, auto-send, Power Mode, and permission regressions
         if: ${{ !cancelled() && steps.unit.outcome == 'success' }}
         timeout-minutes: 35
         run: python3 scripts/verify-lip-pipeline-cancellation.py
@@ -113,6 +119,7 @@ jobs:
             .local-build/onboarding-test-evidence/**
             .local-build/lip-pipeline-regression/**
             .local-build/lip-power-mode-regression/**
+            .local-build/runtime-e2e-core-checks.log
             ${{ runner.temp }}/lip-helper-preflight/**
             VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
           if-no-files-found: ignore

@@ -111,6 +111,15 @@ jobs:
           curl --fail --location --retry 3 \
             "https://raw.githubusercontent.com/CheyneyComputerScience/CREMA-D/$fixture_revision/README.md" \
             --output "$LIP_PROOF_DIR/CREMA-D-source-README.md"
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=black:s=480x360:r=25 \
+            -t 2 -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/no-face.mp4"
+          ffmpeg -hide_banner -loglevel error -loop 1 -framerate 25 -i "$LIP_PROOF_DIR/fixtures/a-first.png" \
+            -f lavfi -i color=c=black:s=480x360:r=25 \
+            -filter_complex '[0:v]trim=end_frame=12,setpts=PTS-STARTPTS[face];[1:v]trim=end_frame=25,setpts=PTS-STARTPTS[blank];[face][blank]concat=n=2:v=1:a=0[out]' \
+            -map '[out]' -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/face-lost.mp4"
+          ffmpeg -hide_banner -loglevel error -i "$LIP_PROOF_DIR/fixtures/c-silent.mp4" \
+            -filter_complex '[0:v]split=2[left][right];[left][right]hstack=inputs=2[out]' \
+            -map '[out]' -an -c:v libx264 -crf 0 -pix_fmt yuv420p "$LIP_PROOF_DIR/fixtures/multiple-faces.mp4"
 
       - name: Install verified original publisher weights
         shell: bash
@@ -139,6 +148,16 @@ jobs:
               printf '%s\t%s\n' "$case_name" "$outcome" >> "$LIP_PROOF_DIR/exit-codes.tsv"
               cat "$LIP_PROOF_DIR/receipts/$case_name.json"
             done
+          done
+          for case_name in no-face face-lost multiple-faces; do
+            outcome=0
+            "$LIP_PROOF_BIN" infer --model-directory "$LIP_MODEL_DIR" \
+              --video "$LIP_PROOF_DIR/fixtures/$case_name.mp4" \
+              --receipt "$LIP_PROOF_DIR/receipts/$case_name.json" \
+              > "$LIP_PROOF_DIR/logs/$case_name.stdout.log" \
+              2> "$LIP_PROOF_DIR/logs/$case_name.stderr.log" || outcome=$?
+            printf '%s\t%s\n' "$case_name" "$outcome" >> "$LIP_PROOF_DIR/exit-codes.tsv"
+            cat "$LIP_PROOF_DIR/receipts/$case_name.json"
           done
 
       - name: Compare frozen outputs with withheld human references
@@ -192,6 +211,14 @@ jobs:
               if pair['motionEqualsFrozen']:
                   acceptance_errors.append(f'{label}: motion text must differ from frozen text')
               results.append(pair)
+          face_controls = {}
+          for case_name, expected_code in [('no-face', 'mouthVideo.missingFace'), ('face-lost', 'mouthVideo.missingFace'), ('multiple-faces', 'mouthVideo.multipleFaces')]:
+              receipt = json.loads((root / 'receipts' / f'{case_name}.json').read_text())
+              face_controls[case_name] = receipt
+              if receipt['status'] != 'error' or receipt.get('errorCode') != expected_code or receipt.get('text', ''):
+                  acceptance_errors.append(f'{case_name}: must reject with {expected_code} and no text')
+              if case_name == 'face-lost' and receipt.get('errorFrame', -1) < 12:
+                  acceptance_errors.append('face-lost: must detect the visible prefix before rejecting actual face loss')
           summary = {
               'schemaVersion': 1,
               'inferenceBoundary': 'Swift AVFoundation + Vision mouth preprocessing + native CPU ONNX Runtime',
@@ -202,6 +229,7 @@ jobs:
               'controlAcceptancePassed': not acceptance_errors,
               'acceptanceErrors': acceptance_errors,
               'results': results,
+              'faceControls': face_controls,
           }
           (root / 'comparison.json').write_text(json.dumps(summary, indent=2) + '\n')
           print(json.dumps(summary, indent=2))

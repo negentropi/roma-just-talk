@@ -85,6 +85,8 @@ private struct Receipt: Encodable {
     var errorCode: String?
     var errorMessage: String?
     var errorDetails: String?
+    var errorFrame: Int?
+    var errorPresentationTime: Double?
 }
 
 @main private struct LipDictationProof {
@@ -148,6 +150,15 @@ private struct Receipt: Encodable {
             receipt.errorCode = errorCode(for: error)
             receipt.errorMessage = error.localizedDescription
             receipt.errorDetails = String(reflecting: error)
+            if let error = error as? MouthVideoProcessingError {
+                switch error {
+                case .missingFace(let frame, let presentationTime):
+                    receipt.errorFrame = frame
+                    receipt.errorPresentationTime = presentationTime
+                case .multipleFaces(let frame): receipt.errorFrame = frame
+                default: break
+                }
+            }
         }
         receipt.timingsSeconds["total"] = elapsed(since: start)
         let encoder = JSONEncoder()
@@ -168,6 +179,13 @@ private struct Receipt: Encodable {
     }
 
     private static func errorCode(for error: Error) -> String? {
+        if let error = error as? MouthVideoProcessingError {
+            switch error {
+            case .missingFace: return "mouthVideo.missingFace"
+            case .multipleFaces: return "mouthVideo.multipleFaces"
+            default: return "mouthVideo.processingFailure"
+            }
+        }
         guard let error = error as? LipRuntimeError else { return nil }
         switch error {
         case .alreadyRecognizing: return "lipRuntime.alreadyRecognizing"

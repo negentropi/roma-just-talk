@@ -62,6 +62,9 @@ public enum MouthVideoProcessor {
         )
         let duration = CMTimeGetSeconds(CMTimeRangeGetEnd(timeRange)) - previous.time
         var schedule = try MouthFrameSchedule(start: previous.time, duration: duration)
+        let faceRequest = VNDetectFaceRectanglesRequest()
+        faceRequest.revision = VNDetectFaceRectanglesRequestRevision3
+        faceRequest.preferBackgroundProcessing = true
         let request = VNDetectFaceLandmarksRequest()
         request.revision = VNDetectFaceLandmarksRequestRevision3
         request.constellation = .constellation76Points
@@ -73,7 +76,9 @@ public enum MouthVideoProcessor {
         func append(_ sample: VideoFrame) throws {
             try Task.checkCancellation()
             if lastObservation?.sourceFrame != sample.index {
-                lastObservation = try autoreleasepool { try detect(sample, geometry: geometry, request: request) }
+                lastObservation = try autoreleasepool {
+                    try detect(sample, geometry: geometry, faceRequest: faceRequest, request: request)
+                }
             }
             observations.append(lastObservation!)
         }
@@ -131,21 +136,28 @@ public enum MouthVideoProcessor {
     }
 
     private static func detect(
-        _ sample: VideoFrame, geometry: VideoGeometry, request: VNDetectFaceLandmarksRequest
+        _ sample: VideoFrame, geometry: VideoGeometry,
+        faceRequest: VNDetectFaceRectanglesRequest, request: VNDetectFaceLandmarksRequest
     ) throws -> MouthObservation {
         guard CVPixelBufferGetWidth(sample.pixels) == geometry.rawWidth,
               CVPixelBufferGetHeight(sample.pixels) == geometry.rawHeight else {
             throw MouthVideoProcessingError.unsupportedVideo
         }
-        try VNImageRequestHandler(cvPixelBuffer: sample.pixels, orientation: geometry.orientation).perform([request])
+        let handler = VNImageRequestHandler(cvPixelBuffer: sample.pixels, orientation: geometry.orientation)
+        try handler.perform([faceRequest])
         try Task.checkCancellation()
-        let faces = request.results ?? []
+        let faces = faceRequest.results ?? []
         guard !faces.isEmpty else {
             throw MouthVideoProcessingError.missingFace(frame: sample.index, presentationTime: sample.time)
         }
         guard faces.count == 1 else { throw MouthVideoProcessingError.multipleFaces(frame: sample.index) }
-        let face = faces[0]
-        guard face.confidence >= 0.5, let landmarks = face.landmarks else {
+        // Rectangle observations contain no old landmarks, so Vision must compute this frame's points.
+        request.inputFaceObservations = faces
+        defer { request.inputFaceObservations = nil }
+        try handler.perform([request])
+        try Task.checkCancellation()
+        guard let face = request.results?.first, request.results?.count == 1,
+              face.confidence >= 0.5, let landmarks = face.landmarks else {
             throw MouthVideoProcessingError.landmarksUnavailable(frame: sample.index)
         }
         func points(_ region: VNFaceLandmarkRegion2D?, minimum: Int) throws -> [CGPoint] {

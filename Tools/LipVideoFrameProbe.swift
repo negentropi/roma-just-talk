@@ -40,24 +40,25 @@ import ImageIO
         let timeRange = try await track.load(.timeRange)
         let formats = try await track.load(.formatDescriptions)
         let nominalFrameRate = try await track.load(.nominalFrameRate)
-        let reader = try AVAssetReader(asset: asset)
-        defer { reader.cancelReading() }
-        let settings: [String: Any] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
-        let output = AVAssetReaderTrackOutput(track: track, outputSettings: settings)
-        output.alwaysCopiesSampleData = false
-        guard reader.canAdd(output) else { throw ProbeError.cannotRead }
-        reader.add(output)
-        guard reader.startReading() else { throw reader.error ?? ProbeError.cannotRead }
-        var samples: [[String: Any]] = []
-        for index in 0..<limit {
-            try Task.checkCancellation()
-            guard let sample = output.copyNextSampleBuffer() else {
-                guard reader.status == .completed else { throw reader.error ?? ProbeError.cannotRead }
-                break
+        let segments = try await track.load(.segments)
+        let unbounded = try snapshots(asset: asset, track: track, range: nil, directory: directory, limit: limit)
+        let mediaRanges = segments.filter { !$0.isEmpty }.map { $0.timeMapping.target }
+        var bounded: [String: Any] = ["status": "noNonemptyMedia"]
+        if let start = mediaRanges.map(\.start).min(by: { CMTimeCompare($0, $1) < 0 }),
+           let end = mediaRanges.map({ CMTimeRangeGetEnd($0) }).max(by: { CMTimeCompare($0, $1) < 0 }) {
+            let range = CMTimeRange(start: start, end: end)
+            bounded = ["selectedTimeRange": rangeJSON(range), "outputDirectory": "bounded-media"]
+            do {
+                let target = directory.appendingPathComponent("bounded-media", isDirectory: true)
+                try FileManager.default.createDirectory(at: target, withIntermediateDirectories: true)
+                let result = try snapshots(asset: asset, track: track, range: range, directory: target, limit: 1)
+                bounded["status"] = "success"
+                bounded["samples"] = result.samples
+                bounded["readerStatusAfterSnapshots"] = result.status
+            } catch {
+                bounded["status"] = "error"
+                bounded["errorDetails"] = String(reflecting: error)
             }
-            samples.append(try autoreleasepool {
-                try snapshot(sample, index: index, directory: directory)
-            })
         }
         return [
             "schemaVersion": 1,
@@ -69,17 +70,44 @@ import ImageIO
             "naturalSize": [naturalSize.width, naturalSize.height],
             "preferredTransform": [transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty],
             "nominalFrameRate": nominalFrameRate,
-            "trackTimeRange": ["start": time(timeRange.start), "duration": time(timeRange.duration),
-                               "end": time(CMTimeRangeGetEnd(timeRange))],
+            "trackTimeRange": rangeJSON(timeRange),
+            "segments": segments.map { ["isEmpty": $0.isEmpty, "source": rangeJSON($0.timeMapping.source),
+                                        "target": rangeJSON($0.timeMapping.target)] },
             "formatDescriptions": formats.map { description -> [String: Any] in
                 let size = CMVideoFormatDescriptionGetDimensions(description)
                 return ["codec": fourCC(CMFormatDescriptionGetMediaSubType(description)),
                         "width": size.width, "height": size.height,
                         "extensions": jsonSafe(CMFormatDescriptionGetExtensions(description))]
             },
-            "readerStatusAfterSnapshots": reader.status.rawValue,
-            "samples": samples
+            "readerStatusAfterSnapshots": unbounded.status,
+            "samples": unbounded.samples,
+            "boundedMediaRead": bounded
         ]
+    }
+
+    private static func snapshots(
+        asset: AVAsset, track: AVAssetTrack, range: CMTimeRange?, directory: URL, limit: Int
+    ) throws -> (samples: [[String: Any]], status: Int) {
+        let reader = try AVAssetReader(asset: asset)
+        defer { reader.cancelReading() }
+        if let range { reader.timeRange = range }
+        let output = AVAssetReaderTrackOutput(track: track, outputSettings: [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
+        ])
+        output.alwaysCopiesSampleData = false
+        guard reader.canAdd(output) else { throw ProbeError.cannotRead }
+        reader.add(output)
+        guard reader.startReading() else { throw reader.error ?? ProbeError.cannotRead }
+        var samples: [[String: Any]] = []
+        for index in 0..<limit {
+            try Task.checkCancellation()
+            guard let sample = output.copyNextSampleBuffer() else {
+                guard reader.status == .completed else { throw reader.error ?? ProbeError.cannotRead }
+                break
+            }
+            samples.append(try autoreleasepool { try snapshot(sample, index: index, directory: directory) })
+        }
+        return (samples, reader.status.rawValue)
     }
 
     private static func snapshot(_ sample: CMSampleBuffer, index: Int, directory: URL) throws -> [String: Any] {
@@ -137,6 +165,9 @@ import ImageIO
             "presentationTime": time(CMSampleBufferGetPresentationTimeStamp(sample)),
             "decodeTime": time(CMSampleBufferGetDecodeTimeStamp(sample)),
             "sampleDuration": time(CMSampleBufferGetDuration(sample)),
+            "outputPresentationTime": time(CMSampleBufferGetOutputPresentationTimeStamp(sample)),
+            "outputDecodeTime": time(CMSampleBufferGetOutputDecodeTimeStamp(sample)),
+            "outputDuration": time(CMSampleBufferGetOutputDuration(sample)),
             "sampleCount": CMSampleBufferGetNumSamples(sample),
             "sampleIsValid": CMSampleBufferIsValid(sample),
             "sampleDataIsReady": CMSampleBufferDataIsReady(sample),
@@ -176,6 +207,10 @@ import ImageIO
         let seconds = CMTimeGetSeconds(time)
         return ["value": time.value, "timescale": time.timescale, "epoch": time.epoch,
                 "flags": time.flags.rawValue, "seconds": seconds.isFinite ? seconds as Any : NSNull()]
+    }
+
+    private static func rangeJSON(_ range: CMTimeRange) -> [String: Any] {
+        ["start": time(range.start), "duration": time(range.duration), "end": time(CMTimeRangeGetEnd(range))]
     }
 
     private static func fourCC(_ code: FourCharCode) -> String {

@@ -130,6 +130,10 @@ jobs:
             > "$LIP_PROOF_DIR/logs/install.stdout.log" \
             2> "$LIP_PROOF_DIR/logs/install.stderr.log"
 
+      - name: Prove the original first-frame padding failure on the same host
+        shell: bash
+        run: python3 VoiceInkLip/Tools/verify_native_padding.py
+
       - name: Recognize silent motion and frozen controls with native Vision and ORT
         shell: bash
         run: |

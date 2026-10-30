@@ -49,19 +49,20 @@ public enum MouthVideoProcessor {
         guard tracks.count == 1, let track = tracks.first else {
             throw MouthVideoProcessingError.noVideo
         }
-        let (preferredTransform, timeRange) = try await (
-            track.load(.preferredTransform), track.load(.timeRange)
+        let (preferredTransform, segments) = try await (
+            track.load(.preferredTransform), track.load(.segments)
         )
+        let mediaRange = try mediaTimeRange(segments)
         let reference = try AlignmentReference.load()
-        let firstPass = try VideoFrameReader(asset: asset, track: track)
+        let firstPass = try VideoFrameReader(asset: asset, track: track, timeRange: mediaRange)
         defer { firstPass.cancel() }
         guard var previous = try firstPass.next() else { throw MouthVideoProcessingError.emptyVideo }
         let geometry = try VideoGeometry(
             width: CVPixelBufferGetWidth(previous.pixels),
             height: CVPixelBufferGetHeight(previous.pixels), transform: preferredTransform
         )
-        let duration = CMTimeGetSeconds(CMTimeRangeGetEnd(timeRange)) - previous.time
-        var schedule = try MouthFrameSchedule(start: previous.time, duration: duration)
+        let duration = CMTimeGetSeconds(mediaRange.duration)
+        var schedule = try MouthFrameSchedule(start: CMTimeGetSeconds(mediaRange.start), duration: duration)
         let faceRequest = VNDetectFaceRectanglesRequest()
         faceRequest.revision = VNDetectFaceRectanglesRequestRevision3
         faceRequest.preferBackgroundProcessing = true
@@ -94,7 +95,7 @@ public enum MouthVideoProcessor {
         }
         for _ in schedule.finish(lastIndex: previous.index) { try append(previous) }
 
-        let secondPass = try VideoFrameReader(asset: asset, track: track)
+        let secondPass = try VideoFrameReader(asset: asset, track: track, timeRange: mediaRange)
         defer { secondPass.cancel() }
         var values: [Float] = []
         values.reserveCapacity(observations.count * MouthGeometry.outputSize * MouthGeometry.outputSize)
@@ -133,6 +134,23 @@ public enum MouthVideoProcessor {
         guard outputIndex == observations.count else { throw MouthVideoProcessingError.decodingFailed }
         try Task.checkCancellation()
         return MouthVideoFrames(values: values, frameCount: observations.count, duration: duration)
+    }
+
+    private static func mediaTimeRange(_ segments: [AVAssetTrackSegment]) throws -> CMTimeRange {
+        let ranges = segments.filter { !$0.isEmpty }.map { $0.timeMapping.target }
+        guard !ranges.isEmpty else { throw MouthVideoProcessingError.emptyVideo }
+        guard ranges.allSatisfy({
+            $0.isValid && CMTimeGetSeconds($0.start).isFinite
+                && CMTimeGetSeconds($0.duration).isFinite && CMTimeCompare($0.duration, .zero) > 0
+        }) else { throw MouthVideoProcessingError.invalidTiming }
+        let start = ranges.map(\.start).min { CMTimeCompare($0, $1) < 0 }!
+        let end = ranges.map { CMTimeRangeGetEnd($0) }.max { CMTimeCompare($0, $1) < 0 }!
+        let range = CMTimeRange(start: start, end: end)
+        // Empty edge edits contain no recorded image; an interior gap still invalidates the recording.
+        guard !segments.contains(where: {
+            $0.isEmpty && CMTimeCompare(CMTimeRangeGetIntersection($0.timeMapping.target, otherRange: range).duration, .zero) > 0
+        }) else { throw MouthVideoProcessingError.invalidTiming }
+        return range
     }
 
     private static func detect(
@@ -236,8 +254,9 @@ private final class VideoFrameReader {
     private let output: AVAssetReaderTrackOutput
     private var nextIndex = 0
 
-    init(asset: AVAsset, track: AVAssetTrack) throws {
+    init(asset: AVAsset, track: AVAssetTrack, timeRange: CMTimeRange) throws {
         reader = try AVAssetReader(asset: asset)
+        reader.timeRange = timeRange
         output = AVAssetReaderTrackOutput(track: track, outputSettings: [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
         ])

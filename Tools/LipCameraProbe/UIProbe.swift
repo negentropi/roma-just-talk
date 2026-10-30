@@ -15,7 +15,10 @@ struct UIProbe {
         let trusted = AXIsProcessTrusted()
         let deadline = ProcessInfo.processInfo.systemUptime + 8
         var requiresAuthentication = false
-        for app in NSWorkspace.shared.runningApplications where targets.contains(app.bundleIdentifier ?? "") && (!authenticating || app.bundleIdentifier == "com.apple.SecurityAgent") {
+        let runningApplications = NSWorkspace.shared.runningApplications.sorted { left, right in
+            (left.bundleIdentifier == "com.apple.SecurityAgent" ? 0 : 1) < (right.bundleIdentifier == "com.apple.SecurityAgent" ? 0 : 1)
+        }
+        for app in runningApplications where targets.contains(app.bundleIdentifier ?? "") && (!authenticating || app.bundleIdentifier == "com.apple.SecurityAgent") {
             guard ProcessInfo.processInfo.systemUptime < deadline else { break }
             let root = AXUIElementCreateApplication(app.processIdentifier)
             AXUIElementSetMessagingTimeout(root, 0.2)

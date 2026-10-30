@@ -175,10 +175,23 @@ try:
     run('extensions-requested', ['/usr/bin/systemextensionsctl', 'list'])
     screenshot('extension-request')
     run('open-extension-settings', ['/usr/bin/open', 'x-apple.systempreferences:com.apple.LoginItems-Settings.extension'])
-    for attempt in range(4):
-        ui('approval-' + str(attempt), approve=True)
+    approval_deadline = time.monotonic() + 45
+    attempt = 0
+    row_requested = False
+    extension_ready = False
+    while time.monotonic() < approval_deadline:
+        state_name = 'extensions-approval-' + str(attempt)
+        run(state_name, ['/usr/bin/systemextensionsctl', 'list'])
+        state = (OUT / (state_name + '.log')).read_text()
+        if any('com.obsproject.obs-studio.mac-camera-extension' in line and '[activated enabled]' in line for line in state.splitlines()):
+            extension_ready = True
+            break
+        ui('approval-' + str(attempt), approve=not row_requested)
         screenshot('approval-' + str(attempt))
         report = json.loads((OUT / ('approval-' + str(attempt) + '.json')).read_text())
+        if any(action.get('rowIdentityVerified') and action.get('posted') for action in report.get('actions', [])):
+            row_requested = True
+            summary['verifiedRowToggleRequested'] = True
         if report.get('authenticationRequired'):
             summary['administratorAuthenticationRequired'] = True
             if os.environ.get('LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH') != '1':
@@ -190,7 +203,7 @@ try:
             if not any(action.get('accountVerified') and action.get('authenticationAttempted') and action.get('submitted') for action in actions):
                 raise RuntimeError('Documented same-host authentication unavailable; see value-free authentication receipt')
             enabled = False
-            for check in range(4):
+            for check in range(10):
                 time.sleep(3)
                 name = 'extensions-post-auth-' + str(check)
                 run(name, ['/usr/bin/systemextensionsctl', 'list'])
@@ -201,10 +214,14 @@ try:
             summary['extensionEnabledAfterAuthentication'] = enabled
             if not enabled:
                 raise RuntimeError('Ordinary credential submission did not enable the camera extension; no further authentication attempt')
+            extension_ready = True
             break
         if not report.get('accessibilityTrusted'):
-            break
+            raise RuntimeError('Test helper lost Accessibility authorization during extension approval')
+        attempt += 1
         time.sleep(2)
+    if not extension_ready:
+        raise RuntimeError('Verified camera toggle did not reach enabled state or a ready authentication dialog before the bounded approval deadline')
     run('extensions-after-approval', ['/usr/bin/systemextensionsctl', 'list'])
     run('retry-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-retry.json')], timeout=20)
     app = OUT / 'LipCameraProbe.app'

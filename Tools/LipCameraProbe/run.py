@@ -171,6 +171,7 @@ try:
         time.sleep(2)
     screenshot('obs-after-startup')
     run('configure-and-request-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-first.json')], timeout=25)
+    ui('finish-obs-startup', approve=True)
     time.sleep(3)
     run('extensions-requested', ['/usr/bin/systemextensionsctl', 'list'])
     screenshot('extension-request')
@@ -223,7 +224,17 @@ try:
     if not extension_ready:
         raise RuntimeError('Verified camera toggle did not reach enabled state or a ready authentication dialog before the bounded approval deadline')
     run('extensions-after-approval', ['/usr/bin/systemextensionsctl', 'list'])
-    run('retry-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-retry.json')], timeout=20)
+    run('restart-obs-quit', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15, required=True)
+    for check in range(20):
+        processes = subprocess.run(['/usr/bin/pgrep', '-x', 'OBS'], stdout=subprocess.DEVNULL)
+        if processes.returncode == 1:
+            break
+        time.sleep(0.25)
+    else:
+        raise RuntimeError('OBS did not exit for its documented camera-extension restart')
+    run('restart-obs-open', ['/usr/bin/open', '-a', str(installed), '--args', '--profile', 'RJTLipProof', '--disable-updater'], required=True)
+    time.sleep(3)
+    run('retry-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-retry.json'), 'require-output'], timeout=30, required=True)
     app = OUT / 'LipCameraProbe.app'
     (app / 'Contents/MacOS').mkdir(parents=True)
     shutil.copy2(BIN / 'CameraProbe', app / 'Contents/MacOS/LipCameraProbe')

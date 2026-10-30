@@ -10,6 +10,10 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "LipDictationPreferenceTests.testFreshPreferencesKeepVoiceOnlyAndCameraClosed", run: { LipDictationPreferenceTests().testFreshPreferencesKeepVoiceOnlyAndCameraClosed() }),
+            VoiceInkCoreCheck(name: "LipDictationPreferenceTests.testEnablingLipDictationActivatesVoiceAndCameraTogether", run: { LipDictationPreferenceTests().testEnablingLipDictationActivatesVoiceAndCameraTogether() }),
+            VoiceInkCoreCheck(name: "LipDictationPreferenceTests.testLipOnlySelectionDisablesMicrophoneUntilMasterIsOff", run: { LipDictationPreferenceTests().testLipOnlySelectionDisablesMicrophoneUntilMasterIsOff() }),
+            VoiceInkCoreCheck(name: "LipDictationPreferenceTests.testLipOnlyChoicePersistsAcrossPreferenceInstancesWithoutAffectingAnotherSuite", run: { LipDictationPreferenceTests().testLipOnlyChoicePersistsAcrossPreferenceInstancesWithoutAffectingAnotherSuite() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testProviderRepairNeverSilentlyRoutesAudioIntoOrOutOfNVIDIA", run: { NVIDIACloudModelTests().testProviderRepairNeverSilentlyRoutesAudioIntoOrOutOfNVIDIA() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testCloudEntryPointRejectsMissingKeyAndMalformedAudioBeforeNetwork", run: { await NVIDIACloudModelTests().testCloudEntryPointRejectsMissingKeyAndMalformedAudioBeforeNetwork() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testNVIDIAIsOptionalCloudAndRequiresBothKeyAndSupportedOS", run: { NVIDIACloudModelTests().testNVIDIAIsOptionalCloudAndRequiresBothKeyAndSupportedOS() }),

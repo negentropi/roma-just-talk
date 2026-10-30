@@ -51,6 +51,24 @@ jobs:
           unzip -q "$RUNNER_TEMP/lip-runtime-source/artifact.zip" -d "$RUNNER_TEMP/lip-runtime-source/unpacked"
           ditto -x -k "$RUNNER_TEMP/lip-runtime-source/unpacked/roma.just.talk.app.zip" "$HOME/Applications"
 
+      - name: Declare diagnostic overlay for the verified older app
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, subprocess
+          assert os.environ['GITHUB_REF'].startswith('refs/heads/ci/lip-runtime-diagnostic-')
+          p=pathlib.Path('Tools/LipDictationE2E/run.py')
+          original=p.read_text()
+          assert original==subprocess.check_output(['git','show','HEAD:'+str(p)],text=True)
+          guard="    if not args.build_helper_only and head != args.app_source_head:\n        raise RuntimeError('The supplied app build head must match the checked-out proof source')\n"
+          boundary='The declared app source head is compared with the checkout. The calling workflow must establish the app was built from that head. The executable hash and signature are verified here.'
+          assert original.count(guard)==1 and original.count(boundary)==1
+          diagnostic=original.replace(guard,'',1).replace(boundary,'DIAGNOSTIC ONLY. The older declared app is verified by artifact metadata and digest; this checkout supplies newer proof tools. This is not final-head acceptance.',1)
+          diagnostic=diagnostic.replace("summary = {'sourceHead': head,", "summary = {'diagnosticOnly': True, 'sourceHead': head,",1)
+          p.write_text(diagnostic)
+          receipt={'diagnosticOnly':True,'appBuildHead':'6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1','proofGitHead':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'originalRunnerSHA256':hashlib.sha256(original.encode()).hexdigest(),'diagnosticRunnerSHA256':hashlib.sha256(diagnostic.encode()).hexdigest(),'change':'Allow explicitly declared older app for diagnosis; final product proof keeps strict head equality.'}
+          (pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-runtime-source/proof-overlay.json').write_text(json.dumps(receipt,indent=2))
+          PY
+
       - name: Exercise actual app and record focus boundaries
         run: python3 Tools/LipDictationE2E/run.py --app "$HOME/Applications/roma just talk.app" --app-source-head 6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1 --visual
 
@@ -61,6 +79,7 @@ jobs:
           path: |
             ${{ runner.temp }}/lip-dictation-e2e/**
             ${{ runner.temp }}/lip-runtime-source/artifact.json
+            ${{ runner.temp }}/lip-runtime-source/proof-overlay.json
             ${{ runner.temp }}/lip-camera-probe/*.json
             ${{ runner.temp }}/lip-camera-probe/*.log
             ${{ runner.temp }}/lip-camera-probe/*.png

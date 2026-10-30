@@ -67,8 +67,8 @@ jobs:
           sleep 4
           system_profiler SPAudioDataType | grep "BlackHole 2ch"
 
-      - name: Shared core tests
-        run: swift test --package-path VoiceInkCore 2>&1 | tail -40
+      - name: Prove text-only Power Mode isolation and all shared core checks
+        run: python3 scripts/verify-lip-power-mode.py
 
       - name: Build release app
         id: release
@@ -83,7 +83,7 @@ jobs:
           TEST_RUNNER_RJT_REQUIRE_MICROPHONE_PRIVACY_PROOF: "1"
         run: bash scripts/run-macos-ci-unit-tests.sh
 
-      - name: Prove microphone teardown and paste cancellation regressions
+      - name: Prove microphone, paste, auto-send, and prewarm regressions
         if: ${{ !cancelled() && steps.unit.outcome == 'success' }}
         timeout-minutes: 35
         run: python3 scripts/verify-lip-pipeline-cancellation.py
@@ -91,6 +91,8 @@ jobs:
       - name: Verify real voice and lip dictation through the app shortcut
         if: ${{ !cancelled() && steps.unit.outcome == 'success' }}
         timeout-minutes: 35
+        env:
+          LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH: "1"
         run: python3 Tools/LipDictationE2E/run.py --app "$HOME/Applications/roma just talk.app" --app-source-head "$GITHUB_SHA" --visual
 
       - name: Package app
@@ -110,6 +112,7 @@ jobs:
           path: |
             .local-build/onboarding-test-evidence/**
             .local-build/lip-pipeline-regression/**
+            .local-build/lip-power-mode-regression/**
             ${{ runner.temp }}/lip-helper-preflight/**
             ${{ runner.temp }}/lip-dictation-e2e/**
             ${{ runner.temp }}/lip-camera-probe/*.json

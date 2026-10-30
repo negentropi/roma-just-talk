@@ -114,9 +114,16 @@ jobs:
             .local-build/lip-pipeline-regression/**
             .local-build/lip-power-mode-regression/**
             ${{ runner.temp }}/lip-helper-preflight/**
+            VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lip-dictation-runtime-evidence
+          path: |
             ${{ runner.temp }}/lip-dictation-e2e/**
             ${{ runner.temp }}/lip-camera-probe/*.json
             ${{ runner.temp }}/lip-camera-probe/*.log
             ${{ runner.temp }}/lip-camera-probe/*.png
-            VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
           if-no-files-found: ignore

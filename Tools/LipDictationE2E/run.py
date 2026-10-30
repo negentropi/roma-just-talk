@@ -172,7 +172,7 @@ def prepare_screen_capture(evidence, app, driver, name, run):
     return {'passed': True, 'captureReport': capture.name, 'consentReport': consent.name, 'screenshot': screenshot.name, 'allowPressCount': approved['allowPressCount'], 'boundary': 'Real ScreenCaptureKit capture, exact owned-helper OS prompt observed, ordinary Allow exactly once, and prompt absent before dictation fixtures'}
 
 
-def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant):
+def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup):
     camera_summary = args.obs_summary or Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/summary.json'
     if args.obs_summary is None:
         run('provision-supported-camera', ['env', 'LIP_CAMERA_PROBE_KEEP_OBS_RUNNING=1', 'python3', ROOT / 'Tools/LipCameraProbe/run.py'], timeout=1000)
@@ -183,6 +183,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         raise RuntimeError('A moving supported OBS camera and retained running OBS process are required')
     if camera.get('sourceHead') != args.app_source_head:
         raise RuntimeError('The reused camera receipt must belong to this exact proof head')
+    # Cleanup ownership transfers only after accepting the successful retained-producer receipt.
+    owned_obs_cleanup['accepted'] = True
     write(evidence / 'supported-camera.json', camera)
     websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
     if not websocket.is_file():
@@ -261,7 +263,6 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
     write(evidence / 'visual-summary.json', {'passed': not private_clips, 'cases': cases, 'remainingPrivateClipCount': len(private_clips), 'recognitionScope': 'One pinned public utterance. This verifies integration, not broad language accuracy or a physical webcam.'})
     if private_clips:
         raise RuntimeError('Private capture clips remained after actual app scenarios')
-    run('close-owned-obs', ['osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], required=False)
     return cases
 
 
@@ -294,6 +295,7 @@ def main():
     helper = ROOT / '.local-build/Tools/RuntimeE2EHarness.app'
     log_process = None
     log_handle = None
+    owned_obs_cleanup = {}
 
     def run(name, command, timeout=60, required=True):
         path = evidence / (name + '.log')
@@ -427,12 +429,26 @@ def main():
             raise RuntimeError('Default-off real dictation gate failed; inspect actual AX, rendered text, history and app logs')
         summary['status'] = 'voiceDefaultOffVerified'
         if args.visual:
-            summary['visualCases'] = run_visual_cases(args, evidence, configuration, original, fixture, app, visual_helper, run, grant)
+            summary['visualCases'] = run_visual_cases(args, evidence, configuration, original, fixture, app, visual_helper, run, grant, owned_obs_cleanup)
             summary['status'] = 'lipDictationVerified'
     except Exception as error:
         summary['status'] = 'blocked'
         summary['failure'] = str(error)
     finally:
+        if owned_obs_cleanup.get('accepted'):
+            try:
+                control = Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/bin/OBSControl'
+                websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
+                receipt = evidence / 'obs-cleanup.json'
+                code = run('close-owned-obs', [control, websocket, '-', receipt, 'stop-and-quit'], timeout=55, required=False)
+                cleanup = json.loads(receipt.read_text()) if receipt.is_file() else {}
+                summary['obsCleanup'] = cleanup
+                if code != 0 or cleanup.get('closed') is not True:
+                    raise RuntimeError('Owned OBS cleanup did not verify inactive output and process exit; inspect obs-cleanup.json')
+            except Exception as error:
+                summary['cleanupFailure'] = str(error)
+                summary.setdefault('failure', str(error))
+                summary['status'] = 'blocked'
         if log_process is not None:
             log_process.terminate()
             try:

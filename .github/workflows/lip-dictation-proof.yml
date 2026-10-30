@@ -137,6 +137,7 @@ jobs:
                 > "$LIP_PROOF_DIR/logs/$case_name.stdout.log" \
                 2> "$LIP_PROOF_DIR/logs/$case_name.stderr.log" || outcome=$?
               printf '%s\t%s\n' "$case_name" "$outcome" >> "$LIP_PROOF_DIR/exit-codes.tsv"
+              cat "$LIP_PROOF_DIR/receipts/$case_name.json"
             done
           done
 
@@ -173,6 +174,8 @@ jobs:
                   result = {
                       'status': receipt['status'], 'text': predicted,
                       'errorCode': receipt.get('errorCode'),
+                      'errorType': receipt.get('errorType'),
+                      'errorMessage': receipt.get('errorMessage'),
                       'wordErrorRate': edits(expected_words, words(predicted)) / len(expected_words),
                       'receipt': f'receipts/{label}-{kind}.json',
                   }
@@ -211,6 +214,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: native-lip-proof-${{ github.sha }}
-          path: ${{ runner.temp }}/lip-dictation-proof
+          path: ${{ env.LIP_PROOF_DIR }}
           if-no-files-found: error
           retention-days: 7

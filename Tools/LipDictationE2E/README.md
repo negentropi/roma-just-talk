@@ -39,12 +39,14 @@ The actual settings UI installs the model. The camera receives a static face whi
 
 - Voice plus lips, requiring the voice result to be selected.
 - Voice plus lips with independently verified zero PCM audio, requiring the visual result to be selected.
-- Lip-only, requiring closed microphone diagnostics before camera capture, no microphone start, a visual result, and no audio file in history.
+- Lip-only with the app's microphone TCC row deliberately denied on this disposable host. It still requires actual shortcut dictation, closed microphone diagnostics before camera capture, no microphone start, a visual result, and no audio file in history.
 - Cancellation during visual inference through the existing double-Escape behavior.
 - Turning the actual settings toggle off while recording.
 - Quitting the actual app while recording.
 
 Each positive case requires one camera session with no audio input, a matching camera close, an actual rendered/AX insertion, the logged selected recognizer, one completed history row, and no native writer timeout. Negative cases require no inserted text and no completed history row. The last gate rejects remaining private movie files.
+
+The microphone-denied fixture applies only to the positive lip-only case. It uses the app's exact signed requirement, records the authorized row before the case and the denied row before/after dictation, then restores and verifies the authorized row in `finally` before later cases. These receipts describe observed SQL fixture state. They do not claim to query the app's authorization API. The actual dictation result and hardware diagnostics provide the separate behavioral proof.
 
 Evidence defaults to `$RUNNER_TEMP/lip-dictation-e2e`. Upload its JSON, logs, and PNG files after every outcome. `summary.json` distinguishes `nativeHelperBuilt`, `voiceDefaultOffVerified`, `lipDictationVerified`, and `blocked`. The 90/120-second observation limits bound functional tests. They are not product latency targets or measured performance claims.
 

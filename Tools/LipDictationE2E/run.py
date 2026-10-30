@@ -69,6 +69,24 @@ def history():
         return [dict(row) for row in connection.execute('SELECT Z_PK, ZTEXT, ZAUDIOFILEURL, ZTRANSCRIPTIONSTATUS, ZTRANSCRIPTIONMODELNAME FROM ZTRANSCRIPTION ORDER BY Z_PK')]
 
 
+def microphone_tcc_fixture(evidence, run, name, expected_value):
+    database = Path.home() / 'Library/Application Support/com.apple.TCC/TCC.db'
+    query = "SELECT service,client,client_type,auth_value,auth_reason,auth_version,hex(csreq) AS requirementHex FROM access WHERE service='kTCCServiceMicrophone' AND client='" + APP_ID + "' AND client_type=0 AND indirect_object_identifier='UNUSED';"
+    run(name, ['/usr/bin/sqlite3', '-json', database, query])
+    rows = json.loads((evidence / (name + '.log')).read_text())
+    if len(rows) != 1 or rows[0]['auth_value'] != expected_value:
+        raise RuntimeError('The microphone TCC test fixture does not have the required row state: ' + name)
+    row = rows[0]
+    requirement = bytes.fromhex(row.pop('requirementHex'))
+    if requirement != (evidence / (APP_ID + '.csreq')).read_bytes():
+        raise RuntimeError('The microphone TCC fixture does not match the exact signed app requirement')
+    write(evidence / (name + '.json'), {
+        'observedRow': row, 'signedRequirementSHA256': hashlib.sha256(requirement).hexdigest(),
+        'appAuthorizationAPIQueried': False,
+        'boundary': 'Observed SQL fixture state only. App behavior is established separately by actual dictation and microphone hardware diagnostics.',
+    })
+
+
 def build_visual_driver(evidence, run):
     build = evidence / 'visual-build'
     build.mkdir(exist_ok=True)
@@ -142,10 +160,29 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         before = history()
         before_ids = {row['Z_PK'] for row in before}
         command = ['/usr/bin/open', '-W', '-n', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--obs-config', websocket, '--still', still, '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
-        code = run('run-' + scenario, command, timeout=1400 if scenario == 'setup' else 360, required=False)
-        if not report.is_file():
-            raise RuntimeError('The actual ' + scenario + ' helper wrote no report')
-        result = json.loads(report.read_text())
+        deny_microphone = scenario == 'lips'
+        if deny_microphone:
+            microphone_tcc_fixture(evidence, run, 'microphone-authorized-before-lips', 2)
+        try:
+            if deny_microphone:
+                grant(app, APP_ID, [], ['kTCCServiceMicrophone'], auth_value=0)
+                run('refresh-denied-microphone-tcc-user', ['killall', 'tccd'], required=False)
+                run('refresh-denied-microphone-tcc-system', ['sudo', '-n', 'killall', 'tccd'], required=False)
+                time.sleep(2)
+                microphone_tcc_fixture(evidence, run, 'microphone-denied-before-lips', 0)
+            code = run('run-' + scenario, command, timeout=1400 if scenario == 'setup' else 360, required=False)
+            if not report.is_file():
+                raise RuntimeError('The actual ' + scenario + ' helper wrote no report')
+            result = json.loads(report.read_text())
+            if deny_microphone:
+                microphone_tcc_fixture(evidence, run, 'microphone-denied-after-lips', 0)
+        finally:
+            if deny_microphone:
+                grant(app, APP_ID, [], ['kTCCServiceMicrophone'])
+                run('refresh-restored-microphone-tcc-user', ['killall', 'tccd'], required=False)
+                run('refresh-restored-microphone-tcc-system', ['sudo', '-n', 'killall', 'tccd'], required=False)
+                time.sleep(2)
+                microphone_tcc_fixture(evidence, run, 'microphone-restored-after-lips', 2)
         after = history()
         created = [row for row in after if row['Z_PK'] not in before_ids]
         completed = [row for row in created if row['ZTRANSCRIPTIONSTATUS'] == 'completed']
@@ -162,7 +199,7 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         else:
             passed = passed and all(row['ZAUDIOFILEURL'] is None for row in created)
         write(evidence / (scenario + '-history.json'), {'createdRows': created, 'independentHistoryPassed': passed})
-        cases.append({'scenario': scenario, 'passed': passed, 'report': report.name, 'historyReport': scenario + '-history.json'})
+        cases.append({'scenario': scenario, 'passed': passed, 'report': report.name, 'historyReport': scenario + '-history.json', 'microphoneTCCDeniedFixture': deny_microphone})
         if not passed:
             write(evidence / 'visual-summary.json', {'passed': False, 'cases': cases})
             raise RuntimeError('Actual app visual scenario failed: ' + scenario)
@@ -217,7 +254,9 @@ def main():
             raise RuntimeError(name + ' failed; inspect ' + str(path))
         return code
 
-    def grant(app, identifier, system_services, user_services):
+    def grant(app, identifier, system_services, user_services, auth_value=2):
+        if auth_value not in [0, 2] or (auth_value == 0 and (identifier != APP_ID or system_services or user_services != ['kTCCServiceMicrophone'])):
+            raise RuntimeError('Only the app microphone has a denied test fixture')
         run('requirement-' + identifier, ['codesign', '-dr', '-', app])
         lines = (evidence / ('requirement-' + identifier + '.log')).read_text().splitlines()
         requirements = [line.split('designated => ', 1)[1] for line in lines if 'designated => ' in line]
@@ -230,7 +269,7 @@ def main():
         for system, services in [(True, system_services), (False, user_services)]:
             database = Path('/Library/Application Support/com.apple.TCC/TCC.db') if system else Path.home() / 'Library/Application Support/com.apple.TCC/TCC.db'
             for service in services:
-                sql = "INSERT OR REPLACE INTO access(service,client,client_type,auth_value,auth_reason,auth_version,csreq,indirect_object_identifier_type,indirect_object_identifier,flags) VALUES('" + service + "','" + identifier + "',0,2,4,1,X'" + requirement_binary.read_bytes().hex() + "',0,'UNUSED',0);"
+                sql = "INSERT OR REPLACE INTO access(service,client,client_type,auth_value,auth_reason,auth_version,csreq,indirect_object_identifier_type,indirect_object_identifier,flags) VALUES('" + service + "','" + identifier + "',0," + str(auth_value) + ",4,1,X'" + requirement_binary.read_bytes().hex() + "',0,'UNUSED',0);"
                 command = (['sudo', '-n'] if system else []) + ['/usr/bin/sqlite3', str(database), sql]
                 run('grant-' + identifier + '-' + service + ('-system' if system else '-user'), command)
 

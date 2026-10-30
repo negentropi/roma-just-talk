@@ -51,6 +51,16 @@ jobs:
           unzip -q "$RUNNER_TEMP/lip-runtime-source/artifact.zip" -d "$RUNNER_TEMP/lip-runtime-source/unpacked"
           ditto -x -k "$RUNNER_TEMP/lip-runtime-source/unpacked/roma.just.talk.app.zip" "$HOME/Applications"
 
+      - name: Execute the actual runtime core checks
+        run: |
+          set -euo pipefail
+          swift run --package-path Tools/RuntimeE2EHarness --scratch-path "$RUNNER_TEMP/runtime-core" RuntimeE2ECoreChecks 2>&1 | tee "$RUNNER_TEMP/runtime-core-checks.log"
+          python3 - <<'PY'
+          import os, pathlib
+          text=(pathlib.Path(os.environ['RUNNER_TEMP'])/'runtime-core-checks.log').read_text()
+          assert 'PASS confirmed empty baselines survive cold AX without accepting unreadable-frame or stale-text timestamps' in text
+          PY
+
       - name: Declare diagnostic overlay for the verified older app
         run: |
           python3 - <<'PY'
@@ -63,6 +73,9 @@ jobs:
           boundary='The declared app source head is compared with the checkout. The calling workflow must establish the app was built from that head. The executable hash and signature are verified here.'
           assert original.count(guard)==1 and original.count(boundary)==1
           diagnostic=original.replace(guard,'',1).replace(boundary,'DIAGNOSTIC ONLY. The older declared app is verified by artifact metadata and digest; this checkout supplies newer proof tools. This is not final-head acceptance.',1)
+          camera_guard="if camera.get('sourceHead') != args.app_source_head:"
+          assert diagnostic.count(camera_guard)==1
+          diagnostic=diagnostic.replace(camera_guard,"if camera.get('sourceHead') != os.environ['GITHUB_SHA']:",1)
           diagnostic=diagnostic.replace("summary = {'sourceHead': head,", "summary = {'diagnosticOnly': True, 'sourceHead': head,",1)
           p.write_text(diagnostic)
           receipt={'diagnosticOnly':True,'appBuildHead':'6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1','proofGitHead':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'originalRunnerSHA256':hashlib.sha256(original.encode()).hexdigest(),'diagnosticRunnerSHA256':hashlib.sha256(diagnostic.encode()).hexdigest(),'change':'Allow explicitly declared older app for diagnosis; final product proof keeps strict head equality.'}
@@ -80,6 +93,7 @@ jobs:
             ${{ runner.temp }}/lip-dictation-e2e/**
             ${{ runner.temp }}/lip-runtime-source/artifact.json
             ${{ runner.temp }}/lip-runtime-source/proof-overlay.json
+            ${{ runner.temp }}/runtime-core-checks.log
             ${{ runner.temp }}/lip-camera-probe/*.json
             ${{ runner.temp }}/lip-camera-probe/*.log
             ${{ runner.temp }}/lip-camera-probe/*.png

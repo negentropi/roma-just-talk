@@ -16,10 +16,19 @@ struct SystemExtensionAuthentication {
             "method": "normalSecurityAgentAuthentication", "accountVerified": false,
             "authenticationAttempted": false, "submitted": false
         ]
-        guard ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == "true",
-              ProcessInfo.processInfo.environment["RUNNER_OS"] == "macOS",
+        let githubActions = ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == "true"
+        let macOSRunner = ProcessInfo.processInfo.environment["RUNNER_OS"] == "macOS"
+        let bundleURL = application.bundleURL?.resolvingSymlinksInPath()
+        let executableURL = application.executableURL?.resolvingSymlinksInPath()
+        result["githubActionsHost"] = githubActions
+        result["macOSRunnerHost"] = macOSRunner
+        result["securityAgentBundlePath"] = bundleURL?.path ?? ""
+        result["securityAgentExecutablePath"] = executableURL?.path ?? ""
+        result["postEventTrusted"] = CGPreflightPostEventAccess()
+        guard githubActions, macOSRunner,
               application.bundleIdentifier == "com.apple.SecurityAgent",
-              application.bundleURL?.path == "/System/Library/CoreServices/SecurityAgent.app",
+              let bundleURL, bundleURL.path.hasPrefix("/System/Library/"),
+              let executableURL, executableURL.path.hasPrefix(bundleURL.path + "/Contents/MacOS/"),
               CGPreflightPostEventAccess() else {
             result["reason"] = "disposableHostOrSecurityAgentIdentityUnavailable"
             return result
@@ -27,7 +36,7 @@ struct SystemExtensionAuthentication {
         var code: SecStaticCode?
         var requirement: SecRequirement?
         let flags = SecCSFlags(rawValue: 0)
-        guard SecStaticCodeCreateWithPath(application.bundleURL! as CFURL, flags, &code) == errSecSuccess,
+        guard SecStaticCodeCreateWithPath(bundleURL as CFURL, flags, &code) == errSecSuccess,
               SecRequirementCreateWithString("anchor apple and identifier \"com.apple.SecurityAgent\"" as CFString, flags, &requirement) == errSecSuccess,
               let code, let requirement,
               SecStaticCodeCheckValidity(code, SecCSFlags(rawValue: kSecCSStrictValidate), requirement) == errSecSuccess else {

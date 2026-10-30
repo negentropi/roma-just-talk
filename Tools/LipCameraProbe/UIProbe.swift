@@ -58,6 +58,37 @@ struct UIProbe {
             }.joined(separator: " ")
             applications.append(["bundleIdentifier": app.bundleIdentifier ?? "", "pid": app.processIdentifier, "nodes": nodes])
             guard attempting, trusted, !requiresAuthentication else { continue }
+            func isOnlyToggleInOBSRow(_ element: AXUIElement) -> Bool {
+                func value(_ element: AXUIElement, _ attribute: String) -> CFTypeRef? {
+                    guard ProcessInfo.processInfo.systemUptime < deadline else { return nil }
+                    var result: CFTypeRef?
+                    return AXUIElementCopyAttributeValue(element, attribute as CFString, &result) == .success ? result : nil
+                }
+                var ancestor = element
+                for _ in 0..<3 {
+                    guard let parent = value(ancestor, kAXParentAttribute) else { return false }
+                    ancestor = parent as! AXUIElement
+                    var descendants: [(AXUIElement, Int)] = [(ancestor, 0)]
+                    var text = Set<String>()
+                    var checkboxCount = 0
+                    var visitedCount = 0
+                    while !descendants.isEmpty && visitedCount < 80 {
+                        let (child, depth) = descendants.removeFirst()
+                        guard depth <= 3 else { continue }
+                        visitedCount += 1
+                        let role = value(child, kAXRoleAttribute) as? String ?? ""
+                        if [kAXCheckBoxRole, "AXSwitch"].contains(role) { checkboxCount += 1 }
+                        if role == kAXStaticTextRole, let label = value(child, kAXValueAttribute) as? String {
+                            text.insert(label)
+                        }
+                        if let children = value(child, kAXChildrenAttribute) as? [AXUIElement] {
+                            descendants.append(contentsOf: children.prefix(30).map { ($0, depth + 1) })
+                        }
+                    }
+                    if checkboxCount == 1 && text.contains("OBS") && text.contains("OBS Virtual Camera") { return true }
+                }
+                return false
+            }
             let ordered = elements.sorted { left, right in
                 func rank(_ item: (AXUIElement, String, String, Int?)) -> Int {
                     if item.1 == "OBS" && item.3 == 0 { return 0 }
@@ -75,10 +106,10 @@ struct UIProbe {
                 let obsPermissionReview = app.bundleIdentifier == "com.obsproject.obs-studio" && labels.contains("Review App Permissions") && label == "Continue" && role == kAXButtonRole
                 let settingsNavigation = isSettings && label == "Camera Extensions" && [kAXButtonRole, "AXLink"].contains(role)
                 let allowedButton = role == kAXButtonRole && ((obsContext && ["Open System Settings", "Allow"].contains(label)) || (probeContext && label == "Allow"))
-                let offOBSToggle = isSettings && label == "OBS" && integer == 0 && [kAXCheckBoxRole, "AXSwitch"].contains(role)
+                let offOBSToggle = isSettings && labels.contains("Camera Extensions") && integer == 0 && [kAXCheckBoxRole, "AXSwitch"].contains(role) && isOnlyToggleInOBSRow(element)
                 if obsMicrophonePrompt || obsPermissionReview || settingsNavigation || (allowedButton && (cameraContext || label == "Open System Settings")) || offOBSToggle {
                     let result = AXUIElementPerformAction(element, kAXPressAction as CFString)
-                    actions.append(["bundleIdentifier": app.bundleIdentifier ?? "", "label": label, "result": result.rawValue])
+                    actions.append(["bundleIdentifier": app.bundleIdentifier ?? "", "label": offOBSToggle ? "OBS Virtual Camera row toggle" : label, "rowIdentityVerified": offOBSToggle, "result": result.rawValue])
                     break
                 }
             }

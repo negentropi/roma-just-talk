@@ -58,8 +58,9 @@ struct LipVisualCases {
             let application = try runningApp(configuration.voiceInkBundleIdentifier)
             if scenario == "setup" {
                 try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
-                if let setup = find(application, label: "Set Up", roles: [kAXButtonRole]) {
-                    try press(setup)
+                if let setup = find(application, label: "Set Up", roles: [kAXButtonRole]), enabled(setup.element) {
+                    report["setupControl"] = setup.evidence
+                    try press(setup.element)
                     report["actualSetupButtonPressed"] = true
                 } else {
                     report["actualSetupButtonPressed"] = false
@@ -67,7 +68,8 @@ struct LipVisualCases {
                 let deadline = Date().addingTimeInterval(1200)
                 var ready = false
                 while Date() < deadline {
-                    if let toggle = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]), enabled(toggle) {
+                    if let toggle = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]), enabled(toggle.element) {
+                        report["readyControl"] = toggle.evidence
                         ready = true
                         break
                     }
@@ -76,11 +78,11 @@ struct LipVisualCases {
                 }
                 guard ready else { throw ProofError.setup }
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("setup.png"))
-                try setToggle(application, label: "Read Lips While Dictating", value: 1)
+                try setToggle(application, label: "Read Lips While Dictating", value: 1, report: &report)
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("settings-combined.png"))
-                try setToggle(application, label: "Lips Only", value: 1)
+                try setToggle(application, label: "Lips Only", value: 1, report: &report)
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("settings-lips-only.png"))
-                try setToggle(application, label: "Read Lips While Dictating", value: 0)
+                try setToggle(application, label: "Read Lips While Dictating", value: 0, report: &report)
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("settings-off.png"))
                 report["actualSetupUIReady"] = true
                 report["actualModeControlsChanged"] = true
@@ -96,7 +98,9 @@ struct LipVisualCases {
                 var disableControl: AXUIElement?
                 if scenario == "disable" {
                     try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
-                    disableControl = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"])
+                    let matched = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"])
+                    disableControl = matched?.element
+                    report["disableControl"] = matched?.evidence
                     guard let disableControl, toggleValue(disableControl) == 1 else { throw ProofError.settingControl }
                 }
                 let prepared = try RuntimeTargetController.prepare(
@@ -335,20 +339,73 @@ struct LipVisualCases {
     static func press(_ element: AXUIElement) throws {
         guard AXUIElementPerformAction(element, kAXPressAction as CFString) == .success else { throw ProofError.settingControl }
     }
-    static func setToggle(_ app: NSRunningApplication, label: String, value: Int) throws {
-        guard let toggle = find(app, label: label, roles: [kAXCheckBoxRole, "AXSwitch"]), enabled(toggle) else { throw ProofError.settingControl }
-        if toggleValue(toggle) != value { try press(toggle) }
+    static func setToggle(_ app: NSRunningApplication, label: String, value: Int, report: inout [String: Any]) throws {
+        guard let toggle = find(app, label: label, roles: [kAXCheckBoxRole, "AXSwitch"]), enabled(toggle.element) else { throw ProofError.settingControl }
+        var actions = report["toggleActions"] as? [[String: Any]] ?? []
+        defer { report["toggleActions"] = actions }
+        actions.append(toggle.evidence.merging(["requestedValue": value]) { _, new in new })
+        guard revealControl(toggle.element, in: app, actions: &actions) else { throw ProofError.settingControl }
+        if toggleValue(toggle.element) != value { try press(toggle.element) }
         let deadline = Date().addingTimeInterval(5)
         while Date() < deadline {
-            if let current = find(app, label: label, roles: [kAXCheckBoxRole, "AXSwitch"]), toggleValue(current) == value { return }
+            if let current = find(app, label: label, roles: [kAXCheckBoxRole, "AXSwitch"]), enabled(current.element), toggleValue(current.element) == value {
+                actions.append(current.evidence.merging(["verifiedValue": value]) { _, new in new })
+                return
+            }
             wait(0.1)
         }
         throw ProofError.settingControl
     }
-    static func find(_ application: NSRunningApplication, label: String, roles: Set<String>) -> AXUIElement? {
+    struct AXControlMatch {
+        let element: AXUIElement
+        let evidence: [String: Any]
+    }
+    static func uiLabel(_ value: String) -> String {
+        var result = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if result.hasSuffix("…") { result.removeLast() }
+        else if result.hasSuffix("...") { result.removeLast(3) }
+        return result.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    static func hasLabel(_ element: AXUIElement, label: String) -> Bool {
+        var attributes = [kAXTitleAttribute, kAXDescriptionAttribute, kAXLabelValueAttribute]
+        if RuntimeAX.stringAttribute(kAXRoleAttribute, from: element) == kAXStaticTextRole { attributes.append(kAXValueAttribute) }
+        return attributes.compactMap { RuntimeAX.stringAttribute($0, from: element) }.contains { uiLabel($0) == uiLabel(label) }
+    }
+    static func axElements(_ element: AXUIElement, attribute: String) -> [AXUIElement] {
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success, let value else { return [] }
+        if CFGetTypeID(value) == AXUIElementGetTypeID() { return [value as! AXUIElement] }
+        return value as? [AXUIElement] ?? []
+    }
+    static func sameOwnedWindow(_ lhs: AXUIElement, _ rhs: AXUIElement, app: NSRunningApplication) -> Bool {
+        var leftPID: pid_t = 0
+        var rightPID: pid_t = 0
+        return AXUIElementGetPid(lhs, &leftPID) == .success && AXUIElementGetPid(rhs, &rightPID) == .success
+            && leftPID == app.processIdentifier && rightPID == leftPID
+            && RuntimeAX.window(for: lhs).flatMap { left in RuntimeAX.window(for: rhs).map { CFEqual(left, $0) } } == true
+    }
+    static func controlMatch(_ element: AXUIElement, label: String, relation: String, labelElement: AXUIElement?, row: AXUIElement? = nil) -> AXControlMatch {
+        var evidence: [String: Any] = ["label": label, "relation": relation,
+            "role": RuntimeAX.stringAttribute(kAXRoleAttribute, from: element) ?? "", "enabled": enabled(element)]
+        if let value = toggleValue(element) { evidence["value"] = value }
+        if let frame = RuntimeAX.frame(of: element), finiteFrame(frame) { evidence["frame"] = frameReceipt(frame) }
+        if let labelElement {
+            evidence["labelRole"] = RuntimeAX.stringAttribute(kAXRoleAttribute, from: labelElement) ?? ""
+            if let frame = RuntimeAX.frame(of: labelElement), finiteFrame(frame) { evidence["labelFrame"] = frameReceipt(frame) }
+        }
+        if let parent = row ?? axElements(element, attribute: kAXParentAttribute).first {
+            evidence["parentRole"] = RuntimeAX.stringAttribute(kAXRoleAttribute, from: parent) ?? ""
+            evidence["childRoles"] = axElements(parent, attribute: kAXChildrenAttribute).prefix(8).map { RuntimeAX.stringAttribute(kAXRoleAttribute, from: $0) ?? "" }
+            if let frame = RuntimeAX.frame(of: parent), finiteFrame(frame) { evidence["parentFrame"] = frameReceipt(frame) }
+        }
+        return AXControlMatch(element: element, evidence: evidence)
+    }
+    static func find(_ application: NSRunningApplication, label: String, roles: Set<String>) -> AXControlMatch? {
         let root = AXUIElementCreateApplication(application.processIdentifier)
         var queue: [(AXUIElement, Int)] = [(root, 0)]
         var visited: [AXUIElement] = []
+        var controls: [AXUIElement] = []
+        var labels: [AXUIElement] = []
         let deadline = Date().addingTimeInterval(3)
         while !queue.isEmpty, visited.count < 2000, Date() < deadline {
             let (element, depth) = queue.removeFirst()
@@ -356,12 +413,70 @@ struct LipVisualCases {
             visited.append(element)
             AXUIElementSetMessagingTimeout(element, 0.15)
             let role = RuntimeAX.stringAttribute(kAXRoleAttribute, from: element) ?? ""
-            let title = [kAXTitleAttribute, kAXDescriptionAttribute].compactMap { RuntimeAX.stringAttribute($0, from: element) }.joined(separator: " ")
-            let value = role == kAXStaticTextRole ? RuntimeAX.stringAttribute(kAXValueAttribute, from: element) ?? "" : ""
-            if roles.contains(role), title.contains(label) || value.contains(label) { return element }
+            if roles.contains(role) { controls.append(element) }
+            if role == kAXStaticTextRole, hasLabel(element, label: label) { labels.append(element) }
             var children: CFTypeRef?
             if AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &children) == .success,
                let children = children as? [AXUIElement] { queue.append(contentsOf: children.map { ($0, depth + 1) }) }
+        }
+        guard queue.isEmpty else { return nil }
+        var matches: [AXControlMatch] = []
+        func add(_ match: AXControlMatch) {
+            if !matches.contains(where: { CFEqual($0.element, match.element) }) { matches.append(match) }
+        }
+        for control in controls {
+            guard Date() < deadline else { return nil }
+            if hasLabel(control, label: label) {
+                add(controlMatch(control, label: label, relation: "directLabel", labelElement: nil))
+            }
+            for attribute in [kAXTitleUIElementAttribute, kAXLabelUIElementsAttribute, kAXLinkedUIElementsAttribute] {
+                for linked in axElements(control, attribute: attribute) where sameOwnedWindow(control, linked, app: application) && hasLabel(linked, label: label) {
+                    add(controlMatch(control, label: label, relation: attribute, labelElement: linked))
+                }
+            }
+        }
+        for labelElement in labels {
+            for control in axElements(labelElement, attribute: kAXServesAsTitleForUIElementsAttribute)
+                where controls.contains(where: { CFEqual($0, control) }) && sameOwnedWindow(control, labelElement, app: application) {
+                add(controlMatch(control, label: label, relation: kAXServesAsTitleForUIElementsAttribute, labelElement: labelElement))
+            }
+        }
+        if matches.count == 1 { return matches[0] }
+        guard matches.isEmpty, labels.count == 1 else { return nil }
+        // Only the smallest local row may associate a separate label and control.
+        var ancestor = labels[0]
+        for ascent in 1...3 {
+            guard Date() < deadline, let parent = axElements(ancestor, attribute: kAXParentAttribute).first else { return nil }
+            ancestor = parent
+            let role = RuntimeAX.stringAttribute(kAXRoleAttribute, from: ancestor) ?? ""
+            if [kAXApplicationRole, kAXWindowRole, kAXScrollAreaRole, kAXTableRole, kAXOutlineRole, kAXListRole].contains(role) { return nil }
+            let children = axElements(ancestor, attribute: kAXChildrenAttribute)
+            guard children.count <= 6 else { return nil }
+            var local = children.map { ($0, 1) }
+            var localControls: [AXUIElement] = roles.contains(role) ? [ancestor] : []
+            var localLabels = 0
+            var count = 0
+            while !local.isEmpty, count < 16, Date() < deadline {
+                let (node, depth) = local.removeFirst()
+                count += 1
+                let nodeRole = RuntimeAX.stringAttribute(kAXRoleAttribute, from: node) ?? ""
+                if roles.contains(nodeRole) { localControls.append(node) }
+                if nodeRole == kAXStaticTextRole, hasLabel(node, label: label) { localLabels += 1 }
+                let nested = axElements(node, attribute: kAXChildrenAttribute)
+                guard depth < 3 || nested.isEmpty else { return nil }
+                local.append(contentsOf: nested.map { ($0, depth + 1) })
+            }
+            guard local.isEmpty, localLabels == 1, localControls.count <= 1 else { return nil }
+            if let control = localControls.first, sameOwnedWindow(control, labels[0], app: application) {
+                var match = controlMatch(control, label: label, relation: "uniqueCommonParentRow", labelElement: labels[0], row: ancestor)
+                var evidence = match.evidence
+                evidence["ancestorDepth"] = ascent
+                evidence["rowNodeCount"] = count
+                evidence["matchingLabels"] = localLabels
+                evidence["matchingControls"] = localControls.count
+                match = AXControlMatch(element: control, evidence: evidence)
+                return match
+            }
         }
         return nil
     }
@@ -379,6 +494,29 @@ struct LipVisualCases {
             var node: [String: Any] = ["role": role, "title": RuntimeAX.stringAttribute(kAXTitleAttribute, from: element) ?? "", "description": RuntimeAX.stringAttribute(kAXDescriptionAttribute, from: element) ?? "", "enabled": enabled(element)]
             if role == kAXStaticTextRole { node["staticText"] = RuntimeAX.stringAttribute(kAXValueAttribute, from: element) }
             if [kAXCheckBoxRole, "AXSwitch"].contains(role) { node["toggleValue"] = toggleValue(element) }
+            if [kAXCheckBoxRole, "AXSwitch", kAXButtonRole].contains(role)
+                || (role == kAXStaticTextRole && ["Read Lips While Dictating", "Lips Only"].contains(node["staticText"] as? String ?? "")) {
+                if let frame = RuntimeAX.frame(of: element), finiteFrame(frame) { node["frame"] = frameReceipt(frame) }
+                if let parent = axElements(element, attribute: kAXParentAttribute).first {
+                    node["parentRole"] = RuntimeAX.stringAttribute(kAXRoleAttribute, from: parent) ?? ""
+                    node["parentChildRoles"] = axElements(parent, attribute: kAXChildrenAttribute).prefix(8).map { RuntimeAX.stringAttribute(kAXRoleAttribute, from: $0) ?? "" }
+                    if let frame = RuntimeAX.frame(of: parent), finiteFrame(frame) { node["parentFrame"] = frameReceipt(frame) }
+                }
+                var relations: [String: Any] = [:]
+                for attribute in [kAXTitleUIElementAttribute, kAXLabelUIElementsAttribute, kAXLinkedUIElementsAttribute, kAXServesAsTitleForUIElementsAttribute] {
+                    let linked = axElements(element, attribute: attribute)
+                    if !linked.isEmpty {
+                        relations[attribute] = linked.prefix(4).map { item -> [String: Any] in
+                            var entry = ["role": RuntimeAX.stringAttribute(kAXRoleAttribute, from: item) ?? "",
+                                         "title": RuntimeAX.stringAttribute(kAXTitleAttribute, from: item) ?? "",
+                                         "description": RuntimeAX.stringAttribute(kAXDescriptionAttribute, from: item) ?? ""]
+                            if entry["role"] == kAXStaticTextRole { entry["staticText"] = RuntimeAX.stringAttribute(kAXValueAttribute, from: item) ?? "" }
+                            return entry
+                        }
+                    }
+                }
+                node["labelRelations"] = relations
+            }
             result.append(node)
             var children: CFTypeRef?
             if AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &children) == .success,
@@ -432,7 +570,8 @@ struct LipVisualCases {
             }
             actions.append(activationState(app, phase: "activeNavigation"))
             if let control = find(app, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]) {
-                let visible = revealControl(control, in: app, actions: &actions)
+                actions.append(control.evidence.merging(["phase": "lipControlAssociation"]) { _, new in new })
+                let visible = revealControl(control.element, in: app, actions: &actions)
                 actions.append(["lipControlsObserved": true, "lipControlsVisible": visible])
                 guard visible else { throw ProofError.settingControl }
                 return

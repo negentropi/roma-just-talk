@@ -746,8 +746,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized: return true
         case .notDetermined:
-            return await withCheckedContinuation { continuation in
-                AVCaptureDevice.requestAccess(for: .audio) { continuation.resume(returning: $0) }
+            return await CaptureAuthorizationDecision.request { decision in
+                AVCaptureDevice.requestAccess(for: .audio, completionHandler: decision)
             }
         default: return false
         }

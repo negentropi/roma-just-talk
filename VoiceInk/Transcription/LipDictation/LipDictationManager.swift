@@ -45,7 +45,10 @@ final class LipDictationManager: ObservableObject {
             let authorized: Bool
             switch AVCaptureDevice.authorizationStatus(for: .video) {
             case .authorized: authorized = true
-            case .notDetermined: authorized = await AVCaptureDevice.requestAccess(for: .video)
+            case .notDetermined:
+                authorized = await CaptureAuthorizationDecision.request { decision in
+                    AVCaptureDevice.requestAccess(for: .video, completionHandler: decision)
+                }
             default: authorized = false
             }
             guard !Task.isCancelled else { self?.readiness = .needsSetup; return }

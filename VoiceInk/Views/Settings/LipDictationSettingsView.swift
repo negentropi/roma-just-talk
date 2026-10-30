@@ -14,7 +14,9 @@ enum LipDictationReadiness: Equatable {
 struct LipDictationSettingsView: View {
     let readiness: LipDictationReadiness
     let downloadDescription: String
-    let isCapturing: Bool
+    // True until the engine is fully idle: the session keeps its mode through
+    // transcription and cleanup, so a change mid-session wouldn't apply to it.
+    let isBusy: Bool
     // Must stay metadata-only: no model load, camera, or network.
     let refresh: @MainActor () async -> Void
     // Only the Set Up button calls this, so the recording shortcut never
@@ -40,8 +42,8 @@ struct LipDictationSettingsView: View {
                     Text("Lips Only")
                     Text("Turns the microphone off and uses only the camera.")
                 }
-                .disabled(isCapturing)
-                .help(isCapturing ? "Can't be changed while recording." : "")
+                .disabled(isBusy)
+                .help(isBusy ? "Available when the current dictation finishes." : "")
             }
         } header: {
             Text("Lip Dictation")
@@ -65,11 +67,10 @@ struct LipDictationSettingsView: View {
         }
     }
 
-    // Turning on needs a working setup and no recording in flight. Turning off
-    // is always allowed: it's how a user leaves a broken setup or cancels lip
-    // capture mid-recording.
+    // Turning off is always allowed: it's how a user leaves a broken setup or
+    // cancels active lip work.
     private var canChangeMaster: Bool {
-        isEnabled || (readiness == .ready && !isCapturing)
+        isEnabled || (readiness == .ready && !isBusy)
     }
 
     private var masterBinding: Binding<Bool> {
@@ -179,13 +180,13 @@ private func lipDictationPreview(
     readiness: LipDictationReadiness,
     isEnabled: Bool = false,
     isLipOnly: Bool = false,
-    isCapturing: Bool = false
+    isBusy: Bool = false
 ) -> some View {
     Form {
         LipDictationSettingsView(
             readiness: readiness,
             downloadDescription: "Downloads 1.98 GB. Uses 1.36 GB on this Mac.",
-            isCapturing: isCapturing,
+            isBusy: isBusy,
             refresh: {},
             setUp: {}
         )
@@ -203,8 +204,8 @@ private func lipDictationPreview(
     lipDictationPreview("readyVoiceAndLips", readiness: .ready, isEnabled: true)
 }
 
-#Preview("Ready, Lips Only, Recording") {
-    lipDictationPreview("readyLipsOnly", readiness: .ready, isEnabled: true, isLipOnly: true, isCapturing: true)
+#Preview("Ready, Lips Only, Busy") {
+    lipDictationPreview("readyLipsOnlyBusy", readiness: .ready, isEnabled: true, isLipOnly: true, isBusy: true)
 }
 
 #Preview("Failed While Enabled") {

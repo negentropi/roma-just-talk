@@ -234,7 +234,7 @@ struct SettingsView: View {
             LipDictationSettingsView(
                 readiness: lipDictation.readiness,
                 downloadDescription: lipDictation.downloadDescription,
-                isCapturing: engine.recordingState.isRecorderCaptureInProgress,
+                isBusy: engine.recordingState != .idle,
                 refresh: lipDictation.refresh,
                 setUp: lipDictation.setUp
             )

@@ -84,6 +84,7 @@ private struct Receipt: Encodable {
     var errorType: String?
     var errorCode: String?
     var errorMessage: String?
+    var errorDetails: String?
 }
 
 @main private struct LipDictationProof {
@@ -146,6 +147,7 @@ private struct Receipt: Encodable {
             receipt.errorType = String(reflecting: type(of: error))
             receipt.errorCode = errorCode(for: error)
             receipt.errorMessage = error.localizedDescription
+            receipt.errorDetails = String(reflecting: error)
         }
         receipt.timingsSeconds["total"] = elapsed(since: start)
         let encoder = JSONEncoder()

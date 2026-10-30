@@ -15,7 +15,8 @@ public struct MouthVideoFrames: Sendable {
 public enum MouthVideoProcessingError: LocalizedError {
     case noVideo, emptyVideo, unsupportedVideo, invalidTiming, decodingFailed
     case clipTooLong, missingAlignmentResource
-    case missingFace(frame: Int), multipleFaces(frame: Int)
+    case missingFace(frame: Int, presentationTime: TimeInterval)
+    case multipleFaces(frame: Int)
     case landmarksUnavailable(frame: Int), invalidAlignment(frame: Int)
 
     public var errorDescription: String? {
@@ -139,7 +140,9 @@ public enum MouthVideoProcessor {
         try VNImageRequestHandler(cvPixelBuffer: sample.pixels, orientation: geometry.orientation).perform([request])
         try Task.checkCancellation()
         let faces = request.results ?? []
-        guard !faces.isEmpty else { throw MouthVideoProcessingError.missingFace(frame: sample.index) }
+        guard !faces.isEmpty else {
+            throw MouthVideoProcessingError.missingFace(frame: sample.index, presentationTime: sample.time)
+        }
         guard faces.count == 1 else { throw MouthVideoProcessingError.multipleFaces(frame: sample.index) }
         let face = faces[0]
         guard face.confidence >= 0.5, let landmarks = face.landmarks else {

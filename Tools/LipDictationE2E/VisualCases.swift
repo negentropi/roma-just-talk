@@ -117,6 +117,7 @@ struct LipVisualCases {
                     report["negativeSeededFullText"] = seededFullText
                 }
                 try await obs.verifyPausedBeforeShortcut()
+                let recorderLogOffset = (try? Data(contentsOf: URL(fileURLWithPath: appLog)).count) ?? startOffset
                 let down = try RuntimeShortcutInjector.postLeftShiftDown()
                 modifierHeld = true
                 report["shortcutDown"] = try json(down)
@@ -151,10 +152,38 @@ struct LipVisualCases {
                 modifierHeld = false
                 report["shortcutUp"] = try json(up)
                 if scenario == "cancel" {
-                    guard waitForLog(appLog, after: startOffset, containing: "recognition.start", timeout: 45) else { throw ProofError.inferenceStart }
-                    guard RuntimeAX.postKey(keyCode: 53, flags: []) else { throw ProofError.cancellation }
+                    let miniShown = waitForLog(appLog, after: recorderLogOffset, containing: "Showing mini recorder", timeout: 5,
+                                              processIdentifier: application.processIdentifier)
+                    report["miniRecorderShown"] = miniShown
+                    report["miniRecorderShownLines"] = logSlice(appLog, after: recorderLogOffset, processIdentifier: application.processIdentifier)
+                        .split(separator: "\n").filter { $0.contains("Showing mini recorder") }.map(String.init)
+                    guard miniShown else { throw ProofError.cancellation }
+                    guard waitForLog(appLog, after: startOffset, containing: "recognition.start", timeout: 45,
+                                     processIdentifier: application.processIdentifier) else { throw ProofError.inferenceStart }
+                    let escapeLogOffset = (try? Data(contentsOf: URL(fileURLWithPath: appLog)).count) ?? startOffset
+                    var injections: [[String: Any]] = []
+                    let firstAt = ProcessInfo.processInfo.systemUptime
+                    let firstPosted = RuntimeAX.postKey(keyCode: 53, flags: [])
+                    injections.append(["postedAtSystemUptime": firstAt, "posted": firstPosted])
+                    report["escapeInjections"] = injections
+                    guard firstPosted else { throw ProofError.cancellation }
                     wait(0.1)
-                    guard RuntimeAX.postKey(keyCode: 53, flags: []) else { throw ProofError.cancellation }
+                    let secondAt = ProcessInfo.processInfo.systemUptime
+                    let secondPosted = RuntimeAX.postKey(keyCode: 53, flags: [])
+                    injections.append(["postedAtSystemUptime": secondAt, "posted": secondPosted])
+                    report["escapeInjections"] = injections
+                    guard secondPosted else { throw ProofError.cancellation }
+                    let dispatchObserved = waitForLog(appLog, after: escapeLogOffset, containing: "dispatchKeyDown: action=miniRecorderEscape",
+                                                      timeout: 5, processIdentifier: application.processIdentifier, minimumCount: 2)
+                    let cancelCalled = waitForLog(appLog, after: escapeLogOffset, containing: "cancelRecording called",
+                                                  timeout: 5, processIdentifier: application.processIdentifier)
+                    let routedLines = logSlice(appLog, after: escapeLogOffset, processIdentifier: application.processIdentifier).split(separator: "\n")
+                    let dispatches = routedLines.filter { $0.contains("dispatchKeyDown: action=miniRecorderEscape") }.map(String.init)
+                    report["escapeDispatchLines"] = dispatches
+                    report["escapeDispatchCount"] = dispatches.count
+                    report["cancelRecordingCalled"] = cancelCalled
+                    report["cancelRecordingCallLines"] = routedLines.filter { $0.contains("cancelRecording called") }.map(String.init)
+                    guard dispatchObserved, dispatches.count == 2, cancelCalled else { throw ProofError.cancellation }
                 }
                 var visible: RuntimeVisibleTextResult?
                 if negative {
@@ -167,6 +196,7 @@ struct LipVisualCases {
                         guard waitForLog(appLog, after: startOffset, containing: terminal, timeout: 45) else { throw ProofError.notDrained }
                         report["negativeCompletionBoundary"] = terminal
                     }
+                    if scenario == "disable" || scenario == "quit" { await obs.recordStats(phase: "afterPartialCaptureStop") }
                     let finalFullText = prepared.readFullText()
                     let observation = RuntimeNegativeTextObservation.classify(baseline: seededFullText, finalText: finalFullText)
                     report["negativeTextObservation"] = observation.rawValue
@@ -310,12 +340,14 @@ struct LipVisualCases {
     static func processExited(_ application: NSRunningApplication) -> Bool {
         application.isTerminated && kill(application.processIdentifier, 0) == -1 && errno == ESRCH
     }
-    static func logSlice(_ path: String, after offset: Int) -> String {
+    static func logSlice(_ path: String, after offset: Int, processIdentifier: pid_t? = nil) -> String {
         guard let file = try? FileHandle(forReadingFrom: URL(fileURLWithPath: path)) else { return "" }
         defer { try? file.close() }
         do {
             try file.seek(toOffset: UInt64(offset))
-            return String(decoding: try file.readToEnd() ?? Data(), as: UTF8.self)
+            let text = String(decoding: try file.readToEnd() ?? Data(), as: UTF8.self)
+            guard let processIdentifier else { return text }
+            return text.split(separator: "\n").filter { $0.contains("[\(processIdentifier):") }.joined(separator: "\n")
         } catch { return "" }
     }
     static func captureIdentifier(_ messages: String) -> String? {
@@ -325,10 +357,12 @@ struct LipVisualCases {
               UUID(uuidString: String(value)) != nil else { return nil }
         return String(value)
     }
-    static func waitForLog(_ path: String, after offset: Int, containing marker: String, timeout: TimeInterval) -> Bool {
+    static func waitForLog(_ path: String, after offset: Int, containing marker: String, timeout: TimeInterval,
+                           processIdentifier: pid_t? = nil, minimumCount: Int = 1) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
-            if logSlice(path, after: offset).contains(marker) { return true }
+            if logSlice(path, after: offset, processIdentifier: processIdentifier).split(separator: "\n")
+                .filter({ $0.contains(marker) }).count >= minimumCount { return true }
             wait(0.05)
         }
         return false
@@ -728,6 +762,12 @@ private final class OBSClient {
         mediaEvidence["videoMinFrameDurationMilliseconds"] = frameMilliseconds
         mediaEvidence["mediaDurationToleranceMilliseconds"] = 1
         mediaEvidence["durationSource"] = "localAVURLAsset"
+        do {
+            let video = try await request("GetVideoSettings", [:])
+            mediaEvidence["videoSettings"] = Dictionary(uniqueKeysWithValues:
+                ["baseWidth", "baseHeight", "outputWidth", "outputHeight", "fpsNumerator", "fpsDenominator"]
+                    .map { ($0, video[$0] ?? NSNull()) })
+        } catch { mediaEvidence["videoSettingsUnavailable"] = String(describing: error) }
         let settings: [String: Any] = ["is_local_file": true, "local_file": path, "looping": false,
                                       "restart_on_activate": false, "clear_on_media_end": false]
         mediaEvidence["requestedInputSettings"] = settings
@@ -763,6 +803,7 @@ private final class OBSClient {
         }
     }
     func playPreparedMotion() async throws {
+        await recordStats(phase: "beforePlay")
         guard usableStatus(try await mediaStatus(phase: "beforePlay"), requirePaused: true, requireFirstFrame: true) else {
             throw OBSError.mediaPreparation("motionChangedBeforePlay")
         }
@@ -797,11 +838,28 @@ private final class OBSClient {
             // OBS reports null cursor/duration after ENDED; prior readiness binds this input.
             if status["mediaState"] as? String == "OBS_MEDIA_STATE_ENDED" {
                 mediaEvidence["motionEndedObservedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+                await recordStats(phase: "afterSourceEnd")
                 return
             }
             try await Task.sleep(nanoseconds: 200_000_000)
         }
         throw OBSError.mediaPreparation("motionDidNotReachEnded")
+    }
+    func recordStats(phase: String) async {
+        var sample: [String: Any] = ["phase": phase]
+        do {
+            let stats = try await request("GetStats", [:])
+            for key in ["activeFps", "averageFrameRenderTime", "renderSkippedFrames", "renderTotalFrames",
+                        "outputSkippedFrames", "outputTotalFrames", "cpuUsage"] { sample[key] = stats[key] ?? NSNull() }
+            sample["available"] = true
+        } catch {
+            sample["available"] = false
+            sample["error"] = String(describing: error)
+        }
+        sample["receivedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        var samples = mediaEvidence["statsSamples"] as? [[String: Any]] ?? []
+        samples.append(sample)
+        mediaEvidence["statsSamples"] = samples
     }
     private func waitForMedia(phase: String, pausedAtFirstFrame: Bool, requirePaused: Bool = false) async throws {
         let deadline = ProcessInfo.processInfo.systemUptime + 5

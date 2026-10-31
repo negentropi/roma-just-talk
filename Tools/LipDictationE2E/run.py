@@ -213,9 +213,18 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
                 raise RuntimeError('The probe-owned private OBS WebSocket configuration is unavailable')
         enabled = scenario != 'setup'
         lips_only = scenario in ['lips', 'cancel', 'disable', 'quit']
+        recorder_fixture = None
+        if scenario == 'cancel':
+            recorder_read = run('read-cancel-recorder-type', ['defaults', 'read', APP_ID, 'RecorderType'], required=False)
+            recorder_value = (evidence / 'read-cancel-recorder-type.log').read_text().strip()
+            if recorder_read != 0 and 'does not exist' not in recorder_value:
+                raise RuntimeError('Could not establish the original cancel recorder preference')
+            if recorder_read == 0 and recorder_value not in ['none', 'notch', 'mini']:
+                raise RuntimeError('Unexpected recorder style in the fresh cancel fixture')
+            recorder_fixture = {'originalPresent': recorder_read == 0, 'originalRawValue': recorder_value if recorder_read == 0 else None, 'requestedRawValue': 'mini', 'restored': False}
+            write(evidence / 'cancel-recorder-fixture.json', recorder_fixture)
         for key, value in [('LipDictationEnabled', enabled), ('LipDictationLipOnly', lips_only)]:
             run('set-' + scenario + '-' + key, ['defaults', 'write', APP_ID, key, '-bool', str(value).lower()])
-        run('refresh-' + scenario + '-preferences', ['killall', 'cfprefsd'], required=False)
         report = evidence / (scenario + '.json')
         before = history()
         before_ids = {row['Z_PK'] for row in before}
@@ -224,6 +233,9 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         if deny_microphone:
             microphone_tcc_fixture(evidence, run, 'microphone-authorized-before-lips', 2)
         try:
+            if recorder_fixture is not None:
+                run('set-cancel-recorder-type', ['defaults', 'write', APP_ID, 'RecorderType', '-string', 'mini'])
+            run('refresh-' + scenario + '-preferences', ['killall', 'cfprefsd'], required=False)
             if deny_microphone:
                 grant(app, APP_ID, [], ['kTCCServiceMicrophone'], auth_value=0)
                 run('refresh-denied-microphone-tcc-user', ['killall', 'tccd'], required=False)
@@ -237,6 +249,18 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             if deny_microphone:
                 microphone_tcc_fixture(evidence, run, 'microphone-denied-after-lips', 0)
         finally:
+            if recorder_fixture is not None:
+                if recorder_fixture['originalPresent']:
+                    run('restore-cancel-recorder-type', ['defaults', 'write', APP_ID, 'RecorderType', '-string', recorder_fixture['originalRawValue']])
+                else:
+                    run('restore-cancel-recorder-type', ['defaults', 'delete', APP_ID, 'RecorderType'])
+                run('refresh-restored-recorder-preferences', ['killall', 'cfprefsd'], required=False)
+                restored_code = run('verify-restored-recorder-type', ['defaults', 'read', APP_ID, 'RecorderType'], required=False)
+                restored_value = (evidence / 'verify-restored-recorder-type.log').read_text().strip()
+                recorder_fixture['restored'] = (restored_code == 0 and restored_value == recorder_fixture['originalRawValue']) if recorder_fixture['originalPresent'] else (restored_code != 0 and 'does not exist' in restored_value)
+                write(evidence / 'cancel-recorder-fixture.json', recorder_fixture)
+                if not recorder_fixture['restored']:
+                    raise RuntimeError('Cancel recorder preference restoration was not verified')
             if deny_microphone:
                 grant(app, APP_ID, [], ['kTCCServiceMicrophone'])
                 run('refresh-restored-microphone-tcc-user', ['killall', 'tccd'], required=False)
@@ -259,7 +283,7 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         else:
             passed = passed and all(row['ZAUDIOFILEURL'] is None for row in created)
         write(evidence / (scenario + '-history.json'), {'createdRows': created, 'independentHistoryPassed': passed})
-        cases.append({'scenario': scenario, 'passed': passed, 'report': report.name, 'historyReport': scenario + '-history.json', 'microphoneTCCDeniedFixture': deny_microphone})
+        cases.append({'scenario': scenario, 'passed': passed, 'report': report.name, 'historyReport': scenario + '-history.json', 'microphoneTCCDeniedFixture': deny_microphone, 'recorderStyleFixture': 'cancel-recorder-fixture.json' if recorder_fixture is not None else None})
         if not passed:
             write(evidence / 'visual-summary.json', {'passed': False, 'cases': cases})
             raise RuntimeError('Actual app visual scenario failed: ' + scenario)

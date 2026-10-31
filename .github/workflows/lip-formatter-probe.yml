@@ -1,0 +1,88 @@
+name: Probe native Swift Testing formatter
+on:
+  push:
+    branches: ["ci/lip-formatter-probe-*"]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - name: Run formatter assertions with the full gate's Xcode selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          probe="$RUNNER_TEMP/lip-formatter-probe"
+          mkdir -p "$probe/Tests/FormatterProbe"
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$latest"
+          { xcode-select -p; xcodebuild -version; swift --version; sw_vers; } | tee "$probe/toolchain.log"
+          printf 'source-base=5aeea3aed848e8b3214197d5c7469efd06af3225\ntransport=%s\n' "$GITHUB_SHA" >> "$probe/toolchain.log"
+          cat > "$probe/Package.swift" <<'SWIFT'
+          // swift-tools-version: 5.9
+          import PackageDescription
+          let package = Package(name: "FormatterProbe", platforms: [.macOS("14.4")], targets: [.testTarget(name: "FormatterProbe")])
+          SWIFT
+          cat > "$probe/Tests/FormatterProbe/DiscardedRecordingTests.swift" <<'SWIFT'
+          import Foundation
+          import Testing
+          enum ProbeState { case canceled }
+          struct ProbeRow { let audioFileURL: String?; let transcriptionState: ProbeState }
+          enum RecordingSessionEndAction: CaseIterable { case masterOff, reset, shutdown }
+          struct ProbeFixture { func transcriptionCount() throws -> Int { 1 } }
+          @Suite(.serialized) struct FormatterProbe {
+              @Test func userCanceledStartupOwnsAudioBeforeAwaitingDrain() throws {
+                  let pending: [ProbeRow] = []
+                  let startupFile = URL(fileURLWithPath: "/tmp/formatter-probe.wav")
+                  #expect(pending.map(\.audioFileURL) == [startupFile.absoluteString])
+                  #expect(pending.map(\.transcriptionState) == [.canceled])
+                  let rows: [ProbeRow] = []
+                  #expect(rows.map(\.transcriptionState) == [.canceled])
+                  let stored = try #require(rows.first)
+                  _ = stored
+              }
+              @Test(arguments: RecordingSessionEndAction.allCases)
+              func lipOnlySessionEndDoesNotCreateHistory(action: RecordingSessionEndAction) throws {
+                  let fixture = ProbeFixture()
+                  #expect(try fixture.transcriptionCount() == 0, "Unexpected history after \(action)")
+              }
+          }
+          SWIFT
+          set +e
+          swift test --package-path "$probe" --jobs 2 > "$probe/stdout.log" 2> "$probe/stderr.log"
+          probe_exit=$?
+          set -e
+          printf '%s\n' "$probe_exit" > "$probe/exit-code.txt"
+          cat "$probe/stdout.log" "$probe/stderr.log"
+          PROBE_PATH="$probe" python3 <<'PY'
+          import json, os, pathlib, re
+          p = pathlib.Path(os.environ["PROBE_PATH"])
+          text = (p / "stdout.log").read_text() + (p / "stderr.log").read_text()
+          issues = [line for line in text.splitlines() if " recorded an issue" in line]
+          startup = [line for line in issues if "Test userCanceledStartupOwnsAudioBeforeAwaitingDrain() recorded an issue" in line]
+          lifecycle = [line for line in issues if "Test lipOnlySessionEndDoesNotCreateHistory(action:) recorded an issue" in line]
+          code = int((p / "exit-code.txt").read_text())
+          receipt = {"boundary": "Native formatter only; no SwiftData, app, or dictation regression proof", "exitCode": code, "startupIssues": startup, "lifecycleIssues": lifecycle}
+          (p / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+          assert code != 0, "Assertions must fail in the actual test runner"
+          assert re.search(r"Testing Library Version: 1902\b", text), "Expected the full gate's Testing Library 1902"
+          assert len(issues) == 7 and len(startup) == 4 and len(lifecycle) == 3, "Expected four startup and three lifecycle issues"
+          assert re.search(r"Test run with 2 tests in 1 suite failed", text), "Both actual test functions must execute"
+          assert all(sum(f"with 1 argument action → .{action} at DiscardedRecordingTests.swift:" in line for line in lifecycle) == 1 for action in ("masterOff", "reset", "shutdown")), "Each enum action must execute once"
+          PY
+      - name: Retain only formatter source, toolchain, and native output
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lip-formatter-probe-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/lip-formatter-probe/Package.swift
+            ${{ runner.temp }}/lip-formatter-probe/Tests/FormatterProbe/DiscardedRecordingTests.swift
+            ${{ runner.temp }}/lip-formatter-probe/toolchain.log
+            ${{ runner.temp }}/lip-formatter-probe/stdout.log
+            ${{ runner.temp }}/lip-formatter-probe/stderr.log
+            ${{ runner.temp }}/lip-formatter-probe/exit-code.txt
+            ${{ runner.temp }}/lip-formatter-probe/receipt.json
+          if-no-files-found: error
+          retention-days: 3

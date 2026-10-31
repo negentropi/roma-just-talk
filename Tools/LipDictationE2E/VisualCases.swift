@@ -683,6 +683,7 @@ private final class OBSClient {
     private let socket: URLSessionWebSocketTask
     private let password: String
     private var requestCounter = 0
+    private var expectedMotionDurationMilliseconds: Double?
     private(set) var mediaEvidence: [String: Any] = ["inputName": "PublicSilentVideo"]
     init(configurationURL: URL) throws {
         let configuration = try JSONSerialization.jsonObject(with: Data(contentsOf: configurationURL)) as? [String: Any]
@@ -705,6 +706,13 @@ private final class OBSClient {
         guard try await receive()["op"] as? Int == 2 else { throw OBSError.protocolFailure }
     }
     func preparePausedMotion(path: String) async throws {
+        let assetDuration = try await AVURLAsset(url: URL(fileURLWithPath: path)).load(.duration)
+        let expectedDuration = CMTimeGetSeconds(assetDuration) * 1000
+        guard expectedDuration.isFinite, expectedDuration > 1000 else { throw OBSError.mediaPreparation("invalidMotionAssetDuration") }
+        expectedMotionDurationMilliseconds = expectedDuration
+        mediaEvidence["expectedMediaDurationMilliseconds"] = expectedDuration
+        mediaEvidence["mediaDurationToleranceMilliseconds"] = 1
+        mediaEvidence["durationSource"] = "localAVURLAsset"
         let settings: [String: Any] = ["is_local_file": true, "local_file": path, "looping": false,
                                       "restart_on_activate": false, "clear_on_media_end": false]
         mediaEvidence["requestedInputSettings"] = settings
@@ -772,6 +780,9 @@ private final class OBSClient {
         guard let state = status["mediaState"] as? String,
               (requirePaused ? state == "OBS_MEDIA_STATE_PAUSED" : ["OBS_MEDIA_STATE_PLAYING", "OBS_MEDIA_STATE_PAUSED"].contains(state)),
               let duration = status["mediaDuration"] as? NSNumber, duration.doubleValue > 1000,
+              let expectedMotionDurationMilliseconds,
+              // OBS returns integer milliseconds; allow only millisecond rounding.
+              abs(duration.doubleValue - expectedMotionDurationMilliseconds) <= 1,
               let cursor = status["mediaCursor"] as? NSNumber, cursor.doubleValue >= 0 else { return false }
         return !requireZero || cursor.doubleValue == 0
     }

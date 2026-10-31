@@ -89,12 +89,12 @@ struct LipVisualCases {
                 report["passed"] = true
             } else {
                 let negative = ["cancel", "disable", "quit"].contains(scenario)
-                guard let websocket = values["--obs-config"], let still = values["--still"],
-                      let video = values["--video"], let audio = values["--audio"] else { throw ProofError.invalidArguments }
+                guard let websocket = values["--obs-config"], let video = values["--video"],
+                      let audio = values["--audio"] else { throw ProofError.invalidArguments }
                 let obs = try OBSClient(configurationURL: URL(fileURLWithPath: websocket))
                 try await obs.connect()
-                defer { obs.close() }
-                try await obs.media(path: still, looping: true)
+                defer { report["obsMedia"] = obs.mediaEvidence; obs.close() }
+                try await obs.preparePausedMotion(path: video)
                 var disableControl: AXUIElement?
                 if scenario == "disable" {
                     try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
@@ -116,6 +116,7 @@ struct LipVisualCases {
                     guard seededFullText == RuntimeTextScenario.existingText.initialText else { throw ProofError.unexpectedInsertion }
                     report["negativeSeededFullText"] = seededFullText
                 }
+                try await obs.verifyPausedBeforeShortcut()
                 let down = try RuntimeShortcutInjector.postLeftShiftDown()
                 modifierHeld = true
                 report["shortcutDown"] = try json(down)
@@ -123,13 +124,14 @@ struct LipVisualCases {
                 guard let captureID = captureIdentifier(logSlice(appLog, after: startOffset)) else { throw ProofError.captureEvidence }
                 report["captureID"] = captureID
                 guard prepared.refreshRenderedBaseline() == nil else { throw ProofError.renderedBaseline }
-                try await obs.media(path: video, looping: false)
                 let audioURL = URL(fileURLWithPath: audio)
                 let file = try AVAudioFile(forReading: audioURL)
                 let duration = Double(file.length) / file.processingFormat.sampleRate
                 let playing = RuntimeAudioPlayback(fixtureURL: audioURL, device: audioDevice, expectedDurationSeconds: duration)
                 playback = playing
-                _ = try playing.start()
+                try await obs.playPreparedMotion()
+                report["audioPlaybackStartedAtSystemUptime"] = try playing.start()
+                try await obs.observePlayingMotion()
                 if scenario == "disable" {
                     wait(0.5)
                     try press(disableControl!)
@@ -681,6 +683,7 @@ private final class OBSClient {
     private let socket: URLSessionWebSocketTask
     private let password: String
     private var requestCounter = 0
+    private(set) var mediaEvidence: [String: Any] = ["inputName": "PublicSilentVideo"]
     init(configurationURL: URL) throws {
         let configuration = try JSONSerialization.jsonObject(with: Data(contentsOf: configurationURL)) as? [String: Any]
         guard let configuration, let password = configuration["server_password"] as? String,
@@ -701,12 +704,87 @@ private final class OBSClient {
         try await send(["op": 1, "d": identify])
         guard try await receive()["op"] as? Int == 2 else { throw OBSError.protocolFailure }
     }
-    func media(path: String, looping: Bool) async throws {
-        try await request("SetInputSettings", ["inputName": "PublicSilentVideo", "inputSettings": ["is_local_file": true, "local_file": path, "looping": looping, "restart_on_activate": true, "clear_on_media_end": false], "overlay": true])
+    func preparePausedMotion(path: String) async throws {
+        let settings: [String: Any] = ["is_local_file": true, "local_file": path, "looping": false,
+                                      "restart_on_activate": false, "clear_on_media_end": false]
+        mediaEvidence["requestedInputSettings"] = settings
+        mediaEvidence["loadRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        try await request("SetInputSettings", ["inputName": "PublicSilentVideo", "inputSettings": settings, "overlay": true])
         try await request("SetInputMute", ["inputName": "PublicSilentVideo", "inputMuted": true])
+        mediaEvidence["restartBeforeCaptureAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
         try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"])
+        try await waitForMedia(phase: "loaded", pausedAtZero: false)
+        mediaEvidence["pauseRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE"])
+        try await waitForMedia(phase: "paused", pausedAtZero: false, requirePaused: true)
+        mediaEvidence["seekZeroBeforeCaptureAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        try await request("SetMediaInputCursor", ["inputName": "PublicSilentVideo", "mediaCursor": 0])
+        try await waitForMedia(phase: "pausedAtZero", pausedAtZero: true, requirePaused: true)
+        let response = try await request("GetInputSettings", ["inputName": "PublicSilentVideo"])
+        guard let actual = response["inputSettings"] as? [String: Any],
+              actual["local_file"] as? String == path, actual["is_local_file"] as? Bool == true,
+              actual["looping"] as? Bool == false, actual["restart_on_activate"] as? Bool == false,
+              actual["clear_on_media_end"] as? Bool == false else { throw OBSError.mediaPreparation("inputSettingsMismatch") }
+        // Only public fixture settings enter receipts; authentication configuration never does.
+        mediaEvidence["inputKind"] = response["inputKind"]
+        mediaEvidence["inputSettings"] = actual.filter { settings[$0.key] != nil }
+        let mute = try await request("GetInputMute", ["inputName": "PublicSilentVideo"])
+        guard mute["inputMuted"] as? Bool == true else { throw OBSError.mediaPreparation("inputNotMuted") }
+        mediaEvidence["inputMuted"] = true
+        mediaEvidence["preparedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
     }
-    private func request(_ type: String, _ data: [String: Any]) async throws {
+    func verifyPausedBeforeShortcut() async throws {
+        guard usableStatus(try await mediaStatus(phase: "beforeShortcut"), requirePaused: true, requireZero: true) else {
+            throw OBSError.mediaPreparation("motionNotPausedAtZeroBeforeShortcut")
+        }
+    }
+    func playPreparedMotion() async throws {
+        guard usableStatus(try await mediaStatus(phase: "beforePlay"), requirePaused: true, requireZero: true) else {
+            throw OBSError.mediaPreparation("motionChangedBeforePlay")
+        }
+        mediaEvidence["playRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY"])
+        mediaEvidence["playAcknowledgedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+    }
+    func observePlayingMotion() async throws {
+        let status = try await mediaStatus(phase: "afterPlay")
+        guard usableStatus(status, requirePaused: false, requireZero: false),
+              status["mediaState"] as? String == "OBS_MEDIA_STATE_PLAYING" else { throw OBSError.mediaPreparation("motionNotPlayingAfterPlay") }
+    }
+    private func waitForMedia(phase: String, pausedAtZero: Bool, requirePaused: Bool = false) async throws {
+        let deadline = ProcessInfo.processInfo.systemUptime + 5
+        var stableSince: TimeInterval?
+        while ProcessInfo.processInfo.systemUptime < deadline {
+            let status = try await mediaStatus(phase: phase)
+            if usableStatus(status, requirePaused: requirePaused, requireZero: pausedAtZero) {
+                if !pausedAtZero { return }
+                if stableSince == nil { stableSince = ProcessInfo.processInfo.systemUptime }
+                if ProcessInfo.processInfo.systemUptime - stableSince! >= 0.5 {
+                    mediaEvidence["pausedZeroStableSeconds"] = ProcessInfo.processInfo.systemUptime - stableSince!
+                    return
+                }
+            } else { stableSince = nil }
+            try await Task.sleep(nanoseconds: 200_000_000)
+        }
+        throw OBSError.mediaPreparation("deadline:\(phase)")
+    }
+    private func usableStatus(_ status: [String: Any], requirePaused: Bool, requireZero: Bool) -> Bool {
+        guard let state = status["mediaState"] as? String,
+              (requirePaused ? state == "OBS_MEDIA_STATE_PAUSED" : ["OBS_MEDIA_STATE_PLAYING", "OBS_MEDIA_STATE_PAUSED"].contains(state)),
+              let duration = status["mediaDuration"] as? NSNumber, duration.doubleValue > 1000,
+              let cursor = status["mediaCursor"] as? NSNumber, cursor.doubleValue >= 0 else { return false }
+        return !requireZero || cursor.doubleValue == 0
+    }
+    private func mediaStatus(phase: String) async throws -> [String: Any] {
+        let response = try await request("GetMediaInputStatus", ["inputName": "PublicSilentVideo"])
+        var sample: [String: Any] = ["phase": phase, "receivedAtSystemUptime": ProcessInfo.processInfo.systemUptime]
+        for key in ["mediaState", "mediaCursor", "mediaDuration"] { sample[key] = response[key] ?? NSNull() }
+        var samples = mediaEvidence["statusSamples"] as? [[String: Any]] ?? []
+        samples.append(sample)
+        mediaEvidence["statusSamples"] = samples
+        return response
+    }
+    @discardableResult private func request(_ type: String, _ data: [String: Any]) async throws -> [String: Any] {
         requestCounter += 1
         let id = String(requestCounter)
         try await send(["op": 6, "d": ["requestType": type, "requestId": id, "requestData": data]])
@@ -714,7 +792,7 @@ private final class OBSClient {
             let message = try await receive()
             guard message["op"] as? Int == 7, let details = message["d"] as? [String: Any], details["requestId"] as? String == id else { continue }
             guard let status = details["requestStatus"] as? [String: Any], status["result"] as? Bool == true else { throw OBSError.requestFailed(type) }
-            return
+            return details["responseData"] as? [String: Any] ?? [:]
         }
         throw OBSError.protocolFailure
     }
@@ -733,5 +811,5 @@ private final class OBSClient {
         guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw OBSError.protocolFailure }
         return object
     }
-    enum OBSError: Error { case configuration, protocolFailure, requestFailed(String) }
+    enum OBSError: Error { case configuration, protocolFailure, requestFailed(String), mediaPreparation(String) }
 }

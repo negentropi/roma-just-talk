@@ -36,9 +36,28 @@ class AudioTranscriptionService {
             throw VoiceInkEngineError.audioFileNotFound
         }
         
+        // Compression of a just-saved recording can delete `url` at any moment,
+        // so read only from this run's own copy.
+        let permanentURL: URL
+        do {
+            let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
+            let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
+            permanentURL = VoiceInkStoredAudioFile.retranscriptionFileURL(
+                in: recordingsDirectory,
+                fileExtension: url.pathExtension
+            )
+            try VoiceInkStoredAudioFile.copyForUnsavedRecord(from: url, to: permanentURL)
+        } catch {
+            let message = VoiceInkAudioFileTranscriptionDiagnostics.permanentCopyFailedMessage(
+                localizedDescription: error.localizedDescription
+            )
+            logger.error("\(message, privacy: .public)")
+            throw error
+        }
+
         do {
             let transcriptionStart = Date()
-            let rawText = try await serviceRegistry.transcribe(audioURL: url, model: model)
+            let rawText = try await serviceRegistry.transcribe(audioURL: permanentURL, model: model)
             let transcriptionDuration = Date().timeIntervalSince(transcriptionStart)
             let cleanupConfiguration = VoiceInkTranscriptionCleanupConfiguration.current()
 
@@ -56,23 +75,8 @@ class AudioTranscriptionService {
             logger.notice("\(VoiceInkAudioFileTranscriptionDiagnostics.wordReplacementsAppliedMessage, privacy: .public)")
             let cleanedText = textPlan.cleanedText
 
-            let audioAsset = AVURLAsset(url: url)
+            let audioAsset = AVURLAsset(url: permanentURL)
             let duration = CMTimeGetSeconds(try await audioAsset.load(.duration))
-            let appSupportDirectory = VoiceInkMacOSStorageDirectories.appSupportDirectory
-            let recordingsDirectory = try VoiceInkStoredAudioFile.createRecordingsDirectory(in: appSupportDirectory)
-            
-            let permanentURL = VoiceInkStoredAudioFile.retranscriptionFileURL(in: recordingsDirectory)
-            
-            do {
-                try FileManager.default.copyItem(at: url, to: permanentURL)
-            } catch {
-                let message = VoiceInkAudioFileTranscriptionDiagnostics.permanentCopyFailedMessage(
-                    localizedDescription: error.localizedDescription
-                )
-                logger.error("\(message, privacy: .public)")
-                throw error
-            }
-            
             let permanentURLString = permanentURL.absoluteString
 
             // Apply prompt detection for trigger words
@@ -129,6 +133,7 @@ class AudioTranscriptionService {
                 localizedDescription: error.localizedDescription
             )
             logger.error("\(message, privacy: .public)")
+            try? FileManager.default.removeItem(at: permanentURL)
             throw error
         }
     }

@@ -238,6 +238,7 @@ class CursorPaster {
             return .commandNotPosted
         }
         latencyTrace.end(clipboardWriteSpan, details: "result=success")
+        let restoreTarget = shouldRestoreClipboard ? CursorTextContextReader.pasteLandingTarget() : nil
 
         let commandSpan = latencyTrace.begin("paste_session.post_command", token: latencyTraceToken)
         let pasteResult = await postPasteCommand(
@@ -260,6 +261,7 @@ class CursorPaster {
                 savedContents,
                 expectedText: text,
                 sessionID: sessionID,
+                target: restoreTarget,
                 on: pasteboard,
                 latencyTraceToken: latencyTraceToken
             )
@@ -323,13 +325,25 @@ class CursorPaster {
         _ savedContents: ClipboardSnapshot,
         expectedText: String,
         sessionID: String,
+        target: CursorTextContextReader.FocusedPasteTarget?,
         on pasteboard: NSPasteboard,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) {
         let delay = VoiceInkPastePreference.boundedClipboardRestoreDelay()
 
         Task { @MainActor in
-            await wait(delay)
+            // Once the pasted text shows up, the target has read the clipboard, so restore
+            // right away; a Cmd-V during the fixed delay would paste the transcript instead.
+            // The delay remains the fallback for targets whose text Accessibility cannot read.
+            let startedAt = ProcessInfo.processInfo.systemUptime
+            let pasteLanded = if let target {
+                await CursorTextContextReader.waitUntilPasteLands(expectedText, in: target, timeout: delay)
+            } else {
+                false
+            }
+            if !pasteLanded {
+                await wait(delay - (ProcessInfo.processInfo.systemUptime - startedAt))
+            }
             guard pasteboardStillOwnedByPasteSession(pasteboard, expectedText: expectedText, sessionID: sessionID) else {
                 VoiceInkLatencyTrace.shared.event(
                     "paste_session.restore_skipped",
@@ -344,7 +358,7 @@ class CursorPaster {
             }
             VoiceInkLatencyTrace.shared.event(
                 "paste_session.restore_executed",
-                details: "items=\(savedContents.count)",
+                details: "items=\(savedContents.count) pasteLanded=\(pasteLanded)",
                 token: latencyTraceToken
             )
         }

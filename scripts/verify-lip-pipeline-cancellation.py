@@ -22,8 +22,9 @@ power_modes = root / "VoiceInk/PowerMode/PowerModeSessionManager.swift"
 power_mode_policy = root / "VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift"
 authorization = root / "VoiceInk/Services/CaptureAuthorizationDecision.swift"
 recognition = root / "VoiceInk/Transcription/Engine/RecordingRecognition.swift"
+engine = root / "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
 candidates = {path: path.read_bytes() for path in (
-    source, recorder, prewarm, power_modes, power_mode_policy, authorization, recognition,
+    source, recorder, prewarm, power_modes, power_mode_policy, authorization, recognition, engine,
 )}
 evidence = root / ".local-build/lip-pipeline-regression"
 evidence.mkdir(parents=True, exist_ok=False)
@@ -37,14 +38,10 @@ receipt = {
     "githubRunID": os.environ.get("GITHUB_RUN_ID"),
     "githubRunAttempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
     "githubJob": os.environ.get("GITHUB_JOB"),
+    "verificationScriptSHA256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     "candidateSourceSHA256": {
         str(path.relative_to(root)): hashlib.sha256(data).hexdigest()
         for path, data in candidates.items()
-    },
-    "integrationSourceSHA256": {
-        "VoiceInk/Transcription/Engine/VoiceInkEngine.swift": hashlib.sha256((
-            root / "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
-        ).read_bytes()).hexdigest(),
     },
     "testSourceSHA256": {
         relative: hashlib.sha256((root / relative).read_bytes()).hexdigest()
@@ -55,6 +52,9 @@ receipt = {
             "VoiceInkTests/PowerModeSessionManagerTests.swift",
             "VoiceInkTests/CaptureAuthorizationDecisionTests.swift",
             "VoiceInkTests/RecordingRecognitionTests.swift",
+            "VoiceInkTests/DiscardedRecordingTests.swift",
+            "VoiceInkTests/QwenRecordingSelectionTests.swift",
+            "VoiceInkTests/VoiceInkTests.swift",
         )
     },
     "controls": [],
@@ -100,9 +100,9 @@ def semantic_revert(mutants, record):
 
 bad = candidate.decode()
 for span in ("pastePreparationSpan", "pasteSpan"):
-    guard = f'''            if shouldCancel() {{
+    guard = f'''            if let cancellation = cancellation() {{
                 latencyTrace.end({span}, details: "result=cancelled")
-                await finishCanceledTranscription()
+                await finishCanceledTranscription(cancellation)
                 return
             }}
 '''
@@ -122,7 +122,7 @@ owned_auto_send = '''                #if DEBUG
                 #endif
                 do {
                     try await Task.sleep(nanoseconds: delayAfterPaste)
-                    if !Task.isCancelled, !shouldCancel() {
+                    if !Task.isCancelled, cancellation() == nil {
                         CursorPaster.performAutoSend(autoSendKey)
                     }
                 } catch {
@@ -140,6 +140,33 @@ escaped_auto_send = '''                Task { @MainActor in
 require(candidate.decode().count(owned_auto_send) == 1, "Expected one owned auto-send delay")
 escaped_timer = candidate.decode().replace(owned_auto_send, escaped_auto_send, 1)
 
+accidental_discard = "            if cancellation == .accidentalShortcut {\n"
+require(candidate.decode().count(accidental_discard) == 1, "Expected one accidental-cancellation discard branch")
+retained_accidental = candidate.decode().replace(accidental_discard, "            if false {\n", 1)
+empty_discard = '''        if VoiceInkEmptyTranscriptionPolicy.isEmptyCompletion(
+            status: transcription.transcriptionState,
+            rawText: transcription.text,
+            enhancedText: transcription.enhancedText
+        ) {
+            discard(transcription)
+            latencyTrace.finish(event: "pipeline.empty_discarded", token: traceToken)
+            return
+        }
+
+'''
+require(candidate.decode().count(empty_discard) == 1, "Expected one empty-completion discard before persistence")
+retained_empty = candidate.decode().replace(empty_discard, "", 1)
+engine_text = candidates[engine].decode()
+start = engine_text.index("    private func requestCancellation(")
+end = engine_text.index("    private func reserveCanceledRecording(", start)
+request_cancellation = engine_text[start:end]
+reservation = "        reserveCanceledRecording(recording)\n"
+require(request_cancellation.count(reservation) == 1, "Expected one synchronous canceled-history reservation")
+late_reservation = engine_text[:start] + request_cancellation.replace(reservation, "", 1) + engine_text[end:]
+session_end_history = "        case .sessionEnded: return audioURL != nil\n"
+require(engine_text.count(session_end_history) == 1, "Expected one audio-backed implicit session-end History policy")
+retained_lip_session_end = engine_text.replace(session_end_history, "        case .sessionEnded: return true\n", 1)
+
 
 pipeline_selection = "VoiceInkTests/VoiceInkTests/canceledPipelineCannotPasteAfterPreparation(boundary:)"
 auto_send_selection = "VoiceInkTests/VoiceInkTests/pipelineOwnsDelayedAutoSendUntilCompletion(scenario:)"
@@ -152,14 +179,24 @@ hardware_suite = "VoiceInkTests/RecorderMicrophonePrivacyTests"
 authorization_suite = "VoiceInkTests/CaptureAuthorizationDecisionTests"
 authorization_selection = authorization_suite + "/testCanceledPermissionDecisionDrainsBeforeSystemCallback"
 recognition_selection = "VoiceInkTests/RecordingRecognitionTests/testVoiceSuccessCancelsAndDrainsLipRecognition"
+lip_history_selection = "VoiceInkTests/VoiceInkTests/lipOnlyPipelineCancellationUsesTypedHistoryPolicy()"
+lip_empty_selection = "VoiceInkTests/VoiceInkTests/lipOnlyPipelineDiscardsOnlyEmptyCompletion()"
+lip_engine_selection = "VoiceInkTests/VoiceInkTests/lipOnlyCancellationPreservesOnlyUserRequestedHistory()"
+startup_history_selection = "VoiceInkTests/VoiceInkTests/userCanceledStartupOwnsAudioBeforeAwaitingDrain()"
+lip_session_end_selection = "VoiceInkTests/VoiceInkTests/lipOnlySessionEndDoesNotCreateHistory(action:)"
+deleted_startup_selection = "VoiceInkTests/VoiceInkTests/deletedStartupCancellationIsNotRecreatedAfterDrain()"
 candidate_selections = (
     pipeline_selection, hardware_suite, auto_send_selection, prewarm_selection,
     central_lip_selection, central_voice_selection, authorization_suite, recognition_selection,
     mixed_power_mode_selection, upgraded_power_mode_selection,
+    lip_history_selection, lip_empty_selection, lip_engine_selection, startup_history_selection,
+    lip_session_end_selection, deleted_startup_selection,
 )
 receipt["candidateSelections"] = candidate_selections
-receipt["expectedCandidateFunctions"] = 16
-receipt["expectedCandidateInvocations"] = 20
+receipt["expectedCandidateFunctions"] = 22
+receipt["expectedCandidateInvocations"] = 28
+receipt["expectedCandidateParameterizedInvocations"] = 9
+receipt["expectedSemanticControls"] = 13
 
 
 def read_summary(destination):
@@ -212,6 +249,27 @@ def counts(summary):
     return {"functions": functions, "invocations": invocations, "parameterizedInvocations": parameter_runs}
 
 
+history_assertions = {
+    "known-bad-lip-cancellation-history": ("TranscriptionPipelineTests.swift", (
+        r'\(rows → .+\)\.isEmpty → false',
+        r'\(events → \["canceled", "duration"\]\) == \["canceled"\]',
+    ), ()),
+    "known-bad-empty-lip-history": ("TranscriptionPipelineTests.swift", (
+        r'\(rows → .+\)\.isEmpty → false',
+        r'\((?:try )?fixture\.readMetrics\(\) → .+\)\.isEmpty → false',
+        r'\(events → \["dismissed", "duration"\]\) == \["dismissed"\]',
+    ), ()),
+    "known-bad-startup-history-reservation": ("DiscardedRecordingTests.swift", (
+        r'\(pending\.map\(\\\.audioFileURL\) → \[\]\) == \(\[startupFile\.absoluteString\] → .+\)',
+        r'\(pending\.map\(\\\.transcriptionState\) → \[\]\) == .*\.canceled.*',
+    ), (
+        # Without the pending row, failed startup can delete the unreferenced WAV before drain.
+        r'\(rows\.map\(\\\.transcriptionState\) → \[\]\) == .*\.canceled.*',
+        r'\(?rows\.first → nil\)?',
+    )),
+}
+
+
 def red_control(path, mutant, label, selection, count, change):
     record = {
         "label": label, "selection": selection, "expectedFunctions": 1,
@@ -248,6 +306,35 @@ def red_control(path, mutant, label, selection, count, change):
                 and hardware.get("isPreBuffering") is True and type(hardware.get("bufferedPCMBytes")) is int
                 and hardware["bufferedPCMBytes"] > 0,
                 f"{label} lacks required live microphone/PCM evidence: {hardware}")
+    if label in history_assertions:
+        filename, required_assertions, followon_assertions = history_assertions[label]
+        test_name = selection.split("/")[-1]
+        issue_lines = [line for line in (evidence / f"{label}.log").read_text().splitlines()
+                       if f"Test {test_name} recorded an issue" in line]
+        issues = [line.split("Expectation failed: ", 1)[-1] for line in issue_lines]
+        record["assertionFailures"] = issues
+        save_receipt()
+        require(all(f" at {filename}:" in line for line in issue_lines)
+                and all(sum(re.fullmatch(pattern, issue) is not None for issue in issues) == 1
+                    for pattern in required_assertions)
+                and all(sum(re.fullmatch(pattern, issue) is not None for issue in issues) <= 1
+                        for pattern in followon_assertions)
+                and all(any(re.fullmatch(pattern, issue) is not None
+                            for pattern in (*required_assertions, *followon_assertions)) for issue in issues),
+                f"{label} lacks its exact History assertions or has unrelated failures: {issues}")
+    if label == "known-bad-lip-session-end-history":
+        log = (evidence / f"{label}.log").read_text()
+        test_name = selection.split("/")[-1]
+        issues = [line for line in log.splitlines() if f"Test {test_name} recorded an issue" in line]
+        record["assertionFailures"] = issues
+        save_receipt()
+        require(len(issues) == 3 and all(sum(
+            f"with 1 argument action → .{action} at DiscardedRecordingTests.swift:" in issue
+            and re.fullmatch(r'\((?:try )?fixture\.transcriptionCount\(\) → 1\) == 0(?:\s+.*)?',
+                             issue.split("Expectation failed: ", 1)[-1]) is not None
+            for issue in issues
+        ) == 1 for action in ("masterOff", "reset", "shutdown")),
+                f"{label} requires the retained-row assertion in each of master-off, reset and shutdown: {issues}")
     record["expectedFailureConfirmed"] = True
     save_receipt()
     print(f"{label}: one function, {count}/{count} expected failed invocations; source restored", flush=True)
@@ -382,6 +469,18 @@ try:
     save_receipt()
     print(f"{label}: mixed-session assertions failed; lip-to-voice upgrade passed; both sources restored", flush=True)
 
+    red_control(source, retained_accidental, "known-bad-lip-cancellation-history", lip_history_selection, 1,
+                "Retain an accidental lip cancellation as a canceled History row instead of discarding it.")
+    red_control(source, retained_empty, "known-bad-empty-lip-history", lip_empty_selection, 1,
+                "Persist a completed empty lip result and session metric instead of discarding them.")
+    red_control(engine, late_reservation, "known-bad-startup-history-reservation", startup_history_selection, 1,
+                "Omit the user-cancel History reservation before awaiting startup; retain the later drain fallback.")
+    red_control(engine, retained_lip_session_end, "known-bad-lip-session-end-history", lip_session_end_selection, 3,
+                "Retain nil-audio History on implicit session end, including master-off, reset and shutdown.")
+    require(len(receipt["controls"]) == 13
+            and all(control.get("expectedFailureConfirmed") is True for control in receipt["controls"]),
+            "All thirteen semantic controls must confirm their selected failures before the candidate gate")
+
     green_exit, green = run("candidate", candidate_selections)
     receipt["candidateSummary"] = green
     receipt["candidateExitCode"] = green_exit
@@ -390,19 +489,27 @@ try:
     receipt["candidateCounts"] = actual
     save_receipt()
     require(green_exit == 0 and green["failedTests"] == 0
-            and actual["functions"] == {"passed": 16, "failed": 0, "skipped": 0, "total": 16}
-            and actual["invocations"] == {"passed": 20, "failed": 0, "skipped": 0, "total": 20}
-            and actual["parameterizedInvocations"] == 6,
-            f"Candidate must pass 16 functions / 20 invocations, including 6 parameterized runs: {actual}")
-    require(all(path.read_bytes() == data for path, data in candidates.items()),
-            "Candidate sources changed after controls")
-    require(all(hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
-                for path, digest in receipt["testSourceSHA256"].items()),
-            "Candidate tests changed during controls")
+            and actual["functions"] == {"passed": 22, "failed": 0, "skipped": 0, "total": 22}
+            and actual["invocations"] == {"passed": 28, "failed": 0, "skipped": 0, "total": 28}
+            and actual["parameterizedInvocations"] == 9,
+            f"Candidate must pass 22 functions / 28 invocations, including 9 parameterized runs: {actual}")
     receipt["status"] = "passed"
-    print("Candidate: 16 functions / 20 invocations passed; all nine semantic reverts failed; sources restored", flush=True)
 except BaseException as error:
     receipt.update({"status": "failed", "error": str(error)})
     raise
 finally:
+    receipt["restoredCandidateSourceSHA256"] = {
+        str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in candidates
+    }
+    receipt["finalTestSourceSHA256"] = {
+        path: hashlib.sha256((root / path).read_bytes()).hexdigest() for path in receipt["testSourceSHA256"]
+    }
+    receipt["sourcesRestored"] = all(path.read_bytes() == data for path, data in candidates.items())
+    receipt["testsUnchanged"] = receipt["finalTestSourceSHA256"] == receipt["testSourceSHA256"]
+    if not receipt["sourcesRestored"] or not receipt["testsUnchanged"]:
+        receipt.update({"status": "failed", "error": "Candidate sources or tests changed during controls"})
     save_receipt()
+    require(receipt["sourcesRestored"], "Candidate sources changed after controls")
+    require(receipt["testsUnchanged"], "Candidate tests changed during controls")
+    if receipt["status"] == "passed":
+        print("Candidate: 22 functions / 28 invocations passed; all thirteen semantic reverts failed; sources restored", flush=True)

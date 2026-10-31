@@ -288,6 +288,10 @@ final class StoredAudioFileTests: XCTestCase {
             VoiceInkStoredAudioFile.retranscriptionFileURL(in: recordingsDirectory, id: id).lastPathComponent,
             "retranscribed_00000000-0000-0000-0000-000000000789.wav"
         )
+        XCTAssertEqual(
+            VoiceInkStoredAudioFile.retranscriptionFileURL(in: recordingsDirectory, id: id, fileExtension: "caf").lastPathComponent,
+            "retranscribed_00000000-0000-0000-0000-000000000789.caf"
+        )
     }
 
     func testResolvesFileURLString() {

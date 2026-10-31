@@ -107,7 +107,12 @@ struct InlineHistoryView: View {
         .onChange(of: searchText) { _, _ in
             performHistoryRefresh(VoiceInkHistoryRefreshPolicy.searchTextDidChange())
         }
+        .onReceive(NotificationCenter.default.publisher(for: .transcriptionDeleted)) { _ in
+            selectedTranscriptions = TranscriptionHistoryQuery.liveSelection(selectedTranscriptions, in: modelContext)
+            performHistoryRefresh(VoiceInkHistoryRefreshPolicy.rowsDidDelete())
+        }
         .onChange(of: latestTranscriptionIndicator.first?.id) { oldId, newId in
+            selectedTranscriptions = TranscriptionHistoryQuery.liveSelection(selectedTranscriptions, in: modelContext)
             performHistoryRefresh(
                 VoiceInkHistoryRefreshPolicy.latestItemDidChange(
                     oldID: oldId,

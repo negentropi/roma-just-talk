@@ -31,6 +31,7 @@ class RecorderUIManager: ObservableObject {
         }
     }
     @Published private(set) var isRecorderSessionActive = false
+    private(set) var recorderSessionID: UUID?
 
     var notchWindowManager: NotchWindowManager?
     var miniWindowManager: MiniWindowManager?
@@ -97,6 +98,7 @@ class RecorderUIManager: ObservableObject {
     // MARK: - Mini Recorder Management
 
     func beginRecorderSession() {
+        recorderSessionID = UUID()
         isRecorderSessionActive = true
         if VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType) {
             isMiniRecorderVisible = true
@@ -133,6 +135,7 @@ class RecorderUIManager: ObservableObject {
             isRecorderSessionActive: isRecorderSessionActive
         ) {
             logger.notice("toggleMiniRecorder: clearing stale hidden recorder session before starting")
+            recorderSessionID = nil
             isRecorderSessionActive = false
         }
 
@@ -150,7 +153,7 @@ class RecorderUIManager: ObservableObject {
                 },
                 cancelRecording: {
                     logger.notice("toggleMiniRecorder: cancelling active recorder work")
-                    await cancelRecording()
+                    await cancelRecording(.userRequested)
                 },
                 dismissRecorder: {
                     logger.notice("toggleMiniRecorder: dismissing recorder UI")
@@ -170,10 +173,20 @@ class RecorderUIManager: ObservableObject {
     }
 
     func dismissMiniRecorder() async {
+        dismissRecorderPanel()
+    }
+
+    func dismissRecorderSession(_ sessionID: UUID?) async {
+        guard recorderSessionID == sessionID else { return }
+        dismissRecorderPanel()
+    }
+
+    private func dismissRecorderPanel() {
         guard let engine = engine else { return }
         logger.notice("dismissMiniRecorder called – state=\(String(describing: engine.recordingState), privacy: .public)")
 
         hideRecorderPanel()
+        recorderSessionID = nil
         isMiniRecorderVisible = false
         isRecorderSessionActive = false
 
@@ -190,11 +203,12 @@ class RecorderUIManager: ObservableObject {
         miniRecorderError = nil
     }
 
-    func cancelRecording() async {
+    func cancelRecording(_ cancellation: RecordingCancellation) async {
         guard let engine = engine else { return }
-        logger.notice("cancelRecording called")
-        await engine.cancelRecording()
-        await dismissMiniRecorder()
+        let sessionID = recorderSessionID
+        logger.notice("cancelRecording called – \(String(describing: cancellation), privacy: .public)")
+        await engine.cancelRecording(cancellation)
+        await dismissRecorderSession(sessionID)
     }
 
     // MARK: - Notification Handling
@@ -225,7 +239,7 @@ class RecorderUIManager: ObservableObject {
         logger.notice("handleDismissMiniRecorder: .dismissMiniRecorder notification received")
         Task {
             if engine?.recordingState.isRecorderDismissCancelable == true {
-                await cancelRecording()
+                await cancelRecording(.userRequested)
             } else {
                 await dismissMiniRecorder()
             }

@@ -18,6 +18,8 @@ Under that toggle, **Lips Only** uses the camera with microphone capture and mic
 
 The camera opens only for an enabled recording. Stop closes capture before recognition. Cancel, disable, and normal app termination cancel the owned camera and inference work. Temporary video is local and is removed after that operation finishes. Video is not stored in transcription history.
 
+Esc and the cancel button keep a canceled History entry; Lips Only stores no audio with it. Accidental shortcut chords and empty completed results are discarded. Disabling lip dictation or quitting during camera capture does not add a lip-only History entry.
+
 Lip recognition runs locally. The optional existing enhancement feature retains its selected provider and privacy behavior. In combined mode, the selected voice model also retains its existing local or cloud behavior.
 
 ## Model and reproduction

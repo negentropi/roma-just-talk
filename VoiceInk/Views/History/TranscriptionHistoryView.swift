@@ -120,7 +120,12 @@ struct TranscriptionHistoryView: View {
         .onChange(of: searchText) { _, _ in
             performHistoryRefresh(VoiceInkHistoryRefreshPolicy.searchTextDidChange())
         }
+        .onReceive(NotificationCenter.default.publisher(for: .transcriptionDeleted)) { _ in
+            dropDeletedSelections()
+            performHistoryRefresh(VoiceInkHistoryRefreshPolicy.rowsDidDelete())
+        }
         .onChange(of: latestTranscriptionIndicator.first?.id) { oldId, newId in
+            dropDeletedSelections()
             performHistoryRefresh(
                 VoiceInkHistoryRefreshPolicy.latestItemDidChange(
                     oldID: oldId,
@@ -399,6 +404,14 @@ struct TranscriptionHistoryView: View {
     @MainActor
     private func resetPagination() {
         applyPaginationPlan(VoiceInkHistoryPaginationPolicy.reset())
+    }
+
+    private func dropDeletedSelections() {
+        if let selectedTranscription,
+           TranscriptionHistoryQuery.liveSelection([selectedTranscription], in: modelContext).isEmpty {
+            self.selectedTranscription = nil
+        }
+        selectedTranscriptions = TranscriptionHistoryQuery.liveSelection(selectedTranscriptions, in: modelContext)
     }
 
     private func performHistoryRefresh(_ plan: VoiceInkHistoryRefreshPlan) {

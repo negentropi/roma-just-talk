@@ -48,7 +48,7 @@ extension VoiceInkTests {
                 captureDuration: { 2.5 },
                 latencyTraceToken: nil,
                 onStateChange: { _ in },
-                shouldCancel: { cancellationRequested },
+                cancellation: { cancellationRequested ? .userRequested : nil },
                 onCancel: { cancelCount += 1 },
                 onDismiss: { dismissCount += 1 }
             )
@@ -124,7 +124,7 @@ extension VoiceInkTests {
                 captureDuration: { 2.5 },
                 latencyTraceToken: nil,
                 onStateChange: { _ in },
-                shouldCancel: { cancellationRequested },
+                cancellation: { cancellationRequested ? .userRequested : nil },
                 onCancel: { Issue.record("Delivered text was recorded as canceled") },
                 onDismiss: {}
             )
@@ -184,7 +184,7 @@ extension VoiceInkTests {
                 captureDuration: { 2.5 },
                 latencyTraceToken: nil,
                 onStateChange: { _ in },
-                shouldCancel: { cancellationRequested },
+                cancellation: { cancellationRequested ? .userRequested : nil },
                 onCancel: { Issue.record("Delivered text was recorded as canceled") },
                 onDismiss: {}
             )
@@ -228,7 +228,7 @@ extension VoiceInkTests {
             },
             latencyTraceToken: nil,
             onStateChange: { _ in },
-            shouldCancel: { false },
+            cancellation: { nil },
             onCancel: { Issue.record("Completed recognition was canceled") },
             onDismiss: { events.append("dismissed") }
         )
@@ -269,7 +269,7 @@ extension VoiceInkTests {
             },
             latencyTraceToken: nil,
             onStateChange: { _ in },
-            shouldCancel: { canceled },
+            cancellation: { canceled ? .userRequested : nil },
             onCancel: {},
             onDismiss: {}
         )
@@ -297,7 +297,7 @@ extension VoiceInkTests {
             },
             latencyTraceToken: nil,
             onStateChange: { _ in },
-            shouldCancel: { false },
+            cancellation: { nil },
             onCancel: { Issue.record("Failed recognition was canceled") },
             onDismiss: { didDismiss = true }
         )
@@ -310,6 +310,99 @@ extension VoiceInkTests {
         #expect(fixture.insertedTexts.isEmpty)
         #expect(fixture.pasteCommandCount == 0)
         #expect(try fixture.readMetrics().isEmpty)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    @MainActor func lipOnlyPipelineCancellationUsesTypedHistoryPolicy() async throws {
+        for reason in [RecordingCancellation.userRequested, .accidentalShortcut] {
+            let fixture = try PipelineFixture()
+            defer { fixture.restore() }
+            let transcription = fixture.insertTranscription()
+            let transcriptionID = transcription.id
+            let recognition = PipelinePreparationBarrier()
+            defer { recognition.release() }
+            var cancellation: RecordingCancellation?
+            var events: [String] = []
+            let clipboardChangeCount = NSPasteboard.general.changeCount
+            let run = Task { @MainActor in
+                await fixture.pipeline.run(
+                    transcription: transcription,
+                    modelDisplayName: "Camera recognition",
+                    recognize: {
+                        await recognition.hold()
+                        return "recognized lip words"
+                    },
+                    captureDuration: { events.append("duration"); return 2.5 },
+                    latencyTraceToken: nil,
+                    onStateChange: { _ in },
+                    cancellation: { cancellation },
+                    onCancel: { events.append("canceled") },
+                    onDismiss: { Issue.record("Canceled recognition was dismissed as completed") }
+                )
+            }
+            #expect(await recognition.waitUntilHeld())
+            cancellation = reason
+            recognition.release()
+            await run.value
+
+            let rows = try fixture.readTranscriptions()
+            if reason == .userRequested {
+                let stored = try #require(rows.first)
+                #expect(rows.map(\.id) == [transcriptionID])
+                #expect(stored.transcriptionState == .canceled)
+                #expect(stored.audioFileURL == nil)
+                #expect(stored.duration == 2.5)
+                #expect(stored.transcriptionModelName == "Camera recognition")
+                #expect(events == ["canceled", "duration"])
+            } else {
+                #expect(rows.isEmpty)
+                #expect(events == ["canceled"])
+            }
+            #expect(fixture.accessibilityInsertionCount == 0)
+            #expect(fixture.insertedTexts.isEmpty)
+            #expect(fixture.pasteCommandCount == 0)
+            #expect(NSPasteboard.general.changeCount == clipboardChangeCount)
+            #expect(try fixture.readMetrics().isEmpty)
+        }
+    }
+
+    @Test @MainActor func lipOnlyPipelineDiscardsOnlyEmptyCompletion() async throws {
+        for text in [" \n ", "recognized lip words"] {
+            let fixture = try PipelineFixture()
+            defer { fixture.restore() }
+            let transcription = fixture.insertTranscription()
+            var events: [String] = []
+            await fixture.pipeline.run(
+                transcription: transcription,
+                modelDisplayName: "Camera recognition",
+                recognize: { text },
+                captureDuration: { events.append("duration"); return 2.5 },
+                latencyTraceToken: nil,
+                onStateChange: { _ in },
+                cancellation: { nil },
+                onCancel: { Issue.record("Completed recognition was canceled") },
+                onDismiss: { events.append("dismissed") }
+            )
+
+            let rows = try fixture.readTranscriptions()
+            if text == " \n " {
+                #expect(rows.isEmpty)
+                #expect(try fixture.readMetrics().isEmpty)
+                #expect(fixture.insertedTexts.isEmpty)
+                #expect(events == ["dismissed"])
+            } else {
+                let stored = try #require(rows.first)
+                #expect(rows.count == 1)
+                #expect(stored.transcriptionState == .completed)
+                #expect(stored.text == "recognized lip words")
+                #expect(stored.audioFileURL == nil)
+                #expect(stored.duration == 2.5)
+                #expect(try fixture.readMetrics().count == 1)
+                #expect(fixture.insertedTexts.count == 1)
+                #expect(events == ["dismissed", "duration"])
+            }
+            #expect(fixture.pasteCommandCount == 0)
+        }
     }
 }
 
@@ -365,10 +458,14 @@ private final class PipelineFixture {
     private let activeConfiguration: PowerModeConfig?
 
     init(insertDirectly: Bool = true) throws {
-        let schema = Schema([Transcription.self, SessionMetric.self, WordReplacement.self])
+        let schema = Schema([Transcription.self, VocabularyWord.self, WordReplacement.self, SessionMetric.self])
         container = try ModelContainer(
             for: schema,
-            configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)]
+            configurations: [
+                ModelConfiguration("default", schema: Schema([Transcription.self]), isStoredInMemoryOnly: true),
+                ModelConfiguration("dictionary", schema: Schema([VocabularyWord.self, WordReplacement.self]), isStoredInMemoryOnly: true),
+                ModelConfiguration("stats", schema: Schema([SessionMetric.self]), isStoredInMemoryOnly: true),
+            ]
         )
         readContext = ModelContext(container)
         pipeline = TranscriptionPipeline(modelContext: container.mainContext, enhancementService: nil)

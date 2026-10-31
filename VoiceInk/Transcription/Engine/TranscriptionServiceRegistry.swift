@@ -62,7 +62,9 @@ class TranscriptionServiceRegistry {
             serviceTypeDescription: String(describing: type(of: service))
         )
         logger.debug("\(message, privacy: .public)")
-        return try await service.transcribe(audioURL: audioURL, model: model)
+        return try await VoiceInkStoredAudioCodec.withPCM16WAV(for: audioURL) { wavURL in
+            try await service.transcribe(audioURL: wavURL, model: model)
+        }
     }
 
     /// Creates a streaming or file-based session depending on the model's capabilities.

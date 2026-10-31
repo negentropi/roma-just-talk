@@ -242,22 +242,11 @@ enum CursorTextContextReader {
         preparedContext: PreparedContext? = nil,
         latencyTraceToken: VoiceInkLatencyTrace.Token?
     ) async -> CommandVMenuAttempt {
-        guard AXIsProcessTrusted(),
-              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+        guard let target = currentPasteTarget() else {
             return .unavailable(nil)
         }
-        var processIdentifier = pid_t()
-        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
-              processIdentifier > 0,
-              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
-            return .unavailable(nil)
-        }
-        let target = FocusedPasteTarget(
-            focusedElement: focusedElement,
-            processIdentifier: processIdentifier,
-            text: textValue(from: focusedElement),
-            selectedRange: selectedTextRange(from: focusedElement)
-        )
+        let focusedElement = target.focusedElement
+        let processIdentifier = target.processIdentifier
         let application = AXUIElementCreateApplication(processIdentifier)
 
         if let preparedContext,
@@ -400,6 +389,83 @@ enum CursorTextContextReader {
             post(event)
         }
         return true
+    }
+
+    @MainActor
+    static func currentPasteTarget(messagingTimeout: Float? = nil) -> FocusedPasteTarget? {
+        guard AXIsProcessTrusted(),
+              let focusedElement = focusedElement(from: AXUIElementCreateSystemWide()) else {
+            return nil
+        }
+        if let messagingTimeout {
+            AXUIElementSetMessagingTimeout(focusedElement, messagingTimeout)
+        }
+        var processIdentifier = pid_t()
+        guard AXUIElementGetPid(focusedElement, &processIdentifier) == .success,
+              processIdentifier > 0,
+              processIdentifier != ProcessInfo.processInfo.processIdentifier else {
+            return nil
+        }
+        return FocusedPasteTarget(
+            focusedElement: focusedElement,
+            processIdentifier: processIdentifier,
+            text: textValue(from: focusedElement),
+            selectedRange: selectedTextRange(from: focusedElement)
+        )
+    }
+
+    /// Snapshot for detecting when a paste lands. Reads are bounded so a stalled target
+    /// can neither delay the paste nor hold the main actor past the restore deadline.
+    @MainActor
+    static func pasteLandingTarget() -> FocusedPasteTarget? {
+        currentPasteTarget(messagingTimeout: Float(pasteDeliveryObservationDelay))
+    }
+
+    /// Returns true once the target shows the pasted text replacing the selection it had
+    /// before the paste, which means the target app has already read the clipboard.
+    @MainActor
+    static func waitUntilPasteLands(
+        _ pastedText: String,
+        in target: FocusedPasteTarget,
+        timeout: TimeInterval
+    ) async -> Bool {
+        guard target.text != nil, let selectedRange = target.selectedRange else { return false }
+        let deadline = ProcessInfo.processInfo.systemUptime + timeout
+        while true {
+            if pasteLanded(
+                pastedText,
+                textBeforePaste: target.text,
+                selectedRangeBeforePaste: selectedRange,
+                textAfterPaste: textValue(from: target.focusedElement)
+            ) {
+                return true
+            }
+            let remaining = deadline - ProcessInfo.processInfo.systemUptime
+            guard remaining > 0, !Task.isCancelled else { return false }
+            try? await Task.sleep(
+                nanoseconds: UInt64(min(remaining, pasteDeliveryObservationDelay) * 1_000_000_000)
+            )
+        }
+    }
+
+    static func pasteLanded(
+        _ pastedText: String,
+        textBeforePaste: String?,
+        selectedRangeBeforePaste: CFRange,
+        textAfterPaste: String?
+    ) -> Bool {
+        // Pasting over an identical selection changes nothing, so it proves no clipboard read.
+        guard let textAfterPaste, textAfterPaste != textBeforePaste else { return false }
+        // Web editors may drop a trailing space the transcript ends with.
+        let trimmedText = pastedText.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
+        return Set([pastedText, trimmedText]).contains {
+            replacementTextWasObserved(
+                textBeforeInsertion: textBeforePaste,
+                rangeBeforeInsertion: selectedRangeBeforePaste,
+                insertedText: $0,
+                textAfterInsertion: textAfterPaste
+            )
+        }
     }
 
     @MainActor

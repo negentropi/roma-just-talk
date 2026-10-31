@@ -8,13 +8,29 @@ import VoiceInkCore
 import VoiceInkQwen
 import VoiceInkLip
 
+enum RecordingCancellation {
+    /// Esc, the cancel button, or dismissing the recorder: keep a canceled row and any captured audio.
+    case userRequested
+    /// The recording shortcut turned out to be part of a larger key chord: leave no row and no audio.
+    case accidentalShortcut
+    /// Settings, shutdown, or reset ended capture: retain voice audio, without creating camera-only history.
+    case sessionEnded
+
+    func retainsCapturedHistory(audioURL: URL?) -> Bool {
+        switch self {
+        case .userRequested: return true
+        case .accidentalShortcut: return false
+        case .sessionEnded: return audioURL != nil
+        }
+    }
+}
+
 @MainActor
 class VoiceInkEngine: NSObject, ObservableObject {
     @Published var recordingState: VoiceInkRecordingState = .idle
-    @Published var shouldCancelRecording = false
     @Published private(set) var dictationMode = VoiceInkLipDictationPreference.mode(in: .standard)
     var partialTranscript = ""
-    var currentSession: TranscriptionSession?
+    private(set) var currentSession: TranscriptionSession?
     private weak var qwenRecordingSession: (any TranscriptionSession)?
     private var qwenRecordingModelName: String?
 
@@ -22,6 +38,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let id = UUID()
         let mode: VoiceInkDictationMode
         let traceToken: VoiceInkLatencyTrace.Token?
+        let recorderUISessionID: UUID?
         var audioURL: URL?
         var model: (any TranscriptionModel)?
         var audioSession: TranscriptionSession?
@@ -39,11 +56,17 @@ class VoiceInkEngine: NSObject, ObservableObject {
         var transcription: Transcription?
         var stopRequested = false
         var inputsStarted = false
-        var canceled = false
+        var cancellation: RecordingCancellation?
+        // Retain a deleted reservation until drain so later cancellation cannot recreate its row.
+        var cancellationTranscription: Transcription?
+        var failure: Error?
+        var captureStartedAt: Date?
+        var captureEndedAt: Date?
 
-        init(mode: VoiceInkDictationMode, traceToken: VoiceInkLatencyTrace.Token?) {
+        init(mode: VoiceInkDictationMode, traceToken: VoiceInkLatencyTrace.Token?, recorderUISessionID: UUID?) {
             self.mode = mode
             self.traceToken = traceToken
+            self.recorderUISessionID = recorderUISessionID
         }
 
         var modelDisplayName: String {
@@ -67,7 +90,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private var lastLipPreferenceMode = VoiceInkLipDictationPreference.mode(in: .standard)
 
     let recorder = Recorder()
-    var recordedFile: URL?
+    private(set) var recordedFile: URL?
     let recordingsDirectory: URL
     let whisperModelManager: WhisperModelManager
     let transcriptionModelManager: TranscriptionModelManager
@@ -112,6 +135,28 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     func getEnhancementService() -> AIEnhancementService? { enhancementService }
 
+    #if DEBUG
+    var recordingCancellationForTesting: RecordingCancellation? { activeRecording?.cancellation }
+
+    func installCapturedRecordingForTesting(
+        audioURL: URL?, model: (any TranscriptionModel)?, session: TranscriptionSession?, mode: VoiceInkDictationMode
+    ) {
+        precondition(activeRecording == nil)
+        let recording = Recording(mode: mode, traceToken: nil, recorderUISessionID: recorderUIManager?.recorderSessionID)
+        recording.audioURL = audioURL
+        recording.model = model
+        recording.audioSession = session
+        recording.inputsStarted = true
+        recording.captureStartedAt = Date()
+        activeRecording = recording
+        dictationMode = mode
+        recordedFile = audioURL
+        currentSession = session
+        if let session, let model { trackQwenRecordingSession(session, model: model) }
+        recordingState = .recording
+    }
+    #endif
+
     func prepareDictationInputs() async {
         await applyIdleInputPolicy()
         guard !isShuttingDown, resetTask == nil else { return }
@@ -133,7 +178,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 VoiceInkLatencyTrace.shared.event("engine.stop.deferred_during_start", token: recording.traceToken)
                 if recording.inputsStarted {
                     do { try await stopCapture(recording) }
-                    catch { await cancelAndDrain(recording) }
+                    catch { await cancelAndDrain(recording, cancellation: .sessionEnded) }
                 }
                 return
             } else if recordingState.isActivelyRecording {
@@ -143,7 +188,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 await work.value
                 return
             } else {
-                await cancelAndDrain(recording)
+                await cancelAndDrain(recording, cancellation: .userRequested)
                 return
             }
         }
@@ -168,11 +213,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return
         }
 
-        let recording = Recording(mode: mode, traceToken: traceToken)
+        let recording = Recording(
+            mode: mode, traceToken: traceToken, recorderUISessionID: recorderUIManager?.recorderSessionID
+        )
         recording.model = mode.usesMicrophone ? transcriptionModelManager.currentTranscriptionModel : nil
         activeRecording = recording
         dictationMode = mode
-        shouldCancelRecording = false
         partialTranscript = ""
         recordedFile = nil
         recordingState = .starting
@@ -183,7 +229,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     private func checkRecording(_ recording: Recording) throws {
         try Task.checkCancellation()
-        guard activeRecording === recording, !recording.canceled, !isShuttingDown else {
+        guard activeRecording === recording, recording.cancellation == nil, recording.failure == nil, !isShuttingDown else {
             throw CancellationError()
         }
     }
@@ -242,14 +288,14 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     try Task.checkCancellation()
                     try await camera.start(sessionID: recording.id) { [weak self] error in
                         Task { @MainActor in
-                            guard let self, self.activeRecording === recording, !recording.canceled else { return }
+                            guard let self, self.activeRecording === recording, recording.cancellation == nil else { return }
                             if let cameraError = error as? LipCaptureError,
                                case .recordingLimitReached = cameraError {
                                 if self.recordingState == .starting {
                                     recording.stopRequested = true
                                     if recording.inputsStarted {
                                         do { try await self.stopCapture(recording) }
-                                        catch { await self.cancelAndDrain(recording) }
+                                        catch { await self.cancelAndDrain(recording, cancellation: .sessionEnded) }
                                     }
                                 } else if self.recordingState.isActivelyRecording {
                                     self.recordingState = .transcribing
@@ -260,9 +306,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 return
                             }
                             NotificationManager.shared.showNotification(title: error.localizedDescription, type: .error)
-                            await self.cancelAndDrain(recording)
+                            await self.cancelAndDrain(recording, cancellation: .sessionEnded)
                             guard self.activeRecording == nil else { return }
-                            await self.recorderUIManager?.dismissMiniRecorder()
+                            await self.recorderUIManager?.dismissRecorderSession(recording.recorderUISessionID)
                         }
                     }
                 }
@@ -284,6 +330,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 try checkRecording(recording)
             }
             recording.inputsStarted = true
+            recording.captureStartedAt = Date()
             if recording.stopRequested {
                 try await stopCapture(recording)
                 try checkRecording(recording)
@@ -315,11 +362,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
             trace.event("engine.state.recording", details: "session=\(recording.id) mode=\(recording.mode)", token: token)
             enhancementService?.captureClipboardContext()
             recording.warmup = Task { [weak self] in
-                guard let self, self.activeRecording === recording, !recording.canceled else { return }
+                guard let self, self.activeRecording === recording, recording.cancellation == nil else { return }
                 if let model = recording.model {
                     await self.warmRecordingModel(model, recording: recording)
                 }
-                guard self.activeRecording === recording, !recording.canceled, !Task.isCancelled else { return }
+                guard self.activeRecording === recording, recording.cancellation == nil, !Task.isCancelled else { return }
                 await self.enhancementService?.captureScreenContext()
             }
             if recording.stopRequested {
@@ -327,15 +374,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
             }
         } catch {
             audioRelay.clear()
+            if let url = recording.audioURL { discardUnreferencedRecordedAudio(at: url) }
             guard activeRecording === recording else { return }
-            recording.canceled = true
+            recording.failure = error
             logger.error("recording.start_failed id=\(recording.id.uuidString, privacy: .public) type=\(String(describing: type(of: error)), privacy: .public)")
             if !(error is CancellationError) {
                 NotificationManager.shared.showNotification(title: error.localizedDescription, type: .error)
             }
             await finishRecording(recording)
             guard activeRecording == nil else { return }
-            await recorderUIManager?.dismissMiniRecorder()
+            await recorderUIManager?.dismissRecorderSession(recording.recorderUISessionID)
             trace.finish(event: "engine.start.failed", token: token)
         }
     }
@@ -353,7 +401,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         try checkRecording(recording)
         let session = serviceRegistry.createSession(for: model, onPartialTranscript: { [weak self] text in
             Task { @MainActor in
-                guard let self, self.activeRecording === recording, !recording.canceled,
+                guard let self, self.activeRecording === recording, recording.cancellation == nil,
                       self.recordingState.isRecorderCaptureInProgress, recording.captureStop == nil else { return }
                 self.partialTranscript = text
             }
@@ -373,10 +421,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             }
         } catch {
             session.cancel()
-            if activeRecording === recording {
-                recording.audioSession = nil
-                currentSession = nil
-            }
+            if recording.audioSession === session { recording.audioSession = nil }
+            if activeRecording === recording, currentSession === session { currentSession = nil }
             throw error
         }
     }
@@ -390,7 +436,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             try await prepareRecordingTranscriptionSession(for: model, recording: recording, audioRelay: audioRelay)
             return recording.audioSession
         } catch {
-            guard activeRecording === recording, !recording.canceled else { return nil }
+            guard activeRecording === recording, recording.cancellation == nil else { return nil }
             audioRelay.clear()
             recorder.onAudioChunk = nil
             logger.error("Startup streaming preparation failed; using recorded audio: \(error.localizedDescription, privacy: .public)")
@@ -405,6 +451,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             return
         }
         try checkRecording(recording)
+        recording.captureEndedAt = Date()
         let stopped = Task {
             if let camera = recording.camera {
                 recording.cameraStop = Task {
@@ -429,7 +476,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func stopRecordingAndRunPipeline(_ recording: Recording) async {
-        guard activeRecording === recording, !recording.canceled else { return }
+        guard activeRecording === recording, recording.cancellation == nil else { return }
         recording.stopRequested = false
         partialTranscript = ""
         recordingState = .transcribing
@@ -459,12 +506,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 },
                 latencyTraceToken: token,
                 onStateChange: { [weak self] state in
-                    guard let self, self.activeRecording === recording, !recording.canceled else { return }
+                    guard let self, self.activeRecording === recording, recording.cancellation == nil else { return }
                     self.recordingState = state
                 },
-                shouldCancel: { [weak self] in
-                    guard let self else { return true }
-                    return self.activeRecording !== recording || recording.canceled || self.isShuttingDown
+                cancellation: { [weak self] in
+                    guard let self else { return .accidentalShortcut }
+                    guard self.activeRecording === recording, !self.isShuttingDown else {
+                        return recording.cancellation ?? .accidentalShortcut
+                    }
+                    return recording.cancellation
                 },
                 onCancel: { [weak self] in
                     recording.audioRecognition?.cancel()
@@ -474,16 +524,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     self.currentSession = nil
                 },
                 onDismiss: { [weak self] in
-                    guard let self, self.activeRecording === recording, !recording.canceled else { return }
-                    await self.recorderUIManager?.dismissMiniRecorder()
+                    guard let self, self.activeRecording === recording, recording.cancellation == nil else { return }
+                    await self.recorderUIManager?.dismissRecorderSession(recording.recorderUISessionID)
                 }
             )
         } catch {
             guard activeRecording === recording else { return }
-            if !(error is CancellationError), !recording.canceled {
+            if !(error is CancellationError), recording.cancellation == nil {
                 NotificationManager.shared.showNotification(title: error.localizedDescription, type: .error)
             }
-            recording.canceled = true
+            recording.failure = error
         }
         await finishRecording(recording)
     }
@@ -520,11 +570,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
     }
 
-    private func requestCancellation(_ recording: Recording) {
+    private func requestCancellation(_ recording: Recording, cancellation: RecordingCancellation) {
         guard activeRecording === recording else { return }
-        recording.canceled = true
+        switch (recording.cancellation, cancellation) {
+        case (.some(.accidentalShortcut), _), (.some(.userRequested), .sessionEnded): break
+        default: recording.cancellation = cancellation
+        }
         recording.stopRequested = false
-        shouldCancelRecording = true
+        if recording.captureEndedAt == nil { recording.captureEndedAt = Date() }
+        reserveCanceledRecording(recording)
         recording.powerModeResolution?.cancel()
         recording.warmup?.cancel()
         recording.cameraStartup?.cancel()
@@ -536,9 +590,87 @@ class VoiceInkEngine: NSObject, ObservableObject {
         recording.work?.cancel()
     }
 
-    private func cancelAndDrain(_ recording: Recording) async {
+    private func reserveCanceledRecording(_ recording: Recording) {
+        guard activeRecording === recording,
+              recording.cancellation?.retainsCapturedHistory(audioURL: recording.audioURL) == true,
+              recording.transcription == nil, recording.cancellationTranscription == nil,
+              recording.audioURL != nil || (recording.mode == .lips && recording.inputsStarted) else { return }
+        let transcription = makeRecordingTranscription(
+            audioURL: recording.audioURL, duration: recording.clip?.duration ?? 0,
+            modelDisplayName: recording.modelDisplayName, canceled: true
+        )
+        // A failed startup may resume at the first await; pending inserts already own their audio.
+        modelContext.insert(transcription)
+        recording.cancellationTranscription = transcription
+    }
+
+    private func finishCancellationHistory(_ recording: Recording) async -> Bool {
+        guard activeRecording === recording else { return false }
+        guard let transcription = recording.cancellationTranscription else { return true }
+        guard !transcription.isDeleted, transcription.modelContext != nil else {
+            return true
+        }
+        let hasCapture = recording.audioURL.map { FileManager.default.fileExists(atPath: $0.path) }
+            ?? recording.inputsStarted
+        guard recording.cancellation?.retainsCapturedHistory(audioURL: recording.audioURL) == true, hasCapture else {
+            return discardCancellationHistory(recording)
+        }
+        var duration = recording.clip?.duration ?? recording.captureStartedAt.map {
+            max(0, (recording.captureEndedAt ?? Date()).timeIntervalSince($0))
+        } ?? 0
+        if let url = recording.audioURL {
+            let result = await AudioFileMetadata.tracedDuration(
+                for: url, executorName: "engine.cancel_audio_duration", latencyTraceToken: recording.traceToken
+            )
+            VoiceInkLatencyTrace.shared.executorResumed(result.executorCheckpoint)
+            guard activeRecording === recording else { return false }
+            duration = result.seconds
+        }
+        guard !transcription.isDeleted, transcription.modelContext != nil else {
+            return true
+        }
+        guard recording.cancellation?.retainsCapturedHistory(audioURL: recording.audioURL) == true else {
+            return discardCancellationHistory(recording)
+        }
+        transcription.duration = duration
+        do {
+            try modelContext.save()
+            NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
+            return true
+        } catch {
+            logger.error("Failed to save canceled recording: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    private func discardCancellationHistory(_ recording: Recording) -> Bool {
+        guard let transcription = recording.cancellationTranscription else { return true }
+        guard !transcription.isDeleted, transcription.modelContext != nil else {
+            return true
+        }
+        modelContext.delete(transcription)
+        do {
+            try modelContext.save()
+            NotificationCenter.default.post(name: .transcriptionDeleted, object: nil)
+            return true
+        } catch {
+            logger.error("Failed to discard canceled recording: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    private func discardUnreferencedRecordedAudio(at url: URL) {
+        let storedURL: String? = url.absoluteString
+        let referencing = FetchDescriptor<Transcription>(predicate: #Predicate { $0.audioFileURL == storedURL })
+        guard (try? modelContext.fetchCount(referencing)) == 0 else { return }
+        VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(for: storedURL) { message in
+            logger.error("\(message, privacy: .public)")
+        }
+    }
+
+    private func cancelAndDrain(_ recording: Recording, cancellation: RecordingCancellation) async {
         guard activeRecording === recording else { return }
-        requestCancellation(recording)
+        requestCancellation(recording, cancellation: cancellation)
         // The owner task may still be preparing hardware or saving its canceled record.
         await recording.work?.value
         await finishRecording(recording)
@@ -557,6 +689,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     private func drainRecording(_ recording: Recording) async {
         guard activeRecording === recording else { return }
+        reserveCanceledRecording(recording)
         recording.powerModeResolution?.cancel()
         recording.warmup?.cancel()
         recording.cameraStartup?.cancel()
@@ -580,29 +713,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
         recording.clip?.remove()
         if case .success(let clip) = stopped { clip.remove() }
-        if recording.canceled, recording.transcription == nil,
-           let url = recording.audioURL, FileManager.default.fileExists(atPath: url.path) {
-            let duration = await AudioFileMetadata.tracedDuration(
-                for: url, executorName: "engine.cancel_audio_duration", latencyTraceToken: recording.traceToken
-            )
-            guard activeRecording === recording else { return }
-            let transcription = makeRecordingTranscription(
-                audioURL: url, duration: duration.seconds,
-                modelDisplayName: recording.modelDisplayName, canceled: true
-            )
-            modelContext.insert(transcription)
-            do {
-                try modelContext.save()
-                NotificationCenter.default.post(name: .transcriptionCreated, object: transcription)
-            } catch {
-                logger.error("Failed to save canceled recording: \(error.localizedDescription, privacy: .public)")
-            }
-        }
+        let canDiscardAudio = await finishCancellationHistory(recording)
+        guard activeRecording === recording else { return }
+        if canDiscardAudio, recording.cancellation == .accidentalShortcut || recording.failure != nil,
+           let url = recording.audioURL { discardUnreferencedRecordedAudio(at: url) }
         qwenRecordingSession = nil
         qwenRecordingModelName = nil
         await finishRecorderSession(applicationScope: .init(dictationMode: recording.mode))
         guard activeRecording === recording else { return }
-        if recording.canceled {
+        if recording.cancellation != nil || recording.failure != nil {
             await cleanupResources()
             guard activeRecording === recording else { return }
         }
@@ -619,21 +738,19 @@ class VoiceInkEngine: NSObject, ObservableObject {
         activeRecording = nil
         currentSession = nil
         recordedFile = nil
-        shouldCancelRecording = false
         partialTranscript = ""
         qwenRecordingSession = nil
         qwenRecordingModelName = nil
         recordingState = .idle
-        logger.notice("recording.drained id=\(recording.id.uuidString, privacy: .public) canceled=\(recording.canceled, privacy: .public)")
+        logger.notice("recording.drained id=\(recording.id.uuidString, privacy: .public) canceled=\(recording.cancellation != nil || recording.failure != nil, privacy: .public) cancellation=\(String(describing: recording.cancellation), privacy: .public)")
     }
 
-    func cancelRecording() async {
+    func cancelRecording(_ cancellation: RecordingCancellation) async {
         if let recording = activeRecording {
-            await cancelAndDrain(recording)
+            await cancelAndDrain(recording, cancellation: cancellation)
         } else {
             currentSession?.cancel()
             currentSession = nil
-            shouldCancelRecording = false
             partialTranscript = ""
             recordingState = .idle
             await applyIdleInputPolicy()
@@ -649,7 +766,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func resetRecordingInputs() async {
-        if let recording = activeRecording { await cancelAndDrain(recording) }
+        if let recording = activeRecording { await cancelAndDrain(recording, cancellation: .sessionEnded) }
         guard activeRecording == nil else { return }
         currentSession?.cancel()
         currentSession = nil
@@ -657,7 +774,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
         guard activeRecording == nil else { return }
         recordedFile = nil
         partialTranscript = ""
-        shouldCancelRecording = false
         recordingState = .idle
         await cleanupResources()
         guard activeRecording == nil else { return }
@@ -669,11 +785,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
     func shutDown() async {
         if let shutdownTask { await shutdownTask.value; return }
         isShuttingDown = true
+        if let recording = activeRecording { requestCancellation(recording, cancellation: .sessionEnded) }
         let task = Task {
             await self.resetTask?.value
             self.inputPolicyTask?.task.cancel()
             await self.inputPolicyTask?.task.value
-            if let recording = self.activeRecording { await self.cancelAndDrain(recording) }
+            if let recording = self.activeRecording { await self.cancelAndDrain(recording, cancellation: .sessionEnded) }
             await self.recorder.setMicrophoneCaptureEnabled(false)
             await LipDictationManager.shared.shutDown()
             await self.cleanupResources()
@@ -712,12 +829,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
         if let recording = activeRecording {
             // Master-off takes effect now. Other preference changes apply after this frozen session drains.
             guard recording.mode.usesCamera, !VoiceInkLipDictationPreference.isEnabled() else { return }
-            requestCancellation(recording)
+            requestCancellation(recording, cancellation: .sessionEnded)
             Task { [weak self] in
                 guard let self, self.activeRecording === recording else { return }
-                await self.cancelAndDrain(recording)
+                await self.cancelAndDrain(recording, cancellation: .sessionEnded)
                 guard self.activeRecording == nil else { return }
-                await self.recorderUIManager?.dismissMiniRecorder()
+                await self.recorderUIManager?.dismissRecorderSession(recording.recorderUISessionID)
             }
         } else {
             Task { [weak self] in await self?.applyIdleInputPolicy() }
@@ -795,7 +912,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func warmRecordingModel(_ model: any TranscriptionModel, recording: Recording) async {
         await model.transcriptionRuntimeResourcePlan.applyRecordingStartupRuntimeState(
             loadLocalWhisperModel: {
-                guard self.activeRecording === recording, !recording.canceled, !Task.isCancelled else { return }
+                guard self.activeRecording === recording, recording.cancellation == nil, !Task.isCancelled else { return }
                 if let file = VoiceInkWhisperModelFiles.downloadedLocalModelFile(
                     forModelName: model.name, in: self.whisperModelManager.availableModels
                 ), self.whisperModelManager.whisperContext == nil {
@@ -804,15 +921,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 }
             },
             loadLocalFluidAudioModel: {
-                guard self.activeRecording === recording, !recording.canceled, !Task.isCancelled,
+                guard self.activeRecording === recording, recording.cancellation == nil, !Task.isCancelled,
                       let fluidModel = model as? FluidAudioModel else { return }
                 try? await self.serviceRegistry.fluidAudioTranscriptionService.loadModel(for: fluidModel)
             },
             loadLocalQwenModel: {
-                guard self.activeRecording === recording, !recording.canceled, !Task.isCancelled,
+                guard self.activeRecording === recording, recording.cancellation == nil, !Task.isCancelled,
                       recording.audioSession is FileTranscriptionSession else { return }
                 await self.transcriptionModelManager.awaitQwenRecordingSelection()
-                guard self.activeRecording === recording, !recording.canceled, !Task.isCancelled else { return }
+                guard self.activeRecording === recording, recording.cancellation == nil, !Task.isCancelled else { return }
                 do { try await self.serviceRegistry.qwenTranscriptionService.loadModel() }
                 catch { self.logger.error("Qwen warmup failed: \(error.localizedDescription, privacy: .public)") }
             }
@@ -828,10 +945,10 @@ class VoiceInkEngine: NSObject, ObservableObject {
         qwenRecordingSession = nil
         qwenRecordingModelName = nil
         if let recording = activeRecording {
-            requestCancellation(recording)
+            requestCancellation(recording, cancellation: .sessionEnded)
             Task { [weak self] in
                 guard let self, self.activeRecording === recording else { return }
-                await self.cancelAndDrain(recording)
+                await self.cancelAndDrain(recording, cancellation: .sessionEnded)
             }
         } else {
             currentSession = nil

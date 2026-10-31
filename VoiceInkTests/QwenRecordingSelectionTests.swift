@@ -49,8 +49,7 @@ struct QwenRecordingSelectionTests {
         let engine = VoiceInkEngine(modelContext: ModelContext(container), whisperModelManager: whisper,
             transcriptionModelManager: models, qwenRuntimeResult: .failure(SelectionFixtureError.unusedRuntime))
         let session = DeferredConnectSession()
-        engine.trackQwenRecordingSession(session, model: QwenModel())
-        engine.currentSession = session
+        engine.installCapturedRecordingForTesting(audioURL: nil, model: QwenModel(), session: session, mode: .voice)
         _ = try await session.prepare(model: QwenModel(), latencyTraceToken: nil)
         // Runtime has no lease yet. Selection must cancel the session synchronously.
         models.currentTranscriptionModel = TranscriptionModelRegistry.defaultMacOSFluidAudioModel
@@ -59,6 +58,7 @@ struct QwenRecordingSelectionTests {
         session.allowConnect()
         await session.waitUntilFinished()
         #expect(!session.connected)
+        await engine.cancelRecording(.accidentalShortcut)
     }
 }
 

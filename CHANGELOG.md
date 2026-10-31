@@ -7,7 +7,7 @@
 
 - Put your previous clipboard back as soon as dictated text appears in the target app, instead of 2 seconds later, so a quick Command-V pastes what you copied rather than the transcript.
 
-- Store new recordings as Opus instead of WAV, about 10x smaller on disk; playback, Retranscribe, and Retry keep working, and existing WAV recordings are unchanged.
+- Store new recordings as Opus instead of WAV, about 10x smaller on disk; playback, Retranscribe, and Retry keep working. Existing WAV recordings are converted once in the background after launch.
 
 ## v1.95.1 - 2026-09-11
 

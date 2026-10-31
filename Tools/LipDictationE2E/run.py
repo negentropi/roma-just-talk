@@ -172,6 +172,21 @@ def prepare_screen_capture(evidence, app, driver, name, run):
     return {'passed': True, 'captureReport': capture.name, 'consentReport': consent.name, 'screenshot': screenshot.name, 'allowPressCount': approved['allowPressCount'], 'boundary': 'Real ScreenCaptureKit capture, exact owned-helper OS prompt observed, ordinary Allow exactly once, and prompt absent before dictation fixtures'}
 
 
+def camera_source_binding(camera, proof_head, same_job_app=None):
+    expected = proof_head
+    if same_job_app is not None:
+        if (same_job_app.get('buildOrigin') != 'sameJobRelease' or same_job_app.get('proofHead') != proof_head
+                or same_job_app.get('appBuildHead') != proof_head or same_job_app.get('transportHead') != os.environ.get('GITHUB_SHA')):
+            raise RuntimeError('Camera transport is not bound to the verified same-job feature source')
+        expected = same_job_app['transportHead']
+    if camera.get('sourceHead') != expected:
+        raise RuntimeError('The camera receipt belongs to a different source or transport revision')
+    return {'probeSourceHead': proof_head, 'receiptSourceHead': camera['sourceHead'],
+            'transportHead': expected if same_job_app is not None else None,
+            'boundary': ('The probe stamps the GitHub transport revision. Its actual feature checkout is bound by the verified wrapper-only transport delta.'
+                         if same_job_app is not None else 'The probe receipt matches the exact checked-out proof source.')}
+
+
 def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup, cached_model=None):
     visual_config = evidence / 'visual-config.json'
     write(visual_config, configuration)
@@ -204,8 +219,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             if camera.get('status') != 'supportedDeviceReady' or camera.get('obsRetainedForE2E') is not True:
                 raise RuntimeError('A moving supported OBS camera and retained running OBS process are required')
             proof_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-            if camera.get('sourceHead') != proof_head:
-                raise RuntimeError('The reused camera receipt must belong to this exact proof head')
+            binding = camera_source_binding(camera, proof_head, cached_model['appBuild'] if args.same_job_build else None)
+            write(evidence / 'supported-camera-source.json', binding)
             # Cleanup ownership transfers only after accepting the successful retained-producer receipt.
             owned_obs_cleanup['accepted'] = True
             write(evidence / 'supported-camera.json', camera)
@@ -231,6 +246,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         command = ['/usr/bin/open', '-W', '-n', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--obs-config', websocket, '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
         if scenario == 'setup' and cached_model is not None:
             command += ['--prior-setup-run', cached_model['priorSetup']['run']]
+            if cached_model['priorSetup']['evidenceScope'] == 'unchangedSetupSources':
+                command += ['--prior-setup-source-head', cached_model['priorSetup']['appBuildHead']]
         deny_microphone = scenario == 'lips'
         if deny_microphone:
             microphone_tcc_fixture(evidence, run, 'microphone-authorized-before-lips', 2)
@@ -279,6 +296,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
                 passed = passed and result.get('actualSetupButtonPressed') is True and result.get('freshDownloadAssessed') is True
             else:
                 passed = passed and result.get('actualSetupButtonPressed') is False and result.get('freshDownloadAssessed') is False and result.get('priorSetupRun') == cached_model['priorSetup']['run'] and result.get('actualSetupUIReady') is True and result.get('initialMasterOffObserved') is True and result.get('initialLipsOnlyOffObserved') is True and result.get('finalMasterOffObserved') is True and result.get('finalLipsOnlyOffObserved') is True
+                if cached_model['priorSetup']['evidenceScope'] == 'unchangedSetupSources':
+                    passed = passed and result.get('setupProfile') == 'verifiedCachedModelWithPriorSetupSources' and result.get('priorSetupSameExecutable') is False and result.get('priorSetupSourceHead') == cached_model['priorSetup']['appBuildHead']
         if positive:
             passed = passed and len(created) == 1 and completed[0]['ZTEXT'].strip() != ''
             if scenario == 'lips':
@@ -301,26 +320,34 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
     return cases
 
 
-def main():
+def parse_arguments(arguments=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--app', type=Path)
     parser.add_argument('--app-source-head')
     parser.add_argument('--producer-run', type=int, help='Verify and reuse an immutable Release artifact with identical app and build sources')
-    parser.add_argument('--model-cache-run', type=int, help='Use the pinned CI checkpoint through the unchanged native installer; reuse prior same-app Setup proof')
+    parser.add_argument('--same-job-build', action='store_true', help='Verify a fresh Release built by the dedicated hosted wrapper; prior Setup covers unchanged sources only')
+    parser.add_argument('--model-cache-run', type=int, help='Use the pinned CI checkpoint through the unchanged native installer with explicitly scoped prior Setup evidence')
     parser.add_argument('--build-helper-only', action='store_true', help='Compile, link, sign, and load the native helper without app, models, OBS, or TCC changes')
     parser.add_argument('--visual', action='store_true', help='After voice passes, provision OBS and run real visual app scenarios')
     parser.add_argument('--obs-summary', type=Path, help='Reuse a successful same-host OBS probe receipt that retained OBS')
     parser.add_argument('--out', type=Path, default=Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'lip-dictation-e2e')
-    args = parser.parse_args()
+    args = parser.parse_args(arguments)
     if args.build_helper_only:
-        if args.app or args.app_source_head or args.producer_run is not None or args.model_cache_run is not None or args.visual or args.obs_summary:
+        if args.app or args.app_source_head or args.producer_run is not None or args.same_job_build or args.model_cache_run is not None or args.visual or args.obs_summary:
             parser.error('--build-helper-only accepts only --out')
     elif args.app is None or args.app_source_head is None:
         parser.error('--app and --app-source-head are required for runtime proof')
     if args.producer_run is not None and args.producer_run <= 0:
         parser.error('--producer-run must be a positive GitHub Actions run ID')
-    if args.model_cache_run is not None and (args.model_cache_run <= 0 or args.producer_run is None or not args.visual):
-        parser.error('--model-cache-run requires a positive run ID, --producer-run, and --visual')
+    if args.same_job_build and (args.producer_run is not None or args.model_cache_run is None or not args.visual):
+        parser.error('--same-job-build requires --model-cache-run and --visual, and excludes --producer-run')
+    if args.model_cache_run is not None and (args.model_cache_run <= 0 or not (args.producer_run is not None or args.same_job_build) or not args.visual):
+        parser.error('--model-cache-run requires a positive run ID, --visual, and either --producer-run or --same-job-build')
+    return args
+
+
+def main():
+    args = parse_arguments()
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted' or sys.platform != 'darwin':
         raise RuntimeError('Only a fresh disposable GitHub-hosted macOS runner is supported')
     if os.getuid() == 0 or subprocess.check_output(['stat', '-f', '%u', '/dev/console'], text=True).strip() != str(os.getuid()):
@@ -391,6 +418,12 @@ def main():
             summary['appSourceBoundary'] = 'The immutable producer artifact and source equivalence are verified independently. App build and proof heads remain separate; this is artifact reuse, not a fresh or reproducible build.'
         else:
             app = args.app.resolve()
+            if args.same_job_build:
+                from model_cache import prepare_same_job_app
+                verified_app = prepare_same_job_app(ROOT, evidence, app, args.app_source_head)
+                summary['sameJobBuildProvenance'] = verified_app.provenance
+                summary['transportHead'] = verified_app.provenance['transportHead']
+                summary['appSourceBoundary'] = 'Fresh Release built by this hosted job from the declared feature checkout. Its transport commit adds only the reviewed wrapper; prior Setup covers unchanged sources, not this executable.'
         if not app.is_dir():
             raise RuntimeError('Built app bundle missing')
         with (app / 'Contents/Info.plist').open('rb') as stream:
@@ -518,10 +551,14 @@ def main():
             log_handle.close()
         if verified_app is not None:
             try:
-                verified_app.verify_unchanged()
-                summary['appArtifactUnchanged'] = True
+                if args.same_job_build:
+                    from model_cache import verify_same_job_unchanged
+                    verify_same_job_unchanged(ROOT, verified_app)
+                else:
+                    verified_app.verify_unchanged()
+                summary['sameJobAppUnchanged' if args.same_job_build else 'appArtifactUnchanged'] = True
             except Exception as error:
-                summary['appArtifactUnchanged'] = False
+                summary['sameJobAppUnchanged' if args.same_job_build else 'appArtifactUnchanged'] = False
                 summary['artifactIntegrityFailure'] = str(error)
                 summary['status'] = 'blocked'
         write(evidence / 'summary.json', summary)

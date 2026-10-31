@@ -38,6 +38,21 @@ After both default-off voice cases pass, this profile copies the unchanged `Voic
 
 Cached replay reuses the actual successful Set Up/download evidence from producer `41165570823` for app build `49d045815749a043016634a2604decfbacbb9803`. The verifier downloads that complete small runtime-evidence artifact, checks its pinned API archive digest, and requires the real Set Up button, ready UI, mode changes, and restoration to have passed with the same source head and executable SHA256 as the current verified app. The producer's later camera failure remains visible in its original summary. Current cached `setup.json` checks actual Ready state, master OFF and Lips Only OFF, and exercises both real toggles before restoring OFF. It explicitly records `actualSetupButtonPressed=false`, `freshDownloadAssessed=false`, and `priorSetupRun`. This is current installed-state/lifecycle proof plus prior same-binary Setup proof; it does not assess a current fresh publisher download or Set Up. The default profile without `--model-cache-run` still requires the actual Set Up button and publisher download.
 
+After a product change, the separate hosted wrapper can build the current app and use the same verified checkpoint:
+
+```sh
+python3 Tools/LipDictationE2E/run.py \
+  --app "$HOME/Applications/roma just talk.app" \
+  --app-source-head "$TESTED_SOURCE_HEAD" \
+  --same-job-build --model-cache-run 41172814095 --visual
+```
+
+`--same-job-build` excludes `--producer-run`. It accepts only `.github/workflows/lip-pr-hosted-gates.yml` on its dedicated `ci/lip-pr-hosted-gates-*` ref, with an ordinary hosted ARM64 desktop owner. The declared feature head must equal the clean actual checkout. `GITHUB_SHA` remains the transport head: it must descend from the feature head and add only that exact wrapper file. Bounded literal checks of the reviewed wrapper's fixed indentation require its pinned checkout action and literal feature ref, Release build command, and explicit proof profile; this is not a general YAML parser. GitHub API receipts must identify the current repository, transport run/attempt, hosted macos job/runner, and successful Release, full Debug, semantic-regression and packaging steps completed before E2E. The parallel iOS job is checked separately by the workflow's overall gates.
+
+This profile records fresh app source, transport source, executable SHA256, strict signature, actual dependency lock, complete bundle fingerprint and bundled lip-resource hashes in `same-job-build/`. Source cleanliness, signature, bundle, executable and resource bindings are checked again after execution. Cache transport and the native installer retain all existing checks. The camera probe's unchanged `sourceHead` field stamps the GitHub transport head; `supported-camera-source.json` binds that receipt separately to the verified actual feature checkout without changing the child's environment or its original report.
+
+Prior Setup remains bound to its original artifact digest, source and executable. For this different binary, exact Git tree entries must match for Settings wiring, lip capture/manager/engine, permission decisions, preferences/storage paths, the native lip package/resources, relevant package dependencies and build/signing inputs. `priorSetup.evidenceScope=unchangedSetupSources` and `sameExecutable=false` describe only that unchanged implementation evidence. Current `setup.json` uses `verifiedCachedModelWithPriorSetupSources`, records the old source head and `priorSetupSameExecutable=false`, and still requires actual Ready state and initial/final OFF controls. No current Set Up button or fresh publisher download is claimed. Every voice, combined, silent-audio fallback, microphone-denied lip-only, cancel, disable and quit case runs against the newly built app.
+
 Full sequence:
 
 ```sh

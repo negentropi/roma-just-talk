@@ -127,11 +127,15 @@ def behavior(log, known_bad):
     require(len(re.findall(r"Test " + identity + r" with 2 test cases " + outcome + r" after ", log)) == 1
             and len(re.findall(r"Test run with 1 test(?: in \d+ suites?)? " + outcome + r" after ", log)) == 1,
             "Expected one completed function with two actual cases")
-    issues = [line for line in log.splitlines() if "recorded an issue" in line]
+    lines = log.splitlines()
+    issues = [(line, lines[index + 1].strip() if index + 1 < len(lines) else "")
+              for index, line in enumerate(lines) if "recorded an issue" in line]
     if known_bad:
         for value in ("false", "true"):
-            require(any(f"Test {TEST} recorded an issue with 1 argument cancel → {value} " in line
-                        and "QwenRuntimeCacheCleanupTests.swift:" in line and ASSERTION in line for line in issues),
+            require(any(f"Test {TEST} recorded an issue with 1 argument cancel → {value} " in header
+                        and "QwenRuntimeCacheCleanupTests.swift:" in header
+                        and (ASSERTION in header or (header.rstrip().endswith(": Issue recorded")
+                             and continuation == f"↳ {ASSERTION}")) for header, continuation in issues),
                     f"Known bad did not reach the reusable-buffer assertion for cancel={value}")
     else:
         require(not issues, "Candidate recorded a test issue")

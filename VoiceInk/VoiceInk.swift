@@ -9,6 +9,8 @@ import VoiceInkCore
 
 @main
 struct VoiceInkApp: App {
+    @MainActor private(set) static var initialInputPreparationTask: Task<Void, Never>?
+
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     let container: ModelContainer
     let containerInitializationFailed: Bool
@@ -184,7 +186,7 @@ struct VoiceInkApp: App {
         appDelegate.engine = engine
 
         // Ensure no lingering recording state from previous runs
-        Task {
+        Self.initialInputPreparationTask = Task { @MainActor in
             await recorderUIManager.resetOnLaunch()
             await engine.prepareDictationInputs()
             DictionaryService.warmWordReplacementCache(using: resolvedContainer.mainContext)

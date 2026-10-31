@@ -76,6 +76,8 @@ extension VoiceInkTests {
 
     @Test(.timeLimit(.minutes(1)), arguments: PipelineAutoSendScenario.allCases)
     @MainActor func pipelineOwnsDelayedAutoSendUntilCompletion(scenario: PipelineAutoSendScenario) async throws {
+        let inputPreparation = try #require(VoiceInkApp.initialInputPreparationTask)
+        await inputPreparation.value
         let fixture = try PipelineFixture()
         defer { fixture.restore() }
         PowerModeManager.shared.activeConfiguration = PowerModeConfig(
@@ -90,8 +92,22 @@ extension VoiceInkTests {
         var sentKeys: [VoiceInkAutoSendKey] = []
         var cancellationRequested = false
         var didFinishPipeline = false
+        @MainActor func recordPrecondition(_ phase: String) {
+            let fields: [String: Any] = [
+                "event": "auto_send_proof", "phase": phase, "scenario": String(describing: scenario),
+                "systemUptime": ProcessInfo.processInfo.systemUptime,
+                "activeConfigurationPresent": PowerModeManager.shared.activeConfiguration != nil,
+                "activeAutoSendKey": PowerModeManager.shared.activeConfiguration?.autoSendKey.rawValue ?? "none",
+                "insertedTextCount": fixture.insertedTexts.count,
+                "delayHookObserved": delayStartedAt != nil, "pipelineFinished": didFinishPipeline
+            ]
+            if let data = try? JSONSerialization.data(withJSONObject: fields, options: [.sortedKeys]),
+               let text = String(data: data, encoding: .utf8) { print(text) }
+        }
+        recordPrecondition("fixture_ready")
         fixture.pipeline.autoSendDelayStartedForTesting = {
             delayStartedAt = clock.now
+            recordPrecondition("delay_started")
             delayStarted.continuation.yield(())
             delayStarted.continuation.finish()
         }
@@ -113,6 +129,7 @@ extension VoiceInkTests {
                 onDismiss: {}
             )
             didFinishPipeline = true
+            recordPrecondition("pipeline_finished")
         }
         for await _ in delayStarted.stream { break }
         #expect(!didFinishPipeline)

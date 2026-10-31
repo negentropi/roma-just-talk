@@ -27,6 +27,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard terminationTask == nil else { return .terminateLater }
         terminationTask = Task { @MainActor [weak self] in
             await self?.engine?.shutDown()
+            await VoiceInkApp.initialInputPreparationTask?.value
             sender.reply(toApplicationShouldTerminate: true)
         }
         return .terminateLater

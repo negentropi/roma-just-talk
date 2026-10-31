@@ -143,6 +143,8 @@ struct LipVisualCases {
                     guard processExited(application) else { throw ProofError.quit }
                 } else {
                     report["audioPlayback"] = try json(playing.waitUntilFinished())
+                    try await obs.waitForMotionEnd()
+                    report["sourceMotionEndedBeforeShortcutUp"] = true
                     wait(0.3)
                 }
                 let up = try RuntimeShortcutInjector.postLeftShiftUp()
@@ -769,9 +771,37 @@ private final class OBSClient {
         mediaEvidence["playAcknowledgedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
     }
     func observePlayingMotion() async throws {
-        let status = try await mediaStatus(phase: "afterPlay")
-        guard usableStatus(status, requirePaused: false, requireFirstFrame: false),
-              status["mediaState"] as? String == "OBS_MEDIA_STATE_PLAYING" else { throw OBSError.mediaPreparation("motionNotPlayingAfterPlay") }
+        guard let preparedFirstFrameCursorMilliseconds else { throw OBSError.mediaPreparation("preparedCursorUnavailable") }
+        let deadline = ProcessInfo.processInfo.systemUptime + 5
+        while ProcessInfo.processInfo.systemUptime < deadline {
+            let status = try await mediaStatus(phase: "afterPlay")
+            if usableStatus(status, requirePaused: false, requireFirstFrame: false),
+               status["mediaState"] as? String == "OBS_MEDIA_STATE_PLAYING",
+               let cursor = status["mediaCursor"] as? NSNumber, cursor.doubleValue > preparedFirstFrameCursorMilliseconds {
+                mediaEvidence["effectivePlayObservedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+                mediaEvidence["effectivePlayCursorMilliseconds"] = cursor
+                return
+            }
+            try await Task.sleep(nanoseconds: 200_000_000)
+        }
+        throw OBSError.mediaPreparation("motionNotPlayingAfterPlay")
+    }
+    func waitForMotionEnd() async throws {
+        guard let expectedMotionDurationMilliseconds else { throw OBSError.mediaPreparation("motionDurationUnavailable") }
+        let timeout = expectedMotionDurationMilliseconds / 1000 + 5
+        let started = ProcessInfo.processInfo.systemUptime
+        mediaEvidence["motionEndWaitStartedAtSystemUptime"] = started
+        mediaEvidence["motionEndDeadlineSeconds"] = timeout
+        while ProcessInfo.processInfo.systemUptime < started + timeout {
+            let status = try await mediaStatus(phase: "afterAudioAwaitingEnd")
+            // OBS reports null cursor/duration after ENDED; prior readiness binds this input.
+            if status["mediaState"] as? String == "OBS_MEDIA_STATE_ENDED" {
+                mediaEvidence["motionEndedObservedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+                return
+            }
+            try await Task.sleep(nanoseconds: 200_000_000)
+        }
+        throw OBSError.mediaPreparation("motionDidNotReachEnded")
     }
     private func waitForMedia(phase: String, pausedAtFirstFrame: Bool, requirePaused: Bool = false) async throws {
         let deadline = ProcessInfo.processInfo.systemUptime + 5

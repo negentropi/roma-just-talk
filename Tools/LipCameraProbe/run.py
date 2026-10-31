@@ -258,35 +258,28 @@ try:
     enabled_state = (OUT / 'extensions-after-approval.log').read_text()
     if not any('com.obsproject.obs-studio.mac-camera-extension' in line and '[activated enabled]' in line for line in enabled_state.splitlines()):
         raise RuntimeError('OBS extension was not enabled in the final pre-restart receipt')
-    ui('obs-camera-alert-before-restart', acknowledge_obs_alert=True)
-    alert_receipt = OUT / 'obs-camera-alert-before-restart.json'
-    alert = json.loads(alert_receipt.read_text()) if alert_receipt.is_file() else {'status': 'helperReceiptMissing'}
-    summary['obsCameraAlertBeforeRestart'] = alert
-    acknowledged = alert.get('status') == 'acknowledged' and alert.get('actionAttempted') is True and alert.get('pressResult') == 0
-    absent = alert.get('status') == 'absent' and alert.get('actionAttempted') is False
-    if alert.get('signedOBSIdentityVerified') is not True or alert.get('alertAbsentObserved') is not True or not (acknowledged or absent):
-        screenshot('obs-camera-alert-before-restart-blocked')
-        raise RuntimeError('OBS camera-alert acknowledgement did not verify absence: ' + str(alert.get('status')))
     restart = {'processIDsBefore': obs_process_ids(), 'exitObserved': False,
-               'alertStateBeforeQuit': alert['status'], 'alertAcknowledgementCount': int(alert.get('actionAttempted') is True)}
+               'alertAcknowledgementCount': 0}
     summary['obsRestart'] = restart
     # OBS can return AppleEvent -128 after starting shutdown; process exit is authoritative.
     restart['quitRequestExitCode'] = run('restart-obs-quit', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15)
     exited = observe_obs_exit(restart)
-    if not exited and restart['alertAcknowledgementCount'] == 0:
-        # A delayed alert can appear after the preflight; another quit requires this exact observed state.
+    if not exited:
+        # Only this exact observed modal can authorize one acknowledgement and another normal quit.
         ui('obs-camera-alert-after-blocked-quit', acknowledge_obs_alert=True)
         delayed_path = OUT / 'obs-camera-alert-after-blocked-quit.json'
         delayed = json.loads(delayed_path.read_text()) if delayed_path.is_file() else {'status': 'helperReceiptMissing'}
         summary['obsCameraAlertAfterBlockedQuit'] = delayed
-        restart['alertAcknowledgementCount'] += int(delayed.get('actionAttempted') is True)
-        if delayed.get('signedOBSIdentityVerified') is True and delayed.get('status') == 'acknowledged' and delayed.get('alertAbsentObserved') is True and delayed.get('actionAttempted') is True and delayed.get('pressResult') == 0:
+        restart['alertAcknowledgementCount'] = int(delayed.get('actionAttempted') is True)
+        # The first normal quit may finish as its blocking modal closes; PID exit remains authoritative.
+        exited = observe_obs_exit(restart)
+        if not exited and delayed.get('signedOBSIdentityVerified') is True and delayed.get('status') == 'acknowledged' and delayed.get('matchedAlertInstanceVerified') is True and delayed.get('matchedAlertAbsentObserved') is True and delayed.get('actionAttempted') is True and delayed.get('pressResult') == 0:
             restart['quitAfterAcknowledgementExitCode'] = run('restart-obs-quit-after-alert', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15)
             exited = observe_obs_exit(restart)
     if not exited:
         ui('obs-restart-exit-blocked')
         screenshot('obs-restart-exit-blocked')
-        state = summary.get('obsCameraAlertAfterBlockedQuit', alert).get('status')
+        state = summary.get('obsCameraAlertAfterBlockedQuit', {'status': 'notInspected'}).get('status')
         raise RuntimeError('OBS did not exit for its documented camera-extension restart; camera-alert state=' + str(state) + ', acknowledgement attempts=' + str(restart['alertAcknowledgementCount']))
     run('restart-obs-open', ['/usr/bin/open', '-a', str(installed), '--args', '--profile', 'RJTLipProof', '--disable-updater'], required=True)
     websocket_deadline = time.monotonic() + 25

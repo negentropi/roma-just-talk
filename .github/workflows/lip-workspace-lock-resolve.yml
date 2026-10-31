@@ -1,0 +1,148 @@
+name: Resolve immutable workspace lock with Xcode 26.3
+
+on:
+  push:
+    branches:
+      - ci/lip-workspace-lock-resolve-21b102a929a547f387cd3d9eef2e21f5
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    if: github.repository == 'negentropi/roma-just-talk' && github.event_name == 'push' && github.ref == 'refs/heads/ci/lip-workspace-lock-resolve-21b102a929a547f387cd3d9eef2e21f5'
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      SOURCE_SHA: 8aabafae521768c8d1d73c437d674b3cb6402762
+      PYTHONDONTWRITEBYTECODE: "1"
+    defaults:
+      run:
+        shell: bash
+        working-directory: source
+    steps:
+      - name: Checkout exact source independently of transport head
+        id: checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 8aabafae521768c8d1d73c437d674b3cb6402762
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Record original locks, graph declarations and exact toolchain
+        id: before
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/lip-workspace-lock-resolve"
+          cat > "$RUNNER_TEMP/lip-workspace-lock-snapshot.py" <<'PY'
+          import hashlib, json, os, shutil, subprocess, sys
+          from pathlib import Path
+          root = Path.cwd()
+          output = Path(os.environ['RUNNER_TEMP']) / 'lip-workspace-lock-resolve'
+          phase = sys.argv[1]
+          locks = (
+              'VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved',
+              'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved',
+              'iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved',
+          )
+          def git(*args):
+              return subprocess.check_output(['git', *args], text=True)
+          assert git('rev-parse', 'HEAD').strip() == os.environ['SOURCE_SHA']
+          changed = git('diff', '--name-only', 'HEAD').splitlines()
+          receipt = {'phase': phase, 'source_sha': os.environ['SOURCE_SHA'],
+                     'transport_sha': os.environ['GITHUB_SHA'],
+                     'run_id': os.environ['GITHUB_RUN_ID'],
+                     'repository': os.environ['GITHUB_REPOSITORY'],
+                     'tracked_changes': changed, 'locks': {}}
+          (output / (phase + '-git-status.log')).write_text(git('status', '--porcelain=v1'))
+          (output / (phase + '-git.diff')).write_text(git('diff', '--no-ext-diff', '--binary', 'HEAD'))
+          for name in locks:
+              data = (root / name).read_bytes()
+              target = output / phase / name
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(data)
+              receipt['locks'][name] = {'bytes': len(data),
+                                       'sha256': hashlib.sha256(data).hexdigest(),
+                                       'graph': json.loads(data)}
+          (output / (phase + '.json')).write_text(json.dumps(receipt, indent=2) + '\n')
+          if phase == 'before':
+              assert not changed, 'Source checkout must start clean'
+              declarations = {'projects': {}, 'package_manifests': {}}
+              for name in ('VoiceInk.xcodeproj/project.pbxproj', 'iOS/VoiceInk-ios.xcodeproj/project.pbxproj'):
+                  project = json.loads(subprocess.check_output(['/usr/bin/plutil', '-convert', 'json', '-o', '-', name]))
+                  declarations['projects'][name] = {
+                      key: value for key, value in project['objects'].items()
+                      if value.get('isa') in ('XCRemoteSwiftPackageReference', 'XCLocalSwiftPackageReference')}
+              for name in git('ls-files', '*Package.swift').splitlines():
+                  data = (root / name).read_bytes()
+                  declarations['package_manifests'][name] = {
+                      'sha256': hashlib.sha256(data).hexdigest(), 'source': data.decode()}
+              (output / 'declared-packages.json').write_text(json.dumps(declarations, indent=2) + '\n')
+          else:
+              state = Path(os.environ['RUNNER_TEMP']) / 'lip-workspace-packages/workspace-state.json'
+              if state.is_file():
+                  json.loads(state.read_bytes())
+                  shutil.copyfile(state, output / 'resolved-workspace-state.json')
+              errors = []
+              if any(name != locks[0] for name in changed):
+                  errors.append('Tracked file changed outside workspace lock')
+              for name in locks[1:]:
+                  if (output / 'before' / name).read_bytes() != (root / name).read_bytes():
+                      errors.append('Project lock changed: ' + name)
+              before = json.loads((output / 'before.json').read_text())
+              old = {pin['identity']: pin for pin in before['locks'][locks[0]]['graph']['pins']}
+              new = {pin['identity']: pin for pin in receipt['locks'][locks[0]]['graph']['pins']}
+              comparison = {'added': {key: new[key] for key in new.keys() - old.keys()},
+                            'removed': {key: old[key] for key in old.keys() - new.keys()},
+                            'changed': {key: {'before': old[key], 'after': new[key]} for key in old.keys() & new.keys() if old[key] != new[key]},
+                            'unchanged': sorted(key for key in old.keys() & new.keys() if old[key] == new[key]),
+                            'guard_errors': errors}
+              (output / 'workspace-lock-comparison.json').write_text(json.dumps(comparison, indent=2, sort_keys=True) + '\n')
+              assert not errors, '; '.join(errors)
+          print(json.dumps({'phase': phase, 'tracked_changes': changed,
+                            'pin_counts': {key: len(value['graph']['pins']) for key, value in receipt['locks'].items()}}))
+          PY
+          python3 "$RUNNER_TEMP/lip-workspace-lock-snapshot.py" before
+          {
+            test -d "$DEVELOPER_DIR"
+            xcodebuild -version
+            xcrun --find swift
+            swift --version
+            xcodebuild -version -sdk iphonesimulator
+            sw_vers
+          } 2>&1 | tee "$RUNNER_TEMP/lip-workspace-lock-resolve/toolchain.log"
+          test "$(xcodebuild -version | head -n 1)" = "Xcode 26.3"
+
+      - name: Resolve workspace packages without building targets
+        id: resolve
+        run: |
+          set -euo pipefail
+          set +e
+          xcodebuild -resolvePackageDependencies \
+            -workspace VoiceInk.xcworkspace \
+            -scheme VoiceInk-ios \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/lip-workspace-packages" \
+            -derivedDataPath "$RUNNER_TEMP/lip-workspace-derived-data" \
+            2>&1 | tee "$RUNNER_TEMP/lip-workspace-lock-resolve/resolve.log"
+          pipeline_exits=("${PIPESTATUS[@]}")
+          resolve_exit="${pipeline_exits[0]}"
+          set -e
+          printf '%s\n' "$resolve_exit" > "$RUNNER_TEMP/lip-workspace-lock-resolve/resolve-exit.txt"
+          test "${pipeline_exits[1]}" -eq 0
+          exit "$resolve_exit"
+
+      - name: Preserve actual resolved locks and enforce tracked-file boundaries
+        if: always() && steps.before.outcome == 'success'
+        run: python3 "$RUNNER_TEMP/lip-workspace-lock-snapshot.py" after
+
+      - name: Upload lock bytes and resolver evidence only
+        if: always() && steps.checkout.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: workspace-lock-resolve-8aabafae-Xcode-26.3
+          path: ${{ runner.temp }}/lip-workspace-lock-resolve/
+          if-no-files-found: error
+          retention-days: 3
+          compression-level: 6

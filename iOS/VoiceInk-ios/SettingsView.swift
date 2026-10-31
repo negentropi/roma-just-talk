@@ -65,9 +65,7 @@ struct SettingsView: View {
                     Label("Recording Feedback", systemImage: "speaker.wave.2")
                 }
 
-                NavigationLink(destination: IOSHelpSupportView(
-                    announcementsStore: .shared
-                )) {
+                NavigationLink(destination: IOSHelpSupportView()) {
                     Label(
                         VoiceInkIOSHelpSupportPresentation.settingsRowTitle,
                         systemImage: VoiceInkIOSHelpSupportPresentation.settingsRowSystemImageName

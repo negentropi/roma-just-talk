@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repository="${NAMESPACE_E2E_REPOSITORY:-happyf-weallareeuropean/roma-just-talk}"
+repository="${NAMESPACE_E2E_REPOSITORY:-negentropi/roma-just-talk}"
 run_id="${1:-}"
 
 command -v nsc >/dev/null 2>&1 || {

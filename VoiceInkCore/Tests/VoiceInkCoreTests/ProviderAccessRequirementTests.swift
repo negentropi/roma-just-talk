@@ -460,46 +460,11 @@ final class ProviderAccessRequirementTests: XCTestCase {
         XCTAssertEqual(VoiceInkProviderKind.localWhisper.runtimeAPIKey(userAPIKey: ""), "local")
     }
 
-    func testLegacyVoiceInkProviderValuesDecodeToLegacyProvider() throws {
+    func testLegacyVoiceInkProviderValuesNoLongerDecodeAsProviderKind() {
         let decoder = JSONDecoder()
 
-        XCTAssertEqual(
-            try decoder.decode(VoiceInkProviderKind.self, from: Data(#""VoiceInk""#.utf8)),
-            .voiceInk
-        )
-        XCTAssertEqual(
-            try decoder.decode(VoiceInkProviderKind.self, from: Data(#""voiceInk""#.utf8)),
-            .voiceInk
-        )
-    }
-
-    func testBundledVoiceInkProviderIsNotSelectableUntilAnAdapterExists() {
-        guard case .bundledService = VoiceInkProviderKind.voiceInk.accessRequirement else {
-            return XCTFail("Legacy VoiceInk provider should keep bundled-service compatibility")
-        }
-
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.requiresUserAPIKey)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyAccount)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationStateKey)
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.apiKeyVerificationTransport)
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.canVerifyAPIKey)
-        XCTAssertEqual(VoiceInkProviderKind.voiceInk.runtimeAPIKey(userAPIKey: ""), "")
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.runtimeAPIKeyIfAvailable(userAPIKey: ""))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isReady(
-            userAPIKey: "",
-            userAPIKeyVerified: false,
-            localWhisperModelAvailable: true
-        ))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .transcription))
-        XCTAssertFalse(VoiceInkProviderKind.voiceInk.isSelectable(for: .postProcessing))
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.fixedModel(for: .transcription))
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.fixedModel(for: .postProcessing))
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.defaultModel(for: .transcription))
-        XCTAssertNil(VoiceInkProviderKind.voiceInk.defaultModel(for: .postProcessing))
-        XCTAssertEqual(VoiceInkProviderKind.voiceInk.models(for: .transcription), [])
-        XCTAssertEqual(VoiceInkProviderKind.voiceInk.models(for: .postProcessing), [])
-        XCTAssertEqual(VoiceInkProviderKind.voiceInk.selectedModel("stale-model", for: .transcription), "")
-        XCTAssertEqual(VoiceInkProviderKind.voiceInk.selectedModel("stale-model", for: .postProcessing), "")
+        XCTAssertNil(try? decoder.decode(VoiceInkProviderKind.self, from: Data(#""VoiceInk""#.utf8)))
+        XCTAssertNil(try? decoder.decode(VoiceInkProviderKind.self, from: Data(#""voiceInk""#.utf8)))
     }
 
     func testProviderCredentialRejectsBlankKeysWithoutNormalizingUsableKeys() {
@@ -1892,16 +1857,6 @@ final class ProviderAccessRequirementTests: XCTestCase {
 
         XCTAssertNil(presentation.fixedModelName)
         XCTAssertEqual(presentation.selectableModels, VoiceInkAIModelCatalog.availableModels(for: .groq))
-    }
-
-    func testModelSelectionPresentationPreservesEmptyBundledProviderList() {
-        let transcription = VoiceInkProviderKind.voiceInk.modelSelectionPresentation(for: .transcription)
-        XCTAssertNil(transcription.fixedModelName)
-        XCTAssertTrue(transcription.selectableModels.isEmpty)
-
-        let postProcessing = VoiceInkProviderKind.voiceInk.modelSelectionPresentation(for: .postProcessing)
-        XCTAssertNil(postProcessing.fixedModelName)
-        XCTAssertTrue(postProcessing.selectableModels.isEmpty)
     }
 
     func testSelectedModelPreservesAvailableCurrentModel() {

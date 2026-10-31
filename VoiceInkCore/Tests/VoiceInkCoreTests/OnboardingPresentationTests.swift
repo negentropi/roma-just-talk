@@ -217,7 +217,7 @@ final class OnboardingPresentationTests: XCTestCase {
     }
 
     func testMacOSSetupPresentationPreservesHeaderAndStepOrder() {
-        XCTAssertEqual(VoiceInkMacOSSetupPresentation.title, "Welcome to VoiceInk")
+        XCTAssertEqual(VoiceInkMacOSSetupPresentation.title, "Welcome to Roma Just Talk")
         XCTAssertEqual(VoiceInkMacOSSetupPresentation.subtitle, "Complete the setup to get started")
         XCTAssertEqual(
             VoiceInkMacOSSetupPresentation.helpText,
@@ -235,7 +235,7 @@ final class OnboardingPresentationTests: XCTestCase {
                     isOptional: false,
                     iconSystemName: "command",
                     title: "Set Keyboard Shortcut",
-                    description: "Use VoiceInk anywhere with a shortcut."
+                    description: "Use Roma Just Talk anywhere with a shortcut."
                 ),
                 VoiceInkMacOSSetupStepPresentation(
                     kind: .accessibility,

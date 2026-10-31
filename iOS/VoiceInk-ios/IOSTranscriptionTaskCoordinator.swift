@@ -10,8 +10,7 @@ enum IOSKeyboardDictationDeliveryText {
     ) -> String {
         VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
             text,
-            appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(from: defaults),
-            isTrialExpired: false
+            appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(from: defaults)
         )
     }
 }

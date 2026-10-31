@@ -1,6 +1,6 @@
-# Building VoiceInk
+# Building Roma Just Talk
 
-This guide provides detailed instructions for building VoiceInk from source.
+This guide provides detailed instructions for building Roma Just Talk from source.
 
 ## Prerequisites
 
@@ -12,14 +12,14 @@ Before you begin, ensure you have:
 
 ## Quick Start with Makefile (Recommended)
 
-The easiest way to build VoiceInk is using the included Makefile, which automates the entire build process including building and statically linking Whisper.
+The easiest way to build Roma Just Talk is using the included Makefile, which automates the entire build process including building and statically linking Whisper.
 
 ### Simple Build Commands
 
 ```bash
 # Clone the repository
-git clone https://github.com/Beingpax/VoiceInk.git
-cd VoiceInk
+git clone https://github.com/negentropi/roma-just-talk.git
+cd roma-just-talk
 
 # Build everything (recommended for first-time setup)
 make all
@@ -33,9 +33,9 @@ make dev
 - `make check` or `make healthcheck` - Verify all required tools are installed
 - `make whisper` - Clone and build the static whisper.cpp XCFramework automatically
 - `make setup` - Prepare the whisper framework for linking
-- `make build` - Build the VoiceInk Xcode project
+- `make build` - Build the macOS app from `VoiceInk.xcodeproj`
 - `make local` - Build for local use (no Apple Developer certificate needed)
-- `make run` - Launch the built VoiceInk app
+- `make run` - Launch the built `roma just talk.app`
 - `make dev` - Build and run (ideal for development workflow)
 - `make all` - Complete build process (default)
 - `make clean` - Remove build artifacts and dependencies
@@ -59,13 +59,13 @@ This approach ensures consistent builds across different machines and eliminates
 If you don't have an Apple Developer certificate, use `make local`:
 
 ```bash
-git clone https://github.com/Beingpax/VoiceInk.git
-cd VoiceInk
+git clone https://github.com/negentropi/roma-just-talk.git
+cd roma-just-talk
 make local
-open ~/Downloads/VoiceInk.app
+open ~/Applications/"roma just talk.app"
 ```
 
-This builds VoiceInk with ad-hoc signing using a separate build configuration (`LocalBuild.xcconfig`) that requires no Apple Developer account.
+This builds `roma just talk.app` with ad-hoc signing using a separate build configuration (`LocalBuild.xcconfig`) that requires no Apple Developer account.
 Whisper is part of the app executable, so the local build does not need a separately signed Whisper dynamic framework at launch.
 The local entitlement set disables Hardened Runtime Library Validation because the app still loads the bundled MediaRemoteAdapter and Sparkle frameworks. Without a Developer ID Team ID, macOS 26.4.1 can reject those separately signed objects when Gatekeeper runs the app through App Translocation. Normal certificate-signed builds keep Library Validation enabled.
 
@@ -119,12 +119,12 @@ BUILD_STATIC_XCFRAMEWORK=ON ./build-xcframework.sh
 ```
 This will create the XCFramework at `build-apple/whisper.xcframework`.
 
-### Building VoiceInk
+### Building Roma Just Talk
 
-1. Clone the VoiceInk repository:
+1. Clone the Roma Just Talk repository:
 ```bash
-git clone https://github.com/Beingpax/VoiceInk.git
-cd VoiceInk
+git clone https://github.com/negentropi/roma-just-talk.git
+cd roma-just-talk
 ```
 
 2. Add the whisper.xcframework to your project for linking without embedding it:
@@ -167,4 +167,4 @@ If you encounter any build issues:
 7. After building, run `make static-whisper-app-check`
 8. Run `make adhoc-library-validation-check` to verify the local app's signature and bundled-code contract
 
-For more help, please check the [issues](https://github.com/Beingpax/VoiceInk/issues) section or create a new issue.
+For more help, please check the [issues](https://github.com/negentropi/roma-just-talk/issues) section or create a new issue.

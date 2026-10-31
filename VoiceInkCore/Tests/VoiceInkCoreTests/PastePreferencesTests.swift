@@ -5,8 +5,7 @@ final class PastePreferencesTests: XCTestCase {
     func testFinalPastedTextReturnsTranscriptWithoutTrailingSpace() {
         let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
             "hello",
-            appendTrailingSpace: false,
-            isTrialExpired: false
+            appendTrailingSpace: false
         )
 
         XCTAssertEqual(pastedText, "hello")
@@ -15,24 +14,10 @@ final class PastePreferencesTests: XCTestCase {
     func testFinalPastedTextAppendsTrailingSpaceWhenEnabled() {
         let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
             "hello",
-            appendTrailingSpace: true,
-            isTrialExpired: false
+            appendTrailingSpace: true
         )
 
         XCTAssertEqual(pastedText, "hello ")
-    }
-
-    func testFinalPastedTextPreservesTrialExpiredPrefixAndBlankLine() {
-        let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
-            "hello",
-            appendTrailingSpace: false,
-            isTrialExpired: true
-        )
-
-        XCTAssertEqual(
-            pastedText,
-            "Your trial has expired. Upgrade to VoiceInk Pro at tryvoiceink.com/buy\n\nhello"
-        )
     }
 
     func testCursorPasteTextPlanSkipsCursorReadWhenLowercaseCleanupIsEnabled() {

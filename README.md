@@ -6,12 +6,12 @@
 
   [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   ![Platform](https://img.shields.io/badge/platform-macOS%2014.0%2B-brightgreen)
-  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/happyf-weallareeuropean/roma-just-talk)](https://github.com/happyf-weallareeuropean/roma-just-talk/releases)
-  ![GitHub all releases](https://img.shields.io/github/downloads/happyf-weallareeuropean/roma-just-talk/total)
-  [![GitHub stars](https://img.shields.io/github/stars/happyf-weallareeuropean/roma-just-talk?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=000000&color=111111)](https://github.com/happyf-weallareeuropean/roma-just-talk)
+  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/negentropi/roma-just-talk)](https://github.com/negentropi/roma-just-talk/releases)
+  ![GitHub all releases](https://img.shields.io/github/downloads/negentropi/roma-just-talk/total)
+  [![GitHub stars](https://img.shields.io/github/stars/negentropi/roma-just-talk?style=for-the-badge&logo=github&logoColor=white&label=Stars&labelColor=000000&color=111111)](https://github.com/negentropi/roma-just-talk)
   [![Follow @Hft_freedom on X](https://img.shields.io/badge/Follow-%40Hft__freedom-111111?style=for-the-badge&logo=x&logoColor=white)](https://x.com/Hft_freedom)
  
-  <a href="https://github.com/happyf-weallareeuropean/roma-just-talk/releases/latest">
+  <a href="https://github.com/negentropi/roma-just-talk/releases/latest">
     <img src="https://img.shields.io/badge/Download%20Latest-macOS%20App-blue?style=for-the-badge&logo=apple" alt="Download roma-just-talk" width="250"/>
   </a>
 </div>
@@ -34,7 +34,7 @@ Most dictation apps make you reach for a hotkey and wait before speaking. Roma J
 - **Less ceremony**: talk first, decide what to do with it second
 - **Built on VoiceInk**: keeps the strong macOS base, shortcuts, dictionary, app-aware modes, and transcription pipeline
 
-Current status: visible app branding uses roma-just-talk, while many internal labels still come from VoiceInk. The logo and source app icon use the roma-just-talk mark while the fork direction keeps moving first.
+Current status: the app, its links, and its support channels are Roma Just Talk. Internal code names (modules, targets, and types) still carry the VoiceInk prefix and are renamed in a follow-up. The logo and source app icon use the roma-just-talk mark.
 
 ## Features
 
@@ -50,7 +50,7 @@ Current status: visible app branding uses roma-just-talk, while many internal la
 ## Get Started
 
 ### Download
-Download the latest fork release from [GitHub Releases](https://github.com/happyf-weallareeuropean/roma-just-talk/releases).
+Download the latest fork release from [GitHub Releases](https://github.com/negentropi/roma-just-talk/releases).
 
 The source app icon now uses the roma-just-talk split-keyboard mark. Published downloads may still show older assets until the next release.
 
@@ -58,7 +58,7 @@ The source app icon now uses the roma-just-talk split-keyboard mark. Published d
 Install the fork release via Homebrew:
 
 ```shell
-brew install --cask happyf-weallareeuropean/roma-just-talk/roma-just-talk
+brew install --cask negentropi/roma-just-talk/roma-just-talk
 ```
 
 The upstream `voiceink` cask installs upstream VoiceInk, not this fork.
@@ -81,7 +81,7 @@ You can build the app yourself by following [BUILDING.md](BUILDING.md).
 This fork is early. Issues, experiments, and focused patches are welcome when they help the pre-roll dictation direction.
 
 Useful contributions right now:
-- Reporting bugs via [issues](https://github.com/happyf-weallareeuropean/roma-just-talk/issues)
+- Reporting bugs via [issues](https://github.com/negentropi/roma-just-talk/issues)
 - Testing pre-roll capture in real macOS writing workflows
 - Improving rough docs left over from the upstream project
 - Proposing focused changes that make speak-before-hotkey dictation faster, calmer, or more reliable
@@ -95,13 +95,14 @@ This project is licensed under the GNU General Public License v3.0 - [learn more
 ## Support
 
 If you encounter any issues or have questions, please:
-1. Check the existing issues in the GitHub repository
-2. Create a new issue if your problem isn't already reported
-3. Provide as much detail as possible about your environment and the problem
+1. Read the documentation at [roma-just-talk.com/readme](https://roma-just-talk.com/readme)
+2. Check the existing issues in the GitHub repository
+3. Create a new issue if your problem isn't already reported, or email [happyfumd@icloud.com](mailto:happyfumd@icloud.com?subject=Roma%20Just%20Talk%20Support%20Request)
+4. Provide as much detail as possible about your environment and the problem
 
 ## Acknowledgments
 
-roma-just-talk is built top on: [VoiceInk](https://github.com/Beingpax/VoiceInk).
+Roma Just Talk is a fork of [VoiceInk](https://github.com/Beingpax/VoiceInk), the GPL v3 macOS dictation app it is built on. Thank you to the VoiceInk authors.
 
 
 ### Core Technology
@@ -109,7 +110,7 @@ roma-just-talk is built top on: [VoiceInk](https://github.com/Beingpax/VoiceInk)
 - [FluidAudio](https://github.com/FluidInference/FluidAudio) - Used for Parakeet model implementation
 
 ### Essential Dependencies
-- [Sparkle](https://github.com/sparkle-project/Sparkle) - Keeping VoiceInk up to date
+- [Sparkle](https://github.com/sparkle-project/Sparkle) - Keeping Roma Just Talk up to date
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) - User-customizable keyboard shortcuts
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Launch at login functionality
 - [MediaRemoteAdapter](https://github.com/ejbills/mediaremote-adapter) - Media playback control during recording

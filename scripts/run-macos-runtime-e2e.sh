@@ -890,7 +890,6 @@ defaults delete "$voiceink_bundle_id" macOSOnboardingPermissionKind 2>/dev/null 
 defaults write "$voiceink_bundle_id" CurrentTranscriptionModel -string "parakeet-tdt-0.6b-v2"
 defaults write "$voiceink_bundle_id" PrewarmModelOnWake -bool true
 defaults write "$voiceink_bundle_id" isSoundFeedbackEnabled -bool false
-defaults write "$voiceink_bundle_id" enableAnnouncements -bool false
 defaults write "$voiceink_bundle_id" restoreClipboardAfterPaste -bool false
 defaults write "$voiceink_bundle_id" appendTrailingSpace -bool false
 killall cfprefsd 2>/dev/null || true

@@ -821,6 +821,8 @@ private final class OBSClient {
     private let password: String
     private var requestCounter = 0
     private var expectedMotionDurationMilliseconds: Double?
+    private var firstFrameDurationMilliseconds: Double?
+    private var preparedFirstFrameCursorMilliseconds: Double?
     private(set) var mediaEvidence: [String: Any] = ["inputName": "PublicSilentVideo"]
     init(configurationURL: URL) throws {
         let configuration = try JSONSerialization.jsonObject(with: Data(contentsOf: configurationURL)) as? [String: Any]
@@ -843,11 +845,22 @@ private final class OBSClient {
         guard try await receive()["op"] as? Int == 2 else { throw OBSError.protocolFailure }
     }
     func preparePausedMotion(path: String) async throws {
-        let assetDuration = try await AVURLAsset(url: URL(fileURLWithPath: path)).load(.duration)
+        let asset = AVURLAsset(url: URL(fileURLWithPath: path))
+        let assetDuration = try await asset.load(.duration)
         let expectedDuration = CMTimeGetSeconds(assetDuration) * 1000
         guard expectedDuration.isFinite, expectedDuration > 1000 else { throw OBSError.mediaPreparation("invalidMotionAssetDuration") }
+        let tracks = try await asset.loadTracks(withMediaType: .video)
+        guard tracks.count == 1 else { throw OBSError.mediaPreparation("expectedOneMotionVideoTrack") }
+        let minFrameDuration = try await tracks[0].load(.minFrameDuration)
+        let frameMilliseconds = CMTimeGetSeconds(minFrameDuration) * 1000
+        guard frameMilliseconds.isFinite, frameMilliseconds > 0, frameMilliseconds <= 1000 else {
+            throw OBSError.mediaPreparation("invalidMotionFrameDuration")
+        }
         expectedMotionDurationMilliseconds = expectedDuration
+        firstFrameDurationMilliseconds = frameMilliseconds
+        preparedFirstFrameCursorMilliseconds = nil
         mediaEvidence["expectedMediaDurationMilliseconds"] = expectedDuration
+        mediaEvidence["videoMinFrameDurationMilliseconds"] = frameMilliseconds
         mediaEvidence["mediaDurationToleranceMilliseconds"] = 1
         mediaEvidence["durationSource"] = "localAVURLAsset"
         let settings: [String: Any] = ["is_local_file": true, "local_file": path, "looping": false,
@@ -858,13 +871,14 @@ private final class OBSClient {
         try await request("SetInputMute", ["inputName": "PublicSilentVideo", "inputMuted": true])
         mediaEvidence["restartBeforeCaptureAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
         try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"])
-        try await waitForMedia(phase: "loaded", pausedAtZero: false)
+        try await waitForMedia(phase: "loaded", pausedAtFirstFrame: false)
         mediaEvidence["pauseRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
         try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE"])
-        try await waitForMedia(phase: "paused", pausedAtZero: false, requirePaused: true)
-        mediaEvidence["seekZeroBeforeCaptureAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        try await waitForMedia(phase: "paused", pausedAtFirstFrame: false, requirePaused: true)
+        mediaEvidence["seekFirstFrameBeforeCaptureAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        mediaEvidence["requestedMediaCursorMilliseconds"] = 0
         try await request("SetMediaInputCursor", ["inputName": "PublicSilentVideo", "mediaCursor": 0])
-        try await waitForMedia(phase: "pausedAtZero", pausedAtZero: true, requirePaused: true)
+        try await waitForMedia(phase: "pausedFirstFrame", pausedAtFirstFrame: true, requirePaused: true)
         let response = try await request("GetInputSettings", ["inputName": "PublicSilentVideo"])
         guard let actual = response["inputSettings"] as? [String: Any],
               actual["local_file"] as? String == path, actual["is_local_file"] as? Bool == true,
@@ -879,12 +893,12 @@ private final class OBSClient {
         mediaEvidence["preparedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
     }
     func verifyPausedBeforeShortcut() async throws {
-        guard usableStatus(try await mediaStatus(phase: "beforeShortcut"), requirePaused: true, requireZero: true) else {
-            throw OBSError.mediaPreparation("motionNotPausedAtZeroBeforeShortcut")
+        guard usableStatus(try await mediaStatus(phase: "beforeShortcut"), requirePaused: true, requireFirstFrame: true) else {
+            throw OBSError.mediaPreparation("motionNotPausedAtFirstFrameBeforeShortcut")
         }
     }
     func playPreparedMotion() async throws {
-        guard usableStatus(try await mediaStatus(phase: "beforePlay"), requirePaused: true, requireZero: true) else {
+        guard usableStatus(try await mediaStatus(phase: "beforePlay"), requirePaused: true, requireFirstFrame: true) else {
             throw OBSError.mediaPreparation("motionChangedBeforePlay")
         }
         mediaEvidence["playRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
@@ -893,27 +907,34 @@ private final class OBSClient {
     }
     func observePlayingMotion() async throws {
         let status = try await mediaStatus(phase: "afterPlay")
-        guard usableStatus(status, requirePaused: false, requireZero: false),
+        guard usableStatus(status, requirePaused: false, requireFirstFrame: false),
               status["mediaState"] as? String == "OBS_MEDIA_STATE_PLAYING" else { throw OBSError.mediaPreparation("motionNotPlayingAfterPlay") }
     }
-    private func waitForMedia(phase: String, pausedAtZero: Bool, requirePaused: Bool = false) async throws {
+    private func waitForMedia(phase: String, pausedAtFirstFrame: Bool, requirePaused: Bool = false) async throws {
         let deadline = ProcessInfo.processInfo.systemUptime + 5
         var stableSince: TimeInterval?
+        var stableCursor: Double?
         while ProcessInfo.processInfo.systemUptime < deadline {
             let status = try await mediaStatus(phase: phase)
-            if usableStatus(status, requirePaused: requirePaused, requireZero: pausedAtZero) {
-                if !pausedAtZero { return }
-                if stableSince == nil { stableSince = ProcessInfo.processInfo.systemUptime }
+            if usableStatus(status, requirePaused: requirePaused, requireFirstFrame: pausedAtFirstFrame) {
+                if !pausedAtFirstFrame { return }
+                let cursor = (status["mediaCursor"] as! NSNumber).doubleValue
+                if stableCursor != cursor {
+                    stableCursor = cursor
+                    stableSince = ProcessInfo.processInfo.systemUptime
+                }
                 if ProcessInfo.processInfo.systemUptime - stableSince! >= 0.5 {
-                    mediaEvidence["pausedZeroStableSeconds"] = ProcessInfo.processInfo.systemUptime - stableSince!
+                    preparedFirstFrameCursorMilliseconds = cursor
+                    mediaEvidence["pausedFirstFrameCursorMilliseconds"] = cursor
+                    mediaEvidence["pausedFirstFrameStableSeconds"] = ProcessInfo.processInfo.systemUptime - stableSince!
                     return
                 }
-            } else { stableSince = nil }
+            } else { stableSince = nil; stableCursor = nil }
             try await Task.sleep(nanoseconds: 200_000_000)
         }
         throw OBSError.mediaPreparation("deadline:\(phase)")
     }
-    private func usableStatus(_ status: [String: Any], requirePaused: Bool, requireZero: Bool) -> Bool {
+    private func usableStatus(_ status: [String: Any], requirePaused: Bool, requireFirstFrame: Bool) -> Bool {
         guard let state = status["mediaState"] as? String,
               (requirePaused ? state == "OBS_MEDIA_STATE_PAUSED" : ["OBS_MEDIA_STATE_PLAYING", "OBS_MEDIA_STATE_PAUSED"].contains(state)),
               let duration = status["mediaDuration"] as? NSNumber, duration.doubleValue > 1000,
@@ -921,7 +942,9 @@ private final class OBSClient {
               // OBS returns integer milliseconds; allow only millisecond rounding.
               abs(duration.doubleValue - expectedMotionDurationMilliseconds) <= 1,
               let cursor = status["mediaCursor"] as? NSNumber, cursor.doubleValue >= 0 else { return false }
-        return !requireZero || cursor.doubleValue == 0
+        guard requireFirstFrame else { return true }
+        guard let firstFrameDurationMilliseconds, cursor.doubleValue <= firstFrameDurationMilliseconds else { return false }
+        return preparedFirstFrameCursorMilliseconds.map { $0 == cursor.doubleValue } ?? true
     }
     private func mediaStatus(phase: String) async throws -> [String: Any] {
         let response = try await request("GetMediaInputStatus", ["inputName": "PublicSilentVideo"])

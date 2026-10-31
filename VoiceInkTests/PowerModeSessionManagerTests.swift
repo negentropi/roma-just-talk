@@ -51,6 +51,47 @@ extension VoiceInkTests {
             ])
         }
     }
+
+    @Test @MainActor func recorderPowerModeMixedSessionRestoresAudioSelectionWithoutLoadingForLips() async throws {
+        for explicitFrozenScope in [true, false] {
+            let fixture = try RecorderPowerModeFixture(mode: .voice)
+            defer { fixture.restorePreferences() }
+            await fixture.manager.beginSession(with: fixture.configuration)
+            #expect(fixture.provider.currentTranscriptionModel?.name == "audio-B")
+            await VoiceInkPowerModeRecordingFinishPlan.finishingRecording(
+                shouldPersistConfiguredPreferences: true
+            ).applyRuntimeState(
+                endSession: { await fixture.manager.endSession() }, clearActiveConfiguration: {}
+            )
+            #expect(fixture.savedSession?.originalState.transcriptionModelName == "audio-A")
+
+            fixture.provider.currentDictationMode = .lips
+            await fixture.manager.beginSession(with: fixture.configuration)
+            #expect(fixture.savedSession?.applicationScope == .full)
+            fixture.provider.resourceEvents.removeAll()
+            // Explicit frozen mode is the recorder path; nil is the persisted-session recovery entry point.
+            await fixture.manager.endSession(applicationScope: explicitFrozenScope ? .textOnly : nil)
+            #expect(fixture.provider.currentTranscriptionModel?.name == "audio-A")
+            #expect(fixture.provider.resourceEvents == ["select:audio-A"])
+            #expect(fixture.savedSession == nil)
+        }
+    }
+
+    @Test @MainActor func recorderPowerModeLipSessionCanUpgradeToVoiceAndRestoreAudioResources() async throws {
+        let fixture = try RecorderPowerModeFixture(mode: .lips)
+        defer { fixture.restorePreferences() }
+        await fixture.manager.beginSession(with: fixture.configuration)
+        #expect(fixture.provider.resourceEvents.isEmpty)
+        fixture.provider.currentDictationMode = .voice
+        await fixture.manager.beginSession(with: fixture.configuration)
+        #expect(fixture.savedSession?.applicationScope == .full)
+        #expect(fixture.provider.resourceEvents == ["select:audio-B", "cleanup", "load:audio-B"])
+        await fixture.manager.endSession()
+        #expect(fixture.provider.currentTranscriptionModel?.name == "audio-A")
+        #expect(fixture.provider.resourceEvents == [
+            "select:audio-B", "cleanup", "load:audio-B", "select:audio-A", "cleanup", "load:audio-A"
+        ])
+    }
 }
 
 @MainActor private final class RecorderPowerModeFixture {
@@ -61,6 +102,10 @@ extension VoiceInkTests {
     private let sessionDefaults: UserDefaults
     private let suiteName = "VoiceInkTests.RecorderPowerMode.\(UUID().uuidString)"
     private let savedPreferences: [(String, Any?)]
+
+    var savedSession: VoiceInkPowerModeSession? {
+        try? VoiceInkPowerModeSessionPreference.loadActiveSession(from: sessionDefaults)
+    }
 
     var configuration: PowerModeConfig {
         PowerModeConfig(
@@ -107,7 +152,7 @@ extension VoiceInkTests {
 }
 
 @MainActor private final class RecorderPowerModeProvider: PowerModeStateProvider {
-    let currentDictationMode: VoiceInkDictationMode
+    var currentDictationMode: VoiceInkDictationMode
     let modelA = ImportedWhisperModel(fileBaseName: "audio-A")
     let modelB = ImportedWhisperModel(fileBaseName: "audio-B")
     var currentTranscriptionModel: (any TranscriptionModel)?

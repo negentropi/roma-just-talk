@@ -53,8 +53,15 @@ class PowerModeSessionManager {
     func endSession(applicationScope: VoiceInkPowerModeSessionApplicationScope? = nil) async {
         guard let session = loadSession() else { return }
 
+        let resourceScope = applicationScope ?? VoiceInkPowerModeSessionApplicationScope(
+            dictationMode: stateProvider?.currentDictationMode ?? VoiceInkLipDictationPreference.mode()
+        )
         isApplyingPowerModeConfig = true
-        await restoreState(session.originalState, applicationScope: applicationScope ?? session.applicationScope)
+        await restoreState(
+            session.originalState,
+            applicationScope: session.applicationScope,
+            loadsModelResources: resourceScope == .full
+        )
         isApplyingPowerModeConfig = false
 
         NotificationCenter.default.removeObserver(self, name: .AppSettingsDidChange, object: nil)
@@ -116,7 +123,8 @@ class PowerModeSessionManager {
 
     private func restoreState(
         _ state: VoiceInkPowerModeApplicationState,
-        applicationScope: VoiceInkPowerModeSessionApplicationScope
+        applicationScope: VoiceInkPowerModeSessionApplicationScope,
+        loadsModelResources: Bool
     ) async {
         guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
@@ -125,7 +133,8 @@ class PowerModeSessionManager {
             VoiceInkPowerModeSessionApplicationPlan.restoring(
                 state: state,
                 facts: sessionApplicationFacts(stateProvider: stateProvider),
-                applicationScope: applicationScope
+                applicationScope: applicationScope,
+                loadsModelResources: loadsModelResources
             ),
             stateProvider: stateProvider
         )

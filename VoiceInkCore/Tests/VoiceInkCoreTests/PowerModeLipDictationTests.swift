@@ -65,14 +65,15 @@ final class PowerModeLipDictationTests: XCTestCase {
     }
 
     func testReusedAndRecoveredLipSessionRetainsTextOnlyRestoration() async throws {
-        let existing = VoiceInkPowerModeSession(id: UUID(), startTime: Date(), originalState: originalState)
-        var saved: VoiceInkPowerModeSession?
+        let existing = VoiceInkPowerModeSession(
+            id: UUID(), startTime: Date(), originalState: originalState, applicationScope: .textOnly
+        )
+        var session = existing
         VoiceInkPowerModeSessionBeginPlan.plan(activeSession: existing, applicationScope: .textOnly).applyRuntimeState(
             id: UUID(), startTime: Date(), originalState: originalState,
-            saveSession: { saved = $0 },
+            saveSession: { session = $0 },
             installSettingsObserver: { XCTFail("An existing session already has its settings observer") }
         )
-        var session = try XCTUnwrap(saved)
         XCTAssertEqual(session.id, existing.id)
         XCTAssertEqual(session.originalState, existing.originalState)
 
@@ -88,6 +89,42 @@ final class PowerModeLipDictationTests: XCTestCase {
         XCTAssertEqual(runtime.resourceEvents, [])
         XCTAssertEqual(runtime.enhancementEnabled, false)
         XCTAssertEqual(runtime.formattingEnabled, true)
+
+        // A persisted voice session can later serve lips, but still owes its original audio selection.
+        for initialScope in [VoiceInkPowerModeSessionApplicationScope.full, .textOnly] {
+            var mixed = VoiceInkPowerModeSession(
+                id: UUID(), startTime: Date(), originalState: originalState, applicationScope: initialScope
+            )
+            for scope in [VoiceInkPowerModeSessionApplicationScope.full, .textOnly] {
+                VoiceInkPowerModeSessionBeginPlan.plan(activeSession: mixed, applicationScope: scope).applyRuntimeState(
+                    id: UUID(), startTime: Date(), originalState: originalState,
+                    saveSession: { mixed = $0 },
+                    installSettingsObserver: { XCTFail("Reusing a session must retain its observer") }
+                )
+            }
+            await VoiceInkPowerModeRecordingFinishPlan.finishingRecording(
+                shouldPersistConfiguredPreferences: true
+            ).applyRuntimeState(
+                endSession: { XCTFail("Persistent preferences keep the session for the next capture") },
+                clearActiveConfiguration: { XCTFail("Persistent preferences keep the active configuration") }
+            )
+            let recoveredMixed = try JSONDecoder().decode(
+                VoiceInkPowerModeSession.self, from: JSONEncoder().encode(mixed)
+            )
+            XCTAssertEqual(recoveredMixed.applicationScope, .full)
+            XCTAssertEqual(recoveredMixed.originalState.transcriptionModelName, "audio-A")
+
+            for loadsResources in [false, true] {
+                let restored = PowerModeLipRuntime(currentModelName: "audio-B")
+                await restored.apply(.restoring(
+                    state: recoveredMixed.originalState, facts: restored.facts,
+                    applicationScope: recoveredMixed.applicationScope, loadsModelResources: loadsResources
+                ))
+                XCTAssertEqual(restored.currentModelName, "audio-A")
+                XCTAssertEqual(restored.resourceEvents, loadsResources
+                    ? ["select:audio-A", "cleanup", "load:audio-A"] : ["select:audio-A"])
+            }
+        }
     }
 
     func testLegacySavedSessionRestoresAudioModel() async throws {

@@ -4,6 +4,7 @@
 
 - Add optional English lip dictation, off by default, with simultaneous voice and camera capture and a Lips Only setting that suspends microphone capture.
 - Stop unused lip recognition when voice text is ready.
+- Restore the original audio-model selection when a Power Mode session continues in Lips Only, without loading audio resources.
 - Cancel pending auto-send when its dictation is canceled, disabled, or replaced.
 - Let dictation and setup tasks stop while a camera or microphone permission reply is pending.
 

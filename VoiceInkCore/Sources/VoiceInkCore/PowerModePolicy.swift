@@ -1434,12 +1434,17 @@ public struct VoiceInkPowerModeTranscriptionModelResourcePlan: Equatable, Sendab
         selectedModelName: String?,
         currentModelName: String?,
         availableModels: [VoiceInkPowerModeTranscriptionModelResourceFacts],
-        availableLocalModelNames: Set<String>
+        availableLocalModelNames: Set<String>,
+        loadsModelResources: Bool = true
     ) -> Self {
         guard let selectedModelName,
               let selectedModel = availableModels.first(where: { $0.name == selectedModelName }),
               currentModelName != selectedModelName else {
             return Self(selectedModelName: nil, action: .none)
+        }
+
+        guard loadsModelResources else {
+            return Self(selectedModelName: selectedModelName, action: .none)
         }
 
         guard selectedModel.loadsLocalWhisperModel else {
@@ -1673,7 +1678,8 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
     public static func restoring(
         state: VoiceInkPowerModeApplicationState,
         facts: VoiceInkPowerModeSessionApplicationFacts,
-        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full
+        applicationScope: VoiceInkPowerModeSessionApplicationScope = .full,
+        loadsModelResources: Bool = true
     ) -> Self {
         plan(
             preferenceApplication: state.powerModePreferenceRestore,
@@ -1681,6 +1687,7 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
             selectedLanguage: state.selectedLanguage,
             facts: facts,
             applicationScope: applicationScope,
+            loadsModelResources: loadsModelResources,
             shouldPostConfigurationApplied: false
         )
     }
@@ -1691,6 +1698,7 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
         selectedLanguage: String?,
         facts: VoiceInkPowerModeSessionApplicationFacts,
         applicationScope: VoiceInkPowerModeSessionApplicationScope,
+        loadsModelResources: Bool = true,
         shouldPostConfigurationApplied: Bool
     ) -> Self {
         Self(
@@ -1699,7 +1707,8 @@ public struct VoiceInkPowerModeSessionApplicationPlan: Equatable, Sendable {
                 selectedModelName: selectedModelName,
                 currentModelName: facts.currentModelName,
                 availableModels: facts.availableModelResourceFacts,
-                availableLocalModelNames: facts.availableLocalModelNames
+                availableLocalModelNames: facts.availableLocalModelNames,
+                loadsModelResources: loadsModelResources
             ),
             languageApplicationPlan: VoiceInkPowerModeLanguageApplicationPlan.plan(
                 selectedLanguage: selectedLanguage
@@ -2030,8 +2039,9 @@ public struct VoiceInkPowerModeSessionBeginPlan: Equatable, Sendable {
         originalState: @autoclosure () -> VoiceInkPowerModeApplicationState
     ) -> VoiceInkPowerModeSession? {
         if var activeSession {
-            guard activeSession.applicationScope != applicationScope else { return nil }
-            activeSession.applicationScope = applicationScope
+            // Once audio preferences changed, every later end/recovery must restore them.
+            guard activeSession.applicationScope == .textOnly, applicationScope == .full else { return nil }
+            activeSession.applicationScope = .full
             return activeSession
         }
         return VoiceInkPowerModeSession(

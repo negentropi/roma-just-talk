@@ -102,6 +102,109 @@ struct VoiceInkTests {
         }
     }
 
+    // Real TextEdit paste through its Edit > Paste menu; needs the Accessibility grant CI gives the test host.
+    @Test(.enabled(if: AXIsProcessTrusted())) @MainActor
+    func clipboardIsRestoredAsSoonAsThePasteLands() async throws {
+        let defaults = UserDefaults.standard
+        let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")
+        let restoreDelayValue = defaults.object(forKey: "clipboardRestoreDelay")
+        let pasteMethodValue = defaults.object(forKey: VoiceInkPasteMethod.userDefaultsKey)
+        let pasteboard = NSPasteboard.general
+        let originalClipboard = (pasteboard.pasteboardItems ?? []).map { item in
+            let copy = NSPasteboardItem()
+            for type in item.types {
+                if let data = item.data(forType: type) { copy.setData(data, forType: type) }
+            }
+            return copy
+        }
+        let document = FileManager.default.temporaryDirectory
+            .appendingPathComponent("clipboard-restore-\(UUID().uuidString).txt")
+        try "".write(to: document, atomically: true, encoding: .utf8)
+        var textEdit: NSRunningApplication?
+        defer {
+            textEdit?.forceTerminate()
+            try? FileManager.default.removeItem(at: document)
+            CursorPaster.configureAccessibilityTextInserterForTesting()
+            restoreDefault(restoreValue, forKey: "restoreClipboardAfterPaste")
+            restoreDefault(restoreDelayValue, forKey: "clipboardRestoreDelay")
+            restoreDefault(pasteMethodValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
+            pasteboard.clearContents()
+            pasteboard.writeObjects(originalClipboard)
+        }
+
+        defaults.set(true, forKey: "restoreClipboardAfterPaste")
+        defaults.set(2.0, forKey: "clipboardRestoreDelay")
+        defaults.set(VoiceInkPasteMethod.standard.rawValue, forKey: VoiceInkPasteMethod.userDefaultsKey)
+        // Web editors reject direct AX insertion, which forces the clipboard paste path.
+        CursorPaster.configureAccessibilityTextInserterForTesting { _, _ in .unsupported }
+
+        let textEditURL = try #require(
+            NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.TextEdit")
+        )
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        configuration.createsNewApplicationInstance = true
+        textEdit = try await NSWorkspace.shared.open(
+            [document],
+            withApplicationAt: textEditURL,
+            configuration: configuration
+        )
+        let textEditPID = try #require(textEdit?.processIdentifier)
+        let editorApplication = AXUIElementCreateApplication(textEditPID)
+        func focusedEditor() -> AXUIElement? {
+            guard NSWorkspace.shared.frontmostApplication?.processIdentifier == textEditPID else { return nil }
+            var focused: CFTypeRef?
+            guard AXUIElementCopyAttributeValue(
+                editorApplication,
+                kAXFocusedUIElementAttribute as CFString,
+                &focused
+            ) == .success else { return nil }
+            return (focused as! AXUIElement)
+        }
+        var attempts = 0
+        while focusedEditor() == nil, attempts < 100 {
+            attempts += 1
+            textEdit?.activate()
+            try await Task.sleep(nanoseconds: 100_000_000)
+        }
+        let editor = try #require(focusedEditor())
+
+        pasteboard.clearContents()
+        pasteboard.setString("previous clipboard", forType: .string)
+
+        #expect(await CursorPaster.pasteAtCursorAndWaitUntilPosted("dictated text") == .commandPosted)
+        try await Task.sleep(nanoseconds: 600_000_000)
+
+        #expect(pasteboard.string(forType: .string) == "previous clipboard")
+        var value: CFTypeRef?
+        _ = AXUIElementCopyAttributeValue(editor, kAXValueAttribute as CFString, &value)
+        #expect((value as? String)?.contains("dictated text") == true)
+    }
+
+    @Test func pasteLandsOnlyWhenTheTargetShowsTheReplacement() {
+        let caret = CFRange(location: 6, length: 0)
+        #expect(CursorTextContextReader.pasteLanded(
+            "dictated text ", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: "Hello dictated text "
+        ))
+        #expect(CursorTextContextReader.pasteLanded(
+            "dictated text ", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: "Hello dictated text"
+        ))
+        #expect(!CursorTextContextReader.pasteLanded(
+            "dictated text", textBeforePaste: "Hello dictated text", selectedRangeBeforePaste: CFRange(location: 6, length: 13),
+            textAfterPaste: "Hello dictated text"
+        ))
+        #expect(!CursorTextContextReader.pasteLanded(
+            "dictated text", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: "Hello x dictated text"
+        ))
+        #expect(!CursorTextContextReader.pasteLanded(
+            "dictated text", textBeforePaste: "Hello ", selectedRangeBeforePaste: caret,
+            textAfterPaste: nil
+        ))
+    }
+
     @Test @MainActor func accessibilityInsertDeliversWithoutTouchingClipboard() async throws {
         let defaults = UserDefaults.standard
         let restoreValue = defaults.object(forKey: "restoreClipboardAfterPaste")

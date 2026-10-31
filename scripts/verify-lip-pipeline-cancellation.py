@@ -256,7 +256,7 @@ history_assertions = {
     ), ()),
     "known-bad-empty-lip-history": ("TranscriptionPipelineTests.swift", (
         r'\(rows → .+\)\.isEmpty → false',
-        r'\((?:try )?fixture\.readMetrics\(\) → .+\)\.isEmpty → false',
+        r'try fixture\.readMetrics\(\)\.isEmpty',
         r'\(events → \["dismissed", "duration"\]\) == \["dismissed"\]',
     ), ()),
     "known-bad-startup-history-reservation": ("DiscardedRecordingTests.swift", (
@@ -265,7 +265,7 @@ history_assertions = {
     ), (
         # Without the pending row, failed startup can delete the unreferenced WAV before drain.
         r'\(rows\.map\(\\\.transcriptionState\) → \[\]\) == .*\.canceled.*',
-        r'\(?rows\.first → nil\)?',
+        r'\(rows → \[\]\)\.first → nil → nil',
     )),
 }
 
@@ -330,7 +330,7 @@ def red_control(path, mutant, label, selection, count, change):
         save_receipt()
         require(len(issues) == 3 and all(sum(
             f"with 1 argument action → .{action} at DiscardedRecordingTests.swift:" in issue
-            and re.fullmatch(r'\((?:try )?fixture\.transcriptionCount\(\) → 1\) == 0(?:\s+.*)?',
+            and re.fullmatch(r'try fixture\.transcriptionCount\(\) == 0',
                              issue.split("Expectation failed: ", 1)[-1]) is not None
             for issue in issues
         ) == 1 for action in ("masterOff", "reset", "shutdown")),

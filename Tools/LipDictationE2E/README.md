@@ -53,6 +53,8 @@ This profile records fresh app source, transport source, executable SHA256, stri
 
 Prior Setup remains bound to its original artifact digest, source and executable. For this different binary, exact Git tree entries must match for Settings wiring, lip capture/manager/engine, permission decisions, preferences/storage paths, the native lip package/resources, relevant package dependencies and build/signing inputs. `priorSetup.evidenceScope=unchangedSetupSources` and `sameExecutable=false` describe only that unchanged implementation evidence. Current `setup.json` uses `verifiedCachedModelWithPriorSetupSources`, records the old source head and `priorSetupSameExecutable=false`, and still requires actual Ready state and initial/final OFF controls. No current Set Up button or fresh publisher download is claimed. Every voice, combined, silent-audio fallback, microphone-denied lip-only, cancel, disable and quit case runs against the newly built app.
 
+This same-job Setup scope follows the actual Mac build: the unchanged Makefile's `local` recipe must use exactly `xcodebuild -project VoiceInk.xcodeproj`. The entire Mac project and its actual `project.xcworkspace/xcshareddata/swiftpm/Package.resolved` stay pinned. Root `VoiceInk.xcworkspace` is used by iOS verification and is not consumed by that project build, so its metadata and workspace lock are outside this Setup source comparison. A workspace-based local build is refused. Immutable app replay, checkpoint provenance, prior Setup artifact pins, and clean-checkout checks retain their existing boundaries.
+
 Full sequence:
 
 ```sh

@@ -46,7 +46,7 @@ SETUP_INPUTS = (
     'VoiceInk/VoiceInk.entitlements', 'VoiceInk/VoiceInk.local.entitlements',
     'VoiceInkCore/Sources/VoiceInkCore/LipDictationPreference.swift',
     'VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift', 'VoiceInkCore/Package.swift', 'VoiceInkCore/Package.resolved',
-    'VoiceInkLip', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj', 'VoiceInk.xcworkspace',
+    'VoiceInkLip', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj',
     'Makefile', 'LocalBuild.xcconfig', 'scripts/verify-static-whisper-xcframework.sh',
     'scripts/verify-static-whisper-app.sh', 'scripts/verify-adhoc-library-validation.sh',
 )
@@ -116,6 +116,17 @@ def ensure_commit(root, head):
         command(['git', 'fetch', '--no-tags', '--depth=2', 'https://github.com/' + REPOSITORY + '.git', head], root)
 
 
+def validate_mac_project_build(raw):
+    recipes = re.findall(r'(?ms)^local: check setup\n(.*?)(?=^[^\s#][^\n]*:|\Z)', raw.decode('utf-8'))
+    require(len(recipes) == 1, 'Pinned Makefile has no unique local build recipe')
+    lines = re.findall(r'(?m)^\txcodebuild[^\n]*$', recipes[0])
+    require(lines == ['\txcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)" \\']
+            and re.findall(r'(?<!\S)-(?:project|workspace)\s+\S+', recipes[0]) == ['-project VoiceInk.xcodeproj'],
+            'Cached Setup source scope requires the exact existing Mac project build, not a workspace build')
+    return {'target': 'make local CONFIGURATION=Release', 'project': 'VoiceInk.xcodeproj', 'dependencyLock': LOCK,
+            'boundary': 'The pinned local recipe uses xcodebuild -project. The root iOS workspace is not an input to this Mac build.'}
+
+
 def check_same_job_sources(root, source_head, transport):
     require(command(['git', 'rev-parse', 'HEAD'], root).decode().strip() == source_head, 'Declared feature source differs from git HEAD')
     require(not command(['git', 'status', '--porcelain=v1', '-z', '--untracked-files=all'], root), 'Same-job checkout is dirty')
@@ -132,6 +143,7 @@ def check_same_job_sources(root, source_head, transport):
     names = [entry.split(b'\t', 1)[1].decode() for entry in current.split(b'\0') if entry]
     require(all(any(name == path or name.startswith(path + '/') for name in names) for path in SETUP_INPUTS),
             'A required Setup source path is absent')
+    receipt['macProjectBuild'] = validate_mac_project_build(command(['git', 'show', source_head + ':Makefile'], root))
     receipt['setupSources'] = {'status': 'verified', 'priorSourceHead': APP_HEAD, 'currentSourceHead': source_head,
                              'paths': list(SETUP_INPUTS), 'gitTreeManifestSHA256': hashlib.sha256(current).hexdigest(),
                              'gitTreeEntries': current.decode().split('\0')[:-1]}

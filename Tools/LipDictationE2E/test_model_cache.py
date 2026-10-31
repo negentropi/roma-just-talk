@@ -288,6 +288,7 @@ class ModelCacheTests(unittest.TestCase):
                 git('init', '-q')
                 (root / 'Setup.swift').write_text('original installer')
                 (root / 'Policy.swift').write_text('old policy')
+                (root / 'Makefile').write_bytes((Path(__file__).resolve().parents[2] / 'Makefile').read_bytes())
                 prior = commit()
                 (root / 'Policy.swift').write_text('fixed policy')
                 if change == 'setup':
@@ -302,10 +303,66 @@ class ModelCacheTests(unittest.TestCase):
                 git('checkout', '-q', '--detach', feature)
                 if change == 'dirty':
                     (root / 'Setup.swift').write_text('dirty installer')
-                with patch.object(cache, 'APP_HEAD', prior), patch.object(cache, 'SETUP_INPUTS', ('Setup.swift',)):
+                with patch.object(cache, 'APP_HEAD', prior), patch.object(cache, 'SETUP_INPUTS', ('Setup.swift', 'Makefile')):
                     if change == 'none':
                         receipt = cache.check_same_job_sources(root, feature, transport)
                         self.assertEqual(receipt['setupSources']['currentSourceHead'], feature)
+                    else:
+                        with self.assertRaises(ArtifactError):
+                            cache.check_same_job_sources(root, feature, transport)
+
+    def test_project_setup_scope_accepts_only_unused_workspace_sync(self):
+        actual_root = Path(__file__).resolve().parents[2]
+        original_makefile = (actual_root / 'Makefile').read_bytes()
+        workspace_lock = 'VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved'
+        for change in ('workspace-only', 'setup', 'mac-project', 'makefile', 'workspace-build'):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+
+                def git(*arguments):
+                    return subprocess.check_output(['git', '-c', 'user.name=Proof Fixture', '-c', 'user.email=fixture@example.invalid',
+                                                    '-c', 'commit.gpgsign=false', '-c', 'core.hooksPath=/dev/null',
+                                                    *arguments], cwd=root, stderr=subprocess.DEVNULL).decode().strip()
+
+                def put(name, data):
+                    path = root / name
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(data)
+
+                def commit():
+                    git('add', '.')
+                    git('commit', '-qm', 'fixture')
+                    return git('rev-parse', 'HEAD')
+
+                git('init', '-q')
+                for name in cache.SETUP_INPUTS:
+                    put(name + '/fixture' if (actual_root / name).is_dir() else name, b'unchanged setup input')
+                makefile = original_makefile
+                if change == 'workspace-build':
+                    makefile = makefile.replace(b'xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)"',
+                                                b'xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk -configuration "$(CONFIGURATION)"')
+                put('Makefile', makefile)
+                put(cache.LOCK, b'actual Mac project pins')
+                put(workspace_lock, b'old iOS workspace pins')
+                prior = commit()
+                put(workspace_lock, b'synchronized iOS workspace pins; actual Mac project pins unchanged')
+                if change == 'setup':
+                    put('VoiceInk/Transcription/LipDictation/LipDictationManager.swift', b'changed setup implementation')
+                elif change == 'mac-project':
+                    put(cache.LOCK, b'changed actual Mac dependency')
+                elif change == 'makefile':
+                    put('Makefile', makefile + b'\n# changed build contract\n')
+                feature = commit()
+                put(cache.SAME_JOB_WORKFLOW, workflow(feature))
+                transport = commit()
+                git('checkout', '-q', '--detach', feature)
+                with patch.object(cache, 'APP_HEAD', prior):
+                    if change == 'workspace-only':
+                        cache.check_same_job_sources(root, feature, transport)
+                        # Known-bad scope rejects the same harmless workspace-only synchronization.
+                        with patch.object(cache, 'SETUP_INPUTS', (*cache.SETUP_INPUTS, 'VoiceInk.xcworkspace')):
+                            with self.assertRaises(ArtifactError):
+                                cache.check_same_job_sources(root, feature, transport)
                     else:
                         with self.assertRaises(ArtifactError):
                             cache.check_same_job_sources(root, feature, transport)

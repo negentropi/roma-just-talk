@@ -211,7 +211,7 @@ extension VoiceInkTests {
         defer { NotificationCenter.default.removeObserver(observer) }
         fixture.context.delete(pending)
         try fixture.context.save()
-        VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(for: storedAudio) { Issue.record($0) }
+        VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(for: storedAudio) { Issue.record(Comment(rawValue: $0)) }
 
         gate.release()
         await start.value

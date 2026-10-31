@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import socket
+import stat
 import subprocess
 import sys
 import time
@@ -25,6 +26,9 @@ FIXTURE_URL = 'https://media.githubusercontent.com/media/CheyneyComputerScience/
 mounted = False
 started_obs = False
 probe_process = None
+failed_postrestart_output = False
+OBS_LOG_LIMIT = 1024 * 1024
+OBS_ACTIVATED_MESSAGE = 'macOS Camera Extension activated successfully.'
 
 
 def run(name, arguments, timeout=40, required=False):
@@ -64,15 +68,20 @@ def ui(name, approve=False, authenticate=False, acknowledge_obs_alert=False):
     run(name, command, timeout=20)
 
 
-def obs_process_ids():
-    result = subprocess.run(['/usr/bin/pgrep', '-x', 'OBS'], capture_output=True, text=True, timeout=5)
+def obs_process_ids(deadline=None):
+    def timeout():
+        remaining = 5 if deadline is None else min(5, deadline - time.monotonic())
+        if remaining <= 0:
+            raise RuntimeError('OBS process inspection deadline expired')
+        return remaining
+    result = subprocess.run(['/usr/bin/pgrep', '-x', 'OBS'], capture_output=True, text=True, timeout=timeout())
     if result.returncode == 1:
         return []
     if result.returncode != 0:
         raise RuntimeError('Could not inspect the probe-owned OBS process')
     verified = []
     for identifier in result.stdout.split():
-        process = subprocess.run(['/bin/ps', '-p', identifier, '-o', 'comm='], capture_output=True, text=True, timeout=5)
+        process = subprocess.run(['/bin/ps', '-p', identifier, '-o', 'comm='], capture_output=True, text=True, timeout=timeout())
         if process.returncode != 0:
             continue
         if process.stdout.strip() != '/Applications/OBS.app/Contents/MacOS/OBS':
@@ -90,6 +99,105 @@ def observe_obs_exit(restart):
             return True
         time.sleep(0.25)
     return False
+
+
+def obs_log_inventory(directory):
+    info = directory.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid():
+        raise RuntimeError('OBS log directory is not a runner-owned non-symlink directory')
+    entries = list(directory.iterdir())
+    if len(entries) > 32:
+        raise RuntimeError('OBS log inventory exceeds its bound')
+    inventory = {}
+    for path in entries:
+        entry = path.lstat()
+        birth = getattr(entry, 'st_birthtime_ns', None)
+        if birth is None and hasattr(entry, 'st_birthtime'):
+            birth = int(entry.st_birthtime * 1_000_000_000)
+        inventory[path.name] = {'device': entry.st_dev, 'inode': entry.st_ino, 'uid': entry.st_uid,
+                                'regular': stat.S_ISREG(entry.st_mode), 'size': entry.st_size,
+                                'createdAtNs': birth, 'modifiedAtNs': entry.st_mtime_ns}
+    return inventory
+
+
+def read_obs_log(path, identity):
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(descriptor, 'rb') as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or (info.st_dev, info.st_ino) != (identity['device'], identity['inode']):
+            raise RuntimeError('Selected OBS log identity, ownership, or regular-file check failed')
+        return stream.read(OBS_LOG_LIMIT + 1)
+
+
+def wait_for_obs_activation(directory, before, expected_pid, launch_ns):
+    started = time.monotonic()
+    deadline = started + 30
+    receipt = {'status': 'waiting', 'expectedPID': expected_pid, 'launchRequestedAtNs': launch_ns,
+               'waitStartedAtNs': time.time_ns(), 'waitLimitSeconds': 30, 'byteLimit': OBS_LOG_LIMIT,
+               'inventoryBeforeLaunch': before, 'flatLog': 'obs-restarted-process.log'}
+    summary['obsActivationReadiness'] = receipt
+    captured = b''
+    selected = None
+    try:
+        while time.monotonic() < deadline:
+            os.kill(expected_pid, 0)
+            current = obs_log_inventory(directory)
+            receipt['inventoryAtLastObservation'] = current
+            new = sorted(set(current) - set(before))
+            receipt['newLogCandidates'] = new
+            if len(new) > 1:
+                raise RuntimeError('Multiple new OBS logs cannot bind the activation callback to this launch')
+            if new:
+                name = new[0]
+                identity = current[name]
+                if not identity['regular'] or identity['uid'] != os.getuid() or identity['createdAtNs'] is None or identity['createdAtNs'] < launch_ns:
+                    raise RuntimeError('New OBS log is not a regular runner-owned file created for this launch')
+                if selected is not None and (name, identity['device'], identity['inode']) != selected:
+                    raise RuntimeError('New OBS log identity changed during activation observation')
+                selected = (name, identity['device'], identity['inode'])
+                receipt.update(selectedLog=str(directory / name), selectedLogIdentity=identity)
+                captured = read_obs_log(directory / name, identity)
+                if len(captured) > OBS_LOG_LIMIT:
+                    raise RuntimeError('New OBS log exceeds the bounded snapshot size')
+                lines = captured.decode('utf-8', errors='replace').splitlines()
+                events = []
+                for number, line in enumerate(lines, 1):
+                    if line.rstrip().endswith(OBS_ACTIVATED_MESSAGE):
+                        phase = 'completed'
+                    elif line.rstrip().endswith('macOS Camera Extension user approval required.'):
+                        phase = 'approvalRequired'
+                    elif line.rstrip().endswith('macOS Camera Extension will activate after reboot.'):
+                        phase = 'rebootRequired'
+                    elif 'mac-camera-extension: OSSystemExtensionErrorCode ' in line or 'mac-camera-extension: OBS cannot install the virtual camera' in line:
+                        phase = 'activationError'
+                    else:
+                        continue
+                    events.append({'phase': phase, 'line': line, 'lineNumber': number})
+                latest_event = events[-1] if events else None
+                receipt['latestActivationEvent'] = latest_event
+                if latest_event and latest_event['phase'] in ['rebootRequired', 'activationError']:
+                    receipt['activationFailureLine'] = latest_event['line']
+                    raise RuntimeError('New OBS process reported an activation error or reboot requirement')
+                if latest_event and latest_event['phase'] == 'completed':
+                    receipt['activationCompletedLine'] = latest_event['line']
+                    latest = obs_log_inventory(directory)
+                    if sorted(set(latest) - set(before)) != [name] or (latest[name]['device'], latest[name]['inode']) != selected[1:]:
+                        raise RuntimeError('OBS log binding changed before callback acceptance')
+                    observed = obs_process_ids(deadline=deadline)
+                    receipt['processIDsAtAcceptance'] = observed
+                    if observed != [expected_pid]:
+                        raise RuntimeError('Owned OBS process changed before callback acceptance')
+                    receipt.update(status='activationCompleted', acceptedAtNs=time.time_ns())
+                    return
+            time.sleep(min(0.2, max(0, deadline - time.monotonic())))
+        raise RuntimeError('New OBS process activation-completed callback was not observed before deadline')
+    except Exception as error:
+        receipt.update(status='blocked', failure=str(error))
+        raise
+    finally:
+        receipt.update(waitElapsedSeconds=time.monotonic() - started, snapshotBytes=min(len(captured), OBS_LOG_LIMIT), snapshotTruncated=len(captured) > OBS_LOG_LIMIT)
+        (OUT / 'obs-restarted-process.log').write_bytes(captured[:OBS_LOG_LIMIT])
+        (OUT / 'obs-activation-readiness.json').write_text(json.dumps(receipt, indent=2) + '\n')
 
 
 try:
@@ -281,6 +389,10 @@ try:
         screenshot('obs-restart-exit-blocked')
         state = summary.get('obsCameraAlertAfterBlockedQuit', {'status': 'notInspected'}).get('status')
         raise RuntimeError('OBS did not exit for its documented camera-extension restart; camera-alert state=' + str(state) + ', acknowledgement attempts=' + str(restart['alertAcknowledgementCount']))
+    log_directory = config / 'logs'
+    logs_before_reopen = obs_log_inventory(log_directory)
+    restart['logInventoryCapturedAtNs'] = time.time_ns()
+    launch_ns = time.time_ns()
     run('restart-obs-open', ['/usr/bin/open', '-a', str(installed), '--args', '--profile', 'RJTLipProof', '--disable-updater'], required=True)
     websocket_deadline = time.monotonic() + 25
     while time.monotonic() < websocket_deadline:
@@ -297,8 +409,13 @@ try:
         ui('obs-restart-endpoint-blocked')
         screenshot('obs-restart-endpoint-blocked')
         raise RuntimeError('Restarted OBS did not expose its WebSocket endpoint before the bounded deadline')
+    if len(restart['processIDsAfter']) != 1 or restart['processIDsAfter'][0] in restart['processIDsBefore']:
+        raise RuntimeError('Restart did not establish one new owned OBS process')
+    wait_for_obs_activation(log_directory, logs_before_reopen, restart['processIDsAfter'][0], launch_ns)
+    summary['obsActivationReadiness']['outputControlInvokedAtNs'] = time.time_ns()
     retry = run('retry-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-retry.json'), 'require-output'], timeout=60)
     if retry != 0:
+        failed_postrestart_output = True
         ui('obs-restart-output-blocked')
         screenshot('obs-restart-output-blocked')
         raise RuntimeError('Restarted OBS did not activate virtual camera output; see authenticated RPC receipt')
@@ -333,6 +450,17 @@ finally:
         keep_obs = os.environ.get('LIP_CAMERA_PROBE_KEEP_OBS_RUNNING') == '1' and summary['status'] == 'supportedDeviceReady'
         summary['obsRetainedForE2E'] = keep_obs
         if not keep_obs:
+            if failed_postrestart_output:
+                try:
+                    expected = summary['obsActivationReadiness']['expectedPID']
+                    if obs_process_ids() == [expected]:
+                        ui('obs-output-failure-cleanup-alert', acknowledge_obs_alert=True)
+                        alert_path = OUT / 'obs-output-failure-cleanup-alert.json'
+                        summary['obsOutputFailureCleanupAlert'] = json.loads(alert_path.read_text()) if alert_path.is_file() else {'status': 'helperReceiptMissing'}
+                    else:
+                        summary['obsOutputFailureCleanupAlert'] = {'status': 'expectedProducerNoLongerCurrent'}
+                except Exception as error:
+                    summary['obsOutputFailureCleanupAlert'] = {'status': 'helperUnavailable', 'failure': str(error)}
             try:
                 receipt = OUT / 'obs-cleanup.json'
                 code = run('close-obs', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(receipt), 'stop-and-quit'], timeout=55)
@@ -345,6 +473,15 @@ finally:
                 summary.setdefault('failure', str(error))
                 summary['status'] = 'blocked'
         run('obs-log-copy', ['/bin/cp', '-R', str(Path.home() / 'Library/Application Support/obs-studio/logs'), str(OUT / 'obs-logs')])
+        readiness = summary.get('obsActivationReadiness', {})
+        if readiness.get('selectedLog'):
+            try:
+                content = read_obs_log(Path(readiness['selectedLog']), readiness['selectedLogIdentity'])
+                (OUT / 'obs-restarted-process.log').write_bytes(content[:OBS_LOG_LIMIT])
+                readiness.update(finalSnapshotBytes=min(len(content), OBS_LOG_LIMIT), finalSnapshotTruncated=len(content) > OBS_LOG_LIMIT)
+            except Exception as error:
+                readiness['finalSnapshotFailure'] = str(error)
+            (OUT / 'obs-activation-readiness.json').write_text(json.dumps(readiness, indent=2) + '\n')
     run('extensions-final', ['/usr/bin/systemextensionsctl', 'list'])
     run('extension-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', 'process == "sysextd" AND eventMessage CONTAINS[c] "obsproject"'], timeout=25)
     run('approval-ui-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', '(process == "System Settings" OR process == "SecurityAgent" OR process == "authd" OR process == "authorizationhost" OR process == "coreauthd") AND (eventMessage CONTAINS[c] "obs" OR eventMessage CONTAINS[c] "extension" OR eventMessage CONTAINS[c] "authenticate" OR eventMessage CONTAINS[c] "authoriz")'], timeout=25)

@@ -104,6 +104,7 @@ class ArtifactTests(unittest.TestCase):
 
     def test_only_exact_proof_paths_can_differ(self):
         self.assertEqual(artifact.check_changed_paths(b'Tools/LipDictationE2E/VisualCases.swift\0'), ['Tools/LipDictationE2E/VisualCases.swift'])
+        self.assertEqual(artifact.check_changed_paths(b'Tools/LipCameraProbe/run.py\0'), ['Tools/LipCameraProbe/run.py'])
         for path in ['VoiceInk/Recorder.swift', 'VoiceInkLip/Package.swift', 'Makefile', 'LocalBuild.xcconfig',
                      'VoiceInkTests/RecordingRecognitionTests.swift', '.github/workflows/lip-dictation-app.yml',
                      'Tools/LipDictationE2E/other.py', 'Tools/LipDictationE2E/../VoiceInk/Recorder.swift']:

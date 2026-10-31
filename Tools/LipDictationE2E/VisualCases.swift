@@ -690,17 +690,53 @@ struct LipVisualCases {
         var ancestor = control
         for _ in 0..<24 {
             if RuntimeAX.stringAttribute(kAXRoleAttribute, from: ancestor) == kAXScrollAreaRole,
-               let frame = verifiedFrame(ancestor, in: app).frame, CGPreflightPostEventAccess() {
-                for _ in 0..<4 {
-                    guard let controlFrame = RuntimeAX.frame(of: control) else { return false }
+               verifiedFrame(ancestor, in: app).frame != nil, CGPreflightPostEventAccess() {
+                func observation() -> [String: Any] {
+                    var result: [String: Any] = ["controlFrameRejection": verifiedFrame(control, in: app).rejection ?? "none"]
+                    if let frame = RuntimeAX.frame(of: control), finiteFrame(frame) { result["controlFrame"] = frameReceipt(frame) }
+                    if let bar = axElements(ancestor, attribute: kAXVerticalScrollBarAttribute).first,
+                       sameOwnedWindow(ancestor, bar, app: app), RuntimeAX.stringAttribute(kAXRoleAttribute, from: bar) == kAXScrollBarRole {
+                        var values: [String: Any] = ["enabled": enabled(bar)]
+                        for attribute in [kAXValueAttribute, kAXMinValueAttribute, kAXMaxValueAttribute] {
+                            var value: CFTypeRef?
+                            if AXUIElementCopyAttributeValue(bar, attribute as CFString, &value) == .success,
+                               let number = value as? NSNumber, number.doubleValue.isFinite { values[attribute] = number }
+                        }
+                        result["verticalScrollBar"] = values
+                    } else { result["verticalScrollBarUnavailable"] = true }
+                    return result
+                }
+                for attempt in 1...4 {
+                    guard let frame = verifiedFrame(ancestor, in: app).frame,
+                          sameOwnedWindow(ancestor, control, app: app),
+                          let controlFrame = RuntimeAX.frame(of: control), finiteFrame(controlFrame) else { return false }
                     let delta: Int32 = controlFrame.midY > frame.midY ? -400 : 400
                     let point = CGPoint(x: frame.midX, y: frame.midY)
                     guard let move = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left),
                           let scroll = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: delta, wheel2: 0, wheel3: 0) else { return false }
+                    var action: [String: Any] = ["method": "ownedScroll", "attempt": attempt, "frame": frameReceipt(frame),
+                        "delta": delta, "before": observation(), "createdFlags": scroll.flags.rawValue]
+                    let createdLocation = scroll.location
+                    if createdLocation.x.isFinite, createdLocation.y.isFinite {
+                        action["createdLocation"] = ["x": createdLocation.x, "y": createdLocation.y]
+                    }
+                    // The wheel carries its own location; an earlier posted move does not set it.
+                    scroll.location = point
+                    scroll.flags = []
+                    move.flags = []
+                    action["postedLocation"] = ["x": scroll.location.x, "y": scroll.location.y]
+                    action["postedFlags"] = scroll.flags.rawValue
+                    action["postedDeltaAxis1"] = scroll.getIntegerValueField(.scrollWheelEventDeltaAxis1)
+                    action["postedPointDeltaAxis1"] = scroll.getIntegerValueField(.scrollWheelEventPointDeltaAxis1)
+                    if let event = NSEvent(cgEvent: scroll) {
+                        action["postedScrollingDeltaY"] = event.scrollingDeltaY
+                        action["postedDirectionInvertedFromDevice"] = event.isDirectionInvertedFromDevice
+                    }
                     move.post(tap: .cghidEventTap)
                     scroll.post(tap: .cghidEventTap)
-                    actions.append(["method": "ownedScroll", "frame": frameReceipt(frame), "delta": delta])
                     wait(0.2)
+                    action["after"] = observation()
+                    actions.append(action)
                     if let visible = verifiedFrame(control, in: app).frame, frame.contains(visible) { return true }
                 }
                 return false

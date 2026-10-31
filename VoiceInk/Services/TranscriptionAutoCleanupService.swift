@@ -151,18 +151,15 @@ class TranscriptionAutoCleanupService {
             })
 
             guard FileManager.default.fileExists(atPath: recordingsDirectory.path) else { return }
-            let filesInDirectory = try FileManager.default.contentsOfDirectory(
-                at: recordingsDirectory,
-                includingPropertiesForKeys: nil
+            let orphanedFiles = try VoiceInkStoredAudioFile.orphanedFiles(
+                in: recordingsDirectory,
+                referencedFileNames: referencedFiles
             )
 
             var deletedCount = 0
-            for fileURL in filesInDirectory {
-                let fileName = fileURL.lastPathComponent
-                if !referencedFiles.contains(fileName) {
-                    try? FileManager.default.removeItem(at: fileURL)
-                    deletedCount += 1
-                }
+            for fileURL in orphanedFiles {
+                try? FileManager.default.removeItem(at: fileURL)
+                deletedCount += 1
             }
 
             if deletedCount > 0 {

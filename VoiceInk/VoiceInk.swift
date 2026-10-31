@@ -191,11 +191,16 @@ struct VoiceInkApp: App {
         AppShortcuts.updateAppShortcutParameters()
 
         StoredAudioCompressionService.shared.startMonitoring()
+        let launchDate = Date()
         let migrationTask = SessionMetricMigrationService.shared.runIfNeeded(modelContainer: resolvedContainer)
         let mainContext = resolvedContainer.mainContext
         Task {
             await migrationTask?.value
             TranscriptionAutoCleanupService.shared.startMonitoring(modelContext: mainContext)
+            await StoredAudioCompressionService.shared.compressExistingRecordings(
+                in: mainContext,
+                createdBefore: launchDate
+            )
         }
     }
 

@@ -187,6 +187,24 @@ def camera_source_binding(camera, proof_head, same_job_app=None):
                          if same_job_app is not None else 'The probe receipt matches the exact checked-out proof source.')}
 
 
+def cached_setup_passed(result, cached_model, same_job_build):
+    """Keep current installed-state observations separate from immutable prior Setup."""
+    if not (result.get('actualSetupButtonPressed') is False and result.get('freshDownloadAssessed') is False
+            and all(result.get(key) is True for key in ('actualSetupUIReady', 'initialMasterOffObserved',
+                    'initialLipsOnlyOffObserved', 'finalMasterOffObserved', 'finalLipsOnlyOffObserved'))):
+        return False
+    if not same_job_build:
+        return result.get('priorSetupRun') == cached_model['priorSetup']['run']
+    native = cached_model.get('nativeInstall', {})
+    return (cached_model.get('status') == 'verified'
+            and cached_model.get('setupProfile') == result.get('setupProfile') == 'currentNativeCachedInstall'
+            and native.get('passed') is True and native.get('nativeFullVerificationPassed') is True
+            and native.get('storageFileCount') == 658 and cached_model.get('historicalSetupUsed') is False
+            and result.get('currentFreshSetupAssessed') is False and result.get('historicalSetupUsed') is False
+            and result.get('actualModeControlsChanged') is True and 'priorSetup' not in cached_model
+            and not any(key in result for key in ('priorSetupRun', 'priorSetupSourceHead', 'priorSetupSameExecutable')))
+
+
 def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup, cached_model=None):
     visual_config = evidence / 'visual-config.json'
     write(visual_config, configuration)
@@ -245,9 +263,10 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         before_ids = {row['Z_PK'] for row in before}
         command = ['/usr/bin/open', '-W', '-n', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--obs-config', websocket, '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
         if scenario == 'setup' and cached_model is not None:
-            command += ['--prior-setup-run', cached_model['priorSetup']['run']]
-            if cached_model['priorSetup']['evidenceScope'] == 'unchangedSetupSources':
-                command += ['--prior-setup-source-head', cached_model['priorSetup']['appBuildHead']]
+            if args.same_job_build:
+                command += ['--cached-install-profile', 'currentNativeCachedInstall']
+            else:
+                command += ['--prior-setup-run', cached_model['priorSetup']['run']]
         deny_microphone = scenario == 'lips'
         if deny_microphone:
             microphone_tcc_fixture(evidence, run, 'microphone-authorized-before-lips', 2)
@@ -295,9 +314,7 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             if cached_model is None:
                 passed = passed and result.get('actualSetupButtonPressed') is True and result.get('freshDownloadAssessed') is True
             else:
-                passed = passed and result.get('actualSetupButtonPressed') is False and result.get('freshDownloadAssessed') is False and result.get('priorSetupRun') == cached_model['priorSetup']['run'] and result.get('actualSetupUIReady') is True and result.get('initialMasterOffObserved') is True and result.get('initialLipsOnlyOffObserved') is True and result.get('finalMasterOffObserved') is True and result.get('finalLipsOnlyOffObserved') is True
-                if cached_model['priorSetup']['evidenceScope'] == 'unchangedSetupSources':
-                    passed = passed and result.get('setupProfile') == 'verifiedCachedModelWithPriorSetupSources' and result.get('priorSetupSameExecutable') is False and result.get('priorSetupSourceHead') == cached_model['priorSetup']['appBuildHead']
+                passed = passed and cached_setup_passed(result, cached_model, args.same_job_build)
         if positive:
             passed = passed and len(created) == 1 and completed[0]['ZTEXT'].strip() != ''
             if scenario == 'lips':
@@ -325,8 +342,8 @@ def parse_arguments(arguments=None):
     parser.add_argument('--app', type=Path)
     parser.add_argument('--app-source-head')
     parser.add_argument('--producer-run', type=int, help='Verify and reuse an immutable Release artifact with identical app and build sources')
-    parser.add_argument('--same-job-build', action='store_true', help='Verify a fresh Release built by the dedicated hosted wrapper; prior Setup covers unchanged sources only')
-    parser.add_argument('--model-cache-run', type=int, help='Use the pinned CI checkpoint through the unchanged native installer with explicitly scoped prior Setup evidence')
+    parser.add_argument('--same-job-build', action='store_true', help='Verify the current hosted Release and native cached installation; no historical Setup transfer or current button/download assessment')
+    parser.add_argument('--model-cache-run', type=int, help='Install the pinned CI checkpoint through the current native installer; immutable replay also requires prior same-executable Setup evidence')
     parser.add_argument('--build-helper-only', action='store_true', help='Compile, link, sign, and load the native helper without app, models, OBS, or TCC changes')
     parser.add_argument('--visual', action='store_true', help='After voice passes, provision OBS and run real visual app scenarios')
     parser.add_argument('--obs-summary', type=Path, help='Reuse a successful same-host OBS probe receipt that retained OBS')
@@ -423,7 +440,7 @@ def main():
                 verified_app = prepare_same_job_app(ROOT, evidence, app, args.app_source_head)
                 summary['sameJobBuildProvenance'] = verified_app.provenance
                 summary['transportHead'] = verified_app.provenance['transportHead']
-                summary['appSourceBoundary'] = 'Fresh Release built by this hosted job from the declared feature checkout. Its transport commit adds only the reviewed wrapper; prior Setup covers unchanged sources, not this executable.'
+                summary['appSourceBoundary'] = 'Fresh Release built by this hosted job from the declared feature checkout. Its transport commit adds only the reviewed wrapper. Current cached installation and app behavior are assessed without transferring historical Setup; the current Set Up button and fresh publisher download remain unassessed.'
         if not app.is_dir():
             raise RuntimeError('Built app bundle missing')
         with (app / 'Contents/Info.plist').open('rb') as stream:

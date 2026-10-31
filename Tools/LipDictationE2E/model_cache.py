@@ -40,16 +40,6 @@ CHECKOUT_ACTION = '11d5960a326750d5838078e36cf38b85af677262'
 SAME_JOB_STEPS = ('Build release app', 'Run Debug unit tests',
                   'Prove microphone, paste, auto-send, Power Mode, and permission regressions', 'Package app')
 SAME_JOB_E2E = 'Verify current real voice and lip dictation'
-SETUP_INPUTS = (
-    'VoiceInk/Views/Settings', 'VoiceInk/Transcription/LipDictation', 'VoiceInk/Transcription/Engine',
-    'VoiceInk/Services/CaptureAuthorizationDecision.swift', 'VoiceInk/VoiceInk.swift', 'VoiceInk/AppDefaults.swift', 'VoiceInk/Info.plist',
-    'VoiceInk/VoiceInk.entitlements', 'VoiceInk/VoiceInk.local.entitlements',
-    'VoiceInkCore/Sources/VoiceInkCore/LipDictationPreference.swift',
-    'VoiceInkCore/Sources/VoiceInkCore/StoredAudioFile.swift', 'VoiceInkCore/Package.swift', 'VoiceInkCore/Package.resolved',
-    'VoiceInkLip', 'VoiceInkNVIDIA', 'VoiceInkQwen', 'VoiceInk.xcodeproj',
-    'Makefile', 'LocalBuild.xcconfig', 'scripts/verify-static-whisper-xcframework.sh',
-    'scripts/verify-static-whisper-app.sh', 'scripts/verify-adhoc-library-validation.sh',
-)
 
 
 def write(path, value):
@@ -122,7 +112,7 @@ def validate_mac_project_build(raw):
     lines = re.findall(r'(?m)^\txcodebuild[^\n]*$', recipes[0])
     require(lines == ['\txcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)" \\']
             and re.findall(r'(?<!\S)-(?:project|workspace)\s+\S+', recipes[0]) == ['-project VoiceInk.xcodeproj'],
-            'Cached Setup source scope requires the exact existing Mac project build, not a workspace build')
+            'Same-job build requires the exact existing Mac project recipe, not a workspace build')
     return {'target': 'make local CONFIGURATION=Release', 'project': 'VoiceInk.xcodeproj', 'dependencyLock': LOCK,
             'boundary': 'The pinned local recipe uses xcodebuild -project. The root iOS workspace is not an input to this Mac build.'}
 
@@ -136,17 +126,7 @@ def check_same_job_sources(root, source_head, transport):
     require(changed == ('A\0' + SAME_JOB_WORKFLOW + '\0').encode(), 'Transport changes more than its one added wrapper')
     workflow = command(['git', 'show', transport + ':' + SAME_JOB_WORKFLOW], root)
     receipt = validate_same_job_workflow(workflow, source_head)
-    ensure_commit(root, APP_HEAD)
-    old = command(['git', 'ls-tree', '-r', '-z', APP_HEAD, '--', *SETUP_INPUTS], root)
-    current = command(['git', 'ls-tree', '-r', '-z', source_head, '--', *SETUP_INPUTS], root)
-    require(old and old == current, 'Prior Setup implementation, resources, dependencies, or build inputs changed')
-    names = [entry.split(b'\t', 1)[1].decode() for entry in current.split(b'\0') if entry]
-    require(all(any(name == path or name.startswith(path + '/') for name in names) for path in SETUP_INPUTS),
-            'A required Setup source path is absent')
     receipt['macProjectBuild'] = validate_mac_project_build(command(['git', 'show', source_head + ':Makefile'], root))
-    receipt['setupSources'] = {'status': 'verified', 'priorSourceHead': APP_HEAD, 'currentSourceHead': source_head,
-                             'paths': list(SETUP_INPUTS), 'gitTreeManifestSHA256': hashlib.sha256(current).hexdigest(),
-                             'gitTreeEntries': current.decode().split('\0')[:-1]}
     return receipt
 
 
@@ -191,7 +171,7 @@ def prepare_same_job_app(root, evidence, destination, source_head):
                    executableSHA256=file_sha256(destination / 'Contents/MacOS/roma just talk'),
                    wholeBundleFingerprintSHA256=fingerprint, appResourceHashes=resource_hashes,
                    actualDependencyLockSHA256=hashlib.sha256(lock).hexdigest(),
-                   boundary='Fresh Release from the current trusted hosted job. Prior download evidence covers unchanged Setup sources only, not this executable.')
+                   boundary='Fresh Release from the current trusted hosted job. Current cached installation and app behavior are assessed separately; no historical Setup is transferred to this executable.')
     write(output / 'provenance.json', receipt)
     return VerifiedApp(destination, receipt, fingerprint, output)
 
@@ -202,7 +182,7 @@ def verify_same_job_unchanged(root, app):
         app.verify_unchanged()
         sources = check_same_job_sources(root, app.provenance['appBuildHead'], app.provenance['transportHead'])
         require(sources['workflowSHA256'] == app.provenance['workflowSHA256']
-                and sources['setupSources'] == app.provenance['setupSources'], 'Same-job source binding changed during proof')
+                and sources['macProjectBuild'] == app.provenance['macProjectBuild'], 'Same-job source binding changed during proof')
         _, _, resources = app_resources(root, app.app_path)
         require(resources == app.provenance['appResourceHashes'], 'Same-job lip resources changed during proof')
         executable = file_sha256(app.app_path / 'Contents/MacOS/roma just talk')
@@ -241,17 +221,9 @@ def validate_cache_artifact(artifact):
             'Cache artifact ID or API archive digest differs')
 
 
-def validate_prior_setup(setup, summary, app, setup_sources=None):
-    if setup_sources is None:
-        require(app.get('status') == 'verified' and app.get('producerRun') == SETUP_RUN and app.get('appBuildHead') == APP_HEAD
-                and app.get('executableSHA256') == APP_EXECUTABLE, 'Prior Setup does not belong to this immutable app')
-    else:
-        require(app.get('status') == 'verified' and app.get('buildOrigin') == 'sameJobRelease'
-                and app.get('appBuildHead') == app.get('proofHead') == setup_sources.get('currentSourceHead')
-                and setup_sources.get('status') == 'verified' and setup_sources.get('priorSourceHead') == APP_HEAD
-                and setup_sources.get('paths') == list(SETUP_INPUTS)
-                and re.fullmatch('[0-9a-f]{64}', setup_sources.get('gitTreeManifestSHA256', '')),
-                'Prior Setup sources are not bound to the verified current-job app')
+def validate_prior_setup(setup, summary, app):
+    require(app.get('status') == 'verified' and app.get('producerRun') == SETUP_RUN and app.get('appBuildHead') == APP_HEAD
+            and app.get('executableSHA256') == APP_EXECUTABLE, 'Prior Setup does not belong to this immutable app')
     require(all(summary.get(key) == APP_HEAD for key in ('sourceHead', 'declaredAppSourceHead', 'appBuildHead'))
             and summary.get('appExecutableSHA256') == APP_EXECUTABLE, 'Prior Setup app source or executable differs')
     require(setup.get('scenario') == 'setup' and all(setup.get(key) is True for key in
@@ -275,16 +247,12 @@ def prior_setup(work, evidence, app):
                     and found[0].file_size <= 1_000_000, 'Prior Setup report missing or unsafe')
             reports[name] = json.loads(archive.read(found[0]))
             write(evidence / ('prior-' + name), reports[name])
-    setup_sources = app.get('setupSources') if app.get('buildOrigin') == 'sameJobRelease' else None
-    validate_prior_setup(reports['setup.json'], reports['summary.json'], app, setup_sources)
-    same_binary = setup_sources is None
+    validate_prior_setup(reports['setup.json'], reports['summary.json'], app)
     return {'run': SETUP_RUN, 'artifactID': artifact['id'], 'archiveSHA256': artifact['digest'],
             'wholeArchiveDigestVerified': True, 'actualSetupButtonPressed': True,
             'appBuildHead': APP_HEAD, 'executableSHA256': APP_EXECUTABLE,
-            'sameExecutable': same_binary, 'evidenceScope': 'sameExecutable' if same_binary else 'unchangedSetupSources',
-            'setupSources': setup_sources,
-            'boundary': ('Prior real Set Up/download success for the same executable; not current fresh Setup.' if same_binary
-                         else 'Prior real Set Up/download success for a different executable with exactly unchanged Setup sources; no current fresh Set Up or download claim.')}
+            'sameExecutable': True, 'evidenceScope': 'sameExecutable', 'setupSources': None,
+            'boundary': 'Prior real Set Up/download success for the same executable; not current fresh Setup.'}
 
 
 def app_resources(root, app):
@@ -297,7 +265,7 @@ def app_resources(root, app):
         if path.is_file():
             actual = resources / path.relative_to(source)
             require(actual.is_file() and not actual.is_symlink() and file_sha256(actual) == file_sha256(path),
-                    'Actual app lip resource differs from unchanged source: ' + str(path.relative_to(source)))
+                    'Actual app lip resource differs from current source: ' + str(path.relative_to(source)))
             records.append({'path': path.relative_to(source).as_posix(), 'sha256': file_sha256(actual)})
     manifest = json.loads((resources / 'manifest.json').read_text())
     require(manifest['checkpoint_bytes'] == CHECKPOINT_BYTES and manifest['checkpoint_sha256'] == CHECKPOINT_SHA256
@@ -386,7 +354,18 @@ def prepare_cached_model(root, evidence, verified_app, requested, run_command):
     try:
         receipt['appBuild'] = {key: verified_app.provenance.get(key) for key in
                                ('buildOrigin', 'appBuildHead', 'proofHead', 'transportHead', 'executableSHA256', 'wholeBundleFingerprintSHA256')}
-        receipt['priorSetup'] = prior_setup(work, evidence, verified_app.provenance)
+        if verified_app.provenance.get('buildOrigin') == 'sameJobRelease':
+            app = verified_app.provenance
+            require(app.get('status') == 'verified' and app.get('appBuildHead') == app.get('proofHead')
+                    and all(isinstance(app.get(key), str) for key in ('appBuildHead', 'transportHead'))
+                    and re.fullmatch('[0-9a-f]{40}', app.get('appBuildHead', ''))
+                    and re.fullmatch('[0-9a-f]{40}', app.get('transportHead', '')),
+                    'Current cached installation requires verified same-job app provenance')
+            receipt.update(setupProfile='currentNativeCachedInstall', historicalSetupUsed=False,
+                           actualSetupButtonPressed=False,
+                           boundary='Current native LipModelStore installation of verified cached publisher bytes, followed by current app readiness, controls and real inference. No historical Setup transfer, current Set Up button, or fresh publisher download is assessed.')
+        else:
+            receipt['priorSetup'] = prior_setup(work, evidence, verified_app.provenance)
         resources, manifest, receipt['appResourceHashes'] = app_resources(root, verified_app.app_path)
         cache_run = api(f'repos/{REPOSITORY}/actions/runs/{requested}')
         jobs = api(f'repos/{REPOSITORY}/actions/runs/{requested}/attempts/1/jobs?per_page=100')

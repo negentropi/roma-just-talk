@@ -134,6 +134,69 @@ class ModelCacheTests(unittest.TestCase):
             with self.subTest(arguments=arguments), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 runner.parse_arguments(arguments)
 
+    def test_same_job_cached_install_does_not_transfer_historical_setup(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            runner_temp = root / 'runner'
+            runner_temp.mkdir()
+            app = SimpleNamespace(app_path=root / 'app', provenance={
+                'status': 'verified', 'buildOrigin': 'sameJobRelease',
+                'appBuildHead': 'a' * 40, 'proofHead': 'a' * 40, 'transportHead': 'b' * 40})
+            with patch.dict(cache.os.environ, {'RUNNER_TEMP': str(runner_temp)}), \
+                    patch.object(cache, 'prior_setup', side_effect=AssertionError('Historical Setup must not transfer')) as prior, \
+                    patch.object(cache, 'app_resources', side_effect=RuntimeError('Fixture stops before network')) as resources, \
+                    patch.object(cache, 'api') as api:
+                with self.assertRaisesRegex(RuntimeError, 'Fixture stops before network'):
+                    cache.prepare_cached_model(root, evidence, app, cache.CACHE_RUN, Mock())
+                prior.assert_not_called()
+                resources.assert_called_once_with(root, app.app_path)
+                api.assert_not_called()
+            receipt = json.loads((evidence / 'model-cache.json').read_text())
+            self.assertNotIn('priorSetup', receipt)
+            self.assertEqual(receipt['setupProfile'], 'currentNativeCachedInstall')
+            for field in ('historicalSetupUsed', 'actualSetupButtonPressed',
+                          'freshDownloadAssessed', 'currentFreshSetupAssessed'):
+                self.assertIs(receipt[field], False)
+
+    def test_cached_install_refuses_unverified_same_job_provenance_before_network(self):
+        valid = {'status': 'verified', 'buildOrigin': 'sameJobRelease',
+                 'appBuildHead': 'a' * 40, 'proofHead': 'a' * 40, 'transportHead': 'b' * 40}
+        for field, value in [('status', 'blocked'), ('proofHead', 'c' * 40), ('transportHead', 'main'), ('transportHead', None)]:
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                evidence = root / 'evidence'
+                evidence.mkdir()
+                app = SimpleNamespace(app_path=root / 'app', provenance=dict(valid, **{field: value}))
+                with patch.dict(cache.os.environ, {'RUNNER_TEMP': str(root)}), \
+                        patch.object(cache, 'prior_setup') as prior, patch.object(cache, 'app_resources') as resources, \
+                        patch.object(cache, 'api') as api, self.assertRaises(ArtifactError):
+                    cache.prepare_cached_model(root, evidence, app, cache.CACHE_RUN, Mock())
+                prior.assert_not_called()
+                resources.assert_not_called()
+                api.assert_not_called()
+
+    def test_immutable_cached_install_keeps_prior_same_executable_setup_route(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            app = SimpleNamespace(app_path=root / 'app', provenance={
+                'status': 'verified', 'producerRun': cache.SETUP_RUN,
+                'appBuildHead': cache.APP_HEAD, 'executableSHA256': cache.APP_EXECUTABLE})
+            prior_receipt = {'run': cache.SETUP_RUN, 'sameExecutable': True, 'evidenceScope': 'sameExecutable'}
+            with patch.dict(cache.os.environ, {'RUNNER_TEMP': str(root)}), \
+                    patch.object(cache, 'prior_setup', return_value=prior_receipt) as prior, \
+                    patch.object(cache, 'app_resources', side_effect=RuntimeError('Fixture stops before network')):
+                with self.assertRaisesRegex(RuntimeError, 'Fixture stops before network'):
+                    cache.prepare_cached_model(root, evidence, app, cache.CACHE_RUN, Mock())
+                prior.assert_called_once_with(root.resolve() / 'lip-model-cache-work', evidence, app.provenance)
+            receipt = json.loads((evidence / 'model-cache.json').read_text())
+            self.assertEqual(receipt['priorSetup'], prior_receipt)
+            self.assertNotIn('setupProfile', receipt)
+            self.assertFalse(receipt['currentFreshSetupAssessed'])
+
     def test_wrapper_checks_macos_checkout_and_build_without_confusing_ios(self):
         source = 'a' * 40
         raw = workflow(source)
@@ -185,27 +248,31 @@ class ModelCacheTests(unittest.TestCase):
         with self.assertRaises(ArtifactError):
             cache.validate_same_job_run(run, changed, environment)
 
-    def test_new_binary_setup_evidence_requires_the_exact_checked_source_contract(self):
-        setup = {'scenario': 'setup', 'passed': True, 'actualSetupButtonPressed': True,
-                 'actualSetupUIReady': True, 'actualModeControlsChanged': True, 'restored': True}
-        summary = {'sourceHead': cache.APP_HEAD, 'declaredAppSourceHead': cache.APP_HEAD,
-                   'appBuildHead': cache.APP_HEAD, 'appExecutableSHA256': cache.APP_EXECUTABLE}
-        app = {'status': 'verified', 'buildOrigin': 'sameJobRelease', 'appBuildHead': 'a' * 40,
-               'proofHead': 'a' * 40, 'executableSHA256': 'b' * 64}
-        sources = {'status': 'verified', 'priorSourceHead': cache.APP_HEAD, 'currentSourceHead': 'a' * 40,
-                   'paths': list(cache.SETUP_INPUTS), 'gitTreeManifestSHA256': 'c' * 64}
-        cache.validate_prior_setup(setup, summary, app, sources)
-        # The old immutable path must still reject this different executable.
-        with self.assertRaises(ArtifactError):
-            cache.validate_prior_setup(setup, summary, app)
-        for changed in [dict(sources, currentSourceHead='d' * 40), dict(sources, priorSourceHead='d' * 40),
-                        dict(sources, paths=sources['paths'][:-1]), dict(sources, status='blocked')]:
-            with self.assertRaises(ArtifactError):
-                cache.validate_prior_setup(setup, summary, app, changed)
-        with self.assertRaises(ArtifactError):
-            cache.validate_prior_setup(dict(setup, actualSetupButtonPressed=False), summary, app, sources)
-        with self.assertRaises(ArtifactError):
-            cache.validate_prior_setup(setup, dict(summary, appExecutableSHA256='d' * 64), app, sources)
+    def test_current_cached_setup_requires_native_install_and_actual_ui_without_prior_claims(self):
+        result = {'setupProfile': 'currentNativeCachedInstall', 'actualSetupButtonPressed': False,
+                  'freshDownloadAssessed': False, 'currentFreshSetupAssessed': False, 'historicalSetupUsed': False,
+                  'actualSetupUIReady': True, 'actualModeControlsChanged': True, 'initialMasterOffObserved': True,
+                  'initialLipsOnlyOffObserved': True, 'finalMasterOffObserved': True, 'finalLipsOnlyOffObserved': True}
+        model = {'status': 'verified', 'setupProfile': 'currentNativeCachedInstall', 'historicalSetupUsed': False,
+                 'nativeInstall': {'passed': True, 'nativeFullVerificationPassed': True, 'storageFileCount': 658}}
+        self.assertTrue(runner.cached_setup_passed(result, model, True))
+        for field in result:
+            changed = dict(result, **{field: not result[field] if type(result[field]) is bool else 'other'})
+            with self.subTest(field=field):
+                self.assertFalse(runner.cached_setup_passed(changed, model, True))
+        for field in ('priorSetupRun', 'priorSetupSourceHead', 'priorSetupSameExecutable'):
+            with self.subTest(prior=field):
+                self.assertFalse(runner.cached_setup_passed(dict(result, **{field: cache.SETUP_RUN}), model, True))
+        for changed in [dict(model, status='blocked'), dict(model, priorSetup={'run': cache.SETUP_RUN}),
+                        dict(model, historicalSetupUsed=True), dict(model, nativeInstall={}),
+                        dict(model, nativeInstall=dict(model['nativeInstall'], storageFileCount=657))]:
+            with self.subTest(model=changed):
+                self.assertFalse(runner.cached_setup_passed(result, changed, True))
+        prior = dict(result, setupProfile='verifiedCachedModelWithPriorSetup', priorSetupRun=cache.SETUP_RUN)
+        prior_model = {'priorSetup': {'run': cache.SETUP_RUN}}
+        self.assertTrue(runner.cached_setup_passed(prior, prior_model, False))
+        self.assertFalse(runner.cached_setup_passed(dict(prior, priorSetupRun=cache.SETUP_RUN + 1), prior_model, False))
+        self.assertFalse(runner.cached_setup_passed(prior, prior_model, True))
 
     def test_actual_app_resources_cannot_be_substituted_for_the_cached_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -233,14 +300,16 @@ class ModelCacheTests(unittest.TestCase):
             command.assert_not_called()
 
     def test_same_job_postcheck_refuses_changed_sources_resources_or_executable(self):
-        for changed in ('none', 'sources', 'resources', 'executable'):
+        for changed in ('none', 'sources', 'resources', 'executable', 'signature'):
             with self.subTest(changed=changed), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 provenance = {'appBuildHead': 'a' * 40, 'transportHead': 'b' * 40, 'workflowSHA256': 'c' * 64,
-                              'setupSources': {'original': True}, 'appResourceHashes': [{'sha256': 'd' * 64}],
+                              'macProjectBuild': {'project': 'VoiceInk.xcodeproj'}, 'appResourceHashes': [{'sha256': 'd' * 64}],
                               'executableSHA256': 'e' * 64}
-                app = SimpleNamespace(provenance=provenance, evidence=root, app_path=root / 'app', verify_unchanged=Mock())
-                source = {'workflowSHA256': 'f' * 64 if changed == 'sources' else 'c' * 64, 'setupSources': {'original': True}}
+                app = SimpleNamespace(provenance=provenance, evidence=root, app_path=root / 'app',
+                                      verify_unchanged=Mock(side_effect=ArtifactError('Signature changed') if changed == 'signature' else None))
+                source = {'workflowSHA256': 'f' * 64 if changed == 'sources' else 'c' * 64,
+                          'macProjectBuild': {'project': 'VoiceInk.xcodeproj'}}
                 resources = [{'sha256': 'f' * 64 if changed == 'resources' else 'd' * 64}]
                 with patch.object(cache, 'check_same_job_sources', return_value=source), \
                         patch.object(cache, 'app_resources', return_value=(root, {}, resources)), \
@@ -270,8 +339,8 @@ class ModelCacheTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 runner.camera_source_binding({'sourceHead': feature}, feature, app)
 
-    def test_real_git_transport_and_setup_source_drift_are_refused(self):
-        for change in ('none', 'dirty', 'setup', 'extra-transport', 'wrong-pin'):
+    def test_real_git_current_source_is_bound_without_historical_setup_equivalence(self):
+        for change in ('none', 'updated-setup', 'dirty', 'untracked', 'extra-transport', 'wrong-pin', 'wrong-head', 'workspace-build'):
             with self.subTest(change=change), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
 
@@ -291,8 +360,11 @@ class ModelCacheTests(unittest.TestCase):
                 (root / 'Makefile').write_bytes((Path(__file__).resolve().parents[2] / 'Makefile').read_bytes())
                 prior = commit()
                 (root / 'Policy.swift').write_text('fixed policy')
-                if change == 'setup':
+                if change == 'updated-setup':
                     (root / 'Setup.swift').write_text('changed installer')
+                if change == 'workspace-build':
+                    makefile = root / 'Makefile'
+                    makefile.write_bytes(makefile.read_bytes().replace(b'-project VoiceInk.xcodeproj', b'-workspace VoiceInk.xcworkspace'))
                 feature = commit()
                 wrapper = root / cache.SAME_JOB_WORKFLOW
                 wrapper.parent.mkdir(parents=True)
@@ -303,69 +375,19 @@ class ModelCacheTests(unittest.TestCase):
                 git('checkout', '-q', '--detach', feature)
                 if change == 'dirty':
                     (root / 'Setup.swift').write_text('dirty installer')
-                with patch.object(cache, 'APP_HEAD', prior), patch.object(cache, 'SETUP_INPUTS', ('Setup.swift', 'Makefile')):
-                    if change == 'none':
-                        receipt = cache.check_same_job_sources(root, feature, transport)
-                        self.assertEqual(receipt['setupSources']['currentSourceHead'], feature)
+                if change == 'untracked':
+                    (root / 'Unexpected.swift').write_text('untracked source')
+                declared = prior if change == 'wrong-head' else feature
+                with patch.object(cache, 'ensure_commit', wraps=cache.ensure_commit) as ensure:
+                    if change in ('none', 'updated-setup'):
+                        receipt = cache.check_same_job_sources(root, declared, transport)
+                        self.assertNotIn('setupSources', receipt)
+                        self.assertEqual(receipt['checkoutSourceHead'], feature)
+                        self.assertEqual(receipt['macProjectBuild']['dependencyLock'], cache.LOCK)
+                        self.assertEqual([call.args for call in ensure.call_args_list], [(root, transport)])
                     else:
                         with self.assertRaises(ArtifactError):
-                            cache.check_same_job_sources(root, feature, transport)
-
-    def test_project_setup_scope_accepts_only_unused_workspace_sync(self):
-        actual_root = Path(__file__).resolve().parents[2]
-        original_makefile = (actual_root / 'Makefile').read_bytes()
-        workspace_lock = 'VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved'
-        for change in ('workspace-only', 'setup', 'mac-project', 'makefile', 'workspace-build'):
-            with self.subTest(change=change), tempfile.TemporaryDirectory() as temporary:
-                root = Path(temporary)
-
-                def git(*arguments):
-                    return subprocess.check_output(['git', '-c', 'user.name=Proof Fixture', '-c', 'user.email=fixture@example.invalid',
-                                                    '-c', 'commit.gpgsign=false', '-c', 'core.hooksPath=/dev/null',
-                                                    *arguments], cwd=root, stderr=subprocess.DEVNULL).decode().strip()
-
-                def put(name, data):
-                    path = root / name
-                    path.parent.mkdir(parents=True, exist_ok=True)
-                    path.write_bytes(data)
-
-                def commit():
-                    git('add', '.')
-                    git('commit', '-qm', 'fixture')
-                    return git('rev-parse', 'HEAD')
-
-                git('init', '-q')
-                for name in cache.SETUP_INPUTS:
-                    put(name + '/fixture' if (actual_root / name).is_dir() else name, b'unchanged setup input')
-                makefile = original_makefile
-                if change == 'workspace-build':
-                    makefile = makefile.replace(b'xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)"',
-                                                b'xcodebuild -workspace VoiceInk.xcworkspace -scheme VoiceInk -configuration "$(CONFIGURATION)"')
-                put('Makefile', makefile)
-                put(cache.LOCK, b'actual Mac project pins')
-                put(workspace_lock, b'old iOS workspace pins')
-                prior = commit()
-                put(workspace_lock, b'synchronized iOS workspace pins; actual Mac project pins unchanged')
-                if change == 'setup':
-                    put('VoiceInk/Transcription/LipDictation/LipDictationManager.swift', b'changed setup implementation')
-                elif change == 'mac-project':
-                    put(cache.LOCK, b'changed actual Mac dependency')
-                elif change == 'makefile':
-                    put('Makefile', makefile + b'\n# changed build contract\n')
-                feature = commit()
-                put(cache.SAME_JOB_WORKFLOW, workflow(feature))
-                transport = commit()
-                git('checkout', '-q', '--detach', feature)
-                with patch.object(cache, 'APP_HEAD', prior):
-                    if change == 'workspace-only':
-                        cache.check_same_job_sources(root, feature, transport)
-                        # Known-bad scope rejects the same harmless workspace-only synchronization.
-                        with patch.object(cache, 'SETUP_INPUTS', (*cache.SETUP_INPUTS, 'VoiceInk.xcworkspace')):
-                            with self.assertRaises(ArtifactError):
-                                cache.check_same_job_sources(root, feature, transport)
-                    else:
-                        with self.assertRaises(ArtifactError):
-                            cache.check_same_job_sources(root, feature, transport)
+                            cache.check_same_job_sources(root, declared, transport)
 
 
 if __name__ == '__main__':

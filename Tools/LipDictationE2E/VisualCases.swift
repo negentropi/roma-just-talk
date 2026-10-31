@@ -39,12 +39,13 @@ struct LipVisualCases {
             guard let configPath = values["--config"], let outputPath = values["--output"],
                   let scenario = values["--scenario"], let appLog = values["--app-log"] else { throw ProofError.invalidArguments }
             let priorSetupRun = values["--prior-setup-run"].flatMap(Int.init)
-            let priorSetupSourceHead = values["--prior-setup-source-head"]
+            let cachedInstallProfile = values["--cached-install-profile"]
             if values["--prior-setup-run"] != nil {
                 guard scenario == "setup", let priorSetupRun, priorSetupRun > 0 else { throw ProofError.invalidArguments }
             }
-            if let priorSetupSourceHead {
-                guard priorSetupRun != nil, priorSetupSourceHead.range(of: "^[0-9a-f]{40}$", options: .regularExpression) != nil else { throw ProofError.invalidArguments }
+            if let cachedInstallProfile {
+                guard scenario == "setup", priorSetupRun == nil,
+                      cachedInstallProfile == "currentNativeCachedInstall" else { throw ProofError.invalidArguments }
             }
             output = URL(fileURLWithPath: outputPath)
             let configuration = try JSONDecoder().decode(RuntimeHarnessConfiguration.self, from: Data(contentsOf: URL(fileURLWithPath: configPath)))
@@ -65,14 +66,14 @@ struct LipVisualCases {
             report["scenario"] = scenario
             let application = try runningApp(configuration.voiceInkBundleIdentifier)
             if scenario == "setup" {
-                let cachedSetup = priorSetupRun != nil
-                report["setupProfile"] = priorSetupSourceHead != nil ? "verifiedCachedModelWithPriorSetupSources" : (cachedSetup ? "verifiedCachedModelWithPriorSetup" : "freshPublisherDownload")
+                let cachedSetup = priorSetupRun != nil || cachedInstallProfile != nil
+                report["setupProfile"] = cachedInstallProfile ?? (cachedSetup ? "verifiedCachedModelWithPriorSetup" : "freshPublisherDownload")
                 report["freshDownloadAssessed"] = !cachedSetup
                 report["actualSetupButtonPressed"] = false
                 if let priorSetupRun { report["priorSetupRun"] = priorSetupRun }
-                if let priorSetupSourceHead {
-                    report["priorSetupSourceHead"] = priorSetupSourceHead
-                    report["priorSetupSameExecutable"] = false
+                if cachedInstallProfile != nil {
+                    report["historicalSetupUsed"] = false
+                    report["currentFreshSetupAssessed"] = false
                 }
                 try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
                 if !cachedSetup {

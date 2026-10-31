@@ -28,6 +28,8 @@ PROOF_PATHS = frozenset({
     'Tools/LipDictationE2E/run.py',
     'Tools/LipDictationE2E/app_artifact.py',
     'Tools/LipDictationE2E/test_app_artifact.py',
+    'Tools/LipDictationE2E/model_cache.py',
+    'Tools/LipDictationE2E/test_model_cache.py',
     'Tools/LipCameraProbe/run.py',
     'Tools/LipCameraProbe/README.md',
     '.github/workflows/lip-dictation-replay.yml',

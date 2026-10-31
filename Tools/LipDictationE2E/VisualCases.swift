@@ -38,6 +38,10 @@ struct LipVisualCases {
             for index in stride(from: 1, to: arguments.count, by: 2) { values[arguments[index]] = arguments[index + 1] }
             guard let configPath = values["--config"], let outputPath = values["--output"],
                   let scenario = values["--scenario"], let appLog = values["--app-log"] else { throw ProofError.invalidArguments }
+            let priorSetupRun = values["--prior-setup-run"].flatMap(Int.init)
+            if values["--prior-setup-run"] != nil {
+                guard scenario == "setup", let priorSetupRun, priorSetupRun > 0 else { throw ProofError.invalidArguments }
+            }
             output = URL(fileURLWithPath: outputPath)
             let configuration = try JSONDecoder().decode(RuntimeHarnessConfiguration.self, from: Data(contentsOf: URL(fileURLWithPath: configPath)))
             if scenario == "negative-controls" {
@@ -57,21 +61,31 @@ struct LipVisualCases {
             report["scenario"] = scenario
             let application = try runningApp(configuration.voiceInkBundleIdentifier)
             if scenario == "setup" {
+                let cachedSetup = priorSetupRun != nil
+                report["setupProfile"] = cachedSetup ? "verifiedCachedModelWithPriorSetup" : "freshPublisherDownload"
+                report["freshDownloadAssessed"] = !cachedSetup
+                report["actualSetupButtonPressed"] = false
+                if let priorSetupRun { report["priorSetupRun"] = priorSetupRun }
                 try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
-                if let setup = find(application, label: "Set Up", roles: [kAXButtonRole]), enabled(setup.element) {
+                if !cachedSetup {
+                    guard let setup = find(application, label: "Set Up", roles: [kAXButtonRole]), enabled(setup.element) else { throw ProofError.setup }
                     report["setupControl"] = setup.evidence
                     try press(setup.element)
                     report["actualSetupButtonPressed"] = true
-                } else {
-                    report["actualSetupButtonPressed"] = false
                 }
-                let deadline = Date().addingTimeInterval(1200)
+                let deadline = Date().addingTimeInterval(cachedSetup ? 30 : 1200)
                 var ready = false
                 while Date() < deadline {
                     if let toggle = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]), enabled(toggle.element) {
-                        report["readyControl"] = toggle.evidence
-                        ready = true
-                        break
+                        let status = find(application, label: "Ready", roles: [kAXStaticTextRole])
+                        if !cachedSetup || status != nil {
+                            report["readyControl"] = toggle.evidence
+                            report["readyStatusControl"] = status?.evidence
+                            report["initialMasterOffObserved"] = toggleValue(toggle.element) == 0
+                            guard toggleValue(toggle.element) == 0 else { throw ProofError.setup }
+                            ready = true
+                            break
+                        }
                     }
                     if find(application, label: "Couldn't set up", roles: [kAXStaticTextRole]) != nil { break }
                     wait(0.5)
@@ -79,10 +93,22 @@ struct LipVisualCases {
                 guard ready else { throw ProofError.setup }
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("setup.png"))
                 try setToggle(application, label: "Read Lips While Dictating", value: 1, report: &report)
+                guard let lipsOnly = find(application, label: "Lips Only", roles: [kAXCheckBoxRole, "AXSwitch"]),
+                      enabled(lipsOnly.element), toggleValue(lipsOnly.element) == 0 else { throw ProofError.setup }
+                report["initialLipsOnlyOffObserved"] = true
+                report["initialLipsOnlyControl"] = lipsOnly.evidence
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("settings-combined.png"))
                 try setToggle(application, label: "Lips Only", value: 1, report: &report)
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("settings-lips-only.png"))
+                try setToggle(application, label: "Lips Only", value: 0, report: &report)
+                guard let finalLipsOnly = find(application, label: "Lips Only", roles: [kAXCheckBoxRole, "AXSwitch"]),
+                      toggleValue(finalLipsOnly.element) == 0 else { throw ProofError.setup }
+                report["finalLipsOnlyOffObserved"] = true
+                report["finalLipsOnlyControl"] = finalLipsOnly.evidence
                 try setToggle(application, label: "Read Lips While Dictating", value: 0, report: &report)
+                guard let finalMaster = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]),
+                      toggleValue(finalMaster.element) == 0 else { throw ProofError.setup }
+                report["finalMasterOffObserved"] = true
                 screenshot(output!.deletingLastPathComponent().appendingPathComponent("settings-off.png"))
                 report["actualSetupUIReady"] = true
                 report["actualModeControlsChanged"] = true

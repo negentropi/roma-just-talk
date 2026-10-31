@@ -172,7 +172,7 @@ def prepare_screen_capture(evidence, app, driver, name, run):
     return {'passed': True, 'captureReport': capture.name, 'consentReport': consent.name, 'screenshot': screenshot.name, 'allowPressCount': approved['allowPressCount'], 'boundary': 'Real ScreenCaptureKit capture, exact owned-helper OS prompt observed, ordinary Allow exactly once, and prompt absent before dictation fixtures'}
 
 
-def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup):
+def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup, cached_model=None):
     visual_config = evidence / 'visual-config.json'
     write(visual_config, configuration)
     control_report = evidence / 'negative-controls.json'
@@ -229,6 +229,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         before = history()
         before_ids = {row['Z_PK'] for row in before}
         command = ['/usr/bin/open', '-W', '-n', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--obs-config', websocket, '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
+        if scenario == 'setup' and cached_model is not None:
+            command += ['--prior-setup-run', cached_model['priorSetup']['run']]
         deny_microphone = scenario == 'lips'
         if deny_microphone:
             microphone_tcc_fixture(evidence, run, 'microphone-authorized-before-lips', 2)
@@ -272,6 +274,11 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         completed = [row for row in created if row['ZTRANSCRIPTIONSTATUS'] == 'completed']
         positive = scenario in ['combined', 'combined-silent', 'lips']
         passed = code == 0 and result.get('passed') is True and len(completed) == (1 if positive else 0)
+        if scenario == 'setup':
+            if cached_model is None:
+                passed = passed and result.get('actualSetupButtonPressed') is True and result.get('freshDownloadAssessed') is True
+            else:
+                passed = passed and result.get('actualSetupButtonPressed') is False and result.get('freshDownloadAssessed') is False and result.get('priorSetupRun') == cached_model['priorSetup']['run'] and result.get('actualSetupUIReady') is True and result.get('initialMasterOffObserved') is True and result.get('initialLipsOnlyOffObserved') is True and result.get('finalMasterOffObserved') is True and result.get('finalLipsOnlyOffObserved') is True
         if positive:
             passed = passed and len(created) == 1 and completed[0]['ZTEXT'].strip() != ''
             if scenario == 'lips':
@@ -299,18 +306,21 @@ def main():
     parser.add_argument('--app', type=Path)
     parser.add_argument('--app-source-head')
     parser.add_argument('--producer-run', type=int, help='Verify and reuse an immutable Release artifact with identical app and build sources')
+    parser.add_argument('--model-cache-run', type=int, help='Use the pinned CI checkpoint through the unchanged native installer; reuse prior same-app Setup proof')
     parser.add_argument('--build-helper-only', action='store_true', help='Compile, link, sign, and load the native helper without app, models, OBS, or TCC changes')
     parser.add_argument('--visual', action='store_true', help='After voice passes, provision OBS and run real visual app scenarios')
     parser.add_argument('--obs-summary', type=Path, help='Reuse a successful same-host OBS probe receipt that retained OBS')
     parser.add_argument('--out', type=Path, default=Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'lip-dictation-e2e')
     args = parser.parse_args()
     if args.build_helper_only:
-        if args.app or args.app_source_head or args.producer_run is not None or args.visual or args.obs_summary:
+        if args.app or args.app_source_head or args.producer_run is not None or args.model_cache_run is not None or args.visual or args.obs_summary:
             parser.error('--build-helper-only accepts only --out')
     elif args.app is None or args.app_source_head is None:
         parser.error('--app and --app-source-head are required for runtime proof')
     if args.producer_run is not None and args.producer_run <= 0:
         parser.error('--producer-run must be a positive GitHub Actions run ID')
+    if args.model_cache_run is not None and (args.model_cache_run <= 0 or args.producer_run is None or not args.visual):
+        parser.error('--model-cache-run requires a positive run ID, --producer-run, and --visual')
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted' or sys.platform != 'darwin':
         raise RuntimeError('Only a fresh disposable GitHub-hosted macOS runner is supported')
     if os.getuid() == 0 or subprocess.check_output(['stat', '-f', '%u', '/dev/console'], text=True).strip() != str(os.getuid()):
@@ -471,7 +481,13 @@ def main():
             raise RuntimeError('Default-off real dictation gate failed; inspect actual AX, rendered text, history and app logs')
         summary['status'] = 'voiceDefaultOffVerified'
         if args.visual:
-            summary['visualCases'] = run_visual_cases(args, evidence, configuration, original, fixture, app, visual_helper, run, grant, owned_obs_cleanup)
+            cached_model = None
+            if args.model_cache_run is not None:
+                from model_cache import prepare_cached_model
+                summary['modelCacheReceipt'] = 'model-cache.json'
+                cached_model = prepare_cached_model(ROOT, evidence, verified_app, args.model_cache_run, run)
+                summary['modelCache'] = cached_model
+            summary['visualCases'] = run_visual_cases(args, evidence, configuration, original, fixture, app, visual_helper, run, grant, owned_obs_cleanup, cached_model)
             summary['status'] = 'lipDictationVerified'
     except Exception as error:
         summary['status'] = 'blocked'

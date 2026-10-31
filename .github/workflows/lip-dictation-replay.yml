@@ -36,8 +36,8 @@ jobs:
           xcodebuild -version
           sw_vers
 
-      - name: Check artifact refusal boundaries
-        run: python3 -m unittest discover -s Tools/LipDictationE2E -p test_app_artifact.py -v
+      - name: Check artifact and cached-model refusal boundaries
+        run: python3 -m unittest discover -s Tools/LipDictationE2E -p 'test_*.py' -v
 
       - name: Execute actual runtime core checks
         shell: bash
@@ -57,6 +57,7 @@ jobs:
             --app "$RUNNER_TEMP/lip-replay-source/roma just talk.app" \
             --app-source-head 49d045815749a043016634a2604decfbacbb9803 \
             --producer-run 41165570823 \
+            --model-cache-run 41172814095 \
             --visual
 
       - name: Upload current proof and immutable producer receipts

@@ -20,7 +20,8 @@ recorder = root / "VoiceInk/Recorder.swift"
 prewarm = root / "VoiceInk/Services/ModelPrewarmService.swift"
 power_modes = root / "VoiceInk/PowerMode/PowerModeSessionManager.swift"
 authorization = root / "VoiceInk/Services/CaptureAuthorizationDecision.swift"
-candidates = {path: path.read_bytes() for path in (source, recorder, prewarm, power_modes, authorization)}
+recognition = root / "VoiceInk/Transcription/Engine/RecordingRecognition.swift"
+candidates = {path: path.read_bytes() for path in (source, recorder, prewarm, power_modes, authorization, recognition)}
 evidence = root / ".local-build/lip-pipeline-regression"
 evidence.mkdir(parents=True, exist_ok=False)
 test_evidence = root / ".local-build/onboarding-test-evidence"
@@ -37,6 +38,11 @@ receipt = {
         str(path.relative_to(root)): hashlib.sha256(data).hexdigest()
         for path, data in candidates.items()
     },
+    "integrationSourceSHA256": {
+        "VoiceInk/Transcription/Engine/VoiceInkEngine.swift": hashlib.sha256((
+            root / "VoiceInk/Transcription/Engine/VoiceInkEngine.swift"
+        ).read_bytes()).hexdigest(),
+    },
     "testSourceSHA256": {
         relative: hashlib.sha256((root / relative).read_bytes()).hexdigest()
         for relative in (
@@ -45,6 +51,7 @@ receipt = {
             "VoiceInkTests/ModelPrewarmServiceTests.swift",
             "VoiceInkTests/PowerModeSessionManagerTests.swift",
             "VoiceInkTests/CaptureAuthorizationDecisionTests.swift",
+            "VoiceInkTests/RecordingRecognitionTests.swift",
         )
     },
     "controls": [],
@@ -131,13 +138,14 @@ central_voice_selection = "VoiceInkTests/VoiceInkTests/recorderPowerModeSelectio
 hardware_suite = "VoiceInkTests/RecorderMicrophonePrivacyTests"
 authorization_suite = "VoiceInkTests/CaptureAuthorizationDecisionTests"
 authorization_selection = authorization_suite + "/testCanceledPermissionDecisionDrainsBeforeSystemCallback"
+recognition_selection = "VoiceInkTests/RecordingRecognitionTests/testVoiceSuccessCancelsAndDrainsLipRecognition"
 candidate_selections = (
     pipeline_selection, hardware_suite, auto_send_selection, prewarm_selection,
-    central_lip_selection, central_voice_selection, authorization_suite,
+    central_lip_selection, central_voice_selection, authorization_suite, recognition_selection,
 )
 receipt["candidateSelections"] = candidate_selections
-receipt["expectedCandidateFunctions"] = 13
-receipt["expectedCandidateInvocations"] = 17
+receipt["expectedCandidateFunctions"] = 14
+receipt["expectedCandidateInvocations"] = 18
 
 
 def read_summary(destination):
@@ -273,6 +281,12 @@ uninterruptible_decision = '''        return await withCheckedContinuation { con
 '''
 require(authorization_text.count(cancelable_decision) == 1, "Expected one cancellation-aware permission decision body")
 pending_decision = authorization_text.replace(cancelable_decision, uninterruptible_decision, 1)
+recognition_text = candidates[recognition].decode()
+cancel_unused_lips = "            lips?.cancel()\n"
+drain_unused_lips = "            _ = await lips?.result\n"
+require(recognition_text.count(cancel_unused_lips) == 1, "Expected one voice-ready unused-lip cancellation")
+require(recognition_text.count(drain_unused_lips) == 1, "Expected one voice-ready lip cleanup drain")
+wait_for_unused_lips = recognition_text.replace(cancel_unused_lips, "", 1)
 
 try:
     if (evidence / "full-candidate").exists():
@@ -299,6 +313,8 @@ try:
                 "Apply full audio resources instead of the frozen recorder input scope.")
     red_control(authorization, pending_decision, "known-bad-pending-permission", authorization_selection, 1,
                 "Wait on the original withCheckedContinuation callback without owner-cancellation cooperation.")
+    red_control(recognition, wait_for_unused_lips, "known-bad-unused-lip-wait", recognition_selection, 1,
+                "Omit cancellation of unused lip inference after voice succeeds, retaining its cleanup drain.")
 
     green_exit, green = run("candidate", candidate_selections)
     receipt["candidateSummary"] = green
@@ -308,14 +324,14 @@ try:
     receipt["candidateCounts"] = actual
     save_receipt()
     require(green_exit == 0 and green["failedTests"] == 0
-            and actual["functions"] == {"passed": 13, "failed": 0, "skipped": 0, "total": 13}
-            and actual["invocations"] == {"passed": 17, "failed": 0, "skipped": 0, "total": 17}
+            and actual["functions"] == {"passed": 14, "failed": 0, "skipped": 0, "total": 14}
+            and actual["invocations"] == {"passed": 18, "failed": 0, "skipped": 0, "total": 18}
             and actual["parameterizedInvocations"] == 6,
-            f"Candidate must pass 13 functions / 17 invocations, including 6 parameterized runs: {actual}")
+            f"Candidate must pass 14 functions / 18 invocations, including 6 parameterized runs: {actual}")
     require(all(path.read_bytes() == data for path, data in candidates.items()),
             "Candidate sources changed after controls")
     receipt["status"] = "passed"
-    print("Candidate: 13 functions / 17 invocations passed; all seven semantic reverts failed; sources restored", flush=True)
+    print("Candidate: 14 functions / 18 invocations passed; all eight semantic reverts failed; sources restored", flush=True)
 except BaseException as error:
     receipt.update({"status": "failed", "error": str(error)})
     raise

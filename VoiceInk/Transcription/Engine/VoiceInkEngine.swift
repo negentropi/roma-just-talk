@@ -504,21 +504,20 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 return try await LipDictationManager.shared.transcribe(clip)
             }
         }
-        let voice = await recording.audioRecognition?.result
-        let lips = await recording.lipRecognition?.result
+        let selection = try await RecordingRecognition.resolve(
+            voice: recording.audioRecognition, lips: recording.lipRecognition
+        )
         try checkRecording(recording)
-        if case .success(let text) = voice, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        switch selection {
+        case .voice(let text):
             logger.notice("recognition.selected id=\(recording.id.uuidString, privacy: .public) source=voice chars=\(text.count, privacy: .public)")
             return text
-        }
-        if case .success(let text) = lips, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        case .lips(let text):
             logger.notice("recognition.selected id=\(recording.id.uuidString, privacy: .public) source=lips chars=\(text.count, privacy: .public)")
             return text
+        case .none:
+            return ""
         }
-        if case .failure(let error) = voice, recording.mode == .voice { throw error }
-        if case .failure(let error) = lips { throw error }
-        if case .failure(let error) = voice { throw error }
-        return ""
     }
 
     private func requestCancellation(_ recording: Recording) {

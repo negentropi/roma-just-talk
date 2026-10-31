@@ -1,0 +1,492 @@
+name: Run standard lip PR gates on isolated hosted Macs
+'on':
+  push:
+    branches:
+    - ci/lip-pr-hosted-gates-*
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: lip-pr-hosted-gates-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  macos:
+    name: Run complete standard macOS gates
+    if: github.repository == 'negentropi/roma-just-talk' && startsWith(github.ref, 'refs/heads/ci/lip-pr-hosted-gates-')
+    runs-on: macos-26
+    timeout-minutes: 180
+    env:
+      TESTED_SOURCE_HEAD: 5aeea3aed848e8b3214197d5c7469efd06af3225
+    steps:
+    - name: Checkout the exact PR source
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        ref: 5aeea3aed848e8b3214197d5c7469efd06af3225
+    - name: Require an isolated hosted Mac and record the toolchain
+      run: |
+        set -euo pipefail
+        test "$GITHUB_ACTIONS" = true
+        test "$RUNNER_ENVIRONMENT" = github-hosted
+        test "$RUNNER_OS" = macOS
+        test "$RUNNER_ARCH" = ARM64
+        test "$(uname -m)" = arm64
+        test "$(stat -f %u /dev/console)" = "$(id -u)"
+        test "$(git rev-parse HEAD)" = "$TESTED_SOURCE_HEAD"
+        test -z "$(git status --porcelain --untracked-files=all)"
+        mkdir -p "$RUNNER_TEMP/lip-pr-hosted-gates"
+        printf '%s\n' "tested_source_head=$TESTED_SOURCE_HEAD" "transport_head=$GITHUB_SHA" "transport_ref=$GITHUB_REF" > "$RUNNER_TEMP/lip-pr-hosted-gates/source-boundary.txt"
+        git hash-object .github/workflows/voiceink-build.yml .github/workflows/voiceink-ios-single-repo-migration.yml > "$RUNNER_TEMP/lip-pr-hosted-gates/standard-workflow-blobs.txt"
+        if [ "$GITHUB_JOB" = ios ]; then
+          test -d "$DEVELOPER_DIR"
+          xcodebuild -version | /usr/bin/grep -Fx 'Xcode 26.3'
+        else
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$latest"
+          export DEVELOPER_DIR="$latest/Contents/Developer"
+          printf 'DEVELOPER_DIR=%s\n' "$DEVELOPER_DIR" >> "$GITHUB_ENV"
+        fi
+        xcodebuild -version | tee "$RUNNER_TEMP/lip-pr-hosted-gates/toolchain.log"
+        swift --version | tee -a "$RUNNER_TEMP/lip-pr-hosted-gates/toolchain.log"
+        sw_vers | tee -a "$RUNNER_TEMP/lip-pr-hosted-gates/toolchain.log"
+        command -v cmake >/dev/null || brew install cmake
+        if ! xcrun metal --version >/dev/null 2>&1; then
+          log="$RUNNER_TEMP/lip-pr-hosted-gates/metal.log"
+          xcodebuild -downloadComponent MetalToolchain 2>&1 | tee "$log"
+          if ! xcrun metal --version >/dev/null 2>&1; then
+            dmg=$(sed -n 's/^Downloaded asset to: //p' "$log" | tail -n 1)
+            hdiutil attach -readonly -nobrowse "$dmg"
+          fi
+        fi
+        xcrun metal --version
+    - name: Compile and verify autonomous runtime E2E harness
+      run: |
+        make runtime-e2e-check
+        make runtime-e2e-app
+    - name: Verify Sonoma-compatible helper
+      run: |
+        HELPER=".local-build/Tools/RuntimeE2EHarness.app"
+        test "$(plutil -extract LSMinimumSystemVersion raw -o - "$HELPER/Contents/Info.plist")" = "14.0"
+        codesign --verify --deep --strict --verbose=4 "$HELPER"
+        file "$HELPER/Contents/MacOS/RuntimeE2EHarness" | grep -Fq arm64
+        otool -l "$HELPER/Contents/MacOS/RuntimeE2EHarness" > helper-load-commands.txt
+        awk '
+          $1 == "cmd" && $2 == "LC_BUILD_VERSION" { in_build = 1; next }
+          in_build && $1 == "minos" && $2 == "14.0" { found = 1; in_build = 0 }
+          END { exit(found ? 0 : 1) }
+        ' helper-load-commands.txt
+    - name: Package runtime E2E helper
+      run: |
+        ditto -c -k --keepParent \
+          ".local-build/Tools/RuntimeE2EHarness.app" \
+          "roma.runtime-e2e-harness.macos.zip"
+    - name: Upload runtime E2E helper
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: roma.runtime-e2e-harness.macos
+        path: roma.runtime-e2e-harness.macos.zip
+        if-no-files-found: error
+        overwrite: true
+    - name: Keep disposable test desktop awake
+      run: |
+        /usr/bin/caffeinate -d -i -u -t 3600 </dev/null >/dev/null 2>&1 &
+        echo "Temporary desktop assertion PID: $!"
+    - name: Show Xcode version
+      run: |
+        xcode-select -p
+        xcodebuild -version
+        swift --version
+    - name: Compile visible text latency harness helper
+      run: make latency-harness-app
+    - name: Verify latency helper run target
+      run: make latency-harness-check
+    - name: Verify ad-hoc Library Validation packaging contract
+      run: bash scripts/tests/verify-adhoc-library-validation.test.sh
+    - name: Verify distribution launch evidence contract
+      run: |
+        bash scripts/tests/macos-finder-extraction-state.test.sh
+        bash scripts/tests/macos-distribution-e2e-contract.test.sh
+        bash scripts/tests/macos-distribution-runtime-handoff.test.sh
+        bash scripts/tests/verify-macos-distribution-launch.test.sh
+        bash scripts/tests/verify-macos-framework-signature-crash.test.sh
+        bash scripts/tests/verify-runtime-empty-final-regression.test.sh
+    - name: Build release app
+      id: release_app
+      run: make local CONFIGURATION=Release
+    - name: Verify FluidAudio array reset semantics
+      id: fluidaudio_test
+      timeout-minutes: 15
+      run: bash scripts/test-fluidaudio-package.sh
+    - name: Upload FluidAudio test evidence
+      if: ${{ !cancelled() && (steps.fluidaudio_test.outcome == 'success' || steps.fluidaudio_test.outcome == 'failure') }}
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: roma.fluidaudio-test-evidence
+        path: |
+          .local-build/fluidaudio-test-evidence/**/gate.log
+          .local-build/fluidaudio-test-evidence/**/provenance.txt
+          .local-build/fluidaudio-test-evidence/**/swift-test.log
+          .local-build/fluidaudio-test-evidence/**/result.txt
+        if-no-files-found: error
+    - name: Verify local bilingual model package
+      timeout-minutes: 15
+      run: bash scripts/test-qwen-package.sh "$HOME/Applications/roma just talk.app"
+    - name: Prove recording cache cleanup regression red and green
+      timeout-minutes: 30
+      run: python3 scripts/verify-recording-cache-regression.py "$HOME/Applications/roma just talk.app"
+    - name: Upload recording cache regression evidence
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: roma.recording-cache-regression
+        path: .local-build/recording-cache-regression
+        if-no-files-found: error
+    - name: Prove text-only Power Mode isolation and all shared core checks
+      id: lip_core
+      run: python3 scripts/verify-lip-power-mode.py
+    - name: Install BlackHole input
+      run: |
+        HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --cask blackhole-2ch
+        sudo killall coreaudiod || true
+        sleep 4
+        system_profiler SPAudioDataType | grep "BlackHole 2ch"
+      if: ${{ !cancelled() && steps.release_app.outcome == 'success' }}
+    - name: Run Debug unit tests
+      if: ${{ !cancelled() && steps.release_app.outcome == 'success' }}
+      timeout-minutes: 15
+      run: bash scripts/run-macos-ci-unit-tests.sh
+      id: debug_tests
+      env:
+        RJT_REQUIRE_MICROPHONE_PRIVACY_PROOF: '1'
+        TEST_RUNNER_RJT_REQUIRE_MICROPHONE_PRIVACY_PROOF: '1'
+    - name: Upload Debug test evidence
+      if: ${{ !cancelled() && steps.release_app.outcome == 'success' }}
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: roma.debug-test-evidence
+        path: .local-build/onboarding-test-evidence
+        if-no-files-found: error
+    - name: Prove microphone, paste, auto-send, Power Mode, and permission regressions
+      id: lip_controls
+      if: ${{ !cancelled() && steps.debug_tests.outcome == 'success' }}
+      timeout-minutes: 40
+      run: python3 scripts/verify-lip-pipeline-cancellation.py
+    - name: Upload Core and semantic-control proof receipts
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: lip-standard-semantic-evidence-${{ github.run_id }}
+        path: |
+          .local-build/lip-power-mode-regression/*.json
+          .local-build/lip-power-mode-regression/*.log
+          .local-build/lip-pipeline-regression/*.json
+          .local-build/lip-pipeline-regression/*.log
+          .local-build/lip-pipeline-regression/**/summary.json
+          .local-build/lip-pipeline-regression/**/identity-*.txt
+          .local-build/lip-pipeline-regression/**/host-requirement.txt
+        if-no-files-found: ignore
+        retention-days: 7
+    - name: Reject debug-only release payload
+      run: |
+        APP="$HOME/Applications/roma just talk.app"
+        if [ -e "$APP/Contents/MacOS/roma just talk.debug.dylib" ] || [ -e "$APP/Contents/MacOS/__preview.dylib" ]; then
+          echo "Release artifact contains debug-only binaries:"
+          ls -la "$APP/Contents/MacOS"
+          exit 1
+        fi
+    - name: Verify packaged app identity
+      run: |
+        APP="$HOME/Applications/roma just talk.app"
+        BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw -o - "$APP/Contents/Info.plist")
+        test "$BUNDLE_ID" = "com.negentropi.RomaJustTalk"
+    - name: Reject test-coverage instrumentation in release app
+      run: bash scripts/verify-macos-release-instrumentation.sh "$HOME/Applications/roma just talk.app"
+    - name: Package app
+      run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" "roma.just.talk.app.zip"
+    - name: Upload app artifact
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: roma.just.talk.app
+        path: roma.just.talk.app.zip
+        if-no-files-found: error
+        overwrite: true
+    - name: Relocate only the three uploaded standard outputs
+      id: standard_outputs
+      if: ${{ success() }}
+      run: |
+        python3 - <<'PY_OUTPUTS'
+        from pathlib import Path
+        import hashlib,json,os,stat
+        root=Path.cwd().resolve()
+        temporary=Path(os.environ['RUNNER_TEMP']).resolve(strict=True)
+        destination=temporary/'lip-pr-standard-outputs'
+        receipt_path=temporary/'lip-pr-hosted-gates/generated-output-relocation.json'
+        receipt_path.parent.mkdir(exist_ok=True)
+        receipt={'status':'blocked','outputs':[]}
+        try:
+            assert destination!=root and root not in destination.parents,'Output destination must be outside the source checkout'
+            assert not destination.exists() and not destination.is_symlink(),'Output destination must be fresh'
+            names=('helper-load-commands.txt','roma.just.talk.app.zip','roma.runtime-e2e-harness.macos.zip')
+            for name in names:
+                source=root/name
+                metadata=source.lstat()
+                assert stat.S_ISREG(metadata.st_mode) and not source.is_symlink(),f'Expected an owned regular output: {name}'
+                receipt['outputs'].append({'source':str(source),'destination':str(destination/name),'bytes':metadata.st_size,'moved':False})
+            destination.mkdir()
+            for output in receipt['outputs']:
+                source=Path(output['source']);target=Path(output['destination'])
+                digest=hashlib.sha256()
+                with source.open('rb') as stream:
+                    for chunk in iter(lambda:stream.read(1024*1024),b''):digest.update(chunk)
+                output['sha256']=digest.hexdigest()
+                source.rename(target)
+                assert not source.exists() and target.is_file() and not target.is_symlink() and target.stat().st_size==output['bytes']
+                output['moved']=True
+            receipt['status']='relocated'
+        except Exception as error:
+            receipt['error']=str(error)
+            raise
+        finally:
+            receipt_path.write_text(json.dumps(receipt,indent=2)+'\n')
+        PY_OUTPUTS
+    - name: Verify current real voice and lip dictation
+      id: lip_e2e
+      if: ${{ success() && steps.debug_tests.outcome == 'success' && steps.lip_controls.outcome == 'success' }}
+      timeout-minutes: 40
+      env:
+        GH_TOKEN: ${{ github.token }}
+        LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH: '1'
+      run: |
+        python3 Tools/LipDictationE2E/run.py \
+          --app "$HOME/Applications/roma just talk.app" \
+          --app-source-head "$TESTED_SOURCE_HEAD" \
+          --same-job-build \
+          --model-cache-run 41172814095 \
+          --visual
+    - name: Upload actual same-job dictation and cache receipts
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: lip-standard-runtime-evidence-${{ github.run_id }}
+        path: |
+          ${{ runner.temp }}/lip-dictation-e2e/**/*.json
+          ${{ runner.temp }}/lip-dictation-e2e/**/*.jsonl
+          ${{ runner.temp }}/lip-dictation-e2e/**/*.log
+          ${{ runner.temp }}/lip-dictation-e2e/**/*.txt
+          ${{ runner.temp }}/lip-dictation-e2e/**/*.resolved
+          ${{ runner.temp }}/lip-dictation-e2e/**/*.png
+          ${{ runner.temp }}/lip-dictation-e2e/model-cache-install-fixture.swift
+          ${{ runner.temp }}/lip-camera-probe/*.json
+          ${{ runner.temp }}/lip-camera-probe/*.log
+          ${{ runner.temp }}/lip-camera-probe/*.png
+        if-no-files-found: ignore
+        retention-days: 7
+    - name: Record tested source and external build inputs
+      if: always()
+      run: |
+        python3 - <<'PY_RECEIPT'
+        from pathlib import Path
+        import hashlib,json,os,subprocess
+        records={}
+        for name,command in [('sourceHead',['git','rev-parse','HEAD']),('trackedDiff',['git','diff','--name-only']),('stagedDiff',['git','diff','--cached','--name-only']),('xcode',['xcodebuild','-version']),('whisperHead',['git','-C',str(Path.home()/'VoiceInk-Dependencies/whisper.cpp'),'rev-parse','HEAD'])]:
+            result=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            records[name]={'exitCode':result.returncode,'output':result.stdout.strip()}
+        locks={}
+        for name in ['VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved','VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved','iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved']:
+            path=Path(name)
+            if path.is_file():locks[name]=hashlib.sha256(path.read_bytes()).hexdigest()
+        receipt={'testedSourceHead':os.environ['TESTED_SOURCE_HEAD'],'transportHead':os.environ['GITHUB_SHA'],'transportRef':os.environ['GITHUB_REF'],'runID':os.environ['GITHUB_RUN_ID'],'runAttempt':os.environ['GITHUB_RUN_ATTEMPT'],'job':os.environ['GITHUB_JOB'],'developerDirectory':os.environ.get('DEVELOPER_DIR'),'commands':records,'dependencyLockSHA256':locks,'boundary':'Task-owned hosted execution of the existing standard macOS and iOS commands. Each job records its own actual source, toolchain and lock state. Original pending Namespace checks remain separate. No fresh-build reproducibility claim. Actual dictation evidence is recorded separately.'}
+        output=Path(os.environ['RUNNER_TEMP'])/'lip-pr-hosted-gates/provenance.json';output.parent.mkdir(exist_ok=True)
+        output.write_text(json.dumps(receipt,indent=2)+'\n')
+        assert records['sourceHead']=={'exitCode':0,'output':os.environ['TESTED_SOURCE_HEAD']}
+        assert records['trackedDiff']=={'exitCode':0,'output':''} and records['stagedDiff']=={'exitCode':0,'output':''},'Tracked source changed during the gates'
+        PY_RECEIPT
+    - name: Upload hosted execution provenance
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: lip-pr-hosted-gates-${{ github.job }}-${{ github.run_id }}
+        path: ${{ runner.temp }}/lip-pr-hosted-gates
+        if-no-files-found: error
+        retention-days: 7
+  ios:
+    name: Run complete standard iOS gates
+    if: github.repository == 'negentropi/roma-just-talk' && startsWith(github.ref, 'refs/heads/ci/lip-pr-hosted-gates-')
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+      TESTED_SOURCE_HEAD: 5aeea3aed848e8b3214197d5c7469efd06af3225
+    steps:
+    - name: Checkout the exact PR source
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      with:
+        ref: 5aeea3aed848e8b3214197d5c7469efd06af3225
+    - name: Require an isolated hosted Mac and record the toolchain
+      run: |
+        set -euo pipefail
+        test "$GITHUB_ACTIONS" = true
+        test "$RUNNER_ENVIRONMENT" = github-hosted
+        test "$RUNNER_OS" = macOS
+        test "$RUNNER_ARCH" = ARM64
+        test "$(uname -m)" = arm64
+        test "$(stat -f %u /dev/console)" = "$(id -u)"
+        test "$(git rev-parse HEAD)" = "$TESTED_SOURCE_HEAD"
+        test -z "$(git status --porcelain --untracked-files=all)"
+        mkdir -p "$RUNNER_TEMP/lip-pr-hosted-gates"
+        printf '%s\n' "tested_source_head=$TESTED_SOURCE_HEAD" "transport_head=$GITHUB_SHA" "transport_ref=$GITHUB_REF" > "$RUNNER_TEMP/lip-pr-hosted-gates/source-boundary.txt"
+        git hash-object .github/workflows/voiceink-build.yml .github/workflows/voiceink-ios-single-repo-migration.yml > "$RUNNER_TEMP/lip-pr-hosted-gates/standard-workflow-blobs.txt"
+        if [ "$GITHUB_JOB" = ios ]; then
+          test -d "$DEVELOPER_DIR"
+          xcodebuild -version | /usr/bin/grep -Fx 'Xcode 26.3'
+        else
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$latest"
+          export DEVELOPER_DIR="$latest/Contents/Developer"
+          printf 'DEVELOPER_DIR=%s\n' "$DEVELOPER_DIR" >> "$GITHUB_ENV"
+        fi
+        xcodebuild -version | tee "$RUNNER_TEMP/lip-pr-hosted-gates/toolchain.log"
+        swift --version | tee -a "$RUNNER_TEMP/lip-pr-hosted-gates/toolchain.log"
+        sw_vers | tee -a "$RUNNER_TEMP/lip-pr-hosted-gates/toolchain.log"
+        command -v cmake >/dev/null || brew install cmake
+        if ! xcrun metal --version >/dev/null 2>&1; then
+          log="$RUNNER_TEMP/lip-pr-hosted-gates/metal.log"
+          xcodebuild -downloadComponent MetalToolchain 2>&1 | tee "$log"
+          if ! xcrun metal --version >/dev/null 2>&1; then
+            dmg=$(sed -n 's/^Downloaded asset to: //p' "$log" | tail -n 1)
+            hdiutil attach -readonly -nobrowse "$dmg"
+          fi
+        fi
+        xcrun metal --version
+    - name: Show toolchain
+      run: |
+        ls -d /Applications/Xcode*.app
+        xcode-select -p
+        xcodebuild -version
+        swift --version
+    - name: Run config verifier
+      run: bash scripts/verify-ios-single-repo-migration.sh
+    - name: Run VoiceInkCore checks
+      run: swift run --package-path VoiceInkCore VoiceInkCoreChecks
+    - name: Prepare local Whisper framework
+      run: make setup
+    - name: Build iOS app
+      run: |
+        xcodebuild build \
+          -workspace VoiceInk.xcworkspace \
+          -scheme VoiceInk-ios \
+          -configuration Debug \
+          -destination "generic/platform=iOS Simulator" \
+          -derivedDataPath "$PWD/.local-build-ios" \
+          CODE_SIGNING_ALLOWED=YES \
+          CODE_SIGN_IDENTITY=- \
+          ENTITLEMENTS_ALLOWED=YES
+    - name: Verify Whisper is statically linked
+      run: bash scripts/verify-static-whisper-app.sh "$PWD/.local-build-ios/Build/Products/Debug-iphonesimulator/roma just talk.app"
+    - name: Package iOS Simulator app
+      run: |
+        APP="$PWD/.local-build-ios/Build/Products/Debug-iphonesimulator/roma just talk.app"
+        test -d "$APP"
+        ditto -c -k --keepParent "$APP" roma.just.talk.ios-simulator.app.zip
+    - name: Upload iOS Simulator app
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: roma.just.talk.ios-simulator.app
+        path: roma.just.talk.ios-simulator.app.zip
+        if-no-files-found: error
+        retention-days: 7
+        overwrite: true
+    - name: Run iOS test bundles
+      id: ios_tests
+      continue-on-error: true
+      run: |
+        SIMULATOR_UDID="$(
+          xcrun simctl list devices available --json \
+            | jq -r '[.devices[][] | select(.name | startswith("iPhone"))][0].udid'
+        )"
+        test -n "$SIMULATOR_UDID"
+        test "$SIMULATOR_UDID" != "null"
+        xcrun simctl shutdown "$SIMULATOR_UDID" || true
+        xcrun simctl erase "$SIMULATOR_UDID"
+        xcrun simctl boot "$SIMULATOR_UDID"
+        xcrun simctl bootstatus "$SIMULATOR_UDID" -b
+        APP="$PWD/.local-build-ios/Build/Products/Debug-iphonesimulator/roma just talk.app"
+        xcrun simctl install "$SIMULATOR_UDID" "$APP"
+        APP_GROUPS="$(
+          xcrun simctl get_app_container \
+            "$SIMULATOR_UDID" \
+            com.negentropi.RomaJustTalk \
+            groups
+        )"
+        printf '%s\n' "$APP_GROUPS"
+        [[ "$APP_GROUPS" == *"group.com.negentropi.RomaJustTalk"* ]]
+        xcodebuild test \
+          -workspace VoiceInk.xcworkspace \
+          -scheme VoiceInk-ios \
+          -configuration Debug \
+          -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+          -derivedDataPath "$PWD/.local-build-ios" \
+          -parallel-testing-enabled NO \
+          CODE_SIGNING_ALLOWED=YES \
+          CODE_SIGN_IDENTITY=- \
+          ENTITLEMENTS_ALLOWED=YES \
+          -only-testing:VoiceInk-iosTests \
+          -only-testing:VoiceInk-iosUITests
+    - name: Upload iOS runtime proof
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: ios-runtime-proof
+        path: .local-build-ios/Logs/Test/*.xcresult
+        if-no-files-found: warn
+        retention-days: 7
+        overwrite: true
+    - name: Upload iOS test diagnostics
+      if: steps.ios_tests.outcome == 'failure'
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: ios-test-diagnostics
+        path: |
+          .local-build-ios/Logs/Test/*.xcresult
+          ~/Library/Logs/DiagnosticReports/roma just talk*.ips
+        if-no-files-found: warn
+        retention-days: 3
+    - name: Print iOS crash reports
+      if: steps.ios_tests.outcome == 'failure'
+      run: |
+        shopt -s nullglob
+        reports=("$HOME"/Library/Logs/DiagnosticReports/roma\ just\ talk*.ips)
+        for report in "${reports[@]}"; do
+          echo "Crash report: $report"
+          sed -n '1,360p' "$report"
+        done
+    - name: Fail when focused iOS parity tests fail
+      if: steps.ios_tests.outcome == 'failure'
+      run: exit 1
+    - name: Record tested source and external build inputs
+      if: always()
+      run: |
+        python3 - <<'PY_RECEIPT'
+        from pathlib import Path
+        import hashlib,json,os,subprocess
+        records={}
+        for name,command in [('sourceHead',['git','rev-parse','HEAD']),('trackedDiff',['git','diff','--name-only']),('stagedDiff',['git','diff','--cached','--name-only']),('xcode',['xcodebuild','-version']),('whisperHead',['git','-C',str(Path.home()/'VoiceInk-Dependencies/whisper.cpp'),'rev-parse','HEAD'])]:
+            result=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            records[name]={'exitCode':result.returncode,'output':result.stdout.strip()}
+        locks={}
+        for name in ['VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved','VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved','iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved']:
+            path=Path(name)
+            if path.is_file():locks[name]=hashlib.sha256(path.read_bytes()).hexdigest()
+        receipt={'testedSourceHead':os.environ['TESTED_SOURCE_HEAD'],'transportHead':os.environ['GITHUB_SHA'],'transportRef':os.environ['GITHUB_REF'],'runID':os.environ['GITHUB_RUN_ID'],'runAttempt':os.environ['GITHUB_RUN_ATTEMPT'],'job':os.environ['GITHUB_JOB'],'developerDirectory':os.environ.get('DEVELOPER_DIR'),'commands':records,'dependencyLockSHA256':locks,'boundary':'Task-owned hosted execution of the existing standard macOS and iOS commands. Each job records its own actual source, toolchain and lock state. Original pending Namespace checks remain separate. No fresh-build reproducibility claim. Actual dictation evidence is recorded separately.'}
+        output=Path(os.environ['RUNNER_TEMP'])/'lip-pr-hosted-gates/provenance.json';output.parent.mkdir(exist_ok=True)
+        output.write_text(json.dumps(receipt,indent=2)+'\n')
+        assert records['sourceHead']=={'exitCode':0,'output':os.environ['TESTED_SOURCE_HEAD']}
+        assert records['trackedDiff']=={'exitCode':0,'output':''} and records['stagedDiff']=={'exitCode':0,'output':''},'Tracked source changed during the gates'
+        PY_RECEIPT
+    - name: Upload hosted execution provenance
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      with:
+        name: lip-pr-hosted-gates-${{ github.job }}-${{ github.run_id }}
+        path: ${{ runner.temp }}/lip-pr-hosted-gates
+        if-no-files-found: error
+        retention-days: 7

@@ -83,7 +83,8 @@ struct StoredAudioCompressionServiceTests {
             let opusURL = try #require(row.existingAudioFileURL())
             #expect(opusURL.pathExtension == "caf")
             #expect(!FileManager.default.fileExists(atPath: wavURL.path))
-            #expect(try AVAudioFile(forReading: opusURL).fileFormat.streamDescription.pointee.mFormatID == kAudioFormatOpus)
+            let opusFile = try AVAudioFile(forReading: opusURL)
+            #expect(opusFile.fileFormat.streamDescription.pointee.mFormatID == kAudioFormatOpus)
         }
         #expect(inFlight.audioFileURL == inFlightWAV.absoluteString)
         #expect(FileManager.default.fileExists(atPath: inFlightWAV.path))

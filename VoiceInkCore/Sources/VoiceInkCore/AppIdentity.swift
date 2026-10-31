@@ -28,9 +28,9 @@ public enum VoiceInkAppNotificationKind: String, CaseIterable, Sendable {
 }
 
 public enum VoiceInkSupportContactPolicy {
-    public static let emailAddress = "support@tryvoiceink.com"
-    public static let emailSubject = "VoiceInk Support Request"
-    public static let commonIssuesURLString = "https://tryvoiceink.com/common-issues"
+    public static let emailAddress = "happyfumd@icloud.com"
+    public static let emailSubject = "Roma Just Talk Support Request"
+    public static let commonIssuesURLString = "https://roma-just-talk.com/readme"
 
     public static func emailBody(systemInformation: String) -> String {
         """
@@ -38,7 +38,7 @@ public enum VoiceInkSupportContactPolicy {
         ------------------------
         ✨ **SCREEN RECORDING HIGHLY RECOMMENDED** ✨
         ▶️ Create a quick screen recording showing the issue!
-        ▶️ It helps me understand and fix the problem much faster.
+        ▶️ It makes the problem much faster to understand and fix.
 
         📝 ISSUE DETAILS:
         - What steps did you take before the issue occurred?
@@ -47,7 +47,7 @@ public enum VoiceInkSupportContactPolicy {
 
 
         ## 📋 COMMON ISSUES:
-        Check out our Common Issues page before sending an email: \(commonIssuesURLString)
+        Check the documentation before sending an email: \(commonIssuesURLString)
         ------------------------
 
         System Information:
@@ -68,179 +68,9 @@ public enum VoiceInkSupportContactPolicy {
     }
 }
 
-public struct VoiceInkRemoteAnnouncement: Decodable, Equatable, Sendable {
-    public let id: String
-    public let title: String
-    public let description: String?
-    public let url: String?
-    public let startAt: String?
-    public let endAt: String?
-
-    public init(
-        id: String,
-        title: String,
-        description: String?,
-        url: String?,
-        startAt: String?,
-        endAt: String?
-    ) {
-        self.id = id
-        self.title = title
-        self.description = description
-        self.url = url
-        self.startAt = startAt
-        self.endAt = endAt
-    }
-}
-
-public struct VoiceInkAnnouncementPresentation: Equatable, Sendable {
-    public let id: String
-    public let title: String
-    public let description: String?
-    public let learnMoreURL: URL?
-    public let closeButtonSystemImageName: String
-    public let learnMoreButtonTitle: String
-    public let dismissButtonTitle: String
-
-    public init(
-        id: String,
-        title: String,
-        description: String?,
-        learnMoreURL: URL?,
-        closeButtonSystemImageName: String = "xmark",
-        learnMoreButtonTitle: String = "Learn more",
-        dismissButtonTitle: String = "Dismiss"
-    ) {
-        self.id = id
-        self.title = title
-        self.description = description
-        self.learnMoreURL = learnMoreURL
-        self.closeButtonSystemImageName = closeButtonSystemImageName
-        self.learnMoreButtonTitle = learnMoreButtonTitle
-        self.dismissButtonTitle = dismissButtonTitle
-    }
-
-    public var descriptionText: String {
-        description ?? ""
-    }
-
-    public var shouldShowDescription: Bool {
-        !descriptionText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-}
-
-public enum VoiceInkAnnouncementPreference {
-    public static let isEnabledKey = VoiceInkUserDefaultsKey.enableAnnouncements
-    public static let dismissedIdsKey = "dismissedAnnouncementIds"
-    public static let defaultIsEnabled = VoiceInkPreferenceDefault.enableAnnouncements
-    public static let maxDismissedIdsToKeep = 2
-    public static let announcementsURLString = "https://beingpax.github.io/VoiceInk/announcements.json"
-    public static let refreshInterval: TimeInterval = 4 * 60 * 60
-    public static let initialFetchDelay: TimeInterval = 5
-    public static let requestTimeout: TimeInterval = 10
-
-    public static var announcementsURL: URL {
-        URL(string: announcementsURLString)!
-    }
-
-    public static var registeredDefaults: [String: Any] {
-        [
-            isEnabledKey: defaultIsEnabled
-        ]
-    }
-
-    public static func isEnabled(from defaults: UserDefaults = .standard) -> Bool {
-        guard defaults.object(forKey: isEnabledKey) != nil else {
-            return defaultIsEnabled
-        }
-
-        return defaults.bool(forKey: isEnabledKey)
-    }
-
-    public static func saveIsEnabled(_ isEnabled: Bool, to defaults: UserDefaults = .standard) {
-        defaults.set(isEnabled, forKey: isEnabledKey)
-    }
-
-    public static func dismissedIds(from defaults: UserDefaults = .standard) -> [String] {
-        defaults.stringArray(forKey: dismissedIdsKey) ?? []
-    }
-
-    public static func saveDismissedIds(_ ids: [String], to defaults: UserDefaults = .standard) {
-        defaults.set(ids, forKey: dismissedIdsKey)
-    }
-
-    public static func isDismissed(_ id: String, dismissedIds: [String]) -> Bool {
-        dismissedIds.contains(id)
-    }
-
-    public static func dismissedIds(afterDismissing id: String, currentIds: [String]) -> [String] {
-        var ids = currentIds
-        if !ids.contains(id) {
-            ids.append(id)
-        }
-
-        if ids.count > maxDismissedIdsToKeep {
-            ids.removeFirst(ids.count - maxDismissedIdsToKeep)
-        }
-
-        return ids
-    }
-}
-
-public enum VoiceInkAnnouncementPolicy {
-    public static func nextAnnouncement(
-        from announcements: [VoiceInkRemoteAnnouncement],
-        dismissedIds: [String],
-        now: Date
-    ) -> VoiceInkAnnouncementPresentation? {
-        let formatter = ISO8601DateFormatter()
-
-        guard let announcement = announcements.first(where: {
-            !VoiceInkAnnouncementPreference.isDismissed($0.id, dismissedIds: dismissedIds)
-                && isActive($0, at: now, formatter: formatter)
-        }) else {
-            return nil
-        }
-
-        return VoiceInkAnnouncementPresentation(
-            id: announcement.id,
-            title: announcement.title,
-            description: announcement.description,
-            learnMoreURL: announcement.url.flatMap(URL.init(string:))
-        )
-    }
-
-    public static func isActive(
-        _ announcement: VoiceInkRemoteAnnouncement,
-        at date: Date
-    ) -> Bool {
-        isActive(announcement, at: date, formatter: ISO8601DateFormatter())
-    }
-
-    private static func isActive(
-        _ announcement: VoiceInkRemoteAnnouncement,
-        at date: Date,
-        formatter: ISO8601DateFormatter
-    ) -> Bool {
-        if let startAt = announcement.startAt,
-           let start = formatter.date(from: startAt),
-           date < start {
-            return false
-        }
-
-        if let endAt = announcement.endAt,
-           let end = formatter.date(from: endAt),
-           date > end {
-            return false
-        }
-
-        return true
-    }
-}
-
 public enum VoiceInkMiniRecorderAppIntentPresentation {
-    public static let toggleSuccessDialog = "VoiceInk recorder toggled"
-    public static let dismissSuccessDialog = "VoiceInk recorder dismissed"
+    public static let toggleSuccessDialog = "Roma Just Talk recorder toggled"
+    public static let dismissSuccessDialog = "Roma Just Talk recorder dismissed"
 }
 
 public enum VoiceInkMiniRecorderRequest {
@@ -263,7 +93,6 @@ public struct VoiceInkMacOSStorageAlertPresentation: Equatable, Sendable {
 public enum VoiceInkMacOSNavigationDestination: String, CaseIterable, Sendable {
     case settings = "Settings"
     case aiModels = "AI Models"
-    case license = "VoiceInk Pro"
     case history = "History"
     case permissions = "Permissions"
     case enhancement = "Enhancement"
@@ -282,7 +111,7 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
     case audioInput
     case dictionary
     case settings
-    case license
+    case about
 
     public var id: String { rawValue }
 
@@ -308,8 +137,8 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
             return "Dictionary"
         case .settings:
             return "Settings"
-        case .license:
-            return "VoiceInk Pro"
+        case .about:
+            return "About & Support"
         }
     }
 
@@ -335,8 +164,8 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
             return "character.book.closed.fill"
         case .settings:
             return "gearshape.fill"
-        case .license:
-            return "checkmark.seal.fill"
+        case .about:
+            return "info.circle.fill"
         }
     }
 
@@ -355,8 +184,6 @@ public enum VoiceInkMacOSMainViewItem: String, CaseIterable, Identifiable, Senda
             return .settings
         case VoiceInkMacOSNavigationDestination.aiModels.rawValue, VoiceInkMacOSMainViewItem.models.title:
             return .models
-        case VoiceInkMacOSNavigationDestination.license.rawValue:
-            return .license
         case VoiceInkMacOSNavigationDestination.history.rawValue, VoiceInkMacOSMainViewItem.history.title:
             return .history
         case VoiceInkMacOSNavigationDestination.permissions.rawValue:
@@ -473,8 +300,6 @@ public enum VoiceInkMacOSLogCategory {
     public static let menuBarManager = "MenuBarManager"
     public static let apiKeyManager = "APIKeyManager"
     public static let keychainService = "KeychainService"
-    public static let polarService = "PolarService"
-    public static let licenseViewModel = "LicenseViewModel"
     public static let aiEnhancementService = "AIEnhancementService"
     public static let customCloudModelManager = "CustomCloudModelManager"
     public static let transcriptionAutoCleanupService = "TranscriptionAutoCleanupService"
@@ -521,9 +346,9 @@ public enum VoiceInkDiagnosticLogExportPolicy {
     public static let maxSessionStartDatesToKeep = 3
     public static let timestampDateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
     public static let fileNameDateFormat = "yyyy-MM-dd_HH-mm-ss"
-    public static let fileNamePrefix = "VoiceInk_Logs_"
+    public static let fileNamePrefix = "Roma_Just_Talk_Logs_"
     public static let fileNameExtension = "log"
-    public static let headerTitle = "=== VoiceInk Diagnostic Logs ==="
+    public static let headerTitle = "=== Roma Just Talk Diagnostic Logs ==="
     public static let headerDivider = "================================"
     public static let noLogsFoundMessage = "No logs found for this session."
     public static let exporterErrorDomain = "LogExporter"
@@ -696,7 +521,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
     public let generated: String
     public let appVersion: String
     public let buildVersion: String
-    public let licenseStatus: String
     public let operatingSystemVersion: String
     public let deviceModel: String
     public let cpu: String
@@ -738,7 +562,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
         generated: String,
         appVersion: String,
         buildVersion: String,
-        licenseStatus: String,
         operatingSystemVersion: String,
         deviceModel: String,
         cpu: String,
@@ -779,7 +602,6 @@ public struct VoiceInkMacOSSystemInformationFacts: Equatable, Sendable {
         self.generated = generated
         self.appVersion = appVersion
         self.buildVersion = buildVersion
-        self.licenseStatus = licenseStatus
         self.operatingSystemVersion = operatingSystemVersion
         self.deviceModel = deviceModel
         self.cpu = cpu
@@ -840,13 +662,12 @@ public enum VoiceInkSystemInformationReport {
 
     public static func macOS(_ facts: VoiceInkMacOSSystemInformationFacts) -> String {
         """
-        === VOICEINK SYSTEM INFORMATION ===
+        === ROMA JUST TALK SYSTEM INFORMATION ===
         Generated: \(facts.generated)
 
         APP INFORMATION:
         App Version: \(facts.appVersion)
         Build Version: \(facts.buildVersion)
-        License Status: \(facts.licenseStatus)
 
         OPERATING SYSTEM:
         macOS Version: \(facts.operatingSystemVersion)
@@ -939,24 +760,6 @@ public enum VoiceInkSystemInformationPermissionStatus: Equatable, Sendable {
     }
 }
 
-public enum VoiceInkSystemInformationLicenseStatus: Equatable, Sendable {
-    case licensedPro
-    case notLicensed
-
-    public var displayText: String {
-        switch self {
-        case .licensedPro:
-            return "Licensed (Pro)"
-        case .notLicensed:
-            return "Not Licensed"
-        }
-    }
-
-    public static func status(hasUsableStoredLicense: Bool) -> Self {
-        hasUsableStoredLicense ? .licensedPro : .notLicensed
-    }
-}
-
 public struct VoiceInkSystemInformationCopyButtonPresentation: Equatable, Sendable {
     public let systemImageName: String
     public let title: String
@@ -1039,7 +842,7 @@ public enum VoiceInkAppIdentity {
 
     public static let storageFallbackWarningPresentation = VoiceInkMacOSStorageAlertPresentation(
         title: "Storage Warning",
-        message: "VoiceInk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
+        message: "Roma Just Talk couldn't access its storage location. Your transcriptions will not be saved between sessions.",
         buttonTitle: "OK"
     )
 

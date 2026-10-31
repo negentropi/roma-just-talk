@@ -61,7 +61,6 @@ struct MetricsContent: View {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "MetricsContent")
     @Environment(\.colorScheme) private var colorScheme
     let modelContext: ModelContext
-    let licenseState: VoiceInkLicenseState
 
     @State private var totalCount: Int = 0
     @State private var totalWords: Int = 0
@@ -71,9 +70,8 @@ struct MetricsContent: View {
     @State private var isModelStatsPanelPresented = false
     @State private var isAccessibilityEnabled = AXIsProcessTrusted()
 
-    init(modelContext: ModelContext, licenseState: VoiceInkLicenseState) {
+    init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        self.licenseState = licenseState
 
         let cachedSummary = DashboardMetricsCache.shared.currentSummary()
         _totalCount = State(initialValue: cachedSummary?.totalCount ?? 0)
@@ -96,10 +94,7 @@ struct MetricsContent: View {
 
                             heroSection
                             metricsSection
-                            HStack(alignment: .top, spacing: 16) {
-                                HelpAndResourcesSection()
-                                DashboardPromotionsSection(licenseState: licenseState)
-                            }
+                            HelpAndResourcesSection()
 
                             Spacer(minLength: 20)
 

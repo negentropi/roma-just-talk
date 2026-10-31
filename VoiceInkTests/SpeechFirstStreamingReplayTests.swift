@@ -32,8 +32,7 @@ struct SpeechFirstStreamingReplayTests {
         )
         let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
             cursorPlan.text(beforeCursor: ""),
-            appendTrailingSpace: true,
-            isTrialExpired: false
+            appendTrailingSpace: true
         )
         #expect(pastedText == "So for example, I can speak longer too. ")
     }

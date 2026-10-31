@@ -940,16 +940,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
         NotificationCenter.default.addObserver(
             self, selector: #selector(qwenModelSelectionChanged), name: .didChangeModel, object: nil
         )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleLicenseStatusChanged),
-            name: .licenseStatusChanged,
-            object: nil
-        )
-    }
-
-    @objc func handleLicenseStatusChanged() {
-        pipeline.licenseViewModel = LicenseViewModel()
     }
 
 }

@@ -77,13 +77,31 @@ jobs:
           assert diagnostic.count(camera_guard)==1
           diagnostic=diagnostic.replace(camera_guard,"if camera.get('sourceHead') != os.environ['GITHUB_SHA']:",1)
           diagnostic=diagnostic.replace("summary = {'sourceHead': head,", "summary = {'diagnosticOnly': True, 'sourceHead': head,",1)
+          launch_anchor="        deny_microphone = scenario == 'lips'\n"
+          assert diagnostic.count(launch_anchor)==1
+          launch_environment="""        command[3:3] = [
+                      '--env', 'GITHUB_ACTIONS=' + os.environ['GITHUB_ACTIONS'],
+                      '--env', 'RUNNER_ENVIRONMENT=' + os.environ['RUNNER_ENVIRONMENT'],
+                      '--env', 'GITHUB_REF=' + os.environ['GITHUB_REF'],
+                      '--env', 'GITHUB_SHA=' + os.environ['GITHUB_SHA'],
+                      '--env', 'LIP_PUBLIC_CAPTURE_DIAGNOSTIC=1',
+                      '--env', 'LIP_PUBLIC_CAPTURE_CONTEXT=' + str(Path(os.environ['RUNNER_TEMP']) / 'lip-runtime-source/public-capture-context.json'),
+                  ]
+          """
+          diagnostic=diagnostic.replace(launch_anchor,launch_environment+launch_anchor,1)
           p.write_text(diagnostic)
           receipt={'diagnosticOnly':True,'appBuildHead':'6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1','proofGitHead':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'originalRunnerSHA256':hashlib.sha256(original.encode()).hexdigest(),'diagnosticRunnerSHA256':hashlib.sha256(diagnostic.encode()).hexdigest(),'change':'Allow explicitly declared older app for diagnosis; final product proof keeps strict head equality.'}
           (pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-runtime-source/proof-overlay.json').write_text(json.dumps(receipt,indent=2))
+          context={'diagnosticOnly':True,'appBuildHead':receipt['appBuildHead'],'proofGitHead':receipt['proofGitHead'],'publicSourceSHA256':'db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc','evidenceDirectory':str(pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-dictation-e2e'),'boundary':'Fresh disposable GitHub host; controlled public OBS fixture only. Copy only the sole new owned MOV after matching writer close and before observed recording drain. Product cleanup remains unchanged.'}
+          (pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-runtime-source/public-capture-context.json').write_text(json.dumps(context,indent=2))
           PY
 
       - name: Exercise actual app and record focus boundaries
         run: python3 Tools/LipDictationE2E/run.py --app "$HOME/Applications/roma just talk.app" --app-source-head 6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1 --visual
+
+      - name: Diagnose retained public captures with the exact older native package
+        if: always()
+        run: python3 Tools/LipDictationE2E/analyze_public_capture.py
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -93,6 +111,7 @@ jobs:
             ${{ runner.temp }}/lip-dictation-e2e/**
             ${{ runner.temp }}/lip-runtime-source/artifact.json
             ${{ runner.temp }}/lip-runtime-source/proof-overlay.json
+            ${{ runner.temp }}/lip-runtime-source/public-capture-context.json
             ${{ runner.temp }}/runtime-core-checks.log
             ${{ runner.temp }}/lip-camera-probe/*.json
             ${{ runner.temp }}/lip-camera-probe/*.log

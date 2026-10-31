@@ -116,6 +116,10 @@ struct LipVisualCases {
                     guard seededFullText == RuntimeTextScenario.existingText.initialText else { throw ProofError.unexpectedInsertion }
                     report["negativeSeededFullText"] = seededFullText
                 }
+                let publicCapture = try preparePublicCaptureDiagnostic(
+                    scenario: scenario, evidence: output!.deletingLastPathComponent(),
+                    video: URL(fileURLWithPath: video), still: URL(fileURLWithPath: still)
+                )
                 let down = try RuntimeShortcutInjector.postLeftShiftDown()
                 modifierHeld = true
                 report["shortcutDown"] = try json(down)
@@ -146,6 +150,16 @@ struct LipVisualCases {
                 let up = try RuntimeShortcutInjector.postLeftShiftUp()
                 modifierHeld = false
                 report["shortcutUp"] = try json(up)
+                if let publicCapture {
+                    let closed = "capture.closed id=\(captureID)"
+                    guard waitForLog(appLog, after: startOffset, containing: closed, timeout: 45) else {
+                        throw ProofError.publicCaptureDiagnostic
+                    }
+                    report["publicCaptureDiagnostic"] = try retainPublicCapture(
+                        publicCapture, captureID: captureID, messages: logSlice(appLog, after: startOffset),
+                        shortcutUpAt: up.postedAtSystemUptime
+                    )
+                }
                 if scenario == "cancel" {
                     guard waitForLog(appLog, after: startOffset, containing: "recognition.start", timeout: 45) else { throw ProofError.inferenceStart }
                     guard RuntimeAX.postKey(keyCode: 53, flags: []) else { throw ProofError.cancellation }
@@ -252,6 +266,130 @@ struct LipVisualCases {
 
     static func json<T: Encodable>(_ value: T) throws -> Any {
         try JSONSerialization.jsonObject(with: JSONEncoder().encode(value))
+    }
+
+    private struct PublicCaptureDiagnostic {
+        let scenario: String
+        let evidence: URL
+        let root: URL
+        let preparedAt: Date
+        let motionSHA256: String
+        let proofHead: String
+    }
+
+    private static func preparePublicCaptureDiagnostic(
+        scenario: String, evidence: URL, video: URL, still: URL
+    ) throws -> PublicCaptureDiagnostic? {
+        let environment = ProcessInfo.processInfo.environment
+        guard ["combined", "combined-silent", "lips"].contains(scenario),
+              environment["LIP_PUBLIC_CAPTURE_DIAGNOSTIC"] == "1" else { return nil }
+        let publicSourceSHA = "db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc"
+        guard environment["GITHUB_ACTIONS"] == "true", environment["RUNNER_ENVIRONMENT"] == "github-hosted",
+              environment["GITHUB_REF"]?.hasPrefix("refs/heads/ci/lip-runtime-diagnostic-") == true,
+              getuid() != 0, let contextPath = environment["LIP_PUBLIC_CAPTURE_CONTEXT"],
+              let context = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(fileURLWithPath: contextPath))) as? [String: Any],
+              context["diagnosticOnly"] as? Bool == true,
+              context["appBuildHead"] as? String == "6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1",
+              let proofHead = context["proofGitHead"] as? String, proofHead == environment["GITHUB_SHA"],
+              context["publicSourceSHA256"] as? String == publicSourceSHA,
+              let declaredEvidence = context["evidenceDirectory"] as? String,
+              URL(fileURLWithPath: declaredEvidence).resolvingSymlinksInPath().path == evidence.resolvingSymlinksInPath().path,
+              (try FileManager.default.attributesOfItem(atPath: "/dev/console")[.ownerAccountID] as? NSNumber)?.uint32Value == getuid(),
+              video.standardizedFileURL == evidence.appendingPathComponent("clock-padded-silent.mp4").standardizedFileURL,
+              still.standardizedFileURL == evidence.appendingPathComponent("clock-still.mp4").standardizedFileURL else {
+            throw ProofError.publicCaptureDiagnostic
+        }
+        let provenance = try JSONSerialization.jsonObject(with: Data(contentsOf: evidence.appendingPathComponent("fixture-provenance.json"))) as? [String: Any]
+        let hashes = try JSONSerialization.jsonObject(with: Data(contentsOf: evidence.appendingPathComponent("visual-fixture-hashes.json"))) as? [String: Any]
+        let camera = try JSONSerialization.jsonObject(with: Data(contentsOf: evidence.appendingPathComponent("supported-camera.json"))) as? [String: Any]
+        guard provenance?["sourceSHA256"] as? String == publicSourceSHA,
+              try diagnosticHash(evidence.appendingPathComponent("clock-source.flv")) == publicSourceSHA,
+              camera?["status"] as? String == "supportedDeviceReady", camera?["obsRetainedForE2E"] as? Bool == true,
+              camera?["sourceHead"] as? String == proofHead,
+              let motionSHA = hashes?["silentMotionVideoSHA256"] as? String,
+              try diagnosticHash(video) == motionSHA,
+              try diagnosticHash(still) == hashes?["staticVideoSHA256"] as? String else {
+            throw ProofError.publicCaptureDiagnostic
+        }
+        let root = FileManager.default.temporaryDirectory.resolvingSymlinksInPath()
+            .appendingPathComponent("RomaJustTalk-LipDictation", isDirectory: true)
+        if FileManager.default.fileExists(atPath: root.path) {
+            try requireDiagnosticItem(root, directory: true)
+            guard try FileManager.default.contentsOfDirectory(atPath: root.path).isEmpty else {
+                throw ProofError.publicCaptureDiagnostic
+            }
+        }
+        return PublicCaptureDiagnostic(scenario: scenario, evidence: evidence, root: root,
+                                       preparedAt: Date(), motionSHA256: motionSHA, proofHead: proofHead)
+    }
+
+    private static func retainPublicCapture(
+        _ diagnostic: PublicCaptureDiagnostic, captureID: String, messages: String, shortcutUpAt: TimeInterval
+    ) throws -> [String: Any] {
+        let copyStarted = ProcessInfo.processInfo.systemUptime
+        let starts = messages.split(separator: "\n").filter { $0.contains("capture.start id=") }
+        guard UUID(uuidString: captureID) != nil, starts.count == 1,
+              starts[0].contains("capture.start id=\(captureID)"), starts[0].contains("audio_inputs=0"),
+              messages.contains("capture.closed id=\(captureID)"),
+              !messages.contains("recording.drained id=\(captureID)") else { throw ProofError.publicCaptureDiagnostic }
+        try requireDiagnosticItem(diagnostic.root, directory: true)
+        let entries = try FileManager.default.contentsOfDirectory(at: diagnostic.root, includingPropertiesForKeys: nil)
+        guard entries.count == 1, let directory = entries.first, UUID(uuidString: directory.lastPathComponent) != nil else {
+            throw ProofError.publicCaptureDiagnostic
+        }
+        try requireDiagnosticItem(directory, directory: true)
+        let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+        guard files.count == 1, let movie = files.first, movie.lastPathComponent == "capture.mov" else {
+            throw ProofError.publicCaptureDiagnostic
+        }
+        try requireDiagnosticItem(movie, directory: false)
+        let attributes = try FileManager.default.attributesOfItem(atPath: movie.path)
+        guard let bytes = attributes[.size] as? NSNumber, bytes.int64Value > 0, bytes.int64Value <= 64_000_000,
+              let created = attributes[.creationDate] as? Date, created >= diagnostic.preparedAt.addingTimeInterval(-1) else {
+            throw ProofError.publicCaptureDiagnostic
+        }
+        let output = diagnostic.evidence.appendingPathComponent("public-captures", isDirectory: true)
+        try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
+        let destination = output.appendingPathComponent(diagnostic.scenario + ".mov")
+        guard !FileManager.default.fileExists(atPath: destination.path) else { throw ProofError.publicCaptureDiagnostic }
+        // The writer is closed, and this sole new file belongs to the observed public-fixture session.
+        try FileManager.default.copyItem(at: movie, to: destination)
+        let sourceSHA = try diagnosticHash(movie)
+        let copiedSHA = try diagnosticHash(destination)
+        guard copiedSHA == sourceSHA else { throw ProofError.publicCaptureDiagnostic }
+        let receipt: [String: Any] = [
+            "diagnosticOnly": true, "publicFixtureOnly": true, "scenario": diagnostic.scenario,
+            "appBuildHead": "6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1", "proofGitHead": diagnostic.proofHead,
+            "captureID": captureID, "sourceRelativePath": directory.lastPathComponent + "/capture.mov",
+            "copiedMovie": destination.lastPathComponent, "bytes": bytes, "sha256": copiedSHA,
+            "fixtureMotionSHA256": diagnostic.motionSHA256, "captureRootEmptyBeforeShortcut": true,
+            "matchingCaptureClosedObserved": true, "matchingDrainObservedBeforeCopy": false,
+            "shortcutUpAtSystemUptime": shortcutUpAt, "copyStartedAtSystemUptime": copyStarted,
+            "copyFinishedAtSystemUptime": ProcessInfo.processInfo.systemUptime,
+            "sourceCreationDate": ISO8601DateFormatter().string(from: created)
+        ]
+        try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+            .write(to: output.appendingPathComponent(diagnostic.scenario + ".json"), options: .atomic)
+        print("PUBLIC_CAPTURE_DIAGNOSTIC scenario=\(diagnostic.scenario) id=\(captureID) bytes=\(bytes) sha256=\(copiedSHA)")
+        return receipt
+    }
+
+    private static func requireDiagnosticItem(_ url: URL, directory: Bool) throws {
+        let values = try url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey, .isRegularFileKey])
+        let owner = try FileManager.default.attributesOfItem(atPath: url.path)[.ownerAccountID] as? NSNumber
+        guard values.isSymbolicLink != true, owner?.uint32Value == getuid(),
+              directory ? values.isDirectory == true : values.isRegularFile == true else {
+            throw ProofError.publicCaptureDiagnostic
+        }
+    }
+
+    private static func diagnosticHash(_ url: URL) throws -> String {
+        try requireDiagnosticItem(url, directory: false)
+        let file = try FileHandle(forReadingFrom: url)
+        defer { try? file.close() }
+        var hash = SHA256()
+        while let data = try file.read(upToCount: 1_048_576), !data.isEmpty { hash.update(data: data) }
+        return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
     static func runNegativeControls(configuration: RuntimeHarnessConfiguration, report: inout [String: Any], directory: URL) throws {
         let environment = ProcessInfo.processInfo.environment
@@ -672,6 +810,7 @@ struct LipVisualCases {
     }
     enum ProofError: Error {
         case invalidArguments, preflight, appMissing, setup, settingControl, recordingStart, renderedBaseline
+        case publicCaptureDiagnostic
         case inferenceStart, notDrained, dictation, captureEvidence, unexpectedInsertion, targetUnreadable, negativeControl, microphone, cancellation, quit
     }
 }

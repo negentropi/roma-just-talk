@@ -184,19 +184,15 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         write(evidence / 'visual-summary.json', {'passed': False, 'cases': cases})
         raise RuntimeError('Actual negative-observation controls failed')
     websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
-    still = evidence / 'clock-still.mp4'
-    first_frame = evidence / 'clock-first.png'
     video = evidence / 'clock-padded-silent.mp4'
     silence = evidence / 'clock-silent.wav'
-    run('prepare-first-camera-frame', ['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', original, '-map', '0:v:0', '-vf', 'scale=640:480', '-frames:v', '1', first_frame])
-    run('prepare-static-camera-feed', ['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-loop', '1', '-framerate', '25', '-i', first_frame, '-t', '2', '-an', '-c:v', 'libx264', '-crf', '0', '-pix_fmt', 'yuv420p', still])
     run('prepare-aligned-camera-feed', ['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', original, '-map', '0:v:0', '-an', '-vf', 'scale=640:480,fps=25,tpad=start_mode=clone:start_duration=1:stop_mode=clone:stop_duration=0.5', '-c:v', 'libx264', '-crf', '0', '-pix_fmt', 'yuv420p', video])
     run('prepare-zero-audio', ['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', audio_fixture, '-af', 'volume=0', silence])
     run('verify-zero-audio', ['ffmpeg', '-nostdin', '-hide_banner', '-i', silence, '-af', 'volumedetect', '-f', 'null', '-'])
     with wave.open(str(silence), 'rb') as stream:
         if any(stream.readframes(stream.getnframes())):
             raise RuntimeError('The fallback test audio contains nonzero PCM')
-    write(evidence / 'visual-fixture-hashes.json', {'staticVideoSHA256': sha256(still), 'silentMotionVideoSHA256': sha256(video), 'speechAudioSHA256': sha256(audio_fixture), 'zeroAudioSHA256': sha256(silence), 'zeroAudioPCMVerified': True})
+    write(evidence / 'visual-fixture-hashes.json', {'silentMotionVideoSHA256': sha256(video), 'speechAudioSHA256': sha256(audio_fixture), 'zeroAudioSHA256': sha256(silence), 'zeroAudioPCMVerified': True})
     for scenario in ['setup', 'combined', 'combined-silent', 'lips', 'cancel', 'disable', 'quit']:
         if scenario == 'combined':
             camera_summary = args.obs_summary or Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/summary.json'
@@ -222,7 +218,7 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         report = evidence / (scenario + '.json')
         before = history()
         before_ids = {row['Z_PK'] for row in before}
-        command = ['/usr/bin/open', '-W', '-n', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--obs-config', websocket, '--still', still, '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
+        command = ['/usr/bin/open', '-W', '-n', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--obs-config', websocket, '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
         deny_microphone = scenario == 'lips'
         if deny_microphone:
             microphone_tcc_fixture(evidence, run, 'microphone-authorized-before-lips', 2)

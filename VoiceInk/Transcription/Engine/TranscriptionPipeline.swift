@@ -8,19 +8,22 @@ import VoiceInkCore
 @MainActor
 class TranscriptionPipeline {
     private let modelContext: ModelContext
-    private let serviceRegistry: TranscriptionServiceRegistry
     private let enhancementService: AIEnhancementService?
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "TranscriptionPipeline")
 
     var licenseViewModel: LicenseViewModel
 
+    #if DEBUG
+    var cursorContextPreparedForTesting: (() async -> Void)?
+    var pasteAuthorizationPreparedForTesting: (() async -> Void)?
+    var autoSendDelayStartedForTesting: (() -> Void)?
+    #endif
+
     init(
         modelContext: ModelContext,
-        serviceRegistry: TranscriptionServiceRegistry,
         enhancementService: AIEnhancementService?
     ) {
         self.modelContext = modelContext
-        self.serviceRegistry = serviceRegistry
         self.enhancementService = enhancementService
         self.licenseViewModel = LicenseViewModel()
     }
@@ -28,18 +31,18 @@ class TranscriptionPipeline {
     /// Run the full pipeline for a given transcription record.
     /// - Parameters:
     ///   - transcription: The pending Transcription SwiftData object to populate and save.
-    ///   - audioURL: The recorded audio file.
-    ///   - model: The transcription model to use.
-    ///   - session: An active streaming session if one was prepared, otherwise nil.
+    ///   - modelDisplayName: The recognition model name stored with the transcription.
+    ///   - recognize: Produces text from the captured input.
+    ///   - captureDuration: Reads the capture duration when the record has none.
     ///   - onStateChange: Called when the pipeline moves to a new recording state (e.g. `.enhancing`).
     ///   - shouldCancel: Returns true if the user requested cancellation.
     ///   - onCancel: Called when cancellation is detected to cancel active session state.
     ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
     func run(
         transcription: Transcription,
-        audioURL: URL,
-        model: any TranscriptionModel,
-        session: TranscriptionSession?,
+        modelDisplayName: String,
+        recognize: () async throws -> String,
+        captureDuration: () async -> TimeInterval,
         latencyTraceToken: VoiceInkLatencyTrace.Token?,
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
         shouldCancel: () -> Bool,
@@ -50,7 +53,7 @@ class TranscriptionPipeline {
         let traceToken = latencyTraceToken
         latencyTrace.event(
             "pipeline.enter",
-            details: "model=\(model.displayName) hasStreamingSession=\(session != nil)",
+            details: "model=\(modelDisplayName)",
             token: traceToken
         )
         var finalPastedText: String?
@@ -63,9 +66,8 @@ class TranscriptionPipeline {
             }
         }
 
-        func restorePromptDetectionSettingsAndDismiss(afterRestore: () -> Void = {}) async {
+        func restorePromptDetectionSettingsAndDismiss() async {
             await restorePromptDetectionSettingsIfNeeded()
-            afterRestore()
             await onDismiss()
         }
 
@@ -77,18 +79,13 @@ class TranscriptionPipeline {
             if transcription.duration > 0 {
                 canceledDuration = nil
             } else {
-                let durationResult = await AudioFileMetadata.tracedDuration(
-                    for: audioURL,
-                    executorName: "pipeline.cancel_audio_duration",
-                    latencyTraceToken: traceToken
-                )
-                latencyTrace.executorResumed(durationResult.executorCheckpoint)
-                canceledDuration = durationResult.seconds > 0 ? durationResult.seconds : nil
+                let duration = await captureDuration()
+                canceledDuration = duration > 0 ? duration : nil
             }
 
             transcription.markAsCanceledTranscription(
                 duration: canceledDuration,
-                modelName: transcription.transcriptionModelName ?? model.displayName
+                modelName: transcription.transcriptionModelName ?? modelDisplayName
             )
 
             do {
@@ -99,7 +96,7 @@ class TranscriptionPipeline {
             }
             latencyTrace.finish(
                 event: "pipeline.cancelled",
-                details: "model=\(model.displayName)",
+                details: "model=\(modelDisplayName)",
                 token: traceToken
             )
         }
@@ -130,6 +127,11 @@ class TranscriptionPipeline {
                 span,
                 details: "available=\(context != nil)"
             )
+            #if DEBUG
+            if let cursorContextPreparedForTesting = self.cursorContextPreparedForTesting {
+                await cursorContextPreparedForTesting()
+            }
+            #endif
             return context
         }
         defer { preparedCursorTextContext.cancel() }
@@ -145,6 +147,11 @@ class TranscriptionPipeline {
             )
             let isTrusted = CursorPaster.preflightPasteAuthorization()
             latencyTrace.end(span, details: "trusted=\(isTrusted)")
+            #if DEBUG
+            if let pasteAuthorizationPreparedForTesting = self.pasteAuthorizationPreparedForTesting {
+                await pasteAuthorizationPreparedForTesting()
+            }
+            #endif
         }
 
         do {
@@ -152,11 +159,7 @@ class TranscriptionPipeline {
             let rawText: String
             let transcriptionSpan = latencyTrace.begin("pipeline.transcribe", token: traceToken)
             do {
-                if let session {
-                    rawText = try await session.transcribe(audioURL: audioURL)
-                } else {
-                    rawText = try await serviceRegistry.transcribe(audioURL: audioURL, model: model)
-                }
+                rawText = try await recognize()
                 latencyTrace.end(
                     transcriptionSpan,
                     details: "result=success rawChars=\(rawText.count)"
@@ -186,7 +189,7 @@ class TranscriptionPipeline {
             if shouldCancel() { await finishCanceledTranscription(); return }
 
             transcription.text = cleanedText
-            transcription.transcriptionModelName = model.displayName
+            transcription.transcriptionModelName = modelDisplayName
             transcription.transcriptionDuration = transcriptionDuration
             finalPastedText = cleanedText
             var enhancementResult: VoiceInkAIEnhancementResult?
@@ -245,7 +248,7 @@ class TranscriptionPipeline {
                 cleanedText: cleanedText,
                 duration: transcription.duration,
                 audioFileURL: transcription.audioFileURL,
-                transcriptionModelName: model.displayName,
+                transcriptionModelName: modelDisplayName,
                 transcriptionDuration: transcriptionDuration,
                 powerModeName: transcription.powerModeName,
                 powerModeEmoji: transcription.powerModeEmoji,
@@ -283,7 +286,7 @@ class TranscriptionPipeline {
                 do {
                     didInsertSessionMetric = try SessionMetricRecorder.recordRecorderSession(
                         transcription: transcription,
-                        model: model,
+                        modelDisplayName: modelDisplayName,
                         in: modelContext
                     )
                 } catch {
@@ -328,6 +331,11 @@ class TranscriptionPipeline {
                 textToPaste,
                 preparedCursorTextContext: preparedCursorTextContext
             )
+            if shouldCancel() {
+                latencyTrace.end(pastePreparationSpan, details: "result=cancelled")
+                await finishCanceledTranscription()
+                return
+            }
 
             let isTrialExpired: Bool
             if case .trialExpired = licenseViewModel.licenseState {
@@ -343,31 +351,52 @@ class TranscriptionPipeline {
             latencyTrace.end(pastePreparationSpan, details: "chars=\(pastedText.count)")
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
             await pasteAuthorizationPreflight.value
-            let pasteResult = await CursorPaster.startPasteAtCursor(
+            if shouldCancel() {
+                latencyTrace.end(pasteSpan, details: "result=cancelled")
+                await finishCanceledTranscription()
+                return
+            }
+            let pasteTask = CursorPaster.startPasteAtCursor(
                 pastedText,
                 preparedCursorTextContext: preparedCursorTextContext,
                 latencyTraceToken: traceToken
-            ).value
+            )
+            // Awaiting an unstructured task does not forward cancellation.
+            let pasteResult = await withTaskCancellationHandler {
+                await pasteTask.value
+            } onCancel: {
+                pasteTask.cancel()
+            }
             latencyTrace.end(
                 pasteSpan,
                 details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"
             )
+            if !pasteResult.didDeliverText, shouldCancel() || Task.isCancelled {
+                await finishCanceledTranscription()
+                return
+            }
             let autoSendKey = PowerModeManager.shared.activeConfiguration?.autoSendKey
             let stopSoundSpan = latencyTrace.begin("pipeline.stop_sound", token: traceToken)
             SoundManager.shared.play(.stop)
             latencyTrace.end(stopSoundSpan)
             let dismissSpan = latencyTrace.begin("pipeline.dismiss_recorder", token: traceToken)
-            await restorePromptDetectionSettingsAndDismiss {
-                if pasteResult.didDeliverText,
-                   let autoSendKey,
-                   let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
-                    Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: delayAfterPaste)
+            await restorePromptDetectionSettingsAndDismiss()
+            latencyTrace.end(dismissSpan)
+            if pasteResult.didDeliverText,
+               let autoSendKey,
+               let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
+                #if DEBUG
+                autoSendDelayStartedForTesting?()
+                #endif
+                do {
+                    try await Task.sleep(nanoseconds: delayAfterPaste)
+                    if !Task.isCancelled, !shouldCancel() {
                         CursorPaster.performAutoSend(autoSendKey)
                     }
+                } catch {
+                    latencyTrace.event("pipeline.auto_send_cancelled", token: traceToken)
                 }
             }
-            latencyTrace.end(dismissSpan)
         } else {
             latencyTrace.event(
                 "pipeline.no_paste",
@@ -382,14 +411,8 @@ class TranscriptionPipeline {
 
         if transcription.transcriptionState == .completed,
            transcription.duration <= 0 {
-            let durationSpan = latencyTrace.begin("pipeline.audio_duration", token: traceToken)
-            let durationResult = await AudioFileMetadata.tracedDuration(
-                for: audioURL,
-                executorName: "pipeline.audio_duration",
-                latencyTraceToken: traceToken
-            )
-            latencyTrace.executorResumed(durationResult.executorCheckpoint)
-            transcription.duration = durationResult.seconds
+            let durationSpan = latencyTrace.begin("pipeline.capture_duration", token: traceToken)
+            transcription.duration = await captureDuration()
             latencyTrace.end(durationSpan)
         }
 

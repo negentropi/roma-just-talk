@@ -1,0 +1,17 @@
+{
+  "initializer_count": 658,
+  "all_initializers_external": true,
+  "inline_initializer_bytes": 0,
+  "external_storage_bytes": 1361670500,
+  "largest_fixed_constant_bytes": 2048,
+  "dynamic_position_encoding": true,
+  "graph_sha256": "0d98db3a949252b205cbc1fc57dee372ed61243aaf917ec684fde26c05e39f29",
+  "graph_bytes": 910911,
+  "onnx": "1.17.0",
+  "onnxruntime": "1.20.1",
+  "torch": "2.5.1+cpu",
+  "cpu_threads": 4,
+  "address_space_limit_gib": 8,
+  "session_load_seconds": 2.4154985579662025,
+  "peak_rss_kib": 3241844
+}

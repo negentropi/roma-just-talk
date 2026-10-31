@@ -1,4 +1,5 @@
 import AppKit
+import Darwin
 import Foundation
 import RuntimeE2ECore
 
@@ -86,7 +87,12 @@ enum RuntimeHarnessRunner {
         configuration: RuntimeHarnessConfiguration,
         reportURL: URL
     ) throws -> RuntimeHarnessReport {
+        let focusRecorder = try RuntimeFocusRecorder(
+            outputURL: reportURL.deletingLastPathComponent().appendingPathComponent("focus-events.jsonl")
+        )
+        defer { focusRecorder.stop() }
         let preflight = RuntimePreflight.run(configuration: configuration)
+        focusRecorder.recordCurrent(kind: "afterPreflight")
         guard preflight.passed else {
             var report = RuntimeHarnessReport(
                 startedAt: Date(),
@@ -162,6 +168,7 @@ enum RuntimeHarnessRunner {
             voiceInkSession = session
             report.voiceInkSession = session.info
             Thread.sleep(forTimeInterval: configuration.preRollWarmupSeconds)
+            focusRecorder.recordCurrent(kind: "afterVoiceInkLaunchWarmup")
 
             var seenTraceIDs = Set((try? RuntimeLatencyLogReader.recent().traces.map(\.traceID)) ?? [])
             var previousFixturePath: String?
@@ -174,6 +181,7 @@ enum RuntimeHarnessRunner {
                 ) {
                     try session.relaunchForRun(bundleIdentifier: configuration.voiceInkBundleIdentifier)
                     Thread.sleep(forTimeInterval: configuration.preRollWarmupSeconds)
+                    focusRecorder.recordCurrent(kind: "afterVoiceInkRelaunchWarmup")
                 }
                 previousFixturePath = runCase.fixtureURL.path
 
@@ -182,7 +190,9 @@ enum RuntimeHarnessRunner {
                     configuration: configuration,
                     audioDevice: audioDevice,
                     fixtureDurationSeconds: fixtureDurations[runCase.fixtureURL.path],
-                    seenTraceIDs: &seenTraceIDs
+                    seenTraceIDs: &seenTraceIDs,
+                    evidenceDirectoryURL: reportURL.deletingLastPathComponent(),
+                    focusRecorder: focusRecorder
                 )
                 report.cases.append(caseReport)
                 report.summary = summarize(cases: report.cases)
@@ -214,7 +224,9 @@ enum RuntimeHarnessRunner {
         configuration: RuntimeHarnessConfiguration,
         audioDevice: RuntimeAudioDevice,
         fixtureDurationSeconds: TimeInterval?,
-        seenTraceIDs: inout Set<String>
+        seenTraceIDs: inout Set<String>,
+        evidenceDirectoryURL: URL,
+        focusRecorder: RuntimeFocusRecorder
     ) throws -> RuntimeCaseReport {
         let startedAt = Date()
         let runID = makeRunID(runCase)
@@ -253,6 +265,7 @@ enum RuntimeHarnessRunner {
                 availabilityPolicy: configuration.targetAvailabilityPolicy
             )
             preparedTarget = target
+            focusRecorder.recordCurrent(kind: "afterTargetPrepareSettle")
 
             phase = "audio"
             let audio = RuntimeAudioPlayback(
@@ -267,6 +280,7 @@ enum RuntimeHarnessRunner {
 
             phase = "shortcut"
             waitUntilSystemUptime(audioStartedAt + plan.keyDownOffsetSeconds)
+            focusRecorder.recordCurrent(kind: "beforeShortcutDown")
             let down = try RuntimeShortcutInjector.postLeftShiftDown()
             shortcutDown = down
             let renderedBaselineDelay = min(0.5, plan.holdDurationSeconds / 2)
@@ -292,6 +306,7 @@ enum RuntimeHarnessRunner {
             phase = "shortcut"
             let up = try RuntimeShortcutInjector.postLeftShiftUp()
             shortcutUp = up
+            focusRecorder.recordCurrent(kind: "afterShortcutUp")
 
             phase = "observation"
             visibleText = target.waitForVisibleText(
@@ -404,6 +419,13 @@ enum RuntimeHarnessRunner {
         } catch {
             playbackCleanupError = error
         }
+        focusRecorder.recordCurrent(kind: "afterObservationBeforeCleanup")
+        let captureBeforeCleanup = !assessment.passed || playbackCleanupError != nil
+        if captureBeforeCleanup {
+            captureFailureEvidence(
+                runID: runID, directoryURL: evidenceDirectoryURL, phase: "beforeTargetCleanup"
+            )
+        }
         let targetCleanup = preparedTarget?.cleanup()
         if let targetCleanup, !targetCleanup.passed {
             let cleanupError = targetCleanup.errors.joined(separator: "; ")
@@ -414,6 +436,11 @@ enum RuntimeHarnessRunner {
             if assessment.passed {
                 assessment = RuntimeCaseAssessment(status: .targetCleanupFailed, passed: false)
             }
+        }
+        if !captureBeforeCleanup, !assessment.passed {
+            captureFailureEvidence(
+                runID: runID, directoryURL: evidenceDirectoryURL, phase: "afterTargetCleanup"
+            )
         }
         if let playbackCleanupError {
             throw playbackCleanupError
@@ -490,6 +517,51 @@ enum RuntimeHarnessRunner {
             assessment: assessment,
             error: errorText
         )
+    }
+
+    private static func captureFailureEvidence(runID: String, directoryURL: URL, phase: String) {
+        let screenshotURL = directoryURL.appendingPathComponent(runID + "-failure-desktop.png")
+        let receiptURL = directoryURL.appendingPathComponent(runID + "-failure-evidence.json")
+        var receipt: [String: Any] = [
+            "capturedAt": ISO8601DateFormatter().string(from: Date()),
+            "phase": phase,
+            "desktopScreenshot": NSNull(),
+            "targetScreenshot": NSNull(),
+            "targetScreenshotUnavailable": "The prepared target does not expose a window ID or capture rectangle"
+        ]
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+        process.arguments = ["-x", "-m", screenshotURL.path]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        let finished = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in finished.signal() }
+        do {
+            try process.run()
+            if finished.wait(timeout: .now() + 5) == .timedOut {
+                process.terminate()
+                if finished.wait(timeout: .now() + 1) == .timedOut {
+                    kill(process.processIdentifier, SIGKILL)
+                    receipt["captureProcessExitConfirmed"] = finished.wait(timeout: .now() + 1) == .success
+                } else {
+                    receipt["captureProcessExitConfirmed"] = true
+                }
+                receipt["desktopScreenshotUnavailable"] = "screencapture exceeded the five-second evidence deadline"
+            } else if process.terminationStatus == 0,
+                      FileManager.default.fileExists(atPath: screenshotURL.path) {
+                receipt["desktopScreenshot"] = screenshotURL.lastPathComponent
+            } else {
+                receipt["desktopScreenshotUnavailable"] = "screencapture exited with status \(process.terminationStatus)"
+            }
+        } catch {
+            receipt["desktopScreenshotUnavailable"] = String(describing: error)
+        }
+        do {
+            let data = try JSONSerialization.data(withJSONObject: receipt, options: [.prettyPrinted, .sortedKeys])
+            try data.write(to: receiptURL, options: .atomic)
+        } catch {
+            fputs("Failure screenshot receipt could not be written: \(error)\n", stderr)
+        }
     }
 
     private static func timingPlanForCase(

@@ -169,7 +169,26 @@ final class RuntimePreparedTarget {
     }
 
     func refreshRenderedBaseline() -> String? {
-        renderedTextObserver.refreshBaseline()
+        renderedTextObserver.refreshBaseline {
+            RuntimeAX.text(from: textElement).flatMap { textScenario.insertedText(from: $0) }
+        }
+    }
+
+    func readFullText() -> String? {
+        guard let application = NSRunningApplication(processIdentifier: info.processIdentifier),
+              !application.isTerminated, application.bundleIdentifier == info.bundleIdentifier,
+              let currentWindow = RuntimeAX.window(containing: info.windowTitleToken, in: appElement),
+              CFEqual(currentWindow, windowElement),
+              let currentTextElement = RuntimeAX.editableElement(
+                in: currentWindow,
+                identifying: target.kind == .browser
+                    ? RuntimeTargetIsolationPlan.browserEditableLabel(windowTitleToken: info.windowTitleToken)
+                    : info.windowTitleToken
+              ) ?? (target.kind == .browser ? nil : RuntimeAX.firstEditableElement(in: currentWindow)),
+              let textWindow = RuntimeAX.window(for: currentTextElement), CFEqual(textWindow, currentWindow),
+              ownedCodeWindow?.stillContainsTarget() ?? true else { return nil }
+        textElement = currentTextElement
+        return RuntimeAX.text(from: currentTextElement)
     }
 
     func waitForVisibleText(
@@ -581,7 +600,7 @@ enum RuntimeTargetController {
                 throw RuntimeTargetControllerError.renderObservationUnavailable(String(describing: error))
             }
 
-            return RuntimePreparedTarget(
+            let preparedTarget = RuntimePreparedTarget(
                 target: target,
                 appURL: appURL,
                 appElement: surface.appElement,
@@ -599,6 +618,10 @@ enum RuntimeTargetController {
                 previousFrontmostApplication: previousFrontmostApplication,
                 renderedTextObserver: renderedTextObserver
             )
+            if let error = preparedTarget.refreshRenderedBaseline() {
+                throw RuntimeTargetControllerError.renderObservationUnavailable(error)
+            }
+            return preparedTarget
         } catch {
             cleanupFailedPreparation(
                 target: target,

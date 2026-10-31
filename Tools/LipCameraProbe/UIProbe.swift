@@ -1,0 +1,337 @@
+import AppKit
+import ApplicationServices
+import Foundation
+import Security
+
+@main
+struct UIProbe {
+    static func main() {
+        let args = CommandLine.arguments
+        guard args.count >= 2 else { return }
+        if args.count == 3 && args[2] == "acknowledge-obs-camera-alert" {
+            let report = acknowledgeOBSCameraAlert()
+            if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
+                try? data.write(to: URL(fileURLWithPath: args[1]), options: .atomic)
+            }
+            return
+        }
+        let authenticating = args.count > 2 && args[2] == "authenticate-host-autologin"
+        let attempting = args.count > 2 && args[2] == "approve"
+        let targets = Set(["com.obsproject.obs-studio", "com.apple.systempreferences", "com.apple.SecurityAgent", "com.apple.UserNotificationCenter", "com.apple.CoreServicesUIAgent", "com.apple.LocalAuthentication.UIAgent", "com.apple.systemuiserver"])
+        var applications: [[String: Any]] = []
+        var actions: [[String: Any]] = []
+        let trusted = AXIsProcessTrusted()
+        let deadline = ProcessInfo.processInfo.systemUptime + 8
+        var requiresAuthentication = false
+        let runningApplications = NSWorkspace.shared.runningApplications.sorted { left, right in
+            (left.bundleIdentifier == "com.apple.SecurityAgent" ? 0 : 1) < (right.bundleIdentifier == "com.apple.SecurityAgent" ? 0 : 1)
+        }
+        for app in runningApplications where targets.contains(app.bundleIdentifier ?? "") && (!authenticating || app.bundleIdentifier == "com.apple.SecurityAgent") {
+            guard ProcessInfo.processInfo.systemUptime < deadline else { break }
+            let root = AXUIElementCreateApplication(app.processIdentifier)
+            AXUIElementSetMessagingTimeout(root, 0.2)
+            var nodes: [[String: Any]] = []
+            var elements: [(AXUIElement, String, String, Int?)] = []
+            var queue: [(AXUIElement, Int)] = [(root, 0)]
+            var visited: [AXUIElement] = []
+            while !queue.isEmpty && nodes.count < 600 && ProcessInfo.processInfo.systemUptime < deadline {
+                let (element, depth) = queue.removeFirst()
+                guard depth <= 20, !visited.contains(where: { CFEqual($0, element) }) else { continue }
+                visited.append(element)
+                AXUIElementSetMessagingTimeout(element, 0.15)
+                func read(_ key: String) -> CFTypeRef? {
+                    guard ProcessInfo.processInfo.systemUptime < deadline else { return nil }
+                    var value: CFTypeRef?
+                    return AXUIElementCopyAttributeValue(element, key as CFString, &value) == .success ? value : nil
+                }
+                let role = read(kAXRoleAttribute) as? String ?? ""
+                let title = read(kAXTitleAttribute) as? String ?? ""
+                let staticText = role == kAXStaticTextRole ? (read(kAXValueAttribute) as? String ?? "") : ""
+                let description = read(kAXDescriptionAttribute) as? String ?? ""
+                let label = !title.isEmpty ? title : description
+                let secure = role == kAXTextFieldRole && (read(kAXSubroleAttribute) as? String) == kAXSecureTextFieldSubrole
+                requiresAuthentication = requiresAuthentication || secure
+                let integer = [kAXCheckBoxRole, "AXSwitch"].contains(role) ? (read(kAXValueAttribute) as? NSNumber)?.intValue : nil
+                var node: [String: Any] = ["role": role, "title": title, "description": description, "secureField": secure]
+                if let enabled = read(kAXEnabledAttribute) as? NSNumber { node["enabled"] = enabled.boolValue }
+                if !staticText.isEmpty { node["staticText"] = staticText }
+                if let integer { node["toggleValue"] = integer }
+                nodes.append(node)
+                elements.append((element, label, role, integer))
+                if ![kAXMenuBarRole, kAXMenuBarItemRole, kAXMenuItemRole].contains(role),
+                   let children = read(kAXChildrenAttribute) as? [AXUIElement] {
+                    queue.append(contentsOf: children.prefix(100).map { ($0, depth + 1) })
+                }
+            }
+            let labels = nodes.map { node in
+                let title = node["title"] as? String ?? ""
+                let description = node["description"] as? String ?? ""
+                let text = node["staticText"] as? String ?? ""
+                return [title, description, text].joined(separator: " ")
+            }.joined(separator: " ")
+            applications.append(["bundleIdentifier": app.bundleIdentifier ?? "", "pid": app.processIdentifier, "nodes": nodes])
+            if authenticating, trusted, app.bundleIdentifier == "com.apple.SecurityAgent" {
+                let authentication = SystemExtensionAuthentication.submit(application: app, elements: elements.map { $0.0 }, reportURL: URL(fileURLWithPath: args[1]), deadline: deadline)
+                actions.append(authentication)
+                continue
+            }
+            guard attempting, trusted, !requiresAuthentication else { continue }
+            func isOnlyToggleInOBSRow(_ element: AXUIElement) -> Bool {
+                func value(_ element: AXUIElement, _ attribute: String) -> CFTypeRef? {
+                    guard ProcessInfo.processInfo.systemUptime < deadline else { return nil }
+                    var result: CFTypeRef?
+                    return AXUIElementCopyAttributeValue(element, attribute as CFString, &result) == .success ? result : nil
+                }
+                var ancestor = element
+                for _ in 0..<3 {
+                    guard let parent = value(ancestor, kAXParentAttribute) else { return false }
+                    ancestor = parent as! AXUIElement
+                    var descendants: [(AXUIElement, Int)] = [(ancestor, 0)]
+                    var text = Set<String>()
+                    var checkboxCount = 0
+                    var visitedCount = 0
+                    while !descendants.isEmpty && visitedCount < 80 {
+                        let (child, depth) = descendants.removeFirst()
+                        guard depth <= 3 else { continue }
+                        visitedCount += 1
+                        let role = value(child, kAXRoleAttribute) as? String ?? ""
+                        if [kAXCheckBoxRole, "AXSwitch"].contains(role) { checkboxCount += 1 }
+                        if role == kAXStaticTextRole, let label = value(child, kAXValueAttribute) as? String {
+                            text.insert(label)
+                        }
+                        if let children = value(child, kAXChildrenAttribute) as? [AXUIElement] {
+                            descendants.append(contentsOf: children.prefix(30).map { ($0, depth + 1) })
+                        }
+                    }
+                    if checkboxCount == 1 && text.contains("OBS") && text.contains("OBS Virtual Camera") { return true }
+                }
+                return false
+            }
+            func clickToggleCenter(_ element: AXUIElement) -> [String: Any] {
+                var report: [String: Any] = ["method": "ordinaryPointerClick", "posted": false, "postEventTrusted": CGPreflightPostEventAccess()]
+                func value(_ attribute: String) -> CFTypeRef? {
+                    var result: CFTypeRef?
+                    return AXUIElementCopyAttributeValue(element, attribute as CFString, &result) == .success ? result : nil
+                }
+                guard let enabled = value(kAXEnabledAttribute) as? NSNumber, enabled.boolValue else {
+                    report["reason"] = "checkboxDisabledOrUnknown"
+                    return report
+                }
+                guard CGPreflightPostEventAccess(),
+                      let positionValue = value(kAXPositionAttribute), CFGetTypeID(positionValue) == AXValueGetTypeID(),
+                      let sizeValue = value(kAXSizeAttribute), CFGetTypeID(sizeValue) == AXValueGetTypeID() else {
+                    report["reason"] = "postEventPermissionOrFrameUnavailable"
+                    return report
+                }
+                var position = CGPoint.zero
+                var size = CGSize.zero
+                guard AXValueGetValue(positionValue as! AXValue, .cgPoint, &position),
+                      AXValueGetValue(sizeValue as! AXValue, .cgSize, &size),
+                      size.width > 0, size.height > 0 else { return report }
+                let point = CGPoint(x: position.x + size.width / 2, y: position.y + size.height / 2)
+                report["x"] = point.x
+                report["y"] = point.y
+                for type in [CGEventType.mouseMoved, .leftMouseDown, .leftMouseUp] {
+                    guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else { return report }
+                    event.setIntegerValueField(.mouseEventClickState, value: 1)
+                    event.post(tap: .cghidEventTap)
+                    Thread.sleep(forTimeInterval: 0.05)
+                }
+                report["posted"] = true
+                return report
+            }
+            let ordered = elements.sorted { left, right in
+                func rank(_ item: (AXUIElement, String, String, Int?)) -> Int {
+                    if item.1 == "OBS" && item.3 == 0 { return 0 }
+                    if item.1 == "Allow" { return 1 }
+                    return 2
+                }
+                return rank(left) < rank(right)
+            }
+            for (element, label, role, integer) in ordered {
+                let obsContext = labels.localizedCaseInsensitiveContains("OBS")
+                let cameraContext = labels.localizedCaseInsensitiveContains("camera") || labels.localizedCaseInsensitiveContains("extension")
+                let probeContext = (labels.localizedCaseInsensitiveContains("Lip Camera Probe") || labels.localizedCaseInsensitiveContains("LipCameraProbe")) && labels.localizedCaseInsensitiveContains("camera")
+                let isSettings = app.bundleIdentifier == "com.apple.systempreferences"
+                let obsMicrophonePrompt = app.bundleIdentifier == "com.apple.UserNotificationCenter" && labels.contains("“OBS”") && labels.localizedCaseInsensitiveContains("microphone") && ["Don’t Allow", "Don't Allow"].contains(label) && role == kAXButtonRole
+                let obsPermissionReview = app.bundleIdentifier == "com.obsproject.obs-studio" && labels.contains("Review App Permissions") && label == "Continue" && role == kAXButtonRole
+                let obsAutoConfiguration = app.bundleIdentifier == "com.obsproject.obs-studio" && labels.contains("Auto-Configuration Wizard") && label == "Cancel" && role == kAXButtonRole
+                let settingsNavigation = isSettings && label == "Camera Extensions" && [kAXButtonRole, "AXLink"].contains(role)
+                let allowedButton = role == kAXButtonRole && ((obsContext && ["Open System Settings", "Allow"].contains(label)) || (probeContext && label == "Allow"))
+                let offOBSToggle = isSettings && labels.contains("Camera Extensions") && integer == 0 && [kAXCheckBoxRole, "AXSwitch"].contains(role) && isOnlyToggleInOBSRow(element)
+                if obsMicrophonePrompt || obsPermissionReview || obsAutoConfiguration || settingsNavigation || (allowedButton && (cameraContext || label == "Open System Settings")) || offOBSToggle {
+                    if offOBSToggle {
+                        var action = clickToggleCenter(element)
+                        action["bundleIdentifier"] = app.bundleIdentifier ?? ""
+                        action["label"] = "OBS Virtual Camera row toggle"
+                        action["rowIdentityVerified"] = true
+                        actions.append(action)
+                    } else {
+                        let result = AXUIElementPerformAction(element, kAXPressAction as CFString)
+                        actions.append(["bundleIdentifier": app.bundleIdentifier ?? "", "label": label, "rowIdentityVerified": false, "method": "AXPress", "result": result.rawValue])
+                    }
+                    break
+                }
+            }
+        }
+        let report: [String: Any] = ["accessibilityTrusted": trusted, "postEventTrusted": CGPreflightPostEventAccess(), "screenCapturePreflight": CGPreflightScreenCaptureAccess(), "authenticationRequired": requiresAuthentication, "actions": actions, "applications": applications]
+        if let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
+            try? data.write(to: URL(fileURLWithPath: args[1]), options: .atomic)
+        }
+    }
+
+    private static func acknowledgeOBSCameraAlert() -> [String: Any] {
+        var report: [String: Any] = ["status": "identityUnavailable", "matchedAlertAbsentObserved": false, "actionAttempted": false, "accessibilityTrusted": AXIsProcessTrusted()]
+        let environment = ProcessInfo.processInfo.environment
+        let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.obsproject.obs-studio")
+        guard environment["GITHUB_ACTIONS"] == "true", environment["RUNNER_OS"] == "macOS", AXIsProcessTrusted(), apps.count == 1,
+              let app = apps.first, app.processIdentifier > 1,
+              let bundle = app.bundleURL?.resolvingSymlinksInPath(), bundle.path == "/Applications/OBS.app",
+              app.executableURL?.resolvingSymlinksInPath().path == "/Applications/OBS.app/Contents/MacOS/OBS" else { return report }
+        var code: SecStaticCode?
+        var requirement: SecRequirement?
+        let flags = SecCSFlags(rawValue: 0)
+        guard SecStaticCodeCreateWithPath(bundle as CFURL, flags, &code) == errSecSuccess,
+              SecRequirementCreateWithString("anchor apple generic and certificate leaf[subject.OU] = \"2MMRE5MTB8\" and identifier \"com.obsproject.obs-studio\"" as CFString, flags, &requirement) == errSecSuccess,
+              let code, let requirement,
+              SecStaticCodeCheckValidity(code, SecCSFlags(rawValue: kSecCSStrictValidate), requirement) == errSecSuccess else {
+            report["status"] = "publisherSignatureRejected"
+            return report
+        }
+        report["signedOBSIdentityVerified"] = true
+        report["pid"] = app.processIdentifier
+        let expectedText = "The virtual camera is not installed.\n\nPlease allow OBS to install the camera system extension in System Settings → General → Login Items & Extensions → Camera Extensions.\n\nYou may need to restart OBS if this message still appears afterward."
+        let deadline = ProcessInfo.processInfo.systemUptime + 6
+        let root = AXUIElementCreateApplication(app.processIdentifier)
+        AXUIElementSetMessagingTimeout(root, 0.15)
+        var errors: [[String: Any]] = []
+        func read(_ element: AXUIElement, _ attribute: String) -> (CFTypeRef?, AXError?) {
+            guard ProcessInfo.processInfo.systemUptime < deadline else { report["deadlineExceeded"] = true; return (nil, nil) }
+            AXUIElementSetMessagingTimeout(element, 0.15)
+            var result: CFTypeRef?
+            let error = AXUIElementCopyAttributeValue(element, attribute as CFString, &result)
+            if error != .success && errors.count < 24 {
+                errors.append(["attribute": attribute, "error": error.rawValue])
+                report["AXErrors"] = errors
+            }
+            return (result, error)
+        }
+        func nullable(_ value: Any?) -> Any { value ?? NSNull() }
+        func match(_ window: AXUIElement) -> (String, AXUIElement?) {
+            var readFailed = false
+            func value(_ element: AXUIElement, _ attribute: String) -> CFTypeRef? {
+                let (result, error) = read(element, attribute)
+                if let error {
+                    if ![AXError.success, .attributeUnsupported, .noValue].contains(error) { readFailed = true }
+                } else { readFailed = true }
+                return result
+            }
+            var pending: [(AXUIElement, Int)] = [(window, 0)]
+            var visited: [AXUIElement] = []
+            var exactTextCount = 0, criticalImageCount = 0, buttonCount = 0
+            var buttons: [AXUIElement] = []
+            while !pending.isEmpty && visited.count < 64 {
+                let (element, depth) = pending.removeFirst()
+                guard depth <= 6 else { return ("alertTreeIncomplete", nil) }
+                if visited.contains(where: { CFEqual($0, element) }) { continue }
+                visited.append(element)
+                let role = value(element, kAXRoleAttribute) as? String ?? ""
+                if role == kAXStaticTextRole, value(element, kAXValueAttribute) as? String == expectedText { exactTextCount += 1 }
+                if role == kAXImageRole, value(element, kAXDescriptionAttribute) as? String == "OBS critical alert" { criticalImageCount += 1 }
+                if role == kAXButtonRole {
+                    buttonCount += 1
+                    if value(element, kAXTitleAttribute) as? String == "OK", (value(element, kAXEnabledAttribute) as? NSNumber)?.boolValue == true { buttons.append(element) }
+                }
+                if let children = value(element, kAXChildrenAttribute) as? [AXUIElement] {
+                    guard children.count <= 30 else { return ("alertTreeIncomplete", nil) }
+                    pending.append(contentsOf: children.map { ($0, depth + 1) })
+                }
+            }
+            report["exactTextCount"] = exactTextCount
+            report["criticalImageCount"] = criticalImageCount
+            report["buttonCount"] = buttonCount
+            report["enabledOKCount"] = buttons.count
+            guard !readFailed, pending.isEmpty else { return ("alertTreeIncomplete", nil) }
+            guard exactTextCount == 1, criticalImageCount == 1, buttonCount == 1, buttons.count == 1 else { return ("unmatchedOBSAlert", nil) }
+            var pid: pid_t = 0
+            let pidError = AXUIElementGetPid(buttons[0], &pid)
+            report["buttonPIDError"] = pidError.rawValue
+            report["buttonPID"] = pid
+            guard pidError == .success, pid == app.processIdentifier else { return ("buttonProcessMismatch", nil) }
+            return ("present", buttons[0])
+        }
+        let (rawWindows, windowsError) = read(root, kAXWindowsAttribute)
+        report["windowsError"] = nullable(windowsError?.rawValue)
+        guard windowsError == .success, let windows = rawWindows as? [AXUIElement] else {
+            report["status"] = "windowsQueryFailed"
+            return report
+        }
+        report["windowCount"] = windows.count
+        guard windows.count <= 16 else { report["status"] = "windowLimitExceeded"; return report }
+        var facts: [[String: Any]] = []
+        var candidates: [(AXUIElement, AXUIElement, Int)] = []
+        var refusal: String?
+        for (index, window) in windows.enumerated() {
+            let (role, roleError) = read(window, kAXRoleAttribute)
+            let (description, descriptionError) = read(window, kAXDescriptionAttribute)
+            let (title, titleError) = read(window, kAXTitleAttribute)
+            var fact: [String: Any] = ["index": index, "role": nullable(role as? String), "roleError": nullable(roleError?.rawValue),
+                                       "description": nullable(description as? String), "descriptionError": nullable(descriptionError?.rawValue),
+                                       "title": nullable(title as? String), "titleError": nullable(titleError?.rawValue)]
+            if roleError != .success || role as? String != kAXWindowRole {
+                refusal = "windowRoleUnavailable"
+            } else if descriptionError.map({ [AXError.success, .attributeUnsupported, .noValue].contains($0) }) != true {
+                refusal = "windowDescriptionUnreadable"
+            } else if description as? String == "alert" {
+                if descriptionError == .success {
+                    let (state, button) = match(window)
+                    fact["alertMatch"] = state
+                    if state == "present", let button { candidates.append((window, button, index)) }
+                    else { refusal = state }
+                } else { refusal = "alertDescriptionUnreadable" }
+            }
+            // Qt main windows may omit optional Description; only exact alert candidates use it.
+            facts.append(fact)
+        }
+        report["windowFacts"] = facts
+        report["exactCandidateCount"] = candidates.count
+        if let refusal { report["status"] = refusal; return report }
+        guard candidates.count == 1 else {
+            report["status"] = candidates.isEmpty ? "noMatchingAlert" : "multipleMatchingAlerts"
+            return report
+        }
+        let (matchedWindow, button, index) = candidates[0]
+        report["matchedWindowIndex"] = index
+        report["matchedAlertInstanceVerified"] = true
+        report["actionAttempted"] = true
+        let pressed = AXUIElementPerformAction(button, kAXPressAction as CFString)
+        report["pressResult"] = pressed.rawValue
+        guard pressed == .success else { report["status"] = "acknowledgementRejected"; return report }
+        // Readable AXWindows must lose this exact instance; unrelated optional attributes cannot block proof.
+        var observations = 0
+        var windowObservations: [[String: Any]] = []
+        repeat {
+            let (rawWindows, error) = read(root, kAXWindowsAttribute)
+            observations += 1
+            report["absenceObservationCount"] = observations
+            guard error == .success, let currentWindows = rawWindows as? [AXUIElement], currentWindows.count <= 16 else {
+                report["status"] = "postAcknowledgementWindowsUnreadable"
+                report["finalWindowsError"] = nullable(error?.rawValue)
+                return report
+            }
+            let present = currentWindows.contains { CFEqual($0, matchedWindow) }
+            let observation: [String: Any] = ["windowsError": nullable(error?.rawValue), "windowCount": currentWindows.count, "matchedInstancePresent": present]
+            if windowObservations.count < 8 { windowObservations.append(observation) }
+            else { windowObservations[7] = observation }
+            report["windowObservations"] = windowObservations
+            if !present {
+                report["status"] = "acknowledged"
+                report["matchedAlertAbsentObserved"] = true
+                return report
+            }
+            Thread.sleep(forTimeInterval: 0.1)
+        } while ProcessInfo.processInfo.systemUptime < deadline
+        report["status"] = "alertRemainedAfterAcknowledgement"
+        return report
+    }
+}

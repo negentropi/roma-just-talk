@@ -6,6 +6,7 @@ private struct RuntimeHarnessArguments {
     var configurationPath: String?
     var jsonOutputPath: String?
     var audioProbePath: String?
+    var consentResultPath: String?
 
     static func parse(_ arguments: [String]) throws -> Self {
         var result = Self()
@@ -28,6 +29,8 @@ private struct RuntimeHarnessArguments {
                 result.mode = "restore"
             case "--playback-check":
                 result.mode = "playback-check"
+            case "--screen-capture-check":
+                result.mode = "screen-capture-check"
             case "--config":
                 index += 1
                 guard index < arguments.count else { throw RuntimeHarnessArgumentError.missingValue(argument) }
@@ -36,6 +39,10 @@ private struct RuntimeHarnessArguments {
                 index += 1
                 guard index < arguments.count else { throw RuntimeHarnessArgumentError.missingValue(argument) }
                 result.jsonOutputPath = arguments[index]
+            case "--consent-result":
+                index += 1
+                guard index < arguments.count else { throw RuntimeHarnessArgumentError.missingValue(argument) }
+                result.consentResultPath = arguments[index]
             case "--help", "-h":
                 result.mode = "help"
             default:
@@ -90,6 +97,7 @@ private func printUsage() {
       RuntimeE2EHarness --audio-probe WAV [--config PATH] [--json-output PATH]
       RuntimeE2EHarness --restore [--config PATH]
       RuntimeE2EHarness --playback-check
+      RuntimeE2EHarness --screen-capture-check --json-output PATH --consent-result PATH
       RuntimeE2EHarness --config PATH --json-output PATH
 
     A run without --config uses ~/Downloads/roma jt builds/audio, BlackHole 2ch,
@@ -205,6 +213,12 @@ do {
         try RuntimeAudioPlayback.verifyLifecycle()
         print("PASS playback completes naturally and stalled children are killed")
         exit(0)
+    case "screen-capture-check":
+        guard let path = arguments.jsonOutputPath else { throw RuntimeHarnessArgumentError.missingValue("--json-output") }
+        guard let consent = arguments.consentResultPath else { throw RuntimeHarnessArgumentError.missingValue("--consent-result") }
+        exit(RuntimeScreenCaptureCheck.capture(
+            reportURL: URL(fileURLWithPath: path), consentResultURL: URL(fileURLWithPath: consent)
+        ) ? 0 : 1)
     default:
         let configuration = try loadConfiguration(path: arguments.configurationPath)
         let reportPath = arguments.jsonOutputPath

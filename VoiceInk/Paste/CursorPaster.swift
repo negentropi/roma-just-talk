@@ -17,6 +17,10 @@ class CursorPaster {
     @MainActor private static var pasteCommandPosterForTesting: ((Bool) async -> PasteResult)?
     @MainActor private static var accessibilityTextInserterForTesting:
         ((String, CursorTextContextReader.PreparedContext?) -> CursorTextContextReader.SelectedTextInsertionResult)?
+    #if DEBUG
+    @MainActor private static var pasteSessionPreparedForTesting: (() async -> Void)?
+    @MainActor private static var autoSendPosterForTesting: ((VoiceInkAutoSendKey) -> Void)?
+    #endif
 
     struct PreparedPasteContext {
         fileprivate let changeCount: Int
@@ -90,6 +94,18 @@ class CursorPaster {
         accessibilityTextInserterForTesting = inserter
     }
 
+    #if DEBUG
+    @MainActor
+    static func configurePasteSessionPreparedForTesting(_ preparation: (() async -> Void)? = nil) {
+        pasteSessionPreparedForTesting = preparation
+    }
+
+    @MainActor
+    static func configureAutoSendPosterForTesting(_ poster: ((VoiceInkAutoSendKey) -> Void)? = nil) {
+        autoSendPosterForTesting = poster
+    }
+    #endif
+
     @MainActor
     @discardableResult
     static func startPasteAtCursor(
@@ -148,6 +164,12 @@ class CursorPaster {
         } else {
             nil as CursorTextContextReader.PreparedContext?
         }
+        #if DEBUG
+        if let pasteSessionPreparedForTesting {
+            await pasteSessionPreparedForTesting()
+        }
+        #endif
+        guard !Task.isCancelled else { return .commandNotPosted }
         latencyTrace.event(
             "paste_session.enter",
             details: "chars=\(text.count) restoreClipboard=\(shouldRestoreClipboard) method=\(VoiceInkPasteMethod.current().rawValue)",
@@ -545,8 +567,15 @@ class CursorPaster {
 
     // MARK: - Auto Send Keys
 
+    @MainActor
     static func performAutoSend(_ key: VoiceInkAutoSendKey) {
         guard key.isEnabled else { return }
+        #if DEBUG
+        if let autoSendPosterForTesting {
+            autoSendPosterForTesting(key)
+            return
+        }
+        #endif
         guard AXIsProcessTrusted() else { return }
 
         let source = CGEventSource(stateID: .privateState)

@@ -1,0 +1,210 @@
+{
+  "date": "2026-10-27",
+  "purpose": "Screen a commercially permissive direct video-language model; do not infer universal inability or shipping readiness.",
+  "fixture": {
+    "dataset": "CREMA-D",
+    "revision": "1658cd342dff90010aa843eaeebd53610a08b1dc",
+    "source_url": "https://media.githubusercontent.com/media/CheyneyComputerScience/CREMA-D/1658cd342dff90010aa843eaeebd53610a08b1dc/VideoFlash/1001_DFA_NEU_XX.flv",
+    "source_sha256": "a2b374bcd195d7320437c944eef2208dedd2c22725d09d65e8c31bf6c1eeb286",
+    "source_frame_rate": "30000/1001",
+    "prepared_frame_rate": 25,
+    "prepared_frame_count": 52,
+    "duration_seconds": 2.08,
+    "width": 160,
+    "height": 100,
+    "crop": "160:100:160:130",
+    "audio_streams": 0,
+    "reference_transcript": "Don't forget a jacket.",
+    "reference_and_source_filename_withheld_from_inference": true,
+    "native_intact_video_sha256": "91f2c725462426147356149ae849e3473146801a8081c4403f8ad77897bf7652",
+    "scope": "One utterance tested; three clips prepared. No actor- or phrase-generalization estimate."
+  },
+  "provenance": {
+    "llama_cpp": {
+      "release": "b11918",
+      "commit": "a2b3e121cea2b0c3ada8a0c3ffb25fb62863a12d",
+      "archive_sha256": "61240df8f2ec3fe71e11a967dedf83fd438493b689a47bda8970121f530981ad"
+    },
+    "qwen2b": {
+      "repo": "Qwen/Qwen3-VL-2B-Instruct-GGUF",
+      "revision": "52d6c8ffea26cc873ac5ad116f8631268d7eb503",
+      "model_file": "Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+      "model_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+      "projector_file": "mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf",
+      "projector_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+    },
+    "qwen8b": {
+      "repo": "Qwen/Qwen3-VL-8B-Instruct-GGUF",
+      "revision": "f982a07559d4a2f6c8744d840bf6fccab30eea96",
+      "model_file": "Qwen3VL-8B-Instruct-Q4_K_M.gguf",
+      "model_sha256": "67d1659bfe71b89d50b45a4ad1a9e5b997e5bb16ce5da66a6a6167abd569e9e2",
+      "projector_file": "mmproj-Qwen3VL-8B-Instruct-Q8_0.gguf",
+      "projector_sha256": "c6ba85508d82f42590e6eb77d5340369ab6fecf107a7561d809523d8aa5f3bfd"
+    },
+    "ffmpeg_tools": {
+      "upstream_download_page": "https://ffmpeg.org/download.html",
+      "publisher": "BtbN/FFmpeg-Builds",
+      "asset_id": 678464224,
+      "asset": "ffmpeg-n8.1-latest-linux64-lgpl-shared-8.1.tar.xz",
+      "sha256": "914bf4d0c64018f63796187d00408ee605904f0d90b4543619a4f0dbe98013b6",
+      "reported_version": "n8.1.3-24-g92611900bb-20261026"
+    },
+    "boundaries": {
+      "model_threads": 4,
+      "per_inference_timeout_seconds": 600,
+      "initial_address_space_gib": 8,
+      "authorized_8b_address_space_gib": 10,
+      "observed_8b_rss_ceiling_gib": 11,
+      "prepared_frame_count": 52,
+      "prepared_fps": 25,
+      "all_prepared_frames_passed": true,
+      "original_source_not_all_frames_retained": true,
+      "video_audio_streams": 0,
+      "source_reference_transcripts_passed_to_inference": false,
+      "candidate_phrase_list_passed_to_inference": false,
+      "results_not_a_production_latency_benchmark": true
+    }
+  },
+  "prompts": {
+    "multi_image": "These are consecutive video frames originally recorded at 25 FPS. Transcribe words from lip movement only. Do not infer words from identity or context. If the mouth is not articulating, or words cannot be reliably recovered from the visible movement, return an empty transcript. Return only JSON with one field transcript.",
+    "multi_image_prompt_note": "Actual source was resampled from about 30 FPS to 25 FPS; the originally recorded wording was inaccurate. Prepared sequence uses 0.04-second timestamps and all 52 images.",
+    "native_video": "Transcribe spoken words from visible lip movement only in this silent25FPS video. Do not infer words from identity or context. If words cannot be reliably recovered from visible lip movement, return an empty transcript. Return only JSON with one field transcript.",
+    "canary": "Describe only what is visible in this image, especially the mouth. Do not guess any spoken words. One short sentence."
+  },
+  "cases": [
+    {
+      "model": "2B",
+      "case": "intact",
+      "exit_code": 0,
+      "prepared_frames": 52,
+      "context_size": 8192,
+      "max_address_space_gib": 8,
+      "raw_stdout": "```json\n{\n  \"transcript\": \"\"\n}\n```"
+    },
+    {
+      "model": "2B",
+      "case": "frozen",
+      "exit_code": 0,
+      "prepared_frames": 52,
+      "context_size": 8192,
+      "max_address_space_gib": 8,
+      "raw_stdout": "```json\n{\n  \"transcript\": \"\"\n}\n```"
+    },
+    {
+      "model": "2B",
+      "case": "native_intact",
+      "exit_code": 0,
+      "prepared_frames": 52,
+      "context_size": 8192,
+      "max_address_space_gib": 8,
+      "raw_stdout": "```json\n{\n  \"transcript\": \"\"\n}\n```"
+    },
+    {
+      "model": "2B",
+      "case": "single_image_canary",
+      "exit_code": 0,
+      "prepared_frames": 1,
+      "context_size": 8192,
+      "max_address_space_gib": 8,
+      "raw_stdout": "The man's mouth is slightly open, showing the inside of his mouth and the upper and lower teeth."
+    },
+    {
+      "model": "8B",
+      "case": "native_intact",
+      "exit_code": 0,
+      "prepared_frames": 52,
+      "context_size": 6144,
+      "max_address_space_gib": 10,
+      "raw_stdout": "{\n  \"transcript\": \"I'm not sure what you're talking about.\"\n}"
+    },
+    {
+      "model": "8B",
+      "case": "native_frozen",
+      "exit_code": 0,
+      "prepared_frames": 52,
+      "context_size": 6144,
+      "max_address_space_gib": 10,
+      "raw_stdout": "{\n  \"transcript\": \"\"\n}"
+    }
+  ],
+  "observed_artifact_hashes": {
+    "qwen2b": {
+      "file": "models/model.gguf",
+      "bytes": 1107409952,
+      "observed_sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae"
+    },
+    "qwen2b_projector": {
+      "file": "models/mmproj.gguf",
+      "bytes": 445053216,
+      "observed_sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+    },
+    "qwen8b": {
+      "file": "models8/model.gguf",
+      "bytes": 5027784800,
+      "observed_sha256": "67d1659bfe71b89d50b45a4ad1a9e5b997e5bb16ce5da66a6a6167abd569e9e2"
+    },
+    "qwen8b_projector": {
+      "file": "models8/mmproj.gguf",
+      "bytes": 752289728,
+      "observed_sha256": "c6ba85508d82f42590e6eb77d5340369ab6fecf107a7561d809523d8aa5f3bfd"
+    },
+    "llama_archive": {
+      "file": "runtime/llama.tar.gz",
+      "bytes": 22480146,
+      "observed_sha256": "61240df8f2ec3fe71e11a967dedf83fd438493b689a47bda8970121f530981ad"
+    },
+    "ffmpeg_archive": {
+      "file": "runtime/ffmpeg-tools.tar.xz",
+      "bytes": 65890924,
+      "observed_sha256": "914bf4d0c64018f63796187d00408ee605904f0d90b4543619a4f0dbe98013b6"
+    },
+    "native_video": {
+      "file": "input/native-x1.mp4",
+      "bytes": 14970,
+      "observed_sha256": "91f2c725462426147356149ae849e3473146801a8081c4403f8ad77897bf7652"
+    }
+  },
+  "runtime_flags": {
+    "llama_cpp_release": "b11918",
+    "threads": 4,
+    "threads_batch": 4,
+    "batch_size": 128,
+    "ubatch_size": 128,
+    "image_min_tokens": 64,
+    "image_max_tokens": 64,
+    "video_fps": 25,
+    "video_timestamp_interval_ms": 40,
+    "temperature": 0,
+    "seed": 1,
+    "maximum_output_tokens": 64,
+    "timeout_seconds": 600,
+    "model_quantization": "Q4_K_M",
+    "projector_quantization": "Q8_0"
+  },
+  "frozen_control_note": "Frozen before lossy encoding; 52 decoded frames had 8 hashes with adjacent pixel differences at most 2/255, not pixel-identical copies.",
+  "excluded_attempts": [
+    {
+      "route": "public Qwen Space",
+      "result": "First client session routing error; corrected client returned SSE error with null data. No usable model response retrieved."
+    },
+    {
+      "route": "Gemini CLI preflight",
+      "result": "Client reported unsupported account route; no visual inference."
+    },
+    {
+      "route": "8B setup",
+      "result": "Initial 8 GiB address-space limits failed KV allocation. A 4096-token context later failed at media chunk 93. These are runtime setup failures, not capability measurements. Final pair used 6144 tokens and a 10 GiB address-space cap."
+    }
+  ],
+  "interpretation": "2B abstained on intact and frozen inputs. 8B produced a wrong sentence on intact input and abstained on frozen input. This one-utterance screen demonstrates no useful transcription for these tested configurations; it does not reject every VLM or a fresh trained visual model.",
+  "untested": [
+    "Other two prepared source clips",
+    "Shuffled-frame control",
+    "True silently mouthed webcam speech",
+    "New speakers and unseen vocabulary",
+    "Other models and full-precision checkpoints",
+    "Broad false-insertion rate",
+    "Fresh visual-model training",
+    "RJT camera, microphone, shortcuts, and insertion runtime"
+  ]
+}

@@ -126,6 +126,10 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
             HStack(spacing: 10) {
                 RecorderPromptButton(activePopover: $activePopover, buttonSize: 20, padding: EdgeInsets())
                 RecorderPowerModeButton(activePopover: $activePopover, buttonSize: 20, padding: EdgeInsets())
+                // Badge lives here because the waveform already fills the right side.
+                if stateProvider.showsCameraBadge {
+                    RecorderCameraBadge()
+                }
                 Spacer(minLength: 0)
             }
             .padding(.leading, displayState == .transcriptPreview ? 18 : 14)
@@ -141,6 +145,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
                 Spacer(minLength: 0)
                 RecorderStatusDisplay(
                     currentState: stateProvider.recordingState,
+                    dictationMode: stateProvider.dictationMode,
                     audioMeter: recorder.audioMeter,
                     menuBarHeight: notchHeight
                 )

@@ -80,6 +80,8 @@ do {
         "every runtime matrix must cover empty and existing-text cursor baselines"
     )
     let existingTextScenario = RuntimeTextScenario.existingText
+    try require(RuntimeTextScenario.empty.insertedText(from: "") == "",
+                "a readable empty editor remains confirmed empty, not unknown")
     try require(
         existingTextScenario.insertedText(
             from: existingTextScenario.prefix + "dictated text" + existingTextScenario.suffix
@@ -90,6 +92,21 @@ do {
         existingTextScenario.insertedText(from: "dictated text") == nil,
         "existing-text cases must fail if either side is lost"
     )
+    let seededTarget = existingTextScenario.initialText
+    try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: seededTarget) == .readableUnchanged,
+                "cancellation succeeds only when the readable full target is unchanged")
+    try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: nil) == .unreadable,
+                "failed final AX reads cannot prove cancellation left the target unchanged")
+    try require(RuntimeNegativeTextObservation.classify(baseline: nil, finalText: seededTarget) == .unreadable,
+                "a missing readable seed cannot prove the target unchanged")
+    for changedTarget in [existingTextScenario.prefix + "unexpected insertion" + existingTextScenario.suffix,
+                          "replacement lost both markers", seededTarget + " "] {
+        try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: changedTarget) == .changed,
+                    "insertions, broken markers, and any full-target change fail cancellation proof")
+    }
+    try require(RuntimeNegativeTextObservation.classify(baseline: "", finalText: "") == .readableUnchanged,
+                "readable empty text remains distinct from an unreadable target")
+    print("PASS negative observations require readable exact full-target equality")
     let singlePasteProof = RuntimeDOMPasteProof.parse(
         from: "Roma Runtime E2E Paste Proof pasteEvents=1 pasteInputs=1"
     )
@@ -950,6 +967,41 @@ do {
                     .firstPersistentChangeAtSystemUptime == 0.180,
                 "matching AX bracket establishes a later genuine captured timestamp, not an AX timestamp")
     print("PASS rendered association rejects pre-text/unknown/replaced pixels and preserves matched paint time")
+
+    // AD4952: cold AX timed out before the first capture after release; keep the
+    // earlier AX-bracketed empty frame, without attributing the unreadable capture.
+    for scenario in RuntimeTextScenario.allCases {
+        let confirmedEmpty = scenario.insertedText(from: scenario.initialText)
+        let inserted = scenario.insertedText(from: scenario.prefix + "inserted" + scenario.suffix)
+        for bracket: (String?, String?) in [(nil, confirmedEmpty), (confirmedEmpty, nil), (nil, nil)] {
+            var coldStart = RuntimeRenderedTextAssociationTracker(baseline: stablePixels)
+            _ = coldStart.observe(current: nontextPixels, atSystemUptime: -0.5,
+                                  accessibilityText: confirmedEmpty, precedingAccessibilityText: confirmedEmpty)
+            try require(coldStart.observe(current: insertedPixels, atSystemUptime: 1.540,
+                                          accessibilityText: bracket.1, precedingAccessibilityText: bracket.0) == nil,
+                        "unreadable AX cannot attribute its captured pixels")
+            _ = coldStart.observe(current: insertedPixels, atSystemUptime: 1.865,
+                                  accessibilityText: inserted, precedingAccessibilityText: inserted)
+            try require(coldStart.observe(current: insertedPixels, atSystemUptime: 1.940,
+                                          accessibilityText: inserted, precedingAccessibilityText: inserted)?
+                            .firstPersistentChangeAtSystemUptime == 1.865,
+                        "a confirmed \(scenario.rawValue) baseline survives unreadable pre-text AX without backdating paint")
+            _ = coldStart.observe(current: insertedPixels, atSystemUptime: 1.970,
+                                  accessibilityText: nil, precedingAccessibilityText: inserted)
+            _ = coldStart.observe(current: insertedPixels, atSystemUptime: 2.000,
+                                  accessibilityText: inserted, precedingAccessibilityText: inserted)
+            try require(coldStart.observe(current: insertedPixels, atSystemUptime: 2.030,
+                                          accessibilityText: inserted, precedingAccessibilityText: inserted) == nil,
+                        "unknown AX after an inserted-text epoch still invalidates old glyph proof")
+        }
+    }
+    var unconfirmedBaseline = RuntimeRenderedTextAssociationTracker(baseline: stablePixels)
+    _ = unconfirmedBaseline.observe(current: insertedPixels, atSystemUptime: 1,
+                                    accessibilityText: "inserted", precedingAccessibilityText: "inserted")
+    try require(unconfirmedBaseline.observe(current: insertedPixels, atSystemUptime: 2,
+                                            accessibilityText: "inserted", precedingAccessibilityText: "inserted") == nil,
+                "initial pixels without an AX-bracketed baseline cannot prove inserted text")
+    print("PASS confirmed empty baselines survive cold AX without accepting unreadable-frame or stale-text timestamps")
 
     let latencies = [100.0, 200.0, 300.0, 400.0, 500.0]
     try require(RuntimeStatistics.percentile(50, values: latencies) ?? -1, equals: 300, "p50 latency")

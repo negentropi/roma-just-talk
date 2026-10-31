@@ -314,11 +314,13 @@ struct TranscriptPreviewView: View {
 
 struct RecorderStatusDisplay: View {
     let currentState: VoiceInkRecordingState
+    let dictationMode: VoiceInkDictationMode
     let audioMeter: AudioMeter
     let menuBarHeight: CGFloat?
 
-    init(currentState: VoiceInkRecordingState, audioMeter: AudioMeter, menuBarHeight: CGFloat? = nil) {
+    init(currentState: VoiceInkRecordingState, dictationMode: VoiceInkDictationMode, audioMeter: AudioMeter, menuBarHeight: CGFloat? = nil) {
         self.currentState = currentState
+        self.dictationMode = dictationMode
         self.audioMeter = audioMeter
         self.menuBarHeight = menuBarHeight
     }
@@ -327,6 +329,9 @@ struct RecorderStatusDisplay: View {
         Group {
             if let presentation = currentState.recorderProcessingPresentation {
                 ProcessingStatusDisplay(presentation: presentation, color: .white).transition(.opacity)
+            } else if !dictationMode.usesMicrophone {
+                // The microphone is off, so a waveform would imply listening that isn't happening.
+                LipsOnlyStatus(isActive: currentState.isActivelyRecording).transition(.opacity)
             } else if currentState.isActivelyRecording {
                 AudioVisualizer(audioMeter: audioMeter, color: .white, isActive: true)
                     .scaleEffect(y: menuBarHeight != nil ? min(1.0, (menuBarHeight! - 8) / 25) : 1.0, anchor: .center)
@@ -338,5 +343,45 @@ struct RecorderStatusDisplay: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: currentState)
+    }
+}
+
+// MARK: - Lip Dictation Indicators
+
+struct LipsOnlyStatus: View {
+    let isActive: Bool
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "video.fill")
+                .font(.system(size: 10, weight: .semibold))
+            Text("Lips only")
+                .font(.system(size: 11, weight: .medium))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .foregroundColor(.white.opacity(isActive ? 0.9 : 0.5))
+        .frame(height: 28)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Lips only. Camera on, microphone off.")
+    }
+}
+
+/// Shown beside the voice controls in voice + lips mode while capture is in progress.
+struct RecorderCameraBadge: View {
+    var body: some View {
+        Image(systemName: "video.fill")
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundColor(.white.opacity(0.75))
+            .help("Camera on: reading lips with your voice")
+            .accessibilityLabel("Camera on")
+    }
+}
+
+extension RecorderStateProvider {
+    // Only while capturing: the camera closes on stop, so the badge must not
+    // linger through transcribing.
+    var showsCameraBadge: Bool {
+        dictationMode == .voiceAndLips && recordingState.isRecorderCaptureInProgress
     }
 }

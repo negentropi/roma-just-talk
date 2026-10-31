@@ -150,7 +150,7 @@ class RecorderUIManager: ObservableObject {
                 },
                 cancelRecording: {
                     logger.notice("toggleMiniRecorder: cancelling active recorder work")
-                    await cancelRecording()
+                    await cancelRecording(.userRequested)
                 },
                 dismissRecorder: {
                     logger.notice("toggleMiniRecorder: dismissing recorder UI")
@@ -190,10 +190,10 @@ class RecorderUIManager: ObservableObject {
         miniRecorderError = nil
     }
 
-    func cancelRecording() async {
+    func cancelRecording(_ cancellation: RecordingCancellation) async {
         guard let engine = engine else { return }
-        logger.notice("cancelRecording called")
-        await engine.cancelRecording()
+        logger.notice("cancelRecording called – \(String(describing: cancellation), privacy: .public)")
+        await engine.cancelRecording(cancellation)
         await dismissMiniRecorder()
     }
 
@@ -225,7 +225,7 @@ class RecorderUIManager: ObservableObject {
         logger.notice("handleDismissMiniRecorder: .dismissMiniRecorder notification received")
         Task {
             if engine?.recordingState.isRecorderDismissCancelable == true {
-                await cancelRecording()
+                await cancelRecording(.userRequested)
             } else {
                 await dismissMiniRecorder()
             }

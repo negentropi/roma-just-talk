@@ -112,7 +112,7 @@ class MiniRecorderShortcutManager: ObservableObject {
         switch action {
         case .cancelRecorder:
             guard ShortcutStore.shortcut(for: .cancelRecorder) != nil else { return }
-            await recorderUIManager.cancelRecording()
+            await recorderUIManager.cancelRecording(.userRequested)
         case .toggleEnhancement:
             guard let enhancementService = engine.getEnhancementService() else { return }
             enhancementService.isEnhancementEnabled.toggle()
@@ -136,7 +136,7 @@ class MiniRecorderShortcutManager: ObservableObject {
             now: now
         ) {
             resetEscapeState()
-            await recorderUIManager.cancelRecording()
+            await recorderUIManager.cancelRecording(.userRequested)
             return
         }
 

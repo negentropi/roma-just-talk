@@ -32,7 +32,7 @@ class TranscriptionPipeline {
     ///   - model: The transcription model to use.
     ///   - session: An active streaming session if one was prepared, otherwise nil.
     ///   - onStateChange: Called when the pipeline moves to a new recording state (e.g. `.enhancing`).
-    ///   - shouldCancel: Returns true if the user requested cancellation.
+    ///   - cancellation: Returns the pending cancellation, if any.
     ///   - onCancel: Called when cancellation is detected to cancel active session state.
     ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
     func run(
@@ -42,7 +42,7 @@ class TranscriptionPipeline {
         session: TranscriptionSession?,
         latencyTraceToken: VoiceInkLatencyTrace.Token?,
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
-        shouldCancel: () -> Bool,
+        cancellation: () -> RecordingCancellation?,
         onCancel: @escaping () async -> Void,
         onDismiss: @escaping () async -> Void
     ) async {
@@ -69,9 +69,15 @@ class TranscriptionPipeline {
             await onDismiss()
         }
 
-        func finishCanceledTranscription() async {
+        func finishCanceledTranscription(_ cancellation: RecordingCancellation) async {
             await onCancel()
             await restorePromptDetectionSettingsIfNeeded()
+
+            if cancellation == .accidentalShortcut {
+                discard(transcription, audioURL: audioURL)
+                latencyTrace.finish(event: "pipeline.cancelled", details: "model=\(model.displayName) discarded=true", token: traceToken)
+                return
+            }
 
             let canceledDuration: TimeInterval?
             if transcription.duration > 0 {
@@ -104,8 +110,8 @@ class TranscriptionPipeline {
             )
         }
 
-        if shouldCancel() {
-            await finishCanceledTranscription()
+        if let cancellation = cancellation() {
+            await finishCanceledTranscription(cancellation)
             return
         }
 
@@ -183,7 +189,7 @@ class TranscriptionPipeline {
                 cleanupSpan,
                 details: "cleanedChars=\(cleanedText.count) enhancementInputChars=\(text.count)"
             )
-            if shouldCancel() { await finishCanceledTranscription(); return }
+            if let cancellation = cancellation() { await finishCanceledTranscription(cancellation); return }
 
             transcription.text = cleanedText
             transcription.transcriptionModelName = model.displayName
@@ -209,7 +215,7 @@ class TranscriptionPipeline {
 
             if let enhancementService,
                let enhancementRequest {
-                if shouldCancel() { await finishCanceledTranscription(); return }
+                if let cancellation = cancellation() { await finishCanceledTranscription(cancellation); return }
 
                 onStateChange(.enhancing)
 
@@ -237,7 +243,7 @@ class TranscriptionPipeline {
                             type: .warning
                         )
                     }
-                    if shouldCancel() { await finishCanceledTranscription(); return }
+                    if let cancellation = cancellation() { await finishCanceledTranscription(cancellation); return }
                 }
             }
 
@@ -309,8 +315,8 @@ class TranscriptionPipeline {
 
         }
 
-        if shouldCancel() {
-            await finishCanceledTranscription()
+        if let cancellation = cancellation() {
+            await finishCanceledTranscription(cancellation)
             return
         }
 
@@ -380,6 +386,16 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         }
 
+        if VoiceInkEmptyTranscriptionPolicy.isEmptyCompletion(
+            status: transcription.transcriptionState,
+            rawText: transcription.text,
+            enhancedText: transcription.enhancedText
+        ) {
+            discard(transcription, audioURL: audioURL)
+            latencyTrace.finish(event: "pipeline.empty_discarded", token: traceToken)
+            return
+        }
+
         if transcription.transcriptionState == .completed,
            transcription.duration <= 0 {
             let durationSpan = latencyTrace.begin("pipeline.audio_duration", token: traceToken)
@@ -401,5 +417,21 @@ class TranscriptionPipeline {
             details: "state=\(transcription.transcriptionState) finalChars=\(finalPastedText?.count ?? 0)",
             token: traceToken
         )
+    }
+
+    /// Treats the recording as if it never happened: no History row, no audio, no metrics.
+    private func discard(_ transcription: Transcription, audioURL: URL) {
+        modelContext.delete(transcription)
+        do {
+            try modelContext.save()
+        } catch {
+            // Keep the audio so a surviving row never points at a missing file.
+            logger.error("Failed to discard transcription: \(error.localizedDescription, privacy: .public)")
+            return
+        }
+        VoiceInkStoredAudioFile.deleteExistingFileReportingFailure(for: audioURL.absoluteString) { message in
+            logger.error("\(message, privacy: .public)")
+        }
+        NotificationCenter.default.post(name: .transcriptionDeleted, object: nil)
     }
 }

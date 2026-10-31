@@ -4135,10 +4135,23 @@ public enum VoiceInkSpecialShortcutEmptyFallbackPolicy {
         lifetime: TimeInterval = fallbackLifetime
     ) -> Bool {
         guard now.timeIntervalSince(createdAt) <= lifetime else { return false }
-        guard transcriptionStatus == .completed else { return false }
+        return VoiceInkEmptyTranscriptionPolicy.isEmptyCompletion(
+            status: transcriptionStatus,
+            rawText: rawText,
+            enhancedText: enhancedText
+        )
+    }
+}
+
+public enum VoiceInkEmptyTranscriptionPolicy {
+    public static func isEmptyCompletion(
+        status: VoiceInkTranscriptionStatus?,
+        rawText: String,
+        enhancedText: String?
+    ) -> Bool {
+        guard status == .completed else { return false }
         guard rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
-        guard enhancedText?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false else { return false }
-        return true
+        return enhancedText?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false
     }
 }
 

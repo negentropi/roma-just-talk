@@ -26,7 +26,11 @@ python3 Tools/LipDictationE2E/run.py \
   --app-source-head "$GITHUB_SHA"
 ```
 
-`--app-source-head` is a caller declaration. The script checks it against the repository head and records the actual app executable hash and signature. The calling workflow must establish that its app build came from that head. The argument itself does not prove artifact provenance. Voice model selection uses `CurrentTranscriptionModel`, verified against `VoiceInkUserDefaultsKey.currentTranscriptionModel`, `VoiceInkCurrentTranscriptionModelPreference.modelName()`, and `TranscriptionModelManager.loadCurrentTranscriptionModel()`. The Boolean `isAIEnhancementEnabled` fixture disables AI enhancement through the key read by `VoiceInkAIEnhancementPreference`.
+`--app-source-head` declares the actual app build revision. Normal execution requires it to match the checkout and records the executable hash and signature. The calling workflow must establish the build's provenance; the argument alone does not prove it. Voice model selection uses `CurrentTranscriptionModel`, verified against `VoiceInkUserDefaultsKey.currentTranscriptionModel`, `VoiceInkCurrentTranscriptionModelPreference.modelName()`, and `TranscriptionModelManager.loadCurrentTranscriptionModel()`. The Boolean `isAIEnhancementEnabled` fixture disables AI enhancement through the key read by `VoiceInkAIEnhancementPreference`.
+
+For a change confined to the named proof files, `--producer-run RUN_ID` verifies an existing Release artifact before reusing it. The verifier checks the producer repository, workflow, attempt, successful build/test steps, immutable artifact ID and archive digest, actual archived dependency lock, exact source comparison, bundle identity, and signature. Every changed path outside its explicit proof-file list rejects reuse. App archives remain outside the evidence directory. A bundle fingerprint and signature check after execution rejects changed app bytes.
+
+Replay receipts keep the app build head and current proof head separate. The camera receipt must belong to the proof head. This tests the verified producer binary with current proof tools; it does not claim a fresh or reproducible build. The replay workflow retains both default-off voice cases and every visual, microphone, insertion, and cleanup gate.
 
 Full sequence:
 

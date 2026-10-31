@@ -1,0 +1,74 @@
+name: Verify lip dictation with an immutable app artifact
+
+on:
+  push:
+    branches:
+      - "ci/lip-dictation-replay-*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: lip-dictation-replay-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    if: startsWith(github.ref, 'refs/heads/ci/lip-dictation-replay-')
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH: "1"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Select native toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/bin/caffeinate -d -i -u -t 3600 </dev/null >/dev/null 2>&1 &
+          latest_xcode="$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)"
+          sudo xcode-select -s "$latest_xcode"
+          xcodebuild -version
+          sw_vers
+
+      - name: Check artifact refusal boundaries
+        run: python3 -m unittest discover -s Tools/LipDictationE2E -p test_app_artifact.py -v
+
+      - name: Execute actual runtime core checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .local-build
+          swift run --package-path Tools/RuntimeE2EHarness --scratch-path .local-build/RuntimeE2EHarness RuntimeE2ECoreChecks 2>&1 | tee "$RUNNER_TEMP/lip-replay-runtime-core.log"
+
+      - name: Compile and load current native helper
+        run: python3 Tools/LipDictationE2E/run.py --build-helper-only --out "$RUNNER_TEMP/lip-replay-helper"
+
+      - name: Verify producer artifact and exercise every real dictation case
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 Tools/LipDictationE2E/run.py \
+            --app "$RUNNER_TEMP/lip-replay-source/roma just talk.app" \
+            --app-source-head a1b8bdc577f24fa3d128791207ba477e76b702ed \
+            --producer-run 41161053977 \
+            --visual
+
+      - name: Upload current proof and immutable producer receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: lip-dictation-replay-evidence-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/lip-dictation-e2e/**
+            ${{ runner.temp }}/lip-replay-helper/**
+            ${{ runner.temp }}/lip-replay-runtime-core.log
+            ${{ runner.temp }}/lip-camera-probe/*.json
+            ${{ runner.temp }}/lip-camera-probe/*.log
+            ${{ runner.temp }}/lip-camera-probe/*.png
+          if-no-files-found: error

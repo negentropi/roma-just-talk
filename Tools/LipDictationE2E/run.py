@@ -203,7 +203,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             camera = json.loads(camera_summary.read_text())
             if camera.get('status') != 'supportedDeviceReady' or camera.get('obsRetainedForE2E') is not True:
                 raise RuntimeError('A moving supported OBS camera and retained running OBS process are required')
-            if camera.get('sourceHead') != args.app_source_head:
+            proof_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+            if camera.get('sourceHead') != proof_head:
                 raise RuntimeError('The reused camera receipt must belong to this exact proof head')
             # Cleanup ownership transfers only after accepting the successful retained-producer receipt.
             owned_obs_cleanup['accepted'] = True
@@ -273,16 +274,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--app', type=Path)
     parser.add_argument('--app-source-head')
+    parser.add_argument('--producer-run', type=int, help='Verify and reuse an immutable Release artifact with identical app and build sources')
     parser.add_argument('--build-helper-only', action='store_true', help='Compile, link, sign, and load the native helper without app, models, OBS, or TCC changes')
     parser.add_argument('--visual', action='store_true', help='After voice passes, provision OBS and run real visual app scenarios')
     parser.add_argument('--obs-summary', type=Path, help='Reuse a successful same-host OBS probe receipt that retained OBS')
     parser.add_argument('--out', type=Path, default=Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'lip-dictation-e2e')
     args = parser.parse_args()
     if args.build_helper_only:
-        if args.app or args.app_source_head or args.visual or args.obs_summary:
+        if args.app or args.app_source_head or args.producer_run is not None or args.visual or args.obs_summary:
             parser.error('--build-helper-only accepts only --out')
     elif args.app is None or args.app_source_head is None:
         parser.error('--app and --app-source-head are required for runtime proof')
+    if args.producer_run is not None and args.producer_run <= 0:
+        parser.error('--producer-run must be a positive GitHub Actions run ID')
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted' or sys.platform != 'darwin':
         raise RuntimeError('Only a fresh disposable GitHub-hosted macOS runner is supported')
     if os.getuid() == 0 or subprocess.check_output(['stat', '-f', '%u', '/dev/console'], text=True).strip() != str(os.getuid()):
@@ -290,7 +294,7 @@ def main():
     if platform.machine() != 'arm64':
         raise RuntimeError('This proof requires the hosted Apple-silicon Mac')
     head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    if not args.build_helper_only and head != args.app_source_head:
+    if not args.build_helper_only and head != args.app_source_head and args.producer_run is None:
         raise RuntimeError('The supplied app build head must match the checked-out proof source')
     args.out.mkdir(parents=True, exist_ok=True)
     evidence = args.out
@@ -299,6 +303,7 @@ def main():
     log_process = None
     log_handle = None
     owned_obs_cleanup = {}
+    verified_app = None
 
     def run(name, command, timeout=60, required=True):
         path = evidence / (name + '.log')
@@ -341,7 +346,17 @@ def main():
             summary['boundary'] = 'Native compile, link, signature, and load check only. No app, model, OBS, TCC, capture, or dictation execution.'
             summary['helperExecutableSHA256'] = sha256(visual_helper / 'Contents/MacOS/LipDictationE2E')
             return 0
-        app = args.app.resolve()
+        summary['appBuildHead'] = args.app_source_head
+        if args.producer_run is not None:
+            from app_artifact import prepare_verified_app
+            verified_app = prepare_verified_app(
+                ROOT, evidence, args.app, args.producer_run, args.app_source_head, head
+            )
+            app = verified_app.app_path
+            summary['appArtifactProvenance'] = verified_app.provenance
+            summary['appSourceBoundary'] = 'The immutable producer artifact and source equivalence are verified independently. App build and proof heads remain separate; this is artifact reuse, not a fresh or reproducible build.'
+        else:
+            app = args.app.resolve()
         if not app.is_dir():
             raise RuntimeError('Built app bundle missing')
         with (app / 'Contents/Info.plist').open('rb') as stream:
@@ -461,6 +476,14 @@ def main():
                 log_process.wait(timeout=5)
         if log_handle is not None:
             log_handle.close()
+        if verified_app is not None:
+            try:
+                verified_app.verify_unchanged()
+                summary['appArtifactUnchanged'] = True
+            except Exception as error:
+                summary['appArtifactUnchanged'] = False
+                summary['artifactIntegrityFailure'] = str(error)
+                summary['status'] = 'blocked'
         write(evidence / 'summary.json', summary)
         print(json.dumps(summary, indent=2, sort_keys=True))
     if args.visual:

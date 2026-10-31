@@ -682,6 +682,7 @@ struct LipVisualCases {
         ["x": frame.minX, "y": frame.minY, "width": frame.width, "height": frame.height]
     }
     static func revealControl(_ control: AXUIElement, in app: NSRunningApplication, actions: inout [[String: Any]]) -> Bool {
+        let deadline = ProcessInfo.processInfo.systemUptime + 5
         if verifiedFrame(control, in: app).frame != nil { return true }
         let result = AXUIElementPerformAction(control, "AXScrollToVisible" as CFString)
         actions.append(["method": "AXScrollToVisible", "result": result.rawValue])
@@ -691,31 +692,40 @@ struct LipVisualCases {
         for _ in 0..<24 {
             if RuntimeAX.stringAttribute(kAXRoleAttribute, from: ancestor) == kAXScrollAreaRole,
                verifiedFrame(ancestor, in: app).frame != nil, CGPreflightPostEventAccess() {
-                func observation() -> [String: Any] {
-                    var result: [String: Any] = ["controlFrameRejection": verifiedFrame(control, in: app).rejection ?? "none"]
-                    if let frame = RuntimeAX.frame(of: control), finiteFrame(frame) { result["controlFrame"] = frameReceipt(frame) }
+                func observation() -> (frame: CGRect?, visibleFrame: CGRect?, bar: Double?, receipt: [String: Any]) {
+                    let checked = verifiedFrame(control, in: app)
+                    var result: [String: Any] = ["controlFrameRejection": checked.rejection ?? "none"]
+                    let controlFrame = (checked.frame ?? RuntimeAX.frame(of: control)).flatMap { finiteFrame($0) ? $0 : nil }
+                    if let controlFrame { result["controlFrame"] = frameReceipt(controlFrame) }
+                    var barValue: Double?
                     if let bar = axElements(ancestor, attribute: kAXVerticalScrollBarAttribute).first,
                        sameOwnedWindow(ancestor, bar, app: app), RuntimeAX.stringAttribute(kAXRoleAttribute, from: bar) == kAXScrollBarRole {
                         var values: [String: Any] = ["enabled": enabled(bar)]
                         for attribute in [kAXValueAttribute, kAXMinValueAttribute, kAXMaxValueAttribute] {
                             var value: CFTypeRef?
                             if AXUIElementCopyAttributeValue(bar, attribute as CFString, &value) == .success,
-                               let number = value as? NSNumber, number.doubleValue.isFinite { values[attribute] = number }
+                               let number = value as? NSNumber, number.doubleValue.isFinite {
+                                values[attribute] = number
+                                if attribute == kAXValueAttribute { barValue = number.doubleValue }
+                            }
                         }
                         result["verticalScrollBar"] = values
                     } else { result["verticalScrollBarUnavailable"] = true }
-                    return result
+                    return (controlFrame, checked.frame, barValue, result)
                 }
                 for attempt in 1...4 {
-                    guard let frame = verifiedFrame(ancestor, in: app).frame,
+                    guard ProcessInfo.processInfo.systemUptime < deadline,
+                          let frame = verifiedFrame(ancestor, in: app).frame,
                           sameOwnedWindow(ancestor, control, app: app),
                           let controlFrame = RuntimeAX.frame(of: control), finiteFrame(controlFrame) else { return false }
                     let delta: Int32 = controlFrame.midY > frame.midY ? -400 : 400
                     let point = CGPoint(x: frame.midX, y: frame.midY)
                     guard let move = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left),
                           let scroll = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 1, wheel1: delta, wheel2: 0, wheel3: 0) else { return false }
+                    let before = observation()
+                    guard before.frame != nil else { return false }
                     var action: [String: Any] = ["method": "ownedScroll", "attempt": attempt, "frame": frameReceipt(frame),
-                        "delta": delta, "before": observation(), "createdFlags": scroll.flags.rawValue]
+                        "delta": delta, "before": before.receipt, "createdFlags": scroll.flags.rawValue]
                     let createdLocation = scroll.location
                     if createdLocation.x.isFinite, createdLocation.y.isFinite {
                         action["createdLocation"] = ["x": createdLocation.x, "y": createdLocation.y]
@@ -734,10 +744,45 @@ struct LipVisualCases {
                     }
                     move.post(tap: .cghidEventTap)
                     scroll.post(tap: .cghidEventTap)
-                    wait(0.2)
-                    action["after"] = observation()
+                    let postedAt = ProcessInfo.processInfo.systemUptime
+                    action["postedAtSystemUptime"] = postedAt
+                    var last = before
+                    var lastChangedAt = postedAt
+                    var progress = false
+                    var settled = false
+                    var changes: [[String: Any]] = []
+                    var outcome = "noMovementBeforeDeadline"
+                    while ProcessInfo.processInfo.systemUptime < deadline {
+                        wait(0.05)
+                        guard let viewport = verifiedFrame(ancestor, in: app).frame,
+                              sameOwnedWindow(ancestor, control, app: app) else { outcome = "ownedScrollAreaUnavailable"; break }
+                        let current = observation()
+                        let observedAt = ProcessInfo.processInfo.systemUptime
+                        guard current.frame != nil else { outcome = "controlFrameUnavailable"; break }
+                        if current.frame != last.frame || current.bar != last.bar {
+                            changes.append(current.receipt.merging(["observedAtSystemUptime": observedAt]) { _, value in value })
+                            let moved = current.frame != before.frame
+                            if moved, !progress { action["progressObservedAtSystemUptime"] = observedAt }
+                            progress = progress || moved
+                            lastChangedAt = observedAt
+                            if progress { outcome = "movementUnsettledAtDeadline" }
+                        }
+                        last = current
+                        // Observe a response and stable position before sending another wheel.
+                        if progress, observedAt < deadline, observedAt - lastChangedAt >= 0.2 {
+                            settled = true
+                            action["settledObservedAtSystemUptime"] = observedAt
+                            action["stableSeconds"] = observedAt - lastChangedAt
+                            outcome = current.visibleFrame.map { viewport.contains($0) } == true ? "settledVisible" : "settledOutside"
+                            break
+                        }
+                    }
+                    action["changes"] = changes
+                    action["after"] = last.receipt
+                    action["outcome"] = outcome
                     actions.append(action)
-                    if let visible = verifiedFrame(control, in: app).frame, frame.contains(visible) { return true }
+                    if outcome == "settledVisible" { return true }
+                    guard settled else { return false }
                 }
                 return false
             }

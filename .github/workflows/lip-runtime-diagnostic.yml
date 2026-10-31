@@ -101,6 +101,8 @@ jobs:
 
       - name: Diagnose retained public captures with the exact older native package
         if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python3 Tools/LipDictationE2E/analyze_public_capture.py
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -6,11 +6,82 @@ import json
 import os
 from pathlib import Path
 import platform
+import stat
 import subprocess
+import zipfile
 
 
 APP_HEAD = "6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1"
 PUBLIC_SHA = "db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc"
+BAD_RUN = 41157989283
+BAD_HEAD = "7058286b465788422fac0a653f0a9d8e5bd16722"
+BAD_ARTIFACT = 13026335983
+BAD_ARCHIVE_SHA = "0757a717bc342de64308159815b45279e92969f025b2297b28831ad32049bf27"
+BAD_MOVIE_SHA = "4ddd916d17b3dce5ca62d9c591037298f78f79be35361fb8b1c82a70cc40c9fe"
+BAD_MEMBER = "lip-dictation-e2e/public-captures/combined-silent.mov"
+
+
+def extract_known_bad_capture(archive_path, destination):
+    with zipfile.ZipFile(archive_path) as archive:
+        members = archive.infolist()
+        names = [item.filename for item in members]
+        assert len(names) == len(set(names)), "Duplicate artifact member names"
+
+        def member(name, limit):
+            assert names.count(name) == 1, "Missing exact public capture artifact member"
+            item = archive.getinfo(name)
+            assert not item.is_dir() and not stat.S_ISLNK(item.external_attr >> 16), "Symlink or directory artifact member"
+            assert 0 < item.file_size <= limit, "Artifact member exceeds its diagnostic bound"
+            return item
+
+        def metadata(name):
+            item = member(name, 16_384)
+            return json.loads(archive.read(item))
+
+        captured = metadata("lip-dictation-e2e/public-captures/combined-silent.json")
+        context = metadata("lip-runtime-source/public-capture-context.json")
+        assert captured["diagnosticOnly"] is True and captured["publicFixtureOnly"] is True
+        assert captured["scenario"] == "combined-silent" and captured["copiedMovie"] == "combined-silent.mov"
+        assert captured["proofGitHead"] == BAD_HEAD and captured["appBuildHead"] == APP_HEAD
+        assert captured["sha256"] == BAD_MOVIE_SHA and captured["matchingCaptureClosedObserved"] is True
+        assert captured["captureRootEmptyBeforeShortcut"] is True and captured["matchingDrainObservedBeforeCopy"] is False
+        assert context["diagnosticOnly"] is True and context["proofGitHead"] == BAD_HEAD
+        assert context["appBuildHead"] == APP_HEAD and context["publicSourceSHA256"] == PUBLIC_SHA
+        movie = member(BAD_MEMBER, 64_000_000)
+        total = 0
+        with archive.open(movie) as source, destination.open("xb") as target:
+            for data in iter(lambda: source.read(1_048_576), b""):
+                total += len(data)
+                assert total <= 64_000_000, "Public MOV exceeded extraction bound"
+                target.write(data)
+        assert total == movie.file_size == captured["bytes"]
+        assert sha256(destination) == BAD_MOVIE_SHA, "Known-bad public MOV hash mismatch"
+        return {"originalCaptureReceipt": captured, "originalPublicContext": context,
+                "selectedMember": BAD_MEMBER, "extractedBytes": total, "movieSHA256": BAD_MOVIE_SHA}
+
+
+def retrieve_known_bad_capture(root, work, output):
+    directory = output / "known-bad"
+    directory.mkdir()
+    endpoint = f"repos/negentropi/roma-just-talk/actions/artifacts/{BAD_ARTIFACT}"
+    artifact = json.loads(subprocess.check_output(["gh", "api", endpoint], cwd=root, text=True))
+    (directory / "artifact.json").write_text(json.dumps(artifact, indent=2) + "\n")
+    assert artifact["id"] == BAD_ARTIFACT and artifact["name"] == "lip-runtime-diagnostic-evidence"
+    assert artifact["expired"] is False and artifact["workflow_run"]["id"] == BAD_RUN
+    assert artifact["workflow_run"]["head_sha"] == BAD_HEAD
+    assert artifact["workflow_run"]["repository_id"] == artifact["workflow_run"]["head_repository_id"] == 1253985786
+    assert artifact["size_in_bytes"] == 18_368_425 and artifact["digest"] == "sha256:" + BAD_ARCHIVE_SHA
+    archive = work / "known-bad-runtime-artifact.zip"
+    with archive.open("xb") as target, (directory / "download.log").open("wb") as log:
+        subprocess.run(["gh", "api", endpoint + "/zip"], cwd=root, stdout=target, stderr=log, timeout=120, check=True)
+    assert archive.stat().st_size == artifact["size_in_bytes"] and sha256(archive) == BAD_ARCHIVE_SHA
+    movie = directory / "retained-combined-silent.mov"
+    provenance = extract_known_bad_capture(archive, movie)
+    provenance.update({"diagnosticOnly": True, "sourceRepository": "negentropi/roma-just-talk",
+                       "sourceRun": BAD_RUN, "sourceHead": BAD_HEAD, "artifactID": BAD_ARTIFACT,
+                       "artifactSHA256": BAD_ARCHIVE_SHA, "extractionBoundary": "Only the exact public MOV is extracted; two small original provenance JSON members are read, not executed."})
+    (directory / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    return movie, directory
 
 
 def sha256(path):
@@ -36,7 +107,8 @@ def main():
     evidence = temporary / "lip-dictation-e2e"
     output = evidence / "public-capture-analysis"
     output.mkdir(parents=True, exist_ok=True)
-    receipt = {"diagnosticOnly": True, "appBuildHead": APP_HEAD, "proofGitHead": env["GITHUB_SHA"],
+    receipt = {"diagnosticOnly": True, "candidateAcceptanceAssessed": False,
+               "appBuildHead": APP_HEAD, "proofGitHead": env["GITHUB_SHA"],
                "boundary": "Exact older app native package; existing actual-Setup model; no model install/download", "cases": []}
     try:
         context = json.loads((temporary / "lip-runtime-source/public-capture-context.json").read_text())
@@ -84,6 +156,29 @@ def main():
         assert model.is_dir(), "The actual app Setup did not install a lip model"
         receipt["modelDirectory"] = str(model)
         receipt["nativeExecutableSHA256"] = sha256(binary)
+        bad_movie, bad_directory = retrieve_known_bad_capture(root, work, output)
+        bad_receipt = bad_directory / "native-preprocess.json"
+        bad_command = [binary, "preprocess", "--video", bad_movie,
+                       "--mouth-dump", bad_directory / "unexpected-mouth.float32", "--receipt", bad_receipt]
+        bad_status = execute(bad_command, bad_directory / "native-preprocess.log", root)
+        bad_result = json.loads(bad_receipt.read_text()) if bad_receipt.is_file() else {}
+        expected_bad = (bad_status == 1 and bad_result.get("status") == "error"
+                        and bad_result.get("errorCode") == "mouthVideo.missingFace"
+                        and bad_result.get("errorType") == "VoiceInkLip.MouthVideoProcessingError"
+                        and bad_result.get("errorFrame") == 22
+                        and isinstance(bad_result.get("errorPresentationTime"), (int, float))
+                        and abs(bad_result["errorPresentationTime"] - 0.88) < 1e-9
+                        and bad_result.get("text", "") == "" and bad_result.get("videoSHA256") == BAD_MOVIE_SHA)
+        receipt["knownBad"] = {"requiredResultMatched": expected_bad, "sourceRun": BAD_RUN,
+                               "movieSHA256": BAD_MOVIE_SHA, "nativeExitCode": bad_status,
+                               "nativeReceipt": "known-bad/native-preprocess.json",
+                               "errorFrame": bad_result.get("errorFrame"),
+                               "errorPresentationTime": bad_result.get("errorPresentationTime"),
+                               "errorDetails": bad_result.get("errorDetails"),
+                               "nativeExecutableSHA256": receipt["nativeExecutableSHA256"],
+                               "compiledPackageGitTree": receipt["compiledPackageGitTree"]}
+        print(json.dumps({"knownBad": receipt["knownBad"]}), flush=True)
+        assert expected_bad, "Known-bad replay must reject the actual public MOV at missingFace frame 22, time 0.88"
         probe_source = work / "LipVideoFrameProbe.swift"
         probe_source.write_bytes(subprocess.check_output(["git", "show", APP_HEAD + ":Tools/LipVideoFrameProbe.swift"], cwd=root))
         probe = work / "LipVideoFrameProbe"

@@ -89,8 +89,19 @@ jobs:
                   ]
           """
           diagnostic=diagnostic.replace(launch_anchor,launch_environment+launch_anchor,1)
+          voice_start="        report_path = evidence / 'voice-default-off.json'\n"
+          visual_start="        if args.visual:\n            summary['visualCases'] = "
+          assert diagnostic.count(voice_start)==1 and diagnostic.count(visual_start)==1
+          start=diagnostic.index(voice_start)
+          end=diagnostic.index(visual_start,start)
+          skipped=diagnostic[start:end]
+          reason='Not assessed in camera-only older-app diagnostic; final app workflow retains both strict voice cases'
+          diagnostic=diagnostic[:start]+"        summary['voiceDefaultOff'] = "+repr({'assessed':False,'passed':False,'reason':reason})+"\n"+diagnostic[end:]
+          assert diagnostic.count("'lipDictationVerified'")==2
+          diagnostic=diagnostic.replace("'lipDictationVerified'","'visualDiagnosticCompletedOlderApp'")
+          compile(diagnostic,str(p),'exec')
           p.write_text(diagnostic)
-          receipt={'diagnosticOnly':True,'appBuildHead':'6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1','proofGitHead':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'originalRunnerSHA256':hashlib.sha256(original.encode()).hexdigest(),'diagnosticRunnerSHA256':hashlib.sha256(diagnostic.encode()).hexdigest(),'change':'Allow explicitly declared older app for diagnosis; final product proof keeps strict head equality.'}
+          receipt={'diagnosticOnly':True,'appBuildHead':'6a3e4cbbef3e39bdf4ef6bf20fadb58824114ca1','proofGitHead':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'originalRunnerSHA256':hashlib.sha256(original.encode()).hexdigest(),'diagnosticRunnerSHA256':hashlib.sha256(diagnostic.encode()).hexdigest(),'change':'Camera-only older-app diagnosis; final product proof keeps strict head equality and both voice cases.','completionStatus':'visualDiagnosticCompletedOlderApp','skippedBoundary':{'start':voice_start.strip(),'endExclusive':'if args.visual:','sourceSHA256':hashlib.sha256(skipped.encode()).hexdigest(),'reason':reason}}
           (pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-runtime-source/proof-overlay.json').write_text(json.dumps(receipt,indent=2))
           context={'diagnosticOnly':True,'appBuildHead':receipt['appBuildHead'],'proofGitHead':receipt['proofGitHead'],'publicSourceSHA256':'db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc','evidenceDirectory':str(pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-dictation-e2e'),'boundary':'Fresh disposable GitHub host; controlled public OBS fixture only. Copy only the sole new owned MOV after matching writer close and before observed recording drain. Product cleanup remains unchanged.'}
           (pathlib.Path(os.environ['RUNNER_TEMP'])/'lip-runtime-source/public-capture-context.json').write_text(json.dumps(context,indent=2))

@@ -8,7 +8,7 @@ Under that toggle, **Lips Only** uses the camera with microphone capture and mic
 
 ## Setup and limits
 
-- macOS 14 or later. Camera access is separate from microphone access.
+- macOS 14.4 or later. Camera access is separate from microphone access.
 - The model download is about 1.98 GB. Installed model storage is about 1.36 GB. Installation temporarily needs both, plus working space.
 - Experimental English recognition. Use short phrases, face the camera in good light, and keep other faces out of view. Maximum recording length is 60 seconds.
 - Lip movements cannot distinguish every sound. Recognition can misread words, names, and numbers. Review the inserted text.

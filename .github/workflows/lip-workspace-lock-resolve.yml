@@ -20,14 +20,12 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: source
     steps:
       - name: Checkout exact source independently of transport head
         id: checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: 8aabafae521768c8d1d73c437d674b3cb6402762
-          path: source
           fetch-depth: 1
           persist-credentials: false
 
@@ -55,6 +53,11 @@ jobs:
                      'transport_sha': os.environ['GITHUB_SHA'],
                      'run_id': os.environ['GITHUB_RUN_ID'],
                      'repository': os.environ['GITHUB_REPOSITORY'],
+                     'source_root': str(root),
+                     'developer_dir': os.environ['DEVELOPER_DIR'],
+                     'configuration': 'Debug',
+                     'destination': 'generic/platform=iOS Simulator',
+                     'derived_data_path': str(root / '.local-build-ios'),
                      'tracked_changes': changed, 'locks': {}}
           (output / (phase + '-git-status.log')).write_text(git('status', '--porcelain=v1'))
           (output / (phase + '-git.diff')).write_text(git('diff', '--no-ext-diff', '--binary', 'HEAD'))
@@ -81,10 +84,10 @@ jobs:
                       'sha256': hashlib.sha256(data).hexdigest(), 'source': data.decode()}
               (output / 'declared-packages.json').write_text(json.dumps(declarations, indent=2) + '\n')
           else:
-              state = Path(os.environ['RUNNER_TEMP']) / 'lip-workspace-packages/workspace-state.json'
+              state = root / '.local-build-ios/SourcePackages/workspace-state.json'
               if state.is_file():
                   json.loads(state.read_bytes())
-                  shutil.copyfile(state, output / 'resolved-workspace-state.json')
+                  shutil.copyfile(state, output / (phase + '-workspace-state.json'))
               errors = []
               if any(name != locks[0] for name in changed):
                   errors.append('Tracked file changed outside workspace lock')
@@ -99,8 +102,12 @@ jobs:
                             'changed': {key: {'before': old[key], 'after': new[key]} for key in old.keys() & new.keys() if old[key] != new[key]},
                             'unchanged': sorted(key for key in old.keys() & new.keys() if old[key] == new[key]),
                             'guard_errors': errors}
-              (output / 'workspace-lock-comparison.json').write_text(json.dumps(comparison, indent=2, sort_keys=True) + '\n')
+              comparison_name = 'workspace-lock-comparison.json' if phase == 'after' else 'stable-workspace-lock-comparison.json'
+              (output / comparison_name).write_text(json.dumps(comparison, indent=2, sort_keys=True) + '\n')
               assert not errors, '; '.join(errors)
+              if phase == 'stable':
+                  for name in locks:
+                      assert (output / 'after' / name).read_bytes() == (root / name).read_bytes(), 'Repeated resolution rewrote ' + name
           print(json.dumps({'phase': phase, 'tracked_changes': changed,
                             'pin_counts': {key: len(value['graph']['pins']) for key, value in receipt['locks'].items()}}))
           PY
@@ -110,6 +117,7 @@ jobs:
             xcodebuild -version
             xcrun --find swift
             swift --version
+            swift package --version
             xcodebuild -version -sdk iphonesimulator
             sw_vers
           } 2>&1 | tee "$RUNNER_TEMP/lip-workspace-lock-resolve/toolchain.log"
@@ -123,8 +131,9 @@ jobs:
           xcodebuild -resolvePackageDependencies \
             -workspace VoiceInk.xcworkspace \
             -scheme VoiceInk-ios \
-            -clonedSourcePackagesDirPath "$RUNNER_TEMP/lip-workspace-packages" \
-            -derivedDataPath "$RUNNER_TEMP/lip-workspace-derived-data" \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$PWD/.local-build-ios" \
             2>&1 | tee "$RUNNER_TEMP/lip-workspace-lock-resolve/resolve.log"
           pipeline_exits=("${PIPESTATUS[@]}")
           resolve_exit="${pipeline_exits[0]}"
@@ -137,11 +146,23 @@ jobs:
         if: always() && steps.before.outcome == 'success'
         run: python3 "$RUNNER_TEMP/lip-workspace-lock-snapshot.py" after
 
+      - name: Repeat identical resolution and require stable lock bytes
+        run: |
+          set -euo pipefail
+          xcodebuild -resolvePackageDependencies \
+            -workspace VoiceInk.xcworkspace \
+            -scheme VoiceInk-ios \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath "$PWD/.local-build-ios" \
+            2>&1 | tee "$RUNNER_TEMP/lip-workspace-lock-resolve/resolve-again.log"
+          python3 "$RUNNER_TEMP/lip-workspace-lock-snapshot.py" stable
+
       - name: Upload lock bytes and resolver evidence only
         if: always() && steps.checkout.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: workspace-lock-resolve-8aabafae-Xcode-26.3
+          name: workspace-lock-resolve-root-8aabafae-Xcode-26.3
           path: ${{ runner.temp }}/lip-workspace-lock-resolve/
           if-no-files-found: error
           retention-days: 3

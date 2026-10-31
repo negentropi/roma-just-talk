@@ -127,11 +127,35 @@ final class VoiceInkIOSUITests: XCTestCase {
 
         let timeoutSlider = app.sliders.firstMatch
         scrollToHittable(timeoutSlider, in: app)
-        let changedTimeoutText = VoiceInkAudioSessionTimeoutPreference.displayText(
-            for: VoiceInkAudioSessionTimeoutPreference.maximumSeconds
+        let defaultSeconds = VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
+        let defaultTimeoutText = VoiceInkAudioSessionTimeoutPreference.displayText(for: defaultSeconds)
+        let validSeconds = Set(stride(
+            from: VoiceInkAudioSessionTimeoutPreference.minimumSeconds,
+            through: VoiceInkAudioSessionTimeoutPreference.maximumSeconds,
+            by: VoiceInkAudioSessionTimeoutPreference.stepSeconds
+        ))
+        let timeoutLabels = app.staticTexts.matching(
+            NSPredicate(format: "label MATCHES %@", "^[0-9]+s$")
         )
+        let initialLabels = timeoutLabels.allElementsBoundByIndex.map(\.label)
+        let initialSeconds = uniqueTimeoutSeconds(in: initialLabels, validSeconds: validSeconds)
+        attachTimeoutObservation("Before drag", labels: initialLabels, seconds: initialSeconds, slider: timeoutSlider)
+        XCTAssertEqual(initialSeconds, defaultSeconds)
+        XCTAssertTrue(app.staticTexts[defaultTimeoutText].isHittable)
+
+        // A synthesized drag may stop short of the endpoint; reset needs a proven changed setting.
         timeoutSlider.adjust(toNormalizedSliderPosition: 1)
-        XCTAssertTrue(app.staticTexts[changedTimeoutText].waitForExistence(timeout: 5))
+        let changedLabelAppeared = timeoutLabels.matching(
+            NSPredicate(format: "label != %@", defaultTimeoutText)
+        ).firstMatch.waitForExistence(timeout: 5)
+        let changedLabels = timeoutLabels.allElementsBoundByIndex.map(\.label)
+        let observedChangedSeconds = uniqueTimeoutSeconds(in: changedLabels, validSeconds: validSeconds)
+        attachTimeoutObservation("After drag", labels: changedLabels, seconds: observedChangedSeconds, slider: timeoutSlider)
+        XCTAssertTrue(changedLabelAppeared)
+        let changedSeconds = try XCTUnwrap(observedChangedSeconds)
+        let changedTimeoutText = try XCTUnwrap(changedLabels.first)
+        XCTAssertNotEqual(changedSeconds, defaultSeconds)
+        XCTAssertTrue(app.staticTexts[changedTimeoutText].isHittable)
 
         let resetButton = app.buttons[VoiceInkIOSAppDataResetPresentation.buttonTitle]
         scrollToHittable(resetButton, in: app)
@@ -158,17 +182,27 @@ final class VoiceInkIOSUITests: XCTestCase {
         ).tap()
         XCTAssertTrue(confirmationTitle.waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.navigationBars["Settings"].exists)
+        scrollToHittable(timeoutSlider, in: app, swipeUp: false)
+        XCTAssertEqual(
+            uniqueTimeoutSeconds(in: timeoutLabels.allElementsBoundByIndex.map(\.label), validSeconds: validSeconds),
+            changedSeconds
+        )
         XCTAssertTrue(app.staticTexts[changedTimeoutText].exists)
+        XCTAssertTrue(app.staticTexts[changedTimeoutText].isHittable)
 
+        scrollToHittable(resetButton, in: app)
         resetButton.tap()
         let confirmButton = app.buttons[VoiceInkIOSAppDataResetPresentation.confirmButtonTitle]
         XCTAssertTrue(confirmButton.waitForExistence(timeout: 5))
         confirmButton.tap()
         XCTAssertTrue(confirmButton.waitForNonExistence(timeout: 5))
-        let defaultTimeoutText = VoiceInkAudioSessionTimeoutPreference.displayText(
-            for: VoiceInkPreferenceDefault.audioSessionTimeoutSeconds
-        )
+        scrollToHittable(timeoutSlider, in: app, swipeUp: false)
         XCTAssertTrue(app.staticTexts[defaultTimeoutText].waitForExistence(timeout: 5))
+        XCTAssertEqual(
+            uniqueTimeoutSeconds(in: timeoutLabels.allElementsBoundByIndex.map(\.label), validSeconds: validSeconds),
+            defaultSeconds
+        )
+        XCTAssertTrue(app.staticTexts[defaultTimeoutText].isHittable)
 
         app.terminate()
         app.launchArguments = [
@@ -209,14 +243,32 @@ final class VoiceInkIOSUITests: XCTestCase {
         element.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
     }
 
+    private func uniqueTimeoutSeconds(in labels: [String], validSeconds: Set<Int>) -> Int? {
+        guard labels.count == 1, let label = labels.first, label.hasSuffix("s"),
+              let seconds = Int(label.dropLast()), "\(seconds)s" == label,
+              validSeconds.contains(seconds) else { return nil }
+        return seconds
+    }
+
+    @MainActor
+    private func attachTimeoutObservation(_ stage: String, labels: [String], seconds: Int?, slider: XCUIElement) {
+        let attachment = XCTAttachment(string:
+            "labels=\(labels)\nseconds=\(String(describing: seconds))\nsliderLabel=\(slider.label)\nsliderValue=\(String(describing: slider.value))\nsliderFrame=\(slider.frame)\nsliderHittable=\(slider.isHittable)"
+        )
+        attachment.name = "Reset timeout: \(stage)"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     private func scrollToHittable(
         _ element: XCUIElement,
         in app: XCUIApplication,
+        swipeUp: Bool = true,
         maxSwipes: Int = 12
     ) {
         var remainingSwipes = maxSwipes
         while !element.isHittable && remainingSwipes > 0 {
-            app.swipeUp()
+            if swipeUp { app.swipeUp() } else { app.swipeDown() }
             remainingSwipes -= 1
         }
         XCTAssertTrue(element.isHittable)

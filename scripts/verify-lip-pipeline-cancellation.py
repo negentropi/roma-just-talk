@@ -19,9 +19,12 @@ candidate = source.read_bytes()
 recorder = root / "VoiceInk/Recorder.swift"
 prewarm = root / "VoiceInk/Services/ModelPrewarmService.swift"
 power_modes = root / "VoiceInk/PowerMode/PowerModeSessionManager.swift"
+power_mode_policy = root / "VoiceInkCore/Sources/VoiceInkCore/PowerModePolicy.swift"
 authorization = root / "VoiceInk/Services/CaptureAuthorizationDecision.swift"
 recognition = root / "VoiceInk/Transcription/Engine/RecordingRecognition.swift"
-candidates = {path: path.read_bytes() for path in (source, recorder, prewarm, power_modes, authorization, recognition)}
+candidates = {path: path.read_bytes() for path in (
+    source, recorder, prewarm, power_modes, power_mode_policy, authorization, recognition,
+)}
 evidence = root / ".local-build/lip-pipeline-regression"
 evidence.mkdir(parents=True, exist_ok=False)
 test_evidence = root / ".local-build/onboarding-test-evidence"
@@ -68,24 +71,32 @@ def save_receipt():
 
 
 @contextmanager
-def semantic_revert(path, mutant, record):
-    original = candidates[path]
-    require(path.read_bytes() == original, f"Candidate changed before {record['label']}")
-    record.update({
-        "source": str(path.relative_to(root)),
-        "mutantSourceSHA256": hashlib.sha256(mutant.encode()).hexdigest(),
-    })
+def semantic_revert(mutants, record):
+    originals = {path: candidates[path] for path in mutants}
+    require(all(path.read_bytes() == data for path, data in originals.items()),
+            f"Candidate changed before {record['label']}")
+    record["sources"] = {
+        str(path.relative_to(root)): {"mutantSourceSHA256": hashlib.sha256(data).hexdigest()}
+        for path, data in mutants.items()
+    }
+    if len(mutants) == 1:
+        path = next(iter(mutants))
+        record.update({"source": str(path.relative_to(root)), **record["sources"][str(path.relative_to(root))]})
     receipt["controls"].append(record)
     save_receipt()
     try:
-        path.write_text(mutant)
+        for path, data in mutants.items():
+            path.write_bytes(data)
         yield
     finally:
-        path.write_bytes(original)
-        record["restoredSourceSHA256"] = hashlib.sha256(path.read_bytes()).hexdigest()
-        record["sourceRestored"] = path.read_bytes() == original
+        for path, data in originals.items():
+            path.write_bytes(data)
+            record["sources"][str(path.relative_to(root))]["restoredSourceSHA256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        record["sourceRestored"] = all(path.read_bytes() == data for path, data in originals.items())
+        if len(mutants) == 1:
+            record["restoredSourceSHA256"] = record["sources"][str(path.relative_to(root))]["restoredSourceSHA256"]
         save_receipt()
-        require(record["sourceRestored"], f"Failed to restore {path}")
+        require(record["sourceRestored"], f"Failed to restore sources for {record['label']}")
 
 bad = candidate.decode()
 for span in ("pastePreparationSpan", "pasteSpan"):
@@ -135,6 +146,8 @@ auto_send_selection = "VoiceInkTests/VoiceInkTests/pipelineOwnsDelayedAutoSendUn
 prewarm_selection = "VoiceInkTests/ModelPrewarmServiceTests/lipOnlyPrewarmNeverLoadsAnInstalledAudioModel()"
 central_lip_selection = "VoiceInkTests/VoiceInkTests/recorderPowerModeSelectionUsesFrozenLipOnlyMode()"
 central_voice_selection = "VoiceInkTests/VoiceInkTests/recorderPowerModeSelectionRetainsAudioForVoiceAndCombined()"
+mixed_power_mode_selection = "VoiceInkTests/VoiceInkTests/recorderPowerModeMixedSessionRestoresAudioSelectionWithoutLoadingForLips()"
+upgraded_power_mode_selection = "VoiceInkTests/VoiceInkTests/recorderPowerModeLipSessionCanUpgradeToVoiceAndRestoreAudioResources()"
 hardware_suite = "VoiceInkTests/RecorderMicrophonePrivacyTests"
 authorization_suite = "VoiceInkTests/CaptureAuthorizationDecisionTests"
 authorization_selection = authorization_suite + "/testCanceledPermissionDecisionDrainsBeforeSystemCallback"
@@ -142,10 +155,11 @@ recognition_selection = "VoiceInkTests/RecordingRecognitionTests/testVoiceSucces
 candidate_selections = (
     pipeline_selection, hardware_suite, auto_send_selection, prewarm_selection,
     central_lip_selection, central_voice_selection, authorization_suite, recognition_selection,
+    mixed_power_mode_selection, upgraded_power_mode_selection,
 )
 receipt["candidateSelections"] = candidate_selections
-receipt["expectedCandidateFunctions"] = 14
-receipt["expectedCandidateInvocations"] = 18
+receipt["expectedCandidateFunctions"] = 16
+receipt["expectedCandidateInvocations"] = 20
 
 
 def read_summary(destination):
@@ -203,7 +217,7 @@ def red_control(path, mutant, label, selection, count, change):
         "label": label, "selection": selection, "expectedFunctions": 1,
         "expectedInvocations": count, "knownBadChange": change,
     }
-    with semantic_revert(path, mutant, record):
+    with semantic_revert({path: mutant.encode()}, record):
         exit_code, summary = run(label, (selection,))
     record.update({"exitCode": exit_code, "summary": summary})
     save_receipt()
@@ -288,6 +302,18 @@ require(recognition_text.count(cancel_unused_lips) == 1, "Expected one voice-rea
 require(recognition_text.count(drain_unused_lips) == 1, "Expected one voice-ready lip cleanup drain")
 wait_for_unused_lips = recognition_text.replace(cancel_unused_lips, "", 1)
 
+restoration_commit = "6421408897bb92f95e8bc04e794d31b15ec0cc71"
+if subprocess.run(["git", "cat-file", "-e", restoration_commit + "^{commit}"],
+                  cwd=root, stderr=subprocess.DEVNULL).returncode != 0:
+    subprocess.run(["git", "fetch", "--no-tags", "--no-write-fetch-head", "--depth=1", "origin", restoration_commit],
+                   cwd=root, check=True)
+old_restoration = {
+    path: subprocess.check_output(["git", "show", f"{restoration_commit}:{path.relative_to(root)}"], cwd=root)
+    for path in (power_mode_policy, power_modes)
+}
+require(all(data != candidates[path] for path, data in old_restoration.items()),
+        "Expected the pre-fix Core policy and actual session manager to differ from the candidate")
+
 try:
     if (evidence / "full-candidate").exists():
         full = read_summary(evidence / "full-candidate")
@@ -316,6 +342,46 @@ try:
     red_control(recognition, wait_for_unused_lips, "known-bad-unused-lip-wait", recognition_selection, 1,
                 "Omit cancellation of unused lip inference after voice succeeds, retaining its cleanup drain.")
 
+    label = "known-bad-power-mode-restoration"
+    restoration = {
+        "label": label, "selection": mixed_power_mode_selection,
+        "positiveSelection": upgraded_power_mode_selection, "knownBadCommit": restoration_commit,
+        "expectedFunctions": 2, "expectedInvocations": 2,
+        "knownBadChange": "Restore the exact pre-fix Core policy and session manager; retain current app tests.",
+    }
+    with semantic_revert(old_restoration, restoration):
+        red_exit, red = run(label, (mixed_power_mode_selection, upgraded_power_mode_selection))
+    restoration.update({"exitCode": red_exit, "summary": red, "counts": counts(red)})
+    save_receipt()
+    require(red_exit != 0
+            and restoration["counts"]["functions"] == {"passed": 1, "failed": 1, "skipped": 0, "total": 2}
+            and restoration["counts"]["invocations"] == {"passed": 1, "failed": 1, "skipped": 0, "total": 2}
+            and restoration["counts"]["parameterizedInvocations"] == 0,
+            f"{label} must fail the mixed session and pass the lip-to-voice upgrade: {restoration['counts']}")
+    mixed_identity = mixed_power_mode_selection.split("/")[-1]
+    require(red["testFailures"] and all(mixed_identity in failure["testIdentifierString"]
+                                       for failure in red["testFailures"]),
+            f"{label} failed outside the actual mixed-session regression")
+    log = (evidence / f"{label}.log").read_text()
+    issues = [line.split("Expectation failed: ", 1)[1] for line in log.splitlines()
+              if f"Test {mixed_identity} recorded an issue at PowerModeSessionManagerTests.swift:" in line
+              and "Expectation failed: " in line]
+    expected_issues = (
+        r'\(fixture\.savedSession\?\.applicationScope → .*textOnly.*\) == \.full',
+        r'\(fixture\.provider\.currentTranscriptionModel\?\.name → "audio-B"\) == "audio-A"',
+        r'\(fixture\.provider\.resourceEvents → \[\]\) == \["select:audio-A"\]',
+    )
+    restoration["assertionFailures"] = issues
+    save_receipt()
+    require(len(issues) == 6 and all(sum(re.fullmatch(pattern, issue) is not None for issue in issues) == 2
+                                   for pattern in expected_issues),
+            f"{label} requires the scope, selection and resource assertions for both frozen/recovered sessions: {issues}")
+    require(f"Test {upgraded_power_mode_selection.split('/')[-1]} passed after " in log,
+            f"{label} did not execute its lip-to-voice positive control")
+    restoration["expectedFailureConfirmed"] = True
+    save_receipt()
+    print(f"{label}: mixed-session assertions failed; lip-to-voice upgrade passed; both sources restored", flush=True)
+
     green_exit, green = run("candidate", candidate_selections)
     receipt["candidateSummary"] = green
     receipt["candidateExitCode"] = green_exit
@@ -324,14 +390,17 @@ try:
     receipt["candidateCounts"] = actual
     save_receipt()
     require(green_exit == 0 and green["failedTests"] == 0
-            and actual["functions"] == {"passed": 14, "failed": 0, "skipped": 0, "total": 14}
-            and actual["invocations"] == {"passed": 18, "failed": 0, "skipped": 0, "total": 18}
+            and actual["functions"] == {"passed": 16, "failed": 0, "skipped": 0, "total": 16}
+            and actual["invocations"] == {"passed": 20, "failed": 0, "skipped": 0, "total": 20}
             and actual["parameterizedInvocations"] == 6,
-            f"Candidate must pass 14 functions / 18 invocations, including 6 parameterized runs: {actual}")
+            f"Candidate must pass 16 functions / 20 invocations, including 6 parameterized runs: {actual}")
     require(all(path.read_bytes() == data for path, data in candidates.items()),
             "Candidate sources changed after controls")
+    require(all(hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
+                for path, digest in receipt["testSourceSHA256"].items()),
+            "Candidate tests changed during controls")
     receipt["status"] = "passed"
-    print("Candidate: 14 functions / 18 invocations passed; all eight semantic reverts failed; sources restored", flush=True)
+    print("Candidate: 16 functions / 20 invocations passed; all nine semantic reverts failed; sources restored", flush=True)
 except BaseException as error:
     receipt.update({"status": "failed", "error": str(error)})
     raise

@@ -1,0 +1,105 @@
+name: Verify fix on macOS 26 (ci transport)
+
+# Disposable CI transport for ci/rjt-fix-* refs. Not part of any PR.
+on:
+  push:
+    branches:
+      - "ci/rjt-fix-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rjt-fix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: macos-26
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode and toolchain
+        run: |
+          /usr/bin/caffeinate -d -i -u -t 6000 </dev/null >/dev/null 2>&1 &
+          latest=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -n 1)
+          sudo xcode-select -s "$latest"
+          xcodebuild -version
+          sw_vers
+          command -v cmake >/dev/null || brew install cmake
+          if ! xcrun metal --version >/dev/null 2>&1; then
+            log="$RUNNER_TEMP/metal.log"
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tee "$log"
+            if ! xcrun metal --version >/dev/null 2>&1; then
+              dmg=$(sed -n 's/^Downloaded asset to: //p' "$log" | tail -n 1)
+              hdiutil attach -readonly -nobrowse "$dmg"
+            fi
+          fi
+          xcrun metal --version
+
+      - uses: actions/cache/restore@v4
+        id: deps
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: writing-macos-${{ runner.arch }}-${{ hashFiles('Makefile', 'scripts/verify-static-whisper-xcframework.sh', 'VoiceInk.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      - name: Prepare static Whisper
+        run: make setup
+
+      - uses: actions/cache/save@v4
+        if: steps.deps.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/VoiceInk-Dependencies/whisper.cpp
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ steps.deps.outputs.cache-primary-key }}
+
+      - name: Install BlackHole input
+        run: |
+          HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew install --cask blackhole-2ch
+          sudo killall coreaudiod || true
+          sleep 4
+          system_profiler SPAudioDataType | grep "BlackHole 2ch"
+
+      - name: Shared core tests
+        run: swift test --package-path VoiceInkCore 2>&1 | tail -40
+
+      - name: Build release app
+        id: release
+        run: make local CONFIGURATION=Release
+
+      - name: Debug unit tests
+        id: unit
+        if: ${{ !cancelled() && steps.release.outcome == 'success' }}
+        timeout-minutes: 25
+        run: bash scripts/run-macos-ci-unit-tests.sh
+
+      - name: Branch proof
+        id: proof
+        if: ${{ !cancelled() && steps.release.outcome == 'success' && hashFiles('.ci-proof/run.sh') != '' }}
+        timeout-minutes: 30
+        run: |
+          mkdir -p "$RUNNER_TEMP/proof"
+          bash .ci-proof/run.sh "$HOME/Applications/roma just talk.app" "$RUNNER_TEMP/proof"
+
+      - name: Package app
+        if: ${{ !cancelled() && steps.release.outcome == 'success' }}
+        run: ditto -c -k --keepParent "$HOME/Applications/roma just talk.app" roma.just.talk.app.zip
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.release.outcome == 'success' }}
+        with:
+          name: roma.just.talk.app
+          path: roma.just.talk.app.zip
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidence
+          path: |
+            ${{ runner.temp }}/proof/**
+            .local-build/onboarding-test-evidence/**
+          if-no-files-found: ignore

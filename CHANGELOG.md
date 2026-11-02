@@ -6,6 +6,7 @@
 - Stop unused lip recognition when voice text is ready.
 - Restore the original audio-model selection when a Power Mode session continues in Lips Only, without loading audio resources.
 - Cancel pending auto-send when its dictation is canceled, disabled, or replaced.
+- Keep unfinished Lips Only dictation out of History when the feature is disabled, the session resets, or the app quits.
 - Let dictation and setup tasks stop while a camera or microphone permission reply is pending.
 
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.

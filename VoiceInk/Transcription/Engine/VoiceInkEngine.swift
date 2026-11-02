@@ -139,13 +139,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
     var recordingCancellationForTesting: RecordingCancellation? { activeRecording?.cancellation }
 
     func installCapturedRecordingForTesting(
-        audioURL: URL?, model: (any TranscriptionModel)?, session: TranscriptionSession?, mode: VoiceInkDictationMode
+        audioURL: URL?, model: (any TranscriptionModel)?, session: TranscriptionSession?, mode: VoiceInkDictationMode,
+        lipRecognition: Task<String, Error>? = nil
     ) {
         precondition(activeRecording == nil)
         let recording = Recording(mode: mode, traceToken: nil, recorderUISessionID: recorderUIManager?.recorderSessionID)
         recording.audioURL = audioURL
         recording.model = model
         recording.audioSession = session
+        recording.lipRecognition = lipRecognition
         recording.inputsStarted = true
         recording.captureStartedAt = Date()
         activeRecording = recording

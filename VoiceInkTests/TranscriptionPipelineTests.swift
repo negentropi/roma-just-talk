@@ -163,7 +163,8 @@ extension VoiceInkTests {
     }
     #endif
 
-    @Test @MainActor func pipelinePreservesDeliveredHistoryAfterLateCancellation() async throws {
+    @Test(arguments: [false, true])
+    @MainActor func pipelinePreservesDeliveredHistoryAfterLateCancellation(sessionEnded: Bool) async throws {
         let fixture = try PipelineFixture()
         defer { fixture.restore() }
         let transcription = fixture.insertTranscription()
@@ -184,7 +185,7 @@ extension VoiceInkTests {
                 captureDuration: { 2.5 },
                 latencyTraceToken: nil,
                 onStateChange: { _ in },
-                cancellation: { cancellationRequested ? .userRequested : nil },
+                cancellation: { cancellationRequested ? (sessionEnded ? .sessionEnded : .userRequested) : nil },
                 onCancel: { Issue.record("Delivered text was recorded as canceled") },
                 onDismiss: {}
             )
@@ -314,7 +315,7 @@ extension VoiceInkTests {
 
     @Test(.timeLimit(.minutes(1)))
     @MainActor func lipOnlyPipelineCancellationUsesTypedHistoryPolicy() async throws {
-        for reason in [RecordingCancellation.userRequested, .accidentalShortcut] {
+        for reason in [RecordingCancellation.userRequested, .accidentalShortcut, .sessionEnded] {
             let fixture = try PipelineFixture()
             defer { fixture.restore() }
             let transcription = fixture.insertTranscription()
@@ -364,6 +365,36 @@ extension VoiceInkTests {
             #expect(NSPasteboard.general.changeCount == clipboardChangeCount)
             #expect(try fixture.readMetrics().isEmpty)
         }
+    }
+
+    @Test @MainActor func sessionEndedPipelineRetainsCapturedVoiceHistory() async throws {
+        let fixture = try PipelineFixture()
+        defer { fixture.restore() }
+        let audioURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).absoluteString
+        let transcription = fixture.insertTranscription(duration: 2.5, audioFileURL: audioURL)
+        var cancelCount = 0
+        await fixture.pipeline.run(
+            transcription: transcription,
+            modelDisplayName: "Voice recognition",
+            recognize: { Issue.record("Session-ended capture reached recognition"); return "unused" },
+            captureDuration: { Issue.record("Known capture duration was read again"); return 0 },
+            latencyTraceToken: nil,
+            onStateChange: { _ in },
+            cancellation: { .sessionEnded },
+            onCancel: { cancelCount += 1 },
+            onDismiss: { Issue.record("Canceled voice capture was dismissed as completed") }
+        )
+
+        let rows = try fixture.readTranscriptions()
+        let stored = try #require(rows.first)
+        #expect(rows.map(\.id) == [transcription.id])
+        #expect(stored.transcriptionState == .canceled)
+        #expect(stored.audioFileURL == audioURL)
+        #expect(stored.duration == 2.5)
+        #expect(cancelCount == 1)
+        #expect(fixture.insertedTexts.isEmpty)
+        #expect(fixture.pasteCommandCount == 0)
+        #expect(try fixture.readMetrics().isEmpty)
     }
 
     @Test @MainActor func lipOnlyPipelineDiscardsOnlyEmptyCompletion() async throws {

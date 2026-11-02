@@ -141,8 +141,13 @@ require(candidate.decode().count(owned_auto_send) == 1, "Expected one owned auto
 escaped_timer = candidate.decode().replace(owned_auto_send, escaped_auto_send, 1)
 
 accidental_discard = "            if cancellation == .accidentalShortcut {\n"
-require(candidate.decode().count(accidental_discard) == 1, "Expected one accidental-cancellation discard branch")
-retained_accidental = candidate.decode().replace(accidental_discard, "            if false {\n", 1)
+shared_cancellation_discard = "            if !cancellation.retainsCapturedHistory(audioURL: transcription.audioFileURL.flatMap { URL(string: $0) }) {\n"
+require(candidate.decode().count(shared_cancellation_discard) == 1, "Expected one shared cancellation History discard guard")
+retained_accidental = candidate.decode().replace(
+    shared_cancellation_discard,
+    shared_cancellation_discard.replace("if !", "if cancellation != .accidentalShortcut && !", 1), 1,
+)
+retained_pipeline_session_end = candidate.decode().replace(shared_cancellation_discard, accidental_discard, 1)
 empty_discard = '''        if VoiceInkEmptyTranscriptionPolicy.isEmptyCompletion(
             status: transcription.transcriptionState,
             rawText: transcription.text,
@@ -184,19 +189,23 @@ lip_empty_selection = "VoiceInkTests/VoiceInkTests/lipOnlyPipelineDiscardsOnlyEm
 lip_engine_selection = "VoiceInkTests/VoiceInkTests/lipOnlyCancellationPreservesOnlyUserRequestedHistory()"
 startup_history_selection = "VoiceInkTests/VoiceInkTests/userCanceledStartupOwnsAudioBeforeAwaitingDrain()"
 lip_session_end_selection = "VoiceInkTests/VoiceInkTests/lipOnlySessionEndDoesNotCreateHistory(action:)"
+lip_pipeline_session_end_selection = "VoiceInkTests/VoiceInkTests/lipOnlySessionEndDuringRecognitionDoesNotCreateHistory(action:)"
+voice_session_end_selection = "VoiceInkTests/VoiceInkTests/sessionEndedPipelineRetainsCapturedVoiceHistory()"
+delivered_history_selection = "VoiceInkTests/VoiceInkTests/pipelinePreservesDeliveredHistoryAfterLateCancellation(sessionEnded:)"
 deleted_startup_selection = "VoiceInkTests/VoiceInkTests/deletedStartupCancellationIsNotRecreatedAfterDrain()"
 candidate_selections = (
     pipeline_selection, hardware_suite, auto_send_selection, prewarm_selection,
     central_lip_selection, central_voice_selection, authorization_suite, recognition_selection,
     mixed_power_mode_selection, upgraded_power_mode_selection,
     lip_history_selection, lip_empty_selection, lip_engine_selection, startup_history_selection,
-    lip_session_end_selection, deleted_startup_selection,
+    lip_session_end_selection, lip_pipeline_session_end_selection,
+    voice_session_end_selection, delivered_history_selection, deleted_startup_selection,
 )
 receipt["candidateSelections"] = candidate_selections
-receipt["expectedCandidateFunctions"] = 22
-receipt["expectedCandidateInvocations"] = 28
-receipt["expectedCandidateParameterizedInvocations"] = 9
-receipt["expectedSemanticControls"] = 13
+receipt["expectedCandidateFunctions"] = 25
+receipt["expectedCandidateInvocations"] = 34
+receipt["expectedCandidateParameterizedInvocations"] = 14
+receipt["expectedSemanticControls"] = 14
 
 
 def read_summary(destination):
@@ -335,6 +344,19 @@ def red_control(path, mutant, label, selection, count, change):
             for issue in issues
         ) == 1 for action in ("masterOff", "reset", "shutdown")),
                 f"{label} requires the retained-row assertion in each of master-off, reset and shutdown: {issues}")
+    if label == "known-bad-pipeline-session-end-history":
+        log = (evidence / f"{label}.log").read_text()
+        test_name = selection.split("/")[-1]
+        issues = [line for line in log.splitlines() if f"Test {test_name} recorded an issue" in line]
+        record["assertionFailures"] = issues
+        save_receipt()
+        require(len(issues) == 3 and all(sum(
+            f"with 1 argument action → .{action} at DiscardedRecordingTests.swift:" in issue
+            and re.fullmatch(r'try fixture\.transcriptionCount\(\) == 0',
+                             issue.split("Expectation failed: ", 1)[-1]) is not None
+            for issue in issues
+        ) == 1 for action in ("masterOff", "reset", "shutdown")),
+                f"{label} requires the retained-row assertion after blocked recognition in each session-end action: {issues}")
     record["expectedFailureConfirmed"] = True
     save_receipt()
     print(f"{label}: one function, {count}/{count} expected failed invocations; source restored", flush=True)
@@ -477,9 +499,11 @@ try:
                 "Omit the user-cancel History reservation before awaiting startup; retain the later drain fallback.")
     red_control(engine, retained_lip_session_end, "known-bad-lip-session-end-history", lip_session_end_selection, 3,
                 "Retain nil-audio History on implicit session end, including master-off, reset and shutdown.")
-    require(len(receipt["controls"]) == 13
+    red_control(source, retained_pipeline_session_end, "known-bad-pipeline-session-end-history", lip_pipeline_session_end_selection, 3,
+                "Restore the S5 accidental-only pipeline discard guard; retain shared candidate policy and engine cancellation.")
+    require(len(receipt["controls"]) == 14
             and all(control.get("expectedFailureConfirmed") is True for control in receipt["controls"]),
-            "All thirteen semantic controls must confirm their selected failures before the candidate gate")
+            "All fourteen semantic controls must confirm their selected failures before the candidate gate")
 
     green_exit, green = run("candidate", candidate_selections)
     receipt["candidateSummary"] = green
@@ -489,10 +513,10 @@ try:
     receipt["candidateCounts"] = actual
     save_receipt()
     require(green_exit == 0 and green["failedTests"] == 0
-            and actual["functions"] == {"passed": 22, "failed": 0, "skipped": 0, "total": 22}
-            and actual["invocations"] == {"passed": 28, "failed": 0, "skipped": 0, "total": 28}
-            and actual["parameterizedInvocations"] == 9,
-            f"Candidate must pass 22 functions / 28 invocations, including 9 parameterized runs: {actual}")
+            and actual["functions"] == {"passed": 25, "failed": 0, "skipped": 0, "total": 25}
+            and actual["invocations"] == {"passed": 34, "failed": 0, "skipped": 0, "total": 34}
+            and actual["parameterizedInvocations"] == 14,
+            f"Candidate must pass 25 functions / 34 invocations, including 14 parameterized runs: {actual}")
     receipt["status"] = "passed"
 except BaseException as error:
     receipt.update({"status": "failed", "error": str(error)})
@@ -512,4 +536,4 @@ finally:
     require(receipt["sourcesRestored"], "Candidate sources changed after controls")
     require(receipt["testsUnchanged"], "Candidate tests changed during controls")
     if receipt["status"] == "passed":
-        print("Candidate: 22 functions / 28 invocations passed; all thirteen semantic reverts failed; sources restored", flush=True)
+        print("Candidate: 25 functions / 34 invocations passed; all fourteen semantic reverts failed; sources restored", flush=True)

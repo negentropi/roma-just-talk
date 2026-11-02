@@ -1,3 +1,5 @@
+# Historical app095c/producer414422 only; product changes intentionally fail source equality.
+# Verify changed products through a fresh same-job hosted Release and app E2E.
 name: Verify lip dictation with an immutable app artifact
 
 on:

@@ -75,7 +75,7 @@ class TranscriptionPipeline {
             await onCancel()
             await restorePromptDetectionSettingsIfNeeded()
 
-            if cancellation == .accidentalShortcut {
+            if !cancellation.retainsCapturedHistory(audioURL: transcription.audioFileURL.flatMap { URL(string: $0) }) {
                 discard(transcription)
                 latencyTrace.finish(event: "pipeline.cancelled", details: "model=\(modelDisplayName) discarded=true", token: traceToken)
                 return

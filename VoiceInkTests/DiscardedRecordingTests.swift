@@ -87,6 +87,77 @@ extension VoiceInkTests {
         await fixture.engine.shutDown()
     }
 
+    @Test(.timeLimit(.minutes(1)), arguments: RecordingSessionEndAction.allCases)
+    @MainActor func lipOnlySessionEndDuringRecognitionDoesNotCreateHistory(action: RecordingSessionEndAction) async throws {
+        let defaults = UserDefaults.standard
+        let keys = [VoiceInkLipDictationPreference.enabledKey, VoiceInkLipDictationPreference.lipOnlyKey]
+        let saved = keys.map { ($0, defaults.object(forKey: $0)) }
+        defer {
+            for (key, value) in saved {
+                if let value { defaults.set(value, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+        }
+        VoiceInkLipDictationPreference.saveIsEnabled(true)
+        VoiceInkLipDictationPreference.saveLipOnly(true)
+        let fixture = try RecordingFixture(mode: .lips)
+        let gate = SelectionDrainGate()
+        let canceled = AsyncStream<Void>.makeStream()
+        defer { canceled.continuation.finish() }
+        let recognition = Task<String, Error> { @MainActor in
+            try await withTaskCancellationHandler {
+                await gate.drain()
+                try Task.checkCancellation()
+                return "recognized lip words"
+            } onCancel: {
+                canceled.continuation.yield(())
+                canceled.continuation.finish()
+            }
+        }
+        fixture.beginRecording(lipRecognition: recognition)
+        let stop = Task { await fixture.engine.toggleRecord() }
+        var ending: Task<Void, Never>?
+        @MainActor func drainOwnedTasks() async {
+            recognition.cancel()
+            gate.release()
+            await stop.value
+            await ending?.value
+            await fixture.engine.shutDown()
+        }
+        do {
+            await gate.waitUntilEntered()
+            let pending = try #require(try await fixture.pendingTranscriptionOnceTranscribing())
+            #expect(fixture.engine.recordingState == .transcribing)
+            #expect(pending.transcriptionState == .pending)
+            #expect(pending.audioFileURL == nil)
+            switch action {
+            case .masterOff:
+                VoiceInkLipDictationPreference.saveIsEnabled(false)
+                NotificationCenter.default.post(name: UserDefaults.didChangeNotification, object: defaults)
+            case .reset:
+                ending = Task { await fixture.engine.resetRecordingSession() }
+            case .shutdown:
+                ending = Task { await fixture.engine.shutDown() }
+            }
+            var cancellationObserved = false
+            for await _ in canceled.stream { cancellationObserved = true; break }
+            #expect(cancellationObserved)
+            #expect(fixture.engine.recordingCancellationForTesting == .sessionEnded)
+            gate.release()
+            await stop.value
+            await ending?.value
+
+            #expect(try fixture.transcriptionCount() == 0, "Session-ended lip-only recognition must leave no history after \(action)")
+            #expect(try fixture.context.fetchCount(FetchDescriptor<SessionMetric>()) == 0)
+            #expect(fixture.audioURL == nil)
+            #expect(fixture.engine.recordingState == .idle)
+        } catch {
+            await drainOwnedTasks()
+            throw error
+        }
+        await drainOwnedTasks()
+    }
+
     // A failed startup keeps audio only if a row references it. An explicit cancel inserts its
     // row before awaiting the duration, so that unsaved row must already count as a reference.
     @Test @MainActor func unsavedCanceledRowCountsAsAudioReference() throws {
@@ -315,13 +386,23 @@ extension VoiceInkTests {
         try context.fetchCount(FetchDescriptor<Transcription>())
     }
 
-    func beginRecording(session: TranscriptionSession? = nil) {
+    func beginRecording(session: TranscriptionSession? = nil, lipRecognition: Task<String, Error>? = nil) {
         engine.installCapturedRecordingForTesting(
             audioURL: audioURL,
             model: mode.usesMicrophone ? models.currentTranscriptionModel : nil,
             session: session,
-            mode: mode
+            mode: mode,
+            lipRecognition: lipRecognition
         )
+    }
+
+    func pendingTranscriptionOnceTranscribing() async throws -> Transcription? {
+        for _ in 0..<500 {
+            if engine.recordingState == .transcribing,
+               let pending = try context.fetch(FetchDescriptor<Transcription>()).first { return pending }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return nil
     }
 
     private static func writeSilence(to url: URL) throws {

@@ -47,6 +47,134 @@ REQUIRED_STEPS = (
     'Package app',
 )
 VISUAL_STEP = 'Verify real voice and lip dictation through the app shortcut'
+SAME_JOB_WORKFLOW = '.github/workflows/lip-pr-hosted-gates.yml'
+SAME_JOB_BRANCH = 'ci/lip-pr-hosted-gates-'
+CHECKOUT_ACTION = '11d5960a326750d5838078e36cf38b85af677262'
+SAME_JOB_STEPS = ('Build release app', 'Run Debug unit tests',
+                  'Prove microphone, paste, auto-send, Power Mode, and permission regressions', 'Package app')
+SAME_JOB_E2E = 'Verify current real voice and lip dictation'
+CHECKPOINT_SHA256 = '8dd3bbf4e8d6287e87e7c3d9bc65f6238b4d75b12040e10f5589e3c6e76bda8f'
+CHECKPOINT_BYTES = 1975266407
+
+# One audited hosted producer. Its API transport revision is not its app checkout.
+HOSTED_RUN = 41442208716
+HOSTED_BUILD = '095c058ddedfe4986802d88c11fe8a58bc71df15'
+HOSTED_TRANSPORT = 'b998507d0595d2d05256ef19c3223279e0e69479'
+HOSTED_REF = 'ci/lip-pr-hosted-gates-20261102-b998507d0595'
+HOSTED_JOB = 125266577339
+HOSTED_WORKFLOW_SHA256 = 'dcaf9bfc80774bd119b9e9cb66db04cc975adcd3975bc1cde53423c4af0acb29'
+HOSTED_WORKFLOW_BLOB = '2efd489ec925b6fb2398949fa884629ec10d2b67'
+HOSTED_EXECUTABLE_SHA256 = 'd91158569d3266d15cf9d6473ef3fba7b54dd17532dde03704d890e9fe3cff6d'
+HOSTED_BUNDLE_SHA256 = '4612e81db2bc5fd9cc1697d4c7bbdcb11c3e7ff73fea168b3ab5a48e6e00b760'
+HOSTED_INNER_SHA256 = 'dc6b7da3eabb26a793e43b1a0dcbc162bcff43adf75d925719a65bac19fb3219'
+HOSTED_ARTIFACTS = (
+    ('app', 'roma.just.talk.app', 13146490251, 40410846,
+     'c6253415007f1a3abe4cf4bed99f55ff9f35c642379db31b6dba0b2c613f7a61'),
+    ('runtime', 'lip-standard-runtime-evidence-41442208716', 13145198641, 4610820,
+     '1ae58fc2fc999b53bda82379847e866283f072283210b0f10cbeea462b9c4688'),
+    ('execution', 'lip-pr-hosted-gates-macos-41442208716', 13145053783, 4812,
+     '33f8254ee25ab73efc209aba5d6feb15d02b9ce52ee247fc06f8f328c2b8b273'),
+)
+HOSTED_LOCKS = (LOCK, 'VoiceInk.xcworkspace/xcshareddata/swiftpm/Package.resolved',
+                'iOS/VoiceInk-ios.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved')
+HOSTED_STEPS = (
+    'Checkout the exact PR source',
+    'Require an isolated hosted Mac and record the toolchain',
+    'Compile and verify autonomous runtime E2E harness',
+    'Verify Sonoma-compatible helper',
+    'Package runtime E2E helper',
+    'Upload runtime E2E helper',
+    'Keep disposable test desktop awake',
+    'Show Xcode version',
+    'Compile visible text latency harness helper',
+    'Verify latency helper run target',
+    'Verify ad-hoc Library Validation packaging contract',
+    'Verify distribution launch evidence contract',
+    'Build release app',
+    'Verify FluidAudio array reset semantics',
+    'Upload FluidAudio test evidence',
+    'Verify local bilingual model package',
+    'Prove recording cache cleanup regression red and green',
+    'Upload recording cache regression evidence',
+    'Prove text-only Power Mode isolation and all shared core checks',
+    'Install BlackHole input',
+    'Run Debug unit tests',
+    'Upload Debug test evidence',
+    'Prove microphone, paste, auto-send, Power Mode, and permission regressions',
+    'Upload Core and semantic-control proof receipts',
+    'Reject debug-only release payload',
+    'Verify packaged app identity',
+    'Reject test-coverage instrumentation in release app',
+    'Package app',
+    'Upload app artifact',
+    'Relocate only the three uploaded standard outputs',
+    'Archive the verified generated Qwen package lock',
+    SAME_JOB_E2E,
+    'Upload actual same-job dictation and cache receipts',
+    'Record tested source and external build inputs',
+    'Upload hosted execution provenance',
+)
+
+
+@dataclass(frozen=True)
+class ProducerBinding:
+    profile: str
+    app_build_head: str
+    transport_head: str
+
+
+def validate_same_job_workflow(raw, source_head):
+    """Check the reviewed wrapper's fixed indentation, not arbitrary YAML semantics."""
+    text = raw.decode('utf-8')
+    found = re.findall(r'(?ms)^  macos:\n(.*?)(?=^  [A-Za-z0-9_-]+:|\Z)', text)
+    require(len(found) == 1, 'Same-job wrapper has no unique macos job')
+    block = found[0]
+    require(re.search(r'(?m)^    name: Run complete standard macOS gates$', block)
+            and re.search(r'(?m)^    runs-on: macos-26$', block), 'Same-job wrapper desktop job differs')
+    checkouts = re.findall(r'(?m)^    - (?:name: [^\n]+\n      )?uses: actions/checkout@([0-9a-f]{40})\n'
+                           r'      with:\n        ref: ([0-9a-f]{40})$', block)
+    require(checkouts == [(CHECKOUT_ACTION, source_head)] and block.count('uses: actions/checkout@') == 1,
+            'Same-job wrapper checkout is not pinned to the declared feature source')
+    pins = re.findall(r'(?m)^ +TESTED_SOURCE_HEAD: ([0-9a-f]{40})$', text)
+    require(pins and all(pin == source_head for pin in pins), 'Same-job wrapper source variable differs')
+    steps = re.findall(r'(?ms)^    - name: ([^\n]+)\n(.*?)(?=^    - |\Z)', block)
+    build = [body for name, body in steps if name == 'Build release app']
+    require(len(build) == 1 and re.search(r'(?m)^      run: make local CONFIGURATION=Release$', build[0]),
+            'Same-job wrapper does not run the existing Release build command')
+    proof = [body for name, body in steps if name == SAME_JOB_E2E]
+    require(len(proof) == 1 and '--same-job-build' in proof[0] and '--producer-run' not in proof[0]
+            and '--app-source-head "$TESTED_SOURCE_HEAD"' in proof[0], 'Same-job wrapper proof profile differs')
+    return {'workflowSHA256': hashlib.sha256(raw).hexdigest(), 'macosBlockSHA256': hashlib.sha256(block.encode()).hexdigest(),
+            'checkoutSourceHead': source_head, 'method': 'Bounded literal checks of the reviewed fixed-indentation wrapper; not a general YAML parser.'}
+
+
+def validate_mac_project_build(raw):
+    recipes = re.findall(r'(?ms)^local: check setup\n(.*?)(?=^[^\s#][^\n]*:|\Z)', raw.decode('utf-8'))
+    require(len(recipes) == 1, 'Pinned Makefile has no unique local build recipe')
+    lines = re.findall(r'(?m)^\txcodebuild[^\n]*$', recipes[0])
+    require(lines == ['\txcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)" \\']
+            and re.findall(r'(?<!\S)-(?:project|workspace)\s+\S+', recipes[0]) == ['-project VoiceInk.xcodeproj'],
+            'Same-job build requires the exact existing Mac project recipe, not a workspace build')
+    return {'target': 'make local CONFIGURATION=Release', 'project': 'VoiceInk.xcodeproj', 'dependencyLock': LOCK,
+            'boundary': 'The pinned local recipe uses xcodebuild -project. The root iOS workspace is not an input to this Mac build.'}
+
+
+def app_resources(root, app):
+    found = [path.parent for path in app.rglob('manifest.json') if path.parent.name == 'Resources'
+             and any(part.startswith('VoiceInkLip') and part.endswith('.bundle') for part in path.relative_to(app).parts)]
+    require(len(found) == 1, 'Verified app has no unique native lip resource bundle')
+    resources, records = found[0], []
+    source = root / 'VoiceInkLip/Sources/VoiceInkLip/Resources'
+    for path in sorted(source.rglob('*')):
+        if path.is_file():
+            actual = resources / path.relative_to(source)
+            require(actual.is_file() and not actual.is_symlink() and file_sha256(actual) == file_sha256(path),
+                    'Actual app lip resource differs from current source: ' + str(path.relative_to(source)))
+            records.append({'path': path.relative_to(source).as_posix(), 'sha256': file_sha256(actual)})
+    manifest = json.loads((resources / 'manifest.json').read_text())
+    require(manifest['checkpoint_bytes'] == CHECKPOINT_BYTES and manifest['checkpoint_sha256'] == CHECKPOINT_SHA256
+            and len(manifest['storages']) == 658, 'Actual app checkpoint manifest differs')
+    return resources, manifest, records
 
 
 class ArtifactError(RuntimeError):
@@ -126,6 +254,125 @@ def validate_run(run, jobs, producer_run, build_head):
     failed = [step.get('name') for step in steps if step.get('conclusion') == 'failure']
     require(failed == [VISUAL_STEP] if run['conclusion'] == 'failure' else not failed,
             'A producer failure outside the replaced visual proof remains open')
+
+
+def producer_binding(run, jobs, producer_run, build_head):
+    if run.get('path') == WORKFLOW:
+        validate_run(run, jobs, producer_run, build_head)
+        return ProducerBinding('legacyAppWorkflow', build_head, build_head)
+    require(run.get('path') == SAME_JOB_WORKFLOW, 'Unrecognized producer workflow')
+    require(producer_run == HOSTED_RUN and build_head == HOSTED_BUILD
+            and run.get('id') == HOSTED_RUN and run.get('head_sha') == HOSTED_TRANSPORT
+            and run.get('workflow_id') == 402555449 and run.get('run_attempt') == 1
+            and run.get('name') == 'Run standard lip PR gates on isolated hosted Macs'
+            and run.get('head_branch') == HOSTED_REF and run.get('event') == 'push'
+            and run.get('status') == 'completed' and run.get('conclusion') == 'failure',
+            'Hosted producer is not the exact audited run and app source')
+    for field in ('repository', 'head_repository'):
+        require(run.get(field, {}).get('id') == REPOSITORY_ID
+                and run.get(field, {}).get('full_name') == REPOSITORY
+                and run.get(field, {}).get('fork') is False, 'Hosted producer repository or fork differs')
+    for field in ('actor', 'triggering_actor'):
+        require(run.get(field, {}).get('id') == 171460575 and run.get(field, {}).get('login') == 'negentropi',
+                'Hosted producer actor differs')
+    require(jobs.get('total_count') == 1 and len(jobs.get('jobs', [])) == 1, 'Ambiguous hosted producer job')
+    job = jobs['jobs'][0]
+    require(job.get('id') == HOSTED_JOB and job.get('run_id') == HOSTED_RUN and job.get('run_attempt') == 1
+            and job.get('head_sha') == HOSTED_TRANSPORT and job.get('name') == 'Run complete standard macOS gates'
+            and job.get('labels') == ['macos-26'] and job.get('runner_group_name') == 'GitHub Actions'
+            and job.get('status') == 'completed' and job.get('conclusion') == 'failure', 'Hosted producer job differs')
+    steps = job.get('steps', [])
+    expected = ['Set up job', *HOSTED_STEPS, 'Post Checkout the exact PR source', 'Complete job']
+    require([step.get('name') for step in steps] == expected, 'Hosted producer steps are missing, duplicated, or reordered')
+    for step in steps:
+        require(step.get('status') == 'completed'
+                and step.get('conclusion') == ('failure' if step['name'] == SAME_JOB_E2E else 'success'),
+                'Hosted producer gate did not pass: ' + step['name'])
+    return ProducerBinding('pinnedHostedWorkflow', build_head, HOSTED_TRANSPORT)
+
+
+def validate_hosted_workflow(raw, blob):
+    require(hashlib.sha256(raw).hexdigest() == HOSTED_WORKFLOW_SHA256 and blob == HOSTED_WORKFLOW_BLOB,
+            'Hosted producer complete workflow differs from the audited bytes')
+    return validate_same_job_workflow(raw, HOSTED_BUILD)
+
+
+def check_hosted_transport(root):
+    if subprocess.run(['git', 'cat-file', '-e', HOSTED_TRANSPORT + '^{commit}'], cwd=root, capture_output=True).returncode:
+        command(['git', 'fetch', '--no-tags', '--depth=2', 'https://github.com/' + REPOSITORY + '.git', HOSTED_TRANSPORT], root)
+    command(['git', 'merge-base', '--is-ancestor', HOSTED_BUILD, HOSTED_TRANSPORT], root)
+    changed = command(['git', 'diff', '--no-renames', '--name-status', '-z', HOSTED_BUILD, HOSTED_TRANSPORT], root)
+    require(changed == ('A\0' + SAME_JOB_WORKFLOW + '\0').encode(), 'Hosted transport changes more than its one wrapper')
+    raw = command(['git', 'show', HOSTED_TRANSPORT + ':' + SAME_JOB_WORKFLOW], root)
+    blob = command(['git', 'rev-parse', HOSTED_TRANSPORT + ':' + SAME_JOB_WORKFLOW], root).decode().strip()
+    receipt = validate_hosted_workflow(raw, blob)
+    receipt['macProjectBuild'] = validate_mac_project_build(command(['git', 'show', HOSTED_BUILD + ':Makefile'], root))
+    return receipt
+
+
+def select_hosted_artifacts(listing):
+    selected = {}
+    for role, name, identifier, size, digest in HOSTED_ARTIFACTS:
+        item = select_artifact(listing, name, HOSTED_RUN, HOSTED_TRANSPORT)
+        require(item['id'] == identifier and item['size_in_bytes'] == size and item['digest'] == 'sha256:' + digest,
+                'Hosted producer artifact differs from its audited ID, size, or full digest: ' + name)
+        selected[role] = item
+    return selected
+
+
+def extract_hosted_receipts(path, destination):
+    destination.mkdir()
+    with zipfile.ZipFile(path) as archive:
+        items = members(archive)
+        require(sum(item.file_size for item in items) <= 20_000_000, 'Hosted evidence expansion exceeds its bound')
+        for item in items:
+            require(not item.is_dir() and stat.S_IFMT(item.external_attr >> 16) in (0, stat.S_IFREG)
+                    and item.file_size <= 2_000_000
+                    and PurePosixPath(item.filename).suffix in ('.json', '.jsonl', '.resolved', '.txt', '.log', '.png'),
+                    'Unsafe hosted evidence member')
+            target = destination / item.filename
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open('xb') as stream:
+                stream.write(archive.read(item))
+
+
+def validate_hosted_receipts(root, proof_head, runtime, execution, expected_lock, workflow):
+    producer = json.loads((runtime / 'provenance.json').read_bytes())
+    recorded = json.loads((execution / 'provenance.json').read_bytes())
+    require(all(producer.get(key) == HOSTED_BUILD for key in ('appBuildHead', 'proofHead', 'checkoutSourceHead'))
+            and producer.get('transportHead') == HOSTED_TRANSPORT and producer.get('runID') == HOSTED_RUN
+            and producer.get('jobID') == HOSTED_JOB and producer.get('status') == 'verified'
+            and producer.get('sameJobSourcesUnchanged') is True and producer.get('appArtifactUnchanged') is True
+            and producer.get('workflowSHA256') == workflow['workflowSHA256']
+            and producer.get('macosBlockSHA256') == workflow['macosBlockSHA256']
+            and producer.get('macProjectBuild') == workflow['macProjectBuild'], 'Hosted runtime source or integrity receipt differs')
+    require(recorded.get('testedSourceHead') == HOSTED_BUILD and recorded.get('transportHead') == HOSTED_TRANSPORT
+            and recorded.get('transportRef') == 'refs/heads/' + HOSTED_REF and recorded.get('runID') == str(HOSTED_RUN)
+            and recorded.get('runAttempt') == '1' and recorded.get('job') == 'macos', 'Hosted execution identity differs')
+    lock_hashes = {}
+    for name in HOSTED_LOCKS:
+        built = command(['git', 'show', HOSTED_BUILD + ':' + name], root)
+        require(built == command(['git', 'show', proof_head + ':' + name], root), 'Hosted dependency source locks differ')
+        lock_hashes[name] = hashlib.sha256(built).hexdigest()
+    actual = (runtime / 'actual.Package.resolved').read_bytes()
+    require(actual == expected_lock and hashlib.sha256(actual).hexdigest() == lock_hashes[LOCK]
+            and producer.get('actualDependencyLockSHA256') == lock_hashes[LOCK]
+            and recorded.get('dependencyLockSHA256') == lock_hashes, 'Hosted actual dependency lock or three-lock map differs')
+    return producer, {'rawMacProjectLockSHA256': lock_hashes[LOCK], 'trackedLockSHA256': lock_hashes,
+                      'boundary': 'Mac project lock bytes are archived; other two tracked locks have authenticated actual producer hash receipts. All equal both source heads.'}
+
+
+def validate_hosted_bundle(producer, fingerprint, records, executable_hash, resources, runtime):
+    before = json.loads((runtime / 'bundle-before.json').read_bytes())
+    after = json.loads((runtime / 'bundle-after.json').read_bytes())
+    require(fingerprint == HOSTED_BUNDLE_SHA256 and len(records) == 401 and records == before == after
+            and producer.get('wholeBundleFingerprintSHA256') == producer.get('postRunBundleFingerprintSHA256') == fingerprint,
+            'Extracted hosted bundle differs from producer before/after records')
+    require(executable_hash == HOSTED_EXECUTABLE_SHA256
+            and producer.get('executableSHA256') == producer.get('postRunExecutableSHA256') == executable_hash,
+            'Extracted hosted executable differs from producer')
+    require(resources == producer.get('appResourceHashes') == producer.get('postRunAppResourceHashes'),
+            'Extracted hosted resources differ from producer')
 
 
 def select_artifact(listing, name, producer_run, build_head):
@@ -367,19 +614,39 @@ def prepare_verified_app(root, evidence, destination, producer_run, declared_bui
     try:
         run = api(f'repos/{REPOSITORY}/actions/runs/{producer_run}')
         jobs = api(f'repos/{REPOSITORY}/actions/runs/{producer_run}/attempts/1/jobs?per_page=100')
-        validate_run(run, jobs, producer_run, declared_build_head)
+        binding = producer_binding(run, jobs, producer_run, declared_build_head)
+        receipt.update(producerProfile=binding.profile, producerTransportHead=binding.transport_head,
+                       producerConclusion=run['conclusion'])
         (evidence / 'producer-run.json').write_text(json.dumps(run, indent=2) + '\n')
         (evidence / 'producer-jobs.json').write_text(json.dumps(jobs, indent=2) + '\n')
-        changed, expected_lock = check_sources(root, declared_build_head, proof_head)
+        changed, expected_lock = check_sources(root, binding.app_build_head, proof_head)
         receipt['changedProofPaths'] = changed
         listing = api(f'repos/{REPOSITORY}/actions/runs/{producer_run}/artifacts?per_page=100')
-        app_artifact = select_artifact(listing, 'roma.just.talk.app', producer_run, declared_build_head)
-        proof_artifact = select_artifact(listing, 'lip-dictation-app-evidence', producer_run, declared_build_head)
-        (evidence / 'artifacts.json').write_text(json.dumps([app_artifact, proof_artifact], indent=2) + '\n')
-        lock, lock_receipt = archived_lock(proof_artifact, expected_lock)
-        (evidence / 'actual.Package.resolved').write_bytes(lock)
-        receipt['actualDependencyLock'] = lock_receipt
-        work.mkdir(mode=0o700)
+        producer = None
+        if binding.profile == 'pinnedHostedWorkflow':
+            workflow = check_hosted_transport(root)
+            artifacts = select_hosted_artifacts(listing)
+            app_artifact = artifacts['app']
+            (evidence / 'artifacts.json').write_text(json.dumps(list(artifacts.values()), indent=2) + '\n')
+            work.mkdir(mode=0o700)
+            for role in ('runtime', 'execution'):
+                archive = work / (role + '.zip')
+                download(artifacts[role], archive)
+                extract_hosted_receipts(archive, evidence / ('producer-' + role))
+            runtime = evidence / 'producer-runtime/lip-dictation-e2e/same-job-build'
+            execution = evidence / 'producer-execution'
+            producer, locks = validate_hosted_receipts(root, proof_head, runtime, execution, expected_lock, workflow)
+            receipt.update(producerWorkflow=workflow, actualDependencyLock=locks, historicalSetupUsed=False,
+                           currentSetupBoundary='Current Set Up button, fresh publisher download, and all cases must execute again; no historical Setup pass is transferred.',
+                           producerProofArchivesFullyVerified=True)
+        else:
+            app_artifact = select_artifact(listing, 'roma.just.talk.app', producer_run, binding.transport_head)
+            proof_artifact = select_artifact(listing, 'lip-dictation-app-evidence', producer_run, binding.transport_head)
+            (evidence / 'artifacts.json').write_text(json.dumps([app_artifact, proof_artifact], indent=2) + '\n')
+            lock, lock_receipt = archived_lock(proof_artifact, expected_lock)
+            (evidence / 'actual.Package.resolved').write_bytes(lock)
+            receipt['actualDependencyLock'] = lock_receipt
+            work.mkdir(mode=0o700)
         outer, inner = work / 'artifact.zip', work / 'app.zip'
         download(app_artifact, outer)
         with zipfile.ZipFile(outer) as archive:
@@ -392,6 +659,8 @@ def prepare_verified_app(root, evidence, destination, producer_run, declared_bui
                     target.write(block)
         with zipfile.ZipFile(inner) as archive:
             validate_app_archive(archive)
+        if producer is not None:
+            require(file_sha256(inner) == HOSTED_INNER_SHA256, 'Hosted inner app package differs')
         command(['/usr/bin/ditto', '-x', '-k', inner, work])
         require(destination.is_dir() and not destination.is_symlink(), 'Extracted app bundle missing')
         with (destination / 'Contents/Info.plist').open('rb') as stream:
@@ -402,6 +671,11 @@ def prepare_verified_app(root, evidence, destination, producer_run, declared_bui
         (evidence / 'signature.log').write_bytes(signature)
         fingerprint, records = bundle_fingerprint(destination)
         (evidence / 'bundle-before.json').write_text(json.dumps(records, indent=2) + '\n')
+        if producer is not None:
+            _, _, resources = app_resources(root, destination)
+            validate_hosted_bundle(producer, fingerprint, records,
+                                   file_sha256(destination / 'Contents/MacOS/roma just talk'), resources, runtime)
+            receipt['appResourceHashes'] = resources
         receipt.update(status='verified', artifactID=app_artifact['id'], artifactSHA256=app_artifact['digest'],
                        innerPackageSHA256=file_sha256(inner), appPath=str(destination),
                        executableSHA256=file_sha256(destination / 'Contents/MacOS/roma just talk'),

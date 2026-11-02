@@ -235,6 +235,23 @@ class ModelCacheTests(unittest.TestCase):
                 self.assertEqual(observed['failure'], 'Actual app visual scenario failed: setup')
                 self.assertIsNone(observed['binding'])
 
+    def test_hosted_immutable_replay_executes_fresh_setup_without_transferring_producer_passes(self):
+        provenance = {'producerProfile': 'pinnedHostedWorkflow', 'producerRun': 41442208716,
+                      'appBuildHead': '095c058ddedfe4986802d88c11fe8a58bc71df15',
+                      'proofHead': 'a' * 40, 'producerTransportHead': 'b998507d0595d2d05256ef19c3223279e0e69479',
+                      'historicalSetupUsed': False, 'producerSetup': {'passed': True}}
+        current = {'passed': True, 'actualSetupButtonPressed': True, 'freshDownloadAssessed': True}
+        observed = self.run_visual_setup(current, same_job=False, provenance=provenance)
+        self.assertEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
+        self.assertEqual(observed['binding']['receiptSourceHead'], 'a' * 40)
+        setup = next(command for label, command in observed['calls'] if label == 'run-setup')
+        self.assertNotIn('--cached-install-profile', setup)
+        self.assertNotIn('--prior-setup-run', setup)
+        observed = self.run_visual_setup(dict(current, freshDownloadAssessed=False), same_job=False,
+                                         provenance=provenance)
+        self.assertEqual(observed['failure'], 'Actual app visual scenario failed: setup')
+        self.assertIsNone(observed['binding'])
+
     def test_fresh_visual_setup_refuses_wrong_current_camera_provenance(self):
         valid = {'buildOrigin': 'sameJobRelease', 'proofHead': 'a' * 40,
                  'appBuildHead': 'a' * 40, 'transportHead': 'b' * 40}

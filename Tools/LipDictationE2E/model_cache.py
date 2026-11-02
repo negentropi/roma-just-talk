@@ -13,7 +13,11 @@ import subprocess
 import sys
 import zipfile
 
-from app_artifact import APP_ID, APP_NAME, LOCK, REPOSITORY, REPOSITORY_ID, VerifiedApp, api, bundle_fingerprint, command, download, file_sha256, members, require, select_artifact
+from app_artifact import (APP_ID, APP_NAME, CHECKOUT_ACTION, CHECKPOINT_BYTES, CHECKPOINT_SHA256,
+                          LOCK, REPOSITORY, REPOSITORY_ID, SAME_JOB_BRANCH, SAME_JOB_E2E,
+                          SAME_JOB_STEPS, SAME_JOB_WORKFLOW, VerifiedApp, api, app_resources,
+                          bundle_fingerprint, command, download, file_sha256, members, require,
+                          select_artifact, validate_mac_project_build, validate_same_job_workflow)
 
 
 CACHE_RUN = 41172814095
@@ -29,46 +33,13 @@ APP_HEAD = '49d045815749a043016634a2604decfbacbb9803'
 APP_EXECUTABLE = 'bc1e4646779f39c668b58f97cb8a70213549c477977d6edb1b50559482ab5d67'
 SETUP_ARTIFACT_ID = 13029488782
 SETUP_ARTIFACT_DIGEST = 'sha256:9c9dd998a6dcafed99a2d4107a231b769d90b8521ccf40938c5f74b8daf36756'
-CHECKPOINT_SHA256 = '8dd3bbf4e8d6287e87e7c3d9bc65f6238b4d75b12040e10f5589e3c6e76bda8f'
-CHECKPOINT_BYTES = 1975266407
 NOTICES = {'notices/LICENSE': 'Tools/BRAVEn/Upstream/LICENSE',
            'notices/README.md': 'Tools/BRAVEn/Upstream/README.md',
            'notices/provenance.json': 'Tools/BRAVEn/provenance.json'}
-SAME_JOB_WORKFLOW = '.github/workflows/lip-pr-hosted-gates.yml'
-SAME_JOB_BRANCH = 'ci/lip-pr-hosted-gates-'
-CHECKOUT_ACTION = '11d5960a326750d5838078e36cf38b85af677262'
-SAME_JOB_STEPS = ('Build release app', 'Run Debug unit tests',
-                  'Prove microphone, paste, auto-send, Power Mode, and permission regressions', 'Package app')
-SAME_JOB_E2E = 'Verify current real voice and lip dictation'
 
 
 def write(path, value):
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
-
-
-def validate_same_job_workflow(raw, source_head):
-    """Check the reviewed wrapper's fixed indentation, not arbitrary YAML semantics."""
-    text = raw.decode('utf-8')
-    found = re.findall(r'(?ms)^  macos:\n(.*?)(?=^  [A-Za-z0-9_-]+:|\Z)', text)
-    require(len(found) == 1, 'Same-job wrapper has no unique macos job')
-    block = found[0]
-    require(re.search(r'(?m)^    name: Run complete standard macOS gates$', block)
-            and re.search(r'(?m)^    runs-on: macos-26$', block), 'Same-job wrapper desktop job differs')
-    checkouts = re.findall(r'(?m)^    - (?:name: [^\n]+\n      )?uses: actions/checkout@([0-9a-f]{40})\n'
-                           r'      with:\n        ref: ([0-9a-f]{40})$', block)
-    require(checkouts == [(CHECKOUT_ACTION, source_head)] and block.count('uses: actions/checkout@') == 1,
-            'Same-job wrapper checkout is not pinned to the declared feature source')
-    pins = re.findall(r'(?m)^ +TESTED_SOURCE_HEAD: ([0-9a-f]{40})$', text)
-    require(pins and all(pin == source_head for pin in pins), 'Same-job wrapper source variable differs')
-    steps = re.findall(r'(?ms)^    - name: ([^\n]+)\n(.*?)(?=^    - |\Z)', block)
-    build = [body for name, body in steps if name == 'Build release app']
-    require(len(build) == 1 and re.search(r'(?m)^      run: make local CONFIGURATION=Release$', build[0]),
-            'Same-job wrapper does not run the existing Release build command')
-    proof = [body for name, body in steps if name == SAME_JOB_E2E]
-    require(len(proof) == 1 and '--same-job-build' in proof[0] and '--producer-run' not in proof[0]
-            and '--app-source-head "$TESTED_SOURCE_HEAD"' in proof[0], 'Same-job wrapper proof profile differs')
-    return {'workflowSHA256': hashlib.sha256(raw).hexdigest(), 'macosBlockSHA256': hashlib.sha256(block.encode()).hexdigest(),
-            'checkoutSourceHead': source_head, 'method': 'Bounded literal checks of the reviewed fixed-indentation wrapper; not a general YAML parser.'}
 
 
 def validate_same_job_run(run, jobs, environment):
@@ -104,17 +75,6 @@ def ensure_commit(root, head):
     require(re.fullmatch('[0-9a-f]{40}', head) is not None, 'Invalid same-job source revision')
     if subprocess.run(['git', 'cat-file', '-e', head + '^{commit}'], cwd=root, capture_output=True).returncode:
         command(['git', 'fetch', '--no-tags', '--depth=2', 'https://github.com/' + REPOSITORY + '.git', head], root)
-
-
-def validate_mac_project_build(raw):
-    recipes = re.findall(r'(?ms)^local: check setup\n(.*?)(?=^[^\s#][^\n]*:|\Z)', raw.decode('utf-8'))
-    require(len(recipes) == 1, 'Pinned Makefile has no unique local build recipe')
-    lines = re.findall(r'(?m)^\txcodebuild[^\n]*$', recipes[0])
-    require(lines == ['\txcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration "$(CONFIGURATION)" \\']
-            and re.findall(r'(?<!\S)-(?:project|workspace)\s+\S+', recipes[0]) == ['-project VoiceInk.xcodeproj'],
-            'Same-job build requires the exact existing Mac project recipe, not a workspace build')
-    return {'target': 'make local CONFIGURATION=Release', 'project': 'VoiceInk.xcodeproj', 'dependencyLock': LOCK,
-            'boundary': 'The pinned local recipe uses xcodebuild -project. The root iOS workspace is not an input to this Mac build.'}
 
 
 def check_same_job_sources(root, source_head, transport):
@@ -253,24 +213,6 @@ def prior_setup(work, evidence, app):
             'appBuildHead': APP_HEAD, 'executableSHA256': APP_EXECUTABLE,
             'sameExecutable': True, 'evidenceScope': 'sameExecutable', 'setupSources': None,
             'boundary': 'Prior real Set Up/download success for the same executable; not current fresh Setup.'}
-
-
-def app_resources(root, app):
-    found = [path.parent for path in app.rglob('manifest.json') if path.parent.name == 'Resources'
-             and any(part.startswith('VoiceInkLip') and part.endswith('.bundle') for part in path.relative_to(app).parts)]
-    require(len(found) == 1, 'Verified app has no unique native lip resource bundle')
-    resources, records = found[0], []
-    source = root / 'VoiceInkLip/Sources/VoiceInkLip/Resources'
-    for path in sorted(source.rglob('*')):
-        if path.is_file():
-            actual = resources / path.relative_to(source)
-            require(actual.is_file() and not actual.is_symlink() and file_sha256(actual) == file_sha256(path),
-                    'Actual app lip resource differs from current source: ' + str(path.relative_to(source)))
-            records.append({'path': path.relative_to(source).as_posix(), 'sha256': file_sha256(actual)})
-    manifest = json.loads((resources / 'manifest.json').read_text())
-    require(manifest['checkpoint_bytes'] == CHECKPOINT_BYTES and manifest['checkpoint_sha256'] == CHECKPOINT_SHA256
-            and len(manifest['storages']) == 658, 'Actual app checkpoint manifest differs')
-    return resources, manifest, records
 
 
 def extract_checkpoint(archive_path, work, package, manifest):

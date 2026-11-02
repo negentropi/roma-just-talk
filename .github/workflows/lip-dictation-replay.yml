@@ -55,9 +55,8 @@ jobs:
         run: |
           python3 Tools/LipDictationE2E/run.py \
             --app "$RUNNER_TEMP/lip-replay-source/roma just talk.app" \
-            --app-source-head 49d045815749a043016634a2604decfbacbb9803 \
-            --producer-run 41165570823 \
-            --model-cache-run 41172814095 \
+            --app-source-head 095c058ddedfe4986802d88c11fe8a58bc71df15 \
+            --producer-run 41442208716 \
             --visual
 
       - name: Upload current proof and immutable producer receipts

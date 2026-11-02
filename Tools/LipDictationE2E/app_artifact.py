@@ -637,7 +637,7 @@ def prepare_verified_app(root, evidence, destination, producer_run, declared_bui
             execution = evidence / 'producer-execution'
             producer, locks = validate_hosted_receipts(root, proof_head, runtime, execution, expected_lock, workflow)
             receipt.update(producerWorkflow=workflow, actualDependencyLock=locks, historicalSetupUsed=False,
-                           currentSetupBoundary='Current Set Up button, fresh publisher download, and all cases must execute again; no historical Setup pass is transferred.',
+                           currentSetupBoundary='The explicitly selected setup profile and all cases must pass in this run; no historical Setup pass is transferred.',
                            producerProofArchivesFullyVerified=True)
         else:
             app_artifact = select_artifact(listing, 'roma.just.talk.app', producer_run, binding.transport_head)

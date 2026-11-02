@@ -205,7 +205,7 @@ def cached_setup_passed(result, cached_model, same_job_build):
             and not any(key in result for key in ('priorSetupRun', 'priorSetupSourceHead', 'priorSetupSameExecutable')))
 
 
-def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup, cached_model=None):
+def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup, app_provenance, cached_model=None):
     visual_config = evidence / 'visual-config.json'
     write(visual_config, configuration)
     control_report = evidence / 'negative-controls.json'
@@ -237,7 +237,7 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             if camera.get('status') != 'supportedDeviceReady' or camera.get('obsRetainedForE2E') is not True:
                 raise RuntimeError('A moving supported OBS camera and retained running OBS process are required')
             proof_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-            binding = camera_source_binding(camera, proof_head, cached_model['appBuild'] if args.same_job_build else None)
+            binding = camera_source_binding(camera, proof_head, app_provenance if args.same_job_build else None)
             write(evidence / 'supported-camera-source.json', binding)
             # Cleanup ownership transfers only after accepting the successful retained-producer receipt.
             owned_obs_cleanup['accepted'] = True
@@ -342,7 +342,7 @@ def parse_arguments(arguments=None):
     parser.add_argument('--app', type=Path)
     parser.add_argument('--app-source-head')
     parser.add_argument('--producer-run', type=int, help='Verify and reuse an immutable Release artifact with identical app and build sources')
-    parser.add_argument('--same-job-build', action='store_true', help='Verify the current hosted Release and native cached installation; no historical Setup transfer or current button/download assessment')
+    parser.add_argument('--same-job-build', action='store_true', help='Verify the current hosted Release and visual scenarios; Set Up downloads from the publisher unless --model-cache-run is supplied')
     parser.add_argument('--model-cache-run', type=int, help='Install the pinned CI checkpoint through the current native installer; immutable replay also requires prior same-executable Setup evidence')
     parser.add_argument('--build-helper-only', action='store_true', help='Compile, link, sign, and load the native helper without app, models, OBS, or TCC changes')
     parser.add_argument('--visual', action='store_true', help='After voice passes, provision OBS and run real visual app scenarios')
@@ -356,8 +356,8 @@ def parse_arguments(arguments=None):
         parser.error('--app and --app-source-head are required for runtime proof')
     if args.producer_run is not None and args.producer_run <= 0:
         parser.error('--producer-run must be a positive GitHub Actions run ID')
-    if args.same_job_build and (args.producer_run is not None or args.model_cache_run is None or not args.visual):
-        parser.error('--same-job-build requires --model-cache-run and --visual, and excludes --producer-run')
+    if args.same_job_build and (args.producer_run is not None or not args.visual):
+        parser.error('--same-job-build requires --visual and excludes --producer-run')
     if args.model_cache_run is not None and (args.model_cache_run <= 0 or not (args.producer_run is not None or args.same_job_build) or not args.visual):
         parser.error('--model-cache-run requires a positive run ID, --visual, and either --producer-run or --same-job-build')
     return args
@@ -440,7 +440,11 @@ def main():
                 verified_app = prepare_same_job_app(ROOT, evidence, app, args.app_source_head)
                 summary['sameJobBuildProvenance'] = verified_app.provenance
                 summary['transportHead'] = verified_app.provenance['transportHead']
-                summary['appSourceBoundary'] = 'Fresh Release built by this hosted job from the declared feature checkout. Its transport commit adds only the reviewed wrapper. Current cached installation and app behavior are assessed without transferring historical Setup; the current Set Up button and fresh publisher download remain unassessed.'
+                summary['appSourceBoundary'] = 'Fresh Release built by this hosted job from the declared feature checkout. Its transport commit adds only the reviewed wrapper. ' + (
+                    'Current cached installation and app behavior are assessed without transferring historical Setup; the current Set Up button and fresh publisher download remain unassessed.'
+                    if args.model_cache_run is not None else
+                    'This run requires the current Set Up button and a fresh publisher download. Actual Setup and visual receipts determine whether those gates passed.'
+                )
         if not app.is_dir():
             raise RuntimeError('Built app bundle missing')
         with (app / 'Contents/Info.plist').open('rb') as stream:
@@ -537,7 +541,10 @@ def main():
                 summary['modelCacheReceipt'] = 'model-cache.json'
                 cached_model = prepare_cached_model(ROOT, evidence, verified_app, args.model_cache_run, run)
                 summary['modelCache'] = cached_model
-            summary['visualCases'] = run_visual_cases(args, evidence, configuration, original, fixture, app, visual_helper, run, grant, owned_obs_cleanup, cached_model)
+            summary['visualCases'] = run_visual_cases(
+                args, evidence, configuration, original, fixture, app, visual_helper, run, grant,
+                owned_obs_cleanup, verified_app.provenance if args.same_job_build else None, cached_model
+            )
             summary['status'] = 'lipDictationVerified'
     except Exception as error:
         summary['status'] = 'blocked'

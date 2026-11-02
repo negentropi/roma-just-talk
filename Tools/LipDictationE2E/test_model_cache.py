@@ -128,11 +128,146 @@ class ModelCacheTests(unittest.TestCase):
         self.assertTrue(runner.parse_arguments(base + ['--same-job-build']).same_job_build)
         old = runner.parse_arguments(base + ['--producer-run', str(cache.SETUP_RUN)])
         self.assertFalse(old.same_job_build)
+        self.assertIsNone(runner.parse_arguments(base[:-2] + ['--producer-run', str(cache.SETUP_RUN)]).model_cache_run)
         for arguments in [base, base + ['--same-job-build', '--producer-run', str(cache.SETUP_RUN)],
-                          ['--same-job-build', '--app', '/fixture/app', '--app-source-head', 'a' * 40, '--visual'],
+                          ['--same-job-build', '--app', '/fixture/app', '--app-source-head', 'a' * 40],
+                          base[:-2] + ['--model-cache-run', '0', '--same-job-build'],
+                          base[:-2] + ['--model-cache-run', '-1', '--same-job-build'],
+                          base + ['--producer-run', '0'], base + ['--producer-run', '-1'],
                           ['--same-job-build', '--build-helper-only']]:
             with self.subTest(arguments=arguments), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 runner.parse_arguments(arguments)
+
+    def test_same_job_fresh_profile_accepts_without_a_model_cache(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            try:
+                args = runner.parse_arguments(['--same-job-build', '--app', '/fixture/app',
+                                               '--app-source-head', 'a' * 40, '--visual'])
+            except SystemExit as error:
+                self.fail(f'The same-job fresh Set Up profile was rejected: {error}')
+        self.assertTrue(args.same_job_build)
+        self.assertTrue(args.visual)
+        self.assertIsNone(args.model_cache_run)
+        self.assertIsNone(args.producer_run)
+
+    def run_visual_setup(self, result, *, cached_model=None, same_job=True, provenance=None):
+        """Exercise real orchestration with fixture subprocess reports, stopping after camera binding."""
+        feature, transport = 'a' * 40, 'b' * 40
+        if provenance is None:
+            provenance = {'buildOrigin': 'sameJobRelease', 'proofHead': feature,
+                          'appBuildHead': feature, 'transportHead': transport}
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            home = root / 'home'
+            websocket = home / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
+            websocket.parent.mkdir(parents=True)
+            websocket.write_text('{}')
+            camera = {'status': 'supportedDeviceReady', 'obsRetainedForE2E': True,
+                      'sourceHead': transport if same_job else feature}
+            camera_path = root / 'camera.json'
+            camera_path.write_text(json.dumps(camera))
+            audio = root / 'speech.wav'
+            audio.write_bytes(b'unit audio fixture')
+            calls = []
+
+            def run(label, command, **options):
+                calls.append((label, command))
+                if label.startswith('set-combined-'):
+                    raise RuntimeError('Unit fixture reached the accepted camera binding')
+                if label == 'run-negative-controls':
+                    (evidence / 'negative-controls.json').write_text(json.dumps({
+                        'passed': True, 'unchangedObservation': 'readableUnchanged',
+                        'changedObservation': 'changed', 'closedObservation': 'unreadable',
+                        'closedTargetReadable': False, 'acceptedStates': ['readableUnchanged'],
+                        'rejectedStates': ['changed', 'unreadable']}))
+                elif label == 'prepare-aligned-camera-feed':
+                    Path(command[-1]).write_bytes(b'unit video fixture')
+                elif label == 'prepare-zero-audio':
+                    with runner.wave.open(str(command[-1]), 'wb') as output:
+                        output.setparams((1, 2, 16_000, 0, 'NONE', 'not compressed'))
+                        output.writeframes(b'\0' * 32)
+                elif label == 'run-setup':
+                    (evidence / 'setup.json').write_text(json.dumps(result))
+                return 0
+
+            args = SimpleNamespace(same_job_build=same_job, obs_summary=camera_path)
+            failure = None
+            with patch.dict(runner.os.environ, {'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted',
+                                               'GITHUB_SHA': transport, 'RUNNER_TEMP': str(root)}), \
+                    patch.object(runner.Path, 'home', return_value=home), \
+                    patch.object(runner, 'history', return_value=[]), \
+                    patch.object(runner.subprocess, 'check_output', return_value=feature + '\n'), \
+                    patch.object(runner, 'camera_source_binding', wraps=runner.camera_source_binding) as binding:
+                try:
+                    runner.run_visual_cases(args, evidence, {}, root / 'original', audio, root / 'app',
+                                            root / 'helper', run, Mock(), {}, provenance, cached_model)
+                except Exception as error:
+                    failure = str(error)
+            receipt = evidence / 'supported-camera-source.json'
+            return {'failure': failure, 'calls': calls,
+                    'binding': json.loads(receipt.read_text()) if receipt.exists() else None,
+                    'actualProvenancePassed': binding.called and binding.call_args.args[2] is provenance}
+
+    def test_fresh_visual_setup_binds_camera_to_current_app_without_cache(self):
+        observed = self.run_visual_setup({'passed': True, 'actualSetupButtonPressed': True,
+                                         'freshDownloadAssessed': True})
+        self.assertEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
+        self.assertTrue(observed['actualProvenancePassed'])
+        self.assertEqual(observed['binding']['probeSourceHead'], 'a' * 40)
+        self.assertEqual(observed['binding']['receiptSourceHead'], 'b' * 40)
+        setup = next(command for label, command in observed['calls'] if label == 'run-setup')
+        self.assertNotIn('--cached-install-profile', setup)
+        self.assertNotIn('--prior-setup-run', setup)
+
+    def test_fresh_visual_setup_refuses_cached_and_incomplete_receipts(self):
+        good = {'passed': True, 'actualSetupButtonPressed': True, 'freshDownloadAssessed': True}
+        invalid = [dict(good, **{field: False}) for field in good]
+        invalid += [{key: value for key, value in good.items() if key != field}
+                    for field in ('actualSetupButtonPressed', 'freshDownloadAssessed')]
+        invalid.append({'passed': True, 'setupProfile': 'currentNativeCachedInstall',
+                        'actualSetupButtonPressed': False, 'freshDownloadAssessed': False,
+                        'priorSetupRun': cache.SETUP_RUN})
+        for result in invalid:
+            with self.subTest(result=result):
+                observed = self.run_visual_setup(result)
+                self.assertEqual(observed['failure'], 'Actual app visual scenario failed: setup')
+                self.assertIsNone(observed['binding'])
+
+    def test_fresh_visual_setup_refuses_wrong_current_camera_provenance(self):
+        valid = {'buildOrigin': 'sameJobRelease', 'proofHead': 'a' * 40,
+                 'appBuildHead': 'a' * 40, 'transportHead': 'b' * 40}
+        for field, value in [('proofHead', 'c' * 40), ('appBuildHead', 'c' * 40),
+                             ('transportHead', 'c' * 40), ('buildOrigin', 'immutableProducer')]:
+            with self.subTest(field=field):
+                observed = self.run_visual_setup({'passed': True, 'actualSetupButtonPressed': True,
+                                                  'freshDownloadAssessed': True},
+                                                 provenance=dict(valid, **{field: value}))
+                self.assertEqual(observed['failure'], 'Camera transport is not bound to the verified same-job feature source')
+                self.assertIsNone(observed['binding'])
+
+    def test_cached_visual_setup_profiles_keep_their_explicit_commands(self):
+        result = {'passed': True, 'setupProfile': 'currentNativeCachedInstall',
+                  'actualSetupButtonPressed': False, 'freshDownloadAssessed': False,
+                  'currentFreshSetupAssessed': False, 'historicalSetupUsed': False,
+                  'actualSetupUIReady': True, 'actualModeControlsChanged': True,
+                  'initialMasterOffObserved': True, 'initialLipsOnlyOffObserved': True,
+                  'finalMasterOffObserved': True, 'finalLipsOnlyOffObserved': True}
+        model = {'status': 'verified', 'setupProfile': 'currentNativeCachedInstall', 'historicalSetupUsed': False,
+                 'nativeInstall': {'passed': True, 'nativeFullVerificationPassed': True, 'storageFileCount': 658}}
+        observed = self.run_visual_setup(result, cached_model=model)
+        self.assertEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
+        self.assertTrue(observed['actualProvenancePassed'])
+        setup = next(command for label, command in observed['calls'] if label == 'run-setup')
+        self.assertEqual(setup[setup.index('--cached-install-profile') + 1], 'currentNativeCachedInstall')
+        self.assertNotIn('--prior-setup-run', setup)
+        prior = dict(result, setupProfile='verifiedCachedModelWithPriorSetup', priorSetupRun=cache.SETUP_RUN)
+        observed = self.run_visual_setup(prior, cached_model={'priorSetup': {'run': cache.SETUP_RUN}}, same_job=False)
+        self.assertEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
+        setup = next(command for label, command in observed['calls'] if label == 'run-setup')
+        self.assertEqual(setup[setup.index('--prior-setup-run') + 1], cache.SETUP_RUN)
+        self.assertNotIn('--cached-install-profile', setup)
 
     def test_same_job_cached_install_does_not_transfer_historical_setup(self):
         with tempfile.TemporaryDirectory() as temporary:

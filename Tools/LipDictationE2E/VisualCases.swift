@@ -36,6 +36,7 @@ struct LipVisualCases {
         var playback: RuntimeAudioPlayback?
         var cameraSource: CMIOFixtureSource?
         var ownedApplication: NSRunningApplication?
+        var ownedApplicationPID: pid_t?
         var modifierHeld = false
         do {
             let arguments = CommandLine.arguments
@@ -71,7 +72,11 @@ struct LipVisualCases {
             report["app"] = try json(session!.info)
             report["scenario"] = scenario
             let application = try runningApp(configuration.voiceInkBundleIdentifier)
+            let applicationPID = application.processIdentifier
+            guard applicationPID > 1 else { throw ProofError.appMissing }
             ownedApplication = application
+            ownedApplicationPID = applicationPID
+            report["ownedAppProcessIdentifier"] = applicationPID
             if scenario == "setup" {
                 let cachedSetup = priorSetupRun != nil || cachedInstallProfile != nil
                 report["setupProfile"] = cachedInstallProfile ?? (cachedSetup ? "verifiedCachedModelWithPriorSetup" : "freshPublisherDownload")
@@ -135,7 +140,6 @@ struct LipVisualCases {
                       let audio = values["--audio"] else { throw ProofError.invalidArguments }
                 let source = try await CMIOFixtureSource(manifestURL: URL(fileURLWithPath: sourceManifest), fixtureURL: URL(fileURLWithPath: video))
                 cameraSource = source
-                try await source.prepareHeldFirst()
                 var disableControl: AXUIElement?
                 if scenario == "disable" {
                     try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
@@ -157,6 +161,7 @@ struct LipVisualCases {
                     guard seededFullText == RuntimeTextScenario.existingText.initialText else { throw ProofError.unexpectedInsertion }
                     report["negativeSeededFullText"] = seededFullText
                 }
+                try await source.prepareHeldFirst()
                 try source.verifyHeldBeforeShortcut()
                 let recorderLogOffset = (try? Data(contentsOf: URL(fileURLWithPath: appLog)).count) ?? startOffset
                 let down = try RuntimeShortcutInjector.postLeftShiftDown()
@@ -182,8 +187,8 @@ struct LipVisualCases {
                     wait(0.5)
                     guard application.terminate() else { throw ProofError.quit }
                     let deadline = Date().addingTimeInterval(45)
-                    while !processExited(application), Date() < deadline { wait(0.1) }
-                    guard processExited(application) else { throw ProofError.quit }
+                    while !processExited(applicationPID), Date() < deadline { wait(0.1) }
+                    guard processExited(applicationPID) else { throw ProofError.quit }
                 } else {
                     report["audioPlayback"] = try json(playing.waitUntilFinished())
                     try await source.waitForMotionEnd()
@@ -228,7 +233,7 @@ struct LipVisualCases {
                     guard dispatchObserved, dispatches.count == 2, cancelCalled else { throw ProofError.cancellation }
                 }
                 let readerCloseBoundary: String
-                if scenario == "quit", processExited(application) {
+                if scenario == "quit", processExited(applicationPID) {
                     readerCloseBoundary = "ownedAppProcessTerminated"
                 } else {
                     let marker = "capture.closed id=\(captureID)"
@@ -240,9 +245,9 @@ struct LipVisualCases {
                 var visible: RuntimeVisibleTextResult?
                 if negative {
                     if scenario == "quit" {
-                        guard processExited(application) else { throw ProofError.quit }
+                        guard processExited(applicationPID) else { throw ProofError.quit }
                         report["negativeCompletionBoundary"] = "ownedAppProcessTerminated"
-                        report["terminatedAppPID"] = application.processIdentifier
+                        report["terminatedAppPID"] = applicationPID
                     } else {
                         let terminal = "recording.drained id=\(captureID) canceled=true"
                         guard waitForLog(appLog, after: startOffset, containing: terminal, timeout: 45) else { throw ProofError.notDrained }
@@ -306,6 +311,7 @@ struct LipVisualCases {
             }
         } catch {
             report["error"] = String(describing: error)
+            cameraSource?.recordFailure(error)
             if let output {
                 report["failureScreenshot"] = screenshot(output.deletingPathExtension().appendingPathExtension("failure.png"))
             }
@@ -332,8 +338,16 @@ struct LipVisualCases {
         if let cameraSource {
             // On an earlier failure, restore() normally terminates the owned app before sink teardown.
             if !cameraSource.finished {
-                let appAbsent = ownedApplication.map { processExited($0) } ?? false
-                cameraSource.cleanupAfterFailure(appAbsent: appAbsent)
+                let probe = ownedApplicationPID.map { processExitProbe($0) }
+                report["ownedAppExitAfterRestore"] = [
+                    "ownedPID": ownedApplicationPID.map { $0 as Any } ?? NSNull(),
+                    "processAbsent": probe?.absent ?? false,
+                    "killReturnCode": probe.flatMap { $0.returnCode }.map { $0 as Any } ?? NSNull(),
+                    "capturedErrno": probe.flatMap { $0.capturedErrno }.map { $0 as Any } ?? NSNull(),
+                    "observedCachedPID": ownedApplication.map { $0.processIdentifier as Any } ?? NSNull(),
+                    "cachedIsTerminated": ownedApplication.map { $0.isTerminated as Any } ?? NSNull()
+                ]
+                cameraSource.cleanupAfterFailure(appAbsent: probe?.absent == true)
             }
             report["cameraSource"] = cameraSource.evidence
             if !cameraSource.passed { report["passed"] = false }
@@ -397,8 +411,14 @@ struct LipVisualCases {
         return words.map { $0 == "11" ? "eleven" : String($0) }.joined(separator: " ")
     }
     static func wait(_ seconds: TimeInterval) { RunLoop.current.run(until: Date().addingTimeInterval(seconds)) }
-    static func processExited(_ application: NSRunningApplication) -> Bool {
-        application.isTerminated && kill(application.processIdentifier, 0) == -1 && errno == ESRCH
+    static func processExitProbe(_ processIdentifier: pid_t) -> (absent: Bool, returnCode: Int32?, capturedErrno: Int32?) {
+        guard processIdentifier > 1 else { return (false, nil, nil) }
+        let result = kill(processIdentifier, 0)
+        let capturedErrno: Int32? = result == -1 ? errno : nil
+        return (result == -1 && capturedErrno == ESRCH, result, capturedErrno)
+    }
+    static func processExited(_ processIdentifier: pid_t) -> Bool {
+        processExitProbe(processIdentifier).absent
     }
     static func logSlice(_ path: String, after offset: Int, processIdentifier: pid_t? = nil) -> String {
         guard let file = try? FileHandle(forReadingFrom: URL(fileURLWithPath: path)) else { return "" }
@@ -1053,6 +1073,44 @@ private final class Fixture {
     }
 }
 
+private struct SinkEnqueueObservation: Sendable {
+    let enqueueEnteredHostSeconds: Double
+    let entryLatenessSeconds: Double
+    let deadlineHostSeconds: Double
+    let failureObservedHostSeconds: Double
+    let queueCountAtEntry: Int32?
+    let lastObservedQueueCount: Int32?
+    let lastQueueObservationHostSeconds: Double?
+    let queueCountAtFailure: Int32?
+    let firstNonEmptyObservedHostSeconds: Double?
+    let queueObservationCount: Int
+    let nonEmptyObservationCount: Int
+    let queueWaitElapsedSeconds: Double
+    let sleepCount: Int
+    let maximumObservedSleepSeconds: Double
+    let enqueueStatus: Int32?
+    let enqueuedHostSeconds: Double?
+
+    var packet: [String: Any] {
+        ["enqueueEnteredHostSeconds": enqueueEnteredHostSeconds, "entryLatenessSeconds": entryLatenessSeconds,
+         "deadlineHostSeconds": deadlineHostSeconds, "failureObservedHostSeconds": failureObservedHostSeconds,
+         "queueCountAtEntry": queueCountAtEntry.map { $0 as Any } ?? NSNull(),
+         "lastObservedQueueCount": lastObservedQueueCount.map { $0 as Any } ?? NSNull(),
+         "lastQueueObservationHostSeconds": lastQueueObservationHostSeconds.map { $0 as Any } ?? NSNull(),
+         "queueCountAtFailure": queueCountAtFailure.map { $0 as Any } ?? NSNull(),
+         "firstNonEmptyObservedHostSeconds": firstNonEmptyObservedHostSeconds.map { $0 as Any } ?? NSNull(),
+         "queueObservationCount": queueObservationCount, "nonEmptyObservationCount": nonEmptyObservationCount,
+         "queueWaitElapsedSeconds": queueWaitElapsedSeconds, "sleepCount": sleepCount,
+         "maximumObservedSleepSeconds": maximumObservedSleepSeconds,
+         "enqueueStatus": enqueueStatus.map { $0 as Any } ?? NSNull(),
+         "enqueuedHostSeconds": enqueuedHostSeconds.map { $0 as Any } ?? NSNull()]
+    }
+}
+private struct SinkEnqueueFailure: Error, CustomStringConvertible {
+    let description: String
+    let observations: SinkEnqueueObservation
+    let enqueued: Bool
+}
 private final class SinkQueue {
     let identity: SinkIdentity
     private var queue: CMSimpleQueue?
@@ -1079,30 +1137,66 @@ private final class SinkQueue {
         started = true
     }
     func enqueue(_ frame: DecodedFrame, format: CMVideoFormatDescription, scheduled: Double) throws -> [String: Any] {
-        guard let queue, started else { throw ProbeFailure("Producer queue is not started") }
-        let firstCount = CMSimpleQueueGetCount(queue)
-        try require(firstCount <= 1, "Sink queue has more than one outstanding buffer: \(firstCount)")
-        while CMSimpleQueueGetCount(queue) > 0 {
-            if hostNow() >= scheduled + frameSeconds { backpressureTimeouts += 1; throw ProbeFailure("Sink backpressure exceeded one frame interval") }
-            Thread.sleep(forTimeInterval: 0.001)
+        let entered = hostNow()
+        let deadline = scheduled + frameSeconds
+        var firstCount: Int32?, lastCount: Int32?
+        var firstNonEmpty: Double?, lastObserved: Double?, waitEnded: Double?
+        var observationCount = 0, nonEmptyCount = 0, sleepCount = 0
+        var maximumSleep = 0.0
+        var enqueueStatus: OSStatus?, enqueuedAt: Double?
+        do {
+            guard let queue, started else { throw ProbeFailure("Producer queue is not started") }
+            let initialCount = CMSimpleQueueGetCount(queue)
+            firstCount = initialCount
+            try require(initialCount <= 1, "Sink queue has more than one outstanding buffer: \(initialCount)")
+            while true {
+                let count = CMSimpleQueueGetCount(queue)
+                let observed = hostNow()
+                observationCount += 1; lastCount = count; lastObserved = observed
+                if count <= 0 { break }
+                nonEmptyCount += 1
+                if firstNonEmpty == nil { firstNonEmpty = observed }
+                if hostNow() >= deadline { backpressureTimeouts += 1; throw ProbeFailure("Sink backpressure exceeded one frame interval") }
+                let beforeSleep = hostNow()
+                Thread.sleep(forTimeInterval: 0.001)
+                sleepCount += 1
+                maximumSleep = max(maximumSleep, hostNow() - beforeSleep)
+            }
+            waitEnded = hostNow()
+            try require(hostNow() < deadline, "Scheduled frame deadline missed; no frame skipping/catch-up is allowed")
+            var timing = CMSampleTimingInfo(duration: CMTime(value: 1, timescale: 25), presentationTimeStamp: CMTime(seconds: scheduled, preferredTimescale: 1_000_000_000), decodeTimeStamp: .invalid)
+            var sample: CMSampleBuffer?
+            let created = CMSampleBufferCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: frame.pixels, dataReady: true, makeDataReadyCallback: nil, refcon: nil, formatDescription: format, sampleTiming: &timing, sampleBufferOut: &sample)
+            try require(created == noErr, "Cannot construct host-clock sample")
+            guard let sample else { throw ProbeFailure("Missing sample buffer") }
+            // Successful enqueue transfers this +1 exactly as OBS's native producer does.
+            try require(hostNow() < deadline, "Sample creation exceeded frame deadline; no late sample enqueued")
+            let token = Unmanaged.passRetained(sample)
+            let status = CMSimpleQueueEnqueue(queue, element: token.toOpaque())
+            enqueueStatus = status
+            if status != noErr { token.release(); enqueueFailures += 1; throw ProbeFailure("Sink enqueue failed: \(status)") }
+            let enqueued = hostNow()
+            enqueuedAt = enqueued
+            let countAfter = CMSimpleQueueGetCount(queue)
+            try require(countAfter <= 1, "Sink queue exceeded one outstanding buffer after enqueue: \(countAfter)")
+            return ["queueCountBefore": initialCount, "queueCountAfter": countAfter, "enqueueStatus": status,
+                    "enqueuedHostSeconds": enqueued, "latenessSeconds": enqueued - scheduled]
+        } catch {
+            let failedAt = hostNow()
+            // Samples at separate reads are evidence of observations, not continuous queue occupancy.
+            let observations = SinkEnqueueObservation(
+                enqueueEnteredHostSeconds: entered, entryLatenessSeconds: entered - scheduled,
+                deadlineHostSeconds: deadline, failureObservedHostSeconds: failedAt,
+                queueCountAtEntry: firstCount, lastObservedQueueCount: lastCount,
+                lastQueueObservationHostSeconds: lastObserved,
+                queueCountAtFailure: queue.map { CMSimpleQueueGetCount($0) },
+                firstNonEmptyObservedHostSeconds: firstNonEmpty,
+                queueObservationCount: observationCount, nonEmptyObservationCount: nonEmptyCount,
+                queueWaitElapsedSeconds: (waitEnded ?? failedAt) - entered,
+                sleepCount: sleepCount, maximumObservedSleepSeconds: maximumSleep,
+                enqueueStatus: enqueueStatus, enqueuedHostSeconds: enqueuedAt)
+            throw SinkEnqueueFailure(description: String(describing: error), observations: observations, enqueued: enqueuedAt != nil)
         }
-        let now = hostNow()
-        try require(now < scheduled + frameSeconds, "Scheduled frame deadline missed; no frame skipping/catch-up is allowed")
-        var timing = CMSampleTimingInfo(duration: CMTime(value: 1, timescale: 25), presentationTimeStamp: CMTime(seconds: scheduled, preferredTimescale: 1_000_000_000), decodeTimeStamp: .invalid)
-        var sample: CMSampleBuffer?
-        let created = CMSampleBufferCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: frame.pixels, dataReady: true, makeDataReadyCallback: nil, refcon: nil, formatDescription: format, sampleTiming: &timing, sampleBufferOut: &sample)
-        try require(created == noErr, "Cannot construct host-clock sample")
-        guard let sample else { throw ProbeFailure("Missing sample buffer") }
-        // Successful enqueue transfers this +1 exactly as OBS's native producer does.
-        try require(hostNow() < scheduled + frameSeconds, "Sample creation exceeded frame deadline; no late sample enqueued")
-        let token = Unmanaged.passRetained(sample)
-        let status = CMSimpleQueueEnqueue(queue, element: token.toOpaque())
-        if status != noErr { token.release(); enqueueFailures += 1; throw ProbeFailure("Sink enqueue failed: \(status)") }
-        let enqueued = hostNow()
-        let countAfter = CMSimpleQueueGetCount(queue)
-        try require(countAfter <= 1, "Sink queue exceeded one outstanding buffer after enqueue: \(countAfter)")
-        return ["queueCountBefore": firstCount, "queueCountAfter": countAfter, "enqueueStatus": status,
-                "enqueuedHostSeconds": enqueued, "latenessSeconds": enqueued - scheduled]
     }
     func cleanup() -> [String: Any] {
         let acquired = queue != nil
@@ -1190,7 +1284,11 @@ private final class Feeder: @unchecked Sendable {
                     event.merge(try sink.enqueue(fixture.frames[index], format: fixture.format, scheduled: scheduled)) { _, right in right }
                     event["enqueued"] = true
                 } catch {
-                    event["enqueued"] = false; event["failure"] = String(describing: error)
+                    if let failure = error as? SinkEnqueueFailure {
+                        event.merge(failure.observations.packet) { _, right in right }
+                        event["enqueued"] = failure.enqueued
+                    } else { event["enqueued"] = false }
+                    event["failure"] = String(describing: error)
                     lock.lock(); events.append(event); lock.unlock()
                     throw error
                 }
@@ -1205,6 +1303,9 @@ private final class Feeder: @unchecked Sendable {
     }
     func eventsSnapshot() -> [[String: Any]] {
         lock.lock(); defer { lock.unlock() }; return events
+    }
+    func failureSnapshot() -> ([[String: Any]], String?) {
+        lock.lock(); defer { lock.unlock() }; return (events, failure)
     }
     func stop() -> (Bool, [[String: Any]], String?) {
         lock.lock(); stopRequested = true; lock.unlock()
@@ -1346,6 +1447,29 @@ private struct CMIOInputManifest: Decodable {
             ($0.element["index"] as? Int) == $0.offset && $0.element["enqueued"] as? Bool == true
         }
     }
+    private func recordSnapshot(events: [[String: Any]], failure: String?) {
+        evidence["events"] = events
+        evidence["sourceSnapshotHostSeconds"] = hostNow()
+        evidence["sourceSnapshotBoundary"] = "Locked copy of completed producer events; worker joining is reported separately"
+        evidence["lastRecordedPhase"] = events.last?["phase"] ?? NSNull()
+        if let failure, evidence["failure"] == nil { evidence["failure"] = failure }
+        let motion = events.filter { $0["phase"] as? String == "motion" }
+        evidence["plannedMotionFrames"] = fixture.frames.count
+        evidence["attemptedMotionFrames"] = motion.count
+        evidence["enqueuedMotionFrames"] = motion.filter { $0["enqueued"] as? Bool == true }.count
+        evidence["motionEnqueueFailures"] = motion.filter { $0["enqueued"] as? Bool != true }.count
+        evidence["unattemptedMotionFrames"] = fixture.frames.count - motion.count
+    }
+    func recordFailure(_ error: Error) {
+        let snapshot = feeder.failureSnapshot()
+        if evidence["caseFailure"] == nil {
+            evidence["caseFailure"] = String(describing: error)
+            evidence["caseFailureObservedHostSeconds"] = hostNow()
+            evidence["caseFailurePhase"] = snapshot.0.last?["phase"] ?? NSNull()
+            evidence["caseFailureEventCount"] = snapshot.0.count
+        }
+        recordSnapshot(events: snapshot.0, failure: snapshot.1)
+    }
     func finishAfterReaderClosed(boundary: String, requireCompleteMotion: Bool) throws {
         try require(!finished, "CMIO source was already finalized")
         evidence["cameraClosedObserved"] = true
@@ -1364,13 +1488,7 @@ private struct CMIOInputManifest: Decodable {
         var cleanup = producer
         cleanup["workerJoined"] = stopped.0
         evidence["producer"] = cleanup
-        evidence["events"] = stopped.1
-        let motion = stopped.1.filter { $0["phase"] as? String == "motion" }
-        evidence["plannedMotionFrames"] = fixture.frames.count
-        evidence["attemptedMotionFrames"] = motion.count
-        evidence["enqueuedMotionFrames"] = motion.filter { $0["enqueued"] as? Bool == true }.count
-        evidence["motionEnqueueFailures"] = motion.filter { $0["enqueued"] as? Bool != true }.count
-        evidence["unattemptedMotionFrames"] = fixture.frames.count - motion.count
+        recordSnapshot(events: stopped.1, failure: stopped.2)
         do {
             if let failure = stopped.2 { throw ProbeFailure(failure) }
             try require(prepared && captureObserved != nil && play != nil, "CMIO capture lifecycle did not start")
@@ -1385,14 +1503,16 @@ private struct CMIOInputManifest: Decodable {
             if requireCompleteMotion { try require(completeMotion(stopped.1), "Full capture omitted a source motion frame") }
             evidence["status"] = requireCompleteMotion ? "completed" : "partialCaptureStopped"
         } catch {
-            evidence["failure"] = String(describing: error)
+            if evidence["failure"] == nil { evidence["failure"] = String(describing: error) }
             throw error
         }
     }
     func cleanupAfterFailure(appAbsent: Bool) {
+        let snapshot = feeder.failureSnapshot()
+        recordSnapshot(events: snapshot.0, failure: snapshot.1)
         guard !finished else { return }
         guard appAbsent else {
-            evidence["failure"] = "Owned app exit was not observed; producer teardown cannot be reported after reader closure"
+            evidence["cleanupFailure"] = "Owned app exit was not observed; producer teardown cannot be reported after reader closure"
             evidence["cameraClosedObserved"] = false
             evidence["cleanupDeferredToProcessExit"] = true
             finished = true

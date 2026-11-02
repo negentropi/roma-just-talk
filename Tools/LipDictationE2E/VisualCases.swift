@@ -1,9 +1,13 @@
 import AppKit
 import ApplicationServices
 import AVFoundation
+import CoreMedia
+import CoreMediaIO
+import CoreVideo
 import CryptoKit
 import Darwin
 import Foundation
+import IOSurface
 import RuntimeE2ECore
 
 @main
@@ -30,6 +34,8 @@ struct LipVisualCases {
         var outputSession: RuntimeSystemOutputSession?
         var target: RuntimePreparedTarget?
         var playback: RuntimeAudioPlayback?
+        var cameraSource: CMIOFixtureSource?
+        var ownedApplication: NSRunningApplication?
         var modifierHeld = false
         do {
             let arguments = CommandLine.arguments
@@ -65,6 +71,7 @@ struct LipVisualCases {
             report["app"] = try json(session!.info)
             report["scenario"] = scenario
             let application = try runningApp(configuration.voiceInkBundleIdentifier)
+            ownedApplication = application
             if scenario == "setup" {
                 let cachedSetup = priorSetupRun != nil || cachedInstallProfile != nil
                 report["setupProfile"] = cachedInstallProfile ?? (cachedSetup ? "verifiedCachedModelWithPriorSetup" : "freshPublisherDownload")
@@ -124,12 +131,11 @@ struct LipVisualCases {
                 report["passed"] = true
             } else {
                 let negative = ["cancel", "disable", "quit"].contains(scenario)
-                guard let websocket = values["--obs-config"], let video = values["--video"],
+                guard let sourceManifest = values["--camera-source"], let video = values["--video"],
                       let audio = values["--audio"] else { throw ProofError.invalidArguments }
-                let obs = try OBSClient(configurationURL: URL(fileURLWithPath: websocket))
-                try await obs.connect()
-                defer { report["obsMedia"] = obs.mediaEvidence; obs.close() }
-                try await obs.preparePausedMotion(path: video)
+                let source = try await CMIOFixtureSource(manifestURL: URL(fileURLWithPath: sourceManifest), fixtureURL: URL(fileURLWithPath: video))
+                cameraSource = source
+                try await source.prepareHeldFirst()
                 var disableControl: AXUIElement?
                 if scenario == "disable" {
                     try openSettings(application, appPath: session!.info.selectedAppPath, report: &report)
@@ -151,7 +157,7 @@ struct LipVisualCases {
                     guard seededFullText == RuntimeTextScenario.existingText.initialText else { throw ProofError.unexpectedInsertion }
                     report["negativeSeededFullText"] = seededFullText
                 }
-                try await obs.verifyPausedBeforeShortcut()
+                try source.verifyHeldBeforeShortcut()
                 let recorderLogOffset = (try? Data(contentsOf: URL(fileURLWithPath: appLog)).count) ?? startOffset
                 let down = try RuntimeShortcutInjector.postLeftShiftDown()
                 modifierHeld = true
@@ -159,15 +165,16 @@ struct LipVisualCases {
                 guard waitForLog(appLog, after: startOffset, containing: "event=engine.state.recording", timeout: 45) else { throw ProofError.recordingStart }
                 guard let captureID = captureIdentifier(logSlice(appLog, after: startOffset)) else { throw ProofError.captureEvidence }
                 report["captureID"] = captureID
+                source.captureRecordingObserved(id: captureID)
                 guard prepared.refreshRenderedBaseline() == nil else { throw ProofError.renderedBaseline }
                 let audioURL = URL(fileURLWithPath: audio)
                 let file = try AVAudioFile(forReading: audioURL)
                 let duration = Double(file.length) / file.processingFormat.sampleRate
                 let playing = RuntimeAudioPlayback(fixtureURL: audioURL, device: audioDevice, expectedDurationSeconds: duration)
                 playback = playing
-                try await obs.playPreparedMotion()
+                try await source.playPreparedMotion()
                 report["audioPlaybackStartedAtSystemUptime"] = try playing.start()
-                try await obs.observePlayingMotion()
+                try await source.observePlayingMotion()
                 if scenario == "disable" {
                     wait(0.5)
                     try press(disableControl!)
@@ -179,7 +186,7 @@ struct LipVisualCases {
                     guard processExited(application) else { throw ProofError.quit }
                 } else {
                     report["audioPlayback"] = try json(playing.waitUntilFinished())
-                    try await obs.waitForMotionEnd()
+                    try await source.waitForMotionEnd()
                     report["sourceMotionEndedBeforeShortcutUp"] = true
                     wait(0.3)
                 }
@@ -220,6 +227,16 @@ struct LipVisualCases {
                     report["cancelRecordingCallLines"] = routedLines.filter { $0.contains("cancelRecording called") }.map(String.init)
                     guard dispatchObserved, dispatches.count == 2, cancelCalled else { throw ProofError.cancellation }
                 }
+                let readerCloseBoundary: String
+                if scenario == "quit", processExited(application) {
+                    readerCloseBoundary = "ownedAppProcessTerminated"
+                } else {
+                    let marker = "capture.closed id=\(captureID)"
+                    guard waitForLog(appLog, after: startOffset, containing: marker, timeout: 45,
+                                     processIdentifier: application.processIdentifier) else { throw ProofError.captureEvidence }
+                    readerCloseBoundary = marker
+                }
+                try source.finishAfterReaderClosed(boundary: readerCloseBoundary, requireCompleteMotion: scenario != "disable" && scenario != "quit")
                 var visible: RuntimeVisibleTextResult?
                 if negative {
                     if scenario == "quit" {
@@ -231,7 +248,6 @@ struct LipVisualCases {
                         guard waitForLog(appLog, after: startOffset, containing: terminal, timeout: 45) else { throw ProofError.notDrained }
                         report["negativeCompletionBoundary"] = terminal
                     }
-                    if scenario == "disable" || scenario == "quit" { await obs.recordStats(phase: "afterPartialCaptureStop") }
                     let finalFullText = prepared.readFullText()
                     let observation = RuntimeNegativeTextObservation.classify(baseline: seededFullText, finalText: finalFullText)
                     report["negativeTextObservation"] = observation.rawValue
@@ -312,6 +328,15 @@ struct LipVisualCases {
             report["restored"] = false
             report["restoreError"] = String(describing: error)
             report["passed"] = false
+        }
+        if let cameraSource {
+            // On an earlier failure, restore() normally terminates the owned app before sink teardown.
+            if !cameraSource.finished {
+                let appAbsent = ownedApplication.map { processExited($0) } ?? false
+                cameraSource.cleanupAfterFailure(appAbsent: appAbsent)
+            }
+            report["cameraSource"] = cameraSource.evidence
+            if !cameraSource.passed { report["passed"] = false }
         }
         if let output, let data = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) {
             try? data.write(to: output, options: .atomic)
@@ -830,224 +855,550 @@ struct LipVisualCases {
     }
 }
 
-private final class OBSClient {
-    private let session = URLSession(configuration: .ephemeral)
-    private let socket: URLSessionWebSocketTask
-    private let password: String
-    private var requestCounter = 0
-    private var expectedMotionDurationMilliseconds: Double?
-    private var firstFrameDurationMilliseconds: Double?
-    private var preparedFirstFrameCursorMilliseconds: Double?
-    private(set) var mediaEvidence: [String: Any] = ["inputName": "PublicSilentVideo"]
-    init(configurationURL: URL) throws {
-        let configuration = try JSONSerialization.jsonObject(with: Data(contentsOf: configurationURL)) as? [String: Any]
-        guard let configuration, let password = configuration["server_password"] as? String,
-              let port = configuration["server_port"] as? Int, port == 4455 else { throw OBSError.configuration }
-        self.password = password
-        socket = session.webSocketTask(with: URL(string: "ws://127.0.0.1:\(port)")!)
+// Public CMIO producer follows OBS 33.0.1, commit 65c320b46e1af5c7a555161aea6182cdf7a8c524.
+// No live OBS process, websocket, renderer, or additional camera consumer participates.
+private let fixtureSHA = "4d18638fa0fbbfc3c75ae06723b5a36cc9114147ea5a337eb1b17fdd2a120aab"
+private let cameraUID = "7626645E-4425-469E-9D8B-97E0FA59AC75"
+private let frameSeconds = 1.0 / 25.0
+private struct ProbeFailure: Error, CustomStringConvertible {
+    let description: String
+    init(_ description: String) { self.description = description }
+}
+private func require(_ condition: @autoclosure () -> Bool, _ message: String) throws {
+    if !condition() { throw ProbeFailure(message) }
+}
+private func hostNow() -> Double { CMClockGetTime(CMClockGetHostTimeClock()).seconds }
+private func sha(_ data: Data) -> String { SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined() }
+private func noOBSProcess() -> Bool {
+    guard NSRunningApplication.runningApplications(withBundleIdentifier: "com.obsproject.obs-studio").isEmpty else { return false }
+    let task = Process()
+    task.executableURL = URL(fileURLWithPath: "/usr/bin/pgrep")
+    task.arguments = ["-x", "OBS"]
+    task.standardOutput = FileHandle.nullDevice; task.standardError = FileHandle.nullDevice
+    do { try task.run(); task.waitUntilExit(); return task.terminationStatus == 1 }
+    catch { return false }
+}
+
+// Only public CMIO property/queue APIs. Stream direction is the HAL convention: output = 0.
+private func property<T>(_ object: CMIOObjectID, _ selector: Int, initial: T) throws -> T {
+    var address = CMIOObjectPropertyAddress(mSelector: UInt32(selector), mScope: UInt32(kCMIOObjectPropertyScopeGlobal), mElement: UInt32(kCMIOObjectPropertyElementMain))
+    var value = initial; var used: UInt32 = 0
+    let status = withUnsafeMutablePointer(to: &value) {
+        CMIOObjectGetPropertyData(object, &address, 0, nil, UInt32(MemoryLayout<T>.size), &used, $0)
     }
-    func close() { socket.cancel(with: .normalClosure, reason: nil); session.invalidateAndCancel() }
-    func connect() async throws {
-        socket.resume()
-        let hello = try await receive()
-        guard hello["op"] as? Int == 0, let data = hello["d"] as? [String: Any] else { throw OBSError.protocolFailure }
-        var identify: [String: Any] = ["rpcVersion": 1, "eventSubscriptions": 0]
-        if let authentication = data["authentication"] as? [String: String], let salt = authentication["salt"], let challenge = authentication["challenge"] {
-            let secret = Data(SHA256.hash(data: Data((password + salt).utf8))).base64EncodedString()
-            identify["authentication"] = Data(SHA256.hash(data: Data((secret + challenge).utf8))).base64EncodedString()
+    try require(status == noErr && used == UInt32(MemoryLayout<T>.size), "CMIO property \(selector) failed: \(status)")
+    return value
+}
+private func objectIDs(_ object: CMIOObjectID, _ selector: Int) throws -> [CMIOObjectID] {
+    var address = CMIOObjectPropertyAddress(mSelector: UInt32(selector), mScope: UInt32(kCMIOObjectPropertyScopeGlobal), mElement: UInt32(kCMIOObjectPropertyElementMain))
+    var bytes: UInt32 = 0; var used: UInt32 = 0
+    try require(CMIOObjectGetPropertyDataSize(object, &address, 0, nil, &bytes) == noErr && bytes > 0 && bytes <= 4096
+                && bytes % UInt32(MemoryLayout<CMIOObjectID>.size) == 0, "CMIO object inventory unavailable")
+    var values = [CMIOObjectID](repeating: 0, count: Int(bytes) / MemoryLayout<CMIOObjectID>.size)
+    let status = values.withUnsafeMutableBytes { CMIOObjectGetPropertyData(object, &address, 0, nil, bytes, &used, $0.baseAddress) }
+    try require(status == noErr && used == bytes, "CMIO object inventory changed")
+    return values
+}
+private func stringProperty(_ object: CMIOObjectID, _ selector: Int) throws -> String {
+    let result: Unmanaged<CFString>? = try property(object, selector, initial: Optional<Unmanaged<CFString>>.none)
+    guard let result else { throw ProbeFailure("Missing CMIO string property") }
+    return result.takeRetainedValue() as String
+}
+private struct SinkIdentity {
+    let device: CMIODeviceID
+    let stream: CMIOStreamID
+    let advertised: [String: Any]
+    static func discover() throws -> SinkIdentity {
+        var matches: [CMIODeviceID] = []
+        for device in try objectIDs(CMIOObjectID(kCMIOObjectSystemObject), kCMIOHardwarePropertyDevices) {
+            if try stringProperty(device, kCMIODevicePropertyDeviceUID) == cameraUID { matches.append(device) }
         }
-        try await send(["op": 1, "d": identify])
-        guard try await receive()["op"] as? Int == 2 else { throw OBSError.protocolFailure }
+        try require(matches.count == 1, "Expected exactly one approved OBS device UID")
+        let device = matches[0]
+        let deviceName = try stringProperty(device, kCMIOObjectPropertyName)
+        try require(deviceName == "OBS Virtual Camera", "CMIO device name differs")
+        var streams: [CMIOStreamID] = []
+        for stream in try objectIDs(device, kCMIODevicePropertyStreams) {
+            let direction: UInt32 = try property(stream, kCMIOStreamPropertyDirection, initial: UInt32.max)
+            if direction == 0 { streams.append(stream) }
+        }
+        try require(streams.count == 1, "Expected exactly one public output/sink stream")
+        let stream = streams[0]
+        let streamName = try stringProperty(stream, kCMIOObjectPropertyName)
+        try require(streamName == "OBS Camera Extension Stream Sink", "CMIO sink name differs")
+        let format: Unmanaged<CMFormatDescription>? = try property(stream, kCMIOStreamPropertyFormatDescription, initial: Optional<Unmanaged<CMFormatDescription>>.none)
+        guard let format else { throw ProbeFailure("Sink format description unavailable") }
+        let description = format.takeRetainedValue()
+        let dimensions = CMVideoFormatDescriptionGetDimensions(description)
+        return SinkIdentity(device: device, stream: stream, advertised: [
+            "deviceUID": cameraUID, "deviceID": device, "streamID": stream,
+            "width": dimensions.width, "height": dimensions.height,
+            "subtype": CMFormatDescriptionGetMediaSubType(description),
+            "boundary": "OBS33.0.1 advertises a fixed format; its own public sink producer sends actual payload descriptions. No alternative format is tried."
+        ])
     }
-    func preparePausedMotion(path: String) async throws {
-        let asset = AVURLAsset(url: URL(fileURLWithPath: path))
+    func requireIdle() throws {
+        try require(noOBSProcess(), "OBS must be normally stopped and its PID absent")
+        let deadline = hostNow() + 2
+        var running: UInt32 = try property(device, kCMIODevicePropertyDeviceIsRunningSomewhere, initial: UInt32.max)
+        while running != 0 && hostNow() < deadline {
+            Thread.sleep(forTimeInterval: 0.01)
+            running = try property(device, kCMIODevicePropertyDeviceIsRunningSomewhere, initial: UInt32.max)
+        }
+        try require(running == 0, "OBS CMIO device is already running; exclusive producer/reader ownership unavailable")
+        try require(noOBSProcess(), "OBS process appeared during idle verification")
+    }
+}
+
+private struct DecodedFrame {
+    let pixels: CVPixelBuffer
+    let pts: CMTime
+    let validPixelSHA256: String
+}
+private final class Fixture {
+    let frames: [DecodedFrame]
+    let duration: Double
+    let format: CMVideoFormatDescription
+    let timelineIndices: [Int]
+    init(url: URL) async throws {
+        let asset = AVURLAsset(url: url)
+        let video = try await asset.loadTracks(withMediaType: .video)
+        let audio = try await asset.loadTracks(withMediaType: .audio)
+        try require(video.count == 1 && audio.isEmpty, "Fixture must have exactly one video track and no audio")
+        let track = video[0]
+        let size = try await track.load(.naturalSize)
+        let transform = try await track.load(.preferredTransform)
+        let minimum = try await track.load(.minFrameDuration)
         let assetDuration = try await asset.load(.duration)
-        let expectedDuration = CMTimeGetSeconds(assetDuration) * 1000
-        guard expectedDuration.isFinite, expectedDuration > 1000 else { throw OBSError.mediaPreparation("invalidMotionAssetDuration") }
-        let tracks = try await asset.loadTracks(withMediaType: .video)
-        guard tracks.count == 1 else { throw OBSError.mediaPreparation("expectedOneMotionVideoTrack") }
-        let minFrameDuration = try await tracks[0].load(.minFrameDuration)
-        let frameMilliseconds = CMTimeGetSeconds(minFrameDuration) * 1000
-        guard frameMilliseconds.isFinite, frameMilliseconds > 0, frameMilliseconds <= 1000 else {
-            throw OBSError.mediaPreparation("invalidMotionFrameDuration")
+        let seconds = assetDuration.seconds
+        try require(size == CGSize(width: 640, height: 480) && transform == .identity
+                    && abs(minimum.seconds - frameSeconds) < 0.000001 && abs(seconds - 3.8) < 0.000001, "Pinned fixture geometry/timing differs")
+        duration = seconds
+        var pool: CVPixelBufferPool?
+        let attributes: [String: Any] = [kCVPixelBufferWidthKey as String: 640, kCVPixelBufferHeightKey as String: 480,
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:]]
+        try require(CVPixelBufferPoolCreate(kCFAllocatorDefault, nil, attributes as CFDictionary, &pool) == kCVReturnSuccess, "IOSurface pool creation failed")
+        guard let pool else { throw ProbeFailure("Missing IOSurface pool") }
+        let reader = try AVAssetReader(asset: asset)
+        let output = AVAssetReaderTrackOutput(track: track, outputSettings: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange])
+        output.alwaysCopiesSampleData = false
+        try require(reader.canAdd(output), "Cannot add video-only decoder")
+        reader.add(output)
+        try require(reader.startReading(), "Cannot start fixture decoder")
+        defer { reader.cancelReading() }
+        var decoded: [DecodedFrame] = []
+        let decodeDeadline = hostNow() + 20
+        while let sample = output.copyNextSampleBuffer() {
+            try require(hostNow() < decodeDeadline, "Predecode time bound exceeded")
+            try require(decoded.count < 100, "Predecode allocation/frame bound exceeded")
+            let pts = CMSampleBufferGetPresentationTimeStamp(sample)
+            try require(pts.isNumeric && pts.seconds >= 0 && pts.seconds < seconds
+                        && abs(pts.seconds / frameSeconds - (pts.seconds / frameSeconds).rounded()) < 0.000001,
+                        "Fixture timestamp is outside its 25 Hz presentation grid")
+            try require(decoded.last.map { pts.seconds > $0.pts.seconds } ?? true, "Fixture timestamps are not strictly ordered")
+            guard let image = CMSampleBufferGetImageBuffer(sample) else { throw ProbeFailure("Decoder returned no image") }
+            var destination: CVPixelBuffer?
+            try require(CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &destination) == kCVReturnSuccess, "IOSurface allocation failed")
+            guard let destination else { throw ProbeFailure("Missing decoded destination") }
+            try require(CVPixelBufferGetIOSurface(destination) != nil, "Decoded frame is not IOSurface-backed")
+            let validPixelSHA = try Self.copyNV12(image, destination)
+            CVBufferPropagateAttachments(image, destination)
+            decoded.append(DecodedFrame(pixels: destination, pts: pts, validPixelSHA256: validPixelSHA))
         }
-        expectedMotionDurationMilliseconds = expectedDuration
-        firstFrameDurationMilliseconds = frameMilliseconds
-        preparedFirstFrameCursorMilliseconds = nil
-        mediaEvidence["expectedMediaDurationMilliseconds"] = expectedDuration
-        mediaEvidence["videoMinFrameDurationMilliseconds"] = frameMilliseconds
-        mediaEvidence["mediaDurationToleranceMilliseconds"] = 1
-        mediaEvidence["durationSource"] = "localAVURLAsset"
-        do {
-            let video = try await request("GetVideoSettings", [:])
-            mediaEvidence["videoSettings"] = Dictionary(uniqueKeysWithValues:
-                ["baseWidth", "baseHeight", "outputWidth", "outputHeight", "fpsNumerator", "fpsDenominator"]
-                    .map { ($0, video[$0] ?? NSNull()) })
-        } catch { mediaEvidence["videoSettingsUnavailable"] = String(describing: error) }
-        let settings: [String: Any] = ["is_local_file": true, "local_file": path, "looping": false,
-                                      "restart_on_activate": false, "clear_on_media_end": false]
-        mediaEvidence["requestedInputSettings"] = settings
-        mediaEvidence["loadRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-        try await request("SetInputSettings", ["inputName": "PublicSilentVideo", "inputSettings": settings, "overlay": true])
-        try await request("SetInputMute", ["inputName": "PublicSilentVideo", "inputMuted": true])
-        mediaEvidence["restartBeforeCaptureAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-        try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"])
-        try await waitForMedia(phase: "loaded", pausedAtFirstFrame: false)
-        mediaEvidence["pauseRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-        try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE"])
-        try await waitForMedia(phase: "paused", pausedAtFirstFrame: false, requirePaused: true)
-        mediaEvidence["seekFirstFrameBeforeCaptureAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-        mediaEvidence["requestedMediaCursorMilliseconds"] = 0
-        try await request("SetMediaInputCursor", ["inputName": "PublicSilentVideo", "mediaCursor": 0])
-        try await waitForMedia(phase: "pausedFirstFrame", pausedAtFirstFrame: true, requirePaused: true)
-        let response = try await request("GetInputSettings", ["inputName": "PublicSilentVideo"])
-        guard let actual = response["inputSettings"] as? [String: Any],
-              actual["local_file"] as? String == path, actual["is_local_file"] as? Bool == true,
-              actual["looping"] as? Bool == false, actual["restart_on_activate"] as? Bool == false,
-              actual["clear_on_media_end"] as? Bool == false else { throw OBSError.mediaPreparation("inputSettingsMismatch") }
-        // Only public fixture settings enter receipts; authentication configuration never does.
-        mediaEvidence["inputKind"] = response["inputKind"]
-        mediaEvidence["inputSettings"] = actual.filter { settings[$0.key] != nil }
-        let mute = try await request("GetInputMute", ["inputName": "PublicSilentVideo"])
-        guard mute["inputMuted"] as? Bool == true else { throw OBSError.mediaPreparation("inputNotMuted") }
-        mediaEvidence["inputMuted"] = true
-        mediaEvidence["preparedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        // Actual native EOF determines the plan; duration alone does not establish a decoded frame count.
+        try require(reader.status == .completed && !decoded.isEmpty, "Fixture predecode incomplete: \(reader.status.rawValue)")
+        try require(abs(decoded[0].pts.seconds) < 0.000001
+                    && abs(decoded.last!.pts.seconds + frameSeconds - seconds) < 0.000001,
+                    "Native fixture first/last PTS does not cover the pinned presentation range")
+        // Pinned 4d186 source evidence d72454c6... has slots 0...94 except 25 (1.00s).
+        // Only that known cloned-lead interval may be held; any other native decoder omission refuses.
+        let actualSlots = Set(decoded.map { Int(($0.pts.seconds / frameSeconds).rounded()) })
+        let allSlots = Set(0..<95)
+        let requiredSlots = allSlots.subtracting([25])
+        try require(actualSlots == requiredSlots || actualSlots == allSlots, "Native decode omitted/added a source presentation slot")
+        let clonedLeadHashes = decoded.filter { [24, 25, 26].contains(Int(($0.pts.seconds / frameSeconds).rounded())) }.map(\.validPixelSHA256)
+        try require(Set(clonedLeadHashes).count == 1, "Known cloned-lead interval is not byte-identical in native NV12 pixels")
+        let slots = Int((seconds / frameSeconds).rounded())
+        var indices: [Int] = []; var current = 0
+        for slot in 0..<slots {
+            while current + 1 < decoded.count && decoded[current + 1].pts.seconds <= Double(slot) * frameSeconds + 0.000001 { current += 1 }
+            indices.append(current)
+        }
+        timelineIndices = indices
+        frames = decoded
+        var description: CMVideoFormatDescription?
+        try require(CMVideoFormatDescriptionCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: decoded[0].pixels, formatDescriptionOut: &description) == noErr, "Payload format unavailable")
+        guard let description else { throw ProbeFailure("Missing payload format") }
+        format = description
     }
-    func verifyPausedBeforeShortcut() async throws {
-        guard usableStatus(try await mediaStatus(phase: "beforeShortcut"), requirePaused: true, requireFirstFrame: true) else {
-            throw OBSError.mediaPreparation("motionNotPausedAtFirstFrameBeforeShortcut")
+    private static func copyNV12(_ source: CVPixelBuffer, _ destination: CVPixelBuffer) throws -> String {
+        try require(CVPixelBufferGetPixelFormatType(source) == kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+                    && CVPixelBufferGetWidth(source) == 640 && CVPixelBufferGetHeight(source) == 480
+                    && CVPixelBufferGetPlaneCount(source) == 2, "Decoder did not deliver expected NV12")
+        try require(CVPixelBufferLockBaseAddress(source, .readOnly) == kCVReturnSuccess, "Decode source lock failed")
+        defer { CVPixelBufferUnlockBaseAddress(source, .readOnly) }
+        try require(CVPixelBufferLockBaseAddress(destination, []) == kCVReturnSuccess, "IOSurface write lock failed")
+        defer { CVPixelBufferUnlockBaseAddress(destination, []) }
+        var validPixels = Data(capacity: 640 * 480 * 3 / 2)
+        for plane in 0..<2 {
+            guard let src = CVPixelBufferGetBaseAddressOfPlane(source, plane), let dst = CVPixelBufferGetBaseAddressOfPlane(destination, plane) else { throw ProbeFailure("Missing NV12 plane") }
+            for row in 0..<CVPixelBufferGetHeightOfPlane(source, plane) {
+                memcpy(dst.advanced(by: row * CVPixelBufferGetBytesPerRowOfPlane(destination, plane)),
+                       src.advanced(by: row * CVPixelBufferGetBytesPerRowOfPlane(source, plane)), 640)
+                validPixels.append(src.advanced(by: row * CVPixelBufferGetBytesPerRowOfPlane(source, plane)).assumingMemoryBound(to: UInt8.self), count: 640)
+            }
         }
+        return sha(validPixels)
+    }
+}
+
+private final class SinkQueue {
+    let identity: SinkIdentity
+    private var queue: CMSimpleQueue?
+    private var started = false
+    private var callbackRegistered = false
+    private var queueAtAcquisition: [String: Int] = [:]
+    private(set) var enqueueFailures = 0
+    private(set) var backpressureTimeouts = 0
+    init(_ identity: SinkIdentity) { self.identity = identity }
+    func start() throws {
+        var copied: Unmanaged<CMSimpleQueue>?
+        // Empty callback + NULL refcon matches OBS; there is no callback context to outlive.
+        let copiedStatus = CMIOStreamCopyBufferQueue(identity.stream, { _, _, _ in }, nil, &copied)
+        if let copied { queue = copied.takeRetainedValue() }
+        try require(copiedStatus == noErr, "Cannot copy public sink queue: \(copiedStatus)")
+        callbackRegistered = true
+        guard let queue else { throw ProbeFailure("Public sink queue missing") }
+        let capacity = Int(CMSimpleQueueGetCapacity(queue))
+        let count = Int(CMSimpleQueueGetCount(queue))
+        queueAtAcquisition = ["capacity": capacity, "count": count]
+        try require(capacity > 0 && count == 0, "Sink queue is not usable and empty: capacity=\(capacity), count=\(count)")
+        let status = CMIODeviceStartStream(identity.device, identity.stream)
+        try require(status == noErr, "Public sink start failed: \(status)")
+        started = true
+    }
+    func enqueue(_ frame: DecodedFrame, format: CMVideoFormatDescription, scheduled: Double) throws -> [String: Any] {
+        guard let queue, started else { throw ProbeFailure("Producer queue is not started") }
+        let firstCount = CMSimpleQueueGetCount(queue)
+        try require(firstCount <= 1, "Sink queue has more than one outstanding buffer: \(firstCount)")
+        while CMSimpleQueueGetCount(queue) > 0 {
+            if hostNow() >= scheduled + frameSeconds { backpressureTimeouts += 1; throw ProbeFailure("Sink backpressure exceeded one frame interval") }
+            Thread.sleep(forTimeInterval: 0.001)
+        }
+        let now = hostNow()
+        try require(now < scheduled + frameSeconds, "Scheduled frame deadline missed; no frame skipping/catch-up is allowed")
+        var timing = CMSampleTimingInfo(duration: CMTime(value: 1, timescale: 25), presentationTimeStamp: CMTime(seconds: scheduled, preferredTimescale: 1_000_000_000), decodeTimeStamp: .invalid)
+        var sample: CMSampleBuffer?
+        let created = CMSampleBufferCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: frame.pixels, dataReady: true, makeDataReadyCallback: nil, refcon: nil, formatDescription: format, sampleTiming: &timing, sampleBufferOut: &sample)
+        try require(created == noErr, "Cannot construct host-clock sample")
+        guard let sample else { throw ProbeFailure("Missing sample buffer") }
+        // Successful enqueue transfers this +1 exactly as OBS's native producer does.
+        try require(hostNow() < scheduled + frameSeconds, "Sample creation exceeded frame deadline; no late sample enqueued")
+        let token = Unmanaged.passRetained(sample)
+        let status = CMSimpleQueueEnqueue(queue, element: token.toOpaque())
+        if status != noErr { token.release(); enqueueFailures += 1; throw ProbeFailure("Sink enqueue failed: \(status)") }
+        let enqueued = hostNow()
+        let countAfter = CMSimpleQueueGetCount(queue)
+        try require(countAfter <= 1, "Sink queue exceeded one outstanding buffer after enqueue: \(countAfter)")
+        return ["queueCountBefore": firstCount, "queueCountAfter": countAfter, "enqueueStatus": status,
+                "enqueuedHostSeconds": enqueued, "latenessSeconds": enqueued - scheduled]
+    }
+    func cleanup() -> [String: Any] {
+        let acquired = queue != nil
+        let deadline = hostNow() + 2
+        while let queue, CMSimpleQueueGetCount(queue) > 0 && hostNow() < deadline { Thread.sleep(forTimeInterval: 0.001) }
+        let remaining = queue.map { Int(CMSimpleQueueGetCount($0)) } ?? 0
+        var stopStatus: OSStatus = noErr
+        var stopRequested: Double?, stopCompleted: Double?
+        if started {
+            stopRequested = hostNow()
+            stopStatus = CMIODeviceStopStream(identity.device, identity.stream)
+            stopCompleted = hostNow()
+            if stopStatus == noErr { started = false }
+        }
+        var unregister: OSStatus = noErr
+        if callbackRegistered {
+            var extra: Unmanaged<CMSimpleQueue>?
+            unregister = CMIOStreamCopyBufferQueue(identity.stream, nil, nil, &extra)
+            if let extra { _ = extra.takeRetainedValue() }
+            if unregister == noErr { callbackRegistered = false }
+        }
+        // Never manually release queued payloads. A nonempty queue remains an explicit failure.
+        queue = nil
+        return ["stopped": !started && stopStatus == noErr, "stopStatus": stopStatus,
+                "stopRequestedHostSeconds": stopRequested.map { $0 as Any } ?? NSNull(),
+                "stopCompletedHostSeconds": stopCompleted.map { $0 as Any } ?? NSNull(),
+                "callbackUnregistered": !callbackRegistered, "unregisterStatus": unregister, "queueReleased": true, "queueWasAcquired": acquired,
+                "queueAtAcquisition": queueAtAcquisition,
+                "remainingQueueTokens": remaining, "enqueueFailures": enqueueFailures, "backpressureTimeouts": backpressureTimeouts,
+                "callbackBoundary": "Empty C callback, NULL refcon; no callback context or sample dereference"]
+    }
+}
+
+private final class Feeder: @unchecked Sendable {
+    let sink: SinkQueue
+    let fixture: Fixture
+    private let lock = NSLock()
+    private let done = DispatchGroup()
+    private let first = DispatchSemaphore(value: 0)
+    private var stopRequested = false
+    private var playBase: Double?
+    private var epoch = 0.0
+    private var failure: String?
+    private var events: [[String: Any]] = []
+    init(sink: SinkQueue, fixture: Fixture) { self.sink = sink; self.fixture = fixture }
+    func start() throws {
+        try sink.start()
+        epoch = hostNow() + 0.04
+        done.enter()
+        DispatchQueue.global(qos: .userInteractive).async { self.run(); self.done.leave() }
+        try require(first.wait(timeout: .now() + 2) == .success, "Producer first frame did not enqueue")
+        try check()
+    }
+    func schedulePlay(after seconds: Double) -> Double {
+        lock.lock(); defer { lock.unlock() }
+        let requested = hostNow() + seconds
+        let time = epoch + ceil((requested - epoch) / frameSeconds) * frameSeconds
+        playBase = time
+        return time
+    }
+    func check() throws {
+        lock.lock(); let error = failure; lock.unlock()
+        if let error { throw ProbeFailure(error) }
+    }
+    private func run() {
+        var tick = 0
+        do {
+            while true {
+                lock.lock(); let stop = stopRequested; let play = playBase; lock.unlock()
+                if stop { break }
+                try require(tick < 4500, "Owned per-case producer exceeded 180 seconds")
+                let scheduled = epoch + Double(tick) * frameSeconds
+                while hostNow() < scheduled { Thread.sleep(forTimeInterval: max(0, min(0.002, scheduled - hostNow()))) }
+                lock.lock(); let stopped = stopRequested; lock.unlock()
+                if stopped { break }
+                let motion = play.map { scheduled >= $0 - 0.000001 } ?? false
+                let offset = motion ? Int(((scheduled - play!) / frameSeconds).rounded()) : 0
+                let inFixture = motion && offset < fixture.timelineIndices.count
+                let index = !motion ? 0 : (inFixture ? fixture.timelineIndices[offset] : fixture.frames.count - 1)
+                let firstPresentation = inFixture && abs(fixture.frames[index].pts.seconds - Double(offset) * frameSeconds) < 0.000001
+                let phase = !motion ? "heldFirst" : (!inFixture ? "heldLast" : (firstPresentation ? "motion" : "sourceGapHold"))
+                var event: [String: Any] = ["ordinal": tick, "phase": phase, "index": index,
+                    "sourcePTS": fixture.frames[index].pts.seconds, "scheduledHostSeconds": scheduled, "planned": true]
+                do {
+                    event.merge(try sink.enqueue(fixture.frames[index], format: fixture.format, scheduled: scheduled)) { _, right in right }
+                    event["enqueued"] = true
+                } catch {
+                    event["enqueued"] = false; event["failure"] = String(describing: error)
+                    lock.lock(); events.append(event); lock.unlock()
+                    throw error
+                }
+                lock.lock(); events.append(event); lock.unlock()
+                if tick == 0 { first.signal() }
+                try require((event["latenessSeconds"] as? Double ?? .infinity) < frameSeconds, "Enqueue completed after frame deadline; actual delivery retained in events")
+                tick += 1
+            }
+        } catch {
+            lock.lock(); failure = String(describing: error); lock.unlock(); first.signal()
+        }
+    }
+    func eventsSnapshot() -> [[String: Any]] {
+        lock.lock(); defer { lock.unlock() }; return events
+    }
+    func stop() -> (Bool, [[String: Any]], String?) {
+        lock.lock(); stopRequested = true; lock.unlock()
+        let stopped = done.wait(timeout: .now() + 2) == .success
+        lock.lock(); defer { lock.unlock() }
+        return (stopped, events, failure)
+    }
+}
+
+private struct CMIOInputManifest: Decodable {
+    let protocolVersion: Int
+    let sourceKind: String
+    let fixtureSHA256: String
+    let cameraDeviceUID: String
+    let obsPID: pid_t
+    let obsOutputInactiveObserved: Bool
+    let obsProcessExitObserved: Bool
+}
+
+@MainActor private final class CMIOFixtureSource {
+    private let identity: SinkIdentity
+    private let fixture: Fixture
+    private let sink: SinkQueue
+    private let feeder: Feeder
+    private var prepared = false
+    private var captureObserved: Double?
+    private var play: Double?
+    private(set) var finished = false
+    private(set) var evidence: [String: Any]
+    var passed: Bool { ["completed", "partialCaptureStopped"].contains(evidence["status"] as? String ?? "") }
+
+    init(manifestURL: URL, fixtureURL: URL) async throws {
+        let environment = ProcessInfo.processInfo.environment
+        try require(environment["GITHUB_ACTIONS"] == "true" && environment["RUNNER_ENVIRONMENT"] == "github-hosted"
+                    && environment["RUNNER_OS"] == "macOS" && getuid() != 0, "CMIO public fixture requires disposable hosted Mac")
+        let console = try FileManager.default.attributesOfItem(atPath: "/dev/console")[.ownerAccountID] as? NSNumber
+        try require(console?.uint32Value == getuid(), "CMIO source helper must own the console")
+        let manifestData = try Data(contentsOf: manifestURL)
+        let manifest = try JSONDecoder().decode(CMIOInputManifest.self, from: manifestData)
+        let manifestObject = try JSONSerialization.jsonObject(with: manifestData) as? [String: Any]
+        let keys: Set<String> = ["protocolVersion", "sourceKind", "fixtureSHA256", "cameraDeviceUID", "obsPID", "obsOutputInactiveObserved", "obsProcessExitObserved"]
+        try require(Set(manifestObject?.keys.map { $0 } ?? []) == keys && manifest.protocolVersion == 1
+                    && manifest.sourceKind == "publicCMIOSinkFixture" && manifest.fixtureSHA256 == fixtureSHA
+                    && manifest.cameraDeviceUID == cameraUID && manifest.obsPID > 1 && manifest.obsPID != getpid()
+                    && manifest.obsOutputInactiveObserved && manifest.obsProcessExitObserved, "CMIO source manifest differs from the pinned public boundary")
+        let priorPIDResult = kill(manifest.obsPID, 0)
+        let priorPIDError = errno
+        try require(priorPIDResult == -1 && priorPIDError == ESRCH && noOBSProcess(), "OBS must have normally exited before CMIO source acquisition")
+        let attributes = try FileManager.default.attributesOfItem(atPath: fixtureURL.path)
+        let size = (attributes[.size] as? NSNumber)?.intValue ?? 0
+        let owner = attributes[.ownerAccountID] as? NSNumber
+        try require(fixtureURL.path.hasPrefix("/") && attributes[.type] as? FileAttributeType == .typeRegular
+                    && owner?.uint32Value == getuid() && size > 0 && size < 4_000_000, "CMIO fixture must be the small owned public video")
+        let actualSHA = sha(try Data(contentsOf: fixtureURL))
+        try require(actualSHA == fixtureSHA, "CMIO fixture SHA differs; no substitution accepted")
+        let identity = try SinkIdentity.discover()
+        try identity.requireIdle()
+        let fixture = try await Fixture(url: fixtureURL)
+        self.identity = identity; self.fixture = fixture
+        let sink = SinkQueue(identity)
+        self.sink = sink; feeder = Feeder(sink: sink, fixture: fixture)
+        let heldSlots: [Int] = fixture.timelineIndices.enumerated().compactMap { slot, index in
+            abs(fixture.frames[index].pts.seconds - Double(slot) * frameSeconds) > 0.000001 ? slot : nil
+        }
+        evidence = ["protocolVersion": 1, "sourceKind": "publicCMIOSinkFixture", "status": "inconclusive",
+                    "helperPID": getpid(), "fixtureSHA256": fixtureSHA, "cameraDeviceUID": cameraUID,
+                    "manifest": manifestObject ?? [:], "sink": identity.advertised, "resetBeforeCapture": false,
+                    "reference": ["frames": fixture.frames.count, "durationSeconds": fixture.duration,
+                                  "width": 640, "height": 480, "fps": 25, "nativeDecoderStatus": "completed",
+                                  "sourcePTS": fixture.frames.map { $0.pts.seconds }, "sourceGapHeldSlots": heldSlots,
+                                  "sourceNV12SHA256": fixture.frames.map(\.validPixelSHA256)],
+                    "plannedMotion": fixture.frames.enumerated().map {
+                        ["index": $0.offset, "sourcePTS": $0.element.pts.seconds, "relativeToPlaySeconds": $0.element.pts.seconds] as [String: Any]
+                    },
+                    "boundary": "Pinned public actor through public CMIO sink; actual app is the sole camera consumer. Enqueue evidence is not a physical-webcam or accuracy claim."]
+    }
+
+    func prepareHeldFirst() async throws {
+        try identity.requireIdle()
+        evidence["resetBeforeCapture"] = true
+        try feeder.start()
+        let first = feeder.eventsSnapshot().first?["enqueuedHostSeconds"] as? Double
+        guard let first else { throw ProbeFailure("Held-first enqueue evidence unavailable") }
+        evidence["producerFirstFrameEnqueuedHostSeconds"] = first
+        try await waitUntil(first + 0.5)
+        prepared = true
+        evidence["preparedHostSeconds"] = hostNow()
+    }
+    func verifyHeldBeforeShortcut() throws {
+        try feeder.check()
+        try require(prepared && play == nil && !finished, "CMIO source is not held at its first frame before shortcut")
+        evidence["beforeShortcutVerifiedHostSeconds"] = hostNow()
+    }
+    func captureRecordingObserved(id: String) {
+        let now = hostNow()
+        captureObserved = now
+        evidence["captureID"] = id
+        evidence["captureRecordingObservedHostSeconds"] = now
+        evidence["heldFirstStartedHostSeconds"] = now
     }
     func playPreparedMotion() async throws {
-        await recordStats(phase: "beforePlay")
-        guard usableStatus(try await mediaStatus(phase: "beforePlay"), requirePaused: true, requireFirstFrame: true) else {
-            throw OBSError.mediaPreparation("motionChangedBeforePlay")
-        }
-        mediaEvidence["playRequestedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-        try await request("TriggerMediaInputAction", ["inputName": "PublicSilentVideo", "mediaAction": "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY"])
-        mediaEvidence["playAcknowledgedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
+        guard let captureObserved else { throw ProbeFailure("App recording boundary unavailable") }
+        try require(prepared && play == nil && !finished, "CMIO source cannot begin motion in this state")
+        try await waitUntil(captureObserved + 0.6)
+        let start = feeder.schedulePlay(after: frameSeconds)
+        play = start
+        evidence["heldFirstEndedHostSeconds"] = start
+        evidence["firstHoldSeconds"] = start - captureObserved
+        evidence["playStartHostSeconds"] = start
     }
     func observePlayingMotion() async throws {
-        guard let preparedFirstFrameCursorMilliseconds else { throw OBSError.mediaPreparation("preparedCursorUnavailable") }
-        let deadline = ProcessInfo.processInfo.systemUptime + 5
-        while ProcessInfo.processInfo.systemUptime < deadline {
-            let status = try await mediaStatus(phase: "afterPlay")
-            if usableStatus(status, requirePaused: false, requireFirstFrame: false),
-               status["mediaState"] as? String == "OBS_MEDIA_STATE_PLAYING",
-               let cursor = status["mediaCursor"] as? NSNumber, cursor.doubleValue > preparedFirstFrameCursorMilliseconds {
-                mediaEvidence["effectivePlayObservedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-                mediaEvidence["effectivePlayCursorMilliseconds"] = cursor
+        guard let play else { throw ProbeFailure("Motion was not scheduled") }
+        while hostNow() < play + 1 {
+            try feeder.check()
+            if let first = feeder.eventsSnapshot().first(where: { $0["phase"] as? String == "motion" && $0["enqueued"] as? Bool == true }) {
+                evidence["firstMotionEnqueuedHostSeconds"] = first["enqueuedHostSeconds"]
                 return
             }
-            try await Task.sleep(nanoseconds: 200_000_000)
+            try await Task.sleep(nanoseconds: 2_000_000)
         }
-        throw OBSError.mediaPreparation("motionNotPlayingAfterPlay")
+        throw ProbeFailure("Actual first motion enqueue was not observed")
     }
     func waitForMotionEnd() async throws {
-        guard let expectedMotionDurationMilliseconds else { throw OBSError.mediaPreparation("motionDurationUnavailable") }
-        let timeout = expectedMotionDurationMilliseconds / 1000 + 5
-        let started = ProcessInfo.processInfo.systemUptime
-        mediaEvidence["motionEndWaitStartedAtSystemUptime"] = started
-        mediaEvidence["motionEndDeadlineSeconds"] = timeout
-        while ProcessInfo.processInfo.systemUptime < started + timeout {
-            let status = try await mediaStatus(phase: "afterAudioAwaitingEnd")
-            // OBS reports null cursor/duration after ENDED; prior readiness binds this input.
-            if status["mediaState"] as? String == "OBS_MEDIA_STATE_ENDED" {
-                mediaEvidence["motionEndedObservedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-                await recordStats(phase: "afterSourceEnd")
-                return
-            }
-            try await Task.sleep(nanoseconds: 200_000_000)
-        }
-        throw OBSError.mediaPreparation("motionDidNotReachEnded")
+        guard let play else { throw ProbeFailure("Motion was not scheduled") }
+        try await waitUntil(play + fixture.duration)
+        try require(completeMotion(feeder.eventsSnapshot()), "Not every original source frame was enqueued at source time")
+        evidence["motionEndedHostSeconds"] = hostNow()
     }
-    func recordStats(phase: String) async {
-        var sample: [String: Any] = ["phase": phase]
+    private func waitUntil(_ time: Double) async throws {
+        while hostNow() < time {
+            try feeder.check()
+            try await Task.sleep(nanoseconds: 2_000_000)
+        }
+        try feeder.check()
+    }
+    private func completeMotion(_ events: [[String: Any]]) -> Bool {
+        let motion = events.filter { $0["phase"] as? String == "motion" }
+        return motion.count == fixture.frames.count && motion.enumerated().allSatisfy {
+            ($0.element["index"] as? Int) == $0.offset && $0.element["enqueued"] as? Bool == true
+        }
+    }
+    func finishAfterReaderClosed(boundary: String, requireCompleteMotion: Bool) throws {
+        try require(!finished, "CMIO source was already finalized")
+        evidence["cameraClosedObserved"] = true
+        evidence["cameraClosedVerifiedHostSeconds"] = hostNow()
+        evidence["readerCloseBoundary"] = boundary
+        evidence["producerStopRequestedHostSeconds"] = hostNow()
+        let stopped = feeder.stop()
+        let producer: [String: Any]
+        if stopped.0 {
+            producer = sink.cleanup()
+        } else {
+            producer = ["stopped": false, "callbackUnregistered": false, "queueReleased": false,
+                        "remainingQueueTokens": -1, "enqueueFailures": -1, "backpressureTimeouts": -1]
+        }
+        finished = true
+        var cleanup = producer
+        cleanup["workerJoined"] = stopped.0
+        evidence["producer"] = cleanup
+        evidence["events"] = stopped.1
+        let motion = stopped.1.filter { $0["phase"] as? String == "motion" }
+        evidence["plannedMotionFrames"] = fixture.frames.count
+        evidence["attemptedMotionFrames"] = motion.count
+        evidence["enqueuedMotionFrames"] = motion.filter { $0["enqueued"] as? Bool == true }.count
+        evidence["motionEnqueueFailures"] = motion.filter { $0["enqueued"] as? Bool != true }.count
+        evidence["unattemptedMotionFrames"] = fixture.frames.count - motion.count
         do {
-            let stats = try await request("GetStats", [:])
-            for key in ["activeFps", "averageFrameRenderTime", "renderSkippedFrames", "renderTotalFrames",
-                        "outputSkippedFrames", "outputTotalFrames", "cpuUsage"] { sample[key] = stats[key] ?? NSNull() }
-            sample["available"] = true
+            if let failure = stopped.2 { throw ProbeFailure(failure) }
+            try require(prepared && captureObserved != nil && play != nil, "CMIO capture lifecycle did not start")
+            try require(stopped.0 && producer["stopped"] as? Bool == true && producer["callbackUnregistered"] as? Bool == true
+                        && producer["queueReleased"] as? Bool == true && producer["remainingQueueTokens"] as? Int == 0
+                        && producer["enqueueFailures"] as? Int == 0 && producer["backpressureTimeouts"] as? Int == 0,
+                        "Owned CMIO producer cleanup failed")
+            // The app reader is already closed; retain the prototype's post-stop observation window.
+            Thread.sleep(forTimeInterval: 0.1)
+            try identity.requireIdle()
+            evidence["postStopIdleObservedHostSeconds"] = hostNow()
+            if requireCompleteMotion { try require(completeMotion(stopped.1), "Full capture omitted a source motion frame") }
+            evidence["status"] = requireCompleteMotion ? "completed" : "partialCaptureStopped"
         } catch {
-            sample["available"] = false
-            sample["error"] = String(describing: error)
+            evidence["failure"] = String(describing: error)
+            throw error
         }
-        sample["receivedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
-        var samples = mediaEvidence["statsSamples"] as? [[String: Any]] ?? []
-        samples.append(sample)
-        mediaEvidence["statsSamples"] = samples
     }
-    private func waitForMedia(phase: String, pausedAtFirstFrame: Bool, requirePaused: Bool = false) async throws {
-        let deadline = ProcessInfo.processInfo.systemUptime + 5
-        var stableSince: TimeInterval?
-        var stableCursor: Double?
-        while ProcessInfo.processInfo.systemUptime < deadline {
-            let status = try await mediaStatus(phase: phase)
-            if usableStatus(status, requirePaused: requirePaused, requireFirstFrame: pausedAtFirstFrame) {
-                if !pausedAtFirstFrame { return }
-                let cursor = (status["mediaCursor"] as! NSNumber).doubleValue
-                if stableCursor != cursor {
-                    stableCursor = cursor
-                    stableSince = ProcessInfo.processInfo.systemUptime
-                }
-                if ProcessInfo.processInfo.systemUptime - stableSince! >= 0.5 {
-                    preparedFirstFrameCursorMilliseconds = cursor
-                    mediaEvidence["pausedFirstFrameCursorMilliseconds"] = cursor
-                    mediaEvidence["pausedFirstFrameStableSeconds"] = ProcessInfo.processInfo.systemUptime - stableSince!
-                    return
-                }
-            } else { stableSince = nil; stableCursor = nil }
-            try await Task.sleep(nanoseconds: 200_000_000)
+    func cleanupAfterFailure(appAbsent: Bool) {
+        guard !finished else { return }
+        guard appAbsent else {
+            evidence["failure"] = "Owned app exit was not observed; producer teardown cannot be reported after reader closure"
+            evidence["cameraClosedObserved"] = false
+            evidence["cleanupDeferredToProcessExit"] = true
+            finished = true
+            return
         }
-        throw OBSError.mediaPreparation("deadline:\(phase)")
+        try? finishAfterReaderClosed(boundary: "ownedAppProcessTerminatedAfterFailure", requireCompleteMotion: false)
+        evidence["status"] = "inconclusive"
     }
-    private func usableStatus(_ status: [String: Any], requirePaused: Bool, requireFirstFrame: Bool) -> Bool {
-        guard let state = status["mediaState"] as? String,
-              (requirePaused ? state == "OBS_MEDIA_STATE_PAUSED" : ["OBS_MEDIA_STATE_PLAYING", "OBS_MEDIA_STATE_PAUSED"].contains(state)),
-              let duration = status["mediaDuration"] as? NSNumber, duration.doubleValue > 1000,
-              let expectedMotionDurationMilliseconds,
-              // OBS returns integer milliseconds; allow only millisecond rounding.
-              abs(duration.doubleValue - expectedMotionDurationMilliseconds) <= 1,
-              let cursor = status["mediaCursor"] as? NSNumber, cursor.doubleValue >= 0 else { return false }
-        guard requireFirstFrame else { return true }
-        guard let firstFrameDurationMilliseconds, cursor.doubleValue <= firstFrameDurationMilliseconds else { return false }
-        return preparedFirstFrameCursorMilliseconds.map { $0 == cursor.doubleValue } ?? true
-    }
-    private func mediaStatus(phase: String) async throws -> [String: Any] {
-        let response = try await request("GetMediaInputStatus", ["inputName": "PublicSilentVideo"])
-        var sample: [String: Any] = ["phase": phase, "receivedAtSystemUptime": ProcessInfo.processInfo.systemUptime]
-        for key in ["mediaState", "mediaCursor", "mediaDuration"] { sample[key] = response[key] ?? NSNull() }
-        var samples = mediaEvidence["statusSamples"] as? [[String: Any]] ?? []
-        samples.append(sample)
-        mediaEvidence["statusSamples"] = samples
-        return response
-    }
-    @discardableResult private func request(_ type: String, _ data: [String: Any]) async throws -> [String: Any] {
-        requestCounter += 1
-        let id = String(requestCounter)
-        try await send(["op": 6, "d": ["requestType": type, "requestId": id, "requestData": data]])
-        for _ in 0..<20 {
-            let message = try await receive()
-            guard message["op"] as? Int == 7, let details = message["d"] as? [String: Any], details["requestId"] as? String == id else { continue }
-            guard let status = details["requestStatus"] as? [String: Any], status["result"] as? Bool == true else { throw OBSError.requestFailed(type) }
-            return details["responseData"] as? [String: Any] ?? [:]
-        }
-        throw OBSError.protocolFailure
-    }
-    private func send(_ object: [String: Any]) async throws {
-        let data = try JSONSerialization.data(withJSONObject: object)
-        try await socket.send(.string(String(decoding: data, as: UTF8.self)))
-    }
-    private func receive() async throws -> [String: Any] {
-        let message = try await socket.receive()
-        let data: Data
-        switch message {
-        case .string(let text): data = Data(text.utf8)
-        case .data(let value): data = value
-        @unknown default: throw OBSError.protocolFailure
-        }
-        guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw OBSError.protocolFailure }
-        return object
-    }
-    enum OBSError: Error { case configuration, protocolFailure, requestFailed(String), mediaPreparation(String) }
 }

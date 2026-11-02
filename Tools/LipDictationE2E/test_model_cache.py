@@ -150,8 +150,9 @@ class ModelCacheTests(unittest.TestCase):
         self.assertIsNone(args.model_cache_run)
         self.assertIsNone(args.producer_run)
 
-    def run_visual_setup(self, result, *, cached_model=None, same_job=True, provenance=None):
-        """Exercise real orchestration with fixture subprocess reports, stopping after camera binding."""
+    def run_visual_setup(self, result, *, cached_model=None, same_job=True, provenance=None,
+                         cleanup_change=None, camera_change=None, obs_absent=True):
+        """Exercise orchestration with fixture subprocess reports, stopping at the first camera launch."""
         feature, transport = 'a' * 40, 'b' * 40
         if provenance is None:
             provenance = {'buildOrigin': 'sameJobRelease', 'proofHead': feature,
@@ -165,7 +166,12 @@ class ModelCacheTests(unittest.TestCase):
             websocket.parent.mkdir(parents=True)
             websocket.write_text('{}')
             camera = {'status': 'supportedDeviceReady', 'obsRetainedForE2E': True,
-                      'sourceHead': transport if same_job else feature}
+                      'sourceHead': transport if same_job else feature,
+                      'obsActivationReadiness': {'status': 'activationCompleted', 'expectedPID': 4321},
+                      'camera': {'chosenDevice': 'OBS Virtual Camera', 'devices': [
+                          {'name': 'OBS Virtual Camera', 'uniqueID': '7626645E-4425-469E-9D8B-97E0FA59AC75'}]}}
+            if camera_change:
+                camera.update(camera_change)
             camera_path = root / 'camera.json'
             camera_path.write_text(json.dumps(camera))
             audio = root / 'speech.wav'
@@ -174,7 +180,7 @@ class ModelCacheTests(unittest.TestCase):
 
             def run(label, command, **options):
                 calls.append((label, command))
-                if label.startswith('set-combined-'):
+                if label == 'run-combined':
                     raise RuntimeError('Unit fixture reached the accepted camera binding')
                 if label == 'run-negative-controls':
                     (evidence / 'negative-controls.json').write_text(json.dumps({
@@ -190,24 +196,39 @@ class ModelCacheTests(unittest.TestCase):
                         output.writeframes(b'\0' * 32)
                 elif label == 'run-setup':
                     (evidence / 'setup.json').write_text(json.dumps(result))
+                elif label == 'obs-cleanup':
+                    cleanup = {'closed': True, 'phase': 'closed', 'cleanup': {
+                        'outputInactiveObserved': True, 'processExitObserved': True,
+                        'ownedProcessIdentityVerified': True, 'processIDsBefore': [4321], 'remainingProcessIDs': []}}
+                    if cleanup_change:
+                        cleanup.update(cleanup_change)
+                    Path(command[3]).write_text(json.dumps(cleanup))
+                elif label.startswith('obs-absence-'):
+                    (evidence / (label + '.log')).write_text('' if obs_absent else '/Applications/OBS.app/Contents/MacOS/OBS')
+                    return 1 if obs_absent else 0
                 return 0
 
             args = SimpleNamespace(same_job_build=same_job, obs_summary=camera_path)
             failure = None
+            ownership = {}
             with patch.dict(runner.os.environ, {'GITHUB_ACTIONS': 'true', 'RUNNER_ENVIRONMENT': 'github-hosted',
                                                'GITHUB_SHA': transport, 'RUNNER_TEMP': str(root)}), \
                     patch.object(runner.Path, 'home', return_value=home), \
+                    patch.object(runner, 'CAMERA_FIXTURE_SHA', hashlib.sha256(b'unit video fixture').hexdigest(), create=True), \
                     patch.object(runner, 'history', return_value=[]), \
                     patch.object(runner.subprocess, 'check_output', return_value=feature + '\n'), \
                     patch.object(runner, 'camera_source_binding', wraps=runner.camera_source_binding) as binding:
                 try:
                     runner.run_visual_cases(args, evidence, {}, root / 'original', audio, root / 'app',
-                                            root / 'helper', run, Mock(), {}, provenance, cached_model)
+                                            root / 'helper', run, Mock(), ownership, provenance, cached_model)
                 except Exception as error:
                     failure = str(error)
             receipt = evidence / 'supported-camera-source.json'
+            manifest = evidence / 'camera-source.json'
             return {'failure': failure, 'calls': calls,
                     'binding': json.loads(receipt.read_text()) if receipt.exists() else None,
+                    'cameraSource': json.loads(manifest.read_text()) if manifest.exists() else None,
+                    'ownership': ownership,
                     'actualProvenancePassed': binding.called and binding.call_args.args[2] is provenance}
 
     def test_fresh_visual_setup_binds_camera_to_current_app_without_cache(self):
@@ -220,6 +241,99 @@ class ModelCacheTests(unittest.TestCase):
         setup = next(command for label, command in observed['calls'] if label == 'run-setup')
         self.assertNotIn('--cached-install-profile', setup)
         self.assertNotIn('--prior-setup-run', setup)
+
+    def test_visual_source_closes_obs_before_cmio_helper_launch(self):
+        observed = self.run_visual_setup({'passed': True, 'actualSetupButtonPressed': True,
+                                         'freshDownloadAssessed': True})
+        self.assertEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
+        labels = [label for label, _ in observed['calls']]
+        for label in ('obs-cleanup', 'obs-absence-before-cmio-pid', 'obs-absence-before-cmio-named'):
+            self.assertIn(label, labels)
+        self.assertLess(labels.index('obs-cleanup'), labels.index('run-combined'))
+        self.assertLess(labels.index('obs-absence-before-cmio-pid'), labels.index('run-combined'))
+        self.assertLess(labels.index('obs-absence-before-cmio-named'), labels.index('run-combined'))
+        self.assertTrue(observed['ownership']['closed'])
+        command = next(command for label, command in observed['calls'] if label == 'run-combined')
+        self.assertIn('--camera-source', command)
+        self.assertNotIn('--obs-config', command)
+        for value in ('GITHUB_ACTIONS=true', 'RUNNER_OS=macOS', 'RUNNER_ENVIRONMENT=github-hosted'):
+            self.assertIn(value, command)
+        self.assertEqual(observed['cameraSource']['obsPID'], 4321)
+        self.assertEqual(observed['cameraSource']['cameraDeviceUID'], '7626645E-4425-469E-9D8B-97E0FA59AC75')
+
+    def test_visual_source_refuses_unclosed_obs_before_helper_launch(self):
+        cleanup = {'outputInactiveObserved': True, 'processExitObserved': True,
+                   'ownedProcessIdentityVerified': True, 'processIDsBefore': [4321], 'remainingProcessIDs': []}
+        for change in [{'closed': False}, {'phase': 'failed'}, *[
+                {'cleanup': dict(cleanup, **{key: value})} for key, value in (
+                    ('outputInactiveObserved', False), ('processExitObserved', False),
+                    ('ownedProcessIdentityVerified', False), ('processIDsBefore', [9876]),
+                    ('remainingProcessIDs', [4321]))]]:
+            with self.subTest(change=change):
+                observed = self.run_visual_setup({'passed': True, 'actualSetupButtonPressed': True,
+                                                  'freshDownloadAssessed': True}, cleanup_change=change)
+                self.assertEqual(observed['failure'], 'Owned OBS cleanup did not verify inactive output and exact process exit')
+                self.assertNotIn('run-combined', [label for label, _ in observed['calls']])
+                self.assertIsNone(observed['cameraSource'])
+        observed = self.run_visual_setup({'passed': True, 'actualSetupButtonPressed': True,
+                                          'freshDownloadAssessed': True}, obs_absent=False)
+        self.assertEqual(observed['failure'], 'OBS must be absent before and after public CMIO source ownership')
+        self.assertNotIn('run-combined', [label for label, _ in observed['calls']])
+
+    def test_visual_source_refuses_unbound_camera_identity(self):
+        for change in [
+                {'obsActivationReadiness': {'status': 'blocked', 'expectedPID': 4321}},
+                {'obsActivationReadiness': {'status': 'activationCompleted', 'expectedPID': 0}},
+                {'camera': {'chosenDevice': 'Other camera', 'devices': []}}]:
+            with self.subTest(change=change):
+                observed = self.run_visual_setup({'passed': True, 'actualSetupButtonPressed': True,
+                                                  'freshDownloadAssessed': True}, camera_change=change)
+                self.assertNotEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
+                self.assertNotIn('run-combined', [label for label, _ in observed['calls']])
+                self.assertIsNone(observed['cameraSource'])
+
+    def test_closed_obs_cleanup_never_reconnects_to_dead_websocket(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            evidence = Path(temporary)
+            calls = []
+
+            def run(label, command, **options):
+                calls.append(command)
+                self.assertIn(command[0], ['/bin/ps', '/usr/bin/pgrep'])
+                (evidence / (label + '.log')).write_text('')
+                return 1
+
+            runner.close_owned_obs(evidence, run, {'pid': 4321, 'closed': True})
+            self.assertEqual(len(calls), 2)
+
+    def test_camera_source_receipt_requires_matching_capture_and_ordered_cleanup(self):
+        # Receipt-parser unit boundary; no native capture is performed by this fixture.
+        manifest = {'protocolVersion': 1, 'sourceKind': 'publicCMIOSinkFixture',
+                    'fixtureSHA256': runner.CAMERA_FIXTURE_SHA, 'cameraDeviceUID': runner.CAMERA_DEVICE_UID,
+                    'obsPID': 4321, 'obsOutputInactiveObserved': True, 'obsProcessExitObserved': True}
+        source = dict(manifest, status='completed', manifest=manifest, captureID='capture-unit',
+                      resetBeforeCapture=True, cameraClosedObserved=True, cameraClosedVerifiedHostSeconds=10,
+                      producerStopRequestedHostSeconds=11, postStopIdleObservedHostSeconds=14,
+                      reference={'frames': 2}, plannedMotionFrames=2, enqueuedMotionFrames=2, motionEnqueueFailures=0,
+                      producer={'stopped': True, 'workerJoined': True, 'callbackUnregistered': True,
+                                'queueReleased': True, 'remainingQueueTokens': 0, 'enqueueFailures': 0,
+                                'backpressureTimeouts': 0, 'stopRequestedHostSeconds': 12, 'stopCompletedHostSeconds': 13})
+        self.assertTrue(runner.camera_source_passed({'captureID': 'capture-unit', 'cameraSource': source}, manifest, False))
+        invalid = [dict(source, **change) for change in (
+            {'manifest': dict(manifest, obsPID=9876)}, {'captureID': 'different-capture'},
+            {'cameraClosedObserved': False}, {'cameraClosedVerifiedHostSeconds': 15},
+            {'postStopIdleObservedHostSeconds': 12}, {'producerStopRequestedHostSeconds': float('nan')},
+            {'status': 'partialCaptureStopped'}, {'enqueuedMotionFrames': 1}, {'motionEnqueueFailures': 1})]
+        invalid += [dict(source, producer=dict(source['producer'], **change)) for change in (
+            {'workerJoined': False}, {'callbackUnregistered': False}, {'queueReleased': False},
+            {'remainingQueueTokens': 1}, {'enqueueFailures': 1}, {'backpressureTimeouts': 1},
+            {'stopRequestedHostSeconds': 9}, {'stopCompletedHostSeconds': 11})]
+        for changed in invalid:
+            with self.subTest(changed=changed):
+                self.assertFalse(runner.camera_source_passed({'captureID': 'capture-unit', 'cameraSource': changed}, manifest, False))
+        partial = dict(source, status='partialCaptureStopped', enqueuedMotionFrames=1)
+        self.assertTrue(runner.camera_source_passed({'captureID': 'capture-unit', 'cameraSource': partial}, manifest, True))
+        self.assertFalse(runner.camera_source_passed({'captureID': 'capture-unit', 'cameraSource': source}, manifest, True))
 
     def test_fresh_visual_setup_refuses_cached_and_incomplete_receipts(self):
         good = {'passed': True, 'actualSetupButtonPressed': True, 'freshDownloadAssessed': True}

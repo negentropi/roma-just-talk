@@ -25,6 +25,8 @@ MODEL_REVISION = 'ee09c569f73759e6d44c9bd16766f477b2b36d39'
 MODEL_BASE = 'https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v2-coreml/resolve/' + MODEL_REVISION
 FIXTURE_URL = 'https://media.githubusercontent.com/media/CheyneyComputerScience/CREMA-D/1658cd342dff90010aa843eaeebd53610a08b1dc/VideoFlash/1003_IEO_NEU_XX.flv'
 FIXTURE_SHA = 'db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc'
+CAMERA_FIXTURE_SHA = '4d18638fa0fbbfc3c75ae06723b5a36cc9114147ea5a337eb1b17fdd2a120aab'
+CAMERA_DEVICE_UID = '7626645E-4425-469E-9D8B-97E0FA59AC75'
 
 
 def sha256(path):
@@ -205,6 +207,65 @@ def cached_setup_passed(result, cached_model, same_job_build):
             and not any(key in result for key in ('priorSetupRun', 'priorSetupSourceHead', 'priorSetupSameExecutable')))
 
 
+def observe_obs_absent(evidence, run, pid, prefix):
+    exact = run(prefix + '-pid', ['/bin/ps', '-p', str(pid), '-o', 'comm='], required=False)
+    named = run(prefix + '-named', ['/usr/bin/pgrep', '-x', 'OBS'], required=False)
+    result = {'ownedPID': pid, 'pidExitCode': exact, 'namedExitCode': named,
+              'observedAtSystemUptime': time.monotonic()}
+    result['absent'] = exact == named == 1 and all(
+        (evidence / (prefix + suffix + '.log')).read_text().strip() == '' for suffix in ('-pid', '-named'))
+    write(evidence / (prefix + '.json'), result)
+    if not result['absent']:
+        raise RuntimeError('OBS must be absent before and after public CMIO source ownership')
+    return result
+
+
+def close_owned_obs(evidence, run, ownership):
+    pid = ownership['pid']
+    if ownership.get('closed'):
+        return observe_obs_absent(evidence, run, pid, 'obs-absence-final')
+    label = 'obs-cleanup-final' if ownership.get('closeAttempted') else 'obs-cleanup'
+    ownership['closeAttempted'] = True
+    control = Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/bin/OBSControl'
+    websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
+    receipt = evidence / (label + '.json')
+    code = run(label, [control, websocket, '-', receipt, 'stop-and-quit'], timeout=55, required=False)
+    result = json.loads(receipt.read_text()) if receipt.is_file() else {}
+    cleanup = result.get('cleanup', {})
+    ownership['cleanup'] = result
+    if not (code == 0 and result.get('closed') is True and result.get('phase') == 'closed'
+            and cleanup.get('outputInactiveObserved') is True and cleanup.get('processExitObserved') is True
+            and cleanup.get('ownedProcessIdentityVerified') is True and cleanup.get('processIDsBefore') == [pid]
+            and cleanup.get('remainingProcessIDs') == []):
+        raise RuntimeError('Owned OBS cleanup did not verify inactive output and exact process exit')
+    ownership['closed'] = True
+    return observe_obs_absent(evidence, run, pid, 'obs-absence-before-cmio')
+
+
+def camera_source_passed(result, manifest, partial):
+    source = result.get('cameraSource', {})
+    producer = source.get('producer', {})
+    times = [source.get('cameraClosedVerifiedHostSeconds'), source.get('producerStopRequestedHostSeconds'),
+             producer.get('stopRequestedHostSeconds'), producer.get('stopCompletedHostSeconds'),
+             source.get('postStopIdleObservedHostSeconds')]
+    return (source.get('protocolVersion') == 1 and source.get('sourceKind') == 'publicCMIOSinkFixture'
+            and source.get('status') == ('partialCaptureStopped' if partial else 'completed')
+            and source.get('fixtureSHA256') == manifest['fixtureSHA256']
+            and source.get('cameraDeviceUID') == manifest['cameraDeviceUID'] and source.get('manifest') == manifest
+            and source.get('resetBeforeCapture') is True and source.get('cameraClosedObserved') is True
+            and isinstance(result.get('captureID'), str) and bool(result['captureID'])
+            and source.get('captureID') == result['captureID']
+            and all(type(value) in (int, float) and 0 < value < float('inf') for value in times)
+            and times == sorted(times)
+            and all(producer.get(key) is True for key in ('stopped', 'workerJoined', 'callbackUnregistered', 'queueReleased'))
+            and all(type(producer.get(key)) is int and producer[key] == 0
+                    for key in ('remainingQueueTokens', 'enqueueFailures', 'backpressureTimeouts'))
+            and source.get('motionEnqueueFailures') == 0
+            and (partial or (type(source.get('reference', {}).get('frames')) is int
+                 and source['reference']['frames'] > 1
+                 and source.get('plannedMotionFrames') == source.get('enqueuedMotionFrames') == source['reference']['frames'])))
+
+
 def run_visual_cases(args, evidence, configuration, original, audio_fixture, app, helper, run, grant, owned_obs_cleanup, app_provenance, cached_model=None):
     visual_config = evidence / 'visual-config.json'
     write(visual_config, configuration)
@@ -216,7 +277,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
     if not controls_passed:
         write(evidence / 'visual-summary.json', {'passed': False, 'cases': cases})
         raise RuntimeError('Actual negative-observation controls failed')
-    websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
+    camera_source_path = evidence / 'camera-source.json'
+    camera_source = None
     video = evidence / 'clock-padded-silent.mp4'
     silence = evidence / 'clock-silent.wav'
     run('prepare-aligned-camera-feed', ['ffmpeg', '-nostdin', '-hide_banner', '-loglevel', 'error', '-y', '-i', original, '-map', '0:v:0', '-an', '-vf', 'scale=640:480,fps=25,tpad=start_mode=clone:start_duration=1:stop_mode=clone:stop_duration=0.5', '-c:v', 'libx264', '-crf', '0', '-pix_fmt', 'yuv420p', video])
@@ -225,6 +287,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
     with wave.open(str(silence), 'rb') as stream:
         if any(stream.readframes(stream.getnframes())):
             raise RuntimeError('The fallback test audio contains nonzero PCM')
+    if sha256(video) != CAMERA_FIXTURE_SHA:
+        raise RuntimeError('The public CMIO movie differs from the qualified fixture bytes')
     write(evidence / 'visual-fixture-hashes.json', {'silentMotionVideoSHA256': sha256(video), 'speechAudioSHA256': sha256(audio_fixture), 'zeroAudioSHA256': sha256(silence), 'zeroAudioPCMVerified': True})
     for scenario in ['setup', 'combined', 'combined-silent', 'lips', 'cancel', 'disable', 'quit']:
         if scenario == 'combined':
@@ -239,11 +303,23 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             proof_head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
             binding = camera_source_binding(camera, proof_head, app_provenance if args.same_job_build else None)
             write(evidence / 'supported-camera-source.json', binding)
+            readiness = camera.get('obsActivationReadiness', {})
+            pid = readiness.get('expectedPID')
+            if type(pid) is not int or pid <= 1 or readiness.get('status') != 'activationCompleted':
+                raise RuntimeError('The camera probe did not bind actual extension activation to its owned OBS PID')
             # Cleanup ownership transfers only after accepting the successful retained-producer receipt.
-            owned_obs_cleanup['accepted'] = True
+            owned_obs_cleanup.update(accepted=True, pid=pid)
             write(evidence / 'supported-camera.json', camera)
-            if not websocket.is_file():
-                raise RuntimeError('The probe-owned private OBS WebSocket configuration is unavailable')
+            close_owned_obs(evidence, run, owned_obs_cleanup)
+            devices = camera.get('camera', {}).get('devices', [])
+            if camera.get('camera', {}).get('chosenDevice') != 'OBS Virtual Camera' or sum(
+                    device.get('uniqueID') == CAMERA_DEVICE_UID and device.get('name') == 'OBS Virtual Camera'
+                    for device in devices) != 1:
+                raise RuntimeError('The probe did not select the exact approved public CMIO camera device')
+            camera_source = {'protocolVersion': 1, 'sourceKind': 'publicCMIOSinkFixture',
+                             'fixtureSHA256': CAMERA_FIXTURE_SHA, 'cameraDeviceUID': CAMERA_DEVICE_UID,
+                             'obsPID': pid, 'obsOutputInactiveObserved': True, 'obsProcessExitObserved': True}
+            write(camera_source_path, camera_source)
         enabled = scenario != 'setup'
         lips_only = scenario in ['lips', 'cancel', 'disable', 'quit']
         recorder_fixture = None
@@ -261,7 +337,9 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         report = evidence / (scenario + '.json')
         before = history()
         before_ids = {row['Z_PK'] for row in before}
-        command = ['/usr/bin/open', '-W', '-n', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--obs-config', websocket, '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
+        command = ['/usr/bin/open', '-W', '-n', '--env', 'GITHUB_ACTIONS=true', '--env', 'RUNNER_OS=macOS', '--env', 'RUNNER_ENVIRONMENT=github-hosted', '-o', str(evidence / (scenario + '.stdout.log')), '--stderr', str(evidence / (scenario + '.stderr.log')), helper, '--args', '--config', visual_config, '--output', report, '--scenario', scenario, '--app-log', evidence / 'app.log', '--video', video, '--audio', silence if scenario == 'combined-silent' else audio_fixture]
+        if scenario != 'setup':
+            command += ['--camera-source', camera_source_path]
         if scenario == 'setup' and cached_model is not None:
             if args.same_job_build:
                 command += ['--cached-install-profile', 'currentNativeCachedInstall']
@@ -315,6 +393,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
                 passed = passed and result.get('actualSetupButtonPressed') is True and result.get('freshDownloadAssessed') is True
             else:
                 passed = passed and cached_setup_passed(result, cached_model, args.same_job_build)
+        else:
+            passed = passed and camera_source_passed(result, camera_source, scenario in ['disable', 'quit'])
         if positive:
             passed = passed and len(created) == 1 and completed[0]['ZTEXT'].strip() != ''
             if scenario == 'lips':
@@ -552,18 +632,12 @@ def main():
     finally:
         if owned_obs_cleanup.get('accepted'):
             try:
-                control = Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe/bin/OBSControl'
-                websocket = Path.home() / 'Library/Application Support/obs-studio/plugin_config/obs-websocket/config.json'
-                receipt = evidence / 'obs-cleanup.json'
-                code = run('close-owned-obs', [control, websocket, '-', receipt, 'stop-and-quit'], timeout=55, required=False)
-                cleanup = json.loads(receipt.read_text()) if receipt.is_file() else {}
-                summary['obsCleanup'] = cleanup
-                if code != 0 or cleanup.get('closed') is not True:
-                    raise RuntimeError('Owned OBS cleanup did not verify inactive output and process exit; inspect obs-cleanup.json')
+                close_owned_obs(evidence, run, owned_obs_cleanup)
             except Exception as error:
                 summary['cleanupFailure'] = str(error)
                 summary.setdefault('failure', str(error))
                 summary['status'] = 'blocked'
+            summary['obsCleanup'] = owned_obs_cleanup.get('cleanup', {})
         if log_process is not None:
             log_process.terminate()
             try:

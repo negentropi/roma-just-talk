@@ -189,17 +189,20 @@ def camera_source_binding(camera, proof_head, same_job_app=None):
                          if same_job_app is not None else 'The probe receipt matches the exact checked-out proof source.')}
 
 
-def cached_setup_passed(result, cached_model, same_job_build):
+def cached_setup_passed(result, cached_model):
     """Keep current installed-state observations separate from immutable prior Setup."""
-    if not (result.get('actualSetupButtonPressed') is False and result.get('freshDownloadAssessed') is False
+    if not (cached_model.get('status') == 'verified' and result.get('actualSetupButtonPressed') is False
+            and result.get('freshDownloadAssessed') is False
             and all(result.get(key) is True for key in ('actualSetupUIReady', 'initialMasterOffObserved',
                     'initialLipsOnlyOffObserved', 'finalMasterOffObserved', 'finalLipsOnlyOffObserved'))):
         return False
-    if not same_job_build:
-        return result.get('priorSetupRun') == cached_model['priorSetup']['run']
+    if cached_model.get('setupProfile') == 'verifiedCachedModelWithPriorSetup':
+        prior_run = cached_model.get('priorSetup', {}).get('run')
+        return (type(prior_run) is int and prior_run > 0
+                and result.get('setupProfile') == 'verifiedCachedModelWithPriorSetup'
+                and result.get('priorSetupRun') == prior_run)
     native = cached_model.get('nativeInstall', {})
-    return (cached_model.get('status') == 'verified'
-            and cached_model.get('setupProfile') == result.get('setupProfile') == 'currentNativeCachedInstall'
+    return (cached_model.get('setupProfile') == result.get('setupProfile') == 'currentNativeCachedInstall'
             and native.get('passed') is True and native.get('nativeFullVerificationPassed') is True
             and native.get('storageFileCount') == 658 and cached_model.get('historicalSetupUsed') is False
             and result.get('currentFreshSetupAssessed') is False and result.get('historicalSetupUsed') is False
@@ -341,10 +344,14 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         if scenario != 'setup':
             command += ['--camera-source', camera_source_path]
         if scenario == 'setup' and cached_model is not None:
-            if args.same_job_build:
+            if cached_model.get('status') != 'verified':
+                raise RuntimeError('Cached Setup requires a verified installer receipt')
+            if cached_model.get('setupProfile') == 'currentNativeCachedInstall':
                 command += ['--cached-install-profile', 'currentNativeCachedInstall']
-            else:
+            elif cached_model.get('setupProfile') == 'verifiedCachedModelWithPriorSetup':
                 command += ['--prior-setup-run', cached_model['priorSetup']['run']]
+            else:
+                raise RuntimeError('Cached Setup has no recognized explicit profile')
         deny_microphone = scenario == 'lips'
         if deny_microphone:
             microphone_tcc_fixture(evidence, run, 'microphone-authorized-before-lips', 2)
@@ -392,7 +399,7 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
             if cached_model is None:
                 passed = passed and result.get('actualSetupButtonPressed') is True and result.get('freshDownloadAssessed') is True
             else:
-                passed = passed and cached_setup_passed(result, cached_model, args.same_job_build)
+                passed = passed and cached_setup_passed(result, cached_model)
         else:
             passed = passed and camera_source_passed(result, camera_source, scenario in ['disable', 'quit'])
         if positive:

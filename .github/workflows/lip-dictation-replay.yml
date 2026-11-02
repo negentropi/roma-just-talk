@@ -57,6 +57,7 @@ jobs:
             --app "$RUNNER_TEMP/lip-replay-source/roma just talk.app" \
             --app-source-head 095c058ddedfe4986802d88c11fe8a58bc71df15 \
             --producer-run 41442208716 \
+            --model-cache-run 41497571853 \
             --visual
 
       - name: Upload current proof and immutable producer receipts

@@ -11,7 +11,9 @@ import unittest
 from unittest.mock import Mock, patch
 import zipfile
 
-from app_artifact import ArtifactError, REPOSITORY, REPOSITORY_ID
+from app_artifact import (ArtifactError, HOSTED_ARTIFACTS, HOSTED_BUILD, HOSTED_BUNDLE_SHA256,
+                          HOSTED_EXECUTABLE_SHA256, HOSTED_RUN, HOSTED_TRANSPORT,
+                          REPOSITORY, REPOSITORY_ID, VerifiedApp)
 import model_cache as cache
 import run as runner
 
@@ -44,18 +46,120 @@ jobs:
 
 
 class ModelCacheTests(unittest.TestCase):
+    def hosted_app(self, root):
+        _, _, identifier, _, digest = next(pin for pin in HOSTED_ARTIFACTS if pin[0] == 'app')
+        app = VerifiedApp(root / 'app', {
+            'status': 'verified', 'producerProfile': 'pinnedHostedWorkflow', 'producerRun': HOSTED_RUN,
+            'appBuildHead': HOSTED_BUILD, 'proofHead': 'a' * 40, 'producerTransportHead': HOSTED_TRANSPORT,
+            'artifactID': identifier, 'artifactSHA256': 'sha256:' + digest,
+            'executableSHA256': HOSTED_EXECUTABLE_SHA256, 'wholeBundleFingerprintSHA256': HOSTED_BUNDLE_SHA256,
+            'bundleItemCount': 401, 'producerProofArchivesFullyVerified': True,
+            'appResourceHashes': [{'path': 'manifest.json', 'sha256': 'f' * 64}]},
+            HOSTED_BUNDLE_SHA256, root / 'app-evidence')
+        app.verify_unchanged = Mock()
+        return app
+
+    def test_hosted_cached_install_has_current_native_profile_without_prior_setup(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            app = self.hosted_app(root)
+            with patch.dict(cache.os.environ, {'RUNNER_TEMP': str(root)}), \
+                    patch.object(cache, 'prior_setup', side_effect=AssertionError('Historical Setup must not transfer')), \
+                    patch.object(cache, 'check_sources', create=True, return_value=([], b'lock')), \
+                    patch.object(cache, 'app_resources', side_effect=RuntimeError('Fixture stops before network')), \
+                    patch.object(cache, 'api') as api:
+                with self.assertRaisesRegex(RuntimeError, 'Fixture stops before network'):
+                    cache.prepare_cached_model(root, evidence, app, cache.CACHE_RUN, Mock())
+                api.assert_not_called()
+            receipt = json.loads((evidence / 'model-cache.json').read_text())
+            self.assertEqual(receipt['setupProfile'], 'currentNativeCachedInstall')
+            self.assertNotIn('priorSetup', receipt)
+            for key in ('historicalSetupUsed', 'actualSetupButtonPressed', 'freshDownloadAssessed', 'currentFreshSetupAssessed'):
+                self.assertIs(receipt[key], False)
+
+    def test_hosted_cached_setup_uses_verified_receipt_profile(self):
+        result = {'passed': True, 'setupProfile': 'currentNativeCachedInstall',
+                  'actualSetupButtonPressed': False, 'freshDownloadAssessed': False,
+                  'currentFreshSetupAssessed': False, 'historicalSetupUsed': False,
+                  'actualSetupUIReady': True, 'actualModeControlsChanged': True,
+                  'initialMasterOffObserved': True, 'initialLipsOnlyOffObserved': True,
+                  'finalMasterOffObserved': True, 'finalLipsOnlyOffObserved': True}
+        model = {'status': 'verified', 'setupProfile': 'currentNativeCachedInstall', 'historicalSetupUsed': False,
+                 'nativeInstall': {'passed': True, 'nativeFullVerificationPassed': True, 'storageFileCount': 658}}
+        observed = self.run_visual_setup(result, cached_model=model, same_job=False)
+        self.assertEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
+        setup = next(command for label, command in observed['calls'] if label == 'run-setup')
+        self.assertEqual(setup[setup.index('--cached-install-profile') + 1], 'currentNativeCachedInstall')
+        self.assertNotIn('--prior-setup-run', setup)
+
+    def test_hosted_cached_install_refuses_wrong_provenance_before_network(self):
+        changes = [('status', 'blocked'), ('producerProfile', 'other'), ('producerRun', 1),
+                   ('producerTransportHead', 'b' * 40), ('appBuildHead', 'a' * 40), ('proofHead', None),
+                   ('artifactID', 1), ('artifactSHA256', 'sha256:' + '0' * 64), ('bundleItemCount', 400),
+                   ('producerProofArchivesFullyVerified', False), ('executableSHA256', '0' * 64),
+                   ('wholeBundleFingerprintSHA256', '0' * 64), ('buildOrigin', 'sameJobRelease')]
+        for key, value in changes:
+            with self.subTest(key=key), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                evidence = root / 'evidence'
+                evidence.mkdir()
+                app = self.hosted_app(root)
+                app.provenance[key] = value
+                with patch.dict(cache.os.environ, {'RUNNER_TEMP': str(root)}), \
+                        patch.object(cache, 'prior_setup') as prior, patch.object(cache, 'api') as api, \
+                        patch.object(cache, 'app_resources') as resources, patch.object(cache, 'check_sources') as sources:
+                    with self.assertRaises(ArtifactError):
+                        cache.prepare_cached_model(root, evidence, app, cache.CACHE_RUN, Mock())
+                    prior.assert_not_called(); api.assert_not_called(); resources.assert_not_called()
+                    sources.assert_not_called(); app.verify_unchanged.assert_not_called()
+                self.assertEqual(json.loads((evidence / 'model-cache.json').read_text())['status'], 'blocked')
+
+    def test_hosted_cached_install_requires_current_source_signature_and_resources(self):
+        for failure in ('source', 'signature', 'resources'):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                evidence = root / 'evidence'
+                evidence.mkdir()
+                app = self.hosted_app(root)
+                actual_resources = app.provenance['appResourceHashes']
+                if failure == 'signature':
+                    app.verify_unchanged.side_effect = ArtifactError('Signature rejected')
+                if failure == 'resources':
+                    app.provenance['appResourceHashes'] = []
+                with patch.dict(cache.os.environ, {'RUNNER_TEMP': str(root)}), \
+                        patch.object(cache, 'check_sources', side_effect=ArtifactError('Source changed')
+                                     if failure == 'source' else None, return_value=([], b'lock')), \
+                        patch.object(cache, 'app_resources', return_value=(root / 'resources', {}, actual_resources)), \
+                        patch.object(cache, 'prior_setup') as prior, patch.object(cache, 'api') as api:
+                    with self.assertRaises(ArtifactError):
+                        cache.prepare_cached_model(root, evidence, app, cache.CACHE_RUN, Mock())
+                    prior.assert_not_called(); api.assert_not_called()
+                self.assertEqual(json.loads((evidence / 'model-cache.json').read_text())['status'], 'blocked')
+
+    def test_cached_setup_refuses_unknown_or_unverified_profiles_before_ui(self):
+        for model in ({'status': 'blocked', 'setupProfile': 'currentNativeCachedInstall'},
+                      {'status': 'verified', 'setupProfile': 'unknown'},
+                      {'status': 'verified', 'priorSetup': {'run': cache.SETUP_RUN}}):
+            with self.subTest(model=model):
+                observed = self.run_visual_setup({'passed': True}, cached_model=model, same_job=False)
+                self.assertNotIn('run-setup', [label for label, _ in observed['calls']])
+                self.assertIn(observed['failure'], ('Cached Setup requires a verified installer receipt',
+                                                    'Cached Setup has no recognized explicit profile'))
+
     def test_wrong_cache_run_head_workflow_and_upload_are_refused(self):
         run = {'id': cache.CACHE_RUN, 'head_sha': cache.CACHE_HEAD, 'run_attempt': 1, 'workflow_id': 402499348,
-               'path': cache.CACHE_WORKFLOW, 'name': 'Transport verified publisher checkpoint for one CI replay',
+               'path': cache.CACHE_WORKFLOW, 'name': 'Transport verified publisher checkpoint for seven-day CI replay',
                'head_branch': cache.CACHE_BRANCH, 'event': 'push', 'status': 'completed', 'conclusion': 'success',
                'repository': {'id': REPOSITORY_ID, 'full_name': REPOSITORY},
                'head_repository': {'id': REPOSITORY_ID, 'full_name': REPOSITORY}}
-        jobs = {'total_count': 1, 'jobs': [{'id': 124454201080, 'name': 'upload', 'run_id': cache.CACHE_RUN,
+        jobs = {'total_count': 1, 'jobs': [{'id': 125456409860, 'name': 'upload', 'run_id': cache.CACHE_RUN,
                 'run_attempt': 1, 'status': 'completed', 'conclusion': 'success',
                 'labels': [cache.CACHE_BRANCH.removeprefix('ci/')], 'steps': [
                     {'name': name, 'conclusion': 'success'} for name in (
                         'Verify exact job and original publisher bytes',
-                        'Upload one-day repository-scoped checkpoint artifact', 'Record artifact receipt')]}]}
+                        'Upload seven-day repository-scoped checkpoint artifact', 'Record artifact receipt')]}]}
         cache.validate_cache_run(run, jobs, cache.CACHE_RUN)
         for field, value in [('head_sha', 'f' * 40), ('path', '.github/workflows/other.yml'),
                              ('run_attempt', 2), ('head_repository', {'id': 99, 'full_name': REPOSITORY})]:
@@ -73,12 +177,16 @@ class ModelCacheTests(unittest.TestCase):
             cache.validate_cache_run(run, changed, cache.CACHE_RUN)
 
     def test_different_archive_identity_and_digest_are_refused(self):
-        with patch.object(cache, 'CACHE_ARTIFACT_ID', 7), patch.object(cache, 'CACHE_ARTIFACT_DIGEST', 'sha256:' + 'a' * 64):
-            good = {'id': 7, 'digest': 'sha256:' + 'a' * 64}
+        with patch.object(cache, 'CACHE_ARTIFACT_ID', 7), patch.object(cache, 'CACHE_ARTIFACT_BYTES', 10), \
+                patch.object(cache, 'CACHE_ARTIFACT_DIGEST', 'sha256:' + 'a' * 64):
+            good = {'id': 7, 'size_in_bytes': 10, 'digest': 'sha256:' + 'a' * 64}
             cache.validate_cache_artifact(good)
-            for changed in [dict(good, id=8), dict(good, digest='sha256:' + 'b' * 64)]:
+            for changed in [dict(good, id=8), dict(good, size_in_bytes=11), dict(good, digest='sha256:' + 'b' * 64)]:
                 with self.assertRaises(ArtifactError):
                     cache.validate_cache_artifact(changed)
+            for name in ('CACHE_ARTIFACT_ID', 'CACHE_ARTIFACT_BYTES', 'CACHE_ARTIFACT_DIGEST'):
+                with self.subTest(pending=name), patch.object(cache, name, None), self.assertRaises(ArtifactError):
+                    cache.validate_cache_artifact(good)
 
     def test_changed_checkpoint_bytes_and_notices_are_refused(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -394,7 +502,9 @@ class ModelCacheTests(unittest.TestCase):
         self.assertEqual(setup[setup.index('--cached-install-profile') + 1], 'currentNativeCachedInstall')
         self.assertNotIn('--prior-setup-run', setup)
         prior = dict(result, setupProfile='verifiedCachedModelWithPriorSetup', priorSetupRun=cache.SETUP_RUN)
-        observed = self.run_visual_setup(prior, cached_model={'priorSetup': {'run': cache.SETUP_RUN}}, same_job=False)
+        observed = self.run_visual_setup(prior, cached_model={
+            'status': 'verified', 'setupProfile': 'verifiedCachedModelWithPriorSetup',
+            'priorSetup': {'run': cache.SETUP_RUN}}, same_job=False)
         self.assertEqual(observed['failure'], 'Unit fixture reached the accepted camera binding')
         setup = next(command for label, command in observed['calls'] if label == 'run-setup')
         self.assertEqual(setup[setup.index('--prior-setup-run') + 1], cache.SETUP_RUN)
@@ -460,7 +570,7 @@ class ModelCacheTests(unittest.TestCase):
                 prior.assert_called_once_with(root.resolve() / 'lip-model-cache-work', evidence, app.provenance)
             receipt = json.loads((evidence / 'model-cache.json').read_text())
             self.assertEqual(receipt['priorSetup'], prior_receipt)
-            self.assertNotIn('setupProfile', receipt)
+            self.assertEqual(receipt['setupProfile'], 'verifiedCachedModelWithPriorSetup')
             self.assertFalse(receipt['currentFreshSetupAssessed'])
 
     def test_wrapper_checks_macos_checkout_and_build_without_confusing_ios(self):
@@ -521,24 +631,26 @@ class ModelCacheTests(unittest.TestCase):
                   'initialLipsOnlyOffObserved': True, 'finalMasterOffObserved': True, 'finalLipsOnlyOffObserved': True}
         model = {'status': 'verified', 'setupProfile': 'currentNativeCachedInstall', 'historicalSetupUsed': False,
                  'nativeInstall': {'passed': True, 'nativeFullVerificationPassed': True, 'storageFileCount': 658}}
-        self.assertTrue(runner.cached_setup_passed(result, model, True))
+        self.assertTrue(runner.cached_setup_passed(result, model))
         for field in result:
             changed = dict(result, **{field: not result[field] if type(result[field]) is bool else 'other'})
             with self.subTest(field=field):
-                self.assertFalse(runner.cached_setup_passed(changed, model, True))
+                self.assertFalse(runner.cached_setup_passed(changed, model))
         for field in ('priorSetupRun', 'priorSetupSourceHead', 'priorSetupSameExecutable'):
             with self.subTest(prior=field):
-                self.assertFalse(runner.cached_setup_passed(dict(result, **{field: cache.SETUP_RUN}), model, True))
+                self.assertFalse(runner.cached_setup_passed(dict(result, **{field: cache.SETUP_RUN}), model))
         for changed in [dict(model, status='blocked'), dict(model, priorSetup={'run': cache.SETUP_RUN}),
                         dict(model, historicalSetupUsed=True), dict(model, nativeInstall={}),
                         dict(model, nativeInstall=dict(model['nativeInstall'], storageFileCount=657))]:
             with self.subTest(model=changed):
-                self.assertFalse(runner.cached_setup_passed(result, changed, True))
+                self.assertFalse(runner.cached_setup_passed(result, changed))
         prior = dict(result, setupProfile='verifiedCachedModelWithPriorSetup', priorSetupRun=cache.SETUP_RUN)
-        prior_model = {'priorSetup': {'run': cache.SETUP_RUN}}
-        self.assertTrue(runner.cached_setup_passed(prior, prior_model, False))
-        self.assertFalse(runner.cached_setup_passed(dict(prior, priorSetupRun=cache.SETUP_RUN + 1), prior_model, False))
-        self.assertFalse(runner.cached_setup_passed(prior, prior_model, True))
+        prior_model = {'status': 'verified', 'setupProfile': 'verifiedCachedModelWithPriorSetup',
+                       'priorSetup': {'run': cache.SETUP_RUN}}
+        self.assertTrue(runner.cached_setup_passed(prior, prior_model))
+        self.assertFalse(runner.cached_setup_passed(dict(prior, priorSetupRun=cache.SETUP_RUN + 1), prior_model))
+        self.assertFalse(runner.cached_setup_passed(result, prior_model))
+        self.assertFalse(runner.cached_setup_passed(prior, dict(prior_model, priorSetup={})))
 
     def test_actual_app_resources_cannot_be_substituted_for_the_cached_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:

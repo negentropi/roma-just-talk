@@ -14,20 +14,23 @@ import sys
 import zipfile
 
 from app_artifact import (APP_ID, APP_NAME, CHECKOUT_ACTION, CHECKPOINT_BYTES, CHECKPOINT_SHA256,
+                          HOSTED_ARTIFACTS, HOSTED_BUILD, HOSTED_BUNDLE_SHA256, HOSTED_EXECUTABLE_SHA256,
+                          HOSTED_RUN, HOSTED_TRANSPORT,
                           LOCK, REPOSITORY, REPOSITORY_ID, SAME_JOB_BRANCH, SAME_JOB_E2E,
                           SAME_JOB_STEPS, SAME_JOB_WORKFLOW, VerifiedApp, api, app_resources,
-                          bundle_fingerprint, command, download, file_sha256, members, require,
+                          bundle_fingerprint, check_sources, command, download, file_sha256, members, require,
                           select_artifact, validate_mac_project_build, validate_same_job_workflow)
 
 
-CACHE_RUN = 41172814095
-CACHE_HEAD = '515983d4a090fc038608aa00479965a739b10f14'
-CACHE_BRANCH = 'ci/lip-model-cache-ba2effb0d0394934839f605434913b50'
+CACHE_RUN = 41497571853
+CACHE_HEAD = '031fdf47ce44e99c5e79375d622c039f2bf1e6fa'
+CACHE_BRANCH = 'ci/lip-model-cache-ecb2890a42fa4a579bc716c64123134b'
 CACHE_WORKFLOW = '.github/workflows/lip-model-cache-transport.yml'
-CACHE_WORKFLOW_SHA256 = '93e773f026eba13c14ee18b74d4fbcafa412c8fdb971b5e8dcfc5abfda078f69'
+CACHE_WORKFLOW_SHA256 = 'bfded5493c38bb415866713244e652d2d263656dd7d7444f3a33cf27159a8bcd'
 CACHE_NAME = 'braven-publisher-checkpoint-8dd3bbf4e8d6287e'
-CACHE_ARTIFACT_ID = 13032296667
-CACHE_ARTIFACT_DIGEST = 'sha256:244374f617f1421d9108b7ac27059ec3821f92937d4c089dbc330b7140d6bd63'
+CACHE_ARTIFACT_ID = 13167287824
+CACHE_ARTIFACT_BYTES = 1975288942
+CACHE_ARTIFACT_DIGEST = 'sha256:81d27b7991f4d8f3348317e7b3065723aa35825b4a1d6d77dfdb81ec84b5ed7f'
 SETUP_RUN = 41165570823
 APP_HEAD = '49d045815749a043016634a2604decfbacbb9803'
 APP_EXECUTABLE = 'bc1e4646779f39c668b58f97cb8a70213549c477977d6edb1b50559482ab5d67'
@@ -157,7 +160,7 @@ def validate_cache_run(run, jobs, requested):
     require(type(requested) is int and requested == CACHE_RUN, 'Cache run is not the pinned checkpoint producer')
     require(run.get('id') == CACHE_RUN and run.get('head_sha') == CACHE_HEAD and run.get('run_attempt') == 1
             and run.get('workflow_id') == 402499348 and run.get('path') == CACHE_WORKFLOW
-            and run.get('name') == 'Transport verified publisher checkpoint for one CI replay'
+            and run.get('name') == 'Transport verified publisher checkpoint for seven-day CI replay'
             and run.get('head_branch') == CACHE_BRANCH and run.get('event') == 'push'
             and run.get('status') == 'completed' and run.get('conclusion') == 'success', 'Cache producer provenance differs')
     for key in ('repository', 'head_repository'):
@@ -165,20 +168,21 @@ def validate_cache_run(run, jobs, requested):
                 'Cache producer repository differs')
     require(jobs.get('total_count') == 1 and len(jobs.get('jobs', [])) == 1, 'Ambiguous cache producer job')
     job = jobs['jobs'][0]
-    require(job.get('id') == 124454201080 and job.get('name') == 'upload' and job.get('run_id') == CACHE_RUN
+    require(job.get('id') == 125456409860 and job.get('name') == 'upload' and job.get('run_id') == CACHE_RUN
             and job.get('run_attempt') == 1 and job.get('status') == 'completed' and job.get('conclusion') == 'success'
             and job.get('labels') == [CACHE_BRANCH.removeprefix('ci/')], 'Cache upload job identity differs')
     steps = job.get('steps', [])
-    for name in ('Verify exact job and original publisher bytes', 'Upload one-day repository-scoped checkpoint artifact', 'Record artifact receipt'):
+    for name in ('Verify exact job and original publisher bytes', 'Upload seven-day repository-scoped checkpoint artifact', 'Record artifact receipt'):
         found = [step for step in steps if step.get('name') == name]
         require(len(found) == 1 and found[0].get('conclusion') == 'success', 'Cache producer gate did not pass: ' + name)
     require(not any(step.get('conclusion') == 'failure' for step in steps), 'Cache producer has a failed step')
 
 
 def validate_cache_artifact(artifact):
-    require(CACHE_ARTIFACT_ID is not None and CACHE_ARTIFACT_DIGEST is not None, 'Cache artifact API pins are pending')
-    require(artifact['id'] == CACHE_ARTIFACT_ID and artifact['digest'] == CACHE_ARTIFACT_DIGEST,
-            'Cache artifact ID or API archive digest differs')
+    require(CACHE_ARTIFACT_ID is not None and CACHE_ARTIFACT_BYTES is not None and CACHE_ARTIFACT_DIGEST is not None,
+            'Cache artifact API pins are pending')
+    require(artifact['id'] == CACHE_ARTIFACT_ID and artifact['size_in_bytes'] == CACHE_ARTIFACT_BYTES
+            and artifact['digest'] == CACHE_ARTIFACT_DIGEST, 'Cache artifact ID, size, or API archive digest differs')
 
 
 def validate_prior_setup(setup, summary, app):
@@ -294,21 +298,43 @@ def prepare_cached_model(root, evidence, verified_app, requested, run_command):
                     'sha256': '96cf136ced6abd811c5c67bfa34a13939e1093aa170a1534472b6b08ce1e7742'}],
                'boundary': 'CI-only verified checkpoint transport through the unchanged native installer. No product URL, library, or completion receipt is patched.'}
     try:
-        receipt['appBuild'] = {key: verified_app.provenance.get(key) for key in
-                               ('buildOrigin', 'appBuildHead', 'proofHead', 'transportHead', 'executableSHA256', 'wholeBundleFingerprintSHA256')}
-        if verified_app.provenance.get('buildOrigin') == 'sameJobRelease':
-            app = verified_app.provenance
-            require(app.get('status') == 'verified' and app.get('appBuildHead') == app.get('proofHead')
-                    and all(isinstance(app.get(key), str) for key in ('appBuildHead', 'transportHead'))
-                    and re.fullmatch('[0-9a-f]{40}', app.get('appBuildHead', ''))
-                    and re.fullmatch('[0-9a-f]{40}', app.get('transportHead', '')),
-                    'Current cached installation requires verified same-job app provenance')
+        app = verified_app.provenance
+        receipt['appBuild'] = {key: app.get(key) for key in
+                               ('buildOrigin', 'producerProfile', 'producerRun', 'producerTransportHead',
+                                'artifactID', 'artifactSHA256', 'appBuildHead', 'proofHead', 'transportHead',
+                                'executableSHA256', 'wholeBundleFingerprintSHA256')}
+        if app.get('buildOrigin') == 'sameJobRelease' or app.get('producerProfile') == 'pinnedHostedWorkflow':
+            if app.get('buildOrigin') == 'sameJobRelease':
+                require(app.get('status') == 'verified' and app.get('producerProfile') is None
+                        and app.get('appBuildHead') == app.get('proofHead')
+                        and all(isinstance(app.get(key), str) for key in ('appBuildHead', 'transportHead'))
+                        and re.fullmatch('[0-9a-f]{40}', app.get('appBuildHead', ''))
+                        and re.fullmatch('[0-9a-f]{40}', app.get('transportHead', '')),
+                        'Current cached installation requires verified same-job app provenance')
+            else:
+                _, _, identifier, _, digest = next(pin for pin in HOSTED_ARTIFACTS if pin[0] == 'app')
+                require(isinstance(verified_app, VerifiedApp) and app.get('status') == 'verified'
+                        and app.get('appBuildHead') == HOSTED_BUILD and app.get('producerRun') == HOSTED_RUN
+                        and app.get('producerTransportHead') == HOSTED_TRANSPORT and app.get('artifactID') == identifier
+                        and app.get('artifactSHA256') == 'sha256:' + digest and app.get('bundleItemCount') == 401
+                        and app.get('producerProofArchivesFullyVerified') is True
+                        and app.get('executableSHA256') == HOSTED_EXECUTABLE_SHA256
+                        and app.get('wholeBundleFingerprintSHA256') == verified_app.fingerprint == HOSTED_BUNDLE_SHA256
+                        and isinstance(app.get('proofHead'), str) and re.fullmatch('[0-9a-f]{40}', app['proofHead']),
+                        'Current cached installation requires the independently verified pinned hosted app')
+                check_sources(root, HOSTED_BUILD, app['proofHead'])
+                verified_app.verify_unchanged()
             receipt.update(setupProfile='currentNativeCachedInstall', historicalSetupUsed=False,
                            actualSetupButtonPressed=False,
                            boundary='Current native LipModelStore installation of verified cached publisher bytes, followed by current app readiness, controls and real inference. No historical Setup transfer, current Set Up button, or fresh publisher download is assessed.')
         else:
-            receipt['priorSetup'] = prior_setup(work, evidence, verified_app.provenance)
+            require(app.get('status') == 'verified' and app.get('producerRun') == SETUP_RUN
+                    and app.get('appBuildHead') == APP_HEAD and app.get('executableSHA256') == APP_EXECUTABLE,
+                    'Prior Setup does not belong to this immutable app')
+            receipt.update(setupProfile='verifiedCachedModelWithPriorSetup', priorSetup=prior_setup(work, evidence, app))
         resources, manifest, receipt['appResourceHashes'] = app_resources(root, verified_app.app_path)
+        if app.get('producerProfile') == 'pinnedHostedWorkflow':
+            require(receipt['appResourceHashes'] == app.get('appResourceHashes'), 'Hosted app lip resources changed before installation')
         cache_run = api(f'repos/{REPOSITORY}/actions/runs/{requested}')
         jobs = api(f'repos/{REPOSITORY}/actions/runs/{requested}/attempts/1/jobs?per_page=100')
         validate_cache_run(cache_run, jobs, requested)

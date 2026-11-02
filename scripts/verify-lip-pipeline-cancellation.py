@@ -184,6 +184,10 @@ hardware_suite = "VoiceInkTests/RecorderMicrophonePrivacyTests"
 authorization_suite = "VoiceInkTests/CaptureAuthorizationDecisionTests"
 authorization_selection = authorization_suite + "/testCanceledPermissionDecisionDrainsBeforeSystemCallback"
 recognition_selection = "VoiceInkTests/RecordingRecognitionTests/testVoiceSuccessCancelsAndDrainsLipRecognition"
+non_speech_selection = "VoiceInkTests/RecordingRecognitionTests/testNonSpeechVoiceUsesLipResultWithoutCancelingIt"
+failure_ui_selection = "VoiceInkTests/VoiceInkTests/cameraFinalizationFailureDismissesRecorderAndAllowsNextShortcut()"
+newer_ui_selection = "VoiceInkTests/VoiceInkTests/cameraFinalizationFailurePreservesNewerRecorderSession()"
+audio_restoration_selection = "VoiceInkTests/VoiceInkTests/fastTranscriptionAndResetShareOneDelayedAudioRestoration()"
 lip_history_selection = "VoiceInkTests/VoiceInkTests/lipOnlyPipelineCancellationUsesTypedHistoryPolicy()"
 lip_empty_selection = "VoiceInkTests/VoiceInkTests/lipOnlyPipelineDiscardsOnlyEmptyCompletion()"
 lip_engine_selection = "VoiceInkTests/VoiceInkTests/lipOnlyCancellationPreservesOnlyUserRequestedHistory()"
@@ -200,12 +204,13 @@ candidate_selections = (
     lip_history_selection, lip_empty_selection, lip_engine_selection, startup_history_selection,
     lip_session_end_selection, lip_pipeline_session_end_selection,
     voice_session_end_selection, delivered_history_selection, deleted_startup_selection,
+    non_speech_selection, failure_ui_selection, newer_ui_selection, audio_restoration_selection,
 )
 receipt["candidateSelections"] = candidate_selections
-receipt["expectedCandidateFunctions"] = 25
-receipt["expectedCandidateInvocations"] = 34
+receipt["expectedCandidateFunctions"] = 29
+receipt["expectedCandidateInvocations"] = 38
 receipt["expectedCandidateParameterizedInvocations"] = 14
-receipt["expectedSemanticControls"] = 14
+receipt["expectedSemanticControls"] = 17
 
 
 def read_summary(destination):
@@ -279,11 +284,53 @@ history_assertions = {
 }
 
 
+stop_assertions = {
+    "known-bad-camera-finalization-ui": (
+        '#expect(!manager.isRecorderSessionActive, "A failed camera finalization must end its logical recorder session")',
+        '#expect(!manager.isMiniRecorderVisible)',
+        '#expect(manager.recorderSessionID == nil)',
+        '#expect(manager.begunSessionIDs.count == 2, "The next shortcut must start a new session instead of dismissing the failed one")',
+        '#expect(manager.begunSessionIDs.last != failedSessionID)',
+    ),
+    "known-bad-duplicate-audio-restoration": (
+        '#expect(restorationTasks.count == 1, "Fast transcription and drain must schedule audio restoration once")',
+        '#expect(restorationTasks.count == 1, "Reset must reuse the pending restoration instead of scheduling another media toggle")',
+        '#expect(restorationCompletions == 1)',
+        '#expect(restorationTasks.count == 1, "A completed restoration stays consumed until the next recording starts")',
+    ),
+}
+
+
+def verify_stop_assertions(label, record, selection):
+    test_source = root / "VoiceInkTests/DiscardedRecordingTests.swift"
+    lines = test_source.read_text().splitlines()
+    expected = {}
+    for assertion in stop_assertions[label]:
+        matches = [index + 1 for index, line in enumerate(lines) if line.strip() == assertion]
+        require(len(matches) == 1, f"{label} requires one exact source assertion: {assertion}")
+        expected[matches[0]] = assertion
+    test_name = selection.split("/")[-1]
+    issues = [line for line in (evidence / f"{label}.log").read_text().splitlines()
+              if f"Test {test_name} recorded an issue" in line]
+    actual = []
+    for issue in issues:
+        match = re.search(r" at DiscardedRecordingTests\.swift:(\d+)(?::\d+)?:", issue)
+        require(match is not None and "Expectation failed: " in issue,
+                f"{label} has an unrelated or non-assertion failure: {issue}")
+        actual.append(int(match.group(1)))
+    record.update({"assertionFailures": issues, "expectedAssertionSourceLines": expected})
+    save_receipt()
+    require(sorted(actual) == sorted(expected),
+            f"{label} must fail exactly its pinned source assertions, not preconditions or cleanup: {issues}")
+
+
 def red_control(path, mutant, label, selection, count, change):
     record = {
         "label": label, "selection": selection, "expectedFunctions": 1,
         "expectedInvocations": count, "knownBadChange": change,
     }
+    if label in ("known-bad-non-speech-voice", "known-bad-duplicate-audio-restoration"):
+        record["knownBadCommit"] = cb_commit
     with semantic_revert({path: mutant.encode()}, record):
         exit_code, summary = run(label, (selection,))
     record.update({"exitCode": exit_code, "summary": summary})
@@ -357,6 +404,29 @@ def red_control(path, mutant, label, selection, count, change):
             for issue in issues
         ) == 1 for action in ("masterOff", "reset", "shutdown")),
                 f"{label} requires the retained-row assertion after blocked recognition in each session-end action: {issues}")
+    if label == "known-bad-non-speech-voice":
+        test_name = selection.split("/")[-1]
+        issues = [line for line in (evidence / f"{label}.log").read_text().splitlines()
+                  if test_name in line and ": error:" in line]
+        record["assertionFailures"] = issues
+        save_receipt()
+        required = []
+        allowed = []
+        for marker in ("[BLANK_AUDIO]", "[music]", "<noise>discard</noise>"):
+            selected = [line for line in issues if "RecordingRecognitionTests.swift:" in line
+                        and "XCTAssertEqual failed:" in line and "voice(" in line and "lips(" in line
+                        and line.endswith(" - Non-speech voice output: " + marker)]
+            canceled = [line for line in issues if "RecordingRecognitionTests.swift:" in line
+                        and "XCTAssertFalse failed" in line
+                        and line.endswith(" - Non-speech voice must preserve lip inference: " + marker)]
+            require(len(selected) == 1 and len(canceled) <= 1,
+                    f"{label} requires wrong source selection for {marker}; cancellation is a permitted follow-on: {issues}")
+            required.extend(selected)
+            allowed.extend((*selected, *canceled))
+        require(len(required) == 3 and sorted(issues) == sorted(allowed),
+                f"{label} has unrelated assertions or lacks a marker selection failure: {issues}")
+    if label == "known-bad-duplicate-audio-restoration":
+        verify_stop_assertions(label, record, selection)
     record["expectedFailureConfirmed"] = True
     save_receipt()
     print(f"{label}: one function, {count}/{count} expected failed invocations; source restored", flush=True)
@@ -423,6 +493,40 @@ old_restoration = {
 require(all(data != candidates[path] for path, data in old_restoration.items()),
         "Expected the pre-fix Core policy and actual session manager to differ from the candidate")
 
+cb_commit = "cb057fc4055d4947a105f5a7f16d614278e55537"
+if subprocess.run(["git", "cat-file", "-e", cb_commit + "^{commit}"],
+                  cwd=root, stderr=subprocess.DEVNULL).returncode != 0:
+    subprocess.run(["git", "fetch", "--no-tags", "--no-write-fetch-head", "--depth=1", "origin", cb_commit],
+                   cwd=root, check=True)
+cb_sources = {
+    path: subprocess.check_output(["git", "show", f"{cb_commit}:{path.relative_to(root)}"], cwd=root)
+    for path in (recognition, engine, recorder)
+}
+receipt["cbBaselineSourceSHA256"] = {
+    str(path.relative_to(root)): hashlib.sha256(data).hexdigest() for path, data in cb_sources.items()
+}
+filtered_voice_guard = "           !VoiceInkTranscriptionOutputFilter.filter(text).isEmpty {\n"
+raw_voice_guard = "           !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {\n"
+require(recognition_text.count(filtered_voice_guard) == 1, "Expected one shared-filter voice-success guard")
+unfiltered_voice = cb_sources[recognition].decode()
+expected_cb_recognition = recognition_text.replace("import VoiceInkCore\n", "", 1).replace(
+    filtered_voice_guard, raw_voice_guard, 1,
+).replace("            // Classify after non-speech filtering; preserve raw text for the shared cleanup pipeline.\n", "", 1)
+require(expected_cb_recognition == unfiltered_voice, "CB recognition revert would change unrelated source")
+failure_ui_guard = '''        if recording.failure != nil {
+            await recorderUIManager?.dismissRecorderSession(recording.recorderUISessionID)
+        }
+'''
+require(engine_text.count(failure_ui_guard) == 1 and failure_ui_guard not in cb_sources[engine].decode(),
+        "Expected one new camera-finalization failure dismissal absent from CB")
+stale_failure_ui = engine_text.replace(failure_ui_guard, "", 1)
+restoration_guard = "        if audioRestorationTask == nil {\n"
+require(recorder_text.count(restoration_guard) == 1 and restoration_guard not in cb_sources[recorder].decode(),
+        "Expected one new audio restoration coalescing guard absent from CB")
+duplicate_restoration = recorder_text.replace(restoration_guard, "        do {\n", 1)
+require("audioRestorationTaskForTesting?() ?? restoreAudio()" in duplicate_restoration,
+        "Restoration revert must retain the current DEBUG scheduling seam")
+
 try:
     if (evidence / "full-candidate").exists():
         full = read_summary(evidence / "full-candidate")
@@ -450,6 +554,8 @@ try:
                 "Wait on the original withCheckedContinuation callback without owner-cancellation cooperation.")
     red_control(recognition, wait_for_unused_lips, "known-bad-unused-lip-wait", recognition_selection, 1,
                 "Omit cancellation of unused lip inference after voice succeeds, retaining its cleanup drain.")
+    red_control(recognition, unfiltered_voice, "known-bad-non-speech-voice", non_speech_selection, 1,
+                "Restore the exact CB recognition file: raw nonempty markers win and cancel lip fallback.")
 
     label = "known-bad-power-mode-restoration"
     restoration = {
@@ -501,9 +607,35 @@ try:
                 "Retain nil-audio History on implicit session end, including master-off, reset and shutdown.")
     red_control(source, retained_pipeline_session_end, "known-bad-pipeline-session-end-history", lip_pipeline_session_end_selection, 3,
                 "Restore the S5 accidental-only pipeline discard guard; retain shared candidate policy and engine cancellation.")
-    require(len(receipt["controls"]) == 14
+    label = "known-bad-camera-finalization-ui"
+    failed_ui = {
+        "label": label, "selection": failure_ui_selection, "positiveSelection": newer_ui_selection,
+        "knownBadCommit": cb_commit, "expectedFunctions": 2, "expectedInvocations": 2,
+        "knownBadChange": "Remove only the CB-missing failed-finalization dismissal; retain current DEBUG capture-stop seam.",
+    }
+    with semantic_revert({engine: stale_failure_ui.encode()}, failed_ui):
+        ui_exit, ui_summary = run(label, (failure_ui_selection, newer_ui_selection))
+    failed_ui.update({"exitCode": ui_exit, "summary": ui_summary, "counts": counts(ui_summary)})
+    save_receipt()
+    require(ui_exit != 0
+            and failed_ui["counts"]["functions"] == {"passed": 1, "failed": 1, "skipped": 0, "total": 2}
+            and failed_ui["counts"]["invocations"] == {"passed": 1, "failed": 1, "skipped": 0, "total": 2}
+            and failed_ui["counts"]["parameterizedInvocations"] == 0,
+            f"{label} must fail old-session dismissal and pass newer-session preservation: {failed_ui['counts']}")
+    require(ui_summary["testFailures"] and all(
+        failure_ui_selection.split("/")[-1] in failure["testIdentifierString"]
+        for failure in ui_summary["testFailures"]
+    ), f"{label} failed outside its failed-finalization regression")
+    verify_stop_assertions(label, failed_ui, failure_ui_selection)
+    require(f"Test {newer_ui_selection.split('/')[-1]} passed after " in (evidence / f"{label}.log").read_text(),
+            f"{label} did not execute the newer-session positive control")
+    failed_ui["expectedFailureConfirmed"] = True
+    save_receipt()
+    red_control(recorder, duplicate_restoration, "known-bad-duplicate-audio-restoration", audio_restoration_selection, 1,
+                "Restore unconditional CB restoration scheduling; retain DEBUG task factory and hardware cleanup.")
+    require(len(receipt["controls"]) == 17
             and all(control.get("expectedFailureConfirmed") is True for control in receipt["controls"]),
-            "All fourteen semantic controls must confirm their selected failures before the candidate gate")
+            "All seventeen semantic controls must confirm their selected failures before the candidate gate")
 
     green_exit, green = run("candidate", candidate_selections)
     receipt["candidateSummary"] = green
@@ -513,10 +645,10 @@ try:
     receipt["candidateCounts"] = actual
     save_receipt()
     require(green_exit == 0 and green["failedTests"] == 0
-            and actual["functions"] == {"passed": 25, "failed": 0, "skipped": 0, "total": 25}
-            and actual["invocations"] == {"passed": 34, "failed": 0, "skipped": 0, "total": 34}
+            and actual["functions"] == {"passed": 29, "failed": 0, "skipped": 0, "total": 29}
+            and actual["invocations"] == {"passed": 38, "failed": 0, "skipped": 0, "total": 38}
             and actual["parameterizedInvocations"] == 14,
-            f"Candidate must pass 25 functions / 34 invocations, including 14 parameterized runs: {actual}")
+            f"Candidate must pass 29 functions / 38 invocations, including 14 parameterized runs: {actual}")
     receipt["status"] = "passed"
 except BaseException as error:
     receipt.update({"status": "failed", "error": str(error)})
@@ -536,4 +668,4 @@ finally:
     require(receipt["sourcesRestored"], "Candidate sources changed after controls")
     require(receipt["testsUnchanged"], "Candidate tests changed during controls")
     if receipt["status"] == "passed":
-        print("Candidate: 25 functions / 34 invocations passed; all fourteen semantic reverts failed; sources restored", flush=True)
+        print("Candidate: 29 functions / 38 invocations passed; all seventeen semantic reverts failed; sources restored", flush=True)

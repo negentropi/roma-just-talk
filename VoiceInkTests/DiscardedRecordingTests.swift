@@ -181,6 +181,158 @@ extension VoiceInkTests {
         #expect(fixture.engine.recordingState == .idle)
     }
 
+    @Test(.timeLimit(.minutes(1)))
+    @MainActor func cameraFinalizationFailureDismissesRecorderAndAllowsNextShortcut() async throws {
+        let defaults = UserDefaults.standard
+        let keys = [VoiceInkLipDictationPreference.enabledKey, VoiceInkLipDictationPreference.lipOnlyKey, "RecorderType"]
+        let saved = keys.map { ($0, defaults.object(forKey: $0)) }
+        defer {
+            for (key, value) in saved {
+                if let value { defaults.set(value, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+        }
+        VoiceInkLipDictationPreference.saveIsEnabled(false)
+        let fixture = try RecordingFixture(mode: .lips)
+        let manager = WindowlessRecorderUIManager()
+        manager.recorderType = "mini"
+        manager.configure(engine: fixture.engine, recorder: fixture.engine.recorder)
+        fixture.engine.recorderUIManager = manager
+        manager.beginRecorderSession()
+        let failedSessionID = try #require(manager.recorderSessionID)
+        fixture.beginRecording(captureStop: Task { throw LipCaptureError.interrupted })
+
+        await fixture.engine.toggleRecord()
+
+        #expect(fixture.engine.recordingState == .idle)
+        #expect(!manager.isRecorderSessionActive, "A failed camera finalization must end its logical recorder session")
+        #expect(!manager.isMiniRecorderVisible)
+        #expect(manager.recorderSessionID == nil)
+        #expect(try fixture.transcriptionCount() == 0)
+        // No model: the next real UI toggle can exercise a fresh start without opening hardware.
+        fixture.models.currentTranscriptionModel = nil
+        await manager.toggleMiniRecorder()
+        #expect(manager.begunSessionIDs.count == 2, "The next shortcut must start a new session instead of dismissing the failed one")
+        #expect(manager.begunSessionIDs.last != failedSessionID)
+        #expect(!manager.isRecorderSessionActive)
+        await fixture.engine.shutDown()
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    @MainActor func cameraFinalizationFailurePreservesNewerRecorderSession() async throws {
+        let defaults = UserDefaults.standard
+        let keys = [VoiceInkLipDictationPreference.enabledKey, VoiceInkLipDictationPreference.lipOnlyKey, "RecorderType"]
+        let saved = keys.map { ($0, defaults.object(forKey: $0)) }
+        defer {
+            for (key, value) in saved {
+                if let value { defaults.set(value, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+        }
+        VoiceInkLipDictationPreference.saveIsEnabled(false)
+        let fixture = try RecordingFixture(mode: .lips)
+        let manager = WindowlessRecorderUIManager()
+        manager.recorderType = "mini"
+        manager.configure(engine: fixture.engine, recorder: fixture.engine.recorder)
+        fixture.engine.recorderUIManager = manager
+        manager.beginRecorderSession()
+        let gate = SelectionDrainGate()
+        fixture.beginRecording(captureStop: Task { @MainActor in
+            await gate.drain()
+            throw LipCaptureError.interrupted
+        })
+        let stop = Task { await fixture.engine.toggleRecord() }
+        @MainActor func drainOwnedTasks() async {
+            gate.release()
+            await stop.value
+            await manager.dismissMiniRecorder()
+            await fixture.engine.shutDown()
+        }
+        do {
+            await gate.waitUntilEntered()
+            manager.beginRecorderSession()
+            let replacementID = try #require(manager.recorderSessionID)
+            gate.release()
+            await stop.value
+
+            #expect(fixture.engine.recordingState == .idle)
+            #expect(manager.isRecorderSessionActive)
+            #expect(manager.isMiniRecorderVisible)
+            #expect(manager.recorderSessionID == replacementID, "Old finalization must not dismiss a newer recorder session")
+            #expect(try fixture.transcriptionCount() == 0)
+        } catch {
+            await drainOwnedTasks()
+            throw error
+        }
+        await drainOwnedTasks()
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    @MainActor func fastTranscriptionAndResetShareOneDelayedAudioRestoration() async throws {
+        let defaults = UserDefaults.standard
+        let keys = [VoiceInkLipDictationPreference.enabledKey, VoiceInkLipDictationPreference.lipOnlyKey,
+                    VoiceInkRecordingFeedbackPreference.audioResumptionDelayKey]
+        let saved = keys.map { ($0, defaults.object(forKey: $0)) }
+        let previousDelay = MediaController.shared.audioResumptionDelay
+        defer {
+            MediaController.shared.audioResumptionDelay = previousDelay
+            for (key, value) in saved {
+                if let value { defaults.set(value, forKey: key) }
+                else { defaults.removeObject(forKey: key) }
+            }
+        }
+        VoiceInkLipDictationPreference.saveIsEnabled(false)
+        MediaController.shared.audioResumptionDelay = 0.05
+        let fixture = try RecordingFixture()
+        let gate = SelectionDrainGate()
+        var restorationTasks: [Task<Void, Never>] = []
+        var restorationDelays: [Double] = []
+        var restorationCompletions = 0
+        fixture.engine.recorder.audioRestorationTaskForTesting = {
+            let delay = MediaController.shared.audioResumptionDelay
+            restorationDelays.append(delay)
+            let task = Task { @MainActor in
+                await gate.drain()
+                try? await Task.sleep(for: .seconds(delay))
+                restorationCompletions += 1
+            }
+            restorationTasks.append(task)
+            return task
+        }
+        fixture.beginRecording(session: GatedTextSession(text: "", released: true))
+        let stop = Task { await fixture.engine.toggleRecord() }
+        @MainActor func drainOwnedTasks() async {
+            gate.release()
+            await stop.value
+            for task in restorationTasks { await task.value }
+            fixture.engine.recorder.audioRestorationTaskForTesting = nil
+            await fixture.engine.shutDown()
+        }
+        do {
+            await gate.waitUntilEntered()
+            await stop.value
+            #expect(fixture.engine.recordingState == .idle)
+            #expect(try fixture.transcriptionCount() == 0)
+            #expect(restorationDelays.first == 0.05)
+            #expect(restorationTasks.count == 1, "Fast transcription and drain must schedule audio restoration once")
+            #expect(restorationCompletions == 0)
+
+            await fixture.engine.resetRecordingSession()
+            #expect(restorationTasks.count == 1, "Reset must reuse the pending restoration instead of scheduling another media toggle")
+            #expect(restorationCompletions == 0)
+            gate.release()
+            for task in restorationTasks { await task.value }
+            #expect(restorationCompletions == 1)
+
+            await fixture.engine.recorder.stopRecording()
+            #expect(restorationTasks.count == 1, "A completed restoration stays consumed until the next recording starts")
+        } catch {
+            await drainOwnedTasks()
+            throw error
+        }
+        await drainOwnedTasks()
+    }
+
     @Test @MainActor func accidentalShortcutCancelDuringTranscriptionLeavesNoHistoryRowOrAudio() async throws {
         let fixture = try RecordingFixture()
         let session = GatedTextSession(text: "hello", released: false)
@@ -386,13 +538,17 @@ extension VoiceInkTests {
         try context.fetchCount(FetchDescriptor<Transcription>())
     }
 
-    func beginRecording(session: TranscriptionSession? = nil, lipRecognition: Task<String, Error>? = nil) {
+    func beginRecording(
+        session: TranscriptionSession? = nil, lipRecognition: Task<String, Error>? = nil,
+        captureStop: Task<Void, Error>? = nil
+    ) {
         engine.installCapturedRecordingForTesting(
             audioURL: audioURL,
             model: mode.usesMicrophone ? models.currentTranscriptionModel : nil,
             session: session,
             mode: mode,
-            lipRecognition: lipRecognition
+            lipRecognition: lipRecognition,
+            captureStop: captureStop
         )
     }
 
@@ -412,6 +568,18 @@ extension VoiceInkTests {
         buffer.frameLength = 16_000
         try file.write(from: buffer)
     }
+}
+
+@MainActor private final class WindowlessRecorderUIManager: RecorderUIManager {
+    private(set) var begunSessionIDs: [UUID] = []
+
+    override func beginRecorderSession() {
+        super.beginRecorderSession()
+        if let recorderSessionID { begunSessionIDs.append(recorderSessionID) }
+    }
+
+    override func showRecorderPanel() {}
+    override func hideRecorderPanel() {}
 }
 
 private extension VoiceInkEngine {
@@ -481,14 +649,14 @@ private final class TranscriptionNotificationCounter: @unchecked Sendable { var 
 
 @MainActor private final class SelectionDrainGate {
     private var entered: CheckedContinuation<Void, Never>?
-    private var held: CheckedContinuation<Void, Never>?
+    private var held: [CheckedContinuation<Void, Never>] = []
     private var released = false
     private var calls = 0
 
     func drain() async {
         calls += 1
         entered?.resume(); entered = nil
-        if !released { await withCheckedContinuation { held = $0 } }
+        if !released { await withCheckedContinuation { held.append($0) } }
     }
 
     func waitUntilEntered() async {
@@ -496,5 +664,10 @@ private final class TranscriptionNotificationCounter: @unchecked Sendable { var 
         await withCheckedContinuation { entered = $0 }
     }
 
-    func release() { released = true; held?.resume(); held = nil }
+    func release() {
+        released = true
+        let continuations = held
+        held.removeAll()
+        for continuation in continuations { continuation.resume() }
+    }
 }

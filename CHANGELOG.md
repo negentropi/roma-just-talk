@@ -4,6 +4,9 @@
 
 - Add optional English lip dictation, off by default, with simultaneous voice and camera capture and a Lips Only setting that suspends microphone capture.
 - Stop unused lip recognition when voice text is ready.
+- Use lip recognition when voice returns only silence or noise markers.
+- Close the recorder after camera finalization fails so the next shortcut starts normally.
+- Resume paused media once when recording stop, cleanup, and reset overlap.
 - Restore the original audio-model selection when a Power Mode session continues in Lips Only, without loading audio resources.
 - Cancel pending auto-send when its dictation is canceled, disabled, or replaced.
 - Keep unfinished Lips Only dictation out of History when the feature is disabled, the session resets, or the app quits.

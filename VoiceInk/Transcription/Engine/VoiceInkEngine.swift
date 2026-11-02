@@ -140,7 +140,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     func installCapturedRecordingForTesting(
         audioURL: URL?, model: (any TranscriptionModel)?, session: TranscriptionSession?, mode: VoiceInkDictationMode,
-        lipRecognition: Task<String, Error>? = nil
+        lipRecognition: Task<String, Error>? = nil, captureStop: Task<Void, Error>? = nil
     ) {
         precondition(activeRecording == nil)
         let recording = Recording(mode: mode, traceToken: nil, recorderUISessionID: recorderUIManager?.recorderSessionID)
@@ -148,6 +148,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         recording.model = model
         recording.audioSession = session
         recording.lipRecognition = lipRecognition
+        recording.captureStop = captureStop
         recording.inputsStarted = true
         recording.captureStartedAt = Date()
         activeRecording = recording
@@ -538,6 +539,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
             recording.failure = error
         }
         await finishRecording(recording)
+        if recording.failure != nil {
+            await recorderUIManager?.dismissRecorderSession(recording.recorderUISessionID)
+        }
     }
 
     private func recognize(_ recording: Recording) async throws -> String {

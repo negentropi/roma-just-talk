@@ -1,4 +1,5 @@
 import Foundation
+import VoiceInkCore
 
 enum RecordingRecognition: Equatable, Sendable {
     case voice(String)
@@ -13,7 +14,8 @@ enum RecordingRecognition: Equatable, Sendable {
         let voiceResult = await voice?.result
         try Task.checkCancellation()
         if case .success(let text) = voiceResult,
-           !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+           !VoiceInkTranscriptionOutputFilter.filter(text).isEmpty {
+            // Classify after non-speech filtering; preserve raw text for the shared cleanup pipeline.
             // Voice wins; release the unused inference process before delivering its text.
             lips?.cancel()
             _ = await lips?.result

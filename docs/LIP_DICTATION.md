@@ -4,6 +4,8 @@ Lip dictation is off by default. In Settings, choose **Set Up** under **Lip Dict
 
 Turn on **Read Lips While Dictating** to record the camera and microphone with the usual recording shortcut. Both recognizers run for that recording. Roma uses the voice transcript when it contains speech and uses lip reading when it does not. Ready voice text cancels unused lip recognition and waits for its cleanup before insertion. Roma inserts one result through the usual dictionary, text cleanup, enhancement, history, and paste flow.
 
+Voice results containing only silence or noise markers use the lip result. If the camera cannot finish its recording, Roma closes that recorder session so the next shortcut can start again. Recording cleanup resumes paused media once, including when cleanup and reset overlap.
+
 Under that toggle, **Lips Only** uses the camera with microphone capture and microphone pre-roll suspended. It does not require an audio recognition model or microphone permission. Turning the master toggle off returns to ordinary voice dictation, including its existing microphone pre-roll behavior.
 
 ## Setup and limits

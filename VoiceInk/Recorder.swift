@@ -47,6 +47,7 @@ class Recorder: NSObject, ObservableObject {
         case preRoll, recording, deviceSwitch, suspension, status
     }
     var microphoneOperationEnqueuedForTesting: ((MicrophoneOperationForTesting) -> Void)?
+    var audioRestorationTaskForTesting: (@MainActor () -> Task<Void, Never>)?
 
     func holdAudioSetupQueueForTesting() async -> DispatchSemaphore {
         let release = DispatchSemaphore(value: 0)
@@ -453,16 +454,26 @@ class Recorder: NSObject, ObservableObject {
 
         audioMeter = AudioMeter(averagePower: 0, peakPower: 0)
 
-        let restorationCheckpoint = latencyTrace.executorEnqueued(
-            "recorder.restore_audio.task",
-            token: traceToken
-        )
-        audioRestorationTask = Task {
-            latencyTrace.executorResumed(restorationCheckpoint)
-            let span = latencyTrace.begin("recorder.restore_audio", token: traceToken)
-            await mediaController.unmuteSystemAudio()
-            await playbackController.resumeMedia()
-            latencyTrace.end(span)
+        // Stop, drain, and reset share one restoration until the next recording starts.
+        if audioRestorationTask == nil {
+            let restorationCheckpoint = latencyTrace.executorEnqueued(
+                "recorder.restore_audio.task",
+                token: traceToken
+            )
+            let restoreAudio = {
+                Task {
+                    latencyTrace.executorResumed(restorationCheckpoint)
+                    let span = latencyTrace.begin("recorder.restore_audio", token: traceToken)
+                    await self.mediaController.unmuteSystemAudio()
+                    await self.playbackController.resumeMedia()
+                    latencyTrace.end(span)
+                }
+            }
+            #if DEBUG
+            audioRestorationTask = audioRestorationTaskForTesting?() ?? restoreAudio()
+            #else
+            audioRestorationTask = restoreAudio()
+            #endif
         }
         activeLatencyTraceToken = nil
         deviceManager.isRecordingActive = false

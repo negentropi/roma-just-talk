@@ -27,7 +27,7 @@ final class RecordingRecognitionTests: XCTestCase {
         }
         let voice = Task<String, Error> { @MainActor in
             await voiceGate.wait()
-            return "  Spoken words.\n"
+            return "  [music] Spoken words.\n"
         }
         let owner = Task { @MainActor in
             let selection = try await RecordingRecognition.resolve(voice: voice, lips: lips)
@@ -52,7 +52,17 @@ final class RecordingRecognitionTests: XCTestCase {
         cleanupGate.open()
         let selection = try await owner.value
         XCTAssertTrue(cleanupFinished)
-        XCTAssertEqual(selection, .voice("  Spoken words.\n"))
+        XCTAssertEqual(selection, .voice("  [music] Spoken words.\n"))
+    }
+
+    func testNonSpeechVoiceUsesLipResultWithoutCancelingIt() async throws {
+        for marker in ["[BLANK_AUDIO]", "[music]", "<noise>discard</noise>"] {
+            let voice = task(.success(marker))
+            let lips = task(.success("  Lip words.\n"))
+            let selection = try await RecordingRecognition.resolve(voice: voice, lips: lips)
+            XCTAssertEqual(selection, .lips("  Lip words.\n"), "Non-speech voice output: \(marker)")
+            XCTAssertFalse(lips.isCancelled, "Non-speech voice must preserve lip inference: \(marker)")
+        }
     }
 
     func testEmptyVoiceWaitsForLipResultWithoutCancelingIt() async throws {

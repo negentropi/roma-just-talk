@@ -25,11 +25,29 @@ A frame spanning an AX text transition is unassociated and cannot supply a
 backdated timestamp; subsequent matching reads may establish new pixel proof.
 Unreadable AX invalidates association until a confirmed empty frame establishes
 a new baseline. Replaced text must change pixels relative to the preceding frame.
+Each bracket resolves the live process and the same unique owned AX window and
+editor. Their geometry and WindowServer window ID remain fixed from preparation.
+Hidden, minimized, moved, resized, replaced, off-screen, or covered targets
+invalidate the observation. On-screen windows are checked in front-to-back
+order before and after capture; any nonzero-alpha window overlapping the capture
+rectangle above the target rejects the sample. The helper does not raise the
+target or establish a new baseline after losing this association.
+
 Captures continue through the existing final-text stability check, without an
-extra screenshot or artificial delay per iteration; the extra AX read is timed
-separately in the report. Unassociated pixels remain
+extra screenshot or artificial delay per iteration. Reported AX-read durations
+include the target identity, geometry, and visibility checks. Unassociated pixels remain
 invalid evidence, not an AX-only latency. Paste-to-visible diagnostics retain
 signed differences rather than hiding impossible ordering behind zero.
+
+A successful result retains the actual accepted ScreenCaptureKit frame as a
+PNG. The result records its path, PNG and comparison-RGBA hashes, dimensions,
+capture-bracket timestamps, and target association. Saving evidence does not
+capture the desktop again. Each result uses a unique path and rejects an
+existing file. Normal runs and calibration save beside their JSON report.
+Calibration with JSON on stdout saves in a unique temporary directory outside
+target cleanup and returns that image path in the result. These frames prove
+the observed surface; functional after-drain checks do not establish product
+latency.
 
 While routing fixture playback through BlackHole, the helper temporarily sets
 Roma's recording mute to Off and restores the prior preference afterward,

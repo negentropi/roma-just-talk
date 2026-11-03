@@ -815,6 +815,91 @@ public enum RuntimeStatistics {
     }
 }
 
+public struct RuntimeScreenRect: Codable, Equatable, Sendable {
+    public let x: Double
+    public let y: Double
+    public let width: Double
+    public let height: Double
+
+    public init(x: Double, y: Double, width: Double, height: Double) {
+        self.x = x; self.y = y; self.width = width; self.height = height
+    }
+
+    public var isUsable: Bool {
+        [x, y, width, height, x + width, y + height].allSatisfy(\.isFinite) && width > 0 && height > 0
+    }
+
+    public func contains(_ other: Self) -> Bool {
+        isUsable && other.isUsable && other.x >= x && other.y >= y
+            && other.x + other.width <= x + width && other.y + other.height <= y + height
+    }
+
+    public func intersects(_ other: Self) -> Bool {
+        isUsable && other.isUsable && x < other.x + other.width && x + width > other.x
+            && y < other.y + other.height && y + height > other.y
+    }
+}
+
+public struct RuntimeTargetCaptureAssociation: Codable, Equatable, Sendable {
+    public let processIdentifier: Int32
+    public let windowID: UInt32
+    public let windowFrame: RuntimeScreenRect
+    public let editableFrame: RuntimeScreenRect
+    public let captureRect: RuntimeScreenRect
+
+    public init(processIdentifier: Int32, windowID: UInt32, windowFrame: RuntimeScreenRect,
+                editableFrame: RuntimeScreenRect, captureRect: RuntimeScreenRect) {
+        self.processIdentifier = processIdentifier
+        self.windowID = windowID
+        self.windowFrame = windowFrame
+        self.editableFrame = editableFrame
+        self.captureRect = captureRect
+    }
+}
+
+public struct RuntimeOnscreenWindow: Equatable, Sendable {
+    public let processIdentifier: Int32
+    public let windowID: UInt32
+    public let frame: RuntimeScreenRect
+    public let alpha: Double
+
+    public init(processIdentifier: Int32, windowID: UInt32, frame: RuntimeScreenRect, alpha: Double) {
+        self.processIdentifier = processIdentifier
+        self.windowID = windowID
+        self.frame = frame
+        self.alpha = alpha
+    }
+}
+
+public enum RuntimeCaptureAssociationPolicy {
+    public static func rejection(
+        expected: RuntimeTargetCaptureAssociation,
+        observed: RuntimeTargetCaptureAssociation,
+        frontToBackWindows: [RuntimeOnscreenWindow]
+    ) -> String? {
+        guard observed == expected else { return "Owned target identity or geometry changed" }
+        guard expected.windowFrame.contains(expected.captureRect),
+              expected.editableFrame.contains(expected.captureRect) else {
+            return "Capture rectangle extends outside the owned target"
+        }
+        let matches = frontToBackWindows.indices.filter {
+            frontToBackWindows[$0].windowID == expected.windowID
+        }
+        guard matches.count == 1, let index = matches.first else {
+            return "Owned target is not uniquely on screen"
+        }
+        let window = frontToBackWindows[index]
+        guard window.processIdentifier == expected.processIdentifier,
+              window.frame == expected.windowFrame, window.alpha == 1 else {
+            return "On-screen target identity, geometry or opacity changed"
+        }
+        guard !frontToBackWindows[..<index].contains(where: {
+            $0.alpha > 0 && $0.frame.intersects(expected.captureRect)
+        }) else { return "Another on-screen window covers the capture rectangle" }
+        return nil
+    }
+}
+
 public struct RuntimeRenderedPixelDifference: Equatable, Sendable {
     public let changedPixels: Int
     public let comparedPixels: Int

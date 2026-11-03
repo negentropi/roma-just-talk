@@ -90,7 +90,9 @@ def microphone_tcc_fixture(evidence, run, name, expected_value):
     })
 
 
-def build_visual_driver(evidence, run):
+def build_visual_driver(evidence, run, identifier='com.negentropi.LipDictationE2E'):
+    if identifier not in ['com.negentropi.LipDictationE2E', 'com.negentropi.LipDictationE2E.AssociationKnownBad']:
+        raise RuntimeError('Unexpected visual-helper identity')
     build = evidence / 'visual-build'
     build.mkdir(exist_ok=True)
     helper = build / 'LipDictationE2E.app'
@@ -103,7 +105,7 @@ def build_visual_driver(evidence, run):
     driver = ROOT / 'Tools/LipDictationE2E/VisualCases.swift'
     run('build-visual-driver', ['xcrun', 'swiftc', '-swift-version', '5', '-target', 'arm64-apple-macosx14.0', '-O', '-parse-as-library', '-module-name', 'LipDictationE2E', '-I', build, '-L', frameworks, '-lRuntimeE2ECore', '-Xlinker', '-rpath', '-Xlinker', '@executable_path/../Frameworks', *sources, driver, '-o', helper / 'Contents/MacOS/LipDictationE2E'], timeout=240)
     info = plistlib.loads((ROOT / 'Tools/RuntimeE2EHarness/Info.plist').read_bytes())
-    info.update({'CFBundleIdentifier': 'com.negentropi.LipDictationE2E', 'CFBundleExecutable': 'LipDictationE2E', 'CFBundleName': 'Lip Dictation E2E'})
+    info.update({'CFBundleIdentifier': identifier, 'CFBundleExecutable': 'LipDictationE2E', 'CFBundleName': 'Lip Dictation E2E'})
     (helper / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
     run('sign-visual-core', ['codesign', '--force', '--sign', '-', frameworks / 'libRuntimeE2ECore.dylib'])
     run('sign-visual-driver', ['codesign', '--force', '--sign', '-', helper])
@@ -172,6 +174,235 @@ def prepare_screen_capture(evidence, app, driver, name, run):
     if not passed:
         raise RuntimeError('Actual screen capture and normal OS consent preflight failed: ' + name)
     return {'passed': True, 'captureReport': capture.name, 'consentReport': consent.name, 'screenshot': screenshot.name, 'allowPressCount': approved['allowPressCount'], 'boundary': 'Real ScreenCaptureKit capture, exact owned-helper OS prompt observed, ordinary Allow exactly once, and prompt absent before dictation fixtures'}
+
+
+def accepted_frame_passed(result, evidence, expected_path=None):
+    rendered = result.get('visibleText', result.get('observation', {})).get('renderedText', {})
+    frame = rendered.get('acceptedFrame') or {}
+    target = result.get('targetPreparation') or result.get('target', {})
+    path = evidence / expected_path if expected_path is not None else Path(frame.get('pngPath', ''))
+    association = frame.get('association', {})
+    if (not path.resolve().is_relative_to(evidence.resolve())
+            or frame.get('pngPath') != str(path.resolve()) or not path.is_file()
+            or path.is_symlink() or path.stat().st_size <= 32
+            or frame.get('pngSHA256') != sha256(path)
+            or type(association.get('processIdentifier')) is not int or association['processIdentifier'] <= 1
+            or type(target.get('processIdentifier')) is not int or target['processIdentifier'] <= 1
+            or association.get('processIdentifier') != target.get('processIdentifier')
+            or type(association.get('windowID')) is not int or association['windowID'] <= 0
+            or not all(type(frame.get(key)) is int and frame[key] > 0
+                       for key in ('imageWidth', 'imageHeight', 'rgbaWidth', 'rgbaHeight'))
+            or not isinstance(frame.get('rgbaSHA256'), str)
+            or len(frame['rgbaSHA256']) != 64 or any(value not in '0123456789abcdef' for value in frame['rgbaSHA256'])):
+        return False
+    header = path.read_bytes()[:24]
+    if (header[:8] != b'\x89PNG\r\n\x1a\n' or header[12:16] != b'IHDR'
+            or int.from_bytes(header[16:20], 'big') != frame['imageWidth']
+            or int.from_bytes(header[20:24], 'big') != frame['imageHeight']):
+        return False
+    for key in ('windowFrame', 'editableFrame', 'captureRect'):
+        rectangle = association.get(key, {})
+        if not (set(rectangle) == {'x', 'y', 'width', 'height'}
+                and all(type(value) in (int, float) and float('-inf') < value < float('inf')
+                        for value in rectangle.values())
+                and rectangle['width'] > 0 and rectangle['height'] > 0):
+            return False
+    times = [frame.get(key) for key in ('captureBracketStartedAtSystemUptime',
+                                       'capturedAtSystemUptime', 'captureBracketFinishedAtSystemUptime')]
+    if not (all(type(value) in (int, float) and 0 < value < float('inf') for value in times)
+            and times == sorted(times)):
+        return False
+    return True
+
+
+def association_control_passed(report, evidence, *, known_bad):
+    cases = report.get('cases', [])
+    words = report.get('controlWords')
+    if (not isinstance(words, str) or not words.strip() or len(cases) != 3
+            or [case.get('case') for case in cases] != ['healthy', 'covered', 'moved']):
+        return False
+    if report.get('error') or report.get('failedControlCleanup') is not None:
+        return False
+    for case in cases:
+        name = case['case']
+        cleanup = case.get('cleanup', {})
+        if (case.get('fixtureValid') is not True
+                or not isinstance(case.get('readableAXBefore'), str) or not case['readableAXBefore']
+                or words not in case['readableAXBefore']
+                or case.get('readableAXAfter') != case['readableAXBefore']
+                or cleanup.get('errors') != []
+                or not all(cleanup.get(key) is True for key in ('surfaceClosed', 'temporaryResourceRemoved',
+                                                              'restoredInitiallyRunningApplication', 'restoredFrontmostApplication'))):
+            return False
+        should_accept = name == 'healthy' or known_bad
+        if case.get('visibleAcceptance') is not should_accept:
+            return False
+        if should_accept:
+            if (case.get('observation', {}).get('text') != words
+                    or not accepted_frame_passed(case, evidence, 'association-' + name + '-accepted.png')):
+                return False
+        elif (case.get('acceptedArtifactExists') is not False
+              or case.get('observation', {}).get('renderedText', {}).get('acceptedFrame') is not None
+              or case.get('expectedRejection') != ('Another on-screen window covers the capture rectangle'
+                  if name == 'covered' else 'Editable target geometry changed')
+              or case.get('observation', {}).get('renderedText', {}).get('error') != case['expectedRejection']):
+            return False
+        if name == 'moved' and case.get('movedWindowRestored') is not True:
+            return False
+        if name == 'healthy':
+            if case.get('passed') is not True:
+                return False
+        elif (case.get('mutationObserved') is not True
+              or (known_bad and (case.get('failure') != 'unexpectedVisibleAcceptance' or case.get('passed') is not False))
+              or (not known_bad and case.get('passed') is not True)):
+            return False
+    return (report.get('passed') is (not known_bad) and type(report.get('controlExitCode')) is int
+            and report['controlExitCode'] == (1 if known_bad else 0))
+
+
+def drain_association_helper(identity_path, helper, expected_scenario):
+    if not identity_path.is_file():
+        raise RuntimeError('Owned association helper wrote no identity; exit cannot be verified')
+    identity = json.loads(identity_path.read_text())
+    bundle = plistlib.loads((helper / 'Contents/Info.plist').read_bytes())
+    executable = (helper / 'Contents/MacOS' / bundle['CFBundleExecutable']).resolve()
+    pid = identity.get('pid')
+    if (type(pid) is not int or pid <= 1 or identity.get('bundlePath') != str(helper.resolve())
+            or identity.get('bundleID') != bundle['CFBundleIdentifier']
+            or identity.get('executablePath') != str(executable)
+            or identity.get('executableSHA256') != sha256(executable)
+            or identity.get('scenario') != expected_scenario):
+        raise RuntimeError('Association helper identity differs; no process was signaled')
+    receipt = {'pid': pid, 'bundleID': bundle['CFBundleIdentifier'], 'executableSHA256': sha256(executable),
+               'exitObserved': False, 'signals': []}
+    for stop_signal in [None, signal.SIGTERM, signal.SIGKILL]:
+        observed = subprocess.run(['/bin/ps', '-p', str(pid), '-ww', '-o', 'comm='],
+                                  capture_output=True, text=True, timeout=3)
+        if observed.returncode == 1 and not observed.stdout.strip():
+            receipt['exitObserved'] = True
+            return receipt
+        if observed.returncode != 0 or observed.stdout.strip() != str(executable):
+            raise RuntimeError('Association helper PID no longer has the exact owned executable; not signaled')
+        if stop_signal is not None:
+            try:
+                os.kill(pid, stop_signal)
+                receipt['signals'].append(stop_signal.name)
+            except ProcessLookupError:
+                pass
+        deadline = time.monotonic() + 1
+        while time.monotonic() < deadline:
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                receipt['exitObserved'] = True
+                return receipt
+            time.sleep(0.05)
+    raise RuntimeError('Owned association helper did not exit')
+
+
+def run_association_controls(evidence, configuration, helper, run, grant):
+    source = ROOT / 'Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimeTargetController.swift'
+    candidate = source.read_bytes()
+    text = candidate.decode()
+    start = text.index('    func waitForVisibleText(')
+    end = text.index('\n    func cleanup()', start)
+    body = text[start:end]
+    for variable in ('precedingText', 'currentText'):
+        checked = '                ' + variable + ' = try validateCaptureAssociation()\n'
+        legacy = ('                ' + variable + ' = try { guard let text = readFullText() else { '
+                  'throw NSError(domain: "AssociationKnownBad", code: 1) }; return text }()\n')
+        if body.count(checked) != 1:
+            raise RuntimeError('Expected one fresh ' + variable + ' association check in the actual positive observation loop')
+        body = body.replace(checked, legacy, 1)
+    mutant = (text[:start] + body + text[end:]).encode()
+    receipt = {'status': 'running', 'candidateSourceSHA256': hashlib.sha256(candidate).hexdigest(),
+               'mutantSourceSHA256': hashlib.sha256(mutant).hexdigest(),
+               'knownBadChange': 'Replace only the two per-sample live association checks with plain readable AX lookups; retain baseline ownership and accepted-frame storage. A nil AX lookup throws and cannot qualify the intended false-acceptance control.'}
+    write(evidence / 'association-regression.json', receipt)
+    bad_evidence = evidence / 'association-known-bad'
+    bad_evidence.mkdir()
+
+    def bad_run(label, command, **kwargs):
+        code = run('association-known-bad-' + label, command, **kwargs)
+        (bad_evidence / (label + '.log')).write_bytes((evidence / ('association-known-bad-' + label + '.log')).read_bytes())
+        return code
+
+    def execute(directory, executable, callback):
+        config = directory / 'association-config.json'
+        write(config, configuration)
+        report_path = directory / 'positive-association-controls.json'
+        def command(output, scenario):
+            return ['/usr/bin/open', '-W', '-n', '--env', 'GITHUB_ACTIONS=true',
+                '--env', 'RUNNER_ENVIRONMENT=github-hosted', '-o', str(directory / (scenario + '.stdout.log')),
+                '--stderr', str(directory / (scenario + '.stderr.log')), executable, '--args', '--config', config,
+                '--output', output, '--scenario', scenario, '--app-log', directory / 'unused-app.log']
+        process_cleanup = {}
+        try:
+            code = callback('controls', command(report_path, 'positive-association-controls'), timeout=90, required=False)
+        finally:
+            process_cleanup['controlsHelper'] = drain_association_helper(
+                report_path.with_suffix('.identity.json'), executable, 'positive-association-controls')
+            cleanup_path = directory / 'association-cleanup.json'
+            try:
+                cleanup_code = callback('cleanup', command(cleanup_path, 'association-cleanup'), timeout=45, required=False)
+            finally:
+                process_cleanup['cleanupHelper'] = drain_association_helper(
+                    cleanup_path.with_suffix('.identity.json'), executable, 'association-cleanup')
+            cleanup = json.loads(cleanup_path.read_text()) if cleanup_path.is_file() else {}
+            process_cleanup['targets'] = cleanup
+            write(directory / 'process-cleanup.json', process_cleanup)
+            if cleanup_code != 0 or cleanup.get('passed') is not True:
+                raise RuntimeError('Owned association target recovery did not complete')
+        report = json.loads(report_path.read_text()) if report_path.is_file() else {}
+        report['processCleanup'] = process_cleanup
+        return code, report
+
+    try:
+        source.write_bytes(mutant)
+        bad = build_visual_driver(bad_evidence, bad_run, 'com.negentropi.LipDictationE2E.AssociationKnownBad')
+        receipt['knownBadHelper'] = {'bundleID': 'com.negentropi.LipDictationE2E.AssociationKnownBad',
+                                     'path': str(bad.resolve()), 'executableSHA256': sha256(bad / 'Contents/MacOS/LipDictationE2E')}
+        grant(bad, 'com.negentropi.LipDictationE2E.AssociationKnownBad',
+              ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
+        bad_run('refresh-tcc-user', ['killall', 'tccd'], required=False)
+        bad_run('refresh-tcc-system', ['sudo', '-n', 'killall', 'tccd'], required=False)
+        time.sleep(2)
+        receipt['knownBadScreenCapture'] = prepare_screen_capture(bad_evidence, bad, bad, 'screen', bad_run)
+        bad_code, bad_report = execute(bad_evidence, bad, bad_run)
+        receipt['knownBad'] = {'exitCode': bad_code, 'report': str(bad_evidence / 'positive-association-controls.json'),
+                               'processCleanup': bad_report.get('processCleanup'),
+                               'intendedFailureConfirmed': bad_code in (0, 1) and association_control_passed(bad_report, bad_evidence, known_bad=True)
+                                  and all(not bad_report['processCleanup'][key]['signals'] for key in ('controlsHelper', 'cleanupHelper'))}
+        if not receipt['knownBad']['intendedFailureConfirmed']:
+            raise RuntimeError('Known-bad positive association control did not reproduce false acceptance with healthy capture and readable AX')
+    except BaseException as error:
+        receipt.update(status='failed', error=str(error))
+        raise
+    finally:
+        source.write_bytes(candidate)
+        receipt['restoredSourceSHA256'] = sha256(source)
+        receipt['sourceRestored'] = source.read_bytes() == candidate
+        write(evidence / 'association-regression.json', receipt)
+        if not receipt['sourceRestored']:
+            raise RuntimeError('Positive observation source was not restored')
+    grant(helper, 'com.negentropi.LipDictationE2E',
+          ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
+    run('association-candidate-refresh-tcc-user', ['killall', 'tccd'], required=False)
+    run('association-candidate-refresh-tcc-system', ['sudo', '-n', 'killall', 'tccd'], required=False)
+    time.sleep(2)
+    receipt['candidateScreenCapture'] = prepare_screen_capture(evidence, helper, helper, 'visual-screen', run)
+    receipt['candidateHelper'] = {'bundleID': 'com.negentropi.LipDictationE2E', 'path': str(helper.resolve()),
+                                  'executableSHA256': sha256(helper / 'Contents/MacOS/LipDictationE2E')}
+    code, report = execute(evidence, helper, run)
+    receipt['candidate'] = {'exitCode': code, 'report': 'positive-association-controls.json',
+                            'processCleanup': report.get('processCleanup'),
+                            'passed': code == 0 and association_control_passed(report, evidence, known_bad=False)
+                                and all(not report['processCleanup'][key]['signals'] for key in ('controlsHelper', 'cleanupHelper'))}
+    receipt['status'] = 'passed' if receipt['candidate']['passed'] else 'failed'
+    write(evidence / 'association-regression.json', receipt)
+    if receipt['status'] != 'passed':
+        raise RuntimeError('Candidate positive association controls failed')
+    return receipt
 
 
 def camera_source_binding(camera, proof_head, same_job_app=None):
@@ -403,7 +634,8 @@ def run_visual_cases(args, evidence, configuration, original, audio_fixture, app
         else:
             passed = passed and camera_source_passed(result, camera_source, scenario in ['disable', 'quit'])
         if positive:
-            passed = passed and len(created) == 1 and completed[0]['ZTEXT'].strip() != ''
+            passed = passed and len(created) == 1 and completed[0]['ZTEXT'].strip() != '' and accepted_frame_passed(
+                result, evidence, scenario + '-accepted.png')
             if scenario == 'lips':
                 passed = passed and completed[0]['ZAUDIOFILEURL'] is None
             else:
@@ -432,13 +664,14 @@ def parse_arguments(arguments=None):
     parser.add_argument('--same-job-build', action='store_true', help='Verify the current hosted Release and visual scenarios; Set Up downloads from the publisher unless --model-cache-run is supplied')
     parser.add_argument('--model-cache-run', type=int, help='Install the pinned CI checkpoint through the current native installer; immutable replay also requires prior same-executable Setup evidence')
     parser.add_argument('--build-helper-only', action='store_true', help='Compile, link, sign, and load the native helper without app, models, OBS, or TCC changes')
+    parser.add_argument('--association-controls-only', action='store_true', help='Run actual moved/covered-target red and green controls without the app, audio, models, or OBS')
     parser.add_argument('--visual', action='store_true', help='After voice passes, provision OBS and run real visual app scenarios')
     parser.add_argument('--obs-summary', type=Path, help='Reuse a successful same-host OBS probe receipt that retained OBS')
     parser.add_argument('--out', type=Path, default=Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'lip-dictation-e2e')
     args = parser.parse_args(arguments)
-    if args.build_helper_only:
-        if args.app or args.app_source_head or args.producer_run is not None or args.same_job_build or args.model_cache_run is not None or args.visual or args.obs_summary:
-            parser.error('--build-helper-only accepts only --out')
+    if args.build_helper_only or args.association_controls_only:
+        if (args.build_helper_only and args.association_controls_only) or args.app or args.app_source_head or args.producer_run is not None or args.same_job_build or args.model_cache_run is not None or args.visual or args.obs_summary:
+            parser.error('--build-helper-only and --association-controls-only each accept only --out')
     elif args.app is None or args.app_source_head is None:
         parser.error('--app and --app-source-head are required for runtime proof')
     if args.producer_run is not None and args.producer_run <= 0:
@@ -459,7 +692,7 @@ def main():
     if platform.machine() != 'arm64':
         raise RuntimeError('This proof requires the hosted Apple-silicon Mac')
     head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    if not args.build_helper_only and head != args.app_source_head and args.producer_run is None:
+    if not (args.build_helper_only or args.association_controls_only) and head != args.app_source_head and args.producer_run is None:
         raise RuntimeError('The supplied app build head must match the checked-out proof source')
     args.out.mkdir(parents=True, exist_ok=True)
     evidence = args.out
@@ -511,6 +744,19 @@ def main():
             summary['boundary'] = 'Native compile, link, signature, and load check only. No app, model, OBS, TCC, capture, or dictation execution.'
             summary['helperExecutableSHA256'] = sha256(visual_helper / 'Contents/MacOS/LipDictationE2E')
             return 0
+        if args.visual or args.association_controls_only:
+            control_configuration = json.loads((ROOT / 'Tools/RuntimeE2EHarness/runtime-e2e.example.json').read_text())
+            control_configuration.update({'targetSettleSeconds': 1, 'minimumTargetCount': 1,
+                'targetAvailabilityPolicy': 'launchIfNeeded', 'targets': [
+                    {'id': 'textedit', 'displayName': 'TextEdit', 'bundleIdentifier': 'com.apple.TextEdit', 'kind': 'document'}]})
+            if args.association_controls_only:
+                summary['positiveAssociationRegression'] = run_association_controls(
+                    evidence, control_configuration, visual_helper, run, grant)
+                summary.pop('declaredAppSourceHead')
+                summary.pop('appSourceBoundary')
+                summary['status'] = 'positiveAssociationVerified'
+                summary['boundary'] = 'Live TextEdit association controls only. No app, audio, model, OBS, camera, or dictation execution.'
+                return 0
         summary['appBuildHead'] = args.app_source_head
         if args.producer_run is not None:
             from app_artifact import prepare_verified_app
@@ -542,6 +788,9 @@ def main():
         summary['appExecutableSHA256'] = sha256(executable)
         run('verify-app-signature', ['codesign', '--verify', '--deep', '--strict', app])
         run('host', ['sw_vers'])
+        if args.visual:
+            summary['positiveAssociationRegression'] = run_association_controls(
+                evidence, control_configuration, visual_helper, run, grant)
         run('audio-devices', ['system_profiler', 'SPAudioDataType'])
         if 'BlackHole 2ch' not in (evidence / 'audio-devices.log').read_text():
             run('install-blackhole', ['brew', 'install', '--cask', 'blackhole-2ch'], timeout=420)
@@ -554,13 +803,15 @@ def main():
         run('verify-helper-signature', ['codesign', '--verify', '--deep', '--strict', helper])
         grant(app, APP_ID, ['kTCCServiceAccessibility', 'kTCCServiceListenEvent', 'kTCCServicePostEvent'], ['kTCCServiceMicrophone'] + (['kTCCServiceCamera'] if args.visual else []))
         grant(helper, HELPER_ID, ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
-        grant(visual_helper, 'com.negentropi.LipDictationE2E', ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
+        if not args.visual:
+            grant(visual_helper, 'com.negentropi.LipDictationE2E', ['kTCCServiceAccessibility', 'kTCCServicePostEvent', 'kTCCServiceScreenCapture'], ['kTCCServiceScreenCapture'])
         run('refresh-tcc-user', ['killall', 'tccd'], required=False)
         run('refresh-tcc-system', ['sudo', '-n', 'killall', 'tccd'], required=False)
         time.sleep(2)
         summary['screenCapturePreflight'] = [
             prepare_screen_capture(evidence, helper, visual_helper, 'runtime-screen', run),
-            prepare_screen_capture(evidence, visual_helper, visual_helper, 'visual-screen', run),
+            summary['positiveAssociationRegression']['candidateScreenCapture'] if args.visual else
+                prepare_screen_capture(evidence, visual_helper, visual_helper, 'visual-screen', run),
         ]
 
         model = Path.home() / 'Library/Application Support/FluidAudio/Models/parakeet-tdt-0.6b-v2'
@@ -616,7 +867,7 @@ def main():
         created = [row for row in after if row['Z_PK'] not in before_ids]
         cases = report.get('cases', [])
         log_text = (evidence / 'app.log').read_text(errors='replace')
-        passed = code == 0 and report.get('summary', {}).get('passed') is True and len(cases) == 2 and len(created) == 2 and all(row['ZTRANSCRIPTIONSTATUS'] == 'completed' and row['ZAUDIOFILEURL'] and row['ZTEXT'].strip() for row in created) and 'capture.start id=' not in log_text and 'LipRuntime' not in log_text
+        passed = code == 0 and report.get('summary', {}).get('passed') is True and len(cases) == 2 and len(created) == 2 and all(row['ZTRANSCRIPTIONSTATUS'] == 'completed' and row['ZAUDIOFILEURL'] and row['ZTEXT'].strip() for row in created) and 'capture.start id=' not in log_text and 'LipRuntime' not in log_text and all(accepted_frame_passed(case, evidence) for case in cases)
         summary['voiceDefaultOff'] = {'passed': passed, 'caseCount': len(cases), 'createdHistoryCount': len(created), 'history': created, 'cameraStartObserved': 'capture.start id=' in log_text, 'lipInferenceObserved': 'LipRuntime' in log_text, 'functionalDeadlineSeconds': 90, 'latencyClaim': 'No product latency claim. The generous limit only bounds this functional proof.'}
         if not passed:
             raise RuntimeError('Default-off real dictation gate failed; inspect actual AX, rendered text, history and app logs')
@@ -668,6 +919,8 @@ def main():
                 summary['status'] = 'blocked'
         write(evidence / 'summary.json', summary)
         print(json.dumps(summary, indent=2, sort_keys=True))
+    if args.association_controls_only:
+        return 0 if summary['status'] == 'positiveAssociationVerified' else 1
     if args.visual:
         return 0 if summary['status'] == 'lipDictationVerified' else 1
     return 0 if summary['status'] == 'voiceDefaultOffVerified' else 1

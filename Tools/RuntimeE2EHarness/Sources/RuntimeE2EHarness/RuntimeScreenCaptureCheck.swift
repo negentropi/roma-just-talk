@@ -10,7 +10,8 @@ enum RuntimeScreenCaptureCheck {
     private static let notificationPath = "/System/Library/CoreServices/UserNotificationCenter.app"
     private static let ownedHelpers: [String: Set<String>] = [
         "com.happyf.roma-just-talk.RuntimeE2EHarness": ["RuntimeE2EHarness"],
-        "com.negentropi.LipDictationE2E": ["LipDictationE2E", "Lip Dictation E2E"]
+        "com.negentropi.LipDictationE2E": ["LipDictationE2E", "Lip Dictation E2E"],
+        "com.negentropi.LipDictationE2E.AssociationKnownBad": ["LipDictationE2E", "Lip Dictation E2E"]
     ]
 
     static func capture(reportURL: URL, consentResultURL: URL) -> Bool {
@@ -94,7 +95,8 @@ enum RuntimeScreenCaptureCheck {
         }
         do {
             try requireDisposableHost()
-            guard AXIsProcessTrusted(), Bundle.main.bundleIdentifier == "com.negentropi.LipDictationE2E" else {
+            guard AXIsProcessTrusted(), ["com.negentropi.LipDictationE2E", "com.negentropi.LipDictationE2E.AssociationKnownBad"]
+                .contains(Bundle.main.bundleIdentifier ?? "") else {
                 throw CheckError.driverPermission
             }
             let configuration = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: configurationURL))

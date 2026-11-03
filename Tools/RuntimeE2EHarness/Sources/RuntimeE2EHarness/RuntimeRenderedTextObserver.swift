@@ -1,7 +1,10 @@
 import CoreGraphics
+import CryptoKit
 import Foundation
+import ImageIO
 import RuntimeE2ECore
 import ScreenCaptureKit
+import UniformTypeIdentifiers
 
 struct RuntimeRenderedTextChangeResult: Codable {
     let keyUpToRenderedTextMilliseconds: Double?
@@ -9,7 +12,22 @@ struct RuntimeRenderedTextChangeResult: Codable {
     let comparedPixels: Int?
     let requiredChangedPixels: Int?
     let interFrameChangedPixels: Int?
+    let acceptedFrame: RuntimeAcceptedTextFrame?
     let error: String?
+}
+
+struct RuntimeAcceptedTextFrame: Codable {
+    let pngPath: String
+    let pngSHA256: String
+    let rgbaSHA256: String
+    let imageWidth: Int
+    let imageHeight: Int
+    let rgbaWidth: Int
+    let rgbaHeight: Int
+    let capturedAtSystemUptime: TimeInterval
+    let captureBracketStartedAtSystemUptime: TimeInterval
+    let captureBracketFinishedAtSystemUptime: TimeInterval
+    let association: RuntimeTargetCaptureAssociation
 }
 
 final class RuntimeRenderedTextObserver {
@@ -18,10 +36,16 @@ final class RuntimeRenderedTextObserver {
     }
 
     private let captureSession: RuntimeScreenshotCaptureSession
+    let editableFrame: CGRect
+    let captureRect: CGRect
     private var baseline: RuntimeRGBAFrame?
     private var baselineError: String?
     private var latencyTracker: RuntimeRenderedTextAssociationTracker?
     private var lastSample: RuntimeRenderedTextStabilitySample?
+    private var acceptedCapture: (frame: RuntimeCapturedTextFrame,
+                                  association: RuntimeTargetCaptureAssociation,
+                                  before: TimeInterval, after: TimeInterval)?
+    private var acceptedChangeAtSystemUptime: TimeInterval?
 
     init(editableFrame: CGRect) throws {
         let horizontalInset = min(12, editableFrame.width / 4)
@@ -34,6 +58,8 @@ final class RuntimeRenderedTextObserver {
         }
         let captureSession = try RuntimeScreenshotCaptureSession(captureRect: captureRect)
         self.captureSession = captureSession
+        self.editableFrame = editableFrame
+        self.captureRect = captureRect
     }
 
     func refreshBaseline(accessibilityText: () -> String?) -> String? {
@@ -54,10 +80,14 @@ final class RuntimeRenderedTextObserver {
                                 accessibilityText: followingText, precedingAccessibilityText: precedingText)
             latencyTracker = tracker
             lastSample = nil
+            acceptedCapture = nil
+            acceptedChangeAtSystemUptime = nil
         } catch {
             baseline = nil
             latencyTracker = nil
             lastSample = nil
+            acceptedCapture = nil
+            acceptedChangeAtSystemUptime = nil
             baselineError = String(describing: error)
         }
         return baselineError
@@ -73,16 +103,30 @@ final class RuntimeRenderedTextObserver {
 
     var associationError: String? { latencyTracker?.associationError }
 
+    func invalidateAssociation(_ error: String) {
+        baseline = nil
+        latencyTracker = nil
+        lastSample = nil
+        acceptedCapture = nil
+        acceptedChangeAtSystemUptime = nil
+        baselineError = error
+    }
+
     func captureFrame() throws -> RuntimeCapturedTextFrame {
         let frame = try captureSession.captureRGBA()
-        return RuntimeCapturedTextFrame(bytes: frame.bytes, atSystemUptime: ProcessInfo.processInfo.systemUptime)
+        return RuntimeCapturedTextFrame(bytes: frame.bytes, image: frame.image,
+                                        rgbaWidth: frame.width, rgbaHeight: frame.height,
+                                        atSystemUptime: ProcessInfo.processInfo.systemUptime)
     }
 
     func observeCapturedFrame(
         _ current: RuntimeCapturedTextFrame,
         accessibilityText: String?,
         precedingAccessibilityText: String?,
-        keyUpAtSystemUptime: TimeInterval
+        keyUpAtSystemUptime: TimeInterval,
+        association: RuntimeTargetCaptureAssociation,
+        captureBracketStartedAtSystemUptime: TimeInterval,
+        captureBracketFinishedAtSystemUptime: TimeInterval
     ) throws -> RuntimeRenderedTextChangeResult? {
         guard var latencyTracker else {
             throw RuntimeRenderedTextObserverError.baselineUnavailable(
@@ -98,6 +142,8 @@ final class RuntimeRenderedTextObserver {
         self.latencyTracker = latencyTracker
         guard let latencySample else {
             lastSample = nil
+            acceptedCapture = nil
+            acceptedChangeAtSystemUptime = nil
             return nil
         }
         let sample = latencySample.stabilitySample
@@ -105,7 +151,15 @@ final class RuntimeRenderedTextObserver {
         guard sample.stable,
               let firstPersistentChangeAtSystemUptime =
                 latencySample.firstPersistentChangeAtSystemUptime else {
+            acceptedCapture = nil
+            acceptedChangeAtSystemUptime = nil
             return nil
+        }
+
+        if acceptedChangeAtSystemUptime != firstPersistentChangeAtSystemUptime {
+            acceptedCapture = (current, association, captureBracketStartedAtSystemUptime,
+                               captureBracketFinishedAtSystemUptime)
+            acceptedChangeAtSystemUptime = firstPersistentChangeAtSystemUptime
         }
 
         return RuntimeRenderedTextChangeResult(
@@ -117,7 +171,35 @@ final class RuntimeRenderedTextObserver {
             comparedPixels: sample.baselineDifference.comparedPixels,
             requiredChangedPixels: sample.baselineDifference.requiredChangedPixels,
             interFrameChangedPixels: sample.interFrameChangedPixels,
+            acceptedFrame: nil,
             error: nil
+        )
+    }
+
+    func retainAcceptedFrame(at url: URL) throws -> RuntimeAcceptedTextFrame {
+        guard let acceptedCapture else { throw RuntimeRenderedTextObserverError.acceptedFrameUnavailable }
+        guard !FileManager.default.fileExists(atPath: url.path) else {
+            throw RuntimeRenderedTextObserverError.acceptedFrameAlreadyExists
+        }
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) else {
+            throw RuntimeRenderedTextObserverError.acceptedFrameWriteFailed
+        }
+        CGImageDestinationAddImage(destination, acceptedCapture.frame.image, nil)
+        guard CGImageDestinationFinalize(destination) else {
+            throw RuntimeRenderedTextObserverError.acceptedFrameWriteFailed
+        }
+        let png = try Data(contentsOf: url)
+        return RuntimeAcceptedTextFrame(
+            pngPath: url.path,
+            pngSHA256: SHA256.hash(data: png).map { String(format: "%02x", $0) }.joined(),
+            rgbaSHA256: SHA256.hash(data: Data(acceptedCapture.frame.bytes)).map { String(format: "%02x", $0) }.joined(),
+            imageWidth: acceptedCapture.frame.image.width, imageHeight: acceptedCapture.frame.image.height,
+            rgbaWidth: acceptedCapture.frame.rgbaWidth, rgbaHeight: acceptedCapture.frame.rgbaHeight,
+            capturedAtSystemUptime: acceptedCapture.frame.atSystemUptime,
+            captureBracketStartedAtSystemUptime: acceptedCapture.before,
+            captureBracketFinishedAtSystemUptime: acceptedCapture.after,
+            association: acceptedCapture.association
         )
     }
 
@@ -128,6 +210,7 @@ final class RuntimeRenderedTextObserver {
             comparedPixels: lastSample?.baselineDifference.comparedPixels,
             requiredChangedPixels: lastSample?.baselineDifference.requiredChangedPixels,
             interFrameChangedPixels: lastSample?.interFrameChangedPixels,
+            acceptedFrame: nil,
             error: error
         )
     }
@@ -136,6 +219,9 @@ final class RuntimeRenderedTextObserver {
 
 struct RuntimeCapturedTextFrame {
     let bytes: [UInt8]
+    let image: CGImage
+    let rgbaWidth: Int
+    let rgbaHeight: Int
     let atSystemUptime: TimeInterval
 }
 
@@ -160,7 +246,7 @@ private final class RuntimeScreenshotCaptureSession {
         guard let display = content.displays.max(by: {
             Self.intersectionArea($0.frame, captureRect)
                 < Self.intersectionArea($1.frame, captureRect)
-        }), Self.intersectionArea(display.frame, captureRect) > 0 else {
+        }), display.frame.contains(captureRect) else {
             throw RuntimeRenderedTextObserverError.captureDisplayNotFound
         }
 
@@ -202,7 +288,7 @@ private final class RuntimeScreenshotCaptureSession {
         guard rendered else {
             throw RuntimeRenderedTextObserverError.pixelConversionFailed
         }
-        return RuntimeRGBAFrame(bytes: bytes)
+        return RuntimeRGBAFrame(bytes: bytes, image: image, width: width, height: height)
     }
 
     fileprivate func captureImage() throws -> CGImage {
@@ -238,6 +324,9 @@ private final class RuntimeScreenshotCaptureSession {
 
 private struct RuntimeRGBAFrame {
     let bytes: [UInt8]
+    let image: CGImage
+    let width: Int
+    let height: Int
 }
 
 private final class RuntimeScreenshotCaptureState: @unchecked Sendable {
@@ -301,6 +390,7 @@ private enum RuntimeRenderedTextObserverError: Error, CustomStringConvertible {
     case missingImage
     case pixelConversionFailed
     case incompatibleFrames
+    case acceptedFrameUnavailable, acceptedFrameAlreadyExists, acceptedFrameWriteFailed
 
     var description: String {
         switch self {
@@ -324,6 +414,12 @@ private enum RuntimeRenderedTextObserverError: Error, CustomStringConvertible {
             return "Could not normalize screenshot pixels"
         case .incompatibleFrames:
             return "Rendered-text baseline and current screenshot dimensions differ"
+        case .acceptedFrameUnavailable:
+            return "No accepted target frame is available"
+        case .acceptedFrameAlreadyExists:
+            return "Accepted-frame evidence path already exists"
+        case .acceptedFrameWriteFailed:
+            return "Could not retain the accepted target frame"
         }
     }
 }

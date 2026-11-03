@@ -127,7 +127,10 @@ do {
         exit(report.passed ? 0 : 2)
     case "visibility-calibration":
         let report = RuntimeVisibilityCalibration.run(
-            configuration: try loadConfiguration(path: arguments.configurationPath)
+            configuration: try loadConfiguration(path: arguments.configurationPath),
+            evidenceDirectoryURL: arguments.jsonOutputPath.map {
+                URL(fileURLWithPath: NSString(string: $0).expandingTildeInPath).deletingLastPathComponent()
+            } ?? FileManager.default.temporaryDirectory.appendingPathComponent("roma-visibility-\(UUID().uuidString)")
         )
         try writeJSON(report, path: arguments.jsonOutputPath)
         exit(!report.isEmpty && report.allSatisfy { $0.error == nil && $0.cleanup?.passed == true } ? 0 : 2)

@@ -784,6 +784,72 @@ do {
     )
     print("PASS latency trace exposes the transcription character count")
 
+    let ownedWindowFrame = RuntimeScreenRect(x: 100, y: 100, width: 600, height: 400)
+    let ownedEditorFrame = RuntimeScreenRect(x: 110, y: 140, width: 580, height: 350)
+    let ownedCaptureRect = RuntimeScreenRect(x: 122, y: 144, width: 556, height: 342)
+    let ownedAssociation = RuntimeTargetCaptureAssociation(
+        processIdentifier: 37, windowID: 9, windowFrame: ownedWindowFrame,
+        editableFrame: ownedEditorFrame, captureRect: ownedCaptureRect
+    )
+    let ownedDisplayWindow = RuntimeOnscreenWindow(
+        processIdentifier: 37, windowID: 9, frame: ownedWindowFrame, alpha: 1
+    )
+    let coveringWindow = RuntimeOnscreenWindow(
+        processIdentifier: 58, windowID: 11, frame: RuntimeScreenRect(x: 200, y: 180, width: 150, height: 100), alpha: 1
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: [ownedDisplayWindow]
+    ) == nil, "A uniquely owned unobscured target must remain observable")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [coveringWindow, ownedDisplayWindow]
+    ) != nil, "Readable AX text behind a covering window must not receive display pixels")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [ownedDisplayWindow, coveringWindow]
+    ) == nil, "A window behind the target must not count as an occluder")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: []
+    ) != nil, "A minimized or off-screen target cannot supply visible text")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [ownedDisplayWindow, ownedDisplayWindow]
+    ) != nil, "Ambiguous WindowServer identity cannot supply capture ownership")
+    let movedAssociation = RuntimeTargetCaptureAssociation(
+        processIdentifier: 37, windowID: 9,
+        windowFrame: RuntimeScreenRect(x: 200, y: 100, width: 600, height: 400),
+        editableFrame: RuntimeScreenRect(x: 210, y: 140, width: 580, height: 350), captureRect: ownedCaptureRect
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: movedAssociation, frontToBackWindows: [ownedDisplayWindow]
+    ) != nil, "Moving readable text away from the fixed capture rectangle must invalidate association")
+    let replacementAssociation = RuntimeTargetCaptureAssociation(
+        processIdentifier: 37, windowID: 12, windowFrame: ownedWindowFrame,
+        editableFrame: ownedEditorFrame, captureRect: ownedCaptureRect
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: replacementAssociation, frontToBackWindows: [ownedDisplayWindow]
+    ) != nil, "A replacement window at the same position is not the owned target")
+    let wrongProcess = RuntimeOnscreenWindow(processIdentifier: 58, windowID: 9, frame: ownedWindowFrame, alpha: 1)
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: [wrongProcess]
+    ) != nil, "A reused window number belonging to another process cannot own the capture")
+    let transparentCover = RuntimeOnscreenWindow(
+        processIdentifier: 58, windowID: 11, frame: coveringWindow.frame, alpha: 0
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [transparentCover, ownedDisplayWindow]
+    ) == nil, "A fully transparent window supplies no covering pixels")
+    let partlyTransparentCover = RuntimeOnscreenWindow(
+        processIdentifier: 58, windowID: 11, frame: coveringWindow.frame, alpha: 0.01
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [partlyTransparentCover, ownedDisplayWindow]
+    ) != nil, "A nonzero-alpha covering window invalidates capture without an occluder allowlist")
+    print("PASS capture ownership rejects covered, moved, minimized, replaced and ambiguous targets")
+
     let stablePixels = [UInt8](repeating: 128, count: 400 * 4)
     var caretOnlyPixels = stablePixels
     for pixel in 0..<40 {

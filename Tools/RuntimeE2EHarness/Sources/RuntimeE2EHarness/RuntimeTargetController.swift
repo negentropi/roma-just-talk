@@ -109,12 +109,31 @@ final class RuntimeOwnedCodeWindow {
     }
 }
 
+private enum RuntimeCaptureAssociationError: Error, CustomStringConvertible {
+    case invalidTarget, invalidWindowList, changed(String)
+
+    var description: String {
+        switch self {
+        case .invalidTarget: return "Owned target is hidden, minimized, missing or ambiguous"
+        case .invalidWindowList: return "WindowServer visibility metadata is incomplete"
+        case .changed(let reason): return reason
+        }
+    }
+}
+
+private extension RuntimeScreenRect {
+    init(_ frame: CGRect) {
+        self.init(x: Double(frame.minX), y: Double(frame.minY),
+                  width: Double(frame.width), height: Double(frame.height))
+    }
+}
+
 final class RuntimePreparedTarget {
     let info: RuntimeTargetPreparationInfo
     private let target: RuntimeTargetApp
     private let appURL: URL
     private let appElement: AXUIElement
-    private var windowElement: AXUIElement
+    private let windowElement: AXUIElement
     private var textElement: AXUIElement
     private let existingProcessIdentifiers: Set<pid_t>
     private let temporaryDirectoryURL: URL
@@ -124,6 +143,7 @@ final class RuntimePreparedTarget {
     private let textScenario: RuntimeTextScenario
     private let pasteProofToken: String?
     private let ownedCodeWindow: RuntimeOwnedCodeWindow?
+    private var captureAssociation: RuntimeTargetCaptureAssociation?
 
     init(
         target: RuntimeTargetApp,
@@ -169,15 +189,25 @@ final class RuntimePreparedTarget {
     }
 
     func refreshRenderedBaseline() -> String? {
-        renderedTextObserver.refreshBaseline {
-            RuntimeAX.text(from: textElement).flatMap { textScenario.insertedText(from: $0) }
+        do {
+            _ = try validateCaptureAssociation()
+            let error = renderedTextObserver.refreshBaseline {
+                readFullText().flatMap { textScenario.insertedText(from: $0) }
+            }
+            _ = try validateCaptureAssociation()
+            return error
+        } catch {
+            renderedTextObserver.invalidateAssociation(String(describing: error))
+            return String(describing: error)
         }
     }
 
     func readFullText() -> String? {
         guard let application = NSRunningApplication(processIdentifier: info.processIdentifier),
               !application.isTerminated, application.bundleIdentifier == info.bundleIdentifier,
-              let currentWindow = RuntimeAX.window(containing: info.windowTitleToken, in: appElement),
+              let windows = RuntimeAX.readWindows(in: appElement) else { return nil }
+        let matchingWindows = windows.filter { RuntimeAX.windowContainsTarget($0, token: info.windowTitleToken) }
+        guard matchingWindows.count == 1, let currentWindow = matchingWindows.first,
               CFEqual(currentWindow, windowElement),
               let currentTextElement = RuntimeAX.editableElement(
                 in: currentWindow,
@@ -187,19 +217,68 @@ final class RuntimePreparedTarget {
               ) ?? (target.kind == .browser ? nil : RuntimeAX.firstEditableElement(in: currentWindow)),
               let textWindow = RuntimeAX.window(for: currentTextElement), CFEqual(textWindow, currentWindow),
               ownedCodeWindow?.stillContainsTarget() ?? true else { return nil }
+        var textPID: pid_t = 0
+        var windowPID: pid_t = 0
+        guard AXUIElementGetPid(currentTextElement, &textPID) == .success,
+              AXUIElementGetPid(currentWindow, &windowPID) == .success,
+              textPID == info.processIdentifier, windowPID == info.processIdentifier else { return nil }
         textElement = currentTextElement
         return RuntimeAX.text(from: currentTextElement)
     }
 
+    private func validateCaptureAssociation() throws -> String {
+        guard let text = readFullText(),
+              let application = NSRunningApplication(processIdentifier: info.processIdentifier),
+              !application.isHidden, !application.isTerminated,
+              RuntimeAX.boolAttribute(kAXMinimizedAttribute, from: windowElement) == false,
+              let windowFrame = RuntimeAX.frame(of: windowElement),
+              let editableFrame = RuntimeAX.observationFrame(for: textElement, fallbackWindow: windowElement),
+              let dictionaries = CGWindowListCopyWindowInfo(
+                [.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID
+              ) as? [[String: Any]] else {
+            throw RuntimeCaptureAssociationError.invalidTarget
+        }
+        let windows = try dictionaries.map { entry -> RuntimeOnscreenWindow in
+            guard let processIdentifier = entry[kCGWindowOwnerPID as String] as? Int32,
+                  let windowID = entry[kCGWindowNumber as String] as? UInt32,
+                  let bounds = entry[kCGWindowBounds as String] as? [String: Any],
+                  let frame = CGRect(dictionaryRepresentation: bounds as CFDictionary),
+                  let alpha = entry[kCGWindowAlpha as String] as? Double,
+                  alpha.isFinite else { throw RuntimeCaptureAssociationError.invalidWindowList }
+            return RuntimeOnscreenWindow(processIdentifier: processIdentifier, windowID: windowID,
+                                         frame: RuntimeScreenRect(frame), alpha: alpha)
+        }
+        let candidates = windows.filter {
+            $0.processIdentifier == info.processIdentifier && $0.frame == RuntimeScreenRect(windowFrame)
+        }
+        guard candidates.count == 1, let window = candidates.first else {
+            throw RuntimeCaptureAssociationError.invalidTarget
+        }
+        let observed = RuntimeTargetCaptureAssociation(
+            processIdentifier: info.processIdentifier, windowID: window.windowID,
+            windowFrame: RuntimeScreenRect(windowFrame), editableFrame: RuntimeScreenRect(editableFrame),
+            captureRect: RuntimeScreenRect(renderedTextObserver.captureRect)
+        )
+        let expected = captureAssociation ?? observed
+        guard observed.editableFrame == RuntimeScreenRect(renderedTextObserver.editableFrame) else {
+            throw RuntimeCaptureAssociationError.changed("Editable target geometry changed")
+        }
+        if let reason = RuntimeCaptureAssociationPolicy.rejection(
+            expected: expected, observed: observed, frontToBackWindows: windows
+        ) {
+            throw RuntimeCaptureAssociationError.changed(reason)
+        }
+        if captureAssociation == nil { captureAssociation = observed }
+        return text
+    }
+
     func waitForVisibleText(
         keyUpAtSystemUptime: TimeInterval,
-        timeoutSeconds: TimeInterval
+        timeoutSeconds: TimeInterval,
+        acceptedFrameURL: URL
     ) -> RuntimeVisibleTextResult {
         let finalTextSettleSeconds: TimeInterval = 0.25
-        let targetRefreshIntervalSeconds: TimeInterval = 0.25
         let deadline = Date().addingTimeInterval(timeoutSeconds)
-        var lastTargetRefreshSystemUptime = ProcessInfo.processInfo.systemUptime
-        var lastError: String?
         var accessibilityText: String?
         var fullText: String?
         var domPasteProof: RuntimeDOMPasteProof?
@@ -216,8 +295,18 @@ final class RuntimePreparedTarget {
                     (ProcessInfo.processInfo.systemUptime - keyUpAtSystemUptime) * 1_000
             )
             defer { observationTimings.append(timing) }
+            let captureBracketStartedAtSystemUptime: TimeInterval
+            let precedingText: String?
             let precedingReadStarted = ProcessInfo.processInfo.systemUptime
-            let precedingText = RuntimeAX.text(from: textElement)
+            do {
+                precedingText = try validateCaptureAssociation()
+                captureBracketStartedAtSystemUptime = ProcessInfo.processInfo.systemUptime
+            } catch {
+                renderedError = String(describing: error)
+                renderedTextObserver.invalidateAssociation(renderedError!)
+                renderedText = nil
+                break
+            }
             timing.precedingAccessibilityReadMilliseconds =
                 (ProcessInfo.processInfo.systemUptime - precedingReadStarted) * 1_000
             var capturedFrame: RuntimeCapturedTextFrame?
@@ -234,18 +323,30 @@ final class RuntimePreparedTarget {
             }
 
             let now = ProcessInfo.processInfo.systemUptime
-            let currentText = RuntimeAX.text(from: textElement)
+            let currentText: String?
+            do {
+                currentText = try validateCaptureAssociation()
+            } catch {
+                renderedError = String(describing: error)
+                renderedTextObserver.invalidateAssociation(renderedError!)
+                renderedText = nil
+                break
+            }
             timing.accessibilityReadMilliseconds =
                 (ProcessInfo.processInfo.systemUptime - now) * 1_000
             timing.accessibilityReadSucceeded = currentText != nil
-            if let capturedFrame {
+            let captureBracketFinishedAtSystemUptime = ProcessInfo.processInfo.systemUptime
+            if let capturedFrame, let captureAssociation {
                 let inserted = currentText.flatMap { textScenario.insertedText(from: $0) }
                 do {
                     renderedText = try renderedTextObserver.observeCapturedFrame(
                         capturedFrame,
                         accessibilityText: inserted,
                         precedingAccessibilityText: precedingText.flatMap { textScenario.insertedText(from: $0) },
-                        keyUpAtSystemUptime: keyUpAtSystemUptime
+                        keyUpAtSystemUptime: keyUpAtSystemUptime,
+                        association: captureAssociation,
+                        captureBracketStartedAtSystemUptime: captureBracketStartedAtSystemUptime,
+                        captureBracketFinishedAtSystemUptime: captureBracketFinishedAtSystemUptime
                     )
                 } catch {
                     renderedError = String(describing: error)
@@ -274,32 +375,6 @@ final class RuntimePreparedTarget {
                 accessibilityText = nil
                 accessibilityLatency = nil
             }
-            // A valid empty value is expected before insertion. Periodic rediscovery still
-            // recovers detached elements that keep returning their last cached value.
-            if currentText == nil || (accessibilityText == nil
-                && now - lastTargetRefreshSystemUptime >= targetRefreshIntervalSeconds) {
-                let refreshStarted = ProcessInfo.processInfo.systemUptime
-                if let refreshedWindow = RuntimeAX.window(
-                    containing: info.windowTitleToken,
-                    in: appElement
-                ), ownedCodeWindow.map({ CFEqual($0.windowElement, refreshedWindow) }) ?? true {
-                    windowElement = refreshedWindow
-                }
-                if let refreshed = RuntimeAX.editableElement(
-                    in: windowElement,
-                    identifying: target.kind == .browser
-                        ? RuntimeTargetIsolationPlan.browserEditableLabel(windowTitleToken: info.windowTitleToken)
-                        : info.windowTitleToken
-                ) ?? (target.kind == .browser ? nil : RuntimeAX.firstEditableElement(in: windowElement)) {
-                    textElement = refreshed
-                } else {
-                    lastError = "Unique target surface no longer exposes an editable AX element"
-                }
-                timing.targetRefreshMilliseconds =
-                    (ProcessInfo.processInfo.systemUptime - refreshStarted) * 1_000
-                lastTargetRefreshSystemUptime = ProcessInfo.processInfo.systemUptime
-            }
-
             let finalTextIsStable = stableSinceSystemUptime.map {
                 now - $0 >= finalTextSettleSeconds
             } ?? false
@@ -332,6 +407,19 @@ final class RuntimePreparedTarget {
                 error: renderedError ?? renderedTextObserver.associationError
                     ?? "Stable rendered pixels associated with inserted AX text were not observed before timeout"
             )
+        } else if let observed = renderedText {
+            do {
+                let frame = try renderedTextObserver.retainAcceptedFrame(at: acceptedFrameURL)
+                renderedText = RuntimeRenderedTextChangeResult(
+                    keyUpToRenderedTextMilliseconds: observed.keyUpToRenderedTextMilliseconds,
+                    changedPixels: observed.changedPixels, comparedPixels: observed.comparedPixels,
+                    requiredChangedPixels: observed.requiredChangedPixels,
+                    interFrameChangedPixels: observed.interFrameChangedPixels,
+                    acceptedFrame: frame, error: nil
+                )
+            } catch {
+                renderedText = renderedTextObserver.failureResult(error: String(describing: error))
+            }
         }
         let visibleLatency = RuntimeTextVisibilityAttribution.renderedLatency(
             accessibilityText: accessibilityText,
@@ -339,7 +427,7 @@ final class RuntimePreparedTarget {
         )
         var errors: [String] = []
         if accessibilityText == nil {
-            errors.append(lastError ?? "Target never exposed non-empty inserted text through Accessibility")
+            errors.append("Target never exposed non-empty inserted text through Accessibility")
         }
         if let renderedError = renderedText?.error {
             errors.append(renderedError)
@@ -1966,7 +2054,7 @@ enum RuntimeAX {
         return AXUIElementPerformAction(button, kAXPressAction as CFString) == .success
     }
 
-    private static func boolAttribute(_ attribute: String, from element: AXUIElement) -> Bool? {
+    static func boolAttribute(_ attribute: String, from element: AXUIElement) -> Bool? {
         var value: CFTypeRef?
         guard AXUIElementCopyAttributeValue(element, attribute as CFString, &value) == .success,
               let value else {

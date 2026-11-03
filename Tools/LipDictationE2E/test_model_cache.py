@@ -1,4 +1,5 @@
 import copy
+import base64
 import contextlib
 import hashlib
 import io
@@ -46,6 +47,173 @@ jobs:
 
 
 class ModelCacheTests(unittest.TestCase):
+    def accepted_frame_fixture(self, root, name='association-healthy-accepted.png'):
+        path = root / name
+        path.write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jK1sAAAAASUVORK5CYII='))
+        rect = {'x': 10, 'y': 20, 'width': 1, 'height': 1}
+        return {'target': {'processIdentifier': 1234}, 'observation': {'renderedText': {'acceptedFrame': {
+            'pngPath': str(path.resolve()), 'pngSHA256': runner.sha256(path), 'rgbaSHA256': 'a' * 64,
+            'imageWidth': 1, 'imageHeight': 1, 'rgbaWidth': 1, 'rgbaHeight': 1,
+            'captureBracketStartedAtSystemUptime': 10, 'capturedAtSystemUptime': 11,
+            'captureBracketFinishedAtSystemUptime': 12, 'association': {
+                'processIdentifier': 1234, 'windowID': 55, 'windowFrame': rect,
+                'editableFrame': rect, 'captureRect': rect}}}}}
+
+    def test_accepted_frame_requires_bound_file_identity_dimensions_and_capture_bracket(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.accepted_frame_fixture(root)
+            self.assertTrue(runner.accepted_frame_passed(result, root))
+            changes = [({'pngSHA256': '0' * 64}, {}), ({'imageWidth': 2}, {}),
+                       ({'captureBracketStartedAtSystemUptime': 20}, {}),
+                       ({'rgbaSHA256': 'z' * 64}, {}), ({}, {'processIdentifier': 999}),
+                       ({}, {'windowID': 0}), ({}, {'captureRect': {'x': 1}})]
+            for frame_change, association_change in changes:
+                changed = copy.deepcopy(result)
+                frame = changed['observation']['renderedText']['acceptedFrame']
+                frame.update(frame_change)
+                frame['association'].update(association_change)
+                with self.subTest(frame_change=frame_change, association_change=association_change):
+                    self.assertFalse(runner.accepted_frame_passed(changed, root))
+            self.assertFalse(runner.accepted_frame_passed(result, root / 'different'))
+            (root / 'association-healthy-accepted.png').write_bytes(b'corrupt')
+            self.assertFalse(runner.accepted_frame_passed(result, root))
+
+    def test_accepted_frame_rejects_missing_or_nonprocess_identifiers(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.accepted_frame_fixture(root)
+            self.assertTrue(runner.accepted_frame_passed(result, root))
+            for value in [None, False, 0, 1, '1234']:
+                changed = copy.deepcopy(result)
+                target = changed['target']
+                association = changed['observation']['renderedText']['acceptedFrame']['association']
+                if value is None:
+                    target.pop('processIdentifier')
+                    association.pop('processIdentifier')
+                else:
+                    target['processIdentifier'] = value
+                    association['processIdentifier'] = value
+                with self.subTest(processIdentifier=value):
+                    self.assertFalse(runner.accepted_frame_passed(changed, root))
+
+    def test_association_red_requires_healthy_capture_and_only_false_acceptance_failures(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            cases = []
+            for name in ['healthy', 'covered', 'moved']:
+                case = self.accepted_frame_fixture(root, 'association-' + name + '-accepted.png')
+                case.update({'case': name, 'fixtureValid': True, 'visibleAcceptance': True,
+                    'mutationObserved': name != 'healthy', 'acceptedArtifactExists': True,
+                    'readableAXBefore': 'still readable control words', 'readableAXAfter': 'still readable control words',
+                    'passed': name == 'healthy', 'cleanup': {'errors': [], 'surfaceClosed': True,
+                        'temporaryResourceRemoved': True, 'restoredInitiallyRunningApplication': True,
+                        'restoredFrontmostApplication': True}})
+                case['observation']['text'] = 'control words'
+                if name != 'healthy':
+                    case['failure'] = 'unexpectedVisibleAcceptance'
+                if name == 'moved':
+                    case['movedWindowRestored'] = True
+                cases.append(case)
+            report = {'passed': False, 'controlExitCode': 1, 'cases': cases, 'controlWords': 'control words'}
+            self.assertTrue(runner.association_control_passed(report, root, known_bad=True))
+            for index, field, value in [(0, 'visibleAcceptance', False), (1, 'fixtureValid', False),
+                                        (1, 'readableAXAfter', None), (2, 'failure', 'permissionDenied')]:
+                changed = copy.deepcopy(report)
+                changed['cases'][index][field] = value
+                with self.subTest(index=index, field=field):
+                    self.assertFalse(runner.association_control_passed(changed, root, known_bad=True))
+            self.assertFalse(runner.association_control_passed(report, root, known_bad=False))
+
+    def test_association_mutation_restores_source_after_build_failure(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / 'Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimeTargetController.swift'
+            source.parent.mkdir(parents=True)
+            candidate = ('    func waitForVisibleText() {\n'
+                         '                precedingText = try validateCaptureAssociation()\n'
+                         '                currentText = try validateCaptureAssociation()\n'
+                         '    }\n    func cleanup() {}\n').encode()
+            source.write_bytes(candidate)
+            evidence = root / 'evidence'
+            evidence.mkdir()
+            with patch.object(runner, 'ROOT', root), patch.object(runner, 'build_visual_driver', side_effect=RuntimeError('build failed')):
+                with self.assertRaisesRegex(RuntimeError, 'build failed'):
+                    runner.run_association_controls(evidence, {}, root / 'helper', Mock(), Mock())
+            self.assertEqual(source.read_bytes(), candidate)
+            receipt = json.loads((evidence / 'association-regression.json').read_text())
+            self.assertTrue(receipt['sourceRestored'])
+            self.assertEqual(receipt['candidateSourceSHA256'], receipt['restoredSourceSHA256'])
+
+    def test_association_candidate_requires_specific_rejection_not_capture_failure(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            cases = []
+            for name in ['healthy', 'covered', 'moved']:
+                case = self.accepted_frame_fixture(root) if name == 'healthy' else {
+                    'target': {'processIdentifier': 1234}, 'observation': {'renderedText': {}}}
+                case.update({'case': name, 'fixtureValid': True, 'visibleAcceptance': name == 'healthy',
+                    'mutationObserved': name != 'healthy', 'acceptedArtifactExists': name == 'healthy',
+                    'readableAXBefore': 'still readable control words', 'readableAXAfter': 'still readable control words',
+                    'passed': True, 'cleanup': {'errors': [], 'surfaceClosed': True,
+                        'temporaryResourceRemoved': True, 'restoredInitiallyRunningApplication': True,
+                        'restoredFrontmostApplication': True}})
+                case['observation']['text'] = 'control words'
+                if name != 'healthy':
+                    reason = ('Another on-screen window covers the capture rectangle' if name == 'covered'
+                              else 'Editable target geometry changed')
+                    case['expectedRejection'] = reason
+                    case['observation']['renderedText']['error'] = reason
+                if name == 'moved':
+                    case['movedWindowRestored'] = True
+                cases.append(case)
+            report = {'passed': True, 'controlExitCode': 0, 'controlWords': 'control words', 'cases': cases}
+            self.assertTrue(runner.association_control_passed(report, root, known_bad=False))
+            changed = copy.deepcopy(report)
+            changed['cases'][1]['observation']['renderedText']['error'] = 'Screen capture denied'
+            self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+            changed = copy.deepcopy(report)
+            changed['controlExitCode'] = False
+            self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+            for index in [1, 2]:
+                changed = copy.deepcopy(report)
+                changed['cases'][index]['readableAXBefore'] = '[existing before][existing after]'
+                changed['cases'][index]['readableAXAfter'] = '[existing before][existing after]'
+                with self.subTest(missingControlWordsCase=index):
+                    self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+
+    def test_association_fast_preflight_accepts_no_app_or_model_arguments(self):
+        args = runner.parse_arguments(['--association-controls-only', '--out', '/fixture/evidence'])
+        self.assertTrue(args.association_controls_only)
+        for extra in [['--app', '/fixture/app'], ['--build-helper-only'], ['--visual'], ['--model-cache-run', '1']]:
+            with self.subTest(extra=extra), contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                runner.parse_arguments(['--association-controls-only', *extra])
+
+    def test_association_helper_drain_rejects_reused_pid_before_signaling(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            helper = root / 'Helper.app'
+            executable = helper / 'Contents/MacOS/Helper'
+            executable.parent.mkdir(parents=True)
+            executable.write_bytes(b'signed fixture executable')
+            (helper / 'Contents/Info.plist').write_bytes(runner.plistlib.dumps({
+                'CFBundleIdentifier': 'com.negentropi.LipDictationE2E', 'CFBundleExecutable': 'Helper'}))
+            identity = root / 'control.identity.json'
+            identity.write_text(json.dumps({'pid': 4321, 'bundleID': 'com.negentropi.LipDictationE2E',
+                'bundlePath': str(helper.resolve()), 'executablePath': str(executable.resolve()),
+                'executableSHA256': runner.sha256(executable), 'scenario': 'positive-association-controls'}))
+            with patch.object(runner.subprocess, 'run', return_value=SimpleNamespace(returncode=0, stdout='/unrelated/process\n')), \
+                    patch.object(runner.os, 'kill') as kill:
+                with self.assertRaisesRegex(RuntimeError, 'no longer has the exact owned executable'):
+                    runner.drain_association_helper(identity, helper, 'positive-association-controls')
+                kill.assert_not_called()
+            with patch.object(runner.subprocess, 'run', return_value=SimpleNamespace(returncode=1, stdout='')), \
+                    patch.object(runner.os, 'kill') as kill:
+                result = runner.drain_association_helper(identity, helper, 'positive-association-controls')
+                self.assertTrue(result['exitObserved'])
+                self.assertEqual(result['signals'], [])
+                kill.assert_not_called()
+
     def hosted_app(self, root):
         _, _, identifier, _, digest = next(pin for pin in HOSTED_ARTIFACTS if pin[0] == 'app')
         app = VerifiedApp(root / 'app', {

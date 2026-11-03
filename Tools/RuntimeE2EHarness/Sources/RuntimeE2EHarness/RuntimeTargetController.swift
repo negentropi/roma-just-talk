@@ -128,6 +128,28 @@ private extension RuntimeScreenRect {
     }
 }
 
+private struct RuntimeCaptureRejectionWindow: Encodable {
+    let frontToBackIndex: Int
+    let windowID: UInt32
+    let ownerPID: Int32
+    let ownerBundleIdentifier: String?
+    let frame: RuntimeScreenRect
+    let alpha: Double
+    let layer: Int?
+}
+
+private struct RuntimeCaptureRejectionEvent: Encodable {
+    let event = "runtime_target_capture_association_rejected"
+    let reason: String
+    let targetID: String
+    let ownedWindowTitleToken: String
+    let baselineAssociationEstablished: Bool
+    let observedAtSystemUptime: TimeInterval
+    let expected: RuntimeTargetCaptureAssociation
+    let observed: RuntimeTargetCaptureAssociation
+    let frontToBackWindows: [RuntimeCaptureRejectionWindow]
+}
+
 final class RuntimePreparedTarget {
     let info: RuntimeTargetPreparationInfo
     private let target: RuntimeTargetApp
@@ -144,6 +166,7 @@ final class RuntimePreparedTarget {
     private let pasteProofToken: String?
     private let ownedCodeWindow: RuntimeOwnedCodeWindow?
     private var captureAssociation: RuntimeTargetCaptureAssociation?
+    private var didLogCaptureAssociationRejection = false
 
     init(
         target: RuntimeTargetApp,
@@ -261,15 +284,54 @@ final class RuntimePreparedTarget {
         )
         let expected = captureAssociation ?? observed
         guard observed.editableFrame == RuntimeScreenRect(renderedTextObserver.editableFrame) else {
+            logCaptureAssociationRejection("Editable target geometry changed", expected: expected,
+                                           observed: observed, windows: windows, dictionaries: dictionaries)
             throw RuntimeCaptureAssociationError.changed("Editable target geometry changed")
         }
         if let reason = RuntimeCaptureAssociationPolicy.rejection(
             expected: expected, observed: observed, frontToBackWindows: windows
         ) {
+            logCaptureAssociationRejection(reason, expected: expected, observed: observed,
+                                           windows: windows, dictionaries: dictionaries)
             throw RuntimeCaptureAssociationError.changed(reason)
         }
         if captureAssociation == nil { captureAssociation = observed }
         return text
+    }
+
+    private func logCaptureAssociationRejection(
+        _ reason: String,
+        expected: RuntimeTargetCaptureAssociation,
+        observed: RuntimeTargetCaptureAssociation,
+        windows: [RuntimeOnscreenWindow],
+        dictionaries: [[String: Any]]
+    ) {
+        guard !didLogCaptureAssociationRejection else { return }
+        didLogCaptureAssociationRejection = true
+        let rows = windows.enumerated().map { index, window in
+            RuntimeCaptureRejectionWindow(
+                frontToBackIndex: index, windowID: window.windowID,
+                ownerPID: window.processIdentifier,
+                ownerBundleIdentifier: NSRunningApplication(processIdentifier: window.processIdentifier)?.bundleIdentifier,
+                frame: window.frame, alpha: window.alpha,
+                layer: (dictionaries[index][kCGWindowLayer as String] as? NSNumber)?.intValue
+            )
+        }
+        let event = RuntimeCaptureRejectionEvent(
+            reason: reason, targetID: info.targetID, ownedWindowTitleToken: info.windowTitleToken,
+            baselineAssociationEstablished: captureAssociation != nil,
+            observedAtSystemUptime: ProcessInfo.processInfo.systemUptime,
+            expected: expected, observed: observed, frontToBackWindows: rows
+        )
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        encoder.nonConformingFloatEncodingStrategy = .convertToString(
+            positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN"
+        )
+        if var data = try? encoder.encode(event) {
+            data.append(0x0A)
+            FileHandle.standardError.write(data)
+        }
     }
 
     func waitForVisibleText(

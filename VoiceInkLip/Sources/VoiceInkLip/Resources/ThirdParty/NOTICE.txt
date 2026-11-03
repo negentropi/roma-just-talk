@@ -1,0 +1,36 @@
+RAVEn / BRAVEn. Copyright (c) 2023 ahaliassos.
+Source revision 9fd9a3743c41ba93532258b340d123c20fe25432.
+Root MIT license reproduced in RAVEn-MIT.txt.
+Official README links the original downloaded Large checkpoint.
+The repository does not separately state a weights license. Applying its MIT license to linked weights is an inference.
+No learned neural weights are included in these resources.
+
+Upstream per-file copyright notices for Apache 2.0 code.
+Apache 2.0 text reproduced in Apache-2.0.txt.
+
+espnet/asr/asr_utils.py: Copyright 2017 Johns Hopkins University (Shinji Watanabe)
+espnet/nets/ctc_prefix_score.py: Copyright 2018 Mitsubishi Electric Research Labs (Takaaki Hori)
+espnet/nets/e2e_asr_common.py: Copyright 2017 Johns Hopkins University (Shinji Watanabe)
+espnet/nets/pytorch_backend/e2e_asr_transformer.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/backbones/conv1d_extractor.py: Copyright 2021 Imperial College London (Pingchuan Ma)
+espnet/nets/pytorch_backend/backbones/conv3d_extractor.py: Copyright 2021 Imperial College London (Pingchuan Ma)
+espnet/nets/pytorch_backend/transformer/add_sos_eos.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/attention.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/convolution.py: Copyright 2020 Johns Hopkins University (Shinji Watanabe)
+espnet/nets/pytorch_backend/transformer/decoder.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/decoder_layer.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/embedding.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/encoder.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/encoder_layer.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/label_smoothing_loss.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/mask.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/multi_layer_conv.py: Copyright 2019 Tomoki Hayashi
+espnet/nets/pytorch_backend/transformer/norm.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/optimizer.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/positionwise_feed_forward.py: Copyright 2019 Shigeki Karita
+espnet/nets/pytorch_backend/transformer/repeat.py: Copyright 2019 Shigeki Karita
+espnet/utils/fill_missing_args.py: Copyright 2018 Nagoya University (Tomoki Hayashi)
+
+ONNX Runtime 1.24.2. Copyright (c) Microsoft Corporation.
+MIT license reproduced in ONNXRuntime-MIT.txt.
+Unmodified upstream third-party notices reproduced in ONNXRuntime-ThirdPartyNotices.txt.

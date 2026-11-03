@@ -1,0 +1,191 @@
+[
+  {
+    "max_probability_abs_error": 2.3096799850463867e-05,
+    "probability_allclose_atol1e-6_rtol1e-4": true,
+    "worst_logprob_index": [
+      0,
+      3,
+      719
+    ],
+    "worst_logprob_expected": -7.378452777862549,
+    "worst_logprob_actual": -7.378677845001221,
+    "worst_token": "\u2581NS",
+    "optimization": "all",
+    "frame_argmax_match": true,
+    "case": "a-intact",
+    "shape": [
+      1,
+      50,
+      1049
+    ],
+    "max_abs_error": 0.000225067138671875,
+    "mean_abs_error": 2.0495601347647607e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "DON'T FORGET A CHINA",
+    "inference_seconds": 0.1959448759444058,
+    "peak_rss_kib": 3232856
+  },
+  {
+    "max_probability_abs_error": 2.0265579223632812e-06,
+    "probability_allclose_atol1e-6_rtol1e-4": true,
+    "worst_logprob_index": [
+      0,
+      13,
+      250
+    ],
+    "worst_logprob_expected": -6.984302520751953,
+    "worst_logprob_actual": -6.9843525886535645,
+    "worst_token": "\u2581",
+    "optimization": "all",
+    "frame_argmax_match": true,
+    "case": "a-frozen",
+    "shape": [
+      1,
+      50,
+      1049
+    ],
+    "max_abs_error": 5.0067901611328125e-05,
+    "mean_abs_error": 6.1598934735229705e-06,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "",
+    "inference_seconds": 0.19429954199586064,
+    "peak_rss_kib": 3236184
+  },
+  {
+    "max_probability_abs_error": 7.212162017822266e-06,
+    "probability_allclose_atol1e-6_rtol1e-4": false,
+    "worst_logprob_index": [
+      0,
+      38,
+      80
+    ],
+    "worst_logprob_expected": -7.8143744468688965,
+    "worst_logprob_actual": -7.814210414886475,
+    "worst_token": "ATING",
+    "optimization": "all",
+    "frame_argmax_match": true,
+    "case": "b-intact",
+    "shape": [
+      1,
+      58,
+      1049
+    ],
+    "max_abs_error": 0.000164031982421875,
+    "mean_abs_error": 1.8268905478180386e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "I'M ON MY WAY TO THE ME I",
+    "inference_seconds": 0.23812876199372113,
+    "peak_rss_kib": 3237080
+  },
+  {
+    "max_probability_abs_error": 0.00037211179733276367,
+    "probability_allclose_atol1e-6_rtol1e-4": false,
+    "worst_logprob_index": [
+      0,
+      14,
+      795
+    ],
+    "worst_logprob_expected": -12.156815528869629,
+    "worst_logprob_actual": -12.150432586669922,
+    "worst_token": "\u2581PROGRAM",
+    "optimization": "all",
+    "frame_argmax_match": true,
+    "case": "b-frozen",
+    "shape": [
+      1,
+      58,
+      1049
+    ],
+    "max_abs_error": 0.006382942199707031,
+    "mean_abs_error": 0.00010526861296966672,
+    "allclose_rtol1e-4_atol1e-4": false,
+    "decoded_ids_match": true,
+    "transcript": "",
+    "inference_seconds": 0.24306208395864815,
+    "peak_rss_kib": 3237208
+  },
+  {
+    "max_probability_abs_error": 1.4424324035644531e-05,
+    "probability_allclose_atol1e-6_rtol1e-4": false,
+    "worst_logprob_index": [
+      0,
+      29,
+      217
+    ],
+    "worst_logprob_expected": -12.24975872039795,
+    "worst_logprob_actual": -12.249591827392578,
+    "worst_token": "T",
+    "optimization": "all",
+    "frame_argmax_match": true,
+    "case": "c-intact",
+    "shape": [
+      1,
+      56,
+      1049
+    ],
+    "max_abs_error": 0.00016689300537109375,
+    "mean_abs_error": 1.7209975339937955e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "IT'S 11 O'CLOCK",
+    "inference_seconds": 0.2386984049808234,
+    "peak_rss_kib": 3237208
+  },
+  {
+    "max_probability_abs_error": 4.172325134277344e-06,
+    "probability_allclose_atol1e-6_rtol1e-4": true,
+    "worst_logprob_index": [
+      0,
+      13,
+      509
+    ],
+    "worst_logprob_expected": -10.638142585754395,
+    "worst_logprob_actual": -10.638361930847168,
+    "worst_token": "\u2581FIRST",
+    "optimization": "all",
+    "frame_argmax_match": true,
+    "case": "c-frozen",
+    "shape": [
+      1,
+      56,
+      1049
+    ],
+    "max_abs_error": 0.0002193450927734375,
+    "mean_abs_error": 1.2965423593414016e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "",
+    "inference_seconds": 0.23611204198095948,
+    "peak_rss_kib": 3237336
+  },
+  {
+    "max_probability_abs_error": 2.8014183044433594e-05,
+    "probability_allclose_atol1e-6_rtol1e-4": true,
+    "worst_logprob_index": [
+      0,
+      33,
+      567
+    ],
+    "worst_logprob_expected": -7.456564903259277,
+    "worst_logprob_actual": -7.456449508666992,
+    "worst_token": "\u2581HIM",
+    "optimization": "all",
+    "frame_argmax_match": true,
+    "case": "dynamic-73",
+    "shape": [
+      1,
+      73,
+      1049
+    ],
+    "max_abs_error": 0.00011539459228515625,
+    "mean_abs_error": 1.8189590264228173e-05,
+    "allclose_rtol1e-4_atol1e-4": true,
+    "decoded_ids_match": true,
+    "transcript": "DON'T FORGET A CHINA DON'T FORGET",
+    "inference_seconds": 0.31794416008051485,
+    "peak_rss_kib": 3240564
+  }
+]

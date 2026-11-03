@@ -4,6 +4,7 @@ import VoiceInkCore
 /// Protocol that VoiceInkEngine conforms to for power mode session management.
 @MainActor
 protocol PowerModeStateProvider: AnyObject {
+    var currentDictationMode: VoiceInkDictationMode { get }
     var currentTranscriptionModel: (any TranscriptionModel)? { get }
     var allAvailableModels: [any TranscriptionModel] { get }
 

@@ -8,8 +8,10 @@ class PowerModeSessionManager {
 
     private weak var stateProvider: (any PowerModeStateProvider)?
     private var enhancementService: AIEnhancementService?
+    private let defaults: UserDefaults
 
-    private init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         recoverSession()
     }
 
@@ -25,7 +27,10 @@ class PowerModeSessionManager {
             return
         }
 
-        let beginPlan = VoiceInkPowerModeSessionBeginPlan.plan(activeSession: loadSession())
+        let applicationScope = VoiceInkPowerModeSessionApplicationScope(dictationMode: stateProvider.currentDictationMode)
+        let beginPlan = VoiceInkPowerModeSessionBeginPlan.plan(
+            activeSession: loadSession(), applicationScope: applicationScope
+        )
         beginPlan.applyRuntimeState(
             id: UUID(),
             startTime: Date(),
@@ -41,20 +46,27 @@ class PowerModeSessionManager {
 
         // Always apply the new configuration
         isApplyingPowerModeConfig = true
-        await applyConfiguration(config)
+        await applyConfiguration(config, applicationScope: applicationScope)
         isApplyingPowerModeConfig = false
     }
 
-    func endSession() async {
+    func endSession(applicationScope: VoiceInkPowerModeSessionApplicationScope? = nil) async {
         guard let session = loadSession() else { return }
 
+        let resourceScope = applicationScope ?? VoiceInkPowerModeSessionApplicationScope(
+            dictationMode: stateProvider?.currentDictationMode ?? VoiceInkLipDictationPreference.mode()
+        )
         isApplyingPowerModeConfig = true
-        await restoreState(session.originalState)
+        await restoreState(
+            session.originalState,
+            applicationScope: session.applicationScope,
+            loadsModelResources: resourceScope == .full
+        )
         isApplyingPowerModeConfig = false
 
         NotificationCenter.default.removeObserver(self, name: .AppSettingsDidChange, object: nil)
 
-        VoiceInkPowerModeSessionPreference.clear()
+        VoiceInkPowerModeSessionPreference.clear(from: defaults)
     }
 
     @objc func updateSessionSnapshot() {
@@ -92,27 +104,37 @@ class PowerModeSessionManager {
         )
     }
 
-    private func applyConfiguration(_ config: PowerModeConfig) async {
+    private func applyConfiguration(
+        _ config: PowerModeConfig,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope
+    ) async {
         guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
         await applySessionApplicationPlan(
             VoiceInkPowerModeSessionApplicationPlan.applying(
                 config: config,
-                facts: sessionApplicationFacts(stateProvider: stateProvider)
+                facts: sessionApplicationFacts(stateProvider: stateProvider),
+                applicationScope: applicationScope
             ),
             stateProvider: stateProvider
         )
     }
 
-    private func restoreState(_ state: VoiceInkPowerModeApplicationState) async {
+    private func restoreState(
+        _ state: VoiceInkPowerModeApplicationState,
+        applicationScope: VoiceInkPowerModeSessionApplicationScope,
+        loadsModelResources: Bool
+    ) async {
         guard enhancementService != nil,
               let stateProvider = stateProvider else { return }
 
         await applySessionApplicationPlan(
             VoiceInkPowerModeSessionApplicationPlan.restoring(
                 state: state,
-                facts: sessionApplicationFacts(stateProvider: stateProvider)
+                facts: sessionApplicationFacts(stateProvider: stateProvider),
+                applicationScope: applicationScope,
+                loadsModelResources: loadsModelResources
             ),
             stateProvider: stateProvider
         )
@@ -222,7 +244,7 @@ class PowerModeSessionManager {
 
     private func saveSession(_ session: VoiceInkPowerModeSession) {
         do {
-            try VoiceInkPowerModeSessionPreference.saveActiveSession(session)
+            try VoiceInkPowerModeSessionPreference.saveActiveSession(session, to: defaults)
         } catch {
             print(
                 VoiceInkPowerModeSessionDiagnostics.saveFailedMessage(
@@ -234,7 +256,7 @@ class PowerModeSessionManager {
 
     private func loadSession() -> VoiceInkPowerModeSession? {
         do {
-            return try VoiceInkPowerModeSessionPreference.loadActiveSession()
+            return try VoiceInkPowerModeSessionPreference.loadActiveSession(from: defaults)
         } catch {
             print(
                 VoiceInkPowerModeSessionDiagnostics.loadFailedMessage(

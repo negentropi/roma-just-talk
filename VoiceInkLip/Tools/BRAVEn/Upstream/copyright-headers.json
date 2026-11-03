@@ -1,0 +1,222 @@
+[
+  {
+    "path": "espnet/asr/asr_utils.py",
+    "line": 1,
+    "text": "# Copyright 2017 Johns Hopkins University (Shinji Watanabe)"
+  },
+  {
+    "path": "espnet/asr/asr_utils.py",
+    "line": 2,
+    "text": "# Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/ctc_prefix_score.py",
+    "line": 3,
+    "text": "# Copyright 2018 Mitsubishi Electric Research Labs (Takaaki Hori)"
+  },
+  {
+    "path": "espnet/nets/ctc_prefix_score.py",
+    "line": 4,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/e2e_asr_common.py",
+    "line": 4,
+    "text": "# Copyright 2017 Johns Hopkins University (Shinji Watanabe)"
+  },
+  {
+    "path": "espnet/nets/e2e_asr_common.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/e2e_asr_transformer.py",
+    "line": 1,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/e2e_asr_transformer.py",
+    "line": 2,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/backbones/conv1d_extractor.py",
+    "line": 4,
+    "text": "# Copyright 2021 Imperial College London (Pingchuan Ma)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/backbones/conv1d_extractor.py",
+    "line": 5,
+    "text": "# Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/backbones/conv3d_extractor.py",
+    "line": 4,
+    "text": "# Copyright 2021 Imperial College London (Pingchuan Ma)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/backbones/conv3d_extractor.py",
+    "line": 5,
+    "text": "# Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/add_sos_eos.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/add_sos_eos.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/attention.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/attention.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/convolution.py",
+    "line": 4,
+    "text": "# Copyright 2020 Johns Hopkins University (Shinji Watanabe)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/convolution.py",
+    "line": 6,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/decoder.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/decoder.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/decoder_layer.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/decoder_layer.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/embedding.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/embedding.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/encoder.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/encoder.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/encoder_layer.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/encoder_layer.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/label_smoothing_loss.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/label_smoothing_loss.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/mask.py",
+    "line": 3,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/mask.py",
+    "line": 4,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/multi_layer_conv.py",
+    "line": 4,
+    "text": "# Copyright 2019 Tomoki Hayashi"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/multi_layer_conv.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/norm.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/norm.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/optimizer.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/optimizer.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/positionwise_feed_forward.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/positionwise_feed_forward.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/repeat.py",
+    "line": 4,
+    "text": "# Copyright 2019 Shigeki Karita"
+  },
+  {
+    "path": "espnet/nets/pytorch_backend/transformer/repeat.py",
+    "line": 5,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  },
+  {
+    "path": "espnet/utils/fill_missing_args.py",
+    "line": 3,
+    "text": "# Copyright 2018 Nagoya University (Tomoki Hayashi)"
+  },
+  {
+    "path": "espnet/utils/fill_missing_args.py",
+    "line": 4,
+    "text": "#  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)"
+  }
+]

@@ -80,6 +80,8 @@ do {
         "every runtime matrix must cover empty and existing-text cursor baselines"
     )
     let existingTextScenario = RuntimeTextScenario.existingText
+    try require(RuntimeTextScenario.empty.insertedText(from: "") == "",
+                "a readable empty editor remains confirmed empty, not unknown")
     try require(
         existingTextScenario.insertedText(
             from: existingTextScenario.prefix + "dictated text" + existingTextScenario.suffix
@@ -90,6 +92,21 @@ do {
         existingTextScenario.insertedText(from: "dictated text") == nil,
         "existing-text cases must fail if either side is lost"
     )
+    let seededTarget = existingTextScenario.initialText
+    try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: seededTarget) == .readableUnchanged,
+                "cancellation succeeds only when the readable full target is unchanged")
+    try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: nil) == .unreadable,
+                "failed final AX reads cannot prove cancellation left the target unchanged")
+    try require(RuntimeNegativeTextObservation.classify(baseline: nil, finalText: seededTarget) == .unreadable,
+                "a missing readable seed cannot prove the target unchanged")
+    for changedTarget in [existingTextScenario.prefix + "unexpected insertion" + existingTextScenario.suffix,
+                          "replacement lost both markers", seededTarget + " "] {
+        try require(RuntimeNegativeTextObservation.classify(baseline: seededTarget, finalText: changedTarget) == .changed,
+                    "insertions, broken markers, and any full-target change fail cancellation proof")
+    }
+    try require(RuntimeNegativeTextObservation.classify(baseline: "", finalText: "") == .readableUnchanged,
+                "readable empty text remains distinct from an unreadable target")
+    print("PASS negative observations require readable exact full-target equality")
     let singlePasteProof = RuntimeDOMPasteProof.parse(
         from: "Roma Runtime E2E Paste Proof pasteEvents=1 pasteInputs=1"
     )
@@ -767,11 +784,122 @@ do {
     )
     print("PASS latency trace exposes the transcription character count")
 
+    let ownedWindowFrame = RuntimeScreenRect(x: 100, y: 100, width: 600, height: 400)
+    let ownedEditorFrame = RuntimeScreenRect(x: 110, y: 140, width: 580, height: 350)
+    let ownedCaptureRect = RuntimeScreenRect(x: 122, y: 144, width: 556, height: 342)
+    let ownedAssociation = RuntimeTargetCaptureAssociation(
+        processIdentifier: 37, windowID: 9, windowFrame: ownedWindowFrame,
+        editableFrame: ownedEditorFrame, captureRect: ownedCaptureRect
+    )
+    let ownedDisplayWindow = RuntimeOnscreenWindow(
+        processIdentifier: 37, windowID: 9, frame: ownedWindowFrame, alpha: 1
+    )
+    let coveringWindow = RuntimeOnscreenWindow(
+        processIdentifier: 58, windowID: 11, frame: RuntimeScreenRect(x: 200, y: 180, width: 150, height: 100), alpha: 1
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: [ownedDisplayWindow]
+    ) == nil, "A uniquely owned unobscured target must remain observable")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [coveringWindow, ownedDisplayWindow]
+    ) == nil, "Global window bounds cannot decide whether an overlapping window paints the capture rectangle")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [ownedDisplayWindow, coveringWindow]
+    ) == nil, "A window behind the target must not count as an occluder")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: []
+    ) != nil, "A minimized or off-screen target cannot supply visible text")
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [ownedDisplayWindow, ownedDisplayWindow]
+    ) != nil, "Ambiguous WindowServer identity cannot supply capture ownership")
+    let movedAssociation = RuntimeTargetCaptureAssociation(
+        processIdentifier: 37, windowID: 9,
+        windowFrame: RuntimeScreenRect(x: 200, y: 100, width: 600, height: 400),
+        editableFrame: RuntimeScreenRect(x: 210, y: 140, width: 580, height: 350), captureRect: ownedCaptureRect
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: movedAssociation, frontToBackWindows: [ownedDisplayWindow]
+    ) != nil, "Moving readable text away from the fixed capture rectangle must invalidate association")
+    let replacementAssociation = RuntimeTargetCaptureAssociation(
+        processIdentifier: 37, windowID: 12, windowFrame: ownedWindowFrame,
+        editableFrame: ownedEditorFrame, captureRect: ownedCaptureRect
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: replacementAssociation, frontToBackWindows: [ownedDisplayWindow]
+    ) != nil, "A replacement window at the same position is not the owned target")
+    let wrongProcess = RuntimeOnscreenWindow(processIdentifier: 58, windowID: 9, frame: ownedWindowFrame, alpha: 1)
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: [wrongProcess]
+    ) != nil, "A reused window number belonging to another process cannot own the capture")
+    let transparentCover = RuntimeOnscreenWindow(
+        processIdentifier: 58, windowID: 11, frame: coveringWindow.frame, alpha: 0
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [transparentCover, ownedDisplayWindow]
+    ) == nil, "A fully transparent window supplies no covering pixels")
+    let partlyTransparentCover = RuntimeOnscreenWindow(
+        processIdentifier: 58, windowID: 11, frame: coveringWindow.frame, alpha: 0.01
+    )
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation,
+        frontToBackWindows: [partlyTransparentCover, ownedDisplayWindow]
+    ) == nil, "Nonzero global alpha does not prove per-pixel opacity; paired pixels decide coverage")
+    let fadedTarget = RuntimeOnscreenWindow(processIdentifier: 37, windowID: 9, frame: ownedWindowFrame, alpha: 0.5)
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: [fadedTarget]
+    ) != nil, "The owned target itself must retain full global opacity")
+    print("PASS capture metadata rejects moved, minimized, replaced, faded and ambiguous targets")
+
+    let ownedPixels: [UInt8] = [255, 255, 255, 255, 12, 34, 56, 255]
+    let equalPair = RuntimeCaptureVisibilityPolicy.compareRGBA(display: ownedPixels, reference: ownedPixels)
+    try require(equalPair?.matches == true && equalPair?.comparedPixels == 2 && equalPair?.differingPixels == 0,
+                "Identical actual display and owned-window pixels prove the same visible surface")
+    var opaqueCoverPixels = ownedPixels
+    opaqueCoverPixels[4] += 1
+    let coveredPair = RuntimeCaptureVisibilityPolicy.compareRGBA(display: opaqueCoverPixels, reference: ownedPixels)
+    try require(coveredPair?.matches == false && coveredPair?.differingPixels == 1,
+                "Even one channel differing by one rejects coverage; no visibility threshold")
+    var alphaChangedPixels = ownedPixels
+    alphaChangedPixels[7] -= 1
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: alphaChangedPixels, reference: ownedPixels)?.matches == false,
+                "Alpha differences cannot be ignored during visible ownership comparison")
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: [], reference: []) == nil,
+                "Empty images cannot prove display visibility")
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: ownedPixels, reference: [0, 0, 0, 0]) == nil,
+                "Different image sizes cannot prove visibility")
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: [0, 0, 0], reference: [0, 0, 0]) == nil,
+                "Partial RGBA pixels cannot prove visibility")
+    print("PASS paired visibility requires exact nonempty full RGBA equality including alpha")
+
     let stablePixels = [UInt8](repeating: 128, count: 400 * 4)
     var caretOnlyPixels = stablePixels
     for pixel in 0..<40 {
         caretOnlyPixels[pixel * 4] = 0
     }
+    var interruptedVisibility = RuntimeRenderedTextAssociationTracker(baseline: stablePixels)
+    _ = interruptedVisibility.observe(current: stablePixels, atSystemUptime: 0,
+                                      accessibilityText: "", precedingAccessibilityText: "")
+    var textPixels = stablePixels
+    for pixel in 0..<100 { textPixels[pixel * 4] = 0 }
+    _ = interruptedVisibility.observe(current: textPixels, atSystemUptime: 1,
+                                      accessibilityText: "visible text", precedingAccessibilityText: "visible text")
+    interruptedVisibility.discardUnassociatedFrame()
+    let afterVisibilityGap = interruptedVisibility.observe(
+        current: textPixels, atSystemUptime: 2, accessibilityText: "visible text", precedingAccessibilityText: "visible text"
+    )
+    try require(afterVisibilityGap?.firstPersistentChangeAtSystemUptime == nil,
+                "A mismatched pair must break the persistence streak without using covered pixels")
+    let confirmedAfterGap = interruptedVisibility.observe(
+        current: textPixels, atSystemUptime: 2.3, accessibilityText: "visible text", precedingAccessibilityText: "visible text"
+    )
+    try require(confirmedAfterGap?.firstPersistentChangeAtSystemUptime == 2,
+                "After a mismatch, new visible persistence starts at the next matched pair and preserves the empty baseline")
+    print("PASS visibility mismatch breaks pixel persistence without replacing the confirmed baseline")
+
     let caretOnlyDifference = RuntimeRenderedTextChangePolicy.compareRGBA(
         baseline: stablePixels,
         current: caretOnlyPixels
@@ -950,6 +1078,41 @@ do {
                     .firstPersistentChangeAtSystemUptime == 0.180,
                 "matching AX bracket establishes a later genuine captured timestamp, not an AX timestamp")
     print("PASS rendered association rejects pre-text/unknown/replaced pixels and preserves matched paint time")
+
+    // AD4952: cold AX timed out before the first capture after release; keep the
+    // earlier AX-bracketed empty frame, without attributing the unreadable capture.
+    for scenario in RuntimeTextScenario.allCases {
+        let confirmedEmpty = scenario.insertedText(from: scenario.initialText)
+        let inserted = scenario.insertedText(from: scenario.prefix + "inserted" + scenario.suffix)
+        for bracket: (String?, String?) in [(nil, confirmedEmpty), (confirmedEmpty, nil), (nil, nil)] {
+            var coldStart = RuntimeRenderedTextAssociationTracker(baseline: stablePixels)
+            _ = coldStart.observe(current: nontextPixels, atSystemUptime: -0.5,
+                                  accessibilityText: confirmedEmpty, precedingAccessibilityText: confirmedEmpty)
+            try require(coldStart.observe(current: insertedPixels, atSystemUptime: 1.540,
+                                          accessibilityText: bracket.1, precedingAccessibilityText: bracket.0) == nil,
+                        "unreadable AX cannot attribute its captured pixels")
+            _ = coldStart.observe(current: insertedPixels, atSystemUptime: 1.865,
+                                  accessibilityText: inserted, precedingAccessibilityText: inserted)
+            try require(coldStart.observe(current: insertedPixels, atSystemUptime: 1.940,
+                                          accessibilityText: inserted, precedingAccessibilityText: inserted)?
+                            .firstPersistentChangeAtSystemUptime == 1.865,
+                        "a confirmed \(scenario.rawValue) baseline survives unreadable pre-text AX without backdating paint")
+            _ = coldStart.observe(current: insertedPixels, atSystemUptime: 1.970,
+                                  accessibilityText: nil, precedingAccessibilityText: inserted)
+            _ = coldStart.observe(current: insertedPixels, atSystemUptime: 2.000,
+                                  accessibilityText: inserted, precedingAccessibilityText: inserted)
+            try require(coldStart.observe(current: insertedPixels, atSystemUptime: 2.030,
+                                          accessibilityText: inserted, precedingAccessibilityText: inserted) == nil,
+                        "unknown AX after an inserted-text epoch still invalidates old glyph proof")
+        }
+    }
+    var unconfirmedBaseline = RuntimeRenderedTextAssociationTracker(baseline: stablePixels)
+    _ = unconfirmedBaseline.observe(current: insertedPixels, atSystemUptime: 1,
+                                    accessibilityText: "inserted", precedingAccessibilityText: "inserted")
+    try require(unconfirmedBaseline.observe(current: insertedPixels, atSystemUptime: 2,
+                                            accessibilityText: "inserted", precedingAccessibilityText: "inserted") == nil,
+                "initial pixels without an AX-bracketed baseline cannot prove inserted text")
+    print("PASS confirmed empty baselines survive cold AX without accepting unreadable-frame or stale-text timestamps")
 
     let latencies = [100.0, 200.0, 300.0, 400.0, 500.0]
     try require(RuntimeStatistics.percentile(50, values: latencies) ?? -1, equals: 300, "p50 latency")

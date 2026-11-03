@@ -1,0 +1,51 @@
+name: Probe supported virtual camera on macOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "ci/lip-camera-probe-*"
+    paths:
+      - ".github/workflows/lip-camera-probe.yml"
+      - "Tools/LipCameraProbe/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lip-camera-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  camera-device:
+    if: startsWith(github.ref, 'refs/heads/ci/lip-camera-probe-')
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH: "1"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Try signed OBS extension and capture actual camera frames
+        id: probe
+        run: python3 Tools/LipCameraProbe/run.py
+
+      - name: Upload actual desktop, AX, extension and frame receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: lip-camera-probe-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/lip-camera-probe/*.json
+            ${{ runner.temp }}/lip-camera-probe/*.log
+            ${{ runner.temp }}/lip-camera-probe/*.png
+            ${{ runner.temp }}/lip-camera-probe/obs-logs/**
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Require functioning device with moving frames and closed capture
+        if: always()
+        env:
+          CAMERA_STATUS: ${{ steps.probe.outputs.camera_status }}
+        run: test "$CAMERA_STATUS" = supportedDeviceReady

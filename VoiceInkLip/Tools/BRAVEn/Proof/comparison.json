@@ -1,0 +1,28 @@
+{
+  "base_ctc": {
+    "a-frozen": "",
+    "a-intact": "DON'T FORGET IN CHINCKY",
+    "b-frozen": "",
+    "b-intact": "ON MY WAY THE ME",
+    "c-frozen": "",
+    "c-intact": "IT' 11 CLOCK"
+  },
+  "large_ctc": {
+    "a-frozen": "",
+    "a-intact": "DON'T FORGET A CHINA",
+    "b-frozen": "",
+    "b-intact": "I'M ON MY WAY TO THE ME I",
+    "c-frozen": "",
+    "c-intact": "IT'S 11 O'CLOCK"
+  },
+  "large_beam": {
+    "a-frozen": "WE'RE GOING TO TALK ABOUT",
+    "a-intact": "DON'T FORGET CHINA LG",
+    "b-frozen": "I'M GOING TO SHOW YOU HOW TO",
+    "b-intact": "I'M ON MY WAY TO THE BED I",
+    "c-frozen": "WHAT I'M GOING TO DO IS",
+    "c-intact": "AND IT'S 11 O'CLOCK"
+  },
+  "references_supplied_to_decoder": false,
+  "selection_judgment": "Large has more useful native CTC text on b and c while a remains wrong. It requires 1.36GB installed storage versus Base Plus 418MB. No broad accuracy estimate is claimed."
+}

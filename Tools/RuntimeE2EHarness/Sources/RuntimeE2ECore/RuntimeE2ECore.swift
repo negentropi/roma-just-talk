@@ -134,6 +134,17 @@ public enum RuntimeTextScenario: String, Codable, CaseIterable, Sendable {
     }
 }
 
+public enum RuntimeNegativeTextObservation: String, Codable, Sendable {
+    case readableUnchanged
+    case changed
+    case unreadable
+
+    public static func classify(baseline: String?, finalText: String?) -> Self {
+        guard let baseline, let finalText else { return .unreadable }
+        return finalText == baseline ? .readableUnchanged : .changed
+    }
+}
+
 public struct RuntimeDOMPasteProof: Codable, Equatable, Sendable {
     public let pasteEventCount: Int
     public let pasteInputCount: Int
@@ -804,6 +815,105 @@ public enum RuntimeStatistics {
     }
 }
 
+public struct RuntimeScreenRect: Codable, Equatable, Sendable {
+    public let x: Double
+    public let y: Double
+    public let width: Double
+    public let height: Double
+
+    public init(x: Double, y: Double, width: Double, height: Double) {
+        self.x = x; self.y = y; self.width = width; self.height = height
+    }
+
+    public var isUsable: Bool {
+        [x, y, width, height, x + width, y + height].allSatisfy(\.isFinite) && width > 0 && height > 0
+    }
+
+    public func contains(_ other: Self) -> Bool {
+        isUsable && other.isUsable && other.x >= x && other.y >= y
+            && other.x + other.width <= x + width && other.y + other.height <= y + height
+    }
+}
+
+public struct RuntimeTargetCaptureAssociation: Codable, Equatable, Sendable {
+    public let processIdentifier: Int32
+    public let windowID: UInt32
+    public let windowFrame: RuntimeScreenRect
+    public let editableFrame: RuntimeScreenRect
+    public let captureRect: RuntimeScreenRect
+
+    public init(processIdentifier: Int32, windowID: UInt32, windowFrame: RuntimeScreenRect,
+                editableFrame: RuntimeScreenRect, captureRect: RuntimeScreenRect) {
+        self.processIdentifier = processIdentifier
+        self.windowID = windowID
+        self.windowFrame = windowFrame
+        self.editableFrame = editableFrame
+        self.captureRect = captureRect
+    }
+}
+
+public struct RuntimeOnscreenWindow: Equatable, Sendable {
+    public let processIdentifier: Int32
+    public let windowID: UInt32
+    public let frame: RuntimeScreenRect
+    public let alpha: Double
+
+    public init(processIdentifier: Int32, windowID: UInt32, frame: RuntimeScreenRect, alpha: Double) {
+        self.processIdentifier = processIdentifier
+        self.windowID = windowID
+        self.frame = frame
+        self.alpha = alpha
+    }
+}
+
+public enum RuntimeCaptureAssociationPolicy {
+    public static func rejection(
+        expected: RuntimeTargetCaptureAssociation,
+        observed: RuntimeTargetCaptureAssociation,
+        frontToBackWindows: [RuntimeOnscreenWindow]
+    ) -> String? {
+        guard observed == expected else { return "Owned target identity or geometry changed" }
+        guard expected.windowFrame.contains(expected.captureRect),
+              expected.editableFrame.contains(expected.captureRect) else {
+            return "Capture rectangle extends outside the owned target"
+        }
+        let matches = frontToBackWindows.indices.filter {
+            frontToBackWindows[$0].windowID == expected.windowID
+        }
+        guard matches.count == 1, let index = matches.first else {
+            return "Owned target is not uniquely on screen"
+        }
+        let window = frontToBackWindows[index]
+        guard window.processIdentifier == expected.processIdentifier,
+              window.frame == expected.windowFrame, window.alpha == 1 else {
+            return "On-screen target identity, geometry or opacity changed"
+        }
+        // Window bounds/global alpha cannot describe per-pixel coverage. The paired
+        // display/owned-window capture decides visibility after these identity checks.
+        return nil
+    }
+}
+
+public struct RuntimeCapturePixelComparison: Equatable, Sendable {
+    public let comparedPixels: Int
+    public let differingPixels: Int
+    public var matches: Bool { differingPixels == 0 }
+}
+
+public enum RuntimeCaptureVisibilityPolicy {
+    public static func compareRGBA(display: [UInt8], reference: [UInt8]) -> RuntimeCapturePixelComparison? {
+        guard !display.isEmpty, display.count == reference.count, display.count.isMultiple(of: 4) else { return nil }
+        var differingPixels = 0
+        for offset in stride(from: 0, to: display.count, by: 4) {
+            if display[offset] != reference[offset] || display[offset + 1] != reference[offset + 1]
+                || display[offset + 2] != reference[offset + 2] || display[offset + 3] != reference[offset + 3] {
+                differingPixels += 1
+            }
+        }
+        return RuntimeCapturePixelComparison(comparedPixels: display.count / 4, differingPixels: differingPixels)
+    }
+}
+
 public struct RuntimeRenderedPixelDifference: Equatable, Sendable {
     public let changedPixels: Int
     public let comparedPixels: Int
@@ -952,9 +1062,8 @@ public struct RuntimeRenderedTextAssociationTracker: Sendable {
     public private(set) var associationError: String?
 
     public init(baseline: [UInt8]) {
-        self.baseline = baseline
+        // Initial pixels establish dimensions, not their pre-insertion AX identity.
         previousFrame = baseline
-        latencyTracker = RuntimeRenderedTextLatencyTracker(baseline: baseline)
     }
 
     public mutating func observe(
@@ -975,21 +1084,11 @@ public struct RuntimeRenderedTextAssociationTracker: Sendable {
         }
         guard let accessibilityText else {
             // Unknown text cannot label a frame as either pre-insertion or inserted text.
-            baseline = nil
-            latencyTracker = nil
-            insertedText = nil
-            acceptedSample = nil
-            acceptedFrame = nil
-            associationError = "AX text was unreadable; no confirmed pre-insertion frame"
+            rejectUnreadableFrame("AX text was unreadable for the captured frame")
             return nil
         }
         guard let precedingAccessibilityText else {
-            baseline = nil
-            latencyTracker = nil
-            insertedText = nil
-            acceptedSample = nil
-            acceptedFrame = nil
-            associationError = "AX text before capture was unreadable; no confirmed pre-insertion frame"
+            rejectUnreadableFrame("AX text before capture was unreadable")
             return nil
         }
         guard precedingAccessibilityText == accessibilityText else {
@@ -1053,6 +1152,27 @@ public struct RuntimeRenderedTextAssociationTracker: Sendable {
         self.latencyTracker = latencyTracker
         associationError = sample == nil ? "Incompatible rendered frames" : nil
         return sample
+    }
+
+    public mutating func discardUnassociatedFrame() {
+        // A visibility mismatch breaks persistence without replacing the confirmed empty baseline.
+        latencyTracker = baseline.map { RuntimeRenderedTextLatencyTracker(baseline: $0) }
+        acceptedSample = nil
+        acceptedFrame = nil
+        associationError = nil
+    }
+
+    private mutating func rejectUnreadableFrame(_ error: String) {
+        // Keep only an AX-bracketed empty baseline from before the first text epoch.
+        // The unreadable frame cannot contribute pixels or a render timestamp.
+        if insertedText != nil {
+            baseline = nil
+        }
+        latencyTracker = baseline.map { RuntimeRenderedTextLatencyTracker(baseline: $0) }
+        insertedText = nil
+        acceptedSample = nil
+        acceptedFrame = nil
+        associationError = error
     }
 }
 

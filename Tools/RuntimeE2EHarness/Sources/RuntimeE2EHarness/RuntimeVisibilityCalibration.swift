@@ -13,7 +13,7 @@ struct RuntimeVisibilityCalibrationCase: Codable {
 }
 
 enum RuntimeVisibilityCalibration {
-    static func run(configuration: RuntimeHarnessConfiguration) -> [RuntimeVisibilityCalibrationCase] {
+    static func run(configuration: RuntimeHarnessConfiguration, evidenceDirectoryURL: URL) -> [RuntimeVisibilityCalibrationCase] {
         let pasteboard = NSPasteboard.general
         let savedItems = pasteboard.pasteboardItems?.map { item in
             item.types.compactMap { type in item.data(forType: type).map { (type, $0) } }
@@ -38,6 +38,9 @@ enum RuntimeVisibilityCalibration {
                         runID: RuntimeTargetIsolationPlan.visibilityCalibrationRunID(
                             targetID: target.id,
                             textScenario: scenario
+                        ),
+                        acceptedFrameURL: evidenceDirectoryURL.appendingPathComponent(
+                            "calibration-\(target.id)-\(scenario.rawValue)-\(UUID().uuidString)-accepted.png"
                         ),
                         settleSeconds: configuration.targetSettleSeconds,
                         availabilityPolicy: configuration.targetAvailabilityPolicy

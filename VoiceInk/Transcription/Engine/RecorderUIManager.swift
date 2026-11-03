@@ -31,6 +31,7 @@ class RecorderUIManager: ObservableObject {
         }
     }
     @Published private(set) var isRecorderSessionActive = false
+    private(set) var recorderSessionID: UUID?
 
     var notchWindowManager: NotchWindowManager?
     var miniWindowManager: MiniWindowManager?
@@ -97,6 +98,7 @@ class RecorderUIManager: ObservableObject {
     // MARK: - Mini Recorder Management
 
     func beginRecorderSession() {
+        recorderSessionID = UUID()
         isRecorderSessionActive = true
         if VoiceInkRecorderStylePreference.hasVisibleRecorder(rawValue: recorderType) {
             isMiniRecorderVisible = true
@@ -133,6 +135,7 @@ class RecorderUIManager: ObservableObject {
             isRecorderSessionActive: isRecorderSessionActive
         ) {
             logger.notice("toggleMiniRecorder: clearing stale hidden recorder session before starting")
+            recorderSessionID = nil
             isRecorderSessionActive = false
         }
 
@@ -170,10 +173,20 @@ class RecorderUIManager: ObservableObject {
     }
 
     func dismissMiniRecorder() async {
+        dismissRecorderPanel()
+    }
+
+    func dismissRecorderSession(_ sessionID: UUID?) async {
+        guard recorderSessionID == sessionID else { return }
+        dismissRecorderPanel()
+    }
+
+    private func dismissRecorderPanel() {
         guard let engine = engine else { return }
         logger.notice("dismissMiniRecorder called – state=\(String(describing: engine.recordingState), privacy: .public)")
 
         hideRecorderPanel()
+        recorderSessionID = nil
         isMiniRecorderVisible = false
         isRecorderSessionActive = false
 
@@ -192,9 +205,10 @@ class RecorderUIManager: ObservableObject {
 
     func cancelRecording(_ cancellation: RecordingCancellation) async {
         guard let engine = engine else { return }
+        let sessionID = recorderSessionID
         logger.notice("cancelRecording called – \(String(describing: cancellation), privacy: .public)")
         await engine.cancelRecording(cancellation)
-        await dismissMiniRecorder()
+        await dismissRecorderSession(sessionID)
     }
 
     // MARK: - Notification Handling

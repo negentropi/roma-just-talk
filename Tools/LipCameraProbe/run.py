@@ -1,0 +1,494 @@
+#!/usr/bin/env python3
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import socket
+import stat
+import subprocess
+import sys
+import time
+import uuid
+
+ROOT = Path(__file__).resolve().parents[2]
+OUT = Path(os.environ['RUNNER_TEMP']) / 'lip-camera-probe'
+OUT.mkdir(parents=True, exist_ok=True)
+BIN = OUT / 'bin'
+BIN.mkdir(exist_ok=True)
+UI_APP = OUT / 'LipCameraUIProbe.app'
+summary = {'status': 'blocked', 'sourceHead': os.environ.get('GITHUB_SHA', ''), 'events': [],
+           'boundary': 'Supported OBS camera extension and actual AVFoundation device frames, not app dictation'}
+OBS_SHA = '3d6b2eedeb56416602af635adaba32327fdf11ff9d2806a4ce7d5b608de73238'
+OBS_URL = 'https://github.com/obsproject/obs-studio/releases/download/33.0.1/OBS-Studio-33.0.1-macOS-Apple.dmg'
+FIXTURE_SHA = 'db7b8cf8cdbe547ab491c42801a1bae5b16c5471050d7e3d9e1f0173c7a0d8fc'
+FIXTURE_URL = 'https://media.githubusercontent.com/media/CheyneyComputerScience/CREMA-D/1658cd342dff90010aa843eaeebd53610a08b1dc/VideoFlash/1003_IEO_NEU_XX.flv'
+mounted = False
+started_obs = False
+probe_process = None
+failed_postrestart_output = False
+OBS_LOG_LIMIT = 1024 * 1024
+OBS_ACTIVATED_MESSAGE = 'macOS Camera Extension activated successfully.'
+
+
+def run(name, arguments, timeout=40, required=False):
+    log = OUT / (name + '.log')
+    with log.open('wb') as stream:
+        try:
+            result = subprocess.run(arguments, stdout=stream, stderr=subprocess.STDOUT, timeout=timeout)
+            code = result.returncode
+        except subprocess.TimeoutExpired:
+            code = 124
+    summary['events'].append({'operation': name, 'exitCode': code, 'log': log.name})
+    if required and code != 0:
+        raise RuntimeError(name + ' failed with exit code ' + str(code))
+    return code
+
+
+def digest(path):
+    value = hashlib.sha256()
+    with path.open('rb') as stream:
+        for part in iter(lambda: stream.read(1024 * 1024), b''):
+            value.update(part)
+    return value.hexdigest()
+
+
+def screenshot(name):
+    run(name, ['/usr/sbin/screencapture', '-x', str(OUT / (name + '.png'))], timeout=12)
+
+
+def ui(name, approve=False, authenticate=False, acknowledge_obs_alert=False):
+    command = ['/usr/bin/open', '-W', '-n', '--env', 'GITHUB_ACTIONS=true', '--env', 'RUNNER_OS=macOS', str(UI_APP), '--args', str(OUT / (name + '.json'))]
+    if acknowledge_obs_alert:
+        command.append('acknowledge-obs-camera-alert')
+    elif authenticate:
+        command.append('authenticate-host-autologin')
+    elif approve:
+        command.append('approve')
+    run(name, command, timeout=20)
+
+
+def obs_process_ids(deadline=None):
+    def timeout():
+        remaining = 5 if deadline is None else min(5, deadline - time.monotonic())
+        if remaining <= 0:
+            raise RuntimeError('OBS process inspection deadline expired')
+        return remaining
+    result = subprocess.run(['/usr/bin/pgrep', '-x', 'OBS'], capture_output=True, text=True, timeout=timeout())
+    if result.returncode == 1:
+        return []
+    if result.returncode != 0:
+        raise RuntimeError('Could not inspect the probe-owned OBS process')
+    verified = []
+    for identifier in result.stdout.split():
+        process = subprocess.run(['/bin/ps', '-p', identifier, '-o', 'comm='], capture_output=True, text=True, timeout=timeout())
+        if process.returncode != 0:
+            continue
+        if process.stdout.strip() != '/Applications/OBS.app/Contents/MacOS/OBS':
+            raise RuntimeError('An OBS-named process is outside the probe-owned application')
+        verified.append(int(identifier))
+    return verified
+
+
+def observe_obs_exit(restart):
+    deadline = time.monotonic() + 15
+    while time.monotonic() < deadline:
+        restart['remainingProcessIDs'] = obs_process_ids()
+        if not restart['remainingProcessIDs']:
+            restart['exitObserved'] = True
+            return True
+        time.sleep(0.25)
+    return False
+
+
+def obs_log_inventory(directory):
+    info = directory.lstat()
+    if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid():
+        raise RuntimeError('OBS log directory is not a runner-owned non-symlink directory')
+    entries = list(directory.iterdir())
+    if len(entries) > 32:
+        raise RuntimeError('OBS log inventory exceeds its bound')
+    inventory = {}
+    for path in entries:
+        entry = path.lstat()
+        birth = getattr(entry, 'st_birthtime_ns', None)
+        if birth is None and hasattr(entry, 'st_birthtime'):
+            birth = int(entry.st_birthtime * 1_000_000_000)
+        inventory[path.name] = {'device': entry.st_dev, 'inode': entry.st_ino, 'uid': entry.st_uid,
+                                'regular': stat.S_ISREG(entry.st_mode), 'size': entry.st_size,
+                                'createdAtNs': birth, 'modifiedAtNs': entry.st_mtime_ns}
+    return inventory
+
+
+def read_obs_log(path, identity):
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(descriptor, 'rb') as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or (info.st_dev, info.st_ino) != (identity['device'], identity['inode']):
+            raise RuntimeError('Selected OBS log identity, ownership, or regular-file check failed')
+        return stream.read(OBS_LOG_LIMIT + 1)
+
+
+def wait_for_obs_activation(directory, before, expected_pid, launch_ns):
+    started = time.monotonic()
+    deadline = started + 30
+    receipt = {'status': 'waiting', 'expectedPID': expected_pid, 'launchRequestedAtNs': launch_ns,
+               'waitStartedAtNs': time.time_ns(), 'waitLimitSeconds': 30, 'byteLimit': OBS_LOG_LIMIT,
+               'inventoryBeforeLaunch': before, 'flatLog': 'obs-restarted-process.log'}
+    summary['obsActivationReadiness'] = receipt
+    captured = b''
+    selected = None
+    try:
+        while time.monotonic() < deadline:
+            os.kill(expected_pid, 0)
+            current = obs_log_inventory(directory)
+            receipt['inventoryAtLastObservation'] = current
+            new = sorted(set(current) - set(before))
+            receipt['newLogCandidates'] = new
+            if len(new) > 1:
+                raise RuntimeError('Multiple new OBS logs cannot bind the activation callback to this launch')
+            if new:
+                name = new[0]
+                identity = current[name]
+                if not identity['regular'] or identity['uid'] != os.getuid() or identity['createdAtNs'] is None or identity['createdAtNs'] < launch_ns:
+                    raise RuntimeError('New OBS log is not a regular runner-owned file created for this launch')
+                if selected is not None and (name, identity['device'], identity['inode']) != selected:
+                    raise RuntimeError('New OBS log identity changed during activation observation')
+                selected = (name, identity['device'], identity['inode'])
+                receipt.update(selectedLog=str(directory / name), selectedLogIdentity=identity)
+                captured = read_obs_log(directory / name, identity)
+                if len(captured) > OBS_LOG_LIMIT:
+                    raise RuntimeError('New OBS log exceeds the bounded snapshot size')
+                lines = captured.decode('utf-8', errors='replace').splitlines()
+                events = []
+                for number, line in enumerate(lines, 1):
+                    if line.rstrip().endswith(OBS_ACTIVATED_MESSAGE):
+                        phase = 'completed'
+                    elif line.rstrip().endswith('macOS Camera Extension user approval required.'):
+                        phase = 'approvalRequired'
+                    elif line.rstrip().endswith('macOS Camera Extension will activate after reboot.'):
+                        phase = 'rebootRequired'
+                    elif 'mac-camera-extension: OSSystemExtensionErrorCode ' in line or 'mac-camera-extension: OBS cannot install the virtual camera' in line:
+                        phase = 'activationError'
+                    else:
+                        continue
+                    events.append({'phase': phase, 'line': line, 'lineNumber': number})
+                latest_event = events[-1] if events else None
+                receipt['latestActivationEvent'] = latest_event
+                if latest_event and latest_event['phase'] in ['rebootRequired', 'activationError']:
+                    receipt['activationFailureLine'] = latest_event['line']
+                    raise RuntimeError('New OBS process reported an activation error or reboot requirement')
+                if latest_event and latest_event['phase'] == 'completed':
+                    receipt['activationCompletedLine'] = latest_event['line']
+                    latest = obs_log_inventory(directory)
+                    if sorted(set(latest) - set(before)) != [name] or (latest[name]['device'], latest[name]['inode']) != selected[1:]:
+                        raise RuntimeError('OBS log binding changed before callback acceptance')
+                    observed = obs_process_ids(deadline=deadline)
+                    receipt['processIDsAtAcceptance'] = observed
+                    if observed != [expected_pid]:
+                        raise RuntimeError('Owned OBS process changed before callback acceptance')
+                    receipt.update(status='activationCompleted', acceptedAtNs=time.time_ns())
+                    return
+            time.sleep(min(0.2, max(0, deadline - time.monotonic())))
+        raise RuntimeError('New OBS process activation-completed callback was not observed before deadline')
+    except Exception as error:
+        receipt.update(status='blocked', failure=str(error))
+        raise
+    finally:
+        receipt.update(waitElapsedSeconds=time.monotonic() - started, snapshotBytes=min(len(captured), OBS_LOG_LIMIT), snapshotTruncated=len(captured) > OBS_LOG_LIMIT)
+        (OUT / 'obs-restarted-process.log').write_bytes(captured[:OBS_LOG_LIMIT])
+        (OUT / 'obs-activation-readiness.json').write_text(json.dumps(receipt, indent=2) + '\n')
+
+
+try:
+    if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_OS') != 'macOS' or sys.platform != 'darwin':
+        raise RuntimeError('Run only on a disposable macOS GitHub Actions host')
+    if subprocess.check_output(['uname', '-m'], text=True).strip() != 'arm64':
+        raise RuntimeError('Pinned OBS artifact requires arm64')
+    for name, arguments in [
+        ('os', ['sw_vers']), ('architecture', ['uname', '-m']), ('sip', ['/usr/bin/csrutil', 'status']),
+        ('gatekeeper', ['/usr/sbin/spctl', '--status']), ('console-owner', ['/usr/bin/stat', '-f', '%Su', '/dev/console']),
+        ('extensions-before', ['/usr/bin/systemextensionsctl', 'list']),
+        ('desktop-before', ['/usr/sbin/system_profiler', 'SPDisplaysDataType']),
+        ('account-groups', ['/usr/bin/id', '-Gn']),
+        ('account-secure-token', ['/usr/sbin/sysadminctl', '-secureTokenStatus', os.environ.get('USER', '')]),
+    ]:
+        run(name, arguments)
+    for source in ['UIProbe', 'OBSControl', 'CameraProbe']:
+        sources = [str(ROOT / 'Tools/LipCameraProbe' / (source + '.swift'))]
+        if source == 'UIProbe':
+            sources.append(str(ROOT / 'Tools/LipCameraProbe/SystemExtensionAuthentication.swift'))
+        run('compile-' + source, ['xcrun', 'swiftc', '-parse-as-library', *sources, '-o', str(BIN / source)], timeout=90, required=True)
+    (UI_APP / 'Contents/MacOS').mkdir(parents=True)
+    shutil.copy2(BIN / 'UIProbe', UI_APP / 'Contents/MacOS/UIProbe')
+    shutil.copy2(ROOT / 'Tools/LipCameraProbe/UIProbe-Info.plist', UI_APP / 'Contents/Info.plist')
+    run('sign-ui-probe', ['/usr/bin/codesign', '--force', '--sign', '-', str(UI_APP)], required=True)
+    run('verify-ui-probe', ['/usr/bin/codesign', '--verify', '--strict', str(UI_APP)], required=True)
+    run('ui-probe-requirement', ['/usr/bin/codesign', '-dr', '-', str(UI_APP)], required=True)
+    lines = (OUT / 'ui-probe-requirement.log').read_text().splitlines()
+    requirements = [line.split('designated => ', 1)[1] for line in lines if 'designated => ' in line]
+    if len(requirements) != 1:
+        raise RuntimeError('Expected one signed helper designated requirement')
+    requirement = OUT / 'ui-probe-requirement.txt'
+    requirement.write_text(requirements[0] + '\n')
+    csreq = OUT / 'ui-probe.csreq'
+    run('compile-ui-probe-requirement', ['/usr/bin/csreq', '-r', str(requirement), '-b', str(csreq)], required=True)
+    database = '/Library/Application Support/com.apple.TCC/TCC.db'
+    client = 'com.negentropi.LipCameraUIProbe'
+    query = "SELECT count(*) FROM access WHERE service='kTCCServiceAccessibility' AND client='" + client + "';"
+    preflight = run('ax-grant-preflight', ['sudo', '-n', '/usr/bin/sqlite3', database, query])
+    if preflight == 0 and (OUT / 'ax-grant-preflight.log').read_text().strip() == '0':
+        sql = "INSERT INTO access(service,client,client_type,auth_value,auth_reason,auth_version,csreq,indirect_object_identifier_type,indirect_object_identifier,flags) VALUES('kTCCServiceAccessibility','" + client + "',0,2,4,1,X'" + csreq.read_bytes().hex() + "',0,'UNUSED',0);"
+        granted = run('provision-helper-accessibility', ['sudo', '-n', '/usr/bin/sqlite3', database, sql]) == 0
+        summary['testHelperAccessibilityGrantInstalled'] = granted
+        if granted:
+            run('refresh-user-tcc-cache', ['/usr/bin/killall', 'tccd'])
+            run('refresh-system-tcc-cache', ['sudo', '-n', '/usr/bin/killall', 'tccd'])
+            time.sleep(2)
+    else:
+        summary['testHelperAccessibilityGrantInstalled'] = False
+        summary['accessibilityProvisioningBlocker'] = 'Scoped test-host TCC write unavailable or helper row unexpectedly pre-existing; existing grants preserved'
+    post_query = "SELECT count(*) FROM access WHERE service='kTCCServicePostEvent' AND client='" + client + "';"
+    post_preflight = run('post-event-grant-preflight', ['sudo', '-n', '/usr/bin/sqlite3', database, post_query])
+    if post_preflight == 0 and (OUT / 'post-event-grant-preflight.log').read_text().strip() == '0':
+        post_sql = "INSERT INTO access(service,client,client_type,auth_value,auth_reason,auth_version,csreq,indirect_object_identifier_type,indirect_object_identifier,flags) VALUES('kTCCServicePostEvent','" + client + "',0,2,4,1,X'" + csreq.read_bytes().hex() + "',0,'UNUSED',0);"
+        summary['testHelperPostEventGrantInstalled'] = run('provision-helper-post-event', ['sudo', '-n', '/usr/bin/sqlite3', database, post_sql]) == 0
+        run('refresh-post-event-tcc-cache', ['sudo', '-n', '/usr/bin/killall', 'tccd'])
+        time.sleep(2)
+    else:
+        summary['testHelperPostEventGrantInstalled'] = False
+    ui('helper-accessibility-check')
+    helper = json.loads((OUT / 'helper-accessibility-check.json').read_text())
+    summary['testHelperAccessibilityTrusted'] = helper.get('accessibilityTrusted', False)
+    dmg = OUT / 'OBS.dmg'
+    run('download-obs', ['curl', '--fail', '--location', '--retry', '2', '--max-time', '180', OBS_URL, '-o', str(dmg)], timeout=200, required=True)
+    assert digest(dmg) == OBS_SHA, 'OBS publisher asset SHA mismatch'
+    (OUT / 'download-provenance.json').write_text(json.dumps({'obs': {'url': OBS_URL, 'sha256': OBS_SHA}, 'fixture': {'url': FIXTURE_URL, 'sha256': FIXTURE_SHA}}, indent=2))
+    mount = OUT / 'obs-mount'
+    mount.mkdir(exist_ok=True)
+    run('mount-obs', ['/usr/bin/hdiutil', 'attach', '-readonly', '-nobrowse', '-mountpoint', str(mount), str(dmg)], timeout=30, required=True)
+    mounted = True
+    installed = Path('/Applications/OBS.app')
+    if installed.exists():
+        raise RuntimeError('Existing OBS installation is not a disposable probe-owned target')
+    run('install-obs', ['/usr/bin/ditto', str(mount / 'OBS.app'), str(installed)], timeout=60, required=True)
+    run('verify-obs', ['/usr/bin/codesign', '--verify', '--deep', '--strict', '--verbose=4', str(installed)], required=True)
+    run('assess-obs', ['/usr/sbin/spctl', '--assess', '--type', 'execute', '--verbose=4', str(installed)], required=True)
+    run('obs-signature', ['/usr/bin/codesign', '-dv', '--verbose=4', str(installed)])
+    extension = installed / 'Contents/Library/SystemExtensions/com.obsproject.obs-studio.mac-camera-extension.systemextension'
+    run('extension-signature', ['/usr/bin/codesign', '-dv', '--verbose=4', str(extension)])
+    run('verify-extension', ['/usr/bin/codesign', '--verify', '--strict', '--verbose=4', str(extension)], required=True)
+    original = OUT / 'public-original.flv'
+    silent = OUT / 'public-silent.mp4'
+    run('download-fixture', ['curl', '--fail', '--location', '--retry', '2', '--max-time', '90', FIXTURE_URL, '-o', str(original)], timeout=100, required=True)
+    assert digest(original) == FIXTURE_SHA, 'Public fixture SHA mismatch'
+    if shutil.which('ffmpeg') is None:
+        run('install-ffmpeg', ['brew', 'install', 'ffmpeg'], timeout=420, required=True)
+    run('prepare-silent-fixture', ['ffmpeg', '-hide_banner', '-loglevel', 'error', '-i', str(original), '-map', '0:v:0', '-an', '-vf', 'scale=640:480,fps=25', '-c:v', 'libx264', '-crf', '0', '-pix_fmt', 'yuv420p', str(silent)], required=True)
+    run('silent-fixture-streams', ['ffprobe', '-v', 'error', '-show_streams', '-of', 'json', str(silent)], required=True)
+    config = Path.home() / 'Library/Application Support/obs-studio'
+    if config.exists():
+        raise RuntimeError('Existing OBS configuration is not probe-owned')
+    websocket = config / 'plugin_config/obs-websocket/config.json'
+    websocket.parent.mkdir(parents=True)
+    websocket.write_text(json.dumps({'server_enabled': True, 'server_port': 4455, 'auth_required': True, 'server_password': uuid.uuid4().hex, 'first_load': False, 'alerts_enabled': False}))
+    websocket.chmod(0o600)
+    (config / 'global.ini').write_text('[General]\nFirstRun=true\nEnableAutoUpdates=false\n\n[Basic]\nProfile=RJTLipProof\nProfileDir=RJTLipProof\nSceneCollection=RJTLipProof\nSceneCollectionFile=RJTLipProof\n')
+    profile = config / 'basic/profiles/RJTLipProof'
+    profile.mkdir(parents=True)
+    (profile / 'basic.ini').write_text('[General]\nName=RJTLipProof\n\n[Video]\nBaseCX=640\nBaseCY=480\nOutputCX=640\nOutputCY=480\nFPSType=0\nFPSCommon=25\n\n[Audio]\nDesktopDevice1=disabled\nDesktopDevice2=disabled\nAuxDevice1=disabled\nAuxDevice2=disabled\nAuxDevice3=disabled\nAuxDevice4=disabled\n')
+    run('open-obs', ['/usr/bin/open', '-a', str(installed), '--args', '--profile', 'RJTLipProof', '--disable-updater'])
+    started_obs = True
+    time.sleep(8)
+    ui('obs-first-ui')
+    screenshot('obs-first')
+    for attempt in range(3):
+        ui('obs-startup-' + str(attempt), approve=True)
+        startup = json.loads((OUT / ('obs-startup-' + str(attempt) + '.json')).read_text())
+        if startup.get('authenticationRequired') or not startup.get('accessibilityTrusted'):
+            break
+        time.sleep(2)
+    screenshot('obs-after-startup')
+    run('configure-and-request-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-first.json')], timeout=25)
+    ui('finish-obs-startup', approve=True)
+    time.sleep(3)
+    run('extensions-requested', ['/usr/bin/systemextensionsctl', 'list'])
+    screenshot('extension-request')
+    run('open-extension-settings', ['/usr/bin/open', 'x-apple.systempreferences:com.apple.LoginItems-Settings.extension'])
+    approval_deadline = time.monotonic() + 45
+    attempt = 0
+    row_requested = False
+    extension_ready = False
+    while time.monotonic() < approval_deadline:
+        state_name = 'extensions-approval-' + str(attempt)
+        run(state_name, ['/usr/bin/systemextensionsctl', 'list'])
+        state = (OUT / (state_name + '.log')).read_text()
+        if any('com.obsproject.obs-studio.mac-camera-extension' in line and '[activated enabled]' in line for line in state.splitlines()):
+            extension_ready = True
+            break
+        ui('approval-' + str(attempt), approve=not row_requested)
+        screenshot('approval-' + str(attempt))
+        report = json.loads((OUT / ('approval-' + str(attempt) + '.json')).read_text())
+        if any(action.get('rowIdentityVerified') and action.get('posted') for action in report.get('actions', [])):
+            row_requested = True
+            summary['verifiedRowToggleRequested'] = True
+        if report.get('authenticationRequired'):
+            summary['administratorAuthenticationRequired'] = True
+            if os.environ.get('LIP_CAMERA_PROBE_USE_HOST_AUTOLOGIN_AUTH') != '1':
+                raise RuntimeError('Actual SecurityAgent System Extensions password prompt requires documented host authentication opt-in')
+            ui('host-authentication', authenticate=True)
+            authentication = json.loads((OUT / 'host-authentication.json').read_text())
+            actions = authentication.get('actions', [])
+            summary['hostAuthentication'] = actions
+            if not any(action.get('accountVerified') and action.get('authenticationAttempted') and action.get('submitted') for action in actions):
+                raise RuntimeError('Documented same-host authentication unavailable; see value-free authentication receipt')
+            enabled = False
+            for check in range(10):
+                time.sleep(3)
+                name = 'extensions-post-auth-' + str(check)
+                run(name, ['/usr/bin/systemextensionsctl', 'list'])
+                state = (OUT / (name + '.log')).read_text()
+                if any('com.obsproject.obs-studio.mac-camera-extension' in line and '[activated enabled]' in line for line in state.splitlines()):
+                    enabled = True
+                    break
+            summary['extensionEnabledAfterAuthentication'] = enabled
+            if not enabled:
+                raise RuntimeError('Ordinary credential submission did not enable the camera extension; no further authentication attempt')
+            extension_ready = True
+            break
+        if not report.get('accessibilityTrusted'):
+            raise RuntimeError('Test helper lost Accessibility authorization during extension approval')
+        attempt += 1
+        time.sleep(2)
+    if not extension_ready:
+        raise RuntimeError('Verified camera toggle did not reach enabled state or a ready authentication dialog before the bounded approval deadline')
+    run('extensions-after-approval', ['/usr/bin/systemextensionsctl', 'list'], required=True)
+    enabled_state = (OUT / 'extensions-after-approval.log').read_text()
+    if not any('com.obsproject.obs-studio.mac-camera-extension' in line and '[activated enabled]' in line for line in enabled_state.splitlines()):
+        raise RuntimeError('OBS extension was not enabled in the final pre-restart receipt')
+    restart = {'processIDsBefore': obs_process_ids(), 'exitObserved': False,
+               'alertAcknowledgementCount': 0}
+    summary['obsRestart'] = restart
+    # OBS can return AppleEvent -128 after starting shutdown; process exit is authoritative.
+    restart['quitRequestExitCode'] = run('restart-obs-quit', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15)
+    exited = observe_obs_exit(restart)
+    if not exited:
+        # Only this exact observed modal can authorize one acknowledgement and another normal quit.
+        ui('obs-camera-alert-after-blocked-quit', acknowledge_obs_alert=True)
+        delayed_path = OUT / 'obs-camera-alert-after-blocked-quit.json'
+        delayed = json.loads(delayed_path.read_text()) if delayed_path.is_file() else {'status': 'helperReceiptMissing'}
+        summary['obsCameraAlertAfterBlockedQuit'] = delayed
+        restart['alertAcknowledgementCount'] = int(delayed.get('actionAttempted') is True)
+        # The first normal quit may finish as its blocking modal closes; PID exit remains authoritative.
+        exited = observe_obs_exit(restart)
+        if not exited and delayed.get('signedOBSIdentityVerified') is True and delayed.get('status') == 'acknowledged' and delayed.get('matchedAlertInstanceVerified') is True and delayed.get('matchedAlertAbsentObserved') is True and delayed.get('actionAttempted') is True and delayed.get('pressResult') == 0:
+            restart['quitAfterAcknowledgementExitCode'] = run('restart-obs-quit-after-alert', ['/usr/bin/osascript', '-e', 'tell application id "com.obsproject.obs-studio" to quit'], timeout=15)
+            exited = observe_obs_exit(restart)
+    if not exited:
+        ui('obs-restart-exit-blocked')
+        screenshot('obs-restart-exit-blocked')
+        state = summary.get('obsCameraAlertAfterBlockedQuit', {'status': 'notInspected'}).get('status')
+        raise RuntimeError('OBS did not exit for its documented camera-extension restart; camera-alert state=' + str(state) + ', acknowledgement attempts=' + str(restart['alertAcknowledgementCount']))
+    log_directory = config / 'logs'
+    logs_before_reopen = obs_log_inventory(log_directory)
+    restart['logInventoryCapturedAtNs'] = time.time_ns()
+    launch_ns = time.time_ns()
+    run('restart-obs-open', ['/usr/bin/open', '-a', str(installed), '--args', '--profile', 'RJTLipProof', '--disable-updater'], required=True)
+    websocket_deadline = time.monotonic() + 25
+    while time.monotonic() < websocket_deadline:
+        restart['processIDsAfter'] = obs_process_ids()
+        try:
+            with socket.create_connection(('127.0.0.1', 4455), timeout=0.5):
+                restart['webSocketPortReady'] = bool(restart['processIDsAfter'])
+            if restart['webSocketPortReady']:
+                break
+        except OSError:
+            pass
+        time.sleep(0.5)
+    else:
+        ui('obs-restart-endpoint-blocked')
+        screenshot('obs-restart-endpoint-blocked')
+        raise RuntimeError('Restarted OBS did not expose its WebSocket endpoint before the bounded deadline')
+    if len(restart['processIDsAfter']) != 1 or restart['processIDsAfter'][0] in restart['processIDsBefore']:
+        raise RuntimeError('Restart did not establish one new owned OBS process')
+    wait_for_obs_activation(log_directory, logs_before_reopen, restart['processIDsAfter'][0], launch_ns)
+    summary['obsActivationReadiness']['outputControlInvokedAtNs'] = time.time_ns()
+    retry = run('retry-camera', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(OUT / 'obs-control-retry.json'), 'require-output'], timeout=60)
+    if retry != 0:
+        failed_postrestart_output = True
+        ui('obs-restart-output-blocked')
+        screenshot('obs-restart-output-blocked')
+        raise RuntimeError('Restarted OBS did not activate virtual camera output; see authenticated RPC receipt')
+    app = OUT / 'LipCameraProbe.app'
+    (app / 'Contents/MacOS').mkdir(parents=True)
+    shutil.copy2(BIN / 'CameraProbe', app / 'Contents/MacOS/LipCameraProbe')
+    shutil.copy2(ROOT / 'Tools/LipCameraProbe/CameraProbe-Info.plist', app / 'Contents/Info.plist')
+    run('sign-camera-probe', ['/usr/bin/codesign', '--force', '--sign', '-', str(app)], required=True)
+    run('verify-camera-probe', ['/usr/bin/codesign', '--verify', '--strict', str(app)], required=True)
+    probe_process = subprocess.Popen(['/usr/bin/open', '-W', '-n', str(app), '--args', '--report-directory', str(OUT)])
+    for attempt in range(8):
+        time.sleep(2)
+        ui('capture-permission-' + str(attempt), approve=True)
+        if probe_process.poll() is not None:
+            break
+    try:
+        probe_process.wait(timeout=30)
+    except subprocess.TimeoutExpired:
+        summary['events'].append({'operation': 'camera-app', 'error': 'did not exit before deadline'})
+        probe_process.terminate()
+    screenshot('final-desktop')
+    camera_path = OUT / 'camera.json'
+    if camera_path.exists():
+        camera = json.loads(camera_path.read_text())
+        summary['camera'] = camera
+        if camera.get('status') == 'supportedDeviceReady' and camera.get('cameraClosed') and camera.get('audioInputCount') == 0:
+            summary['status'] = 'supportedDeviceReady'
+except Exception as error:
+    summary['failure'] = str(error)
+finally:
+    if started_obs:
+        keep_obs = os.environ.get('LIP_CAMERA_PROBE_KEEP_OBS_RUNNING') == '1' and summary['status'] == 'supportedDeviceReady'
+        summary['obsRetainedForE2E'] = keep_obs
+        if not keep_obs:
+            if failed_postrestart_output:
+                try:
+                    expected = summary['obsActivationReadiness']['expectedPID']
+                    if obs_process_ids() == [expected]:
+                        ui('obs-output-failure-cleanup-alert', acknowledge_obs_alert=True)
+                        alert_path = OUT / 'obs-output-failure-cleanup-alert.json'
+                        summary['obsOutputFailureCleanupAlert'] = json.loads(alert_path.read_text()) if alert_path.is_file() else {'status': 'helperReceiptMissing'}
+                    else:
+                        summary['obsOutputFailureCleanupAlert'] = {'status': 'expectedProducerNoLongerCurrent'}
+                except Exception as error:
+                    summary['obsOutputFailureCleanupAlert'] = {'status': 'helperUnavailable', 'failure': str(error)}
+            try:
+                receipt = OUT / 'obs-cleanup.json'
+                code = run('close-obs', [str(BIN / 'OBSControl'), str(websocket), str(silent), str(receipt), 'stop-and-quit'], timeout=55)
+                cleanup = json.loads(receipt.read_text()) if receipt.is_file() else {}
+                summary['obsCleanup'] = cleanup
+                if code != 0 or cleanup.get('closed') is not True:
+                    raise RuntimeError('Owned OBS cleanup did not verify inactive output and process exit; inspect obs-cleanup.json')
+            except Exception as error:
+                summary['cleanupFailure'] = str(error)
+                summary.setdefault('failure', str(error))
+                summary['status'] = 'blocked'
+        run('obs-log-copy', ['/bin/cp', '-R', str(Path.home() / 'Library/Application Support/obs-studio/logs'), str(OUT / 'obs-logs')])
+        readiness = summary.get('obsActivationReadiness', {})
+        if readiness.get('selectedLog'):
+            try:
+                content = read_obs_log(Path(readiness['selectedLog']), readiness['selectedLogIdentity'])
+                (OUT / 'obs-restarted-process.log').write_bytes(content[:OBS_LOG_LIMIT])
+                readiness.update(finalSnapshotBytes=min(len(content), OBS_LOG_LIMIT), finalSnapshotTruncated=len(content) > OBS_LOG_LIMIT)
+            except Exception as error:
+                readiness['finalSnapshotFailure'] = str(error)
+            (OUT / 'obs-activation-readiness.json').write_text(json.dumps(readiness, indent=2) + '\n')
+    run('extensions-final', ['/usr/bin/systemextensionsctl', 'list'])
+    run('extension-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', 'process == "sysextd" AND eventMessage CONTAINS[c] "obsproject"'], timeout=25)
+    run('approval-ui-events', ['/usr/bin/log', 'show', '--last', '6m', '--style', 'compact', '--predicate', '(process == "System Settings" OR process == "SecurityAgent" OR process == "authd" OR process == "authorizationhost" OR process == "coreauthd") AND (eventMessage CONTAINS[c] "obs" OR eventMessage CONTAINS[c] "extension" OR eventMessage CONTAINS[c] "authenticate" OR eventMessage CONTAINS[c] "authoriz")'], timeout=25)
+    if mounted:
+        run('unmount-obs', ['/usr/bin/hdiutil', 'detach', str(OUT / 'obs-mount')], timeout=15)
+    (OUT / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+    print(json.dumps(summary, indent=2))
+    if output := os.environ.get('GITHUB_OUTPUT'):
+        with open(output, 'a') as stream:
+            stream.write('camera_status=' + summary['status'] + '\n')

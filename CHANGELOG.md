@@ -2,6 +2,16 @@
 
 ## v1.95.2 - Unreleased
 
+- Add optional English lip dictation, off by default, with simultaneous voice and camera capture and a Lips Only setting that suspends microphone capture.
+- Stop unused lip recognition when voice text is ready.
+- Use lip recognition when voice returns only silence or noise markers.
+- Close the recorder after camera finalization fails so the next shortcut starts normally.
+- Resume paused media once when recording stop, cleanup, and reset overlap.
+- Restore the original audio-model selection when a Power Mode session continues in Lips Only, without loading audio resources.
+- Cancel pending auto-send when its dictation is canceled, disabled, or replaced.
+- Keep unfinished Lips Only dictation out of History when the feature is disabled, the session resets, or the app quits.
+- Let dictation and setup tasks stop while a camera or microphone permission reply is pending.
+
 - Add a manually triggered Codemagic Mac M2 workflow for shared core checks and downloadable macOS app builds.
 - Keep History clean of accidental recordings: a recording canceled because its shortcut became part of a larger key chord, or one that transcribes to nothing, no longer saves a History entry or audio file. Esc and the cancel button still keep canceled recordings.
 

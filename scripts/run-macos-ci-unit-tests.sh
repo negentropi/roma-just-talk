@@ -25,8 +25,11 @@ build_arguments=(
   CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES
   DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$PWD/VoiceInk/VoiceInk.local.entitlements"
   'SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) LOCAL_BUILD'
-  -only-testing:VoiceInkTests
 )
+if [[ "$#" -eq 0 ]]; then set -- VoiceInkTests; fi
+for test_selection in "$@"; do
+  build_arguments+=("-only-testing:$test_selection")
+done
 xcodebuild build-for-testing "${build_arguments[@]}"
 
 test "$(plutil -extract CFBundleIdentifier raw -o - "$app/Contents/Info.plist")" = com.negentropi.RomaJustTalk

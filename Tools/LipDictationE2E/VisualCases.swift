@@ -411,48 +411,65 @@ struct LipVisualCases {
         for mutation in ["healthy", "transparent", "covered", "moved"] {
             report["currentControlCase"] = mutation
             let acceptedURL = directory.appendingPathComponent("association-" + mutation + "-accepted.png")
-            let prepared = try RuntimeTargetController.prepare(
-                target: target, textScenario: .existingText,
-                runID: "association-\(mutation)-textedit-existingText-r1-\(UUID().uuidString.prefix(6))",
-                acceptedFrameURL: acceptedURL,
-                settleSeconds: configuration.targetSettleSeconds, availabilityPolicy: .launchIfNeeded
-            )
-            var item: [String: Any] = ["case": mutation, "passed": false, "fixtureValid": false]
+            var item: [String: Any] = ["case": mutation, "passed": false, "fixtureValid": false, "phase": "prepareTarget"]
+            var cleanupTarget: RuntimePreparedTarget?
             var cover: NSPanel?
             var originalPosition: CGPoint?
             var movedWindow: AXUIElement?
             var cleanedUp = false
+            var completed = false
             defer {
+                if !completed { report["failedControlItem"] = item }
                 cover?.orderOut(nil)
                 cover?.close()
                 if var position = originalPosition, let movedWindow,
                    let value = AXValueCreate(.cgPoint, &position) {
                     _ = AXUIElementSetAttributeValue(movedWindow, kAXPositionAttribute as CFString, value)
                 }
-                if !cleanedUp {
-                    let cleanup = prepared.cleanup()
+                if !cleanedUp, let cleanupTarget {
+                    let cleanup = cleanupTarget.cleanup()
                     report["failedControlCleanup"] = try? json(cleanup)
                 }
             }
-            let appElement = AXUIElementCreateApplication(prepared.info.processIdentifier)
-            guard let window = RuntimeAX.window(containing: prepared.info.windowTitleToken, in: appElement),
-                  let editor = RuntimeAX.editableElement(in: window, identifying: prepared.info.windowTitleToken)
-                    ?? RuntimeAX.firstEditableElement(in: window),
-                  let windowFrame = RuntimeAX.frame(of: window),
-                  let editorFrame = RuntimeAX.observationFrame(for: editor, fallbackWindow: window),
-                  prepared.readFullText() == RuntimeTextScenario.existingText.initialText,
-                  prepared.refreshRenderedBaseline() == nil else { throw ProofError.associationControl }
+            let prepared = try RuntimeTargetController.prepare(
+                target: target, textScenario: .existingText,
+                runID: "association-\(mutation)-textedit-existingText-r1-\(UUID().uuidString.prefix(6))",
+                acceptedFrameURL: acceptedURL,
+                settleSeconds: configuration.targetSettleSeconds, availabilityPolicy: .launchIfNeeded
+            )
+            cleanupTarget = prepared
+            item["phase"] = "resolveOwnedEditor"
             item["target"] = try json(prepared.info)
+            let appElement = AXUIElementCreateApplication(prepared.info.processIdentifier)
+            let ownedWindow = RuntimeAX.window(containing: prepared.info.windowTitleToken, in: appElement)
+            let ownedEditor = ownedWindow.flatMap { RuntimeAX.editableElement(in: $0, identifying: prepared.info.windowTitleToken)
+                ?? RuntimeAX.firstEditableElement(in: $0) }
+            item["ownedWindowFound"] = ownedWindow != nil
+            item["ownedEditorFound"] = ownedEditor != nil
+            guard let window = ownedWindow, let editor = ownedEditor,
+                  let windowFrame = RuntimeAX.frame(of: window),
+                  let editorFrame = RuntimeAX.observationFrame(for: editor, fallbackWindow: window) else { throw ProofError.associationControl }
             item["baselineWindowFrame"] = rectEvidence(windowFrame)
             item["baselineEditableFrame"] = rectEvidence(editorFrame)
+            item["phase"] = "verifySeededAXBaseline"
+            item["seededAXMatches"] = prepared.readFullText() == RuntimeTextScenario.existingText.initialText
+            guard item["seededAXMatches"] as? Bool == true else { throw ProofError.associationControl }
+            item["phase"] = "refreshRenderedBaseline"
+            let baselineError = prepared.refreshRenderedBaseline()
+            item["baselineRefreshError"] = baselineError.map { $0 as Any } ?? NSNull()
+            guard baselineError == nil else { throw ProofError.associationControl }
             if mutation == "covered" || mutation == "transparent" {
+                item["phase"] = "createPanel"
                 let display = CGDisplayBounds(CGMainDisplayID())
                 let frame = mutation == "transparent"
                     ? NSRect(x: display.minX, y: 0, width: display.width, height: display.height)
                     : NSRect(x: editorFrame.minX - 8, y: display.height - editorFrame.maxY - 8,
                              width: editorFrame.width + 16, height: editorFrame.height + 16)
                 let panel = NSPanel(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
+                cover = panel
+                item["defaultHidesOnDeactivate"] = panel.hidesOnDeactivate
                 panel.isReleasedWhenClosed = false
+                panel.hidesOnDeactivate = false
                 panel.alphaValue = 1
                 panel.isOpaque = mutation == "covered"
                 panel.hasShadow = false
@@ -460,15 +477,54 @@ struct LipVisualCases {
                     : NSColor(calibratedRed: 0.15, green: 0.45, blue: 0.80, alpha: 1)
                 panel.level = .floating
                 panel.ignoresMouseEvents = true
+                var anchor: NSView?
+                if mutation == "transparent" {
+                    item["phase"] = "placePaintedAnchor"
+                    let edge: CGFloat = 16
+                    let candidates = [CGPoint(x: display.maxX - edge - 12, y: display.maxY - edge - 12),
+                                      CGPoint(x: display.minX + 12, y: display.maxY - edge - 12),
+                                      CGPoint(x: display.maxX - edge - 12, y: display.minY + 40),
+                                      CGPoint(x: display.minX + 12, y: display.minY + 40)]
+                        .map { CGRect(origin: $0, size: CGSize(width: edge, height: edge)) }
+                    item["anchorCandidates"] = candidates.map(rectEvidence)
+                    guard let anchorFrame = candidates.first(where: { display.contains($0) && !$0.intersects(editorFrame) }),
+                          let contentView = panel.contentView else { throw ProofError.associationControl }
+                    let view = NSView(frame: NSRect(x: anchorFrame.minX - display.minX, y: display.maxY - anchorFrame.maxY,
+                                                   width: anchorFrame.width, height: anchorFrame.height))
+                    view.wantsLayer = true
+                    view.layer?.backgroundColor = NSColor(calibratedRed: 0.9, green: 0.3, blue: 0.1, alpha: 1).cgColor
+                    view.layer?.isOpaque = true
+                    contentView.addSubview(view)
+                    anchor = view
+                }
+                item["phase"] = "presentPanel"
                 panel.orderFrontRegardless()
-                cover = panel
+                panel.displayIfNeeded()
                 wait(0.25)
-                guard panel.isVisible,
-                      let stacking = coveredWindowEvidence(panel: panel, targetPID: prepared.info.processIdentifier,
-                                                           targetFrame: windowFrame, coveredFrame: editorFrame) else { throw ProofError.associationControl }
+                item["phase"] = "validatePanelVisibilityAndStacking"
+                var inspection: [String: Any] = [:]
+                let stacking = coveredWindowEvidence(panel: panel, targetPID: prepared.info.processIdentifier,
+                    targetFrame: windowFrame, coveredFrame: editorFrame, inspection: &inspection)
+                item["panelInspection"] = inspection
+                if let anchor {
+                    let screenFrame = panel.convertToScreen(anchor.convert(anchor.bounds, to: nil))
+                    let actualFrame = CGRect(x: screenFrame.minX, y: display.maxY - screenFrame.maxY,
+                                             width: screenFrame.width, height: screenFrame.height)
+                    item["paintedAnchor"] = ["frame": rectEvidence(actualFrame), "viewAlpha": anchor.alphaValue,
+                        "layerOpacity": anchor.layer.map { Double($0.opacity) as Any } ?? NSNull(),
+                        "contentAlpha": (anchor.layer?.backgroundColor?.alpha).map { Double($0) as Any } ?? NSNull(),
+                        "hidden": anchor.isHidden]
+                    guard display.contains(actualFrame), !actualFrame.intersects(editorFrame),
+                          anchor.alphaValue == 1, anchor.layer?.opacity == 1,
+                          anchor.layer?.backgroundColor?.alpha == 1, !anchor.isHidden else { throw ProofError.associationControl }
+                }
+                guard panel.isVisible, !panel.hidesOnDeactivate,
+                      NSWorkspace.shared.frontmostApplication?.processIdentifier == prepared.info.processIdentifier,
+                      let stacking else { throw ProofError.associationControl }
                 item["cover"] = stacking
                 item["panelContent"] = mutation == "transparent" ? "clear" : "opaqueBlue"
             } else if mutation == "moved" {
+                item["phase"] = "moveOwnedWindow"
                 originalPosition = windowFrame.origin
                 movedWindow = window
                 var position = CGPoint(x: windowFrame.minX + 160, y: windowFrame.minY + 120)
@@ -483,10 +539,12 @@ struct LipVisualCases {
                 }
                 item["movedWindowFrame"] = rectEvidence(changed)
             }
+            item["phase"] = "writeAXFixture"
             guard AXUIElementSetAttributeValue(editor, kAXValueAttribute as CFString, fullText as CFString) == .success else {
                 throw ProofError.associationControl
             }
             wait(0.15)
+            item["phase"] = "verifyReadableFixture"
             guard let readableBefore = prepared.readFullText(), readableBefore == fullText as String else {
                 throw ProofError.associationControl
             }
@@ -494,10 +552,12 @@ struct LipVisualCases {
             item["mutationObserved"] = mutation != "healthy"
             item["readableAXBefore"] = readableBefore
             item["fixtureScreenshot"] = screenshot(directory.appendingPathComponent("association-" + mutation + "-fixture.png"))
+            item["phase"] = "observeDisplayReferencePair"
             let observed = prepared.waitForVisibleText(
                 keyUpAtSystemUptime: ProcessInfo.processInfo.systemUptime, timeoutSeconds: 3
             )
             let readableAfter = prepared.readFullText()
+            item["phase"] = "validateObservation"
             guard readableAfter == readableBefore else { throw ProofError.associationControl }
             item["readableAXAfter"] = readableAfter
             item["observation"] = try json(observed)
@@ -524,6 +584,7 @@ struct LipVisualCases {
             if !shouldAccept, accepted {
                 item["failure"] = observed.text == words ? "unexpectedVisibleAcceptance" : "unexpectedObservationText"
             }
+            item["phase"] = "restoreMutation"
             cover?.orderOut(nil)
             cover?.close()
             cover = nil
@@ -540,12 +601,15 @@ struct LipVisualCases {
                 item["movedWindowRestored"] = true
             }
             originalPosition = nil
+            item["phase"] = "cleanupTarget"
             let cleanup = prepared.cleanup()
             cleanedUp = true
             item["cleanup"] = try json(cleanup)
             item["passed"] = item["passed"] as? Bool == true && cleanup.passed
+            item["phase"] = "completed"
             cases.append(item)
             report["cases"] = cases
+            completed = true
         }
         report["passed"] = cases.count == 4 && cases.allSatisfy { $0["passed"] as? Bool == true }
             && report["failedControlCleanup"] == nil
@@ -555,8 +619,24 @@ struct LipVisualCases {
         ["x": rect.minX, "y": rect.minY, "width": rect.width, "height": rect.height]
     }
 
-    static func coveredWindowEvidence(panel: NSPanel, targetPID: pid_t, targetFrame: CGRect, coveredFrame: CGRect) -> [String: Any]? {
-        guard let rows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]],
+    static func coveredWindowEvidence(panel: NSPanel, targetPID: pid_t, targetFrame: CGRect, coveredFrame: CGRect,
+                                      inspection: inout [String: Any]) -> [String: Any]? {
+        let rows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]]
+        let frontmostPID = NSWorkspace.shared.frontmostApplication?.processIdentifier
+        inspection = ["visible": panel.isVisible, "hidesOnDeactivate": panel.hidesOnDeactivate,
+            "windowID": panel.windowNumber, "helperPID": getpid(), "appKitFrame": rectEvidence(panel.frame),
+            "alphaValue": panel.alphaValue, "opaque": panel.isOpaque, "level": panel.level.rawValue,
+            "frontmostPID": frontmostPID.map { $0 as Any } ?? NSNull(), "targetPID": targetPID,
+            "expectedTargetFrame": rectEvidence(targetFrame), "expectedEditorFrame": rectEvidence(coveredFrame),
+            "windowServerAvailable": rows != nil,
+            "windowServerRows": (rows ?? []).enumerated().map { index, row in
+                ["index": index, "windowID": row[kCGWindowNumber as String] ?? NSNull(),
+                 "ownerPID": row[kCGWindowOwnerPID as String] ?? NSNull(),
+                 "alpha": row[kCGWindowAlpha as String] ?? NSNull(),
+                 "layer": row[kCGWindowLayer as String] ?? NSNull(),
+                 "bounds": row[kCGWindowBounds as String] ?? NSNull()]
+            }]
+        guard let rows,
               let coverIndex = rows.firstIndex(where: { ($0[kCGWindowNumber as String] as? NSNumber)?.intValue == panel.windowNumber }),
               (rows[coverIndex][kCGWindowOwnerPID as String] as? NSNumber)?.int32Value == getpid(),
               let alpha = rows[coverIndex][kCGWindowAlpha as String] as? Double, alpha == 1,
@@ -570,7 +650,9 @@ struct LipVisualCases {
                       && abs(frame.width - targetFrame.width) < 2 && abs(frame.height - targetFrame.height) < 2
               }), coverIndex < targetIndex else { return nil }
         return ["windowID": panel.windowNumber, "ownerPID": getpid(), "alpha": alpha, "coverIndex": coverIndex,
-                "targetIndex": targetIndex, "aboveTarget": true, "frame": rectEvidence(actualCoverFrame)]
+                "targetIndex": targetIndex, "aboveTarget": true, "frame": rectEvidence(actualCoverFrame),
+                "visible": panel.isVisible, "hidesOnDeactivate": panel.hidesOnDeactivate,
+                "frontmostPID": frontmostPID.map { $0 as Any } ?? NSNull()]
     }
     static func runNegativeControls(configuration: RuntimeHarnessConfiguration, report: inout [String: Any], directory: URL) throws {
         let environment = ProcessInfo.processInfo.environment

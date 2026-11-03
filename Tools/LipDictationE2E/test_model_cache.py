@@ -159,9 +159,13 @@ class ModelCacheTests(unittest.TestCase):
                 if name in ('transparent', 'covered'):
                     case['cover'] = {'windowID': 77, 'ownerPID': 2345, 'alpha': 1,
                                      'coverIndex': 0, 'targetIndex': 1, 'aboveTarget': True,
+                                     'visible': True, 'hidesOnDeactivate': False, 'frontmostPID': 1234,
                                      'frame': {'x': 0, 'y': 0, 'width': 100, 'height': 100}}
                     case['baselineEditableFrame'] = {'x': 10, 'y': 20, 'width': 1, 'height': 1}
                     case['panelContent'] = 'clear' if name == 'transparent' else 'opaqueBlue'
+                if name == 'transparent':
+                    case['paintedAnchor'] = {'frame': {'x': 80, 'y': 80, 'width': 16, 'height': 16},
+                        'viewAlpha': 1, 'layerOpacity': 1, 'contentAlpha': 1, 'hidden': False}
                 if not positive:
                     case['failure'] = 'unexpectedVisibleAcceptance'
                 if name == 'moved':
@@ -230,9 +234,13 @@ class ModelCacheTests(unittest.TestCase):
             if name in ('transparent', 'covered'):
                 case['cover'] = {'windowID': 77, 'ownerPID': 2345, 'alpha': 1,
                                  'coverIndex': 0, 'targetIndex': 1, 'aboveTarget': True,
+                                 'visible': True, 'hidesOnDeactivate': False, 'frontmostPID': 1234,
                                  'frame': {'x': 0, 'y': 0, 'width': 100, 'height': 100}}
                 case['baselineEditableFrame'] = {'x': 10, 'y': 20, 'width': 1, 'height': 1}
                 case['panelContent'] = 'clear' if name == 'transparent' else 'opaqueBlue'
+            if name == 'transparent':
+                case['paintedAnchor'] = {'frame': {'x': 80, 'y': 80, 'width': 16, 'height': 16},
+                    'viewAlpha': 1, 'layerOpacity': 1, 'contentAlpha': 1, 'hidden': False}
             if not positive:
                 reason = ('Display pixels did not match the owned window' if name == 'covered'
                           else 'Editable target geometry changed')
@@ -315,6 +323,35 @@ class ModelCacheTests(unittest.TestCase):
                 changed['cases'][2]['observation']['renderedText']['error'] = error
                 with self.subTest(error=error):
                     self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+
+    def test_association_transparent_requires_visible_anchor_outside_observation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = self.association_candidate_fixture(root)
+            self.assertTrue(runner.association_control_passed(report, root, known_bad=False))
+            for change in [{'paintedAnchor': None},
+                           {'paintedAnchor': dict(report['cases'][1]['paintedAnchor'], frame={'x': 10, 'y': 20, 'width': 1, 'height': 1})},
+                           {'paintedAnchor': dict(report['cases'][1]['paintedAnchor'], frame={'x': 110, 'y': 80, 'width': 16, 'height': 16})},
+                           {'paintedAnchor': dict(report['cases'][1]['paintedAnchor'], contentAlpha=0)},
+                           {'paintedAnchor': dict(report['cases'][1]['paintedAnchor'], hidden=True)}]:
+                changed = copy.deepcopy(report)
+                changed['cases'][1].update(change)
+                with self.subTest(anchor=change):
+                    self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+            for field, value in [('visible', False), ('hidesOnDeactivate', True), ('frontmostPID', 2345)]:
+                changed = copy.deepcopy(report)
+                changed['cases'][1]['cover'][field] = value
+                with self.subTest(panelField=field):
+                    self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+            changed = copy.deepcopy(report)
+            changed['failedControlItem'] = {'case': 'transparent', 'phase': 'validatePanelVisibilityAndStacking'}
+            with self.subTest(failedPartialItem=True):
+                self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+            changed = copy.deepcopy(report)
+            changed['cases'][1]['observation']['renderedText']['acceptedFrame']['association']['captureRect'] = {
+                'x': 80, 'y': 80, 'width': 16, 'height': 16}
+            with self.subTest(anchorOverlapsActualCapture=True):
+                self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
 
     def test_association_fast_preflight_accepts_no_app_or_model_arguments(self):
         args = runner.parse_arguments(['--association-controls-only', '--out', '/fixture/evidence'])

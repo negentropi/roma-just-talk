@@ -267,7 +267,7 @@ def association_control_passed(report, evidence, *, known_bad):
     if (not isinstance(words, str) or not words.strip() or len(cases) != 4
             or [case.get('case') for case in cases] != ['healthy', 'transparent', 'covered', 'moved']):
         return False
-    if report.get('error') or report.get('failedControlCleanup') is not None:
+    if report.get('error') or report.get('failedControlCleanup') is not None or report.get('failedControlItem') is not None:
         return False
     for case in cases:
         name = case['case']
@@ -293,10 +293,21 @@ def association_control_passed(report, evidence, *, known_bad):
                     or type(panel.get('windowID')) is not int or panel['windowID'] <= 0
                     or type(panel.get('coverIndex')) is not int or panel['coverIndex'] < 0
                     or type(panel.get('targetIndex')) is not int or panel['targetIndex'] <= panel['coverIndex']
+                    or panel.get('visible') is not True or panel.get('hidesOnDeactivate') is not False
+                    or type(panel.get('frontmostPID')) is not int or panel['frontmostPID'] <= 1
+                    or panel['frontmostPID'] != case.get('target', {}).get('processIdentifier')
                     or case.get('panelContent') != ('clear' if name == 'transparent' else 'opaqueBlue')):
                 return False
             panel_frame, editor = panel.get('frame'), case.get('baselineEditableFrame')
-            for rectangle in (panel_frame, editor):
+            rectangles = [panel_frame, editor]
+            if name == 'transparent':
+                anchor = case.get('paintedAnchor')
+                if (not isinstance(anchor, dict) or anchor.get('hidden') is not False
+                        or not all(type(anchor.get(key)) in (int, float) and anchor[key] == 1
+                                   for key in ('viewAlpha', 'layerOpacity', 'contentAlpha'))):
+                    return False
+                rectangles.append(anchor.get('frame'))
+            for rectangle in rectangles:
                 if (not isinstance(rectangle, dict) or set(rectangle) != {'x', 'y', 'width', 'height'}
                         or not all(type(value) in (int, float) and float('-inf') < value < float('inf')
                                    for value in rectangle.values())
@@ -315,6 +326,18 @@ def association_control_passed(report, evidence, *, known_bad):
                             else paired_frame_artifacts_passed(case, evidence, expected_path))
                     or (name == 'covered' and rendered['acceptedFrame']['referenceMatched'] is not False)):
                 return False
+            if name == 'transparent':
+                anchor_frame = anchor['frame']
+                capture = rendered['acceptedFrame']['association']['captureRect']
+                if (not (panel_frame['x'] <= anchor_frame['x'] and panel_frame['y'] <= anchor_frame['y']
+                         and panel_frame['x'] + panel_frame['width'] >= anchor_frame['x'] + anchor_frame['width']
+                         and panel_frame['y'] + panel_frame['height'] >= anchor_frame['y'] + anchor_frame['height'])
+                        or any(not (anchor_frame['x'] + anchor_frame['width'] <= rectangle['x']
+                                    or rectangle['x'] + rectangle['width'] <= anchor_frame['x']
+                                    or anchor_frame['y'] + anchor_frame['height'] <= rectangle['y']
+                                    or rectangle['y'] + rectangle['height'] <= anchor_frame['y'])
+                               for rectangle in (editor, capture))):
+                    return False
         elif (case.get('acceptedArtifactExists') is not False
               or rendered.get('acceptedFrame') is not None
               or (evidence / expected_path).exists()

@@ -833,11 +833,6 @@ public struct RuntimeScreenRect: Codable, Equatable, Sendable {
         isUsable && other.isUsable && other.x >= x && other.y >= y
             && other.x + other.width <= x + width && other.y + other.height <= y + height
     }
-
-    public func intersects(_ other: Self) -> Bool {
-        isUsable && other.isUsable && x < other.x + other.width && x + width > other.x
-            && y < other.y + other.height && y + height > other.y
-    }
 }
 
 public struct RuntimeTargetCaptureAssociation: Codable, Equatable, Sendable {
@@ -893,10 +888,29 @@ public enum RuntimeCaptureAssociationPolicy {
               window.frame == expected.windowFrame, window.alpha == 1 else {
             return "On-screen target identity, geometry or opacity changed"
         }
-        guard !frontToBackWindows[..<index].contains(where: {
-            $0.alpha > 0 && $0.frame.intersects(expected.captureRect)
-        }) else { return "Another on-screen window covers the capture rectangle" }
+        // Window bounds/global alpha cannot describe per-pixel coverage. The paired
+        // display/owned-window capture decides visibility after these identity checks.
         return nil
+    }
+}
+
+public struct RuntimeCapturePixelComparison: Equatable, Sendable {
+    public let comparedPixels: Int
+    public let differingPixels: Int
+    public var matches: Bool { differingPixels == 0 }
+}
+
+public enum RuntimeCaptureVisibilityPolicy {
+    public static func compareRGBA(display: [UInt8], reference: [UInt8]) -> RuntimeCapturePixelComparison? {
+        guard !display.isEmpty, display.count == reference.count, display.count.isMultiple(of: 4) else { return nil }
+        var differingPixels = 0
+        for offset in stride(from: 0, to: display.count, by: 4) {
+            if display[offset] != reference[offset] || display[offset + 1] != reference[offset + 1]
+                || display[offset + 2] != reference[offset + 2] || display[offset + 3] != reference[offset + 3] {
+                differingPixels += 1
+            }
+        }
+        return RuntimeCapturePixelComparison(comparedPixels: display.count / 4, differingPixels: differingPixels)
     }
 }
 
@@ -1138,6 +1152,14 @@ public struct RuntimeRenderedTextAssociationTracker: Sendable {
         self.latencyTracker = latencyTracker
         associationError = sample == nil ? "Incompatible rendered frames" : nil
         return sample
+    }
+
+    public mutating func discardUnassociatedFrame() {
+        // A visibility mismatch breaks persistence without replacing the confirmed empty baseline.
+        latencyTracker = baseline.map { RuntimeRenderedTextLatencyTracker(baseline: $0) }
+        acceptedSample = nil
+        acceptedFrame = nil
+        associationError = nil
     }
 
     private mutating func rejectUnreadableFrame(_ error: String) {

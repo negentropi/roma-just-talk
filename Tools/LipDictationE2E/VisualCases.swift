@@ -128,9 +128,9 @@ struct LipVisualCases {
                 while Date() < deadline {
                     if let toggle = find(application, label: "Read Lips While Dictating", roles: [kAXCheckBoxRole, "AXSwitch"]), enabled(toggle.element) {
                         let status = find(application, label: "Ready", roles: [kAXStaticTextRole])
-                        if !cachedSetup || status != nil {
+                        if let status {
                             report["readyControl"] = toggle.evidence
-                            report["readyStatusControl"] = status?.evidence
+                            report["readyStatusControl"] = status.evidence
                             report["initialMasterOffObserved"] = toggleValue(toggle.element) == 0
                             guard toggleValue(toggle.element) == 0 else { throw ProofError.setup }
                             ready = true
@@ -180,6 +180,7 @@ struct LipVisualCases {
                 let prepared = try RuntimeTargetController.prepare(
                     target: configuration.targets[0], textScenario: .existingText,
                     runID: "lip-\(scenario)-textedit-existingText-r1-\(UUID().uuidString.prefix(6))",
+                    acceptedFrameURL: output!.deletingLastPathComponent().appendingPathComponent(scenario + "-accepted.png"),
                     settleSeconds: 1, availabilityPolicy: .launchIfNeeded
                 )
                 target = prepared
@@ -297,8 +298,7 @@ struct LipVisualCases {
                     report["observationLatencyBoundary"] = "After-drain functional observation; no product latency claim."
                     report["positiveObservationStartedAtSystemUptime"] = ProcessInfo.processInfo.systemUptime
                     let observed = prepared.waitForVisibleText(
-                        keyUpAtSystemUptime: up.postedAtSystemUptime, timeoutSeconds: 120,
-                        acceptedFrameURL: output!.deletingLastPathComponent().appendingPathComponent(scenario + "-accepted.png")
+                        keyUpAtSystemUptime: up.postedAtSystemUptime, timeoutSeconds: 120
                     )
                     visible = observed
                     report["visibleText"] = try json(observed)
@@ -406,10 +406,15 @@ struct LipVisualCases {
         let fullText = NSMutableString(string: RuntimeTextScenario.existingText.initialText)
         fullText.insert(words, at: RuntimeTextScenario.existingText.cursorUTF16Offset)
         var cases: [[String: Any]] = []
-        for mutation in ["healthy", "covered", "moved"] {
+        report["controlWords"] = words
+        report["cases"] = cases
+        for mutation in ["healthy", "transparent", "covered", "moved"] {
+            report["currentControlCase"] = mutation
+            let acceptedURL = directory.appendingPathComponent("association-" + mutation + "-accepted.png")
             let prepared = try RuntimeTargetController.prepare(
                 target: target, textScenario: .existingText,
                 runID: "association-\(mutation)-textedit-existingText-r1-\(UUID().uuidString.prefix(6))",
+                acceptedFrameURL: acceptedURL,
                 settleSeconds: configuration.targetSettleSeconds, availabilityPolicy: .launchIfNeeded
             )
             var item: [String: Any] = ["case": mutation, "passed": false, "fixtureValid": false]
@@ -440,14 +445,19 @@ struct LipVisualCases {
             item["target"] = try json(prepared.info)
             item["baselineWindowFrame"] = rectEvidence(windowFrame)
             item["baselineEditableFrame"] = rectEvidence(editorFrame)
-            if mutation == "covered" {
-                let mainHeight = CGDisplayBounds(CGMainDisplayID()).height
-                let frame = NSRect(x: editorFrame.minX - 8, y: mainHeight - editorFrame.maxY - 8,
-                                   width: editorFrame.width + 16, height: editorFrame.height + 16)
+            if mutation == "covered" || mutation == "transparent" {
+                let display = CGDisplayBounds(CGMainDisplayID())
+                let frame = mutation == "transparent"
+                    ? NSRect(x: display.minX, y: 0, width: display.width, height: display.height)
+                    : NSRect(x: editorFrame.minX - 8, y: display.height - editorFrame.maxY - 8,
+                             width: editorFrame.width + 16, height: editorFrame.height + 16)
                 let panel = NSPanel(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
                 panel.isReleasedWhenClosed = false
-                panel.isOpaque = true
-                panel.backgroundColor = NSColor(calibratedRed: 0.15, green: 0.45, blue: 0.80, alpha: 1)
+                panel.alphaValue = 1
+                panel.isOpaque = mutation == "covered"
+                panel.hasShadow = false
+                panel.backgroundColor = mutation == "transparent" ? .clear
+                    : NSColor(calibratedRed: 0.15, green: 0.45, blue: 0.80, alpha: 1)
                 panel.level = .floating
                 panel.ignoresMouseEvents = true
                 panel.orderFrontRegardless()
@@ -457,6 +467,7 @@ struct LipVisualCases {
                       let stacking = coveredWindowEvidence(panel: panel, targetPID: prepared.info.processIdentifier,
                                                            targetFrame: windowFrame, coveredFrame: editorFrame) else { throw ProofError.associationControl }
                 item["cover"] = stacking
+                item["panelContent"] = mutation == "transparent" ? "clear" : "opaqueBlue"
             } else if mutation == "moved" {
                 originalPosition = windowFrame.origin
                 movedWindow = window
@@ -483,10 +494,8 @@ struct LipVisualCases {
             item["mutationObserved"] = mutation != "healthy"
             item["readableAXBefore"] = readableBefore
             item["fixtureScreenshot"] = screenshot(directory.appendingPathComponent("association-" + mutation + "-fixture.png"))
-            let acceptedURL = directory.appendingPathComponent("association-" + mutation + "-accepted.png")
             let observed = prepared.waitForVisibleText(
-                keyUpAtSystemUptime: ProcessInfo.processInfo.systemUptime, timeoutSeconds: 3,
-                acceptedFrameURL: acceptedURL
+                keyUpAtSystemUptime: ProcessInfo.processInfo.systemUptime, timeoutSeconds: 3
             )
             let readableAfter = prepared.readFullText()
             guard readableAfter == readableBefore else { throw ProofError.associationControl }
@@ -496,15 +505,23 @@ struct LipVisualCases {
             item["visibleAcceptance"] = accepted
             item["acceptedArtifactExists"] = FileManager.default.fileExists(atPath: acceptedURL.path)
             let frame = ((item["observation"] as? [String: Any])?["renderedText"] as? [String: Any])?["acceptedFrame"] as? [String: Any]
+            let reference = frame?["reference"] as? [String: Any]
+            let referenceURL = directory.appendingPathComponent(acceptedURL.deletingPathExtension().lastPathComponent + "-reference.png")
             let retained = accepted && observed.text == words && (frame?["pngPath"] as? String) == acceptedURL.path
                 && (frame?["pngSHA256"] as? String) == (try? Data(contentsOf: acceptedURL)).map { SHA256.hash(data: $0).map { String(format: "%02x", $0) }.joined() }
-            let expectedRejection = mutation == "covered" ? "Another on-screen window covers the capture rectangle"
+                && (frame?["referenceMatched"] as? Bool) == true && (frame?["visibilityDifferingPixels"] as? Int) == 0
+                && (reference?["pngPath"] as? String) == referenceURL.path
+                && (reference?["pngSHA256"] as? String) == (try? Data(contentsOf: referenceURL)).map { SHA256.hash(data: $0).map { String(format: "%02x", $0) }.joined() }
+                && (reference?["rgbaSHA256"] as? String) == (frame?["rgbaSHA256"] as? String)
+            let expectedRejection = mutation == "covered" ? "Display pixels did not match the owned window"
                 : "Editable target geometry changed"
-            if mutation != "healthy" { item["expectedRejection"] = expectedRejection }
-            item["passed"] = mutation == "healthy" ? retained
+            let shouldAccept = mutation == "healthy" || mutation == "transparent"
+            if !shouldAccept { item["expectedRejection"] = expectedRejection }
+            item["passed"] = shouldAccept ? retained
                 : (!accepted && frame == nil && !FileManager.default.fileExists(atPath: acceptedURL.path)
-                    && observed.renderedText?.error == expectedRejection)
-            if mutation != "healthy", accepted {
+                    && (mutation == "covered" ? observed.renderedText?.error?.hasPrefix(expectedRejection) == true
+                        : observed.renderedText?.error == expectedRejection))
+            if !shouldAccept, accepted {
                 item["failure"] = observed.text == words ? "unexpectedVisibleAcceptance" : "unexpectedObservationText"
             }
             cover?.orderOut(nil)
@@ -528,10 +545,9 @@ struct LipVisualCases {
             item["cleanup"] = try json(cleanup)
             item["passed"] = item["passed"] as? Bool == true && cleanup.passed
             cases.append(item)
+            report["cases"] = cases
         }
-        report["cases"] = cases
-        report["controlWords"] = words
-        report["passed"] = cases.count == 3 && cases.allSatisfy { $0["passed"] as? Bool == true }
+        report["passed"] = cases.count == 4 && cases.allSatisfy { $0["passed"] as? Bool == true }
             && report["failedControlCleanup"] == nil
     }
 
@@ -543,6 +559,7 @@ struct LipVisualCases {
         guard let rows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]],
               let coverIndex = rows.firstIndex(where: { ($0[kCGWindowNumber as String] as? NSNumber)?.intValue == panel.windowNumber }),
               (rows[coverIndex][kCGWindowOwnerPID as String] as? NSNumber)?.int32Value == getpid(),
+              let alpha = rows[coverIndex][kCGWindowAlpha as String] as? Double, alpha == 1,
               let coverBounds = rows[coverIndex][kCGWindowBounds as String] as? [String: Any],
               let actualCoverFrame = CGRect(dictionaryRepresentation: coverBounds as CFDictionary), actualCoverFrame.contains(coveredFrame),
               let targetIndex = rows.firstIndex(where: { row in
@@ -552,7 +569,7 @@ struct LipVisualCases {
                   return abs(frame.minX - targetFrame.minX) < 2 && abs(frame.minY - targetFrame.minY) < 2
                       && abs(frame.width - targetFrame.width) < 2 && abs(frame.height - targetFrame.height) < 2
               }), coverIndex < targetIndex else { return nil }
-        return ["windowID": panel.windowNumber, "ownerPID": getpid(), "coverIndex": coverIndex,
+        return ["windowID": panel.windowNumber, "ownerPID": getpid(), "alpha": alpha, "coverIndex": coverIndex,
                 "targetIndex": targetIndex, "aboveTarget": true, "frame": rectEvidence(actualCoverFrame)]
     }
     static func runNegativeControls(configuration: RuntimeHarnessConfiguration, report: inout [String: Any], directory: URL) throws {
@@ -562,8 +579,9 @@ struct LipVisualCases {
               target.bundleIdentifier == "com.apple.TextEdit" else { throw ProofError.invalidArguments }
         let prepared = try RuntimeTargetController.prepare(
             target: target, textScenario: .existingText,
-            runID: "negative-controls-\(UUID().uuidString)", settleSeconds: configuration.targetSettleSeconds,
-            availabilityPolicy: .launchIfNeeded
+            runID: "negative-controls-\(UUID().uuidString)",
+            acceptedFrameURL: directory.appendingPathComponent("negative-controls-accepted.png"),
+            settleSeconds: configuration.targetSettleSeconds, availabilityPolicy: .launchIfNeeded
         )
         var cleanedUp = false
         defer {

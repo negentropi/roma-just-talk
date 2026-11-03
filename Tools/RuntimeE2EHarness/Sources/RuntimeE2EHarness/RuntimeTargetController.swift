@@ -18,6 +18,9 @@ struct RuntimeVisibleTextResult: Codable {
 struct RuntimeVisibilityObservationTiming: Codable {
     let startedAfterKeyUpMilliseconds: Double
     var renderedCaptureMilliseconds: Double?
+    var displayCaptureMilliseconds: Double?
+    var referenceCaptureMilliseconds: Double?
+    var visibilityDifferingPixels: Int?
     var accessibilityReadMilliseconds: Double?
     var precedingAccessibilityReadMilliseconds: Double?
     var domProofMilliseconds: Double?
@@ -212,16 +215,33 @@ final class RuntimePreparedTarget {
     }
 
     func refreshRenderedBaseline() -> String? {
+        if let error = renderedTextObserver.invalidationError { return error }
+        let deadline = Date().addingTimeInterval(2)
         do {
-            _ = try validateCaptureAssociation()
-            let error = renderedTextObserver.refreshBaseline {
-                readFullText().flatMap { textScenario.insertedText(from: $0) }
-            }
-            _ = try validateCaptureAssociation()
-            return error
+            repeat {
+                let before = ProcessInfo.processInfo.systemUptime
+                let precedingText = try validateCaptureAssociation()
+                guard let captureAssociation else { throw RuntimeCaptureAssociationError.invalidTarget }
+                let frame = try renderedTextObserver.captureFrame(association: captureAssociation)
+                let followingText = try validateCaptureAssociation()
+                let after = ProcessInfo.processInfo.systemUptime
+                if !frame.visibilityMatches {
+                    renderedTextObserver.discardVisibilitySample(frame, association: captureAssociation,
+                                                                 before: before, after: after)
+                    RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.016))
+                    continue
+                }
+                try renderedTextObserver.establishBaseline(
+                    frame, precedingText: textScenario.insertedText(from: precedingText),
+                    followingText: textScenario.insertedText(from: followingText)
+                )
+                return nil
+            } while Date() < deadline
+            throw RuntimeCaptureAssociationError.changed("Display pixels did not match the owned window before baseline timeout")
         } catch {
-            renderedTextObserver.invalidateAssociation(String(describing: error))
-            return String(describing: error)
+            let error = String(describing: error)
+            renderedTextObserver.invalidateAssociation(error)
+            return [error, renderedTextObserver.flushMismatchEvidence()].compactMap { $0 }.joined(separator: "; ")
         }
     }
 
@@ -336,8 +356,7 @@ final class RuntimePreparedTarget {
 
     func waitForVisibleText(
         keyUpAtSystemUptime: TimeInterval,
-        timeoutSeconds: TimeInterval,
-        acceptedFrameURL: URL
+        timeoutSeconds: TimeInterval
     ) -> RuntimeVisibleTextResult {
         let finalTextSettleSeconds: TimeInterval = 0.25
         let deadline = Date().addingTimeInterval(timeoutSeconds)
@@ -357,12 +376,11 @@ final class RuntimePreparedTarget {
                     (ProcessInfo.processInfo.systemUptime - keyUpAtSystemUptime) * 1_000
             )
             defer { observationTimings.append(timing) }
-            let captureBracketStartedAtSystemUptime: TimeInterval
+            let captureBracketStartedAtSystemUptime = ProcessInfo.processInfo.systemUptime
             let precedingText: String?
             let precedingReadStarted = ProcessInfo.processInfo.systemUptime
             do {
                 precedingText = try validateCaptureAssociation()
-                captureBracketStartedAtSystemUptime = ProcessInfo.processInfo.systemUptime
             } catch {
                 renderedError = String(describing: error)
                 renderedTextObserver.invalidateAssociation(renderedError!)
@@ -375,7 +393,11 @@ final class RuntimePreparedTarget {
             if renderedError == nil {
                 let captureStarted = ProcessInfo.processInfo.systemUptime
                 do {
-                    capturedFrame = try renderedTextObserver.captureFrame()
+                    guard let captureAssociation else { throw RuntimeCaptureAssociationError.invalidTarget }
+                    capturedFrame = try renderedTextObserver.captureFrame(association: captureAssociation)
+                    timing.displayCaptureMilliseconds = capturedFrame?.displayCaptureMilliseconds
+                    timing.referenceCaptureMilliseconds = capturedFrame?.referenceCaptureMilliseconds
+                    timing.visibilityDifferingPixels = capturedFrame?.visibilityComparison.differingPixels
                 } catch {
                     renderedError = String(describing: error)
                     renderedText = nil
@@ -398,23 +420,6 @@ final class RuntimePreparedTarget {
                 (ProcessInfo.processInfo.systemUptime - now) * 1_000
             timing.accessibilityReadSucceeded = currentText != nil
             let captureBracketFinishedAtSystemUptime = ProcessInfo.processInfo.systemUptime
-            if let capturedFrame, let captureAssociation {
-                let inserted = currentText.flatMap { textScenario.insertedText(from: $0) }
-                do {
-                    renderedText = try renderedTextObserver.observeCapturedFrame(
-                        capturedFrame,
-                        accessibilityText: inserted,
-                        precedingAccessibilityText: precedingText.flatMap { textScenario.insertedText(from: $0) },
-                        keyUpAtSystemUptime: keyUpAtSystemUptime,
-                        association: captureAssociation,
-                        captureBracketStartedAtSystemUptime: captureBracketStartedAtSystemUptime,
-                        captureBracketFinishedAtSystemUptime: captureBracketFinishedAtSystemUptime
-                    )
-                } catch {
-                    renderedError = String(describing: error)
-                    renderedText = nil
-                }
-            }
             if let currentText {
                 fullText = currentText
                 if let insertedText = textScenario.insertedText(from: currentText),
@@ -436,6 +441,32 @@ final class RuntimePreparedTarget {
                 stableSinceSystemUptime = nil
                 accessibilityText = nil
                 accessibilityLatency = nil
+            }
+            if let capturedFrame, let captureAssociation {
+                if !capturedFrame.visibilityMatches {
+                    renderedTextObserver.discardVisibilitySample(
+                        capturedFrame, association: captureAssociation,
+                        before: captureBracketStartedAtSystemUptime, after: captureBracketFinishedAtSystemUptime
+                    )
+                    renderedText = nil
+                    RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.016))
+                    continue
+                }
+                let inserted = currentText.flatMap { textScenario.insertedText(from: $0) }
+                do {
+                    renderedText = try renderedTextObserver.observeCapturedFrame(
+                        capturedFrame,
+                        accessibilityText: inserted,
+                        precedingAccessibilityText: precedingText.flatMap { textScenario.insertedText(from: $0) },
+                        keyUpAtSystemUptime: keyUpAtSystemUptime,
+                        association: captureAssociation,
+                        captureBracketStartedAtSystemUptime: captureBracketStartedAtSystemUptime,
+                        captureBracketFinishedAtSystemUptime: captureBracketFinishedAtSystemUptime
+                    )
+                } catch {
+                    renderedError = String(describing: error)
+                    renderedText = nil
+                }
             }
             let finalTextIsStable = stableSinceSystemUptime.map {
                 now - $0 >= finalTextSettleSeconds
@@ -467,21 +498,29 @@ final class RuntimePreparedTarget {
         if renderedText == nil {
             renderedText = renderedTextObserver.failureResult(
                 error: renderedError ?? renderedTextObserver.associationError
-                    ?? "Stable rendered pixels associated with inserted AX text were not observed before timeout"
+                    ?? (renderedTextObserver.hasPendingVisibilityMismatch
+                        ? "Display pixels did not match the owned window before timeout"
+                        : "Stable rendered pixels associated with inserted AX text were not observed before timeout")
             )
         } else if let observed = renderedText {
             do {
-                let frame = try renderedTextObserver.retainAcceptedFrame(at: acceptedFrameURL)
+                let frame = try renderedTextObserver.retainAcceptedFrame()
                 renderedText = RuntimeRenderedTextChangeResult(
                     keyUpToRenderedTextMilliseconds: observed.keyUpToRenderedTextMilliseconds,
                     changedPixels: observed.changedPixels, comparedPixels: observed.comparedPixels,
                     requiredChangedPixels: observed.requiredChangedPixels,
                     interFrameChangedPixels: observed.interFrameChangedPixels,
-                    acceptedFrame: frame, error: nil
+                    acceptedFrame: frame,
+                    discardedVisibilitySamples: renderedTextObserver.discardedVisibilitySamples, error: nil
                 )
             } catch {
                 renderedText = renderedTextObserver.failureResult(error: String(describing: error))
             }
+        }
+        if renderedText?.acceptedFrame == nil, let evidenceError = renderedTextObserver.flushMismatchEvidence() {
+            renderedText = renderedTextObserver.failureResult(
+                error: [renderedText?.error, evidenceError].compactMap { $0 }.joined(separator: "; ")
+            )
         }
         let visibleLatency = RuntimeTextVisibilityAttribution.renderedLatency(
             accessibilityText: accessibilityText,
@@ -645,6 +684,7 @@ enum RuntimeTargetController {
         target: RuntimeTargetApp,
         textScenario: RuntimeTextScenario = .empty,
         runID: String,
+        acceptedFrameURL: URL,
         settleSeconds: TimeInterval,
         availabilityPolicy: RuntimeHarnessConfiguration.TargetAvailabilityPolicy
     ) throws -> RuntimePreparedTarget {
@@ -745,7 +785,7 @@ enum RuntimeTargetController {
             }
             let renderedTextObserver: RuntimeRenderedTextObserver
             do {
-                renderedTextObserver = try RuntimeRenderedTextObserver(editableFrame: editableFrame)
+                renderedTextObserver = try RuntimeRenderedTextObserver(editableFrame: editableFrame, acceptedFrameURL: acceptedFrameURL)
             } catch {
                 throw RuntimeTargetControllerError.renderObservationUnavailable(String(describing: error))
             }

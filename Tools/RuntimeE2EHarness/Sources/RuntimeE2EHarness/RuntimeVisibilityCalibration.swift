@@ -39,6 +39,9 @@ enum RuntimeVisibilityCalibration {
                             targetID: target.id,
                             textScenario: scenario
                         ),
+                        acceptedFrameURL: evidenceDirectoryURL.appendingPathComponent(
+                            "calibration-\(target.id)-\(scenario.rawValue)-\(UUID().uuidString)-accepted.png"
+                        ),
                         settleSeconds: configuration.targetSettleSeconds,
                         availabilityPolicy: configuration.targetAvailabilityPolicy
                     )
@@ -60,10 +63,7 @@ enum RuntimeVisibilityCalibration {
                     DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.2, execute: injection)
                     let observed = surface.waitForVisibleText(
                         keyUpAtSystemUptime: started,
-                        timeoutSeconds: 5,
-                        acceptedFrameURL: evidenceDirectoryURL.appendingPathComponent(
-                            "calibration-\(target.id)-\(scenario.rawValue)-\(UUID().uuidString)-accepted.png"
-                        )
+                        timeoutSeconds: 5
                     )
                     // Finish the owned paste before closing its target or restoring the clipboard.
                     injection.wait()

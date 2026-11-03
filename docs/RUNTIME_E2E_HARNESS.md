@@ -27,25 +27,48 @@ Unreadable AX invalidates association until a confirmed empty frame establishes
 a new baseline. Replaced text must change pixels relative to the preceding frame.
 Each bracket resolves the live process and the same unique owned AX window and
 editor. Their geometry and WindowServer window ID remain fixed from preparation.
-Hidden, minimized, moved, resized, replaced, off-screen, or covered targets
-invalidate the observation. On-screen windows are checked in front-to-back
-order before and after capture; any nonzero-alpha window overlapping the capture
-rectangle above the target rejects the sample. The helper does not raise the
-target or establish a new baseline after losing this association.
+Hidden, minimized, moved, resized, replaced, off-screen, ambiguous, or faded
+targets invalidate the observation. Window bounds and global alpha do not prove
+per-pixel coverage: a fully clear system surface may still have alpha 1 and
+screen-sized bounds. No process-name or window-layer allowlist decides visibility.
 
-Captures continue through the existing final-text stability check, without an
-extra screenshot or artificial delay per iteration. Reported AX-read durations
-include the target identity, geometry, and visibility checks. Unassociated pixels remain
-invalid evidence, not an AX-only latency. Paste-to-visible diagnostics retain
-signed differences rather than hiding impossible ordering behind zero.
+Every sample takes two ScreenCaptureKit screenshots on the same display, with
+the same global ROI, configured dimensions, BGRA format, and sRGB color space.
+The first captures the actual display (`excludingWindows: []`); the second
+includes only the exact owned window. Both images are normalized to full-size
+sRGB RGBA, including alpha. Only byte-for-byte equality associates those display
+pixels with the owned editor. The window-only image never supplies visible-text
+proof by itself. Caret motion, an animated overlay, or an opaque cover can make
+a pair differ. That sample breaks pixel persistence and is discarded within
+the existing observation deadline, without changing the confirmed baseline or
+raising the target. Fresh ownership, geometry, and AX reads bracket each pair.
+The initial empty baseline waits up to two seconds for the first matching pair;
+later baseline refresh calls validate it without replacing it. An invalidated
+association cannot establish another baseline.
 
-A successful result retains the actual accepted ScreenCaptureKit frame as a
-PNG. The result records its path, PNG and comparison-RGBA hashes, dimensions,
-capture-bracket timestamps, and target association. Saving evidence does not
-capture the desktop again. Each result uses a unique path and rejects an
-existing file. Normal runs and calibration save beside their JSON report.
-Calibration with JSON on stdout saves in a unique temporary directory outside
-target cleanup and returns that image path in the result. These frames prove
+Captures continue through the existing final-text stability check. Each iteration
+uses exactly two screenshots, with no extra evidence capture. Reported AX-read
+durations include identity and geometry checks; display/reference capture times
+include pixel normalization. The result reports discarded visibility samples,
+and each observation records both capture durations and differing-pixel count.
+Capture brackets include both screenshots and both checked AX reads. Unassociated
+pixels remain invalid evidence, never an AX-only latency. Paste-to-visible
+diagnostics retain signed differences rather than hiding impossible ordering
+behind zero.
+
+Preparation requires a unique accepted-frame path before establishing the
+baseline. A successful result retains the actual accepted display PNG and its
+owned-window reference PNG, with both PNG/RGBA hashes, dimensions, capture times,
+zero differing pixels, and target association. Saving evidence never captures
+the desktop again. If preparation or observation fails after a mismatch, the
+last actual display/reference pair and JSON receipt are saved before target
+cleanup as `-mismatch-display.png`, `-mismatch-reference.png`, and `-mismatch.json`
+under the same supplied filename stem. These diagnostic pairs may differ; they
+are never reported as accepted frames. All derived paths reject existing files.
+Normal runs, calibration, and target probes save beside their JSON report.
+Calibration and target-probe JSON on stdout use a unique temporary directory
+outside target cleanup; accepted-frame paths appear in successful calibration
+results; failures include the mismatch receipt path. These frames prove
 the observed surface; functional after-drain checks do not establish product
 latency.
 

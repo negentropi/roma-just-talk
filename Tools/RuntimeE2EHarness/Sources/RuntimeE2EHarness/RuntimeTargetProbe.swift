@@ -23,7 +23,7 @@ struct RuntimeTargetProbeReport: Codable {
 }
 
 enum RuntimeTargetProbe {
-    static func run(configuration: RuntimeHarnessConfiguration) -> RuntimeTargetProbeReport {
+    static func run(configuration: RuntimeHarnessConfiguration, evidenceDirectoryURL: URL) -> RuntimeTargetProbeReport {
         let runningBundleIdentifiers = Set(
             configuration.targets.compactMap { target in
                 NSRunningApplication.runningApplications(
@@ -68,6 +68,9 @@ enum RuntimeTargetProbe {
                             target: target,
                             textScenario: textScenario,
                             runID: "target-probe-\(target.id)-\(textScenario.rawValue)-r1-\(UUID().uuidString.prefix(6))",
+                            acceptedFrameURL: evidenceDirectoryURL.appendingPathComponent(
+                                "target-probe-\(target.id)-\(textScenario.rawValue)-\(UUID().uuidString)-accepted.png"
+                            ),
                             settleSeconds: configuration.targetSettleSeconds,
                             availabilityPolicy: configuration.targetAvailabilityPolicy
                         )

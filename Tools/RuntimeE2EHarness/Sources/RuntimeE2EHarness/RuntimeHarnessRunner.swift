@@ -261,6 +261,7 @@ enum RuntimeHarnessRunner {
                 target: runCase.target,
                 textScenario: runCase.textScenario,
                 runID: runID,
+                acceptedFrameURL: evidenceDirectoryURL.appendingPathComponent(runID + "-accepted.png"),
                 settleSeconds: configuration.targetSettleSeconds,
                 availabilityPolicy: configuration.targetAvailabilityPolicy
             )
@@ -311,8 +312,7 @@ enum RuntimeHarnessRunner {
             phase = "observation"
             visibleText = target.waitForVisibleText(
                 keyUpAtSystemUptime: up.postedAtSystemUptime,
-                timeoutSeconds: configuration.targetTextTimeoutSeconds,
-                acceptedFrameURL: evidenceDirectoryURL.appendingPathComponent(runID + "-accepted.png")
+                timeoutSeconds: configuration.targetTextTimeoutSeconds
             )
             if audioResult == nil {
                 audioResult = try audio.waitUntilFinished()

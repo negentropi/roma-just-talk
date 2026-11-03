@@ -803,7 +803,7 @@ do {
     try require(RuntimeCaptureAssociationPolicy.rejection(
         expected: ownedAssociation, observed: ownedAssociation,
         frontToBackWindows: [coveringWindow, ownedDisplayWindow]
-    ) != nil, "Readable AX text behind a covering window must not receive display pixels")
+    ) == nil, "Global window bounds cannot decide whether an overlapping window paints the capture rectangle")
     try require(RuntimeCaptureAssociationPolicy.rejection(
         expected: ownedAssociation, observed: ownedAssociation,
         frontToBackWindows: [ownedDisplayWindow, coveringWindow]
@@ -847,14 +847,59 @@ do {
     try require(RuntimeCaptureAssociationPolicy.rejection(
         expected: ownedAssociation, observed: ownedAssociation,
         frontToBackWindows: [partlyTransparentCover, ownedDisplayWindow]
-    ) != nil, "A nonzero-alpha covering window invalidates capture without an occluder allowlist")
-    print("PASS capture ownership rejects covered, moved, minimized, replaced and ambiguous targets")
+    ) == nil, "Nonzero global alpha does not prove per-pixel opacity; paired pixels decide coverage")
+    let fadedTarget = RuntimeOnscreenWindow(processIdentifier: 37, windowID: 9, frame: ownedWindowFrame, alpha: 0.5)
+    try require(RuntimeCaptureAssociationPolicy.rejection(
+        expected: ownedAssociation, observed: ownedAssociation, frontToBackWindows: [fadedTarget]
+    ) != nil, "The owned target itself must retain full global opacity")
+    print("PASS capture metadata rejects moved, minimized, replaced, faded and ambiguous targets")
+
+    let ownedPixels: [UInt8] = [255, 255, 255, 255, 12, 34, 56, 255]
+    let equalPair = RuntimeCaptureVisibilityPolicy.compareRGBA(display: ownedPixels, reference: ownedPixels)
+    try require(equalPair?.matches == true && equalPair?.comparedPixels == 2 && equalPair?.differingPixels == 0,
+                "Identical actual display and owned-window pixels prove the same visible surface")
+    var opaqueCoverPixels = ownedPixels
+    opaqueCoverPixels[4] += 1
+    let coveredPair = RuntimeCaptureVisibilityPolicy.compareRGBA(display: opaqueCoverPixels, reference: ownedPixels)
+    try require(coveredPair?.matches == false && coveredPair?.differingPixels == 1,
+                "Even one channel differing by one rejects coverage; no visibility threshold")
+    var alphaChangedPixels = ownedPixels
+    alphaChangedPixels[7] -= 1
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: alphaChangedPixels, reference: ownedPixels)?.matches == false,
+                "Alpha differences cannot be ignored during visible ownership comparison")
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: [], reference: []) == nil,
+                "Empty images cannot prove display visibility")
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: ownedPixels, reference: [0, 0, 0, 0]) == nil,
+                "Different image sizes cannot prove visibility")
+    try require(RuntimeCaptureVisibilityPolicy.compareRGBA(display: [0, 0, 0], reference: [0, 0, 0]) == nil,
+                "Partial RGBA pixels cannot prove visibility")
+    print("PASS paired visibility requires exact nonempty full RGBA equality including alpha")
 
     let stablePixels = [UInt8](repeating: 128, count: 400 * 4)
     var caretOnlyPixels = stablePixels
     for pixel in 0..<40 {
         caretOnlyPixels[pixel * 4] = 0
     }
+    var interruptedVisibility = RuntimeRenderedTextAssociationTracker(baseline: stablePixels)
+    _ = interruptedVisibility.observe(current: stablePixels, atSystemUptime: 0,
+                                      accessibilityText: "", precedingAccessibilityText: "")
+    var textPixels = stablePixels
+    for pixel in 0..<100 { textPixels[pixel * 4] = 0 }
+    _ = interruptedVisibility.observe(current: textPixels, atSystemUptime: 1,
+                                      accessibilityText: "visible text", precedingAccessibilityText: "visible text")
+    interruptedVisibility.discardUnassociatedFrame()
+    let afterVisibilityGap = interruptedVisibility.observe(
+        current: textPixels, atSystemUptime: 2, accessibilityText: "visible text", precedingAccessibilityText: "visible text"
+    )
+    try require(afterVisibilityGap?.firstPersistentChangeAtSystemUptime == nil,
+                "A mismatched pair must break the persistence streak without using covered pixels")
+    let confirmedAfterGap = interruptedVisibility.observe(
+        current: textPixels, atSystemUptime: 2.3, accessibilityText: "visible text", precedingAccessibilityText: "visible text"
+    )
+    try require(confirmedAfterGap?.firstPersistentChangeAtSystemUptime == 2,
+                "After a mismatch, new visible persistence starts at the next matched pair and preserves the empty baseline")
+    print("PASS visibility mismatch breaks pixel persistence without replacing the confirmed baseline")
+
     let caretOnlyDifference = RuntimeRenderedTextChangePolicy.compareRGBA(
         baseline: stablePixels,
         current: caretOnlyPixels

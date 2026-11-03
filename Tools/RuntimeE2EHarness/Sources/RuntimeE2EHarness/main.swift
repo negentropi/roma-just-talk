@@ -121,7 +121,10 @@ do {
         exit(report.passed ? 0 : 2)
     case "target-probe":
         let report = RuntimeTargetProbe.run(
-            configuration: try loadConfiguration(path: arguments.configurationPath)
+            configuration: try loadConfiguration(path: arguments.configurationPath),
+            evidenceDirectoryURL: arguments.jsonOutputPath.map {
+                URL(fileURLWithPath: NSString(string: $0).expandingTildeInPath).deletingLastPathComponent()
+            } ?? FileManager.default.temporaryDirectory.appendingPathComponent("roma-target-probe-\(UUID().uuidString)")
         )
         try writeJSON(report, path: arguments.jsonOutputPath)
         exit(report.passed ? 0 : 2)

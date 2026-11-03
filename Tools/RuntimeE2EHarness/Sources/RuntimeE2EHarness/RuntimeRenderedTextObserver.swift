@@ -1,4 +1,5 @@
 import CoreGraphics
+import CoreVideo
 import CryptoKit
 import Foundation
 import ImageIO
@@ -13,7 +14,19 @@ struct RuntimeRenderedTextChangeResult: Codable {
     let requiredChangedPixels: Int?
     let interFrameChangedPixels: Int?
     let acceptedFrame: RuntimeAcceptedTextFrame?
+    let discardedVisibilitySamples: Int
     let error: String?
+}
+
+struct RuntimeReferenceTextFrame: Codable {
+    let pngPath: String
+    let pngSHA256: String
+    let rgbaSHA256: String
+    let imageWidth: Int
+    let imageHeight: Int
+    let rgbaWidth: Int
+    let rgbaHeight: Int
+    let capturedAtSystemUptime: TimeInterval
 }
 
 struct RuntimeAcceptedTextFrame: Codable {
@@ -28,6 +41,12 @@ struct RuntimeAcceptedTextFrame: Codable {
     let captureBracketStartedAtSystemUptime: TimeInterval
     let captureBracketFinishedAtSystemUptime: TimeInterval
     let association: RuntimeTargetCaptureAssociation
+    let reference: RuntimeReferenceTextFrame
+    let referenceMatched: Bool
+    let visibilityComparedPixels: Int
+    let visibilityDifferingPixels: Int
+    let displayCaptureMilliseconds: Double
+    let referenceCaptureMilliseconds: Double
 }
 
 final class RuntimeRenderedTextObserver {
@@ -36,61 +55,69 @@ final class RuntimeRenderedTextObserver {
     }
 
     private let captureSession: RuntimeScreenshotCaptureSession
+    private let acceptedFrameURL: URL
+    private let referenceFrameURL: URL
+    private let mismatchDisplayURL: URL
+    private let mismatchReferenceURL: URL
+    private let mismatchReceiptURL: URL
     let editableFrame: CGRect
     let captureRect: CGRect
-    private var baseline: RuntimeRGBAFrame?
+    private var baseline: [UInt8]?
     private var baselineError: String?
+    private(set) var invalidationError: String?
     private var latencyTracker: RuntimeRenderedTextAssociationTracker?
     private var lastSample: RuntimeRenderedTextStabilitySample?
-    private var acceptedCapture: (frame: RuntimeCapturedTextFrame,
-                                  association: RuntimeTargetCaptureAssociation,
-                                  before: TimeInterval, after: TimeInterval)?
+    private typealias AssociatedCapture = (frame: RuntimeCapturedTextFrame,
+                                           association: RuntimeTargetCaptureAssociation,
+                                           before: TimeInterval, after: TimeInterval)
+    private var acceptedCapture: AssociatedCapture?
+    private var lastMismatch: AssociatedCapture?
     private var acceptedChangeAtSystemUptime: TimeInterval?
+    private(set) var discardedVisibilitySamples = 0
+    private var didFlushMismatch = false
 
-    init(editableFrame: CGRect) throws {
+    init(editableFrame: CGRect, acceptedFrameURL: URL) throws {
         let horizontalInset = min(12, editableFrame.width / 4)
         let verticalInset = min(4, editableFrame.height / 4)
-        let captureRect = editableFrame
-            .insetBy(dx: horizontalInset, dy: verticalInset)
-            .integral
+        let captureRect = editableFrame.insetBy(dx: horizontalInset, dy: verticalInset).integral
         guard captureRect.width >= 8, captureRect.height >= 8 else {
             throw RuntimeRenderedTextObserverError.invalidCaptureRect
         }
-        let captureSession = try RuntimeScreenshotCaptureSession(captureRect: captureRect)
-        self.captureSession = captureSession
+        self.acceptedFrameURL = acceptedFrameURL
+        let stem = acceptedFrameURL.deletingPathExtension().path
+        referenceFrameURL = URL(fileURLWithPath: stem + "-reference.png")
+        mismatchDisplayURL = URL(fileURLWithPath: stem + "-mismatch-display.png")
+        mismatchReferenceURL = URL(fileURLWithPath: stem + "-mismatch-reference.png")
+        mismatchReceiptURL = URL(fileURLWithPath: stem + "-mismatch.json")
+        guard ![acceptedFrameURL, referenceFrameURL, mismatchDisplayURL,
+                mismatchReferenceURL, mismatchReceiptURL].contains(where: {
+            FileManager.default.fileExists(atPath: $0.path)
+        }) else { throw RuntimeRenderedTextObserverError.acceptedFrameAlreadyExists }
+        captureSession = try RuntimeScreenshotCaptureSession(captureRect: captureRect)
         self.editableFrame = editableFrame
         self.captureRect = captureRect
     }
 
-    func refreshBaseline(accessibilityText: () -> String?) -> String? {
-        do {
-            let precedingText = accessibilityText()
-            let frame = try captureSession.captureRGBA()
-            let followingText = accessibilityText()
-            guard let precedingText, let followingText, precedingText == followingText,
-                  followingText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                throw RuntimeRenderedTextObserverError.baselineUnavailable(
-                    "Pre-insertion capture requires matching readable empty AX text before and after capture"
-                )
-            }
-            baseline = frame
-            baselineError = nil
-            var tracker = RuntimeRenderedTextAssociationTracker(baseline: frame.bytes)
-            _ = tracker.observe(current: frame.bytes, atSystemUptime: ProcessInfo.processInfo.systemUptime,
-                                accessibilityText: followingText, precedingAccessibilityText: precedingText)
-            latencyTracker = tracker
-            lastSample = nil
-            acceptedCapture = nil
-            acceptedChangeAtSystemUptime = nil
-        } catch {
-            baseline = nil
-            latencyTracker = nil
-            lastSample = nil
-            acceptedCapture = nil
-            acceptedChangeAtSystemUptime = nil
-            baselineError = String(describing: error)
+    func establishBaseline(_ frame: RuntimeCapturedTextFrame, precedingText: String?, followingText: String?) throws {
+        if let invalidationError { throw RuntimeRenderedTextObserverError.baselineUnavailable(invalidationError) }
+        guard let precedingText, let followingText, precedingText == followingText,
+              followingText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw RuntimeRenderedTextObserverError.baselineUnavailable(
+                "Pre-insertion capture requires matching readable empty AX text before and after capture"
+            )
         }
-        return baselineError
+        guard frame.visibilityMatches else {
+            throw RuntimeRenderedTextObserverError.baselineUnavailable("Display pixels did not match the owned window")
+        }
+        lastMismatch = nil
+        // Repeated preparation checks validate the same baseline; never replace an established one.
+        guard baseline == nil else { return }
+        baseline = frame.bytes
+        baselineError = nil
+        var tracker = RuntimeRenderedTextAssociationTracker(baseline: frame.bytes)
+        _ = tracker.observe(current: frame.bytes, atSystemUptime: frame.atSystemUptime,
+                            accessibilityText: followingText, precedingAccessibilityText: precedingText)
+        latencyTracker = tracker
     }
 
     func beginObservation() -> String? {
@@ -102,8 +129,10 @@ final class RuntimeRenderedTextObserver {
     }
 
     var associationError: String? { latencyTracker?.associationError }
+    var hasPendingVisibilityMismatch: Bool { lastMismatch != nil }
 
     func invalidateAssociation(_ error: String) {
+        invalidationError = error
         baseline = nil
         latencyTracker = nil
         lastSample = nil
@@ -112,11 +141,19 @@ final class RuntimeRenderedTextObserver {
         baselineError = error
     }
 
-    func captureFrame() throws -> RuntimeCapturedTextFrame {
-        let frame = try captureSession.captureRGBA()
-        return RuntimeCapturedTextFrame(bytes: frame.bytes, image: frame.image,
-                                        rgbaWidth: frame.width, rgbaHeight: frame.height,
-                                        atSystemUptime: ProcessInfo.processInfo.systemUptime)
+    func captureFrame(association: RuntimeTargetCaptureAssociation) throws -> RuntimeCapturedTextFrame {
+        try captureSession.capturePair(association: association)
+    }
+
+    func discardVisibilitySample(_ frame: RuntimeCapturedTextFrame,
+                                 association: RuntimeTargetCaptureAssociation,
+                                 before: TimeInterval, after: TimeInterval) {
+        discardedVisibilitySamples += 1
+        lastMismatch = (frame, association, before, after)
+        latencyTracker?.discardUnassociatedFrame()
+        lastSample = nil
+        acceptedCapture = nil
+        acceptedChangeAtSystemUptime = nil
     }
 
     func observeCapturedFrame(
@@ -128,16 +165,15 @@ final class RuntimeRenderedTextObserver {
         captureBracketStartedAtSystemUptime: TimeInterval,
         captureBracketFinishedAtSystemUptime: TimeInterval
     ) throws -> RuntimeRenderedTextChangeResult? {
+        if current.visibilityMatches { lastMismatch = nil }
         guard var latencyTracker else {
             throw RuntimeRenderedTextObserverError.baselineUnavailable(
                 baselineError ?? "Rendered-text baseline is unavailable"
             )
         }
         let latencySample = latencyTracker.observe(
-            current: current.bytes,
-            atSystemUptime: current.atSystemUptime,
-            accessibilityText: accessibilityText,
-            precedingAccessibilityText: precedingAccessibilityText
+            current: current.bytes, atSystemUptime: current.atSystemUptime,
+            accessibilityText: accessibilityText, precedingAccessibilityText: precedingAccessibilityText
         )
         self.latencyTracker = latencyTracker
         guard let latencySample else {
@@ -149,58 +185,85 @@ final class RuntimeRenderedTextObserver {
         let sample = latencySample.stabilitySample
         lastSample = sample
         guard sample.stable,
-              let firstPersistentChangeAtSystemUptime =
-                latencySample.firstPersistentChangeAtSystemUptime else {
+              let firstPersistentChangeAtSystemUptime = latencySample.firstPersistentChangeAtSystemUptime else {
             acceptedCapture = nil
             acceptedChangeAtSystemUptime = nil
             return nil
         }
-
         if acceptedChangeAtSystemUptime != firstPersistentChangeAtSystemUptime {
             acceptedCapture = (current, association, captureBracketStartedAtSystemUptime,
                                captureBracketFinishedAtSystemUptime)
             acceptedChangeAtSystemUptime = firstPersistentChangeAtSystemUptime
         }
-
         return RuntimeRenderedTextChangeResult(
-            keyUpToRenderedTextMilliseconds: max(
-                0,
-                firstPersistentChangeAtSystemUptime - keyUpAtSystemUptime
-            ) * 1_000,
+            keyUpToRenderedTextMilliseconds: max(0, firstPersistentChangeAtSystemUptime - keyUpAtSystemUptime) * 1_000,
             changedPixels: sample.baselineDifference.changedPixels,
             comparedPixels: sample.baselineDifference.comparedPixels,
             requiredChangedPixels: sample.baselineDifference.requiredChangedPixels,
             interFrameChangedPixels: sample.interFrameChangedPixels,
-            acceptedFrame: nil,
-            error: nil
+            acceptedFrame: nil, discardedVisibilitySamples: discardedVisibilitySamples, error: nil
         )
     }
 
-    func retainAcceptedFrame(at url: URL) throws -> RuntimeAcceptedTextFrame {
+    func retainAcceptedFrame() throws -> RuntimeAcceptedTextFrame {
         guard let acceptedCapture else { throw RuntimeRenderedTextObserverError.acceptedFrameUnavailable }
+        return try retainPair(acceptedCapture, displayURL: acceptedFrameURL, referenceURL: referenceFrameURL)
+    }
+
+    // Called before failed preparation/observation cleanup; never capture a later desktop as evidence.
+    func flushMismatchEvidence() -> String? {
+        guard !didFlushMismatch, let lastMismatch else { return nil }
+        didFlushMismatch = true
+        do {
+            let receipt = try retainPair(lastMismatch, displayURL: mismatchDisplayURL, referenceURL: mismatchReferenceURL)
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            try encoder.encode(receipt).write(to: mismatchReceiptURL, options: .withoutOverwriting)
+            return "Mismatched capture evidence: \(mismatchReceiptURL.path)"
+        } catch { return "Could not retain mismatched capture pair: \(error)" }
+    }
+
+    private func retainPair(_ capture: AssociatedCapture, displayURL: URL, referenceURL: URL) throws -> RuntimeAcceptedTextFrame {
+        let frame = capture.frame
+        let displayHash = try Self.writePNG(frame.image, to: displayURL)
+        let referenceHash = try Self.writePNG(frame.reference.image, to: referenceURL)
+        return RuntimeAcceptedTextFrame(
+            pngPath: displayURL.path, pngSHA256: displayHash, rgbaSHA256: Self.hash(frame.bytes),
+            imageWidth: frame.image.width, imageHeight: frame.image.height,
+            rgbaWidth: frame.rgbaWidth, rgbaHeight: frame.rgbaHeight,
+            capturedAtSystemUptime: frame.atSystemUptime,
+            captureBracketStartedAtSystemUptime: capture.before,
+            captureBracketFinishedAtSystemUptime: capture.after, association: capture.association,
+            reference: RuntimeReferenceTextFrame(
+                pngPath: referenceURL.path, pngSHA256: referenceHash, rgbaSHA256: Self.hash(frame.reference.bytes),
+                imageWidth: frame.reference.image.width, imageHeight: frame.reference.image.height,
+                rgbaWidth: frame.reference.width, rgbaHeight: frame.reference.height,
+                capturedAtSystemUptime: frame.reference.atSystemUptime
+            ), referenceMatched: frame.visibilityMatches,
+            visibilityComparedPixels: frame.visibilityComparison.comparedPixels,
+            visibilityDifferingPixels: frame.visibilityComparison.differingPixels,
+            displayCaptureMilliseconds: frame.displayCaptureMilliseconds,
+            referenceCaptureMilliseconds: frame.referenceCaptureMilliseconds
+        )
+    }
+
+    private static func hash(_ bytes: [UInt8]) -> String {
+        SHA256.hash(data: Data(bytes)).map { String(format: "%02x", $0) }.joined()
+    }
+
+    private static func writePNG(_ image: CGImage, to url: URL) throws -> String {
         guard !FileManager.default.fileExists(atPath: url.path) else {
             throw RuntimeRenderedTextObserverError.acceptedFrameAlreadyExists
         }
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) else {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data, UTType.png.identifier as CFString, 1, nil) else {
             throw RuntimeRenderedTextObserverError.acceptedFrameWriteFailed
         }
-        CGImageDestinationAddImage(destination, acceptedCapture.frame.image, nil)
-        guard CGImageDestinationFinalize(destination) else {
-            throw RuntimeRenderedTextObserverError.acceptedFrameWriteFailed
-        }
-        let png = try Data(contentsOf: url)
-        return RuntimeAcceptedTextFrame(
-            pngPath: url.path,
-            pngSHA256: SHA256.hash(data: png).map { String(format: "%02x", $0) }.joined(),
-            rgbaSHA256: SHA256.hash(data: Data(acceptedCapture.frame.bytes)).map { String(format: "%02x", $0) }.joined(),
-            imageWidth: acceptedCapture.frame.image.width, imageHeight: acceptedCapture.frame.image.height,
-            rgbaWidth: acceptedCapture.frame.rgbaWidth, rgbaHeight: acceptedCapture.frame.rgbaHeight,
-            capturedAtSystemUptime: acceptedCapture.frame.atSystemUptime,
-            captureBracketStartedAtSystemUptime: acceptedCapture.before,
-            captureBracketFinishedAtSystemUptime: acceptedCapture.after,
-            association: acceptedCapture.association
-        )
+        CGImageDestinationAddImage(destination, image, nil)
+        guard CGImageDestinationFinalize(destination) else { throw RuntimeRenderedTextObserverError.acceptedFrameWriteFailed }
+        try (data as Data).write(to: url, options: .withoutOverwriting)
+        return SHA256.hash(data: data as Data).map { String(format: "%02x", $0) }.joined()
     }
 
     func failureResult(error: String) -> RuntimeRenderedTextChangeResult {
@@ -210,104 +273,119 @@ final class RuntimeRenderedTextObserver {
             comparedPixels: lastSample?.baselineDifference.comparedPixels,
             requiredChangedPixels: lastSample?.baselineDifference.requiredChangedPixels,
             interFrameChangedPixels: lastSample?.interFrameChangedPixels,
-            acceptedFrame: nil,
-            error: error
+            acceptedFrame: nil, discardedVisibilitySamples: discardedVisibilitySamples, error: error
         )
     }
-
 }
 
 struct RuntimeCapturedTextFrame {
-    let bytes: [UInt8]
-    let image: CGImage
-    let rgbaWidth: Int
-    let rgbaHeight: Int
-    let atSystemUptime: TimeInterval
+    let display: RuntimeRGBAFrame
+    let reference: RuntimeRGBAFrame
+    let visibilityComparison: RuntimeCapturePixelComparison
+    let displayCaptureMilliseconds: Double
+    let referenceCaptureMilliseconds: Double
+    var bytes: [UInt8] { display.bytes }
+    var image: CGImage { display.image }
+    var rgbaWidth: Int { display.width }
+    var rgbaHeight: Int { display.height }
+    var atSystemUptime: TimeInterval { display.atSystemUptime }
+    var visibilityMatches: Bool { visibilityComparison.matches }
 }
 
 private final class RuntimeScreenshotCaptureSession {
     private let filter: SCContentFilter
+    private let display: SCDisplay
+    private let windows: [SCWindow]
     private let configuration: SCStreamConfiguration
+    private var referenceFilter: SCContentFilter?
+    private var referenceAssociation: RuntimeTargetCaptureAssociation?
 
     init(captureRect: CGRect) throws {
         let contentState = RuntimeShareableContentState()
         Task {
             do {
-                let content = try await SCShareableContent.excludingDesktopWindows(
-                    false,
-                    onScreenWindowsOnly: true
-                )
+                let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
                 contentState.complete(content: content, error: nil)
-            } catch {
-                contentState.complete(content: nil, error: error)
-            }
+            } catch { contentState.complete(content: nil, error: error) }
         }
         let content = try contentState.wait(timeoutSeconds: 3)
         guard let display = content.displays.max(by: {
-            Self.intersectionArea($0.frame, captureRect)
-                < Self.intersectionArea($1.frame, captureRect)
-        }), display.frame.contains(captureRect) else {
-            throw RuntimeRenderedTextObserverError.captureDisplayNotFound
-        }
-
+            Self.intersectionArea($0.frame, captureRect) < Self.intersectionArea($1.frame, captureRect)
+        }), display.frame.contains(captureRect) else { throw RuntimeRenderedTextObserverError.captureDisplayNotFound }
+        self.display = display
+        windows = content.windows
         filter = SCContentFilter(display: display, excludingWindows: [])
         configuration = SCStreamConfiguration()
-        configuration.sourceRect = captureRect.offsetBy(
-            dx: -display.frame.minX,
-            dy: -display.frame.minY
-        )
+        configuration.sourceRect = captureRect.offsetBy(dx: -display.frame.minX, dy: -display.frame.minY)
         configuration.width = max(1, Int(captureRect.width.rounded(.up)))
         configuration.height = max(1, Int(captureRect.height.rounded(.up)))
+        configuration.pixelFormat = kCVPixelFormatType_32BGRA
+        configuration.colorSpaceName = CGColorSpace.sRGB
         configuration.showsCursor = false
     }
 
-    func captureRGBA() throws -> RuntimeRGBAFrame {
-        let image = try captureImage()
-        let longestSide = max(image.width, image.height)
-        let scale = min(1, 640 / Double(longestSide))
-        let width = max(1, Int((Double(image.width) * scale).rounded()))
-        let height = max(1, Int((Double(image.height) * scale).rounded()))
+    func capturePair(association: RuntimeTargetCaptureAssociation) throws -> RuntimeCapturedTextFrame {
+        if referenceFilter == nil {
+            let matches = windows.filter {
+                $0.windowID == association.windowID && $0.owningApplication?.processID == association.processIdentifier
+                    && $0.frame == CGRect(x: association.windowFrame.x, y: association.windowFrame.y,
+                                          width: association.windowFrame.width, height: association.windowFrame.height)
+            }
+            guard matches.count == 1, let window = matches.first else {
+                throw RuntimeRenderedTextObserverError.captureWindowNotFound
+            }
+            referenceFilter = SCContentFilter(display: display, including: [window])
+            referenceAssociation = association
+        }
+        guard referenceAssociation == association, let referenceFilter else {
+            throw RuntimeRenderedTextObserverError.captureWindowNotFound
+        }
+        let displayStarted = ProcessInfo.processInfo.systemUptime
+        let displayFrame = try normalize(captureImage())
+        let displayFinished = ProcessInfo.processInfo.systemUptime
+        let referenceFrame = try normalize(captureImage(filter: referenceFilter))
+        let referenceFinished = ProcessInfo.processInfo.systemUptime
+        guard displayFrame.width == referenceFrame.width, displayFrame.height == referenceFrame.height,
+              let comparison = RuntimeCaptureVisibilityPolicy.compareRGBA(
+                display: displayFrame.bytes, reference: referenceFrame.bytes
+              ) else { throw RuntimeRenderedTextObserverError.incompatibleFrames }
+        return RuntimeCapturedTextFrame(display: displayFrame, reference: referenceFrame,
+                                        visibilityComparison: comparison,
+                                        displayCaptureMilliseconds: (displayFinished - displayStarted) * 1_000,
+                                        referenceCaptureMilliseconds: (referenceFinished - displayFinished) * 1_000)
+    }
+
+    private func normalize(_ image: CGImage) throws -> RuntimeRGBAFrame {
+        // Full configured ROI: downsampling could erase a small opaque occluder.
+        let width = image.width
+        let height = image.height
         var bytes = [UInt8](repeating: 0, count: width * height * 4)
         let rendered = bytes.withUnsafeMutableBytes { storage -> Bool in
-            guard let context = CGContext(
-                data: storage.baseAddress,
-                width: width,
-                height: height,
-                bitsPerComponent: 8,
-                bytesPerRow: width * 4,
-                space: CGColorSpaceCreateDeviceRGB(),
-                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-                    | CGBitmapInfo.byteOrder32Big.rawValue
-            ) else {
-                return false
-            }
-            context.interpolationQuality = .low
+            guard let colorSpace = CGColorSpace(name: CGColorSpace.sRGB), let context = CGContext(
+                data: storage.baseAddress, width: width, height: height,
+                bitsPerComponent: 8, bytesPerRow: width * 4, space: colorSpace,
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue
+            ) else { return false }
+            context.setBlendMode(.copy)
             context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
             return true
         }
-        guard rendered else {
-            throw RuntimeRenderedTextObserverError.pixelConversionFailed
-        }
-        return RuntimeRGBAFrame(bytes: bytes, image: image, width: width, height: height)
+        guard rendered else { throw RuntimeRenderedTextObserverError.pixelConversionFailed }
+        return RuntimeRGBAFrame(bytes: bytes, image: image, width: width, height: height,
+                                atSystemUptime: ProcessInfo.processInfo.systemUptime)
     }
 
-    fileprivate func captureImage() throws -> CGImage {
+    fileprivate func captureImage(filter override: SCContentFilter? = nil) throws -> CGImage {
         let state = RuntimeScreenshotCaptureState()
-        SCScreenshotManager.captureImage(
-            contentFilter: filter,
-            configuration: configuration
-        ) { image, error in
+        SCScreenshotManager.captureImage(contentFilter: override ?? filter, configuration: configuration) { image, error in
             state.complete(image: image, error: error)
         }
-
         let deadline = Date().addingTimeInterval(2)
         while Date() < deadline {
             if let result = state.result() {
                 switch result {
-                case .success(let image):
-                    return image
-                case .failure(let error):
-                    throw RuntimeRenderedTextObserverError.captureFailed(error.localizedDescription)
+                case .success(let image): return image
+                case .failure(let error): throw RuntimeRenderedTextObserverError.captureFailed(error.localizedDescription)
                 }
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
@@ -317,16 +395,16 @@ private final class RuntimeScreenshotCaptureSession {
 
     private static func intersectionArea(_ lhs: CGRect, _ rhs: CGRect) -> CGFloat {
         let intersection = lhs.intersection(rhs)
-        guard !intersection.isNull else { return 0 }
-        return intersection.width * intersection.height
+        return intersection.isNull ? 0 : intersection.width * intersection.height
     }
 }
 
-private struct RuntimeRGBAFrame {
+struct RuntimeRGBAFrame {
     let bytes: [UInt8]
     let image: CGImage
     let width: Int
     let height: Int
+    let atSystemUptime: TimeInterval
 }
 
 private final class RuntimeScreenshotCaptureState: @unchecked Sendable {
@@ -382,7 +460,7 @@ private final class RuntimeShareableContentState: @unchecked Sendable {
 private enum RuntimeRenderedTextObserverError: Error, CustomStringConvertible {
     case invalidCaptureRect
     case baselineUnavailable(String)
-    case captureDisplayNotFound
+    case captureDisplayNotFound, captureWindowNotFound
     case shareableContentTimedOut
     case missingShareableContent
     case captureTimedOut
@@ -398,6 +476,8 @@ private enum RuntimeRenderedTextObserverError: Error, CustomStringConvertible {
             return "Editable AX element has no usable screen rectangle"
         case .baselineUnavailable(let message):
             return message
+        case .captureWindowNotFound:
+            return "No unique ScreenCaptureKit window matches the owned target association"
         case .captureDisplayNotFound:
             return "No ScreenCaptureKit display contains the target editor"
         case .shareableContentTimedOut:

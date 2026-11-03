@@ -176,29 +176,52 @@ def prepare_screen_capture(evidence, app, driver, name, run):
     return {'passed': True, 'captureReport': capture.name, 'consentReport': consent.name, 'screenshot': screenshot.name, 'allowPressCount': approved['allowPressCount'], 'boundary': 'Real ScreenCaptureKit capture, exact owned-helper OS prompt observed, ordinary Allow exactly once, and prompt absent before dictation fixtures'}
 
 
-def accepted_frame_passed(result, evidence, expected_path=None):
+def paired_frame_artifacts_passed(result, evidence, expected_path=None, *, expected_reference_path=None):
     rendered = result.get('visibleText', result.get('observation', {})).get('renderedText', {})
     frame = rendered.get('acceptedFrame') or {}
     target = result.get('targetPreparation') or result.get('target', {})
     path = evidence / expected_path if expected_path is not None else Path(frame.get('pngPath', ''))
     association = frame.get('association', {})
     if (not path.resolve().is_relative_to(evidence.resolve())
-            or frame.get('pngPath') != str(path.resolve()) or not path.is_file()
-            or path.is_symlink() or path.stat().st_size <= 32
-            or frame.get('pngSHA256') != sha256(path)
+            or frame.get('pngPath') != str(path.resolve())
             or type(association.get('processIdentifier')) is not int or association['processIdentifier'] <= 1
             or type(target.get('processIdentifier')) is not int or target['processIdentifier'] <= 1
             or association.get('processIdentifier') != target.get('processIdentifier')
-            or type(association.get('windowID')) is not int or association['windowID'] <= 0
-            or not all(type(frame.get(key)) is int and frame[key] > 0
-                       for key in ('imageWidth', 'imageHeight', 'rgbaWidth', 'rgbaHeight'))
-            or not isinstance(frame.get('rgbaSHA256'), str)
-            or len(frame['rgbaSHA256']) != 64 or any(value not in '0123456789abcdef' for value in frame['rgbaSHA256'])):
+            or type(association.get('windowID')) is not int or association['windowID'] <= 0):
         return False
-    header = path.read_bytes()[:24]
-    if (header[:8] != b'\x89PNG\r\n\x1a\n' or header[12:16] != b'IHDR'
-            or int.from_bytes(header[16:20], 'big') != frame['imageWidth']
-            or int.from_bytes(header[20:24], 'big') != frame['imageHeight']):
+    reference = frame.get('reference')
+    if not isinstance(reference, dict):
+        return False
+    reference_path = (evidence / expected_reference_path if expected_reference_path is not None
+                      else path.with_name(path.stem + '-reference.png'))
+    if not reference_path.resolve().is_relative_to(evidence.resolve()):
+        return False
+    for actual, receipt in ((path, frame), (reference_path, reference)):
+        if (receipt.get('pngPath') != str(actual.resolve()) or not actual.is_file()
+                or actual.is_symlink() or actual.stat().st_size <= 32
+                or receipt.get('pngSHA256') != sha256(actual)
+                or not all(type(receipt.get(key)) is int and receipt[key] > 0
+                           for key in ('imageWidth', 'imageHeight', 'rgbaWidth', 'rgbaHeight'))
+                or receipt['rgbaWidth'] != receipt['imageWidth'] or receipt['rgbaHeight'] != receipt['imageHeight']
+                or not isinstance(receipt.get('rgbaSHA256'), str)
+                or len(receipt['rgbaSHA256']) != 64
+                or any(value not in '0123456789abcdef' for value in receipt['rgbaSHA256'])):
+            return False
+        header = actual.read_bytes()[:24]
+        if (header[:8] != b'\x89PNG\r\n\x1a\n' or header[12:16] != b'IHDR'
+                or int.from_bytes(header[16:20], 'big') != receipt['imageWidth']
+                or int.from_bytes(header[20:24], 'big') != receipt['imageHeight']):
+            return False
+    if (any(reference[key] != frame[key] for key in ('imageWidth', 'imageHeight', 'rgbaWidth', 'rgbaHeight'))
+            or type(frame.get('visibilityComparedPixels')) is not int
+            or frame['visibilityComparedPixels'] != frame['rgbaWidth'] * frame['rgbaHeight']
+            or type(frame.get('visibilityDifferingPixels')) is not int
+            or not 0 <= frame['visibilityDifferingPixels'] <= frame['visibilityComparedPixels']
+            or type(frame.get('referenceMatched')) is not bool
+            or frame['referenceMatched'] != (frame['visibilityDifferingPixels'] == 0)
+            or frame['referenceMatched'] != (frame['rgbaSHA256'] == reference['rgbaSHA256'])
+            or not all(type(frame.get(key)) in (int, float) and 0 <= frame[key] < float('inf')
+                       for key in ('displayCaptureMilliseconds', 'referenceCaptureMilliseconds'))):
         return False
     for key in ('windowFrame', 'editableFrame', 'captureRect'):
         rectangle = association.get(key, {})
@@ -207,19 +230,42 @@ def accepted_frame_passed(result, evidence, expected_path=None):
                         for value in rectangle.values())
                 and rectangle['width'] > 0 and rectangle['height'] > 0):
             return False
-    times = [frame.get(key) for key in ('captureBracketStartedAtSystemUptime',
-                                       'capturedAtSystemUptime', 'captureBracketFinishedAtSystemUptime')]
+    times = [frame.get('captureBracketStartedAtSystemUptime'), frame.get('capturedAtSystemUptime'),
+             reference.get('capturedAtSystemUptime'), frame.get('captureBracketFinishedAtSystemUptime')]
     if not (all(type(value) in (int, float) and 0 < value < float('inf') for value in times)
             and times == sorted(times)):
         return False
     return True
 
 
+def accepted_frame_passed(result, evidence, expected_path=None):
+    frame = result.get('visibleText', result.get('observation', {})).get('renderedText', {}).get('acceptedFrame') or {}
+    return frame.get('referenceMatched') is True and paired_frame_artifacts_passed(result, evidence, expected_path)
+
+
+def covered_mismatch_evidence_passed(case, evidence):
+    stem = 'association-covered-accepted-mismatch'
+    receipt = evidence / (stem + '.json')
+    error = case.get('observation', {}).get('renderedText', {}).get('error')
+    if (error != 'Display pixels did not match the owned window before timeout; Mismatched capture evidence: ' + str(receipt.resolve())
+            or not receipt.resolve().is_relative_to(evidence.resolve())
+            or not receipt.is_file() or receipt.is_symlink()):
+        return False
+    try:
+        frame = json.loads(receipt.read_text())
+        result = {'target': case.get('target', {}), 'observation': {'renderedText': {'acceptedFrame': frame}}}
+        return (isinstance(frame, dict) and frame.get('referenceMatched') is False
+                and paired_frame_artifacts_passed(result, evidence, stem + '-display.png',
+                                                 expected_reference_path=stem + '-reference.png'))
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return False
+
+
 def association_control_passed(report, evidence, *, known_bad):
     cases = report.get('cases', [])
     words = report.get('controlWords')
-    if (not isinstance(words, str) or not words.strip() or len(cases) != 3
-            or [case.get('case') for case in cases] != ['healthy', 'covered', 'moved']):
+    if (not isinstance(words, str) or not words.strip() or len(cases) != 4
+            or [case.get('case') for case in cases] != ['healthy', 'transparent', 'covered', 'moved']):
         return False
     if report.get('error') or report.get('failedControlCleanup') is not None:
         return False
@@ -234,27 +280,62 @@ def association_control_passed(report, evidence, *, known_bad):
                 or not all(cleanup.get(key) is True for key in ('surfaceClosed', 'temporaryResourceRemoved',
                                                               'restoredInitiallyRunningApplication', 'restoredFrontmostApplication'))):
             return False
-        should_accept = name == 'healthy' or known_bad
+        positive = name in ('healthy', 'transparent')
+        should_accept = positive or known_bad
+        expected_path = 'association-' + name + '-accepted.png'
+        rendered = case.get('observation', {}).get('renderedText', {})
+        if name in ('transparent', 'covered'):
+            panel = case.get('cover', {})
+            if (panel.get('aboveTarget') is not True or panel.get('alpha') != 1
+                    or type(panel.get('alpha')) not in (int, float)
+                    or type(panel.get('ownerPID')) is not int or panel['ownerPID'] <= 1
+                    or panel['ownerPID'] == case.get('target', {}).get('processIdentifier')
+                    or type(panel.get('windowID')) is not int or panel['windowID'] <= 0
+                    or type(panel.get('coverIndex')) is not int or panel['coverIndex'] < 0
+                    or type(panel.get('targetIndex')) is not int or panel['targetIndex'] <= panel['coverIndex']
+                    or case.get('panelContent') != ('clear' if name == 'transparent' else 'opaqueBlue')):
+                return False
+            panel_frame, editor = panel.get('frame'), case.get('baselineEditableFrame')
+            for rectangle in (panel_frame, editor):
+                if (not isinstance(rectangle, dict) or set(rectangle) != {'x', 'y', 'width', 'height'}
+                        or not all(type(value) in (int, float) and float('-inf') < value < float('inf')
+                                   for value in rectangle.values())
+                        or rectangle['width'] <= 0 or rectangle['height'] <= 0):
+                    return False
+            if not (panel_frame['x'] <= editor['x'] and panel_frame['y'] <= editor['y']
+                    and panel_frame['x'] + panel_frame['width'] >= editor['x'] + editor['width']
+                    and panel_frame['y'] + panel_frame['height'] >= editor['y'] + editor['height']):
+                return False
         if case.get('visibleAcceptance') is not should_accept:
             return False
         if should_accept:
             if (case.get('observation', {}).get('text') != words
-                    or not accepted_frame_passed(case, evidence, 'association-' + name + '-accepted.png')):
+                    or case.get('acceptedArtifactExists') is not True
+                    or not (accepted_frame_passed(case, evidence, expected_path) if positive
+                            else paired_frame_artifacts_passed(case, evidence, expected_path))
+                    or (name == 'covered' and rendered['acceptedFrame']['referenceMatched'] is not False)):
                 return False
         elif (case.get('acceptedArtifactExists') is not False
-              or case.get('observation', {}).get('renderedText', {}).get('acceptedFrame') is not None
-              or case.get('expectedRejection') != ('Another on-screen window covers the capture rectangle'
+              or rendered.get('acceptedFrame') is not None
+              or (evidence / expected_path).exists()
+              or (evidence / expected_path).with_name(Path(expected_path).stem + '-reference.png').exists()
+              or case.get('expectedRejection') != ('Display pixels did not match the owned window'
                   if name == 'covered' else 'Editable target geometry changed')
-              or case.get('observation', {}).get('renderedText', {}).get('error') != case['expectedRejection']):
+              or not isinstance(rendered.get('error'), str)
+              or (not rendered['error'].startswith(case['expectedRejection']) if name == 'covered'
+                  else rendered['error'] != case['expectedRejection'])):
+            return False
+        if name == 'covered' and not known_bad and not covered_mismatch_evidence_passed(case, evidence):
             return False
         if name == 'moved' and case.get('movedWindowRestored') is not True:
             return False
-        if name == 'healthy':
+        if positive:
             if case.get('passed') is not True:
                 return False
-        elif (case.get('mutationObserved') is not True
-              or (known_bad and (case.get('failure') != 'unexpectedVisibleAcceptance' or case.get('passed') is not False))
+        elif ((known_bad and (case.get('failure') != 'unexpectedVisibleAcceptance' or case.get('passed') is not False))
               or (not known_bad and case.get('passed') is not True)):
+            return False
+        if name != 'healthy' and case.get('mutationObserved') is not True:
             return False
     return (report.get('passed') is (not known_bad) and type(report.get('controlExitCode')) is int
             and report['controlExitCode'] == (1 if known_bad else 0))
@@ -314,10 +395,22 @@ def run_association_controls(evidence, configuration, helper, run, grant):
         if body.count(checked) != 1:
             raise RuntimeError('Expected one fresh ' + variable + ' association check in the actual positive observation loop')
         body = body.replace(checked, legacy, 1)
+    visibility_guard = ('                if !capturedFrame.visibilityMatches {\n'
+        '                    renderedTextObserver.discardVisibilitySample(\n'
+        '                        capturedFrame, association: captureAssociation,\n'
+        '                        before: captureBracketStartedAtSystemUptime, after: captureBracketFinishedAtSystemUptime\n'
+        '                    )\n'
+        '                    renderedText = nil\n'
+        '                    RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.016))\n'
+        '                    continue\n'
+        '                }\n')
+    if body.count(visibility_guard) != 1:
+        raise RuntimeError('Expected one paired-pixel mismatch discard in the actual positive observation loop')
+    body = body.replace(visibility_guard, '', 1)
     mutant = (text[:start] + body + text[end:]).encode()
     receipt = {'status': 'running', 'candidateSourceSHA256': hashlib.sha256(candidate).hexdigest(),
                'mutantSourceSHA256': hashlib.sha256(mutant).hexdigest(),
-               'knownBadChange': 'Replace only the two per-sample live association checks with plain readable AX lookups; retain baseline ownership and accepted-frame storage. A nil AX lookup throws and cannot qualify the intended false-acceptance control.'}
+               'knownBadChange': 'Replace the two positive-sample live association checks with plain readable AX lookups and remove the positive paired-pixel mismatch discard. Retain strict baseline pair checks, both actual captures and factual paired-frame storage. A nil AX lookup throws and cannot qualify the intended false acceptance.'}
     write(evidence / 'association-regression.json', receipt)
     bad_evidence = evidence / 'association-known-bad'
     bad_evidence.mkdir()

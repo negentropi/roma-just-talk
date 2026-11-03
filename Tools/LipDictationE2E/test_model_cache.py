@@ -47,17 +47,62 @@ jobs:
 
 
 class ModelCacheTests(unittest.TestCase):
-    def accepted_frame_fixture(self, root, name='association-healthy-accepted.png'):
+    def accepted_frame_fixture(self, root, name='association-healthy-accepted.png', *, matched=True):
         path = root / name
-        path.write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jK1sAAAAASUVORK5CYII='))
+        path.write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP4DwQACfsD/fteaysAAAAASUVORK5CYII='))
+        reference = path.with_name(path.stem + '-reference.png')
+        reference.write_bytes(path.read_bytes() if matched else base64.b64decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAX+XDSwAAAABJRU5ErkJggg=='))
         rect = {'x': 10, 'y': 20, 'width': 1, 'height': 1}
         return {'target': {'processIdentifier': 1234}, 'observation': {'renderedText': {'acceptedFrame': {
             'pngPath': str(path.resolve()), 'pngSHA256': runner.sha256(path), 'rgbaSHA256': 'a' * 64,
             'imageWidth': 1, 'imageHeight': 1, 'rgbaWidth': 1, 'rgbaHeight': 1,
+            'referenceMatched': matched, 'visibilityComparedPixels': 1, 'visibilityDifferingPixels': 0 if matched else 1,
+            'displayCaptureMilliseconds': 2, 'referenceCaptureMilliseconds': 3,
+            'reference': {'pngPath': str(reference.resolve()), 'pngSHA256': runner.sha256(reference),
+                'rgbaSHA256': ('a' if matched else 'b') * 64, 'imageWidth': 1, 'imageHeight': 1,
+                'rgbaWidth': 1, 'rgbaHeight': 1, 'capturedAtSystemUptime': 11.5},
             'captureBracketStartedAtSystemUptime': 10, 'capturedAtSystemUptime': 11,
             'captureBracketFinishedAtSystemUptime': 12, 'association': {
                 'processIdentifier': 1234, 'windowID': 55, 'windowFrame': rect,
                 'editableFrame': rect, 'captureRect': rect}}}}}
+
+    def test_accepted_frame_requires_actual_matching_owned_reference(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.accepted_frame_fixture(root)
+            self.assertTrue(runner.accepted_frame_passed(result, root))
+            changes = [({'reference': None}, {}), ({'referenceMatched': False}, {}),
+                ({'visibilityDifferingPixels': 1}, {}), ({'visibilityComparedPixels': 2}, {}),
+                ({'visibilityDifferingPixels': False}, {}), ({'displayCaptureMilliseconds': float('inf')}, {}),
+                ({}, {'pngSHA256': '0' * 64}), ({}, {'imageWidth': 2}),
+                ({}, {'rgbaSHA256': 'b' * 64}), ({}, {'rgbaWidth': 2}),
+                ({'rgbaWidth': 2, 'visibilityComparedPixels': 2}, {'rgbaWidth': 2}),
+                ({}, {'capturedAtSystemUptime': 20})]
+            for frame_change, reference_change in changes:
+                changed = copy.deepcopy(result)
+                frame = changed['observation']['renderedText']['acceptedFrame']
+                frame['reference'].update(reference_change)
+                frame.update(frame_change)
+                with self.subTest(frame=frame_change, reference=reference_change):
+                    self.assertFalse(runner.accepted_frame_passed(changed, root))
+            (root / 'association-healthy-accepted-reference.png').write_bytes(b'corrupt reference')
+            self.assertFalse(runner.accepted_frame_passed(result, root))
+
+    def test_known_bad_pair_integrity_keeps_factual_mismatch(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.accepted_frame_fixture(root, matched=False)
+            self.assertTrue(runner.paired_frame_artifacts_passed(result, root))
+            self.assertFalse(runner.accepted_frame_passed(result, root))
+            for changes in [{'referenceMatched': True}, {'visibilityDifferingPixels': 0},
+                            {'visibilityComparedPixels': 0}, {'reference': {}}]:
+                changed = copy.deepcopy(result)
+                changed['observation']['renderedText']['acceptedFrame'].update(changes)
+                with self.subTest(changes=changes):
+                    self.assertFalse(runner.paired_frame_artifacts_passed(changed, root))
+            (root / 'association-healthy-accepted-reference.png').unlink()
+            self.assertFalse(runner.paired_frame_artifacts_passed(result, root))
 
     def test_accepted_frame_requires_bound_file_identity_dimensions_and_capture_bracket(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -101,16 +146,23 @@ class ModelCacheTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             cases = []
-            for name in ['healthy', 'covered', 'moved']:
-                case = self.accepted_frame_fixture(root, 'association-' + name + '-accepted.png')
+            for name in ['healthy', 'transparent', 'covered', 'moved']:
+                positive = name in ('healthy', 'transparent')
+                case = self.accepted_frame_fixture(root, 'association-' + name + '-accepted.png', matched=name != 'covered')
                 case.update({'case': name, 'fixtureValid': True, 'visibleAcceptance': True,
                     'mutationObserved': name != 'healthy', 'acceptedArtifactExists': True,
                     'readableAXBefore': 'still readable control words', 'readableAXAfter': 'still readable control words',
-                    'passed': name == 'healthy', 'cleanup': {'errors': [], 'surfaceClosed': True,
+                    'passed': positive, 'cleanup': {'errors': [], 'surfaceClosed': True,
                         'temporaryResourceRemoved': True, 'restoredInitiallyRunningApplication': True,
                         'restoredFrontmostApplication': True}})
                 case['observation']['text'] = 'control words'
-                if name != 'healthy':
+                if name in ('transparent', 'covered'):
+                    case['cover'] = {'windowID': 77, 'ownerPID': 2345, 'alpha': 1,
+                                     'coverIndex': 0, 'targetIndex': 1, 'aboveTarget': True,
+                                     'frame': {'x': 0, 'y': 0, 'width': 100, 'height': 100}}
+                    case['baselineEditableFrame'] = {'x': 10, 'y': 20, 'width': 1, 'height': 1}
+                    case['panelContent'] = 'clear' if name == 'transparent' else 'opaqueBlue'
+                if not positive:
                     case['failure'] = 'unexpectedVisibleAcceptance'
                 if name == 'moved':
                     case['movedWindowRestored'] = True
@@ -118,7 +170,7 @@ class ModelCacheTests(unittest.TestCase):
             report = {'passed': False, 'controlExitCode': 1, 'cases': cases, 'controlWords': 'control words'}
             self.assertTrue(runner.association_control_passed(report, root, known_bad=True))
             for index, field, value in [(0, 'visibleAcceptance', False), (1, 'fixtureValid', False),
-                                        (1, 'readableAXAfter', None), (2, 'failure', 'permissionDenied')]:
+                                        (2, 'readableAXAfter', None), (3, 'failure', 'permissionDenied')]:
                 changed = copy.deepcopy(report)
                 changed['cases'][index][field] = value
                 with self.subTest(index=index, field=field):
@@ -130,14 +182,31 @@ class ModelCacheTests(unittest.TestCase):
             root = Path(temporary)
             source = root / 'Tools/RuntimeE2EHarness/Sources/RuntimeE2EHarness/RuntimeTargetController.swift'
             source.parent.mkdir(parents=True)
-            candidate = ('    func waitForVisibleText() {\n'
+            baseline = '    func baseline() { if !capturedFrame.visibilityMatches { throw mismatch }; _ = try validateCaptureAssociation() }\n'
+            visibility_guard = ('                if !capturedFrame.visibilityMatches {\n'
+                '                    renderedTextObserver.discardVisibilitySample(\n'
+                '                        capturedFrame, association: captureAssociation,\n'
+                '                        before: captureBracketStartedAtSystemUptime, after: captureBracketFinishedAtSystemUptime\n'
+                '                    )\n'
+                '                    renderedText = nil\n'
+                '                    RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.016))\n'
+                '                    continue\n'
+                '                }\n')
+            candidate = (baseline + '    func waitForVisibleText() {\n'
                          '                precedingText = try validateCaptureAssociation()\n'
                          '                currentText = try validateCaptureAssociation()\n'
-                         '    }\n    func cleanup() {}\n').encode()
+                         + visibility_guard + '    }\n    func cleanup() {}\n').encode()
             source.write_bytes(candidate)
             evidence = root / 'evidence'
             evidence.mkdir()
-            with patch.object(runner, 'ROOT', root), patch.object(runner, 'build_visual_driver', side_effect=RuntimeError('build failed')):
+            def fail_build(*args):
+                mutated = source.read_text()
+                self.assertTrue(mutated.startswith(baseline))
+                self.assertNotIn(visibility_guard, mutated)
+                self.assertNotIn('= try validateCaptureAssociation()', mutated.removeprefix(baseline))
+                self.assertEqual(mutated.count('guard let text = readFullText()'), 2)
+                raise RuntimeError('build failed')
+            with patch.object(runner, 'ROOT', root), patch.object(runner, 'build_visual_driver', side_effect=fail_build):
                 with self.assertRaisesRegex(RuntimeError, 'build failed'):
                     runner.run_association_controls(evidence, {}, root / 'helper', Mock(), Mock())
             self.assertEqual(source.read_bytes(), candidate)
@@ -145,41 +214,106 @@ class ModelCacheTests(unittest.TestCase):
             self.assertTrue(receipt['sourceRestored'])
             self.assertEqual(receipt['candidateSourceSHA256'], receipt['restoredSourceSHA256'])
 
+    def association_candidate_fixture(self, root):
+        cases = []
+        for name in ['healthy', 'transparent', 'covered', 'moved']:
+            positive = name in ('healthy', 'transparent')
+            case = self.accepted_frame_fixture(root, 'association-' + name + '-accepted.png') if positive else {
+                'target': {'processIdentifier': 1234}, 'observation': {'renderedText': {}}}
+            case.update({'case': name, 'fixtureValid': True, 'visibleAcceptance': positive,
+                'mutationObserved': name != 'healthy', 'acceptedArtifactExists': positive,
+                'readableAXBefore': 'still readable control words', 'readableAXAfter': 'still readable control words',
+                'passed': True, 'cleanup': {'errors': [], 'surfaceClosed': True,
+                    'temporaryResourceRemoved': True, 'restoredInitiallyRunningApplication': True,
+                    'restoredFrontmostApplication': True}})
+            case['observation']['text'] = 'control words'
+            if name in ('transparent', 'covered'):
+                case['cover'] = {'windowID': 77, 'ownerPID': 2345, 'alpha': 1,
+                                 'coverIndex': 0, 'targetIndex': 1, 'aboveTarget': True,
+                                 'frame': {'x': 0, 'y': 0, 'width': 100, 'height': 100}}
+                case['baselineEditableFrame'] = {'x': 10, 'y': 20, 'width': 1, 'height': 1}
+                case['panelContent'] = 'clear' if name == 'transparent' else 'opaqueBlue'
+            if not positive:
+                reason = ('Display pixels did not match the owned window' if name == 'covered'
+                          else 'Editable target geometry changed')
+                case['expectedRejection'] = reason
+                case['observation']['renderedText']['error'] = reason
+            if name == 'covered':
+                diagnostic = self.accepted_frame_fixture(root,
+                    'association-covered-accepted-mismatch-display.png', matched=False)
+                frame = diagnostic['observation']['renderedText']['acceptedFrame']
+                reference = root / 'association-covered-accepted-mismatch-reference.png'
+                Path(frame['reference']['pngPath']).replace(reference)
+                frame['reference']['pngPath'] = str(reference.resolve())
+                receipt = root / 'association-covered-accepted-mismatch.json'
+                runner.write(receipt, frame)
+                case['observation']['renderedText'].update(discardedVisibilitySamples=2,
+                    error='Display pixels did not match the owned window before timeout; Mismatched capture evidence: ' + str(receipt.resolve()))
+            if name == 'moved':
+                case['movedWindowRestored'] = True
+            cases.append(case)
+        return {'passed': True, 'controlExitCode': 0, 'controlWords': 'control words', 'cases': cases}
+
     def test_association_candidate_requires_specific_rejection_not_capture_failure(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            cases = []
-            for name in ['healthy', 'covered', 'moved']:
-                case = self.accepted_frame_fixture(root) if name == 'healthy' else {
-                    'target': {'processIdentifier': 1234}, 'observation': {'renderedText': {}}}
-                case.update({'case': name, 'fixtureValid': True, 'visibleAcceptance': name == 'healthy',
-                    'mutationObserved': name != 'healthy', 'acceptedArtifactExists': name == 'healthy',
-                    'readableAXBefore': 'still readable control words', 'readableAXAfter': 'still readable control words',
-                    'passed': True, 'cleanup': {'errors': [], 'surfaceClosed': True,
-                        'temporaryResourceRemoved': True, 'restoredInitiallyRunningApplication': True,
-                        'restoredFrontmostApplication': True}})
-                case['observation']['text'] = 'control words'
-                if name != 'healthy':
-                    reason = ('Another on-screen window covers the capture rectangle' if name == 'covered'
-                              else 'Editable target geometry changed')
-                    case['expectedRejection'] = reason
-                    case['observation']['renderedText']['error'] = reason
-                if name == 'moved':
-                    case['movedWindowRestored'] = True
-                cases.append(case)
-            report = {'passed': True, 'controlExitCode': 0, 'controlWords': 'control words', 'cases': cases}
+            report = self.association_candidate_fixture(root)
             self.assertTrue(runner.association_control_passed(report, root, known_bad=False))
             changed = copy.deepcopy(report)
-            changed['cases'][1]['observation']['renderedText']['error'] = 'Screen capture denied'
+            changed['cases'][2]['observation']['renderedText']['error'] = 'Screen capture denied'
             self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
             changed = copy.deepcopy(report)
             changed['controlExitCode'] = False
             self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
-            for index in [1, 2]:
+            for index in [1, 2, 3]:
                 changed = copy.deepcopy(report)
                 changed['cases'][index]['readableAXBefore'] = '[existing before][existing after]'
                 changed['cases'][index]['readableAXAfter'] = '[existing before][existing after]'
                 with self.subTest(missingControlWordsCase=index):
+                    self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+            for field, value in [('alpha', 0), ('alpha', True), ('aboveTarget', False), ('ownerPID', 1234),
+                                 ('frame', {'x': 12, 'y': 20, 'width': 1, 'height': 1})]:
+                changed = copy.deepcopy(report)
+                changed['cases'][1]['cover'][field] = value
+                with self.subTest(transparentPanelField=field, value=value):
+                    self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
+
+    def test_association_covered_requires_actual_retained_mismatch_evidence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = self.association_candidate_fixture(root)
+            self.assertTrue(runner.association_control_passed(report, root, known_bad=False))
+            receipt = root / 'association-covered-accepted-mismatch.json'
+            display = root / 'association-covered-accepted-mismatch-display.png'
+            reference = root / 'association-covered-accepted-mismatch-reference.png'
+            for path in (receipt, display, reference):
+                original = path.read_bytes()
+                try:
+                    path.unlink()
+                    with self.subTest(missing=path.name):
+                        self.assertFalse(runner.association_control_passed(report, root, known_bad=False))
+                    path.write_bytes(b'corrupt artifact')
+                    with self.subTest(corrupt=path.name):
+                        self.assertFalse(runner.association_control_passed(report, root, known_bad=False))
+                finally:
+                    path.write_bytes(original)
+            frame = json.loads(receipt.read_text())
+            for changes in [{'referenceMatched': True, 'visibilityDifferingPixels': 0,
+                              'reference': dict(frame['reference'], rgbaSHA256=frame['rgbaSHA256'])},
+                            {'association': dict(frame['association'], processIdentifier=4321)},
+                            {'captureBracketStartedAtSystemUptime': 20}]:
+                try:
+                    runner.write(receipt, dict(frame, **changes))
+                    with self.subTest(receipt=changes):
+                        self.assertFalse(runner.association_control_passed(report, root, known_bad=False))
+                finally:
+                    runner.write(receipt, frame)
+            for error in ['Display pixels did not match the owned window before timeout; Could not retain mismatched capture pair: disk full',
+                          'Display pixels did not match the owned window before timeout',
+                          'Display pixels did not match the owned window before timeout; Mismatched capture evidence: /wrong/mismatch.json']:
+                changed = copy.deepcopy(report)
+                changed['cases'][2]['observation']['renderedText']['error'] = error
+                with self.subTest(error=error):
                     self.assertFalse(runner.association_control_passed(changed, root, known_bad=False))
 
     def test_association_fast_preflight_accepts_no_app_or_model_arguments(self):

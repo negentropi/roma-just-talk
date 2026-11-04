@@ -2,42 +2,6 @@ import Foundation
 @testable import VoiceInkCore
 
 final class LiveTypingTests: XCTestCase {
-    func testRemainderIsOnlyTheTextSpokenAfterTheTypedSegments() {
-        let typed = VoiceInkStreamingTranscriptAssembly.committedText(["Hello there", "how are you"])
-        let final = VoiceInkStreamingTranscriptAssembly.committedText(["Hello there", "how are you", "doing today?"])
-
-        XCTAssertEqual(
-            VoiceInkLiveTyping.untypedRemainder(finalRawText: final, typedRawText: typed),
-            "doing today?"
-        )
-    }
-
-    func testRemainderIsEmptyWhenEverythingWasTypedDuringTheHold() {
-        let typed = VoiceInkStreamingTranscriptAssembly.committedText(["Hello there"])
-
-        XCTAssertEqual(VoiceInkLiveTyping.untypedRemainder(finalRawText: typed, typedRawText: typed), "")
-    }
-
-    func testRemainderSurvivesARepunctuatedFallbackTranscript() {
-        XCTAssertEqual(
-            VoiceInkLiveTyping.untypedRemainder(
-                finalRawText: "Hello, there. How are you doing today?",
-                typedRawText: "Hello there how are you"
-            ),
-            "doing today?"
-        )
-    }
-
-    func testRemainderRefusesATranscriptWithDifferentWords() {
-        XCTAssertNil(
-            VoiceInkLiveTyping.untypedRemainder(
-                finalRawText: "Yellow there, how are you doing today?",
-                typedRawText: "Hello there"
-            )
-        )
-        XCTAssertNil(VoiceInkLiveTyping.untypedRemainder(finalRawText: "Hello", typedRawText: "Hello there"))
-    }
-
     func testOnlyWordsEveryRecentPassAgreesOnAreTyped() {
         let passes = [
             VoiceInkLiveTyping.words("The weather was warm and"),

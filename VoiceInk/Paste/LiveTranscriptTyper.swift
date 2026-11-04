@@ -47,6 +47,8 @@ final class LiveTranscriptTyper {
     private var recentPasses: [[String]] = []
     private var queuedWords: [String] = []
     private var typedWords: [String] = []
+    /// True once anything was sent to the field, confirmed or not, so release never re-pastes it.
+    private var hasTouchedField = false
     private var typedRegion = ""
     /// Text before the cursor when typing began, so cursor-adapted capitalization and spacing stay
     /// the same every time the region is recomputed.
@@ -96,11 +98,11 @@ final class LiveTranscriptTyper {
         }
     }
 
-    /// Stops queuing, waits for queued insertions, and reports whether anything was typed.
+    /// Stops queuing, waits for queued insertions, and reports whether anything may have been typed.
     func finish() async -> Bool {
         phase = .stopped
         await pendingInsertion?.value
-        return !typedWords.isEmpty
+        return hasTouchedField
     }
 
     /// Drops every queued insertion and stops a keystroke run in progress.
@@ -111,11 +113,12 @@ final class LiveTranscriptTyper {
 
     /// Brings the field in line with the final transcript after `finish()`.
     func releaseInsertion(finalRawText: String) -> ReleaseInsertion {
-        let desired = region(for: VoiceInkLiveTyping.words(finalRawText))
-        guard desired != typedRegion else { return .insert("") }
+        // Checked even when nothing is left to type: the trailing space and auto-send go to the caret too.
         guard !isPlacementUncertain, isAtLastInsertionPoint() else {
             return unreconciled("the field or caret changed during live typing")
         }
+        let desired = region(for: VoiceInkLiveTyping.words(finalRawText))
+        guard desired != typedRegion else { return .insert("") }
 
         let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
         if edit.removedSuffix.isEmpty { return .insert(edit.insertedText) }
@@ -126,17 +129,9 @@ final class LiveTranscriptTyper {
         case .uncertain:
             return unreconciled("correcting live-typed text left unexpected text")
         case .untouched:
-            break
+            // The field cannot be edited in place, so it would not match History.
+            return unreconciled("live-typed text differs from the transcript and cannot be corrected")
         }
-
-        // Fields that cannot be edited in place keep what was typed when the words only differ
-        // in case or punctuation, and get the words that follow appended.
-        let typedRawText = typedWords.joined(separator: " ")
-        guard let remainder = VoiceInkLiveTyping.untypedRemainder(finalRawText: finalRawText, typedRawText: typedRawText) else {
-            return unreconciled("the final transcript does not continue the live-typed words")
-        }
-        let cleaned = cleanText(remainder).trimmingCharacters(in: .whitespacesAndNewlines)
-        return .insert(cleaned.isEmpty ? "" : " " + cleaned)
     }
 
     private func unreconciled(_ reason: String) -> ReleaseInsertion {
@@ -170,6 +165,7 @@ final class LiveTranscriptTyper {
         let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
         let before = CursorTextContextReader.focusedInsertionPoint()
         var outcome = InsertionOutcome.insertedAtCaret
+        if !edit.removedSuffix.isEmpty || !edit.insertedText.isEmpty { hasTouchedField = true }
         if !edit.removedSuffix.isEmpty {
             switch CursorTextContextReader.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
             case .replaced:
@@ -192,17 +188,29 @@ final class LiveTranscriptTyper {
         typedWords = words
         typedRegion = desired
 
-        let after = CursorTextContextReader.focusedInsertionPoint()
-        guard outcome == .insertedAtCaret else {
-            // The app may not have handled the keystrokes yet, so only the field itself is tracked.
-            lastInsertionPoint = after.withoutCaret()
+        let delta = (edit.insertedText as NSString).length - (edit.removedSuffix as NSString).length
+        let expectedCaret = before.caretLocation.map { $0 + delta }
+        // Keystrokes are handled asynchronously, so give the app a moment to move the caret.
+        let after = outcome == .typedAsKeystrokes
+            ? await settledInsertionPoint(expectedCaret: expectedCaret)
+            : CursorTextContextReader.focusedInsertionPoint()
+        lastInsertionPoint = after
+        guard after.continues(before.withoutCaret()) else {
+            stopUncertain("focus moved while typing")
             return
         }
-        lastInsertionPoint = after
-        let delta = (edit.insertedText as NSString).length - (edit.removedSuffix as NSString).length
-        if let start = before.caretLocation, let end = after.caretLocation, end != start + delta {
+        if let expectedCaret, after.caretLocation != expectedCaret {
             stopUncertain("the caret did not end after the typed text")
         }
+    }
+
+    private func settledInsertionPoint(expectedCaret: Int?) async -> CursorTextContextReader.InsertionPoint {
+        var point = CursorTextContextReader.focusedInsertionPoint()
+        for _ in 0..<20 where expectedCaret != nil && point.caretLocation != expectedCaret {
+            try? await Task.sleep(nanoseconds: 10_000_000)
+            point = CursorTextContextReader.focusedInsertionPoint()
+        }
+        return point
     }
 
     private func isAtLastInsertionPoint() -> Bool {

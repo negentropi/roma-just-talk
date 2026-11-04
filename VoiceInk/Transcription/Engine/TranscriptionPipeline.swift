@@ -348,7 +348,7 @@ class TranscriptionPipeline {
                     textToPaste = ""
                     liveTypingLostWords = true
                     NotificationManager.shared.showNotification(
-                        title: "Some dictated words could not be typed. The full transcript is in History.",
+                        title: "Live typing could not finish cleanly. Check the text field; the full transcript is in History.",
                         type: .warning
                     )
                 }

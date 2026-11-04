@@ -16,13 +16,6 @@ final class LiveTranscriptTyper {
     /// Marks keystrokes this class posts so the shortcut monitor does not read them as a key chord.
     nonisolated static let syntheticEventTag: Int64 = 0x524A_5454_5950 // "RJTTYP"
 
-    enum ReleaseInsertion: Equatable {
-        /// Text to insert at the caret; empty when the field already holds the whole transcript.
-        case insert(String)
-        /// The field could not be brought in line with the transcript; History keeps the full text.
-        case unreconciled
-    }
-
     private enum InsertionOutcome {
         case insertedAtCaret
         /// Posted as keystrokes, which the target app handles asynchronously.
@@ -114,33 +107,27 @@ final class LiveTranscriptTyper {
         isCancelled = true
     }
 
-    /// Brings the field in line with the final transcript after `finish()`.
-    func releaseInsertion(finalRawText: String) -> ReleaseInsertion {
-        // Checked even when nothing is left to type: the trailing space and auto-send go to the caret too.
+    /// Brings the field in line with the final transcript after `finish()`, typing `trailingText`
+    /// after it when the transcript is not empty. Returns false when the field could not be made to
+    /// match; History keeps the full text either way.
+    func release(finalRawText: String, trailingText: String) async -> Bool {
+        // Checked even when nothing is left to type: auto-send goes to the caret too.
         guard !isPlacementUncertain, isAtLastInsertionPoint() else {
             return unreconciled("the field or caret changed during live typing")
         }
         // From the raw text, as History cleans it, so single newlines survive.
         let desired = region(for: finalRawText)
-        guard desired != typedRegion else { return .insert("") }
-
-        let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
-        if edit.removedSuffix.isEmpty { return .insert(edit.insertedText) }
-        switch field.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
-        case .replaced:
-            logger.notice("Corrected live-typed text on release")
-            return .insert("")
-        case .uncertain:
-            return unreconciled("correcting live-typed text left unexpected text")
-        case .untouched:
-            // The field cannot be edited in place, so it would not match History.
-            return unreconciled("live-typed text differs from the transcript and cannot be corrected")
+        let target = desired.isEmpty ? "" : desired + trailingText
+        guard target != typedRegion else { return true }
+        guard await apply(target), !isPlacementUncertain, typedRegion == target else {
+            return unreconciled("the field could not be brought in line with the transcript")
         }
+        return true
     }
 
-    private func unreconciled(_ reason: String) -> ReleaseInsertion {
+    private func unreconciled(_ reason: String) -> Bool {
         logger.error("Live-typed text left as typed: \(reason, privacy: .public)")
-        return .unreconciled
+        return false
     }
 
     /// The text the field should hold for a raw transcript: cleaned as a whole, then adapted to the
@@ -153,18 +140,22 @@ final class LiveTranscriptTyper {
 
     private func type(words: [String]) async {
         guard !isCancelled, !isHalted else { return }
-        guard !field.isSecureInputActive else {
-            halt("secure input is active")
-            return
-        }
         if typedWords.isEmpty {
             textBeforeTyping = field.textBeforeCursor()
         } else if !isAtLastInsertionPoint() {
             stopUncertain("the field or caret changed during live typing")
             return
         }
+        if await apply(region(for: words.joined(separator: " "))) { typedWords = words }
+    }
 
-        let desired = region(for: words.joined(separator: " "))
+    /// Types the difference between `typedRegion` and `desired` at the caret, then checks the field
+    /// and caret ended where expected. Returns whether the change landed; problems halt live typing.
+    private func apply(_ desired: String) async -> Bool {
+        guard !field.isSecureInputActive else {
+            halt("secure input is active")
+            return false
+        }
         let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
         let before = field.insertionPoint()
         var outcome = InsertionOutcome.insertedAtCaret
@@ -174,21 +165,20 @@ final class LiveTranscriptTyper {
             case .replaced:
                 break
             case .untouched:
-                // The field still ends with the old region; release appends after it.
+                // The field still ends with the old region; release tries again.
                 halt("typed text could not be corrected in place")
-                return
+                return false
             case .uncertain:
                 stopUncertain("correcting typed text left unexpected text")
-                return
+                return false
             }
         } else if !edit.insertedText.isEmpty {
             outcome = await insert(edit.insertedText)
             guard outcome != .caretUnknown else {
                 stopUncertain("the caret position after insertion is unknown")
-                return
+                return false
             }
         }
-        typedWords = words
         typedRegion = desired
 
         let delta = (edit.insertedText as NSString).length - (edit.removedSuffix as NSString).length
@@ -200,11 +190,12 @@ final class LiveTranscriptTyper {
         lastInsertionPoint = after
         guard after.continues(before.withoutCaret()) else {
             stopUncertain("focus moved while typing")
-            return
+            return true
         }
         if let expectedCaret, after.caretLocation != expectedCaret {
             stopUncertain("the caret did not end after the typed text")
         }
+        return true
     }
 
     private func settledInsertionPoint(expectedCaret: Int?) async -> CursorTextContextReader.InsertionPoint {
@@ -279,8 +270,10 @@ struct FocusedTextField: LiveTypingField {
         // A private source keeps the physically held Shift key out of the typed events.
         let source = CGEventSource(stateID: .privateState)
         let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()
+        let target = CursorTextContextReader.focusedInsertionPoint().withoutCaret()
         for chunk in Self.utf16Chunks(text, maximumLength: 20) {
-            guard !isCancelled() else { return }
+            // Stop before a chunk could land in a field the user switched to; the caller then sees the move.
+            guard !isCancelled(), CursorTextContextReader.focusedInsertionPoint().continues(target) else { return }
             for isKeyDown in [true, false] {
                 guard let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: isKeyDown) else { return }
                 chunk.withUnsafeBufferPointer { buffer in

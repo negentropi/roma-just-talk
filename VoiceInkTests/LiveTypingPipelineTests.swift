@@ -49,6 +49,24 @@ struct LiveTypingPipelineTests {
         #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
     }
 
+    @Test @MainActor func focusMovedBeforeReleaseWritesNothingMoreAndWarns() async throws {
+        let (fixture, field, restore) = try makeFixture(finalText: "Hello there friend.")
+        defer { restore() }
+        var warnings: [String] = []
+        NotificationManager.showNotificationForTesting = { title, type in
+            if type == .warning { warnings.append(title) }
+        }
+        defer { NotificationManager.showNotificationForTesting = nil }
+        speak("Hello there friend", into: fixture)
+        // Let the queued insertion land, then the user clicks into another app.
+        _ = await fixture.engine.liveTranscriptTyper?.finish()
+        field.focusedProcessIdentifier = 2
+        await fixture.engine.toggleRecord()
+
+        #expect(field.text == "Hello there")
+        #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
+    }
+
     @MainActor private func makeFixture(
         finalText: String = "",
         session: TranscriptionSession? = nil
@@ -58,10 +76,7 @@ struct LiveTypingPipelineTests {
         let defaults = UserDefaults.standard
         let trailingSpace = defaults.object(forKey: VoiceInkAppendTrailingSpacePreference.userDefaultsKey)
         defaults.set(false, forKey: VoiceInkAppendTrailingSpacePreference.userDefaultsKey)
-        // The release remainder goes through the normal paste path; route it into the same field.
-        CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in field.insert(text) }
         let restore: @MainActor () -> Void = {
-            CursorPaster.configureAccessibilityTextInserterForTesting()
             defaults.set(trailingSpace, forKey: VoiceInkAppendTrailingSpacePreference.userDefaultsKey)
         }
         fixture.beginRecording(session: session ?? GatedTextSession(text: finalText, released: true))
@@ -80,12 +95,13 @@ struct LiveTypingPipelineTests {
 @MainActor private final class InMemoryTextField: LiveTypingField {
     private(set) var text = ""
     private var caret = 0
+    var focusedProcessIdentifier: pid_t = 1
     let isSecureInputActive = false
 
     func textBeforeCursor() -> String? { (text as NSString).substring(to: caret) }
 
     func insertionPoint() -> CursorTextContextReader.InsertionPoint {
-        CursorTextContextReader.InsertionPoint(processIdentifier: 1, element: nil, caretLocation: caret)
+        CursorTextContextReader.InsertionPoint(processIdentifier: focusedProcessIdentifier, element: nil, caretLocation: caret)
     }
 
     func insert(_ inserted: String) -> CursorTextContextReader.SelectedTextInsertionResult {

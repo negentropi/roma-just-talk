@@ -335,13 +335,17 @@ class TranscriptionPipeline {
         )
         // Reconciled even when nothing is pasteable: a final transcript that cleans to nothing must
         // remove what was typed live, and a failed one leaves the typed words with a warning.
-        var liveRelease: LiveTranscriptTyper.ReleaseInsertion?
+        // The typer delivers the rest itself, so it lands in the field it verified, never a newly focused one.
+        var liveTypingDelivered: Bool?
         if let liveTyper, didLiveType {
-            liveRelease = transcription.transcriptionState == .completed
-                ? liveTyper.releaseInsertion(finalRawText: finalRawText ?? "")
-                : .unreconciled
+            if transcription.transcriptionState == .completed {
+                let trailingText = pasteDecision.textToPaste != nil && VoiceInkAppendTrailingSpacePreference.isEnabled() ? " " : ""
+                liveTypingDelivered = await liveTyper.release(finalRawText: finalRawText ?? "", trailingText: trailingText)
+            } else {
+                liveTypingDelivered = false
+            }
         }
-        let liveTypingUnreconciled = liveRelease == .unreconciled
+        let liveTypingUnreconciled = liveTypingDelivered == false
         if liveTypingUnreconciled {
             NotificationManager.shared.showNotification(
                 title: "Live typing could not finish cleanly. Check the text field; the full transcript is in History.",
@@ -349,21 +353,17 @@ class TranscriptionPipeline {
             )
         }
 
-        if liveRelease == nil,
+        if liveTypingDelivered == nil,
            SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
             latencyTrace.event("pipeline.empty_transcription_fallback", token: traceToken)
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
-        } else if liveRelease != nil || pasteDecision.textToPaste != nil {
+        } else if liveTypingDelivered != nil || pasteDecision.textToPaste != nil {
             let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
-            var textToPaste = ""
-            switch liveRelease {
-            case .insert(let remainder):
-                textToPaste = remainder
-            case .unreconciled:
-                break
-            case nil:
-                textToPaste = await CursorPaster.preparedTextForPaste(
+            let textToPaste: String = if liveTypingDelivered != nil {
+                ""
+            } else {
+                await CursorPaster.preparedTextForPaste(
                     pasteDecision.textToPaste ?? "",
                     preparedCursorTextContext: preparedCursorTextContext
                 )
@@ -375,8 +375,8 @@ class TranscriptionPipeline {
             } else {
                 isTrialExpired = false
             }
-            // The trailing space follows a delivered transcript, not live text that was only removed.
-            let pastedText = pasteDecision.textToPaste == nil ? textToPaste : VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
+            // Live typing already typed the trailing space with the transcript.
+            let pastedText = liveTypingDelivered != nil ? "" : VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
                 textToPaste,
                 appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(),
                 isTrialExpired: isTrialExpired

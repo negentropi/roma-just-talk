@@ -1510,7 +1510,12 @@ enum CursorTextContextReader {
     static func focusedInsertionPoint() -> InsertionPoint {
         guard AXIsProcessTrusted(),
               let element = focusedElement(from: AXUIElementCreateSystemWide()) else {
-            return InsertionPoint(processIdentifier: nil, element: nil, caretLocation: nil)
+            // Without an Accessibility focus, the frontmost app still tells a switch to another app apart.
+            return InsertionPoint(
+                processIdentifier: NSWorkspace.shared.frontmostApplication?.processIdentifier,
+                element: nil,
+                caretLocation: nil
+            )
         }
         var processIdentifier = pid_t()
         let pid = AXUIElementGetPid(element, &processIdentifier) == .success ? processIdentifier : nil

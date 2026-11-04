@@ -347,10 +347,10 @@ class TranscriptionPipeline {
         }
         let liveTypingUnreconciled = liveTypingDelivered == false
         if liveTypingUnreconciled {
-            NotificationManager.shared.showNotification(
-                title: "Live typing could not finish cleanly. Check the text field; the full transcript is in History.",
-                type: .warning
-            )
+            let title = transcription.transcriptionState == .completed
+                ? "Live typing could not finish cleanly. Check the text field; the full transcript is in History."
+                : "Live typing could not finish cleanly because transcription failed. Check the text field."
+            NotificationManager.shared.showNotification(title: title, type: .warning)
         }
 
         if liveTypingDelivered == nil,

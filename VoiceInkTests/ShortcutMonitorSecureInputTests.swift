@@ -3,7 +3,7 @@ import Carbon.HIToolbox
 import Testing
 @testable import VoiceInk
 
-extension VoiceInkTests {
+extension CursorPasterHookTests.VoiceInkTests {
     @Test func secureInputBlocksSpecialModifierShortcutUntilRelease() async {
         let monitor = ShortcutMonitor()
         var secureInputEnabled = true

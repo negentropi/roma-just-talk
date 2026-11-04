@@ -61,11 +61,11 @@ final class LiveTranscriptTyper {
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LiveTranscriptTyper")
 
     init(
-        field: LiveTypingField = FocusedTextField(),
+        field: LiveTypingField? = nil,
         canStartTyping: @escaping @MainActor () -> Bool,
         cleanText: @escaping @MainActor (String) -> String
     ) {
-        self.field = field
+        self.field = field ?? FocusedTextField()
         self.canStartTyping = canStartTyping
         self.cleanText = cleanText
     }

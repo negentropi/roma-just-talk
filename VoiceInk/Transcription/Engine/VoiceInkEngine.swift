@@ -891,7 +891,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         liveTranscriptTyper = nil
     }
 
-    func makeLiveTranscriptTyper(field: LiveTypingField = FocusedTextField()) -> LiveTranscriptTyper {
+    func makeLiveTranscriptTyper(field: LiveTypingField? = nil) -> LiveTranscriptTyper {
         LiveTranscriptTyper(
             field: field,
             canStartTyping: { [weak self] in

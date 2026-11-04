@@ -152,6 +152,15 @@ final class LiveTranscriptTyper {
     /// Types the difference between `typedRegion` and `desired` at the caret, then checks the field
     /// and caret ended where expected. Returns whether the change landed; problems halt live typing.
     private func apply(_ desired: String) async -> Bool {
+        // Rechecked every time: permission can be revoked mid-recording, and dropped keystrokes look delivered.
+        guard field.canReceiveText else {
+            if hasTouchedField {
+                stopUncertain("the field can no longer receive text")
+            } else {
+                halt("the field cannot receive text")
+            }
+            return false
+        }
         guard !field.isSecureInputActive else {
             halt("secure input is active")
             return false

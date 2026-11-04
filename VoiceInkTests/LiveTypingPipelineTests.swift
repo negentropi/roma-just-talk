@@ -4,6 +4,12 @@ import Testing
 import VoiceInkCore
 @testable import VoiceInk
 
+/// Suites that set CursorPaster's process-wide test hooks run one at a time, even across files;
+/// `.serialized` on a single suite only orders its own tests.
+@Suite(.serialized)
+struct CursorPasterHookTests {}
+
+extension CursorPasterHookTests {
 /// Drives the real engine and pipeline with live typing into an in-memory field and checks that
 /// release leaves the field holding exactly what History saves.
 @Suite(.serialized)
@@ -142,6 +148,7 @@ struct LiveTypingPipelineTests {
             fixture.engine.liveTranscriptTyper?.update(liveTranscript: transcript)
         }
     }
+}
 }
 
 @MainActor private final class InMemoryTextField: LiveTypingField {

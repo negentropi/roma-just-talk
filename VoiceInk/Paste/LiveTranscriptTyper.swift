@@ -115,6 +115,10 @@ final class LiveTranscriptTyper {
         guard !isPlacementUncertain, isAtLastInsertionPoint() else {
             return unreconciled("the field or caret changed during live typing")
         }
+        // Even with nothing left to type: without it, earlier keystrokes may have been dropped.
+        guard field.canReceiveText else {
+            return unreconciled("the field can no longer receive text")
+        }
         // From the raw text, as History cleans it, so single newlines survive.
         let desired = region(for: finalRawText)
         let target = desired.isEmpty ? "" : desired + trailingText

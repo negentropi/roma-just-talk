@@ -19,6 +19,11 @@ struct LiveTypingPipelineTests {
     }
 
     @Test @MainActor func fieldMatchesHistoryIncludingSingleNewlines() async throws {
+        // Paragraph formatting rewraps text; with it off, History keeps a single newline as spoken.
+        let defaults = UserDefaults.standard
+        let formatting = defaults.object(forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
+        defaults.set(false, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled)
+        defer { defaults.set(formatting, forKey: VoiceInkUserDefaultsKey.isTextFormattingEnabled) }
         let (fixture, field, restore) = try makeFixture(finalText: "First line.\nSecond line.")
         defer { restore() }
         speak("First line. Second", into: fixture)

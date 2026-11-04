@@ -67,7 +67,7 @@ final class LiveTranscriptTyper {
     func update(liveTranscript: String) {
         if phase == .undecided {
             // Decided at the first live text, after Power Mode has applied its per-app settings.
-            phase = canStartTyping() ? .typing : .stopped
+            phase = field.canReceiveText && canStartTyping() ? .typing : .stopped
             logger.notice("Live typing \(self.phase == .typing ? "started" : "declined", privacy: .public)")
         }
         guard phase == .typing, !isHalted else { return }
@@ -240,6 +240,8 @@ final class LiveTranscriptTyper {
 /// Where live typing puts text. `FocusedTextField` is the focused field of the frontmost app.
 @MainActor
 protocol LiveTypingField {
+    /// Whether text can reach the field at all; without it the normal paste path handles the recording.
+    var canReceiveText: Bool { get }
     var isSecureInputActive: Bool { get }
     func textBeforeCursor() -> String?
     func insertionPoint() -> CursorTextContextReader.InsertionPoint
@@ -250,6 +252,9 @@ protocol LiveTypingField {
 
 @MainActor
 struct FocusedTextField: LiveTypingField {
+    /// Without Accessibility trust, macOS drops synthetic keystrokes silently.
+    var canReceiveText: Bool { AXIsProcessTrusted() }
+
     var isSecureInputActive: Bool { ShortcutMonitor.isSecureEventInputEnabled() }
 
     func textBeforeCursor() -> String? { CursorTextContextReader.textBeforeCursor() }

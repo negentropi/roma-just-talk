@@ -67,6 +67,18 @@ struct LiveTypingPipelineTests {
         #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
     }
 
+    @Test @MainActor func fieldThatCannotReceiveTextFallsBackToOneNormalPaste() async throws {
+        let (fixture, field, restore) = try makeFixture(finalText: "Hello there friend.")
+        defer { restore() }
+        field.canReceiveText = false
+        CursorPaster.configureAccessibilityTextInserterForTesting { text, _ in field.insert(text) }
+        defer { CursorPaster.configureAccessibilityTextInserterForTesting() }
+        speak("Hello there friend", into: fixture)
+        await fixture.engine.toggleRecord()
+
+        #expect(field.text == "Hello there friend.")
+    }
+
     @MainActor private func makeFixture(
         finalText: String = "",
         session: TranscriptionSession? = nil
@@ -96,6 +108,7 @@ struct LiveTypingPipelineTests {
     private(set) var text = ""
     private var caret = 0
     var focusedProcessIdentifier: pid_t = 1
+    var canReceiveText = true
     let isSecureInputActive = false
 
     func textBeforeCursor() -> String? { (text as NSString).substring(to: caret) }

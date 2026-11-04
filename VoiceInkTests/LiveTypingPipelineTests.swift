@@ -29,13 +29,19 @@ struct LiveTypingPipelineTests {
         #expect(field.text == saved)
     }
 
-    @Test @MainActor func failedTranscriptionLeavesLiveTypedWordsWithoutPastingAgain() async throws {
+    @Test @MainActor func failedTranscriptionWarnsAndLeavesLiveTypedWordsWithoutPastingAgain() async throws {
         let (fixture, field, restore) = try makeFixture(session: FailingSession())
         defer { restore() }
+        var warnings: [String] = []
+        NotificationManager.showNotificationForTesting = { title, type in
+            if type == .warning { warnings.append(title) }
+        }
+        defer { NotificationManager.showNotificationForTesting = nil }
         speak("Hello there friend", into: fixture)
         await fixture.engine.toggleRecord()
 
         #expect(field.text == "Hello there")
+        #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
     }
 
     @MainActor private func makeFixture(

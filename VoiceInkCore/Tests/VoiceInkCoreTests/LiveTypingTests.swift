@@ -54,24 +54,18 @@ final class LiveTypingTests: XCTestCase {
         XCTAssertEqual(VoiceInkLiveTyping.stableWords(acrossPasses: [pass, pass, pass]), ["Send", "it", "to"])
     }
 
-    func testReconcileKeepsMatchingChunksAndReplacesTheRest() {
-        let result = VoiceInkLiveTyping.reconcile(
-            typedChunks: [["Hello", "there."], ["My", "sister", "plan"]],
-            finalWords: VoiceInkLiveTyping.words("Hello there. My sister planted tomatoes.")
-        )
+    func testNewWordsAreAppendedWithoutTouchingTypedText() {
+        let edit = VoiceInkLiveTyping.edit(from: "Hello there.", to: "Hello there. How are")
 
-        XCTAssertEqual(result.keptChunkCount, 1)
-        XCTAssertEqual(result.remainingWords, ["My", "sister", "planted", "tomatoes."])
+        XCTAssertEqual(edit.removedSuffix, "")
+        XCTAssertEqual(edit.insertedText, " How are")
     }
 
-    func testReconcileKeepsEveryChunkWhenTheFinalTranscriptContinuesThem() {
-        let result = VoiceInkLiveTyping.reconcile(
-            typedChunks: [["Hello", "there."]],
-            finalWords: VoiceInkLiveTyping.words("Hello there. How are you?")
-        )
+    func testAReplacementSpanningTypedTextOnlyRewritesTheChangedTail() {
+        let edit = VoiceInkLiveTyping.edit(from: "I moved to New", to: "I moved to NYC last year")
 
-        XCTAssertEqual(result.keptChunkCount, 1)
-        XCTAssertEqual(result.remainingWords, ["How", "are", "you?"])
+        XCTAssertEqual(edit.removedSuffix, "ew")
+        XCTAssertEqual(edit.insertedText, "YC last year")
     }
 
     func testTypingWhileSpeakingIsOnUnlessTurnedOff() throws {

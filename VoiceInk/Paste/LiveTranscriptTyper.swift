@@ -6,9 +6,11 @@ import VoiceInkCore
 /// Types dictated words into the focused field while the recording shortcut is held, so they appear
 /// where the user is looking instead of all at once on release.
 ///
-/// A word is typed once the last few live passes agree on it. On release, `releaseInsertion` lines the
-/// typed chunks up with the final transcript, replaces any typed tail the final pass changed, and
-/// returns the rest to insert.
+/// Invariant: `typedRegion`, the text this typer put into the field, ends at the caret and equals the
+/// cleaned, cursor-adapted transcript of `typedWords`. Each change types only the difference: new text
+/// is appended, and a changed tail (a dictionary replacement spanning words, a corrected word) is
+/// replaced in place. Release applies the same rule to the final transcript, so the field ends up with
+/// exactly the text History saves.
 @MainActor
 final class LiveTranscriptTyper {
     /// Marks keystrokes this class posts so the shortcut monitor does not read them as a key chord.
@@ -21,6 +23,14 @@ final class LiveTranscriptTyper {
         case unreconciled
     }
 
+    private enum InsertionOutcome {
+        case insertedAtCaret
+        /// Posted as keystrokes, which the target app handles asynchronously.
+        case typedAsKeystrokes
+        /// The text landed but the caret may not be after it.
+        case caretUnknown
+    }
+
     private enum Phase {
         case undecided
         case typing
@@ -28,26 +38,20 @@ final class LiveTranscriptTyper {
         case stopped
     }
 
-    private enum InsertionOutcome {
-        case insertedAtCaret
-        /// The text landed but the caret may not be after it, so later text could land in the wrong place.
-        case insertedCaretUnknown
-    }
-
-    /// One insertion: the raw transcript words and the exact text put into the field for them.
-    private struct TypedChunk {
-        let rawWords: [String]
-        let insertedText: String
-    }
-
     private var phase = Phase.undecided
     private var isCancelled = false
     private var isHalted = false
-    private var isCaretUncertain = false
+    /// Set when the field may no longer end with `typedRegion` at the caret: the user moved focus or
+    /// the caret, or an insertion could not be confirmed. Nothing more is inserted after that.
+    private var isPlacementUncertain = false
     private var recentPasses: [[String]] = []
     private var queuedWords: [String] = []
-    /// Only chunks that were inserted, in order, so their words are a prefix of `queuedWords`.
-    private var typedChunks: [TypedChunk] = []
+    private var typedWords: [String] = []
+    private var typedRegion = ""
+    /// Text before the cursor when typing began, so cursor-adapted capitalization and spacing stay
+    /// the same every time the region is recomputed.
+    private var textBeforeTyping: String?
+    private var lastInsertionPoint: CursorTextContextReader.InsertionPoint?
     private var pendingInsertion: Task<Void, Never>?
     private let canStartTyping: @MainActor () -> Bool
     private let cleanText: @MainActor (String) -> String
@@ -82,18 +86,13 @@ final class LiveTranscriptTyper {
         guard recentPasses.count == VoiceInkLiveTyping.stabilityPasses else { return }
 
         let stable = VoiceInkLiveTyping.stableWords(acrossPasses: recentPasses)
-        guard stable.count > queuedWords.count else { return }
-        guard stable.starts(with: queuedWords) else {
-            halt("the live transcript revised words already typed")
-            return
-        }
-        let newWords = Array(stable.dropFirst(queuedWords.count))
+        guard stable.count > queuedWords.count, stable.starts(with: queuedWords) else { return }
         queuedWords = stable
 
         let previous = pendingInsertion
         pendingInsertion = Task { @MainActor in
             await previous?.value
-            await self.insertChunk(newWords)
+            await self.type(words: stable)
         }
     }
 
@@ -101,7 +100,7 @@ final class LiveTranscriptTyper {
     func finish() async -> Bool {
         phase = .stopped
         await pendingInsertion?.value
-        return !typedChunks.isEmpty
+        return !typedWords.isEmpty
     }
 
     /// Drops every queued insertion and stops a keystroke run in progress.
@@ -112,41 +111,32 @@ final class LiveTranscriptTyper {
 
     /// Brings the field in line with the final transcript after `finish()`.
     func releaseInsertion(finalRawText: String) -> ReleaseInsertion {
-        let finalWords = VoiceInkLiveTyping.words(finalRawText)
-        let (keptChunkCount, remainingWords) = VoiceInkLiveTyping.reconcile(
-            typedChunks: typedChunks.map(\.rawWords),
-            finalWords: finalWords
-        )
-        let remainder = cleanText(remainingWords.joined(separator: " ")).trimmingCharacters(in: .whitespacesAndNewlines)
-        let changedTail = typedChunks.dropFirst(keptChunkCount).map(\.insertedText).joined()
-
-        if changedTail.isEmpty {
-            guard !remainder.isEmpty else { return .insert("") }
-            guard !isCaretUncertain else { return unreconciled("the caret position after live typing is unknown") }
-            return .insert(Self.insertionText(remainder, continuing: typedChunks.contains { !$0.insertedText.isEmpty }))
+        let desired = region(for: VoiceInkLiveTyping.words(finalRawText))
+        guard desired != typedRegion else { return .insert("") }
+        guard !isPlacementUncertain, isAtLastInsertionPoint() else {
+            return unreconciled("the field or caret changed during live typing")
         }
 
-        guard !isCaretUncertain else { return unreconciled("the caret position after live typing is unknown") }
-        // Keep the tail's leading space so the corrected words stay separated from what precedes them.
-        let leadingSpace = String(changedTail.prefix { $0.isWhitespace })
-        switch CursorTextContextReader.replaceTextBeforeCaret(changedTail, with: remainder.isEmpty ? "" : leadingSpace + remainder) {
+        let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
+        if edit.removedSuffix.isEmpty { return .insert(edit.insertedText) }
+        switch CursorTextContextReader.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
         case .replaced:
-            logger.notice("Corrected \(self.typedChunks.count - keptChunkCount, privacy: .public) live-typed chunks on release")
+            logger.notice("Corrected live-typed text on release")
             return .insert("")
         case .uncertain:
-            return unreconciled("correcting live-typed words left unexpected text")
+            return unreconciled("correcting live-typed text left unexpected text")
         case .untouched:
             break
         }
 
-        // Fields that cannot be edited in place: accept typed words that differ only in case or
-        // punctuation and append what follows them.
-        let typedRawText = typedChunks.flatMap(\.rawWords).joined(separator: " ")
-        guard let fallback = VoiceInkLiveTyping.untypedRemainder(finalRawText: finalRawText, typedRawText: typedRawText) else {
+        // Fields that cannot be edited in place keep what was typed when the words only differ
+        // in case or punctuation, and get the words that follow appended.
+        let typedRawText = typedWords.joined(separator: " ")
+        guard let remainder = VoiceInkLiveTyping.untypedRemainder(finalRawText: finalRawText, typedRawText: typedRawText) else {
             return unreconciled("the final transcript does not continue the live-typed words")
         }
-        let cleanedFallback = cleanText(fallback).trimmingCharacters(in: .whitespacesAndNewlines)
-        return .insert(cleanedFallback.isEmpty ? "" : " " + cleanedFallback)
+        let cleaned = cleanText(remainder).trimmingCharacters(in: .whitespacesAndNewlines)
+        return .insert(cleaned.isEmpty ? "" : " " + cleaned)
     }
 
     private func unreconciled(_ reason: String) -> ReleaseInsertion {
@@ -154,25 +144,70 @@ final class LiveTranscriptTyper {
         return .unreconciled
     }
 
-    private func insertChunk(_ rawWords: [String]) async {
+    /// The text the field should hold for `words`: cleaned as a whole, then adapted to the text
+    /// that preceded the cursor when typing began.
+    private func region(for words: [String]) -> String {
+        guard !words.isEmpty else { return "" }
+        let cleaned = cleanText(words.joined(separator: " ")).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleaned.isEmpty else { return "" }
+        return VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(cleaned).text(beforeCursor: textBeforeTyping)
+    }
+
+    private func type(words: [String]) async {
         guard !isCancelled, !isHalted else { return }
         guard !ShortcutMonitor.isSecureEventInputEnabled() else {
             halt("secure input is active")
             return
         }
-        let cleaned = cleanText(rawWords.joined(separator: " ")).trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleaned.isEmpty else {
-            typedChunks.append(TypedChunk(rawWords: rawWords, insertedText: ""))
+        if typedWords.isEmpty {
+            textBeforeTyping = CursorTextContextReader.textBeforeCursor()
+        } else if !isAtLastInsertionPoint() {
+            stopUncertain("the field or caret changed during live typing")
             return
         }
 
-        let text = Self.insertionText(cleaned, continuing: typedChunks.contains { !$0.insertedText.isEmpty })
-        let outcome = await insert(text)
-        typedChunks.append(TypedChunk(rawWords: rawWords, insertedText: text))
-        if outcome == .insertedCaretUnknown {
-            isCaretUncertain = true
-            halt("the caret position after insertion is unknown")
+        let desired = region(for: words)
+        let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
+        let before = CursorTextContextReader.focusedInsertionPoint()
+        var outcome = InsertionOutcome.insertedAtCaret
+        if !edit.removedSuffix.isEmpty {
+            switch CursorTextContextReader.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
+            case .replaced:
+                break
+            case .untouched:
+                // The field still ends with the old region; release appends after it.
+                halt("typed text could not be corrected in place")
+                return
+            case .uncertain:
+                stopUncertain("correcting typed text left unexpected text")
+                return
+            }
+        } else if !edit.insertedText.isEmpty {
+            outcome = await insert(edit.insertedText)
+            guard outcome != .caretUnknown else {
+                stopUncertain("the caret position after insertion is unknown")
+                return
+            }
         }
+        typedWords = words
+        typedRegion = desired
+
+        let after = CursorTextContextReader.focusedInsertionPoint()
+        guard outcome == .insertedAtCaret else {
+            // The app may not have handled the keystrokes yet, so only the field itself is tracked.
+            lastInsertionPoint = after.withoutCaret()
+            return
+        }
+        lastInsertionPoint = after
+        let delta = (edit.insertedText as NSString).length - (edit.removedSuffix as NSString).length
+        if let start = before.caretLocation, let end = after.caretLocation, end != start + delta {
+            stopUncertain("the caret did not end after the typed text")
+        }
+    }
+
+    private func isAtLastInsertionPoint() -> Bool {
+        guard let lastInsertionPoint else { return true }
+        return CursorTextContextReader.focusedInsertionPoint().continues(lastInsertionPoint)
     }
 
     private func halt(_ reason: String) {
@@ -180,10 +215,9 @@ final class LiveTranscriptTyper {
         logger.notice("Live typing stopped: \(reason, privacy: .public)")
     }
 
-    /// The first insertion adapts spacing and capitalization to the text before the cursor;
-    /// later ones continue the dictation after a space.
-    private static func insertionText(_ cleaned: String, continuing: Bool) -> String {
-        continuing ? " " + cleaned : CursorPaster.preparedTextForPaste(cleaned)
+    private func stopUncertain(_ reason: String) {
+        isPlacementUncertain = true
+        halt(reason)
     }
 
     private func insert(_ text: String) async -> InsertionOutcome {
@@ -191,14 +225,14 @@ final class LiveTranscriptTyper {
         case .inserted, .insertedViaValue:
             return .insertedAtCaret
         case .insertedWithoutSelection, .insertedViaValueWithoutSelection:
-            return .insertedCaretUnknown
+            return .caretUnknown
         case .unsupported, .notApplied:
             await typeKeystrokes(text)
-            return .insertedAtCaret
+            return .typedAsKeystrokes
         }
     }
 
-    /// Posts the text as Unicode keystrokes. Avoids the clipboard so each chunk does not
+    /// Posts the text as Unicode keystrokes. Avoids the clipboard so each insertion does not
     /// overwrite and restore the user's clipboard while they are still speaking.
     private func typeKeystrokes(_ text: String) async {
         // A private source keeps the physically held Shift key out of the typed events.

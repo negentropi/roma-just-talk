@@ -29,21 +29,11 @@ public enum VoiceInkLiveTyping {
         return Array(agreed.dropLast())
     }
 
-    /// How many leading typed chunks the final transcript keeps word for word,
-    /// and the final words that follow them.
-    public static func reconcile(
-        typedChunks: [[String]],
-        finalWords: [String]
-    ) -> (keptChunkCount: Int, remainingWords: [String]) {
-        var keptChunkCount = 0
-        var keptWordCount = 0
-        for chunk in typedChunks {
-            let end = keptWordCount + chunk.count
-            guard end <= finalWords.count, Array(finalWords[keptWordCount..<end]) == chunk else { break }
-            keptChunkCount += 1
-            keptWordCount = end
-        }
-        return (keptChunkCount, Array(finalWords.dropFirst(keptWordCount)))
+    /// The smallest change that turns the text already typed (ending at the caret) into `desired`:
+    /// remove `removedSuffix` from just before the caret, then type `insertedText`.
+    public static func edit(from typed: String, to desired: String) -> (removedSuffix: String, insertedText: String) {
+        let kept = zip(typed, desired).prefix { $0 == $1 }.count
+        return (String(typed.dropFirst(kept)), String(desired.dropFirst(kept)))
     }
 
     /// The words of the final raw transcript after the ones live typing already inserted.

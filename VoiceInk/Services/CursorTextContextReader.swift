@@ -1484,6 +1484,40 @@ enum CursorTextContextReader {
     }
 
     @MainActor
+    /// Where typed text would land: the focused app, its focused element, and the caret when readable.
+    struct InsertionPoint {
+        let processIdentifier: pid_t?
+        fileprivate let element: AXUIElement?
+        /// UTF-16 offset of a collapsed caret; nil when unreadable or text is selected.
+        let caretLocation: Int?
+
+        /// The same place without a caret, for text whose caret position cannot be read back reliably.
+        func withoutCaret() -> InsertionPoint {
+            InsertionPoint(processIdentifier: processIdentifier, element: element, caretLocation: nil)
+        }
+
+        /// Whether `self`, read later, is still the same place, judged by everything `earlier` could read.
+        func continues(_ earlier: InsertionPoint) -> Bool {
+            if let pid = earlier.processIdentifier, processIdentifier != pid { return false }
+            if let element = earlier.element {
+                guard let current = self.element, CFEqual(current, element) else { return false }
+            }
+            if let caret = earlier.caretLocation, caretLocation != caret { return false }
+            return true
+        }
+    }
+
+    static func focusedInsertionPoint() -> InsertionPoint {
+        guard AXIsProcessTrusted(),
+              let element = focusedElement(from: AXUIElementCreateSystemWide()) else {
+            return InsertionPoint(processIdentifier: nil, element: nil, caretLocation: nil)
+        }
+        var processIdentifier = pid_t()
+        let pid = AXUIElementGetPid(element, &processIdentifier) == .success ? processIdentifier : nil
+        let caret = selectedTextRange(from: element).flatMap { $0.length == 0 ? $0.location : nil }
+        return InsertionPoint(processIdentifier: pid, element: element, caretLocation: caret)
+    }
+
     enum TextReplacementResult {
         case replaced
         /// The field was not changed; the caret is where it was.

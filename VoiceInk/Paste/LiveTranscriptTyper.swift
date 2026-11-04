@@ -55,14 +55,17 @@ final class LiveTranscriptTyper {
     private var textBeforeTyping: String?
     private var lastInsertionPoint: CursorTextContextReader.InsertionPoint?
     private var pendingInsertion: Task<Void, Never>?
+    private let field: LiveTypingField
     private let canStartTyping: @MainActor () -> Bool
     private let cleanText: @MainActor (String) -> String
     private let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LiveTranscriptTyper")
 
     init(
+        field: LiveTypingField = FocusedTextField(),
         canStartTyping: @escaping @MainActor () -> Bool,
         cleanText: @escaping @MainActor (String) -> String
     ) {
+        self.field = field
         self.canStartTyping = canStartTyping
         self.cleanText = cleanText
     }
@@ -123,7 +126,7 @@ final class LiveTranscriptTyper {
 
         let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
         if edit.removedSuffix.isEmpty { return .insert(edit.insertedText) }
-        switch CursorTextContextReader.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
+        switch field.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
         case .replaced:
             logger.notice("Corrected live-typed text on release")
             return .insert("")
@@ -150,12 +153,12 @@ final class LiveTranscriptTyper {
 
     private func type(words: [String]) async {
         guard !isCancelled, !isHalted else { return }
-        guard !ShortcutMonitor.isSecureEventInputEnabled() else {
+        guard !field.isSecureInputActive else {
             halt("secure input is active")
             return
         }
         if typedWords.isEmpty {
-            textBeforeTyping = CursorTextContextReader.textBeforeCursor()
+            textBeforeTyping = field.textBeforeCursor()
         } else if !isAtLastInsertionPoint() {
             stopUncertain("the field or caret changed during live typing")
             return
@@ -163,11 +166,11 @@ final class LiveTranscriptTyper {
 
         let desired = region(for: words.joined(separator: " "))
         let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
-        let before = CursorTextContextReader.focusedInsertionPoint()
+        let before = field.insertionPoint()
         var outcome = InsertionOutcome.insertedAtCaret
         if !edit.removedSuffix.isEmpty || !edit.insertedText.isEmpty { hasTouchedField = true }
         if !edit.removedSuffix.isEmpty {
-            switch CursorTextContextReader.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
+            switch field.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
             case .replaced:
                 break
             case .untouched:
@@ -193,7 +196,7 @@ final class LiveTranscriptTyper {
         // Keystrokes are handled asynchronously, so give the app a moment to move the caret.
         let after = outcome == .typedAsKeystrokes
             ? await settledInsertionPoint(expectedCaret: expectedCaret)
-            : CursorTextContextReader.focusedInsertionPoint()
+            : field.insertionPoint()
         lastInsertionPoint = after
         guard after.continues(before.withoutCaret()) else {
             stopUncertain("focus moved while typing")
@@ -205,17 +208,17 @@ final class LiveTranscriptTyper {
     }
 
     private func settledInsertionPoint(expectedCaret: Int?) async -> CursorTextContextReader.InsertionPoint {
-        var point = CursorTextContextReader.focusedInsertionPoint()
+        var point = field.insertionPoint()
         for _ in 0..<20 where expectedCaret != nil && point.caretLocation != expectedCaret {
             try? await Task.sleep(nanoseconds: 10_000_000)
-            point = CursorTextContextReader.focusedInsertionPoint()
+            point = field.insertionPoint()
         }
         return point
     }
 
     private func isAtLastInsertionPoint() -> Bool {
         guard let lastInsertionPoint else { return true }
-        return CursorTextContextReader.focusedInsertionPoint().continues(lastInsertionPoint)
+        return field.insertionPoint().continues(lastInsertionPoint)
     }
 
     private func halt(_ reason: String) {
@@ -229,32 +232,62 @@ final class LiveTranscriptTyper {
     }
 
     private func insert(_ text: String) async -> InsertionOutcome {
-        switch CursorTextContextReader.insertSelectedText(text, preparedContext: nil) {
+        switch field.insert(text) {
         case .inserted, .insertedViaValue:
             return .insertedAtCaret
-        case .insertedWithoutSelection, .insertedViaValueWithoutSelection:
+        case .insertedWithoutSelection, .insertedViaValueWithoutSelection,
+             // An unobserved Accessibility write may still land, so typing it again could duplicate it.
+             .notApplied:
             return .caretUnknown
-        case .unsupported, .notApplied:
-            await typeKeystrokes(text)
+        case .unsupported:
+            await field.typeKeystrokes(text) { [weak self] in self?.isCancelled ?? true }
             return .typedAsKeystrokes
         }
+    }
+}
+
+/// Where live typing puts text. `FocusedTextField` is the focused field of the frontmost app.
+@MainActor
+protocol LiveTypingField {
+    var isSecureInputActive: Bool { get }
+    func textBeforeCursor() -> String?
+    func insertionPoint() -> CursorTextContextReader.InsertionPoint
+    func insert(_ text: String) -> CursorTextContextReader.SelectedTextInsertionResult
+    func replaceTextBeforeCaret(_ expected: String, with replacement: String) -> CursorTextContextReader.TextReplacementResult
+    func typeKeystrokes(_ text: String, isCancelled: () -> Bool) async
+}
+
+@MainActor
+struct FocusedTextField: LiveTypingField {
+    var isSecureInputActive: Bool { ShortcutMonitor.isSecureEventInputEnabled() }
+
+    func textBeforeCursor() -> String? { CursorTextContextReader.textBeforeCursor() }
+
+    func insertionPoint() -> CursorTextContextReader.InsertionPoint { CursorTextContextReader.focusedInsertionPoint() }
+
+    func insert(_ text: String) -> CursorTextContextReader.SelectedTextInsertionResult {
+        CursorTextContextReader.insertSelectedText(text, preparedContext: nil)
+    }
+
+    func replaceTextBeforeCaret(_ expected: String, with replacement: String) -> CursorTextContextReader.TextReplacementResult {
+        CursorTextContextReader.replaceTextBeforeCaret(expected, with: replacement)
     }
 
     /// Posts the text as Unicode keystrokes. Avoids the clipboard so each insertion does not
     /// overwrite and restore the user's clipboard while they are still speaking.
-    private func typeKeystrokes(_ text: String) async {
+    func typeKeystrokes(_ text: String, isCancelled: () -> Bool) async {
         // A private source keeps the physically held Shift key out of the typed events.
         let source = CGEventSource(stateID: .privateState)
         let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()
         for chunk in Self.utf16Chunks(text, maximumLength: 20) {
-            guard !isCancelled else { return }
+            guard !isCancelled() else { return }
             for isKeyDown in [true, false] {
                 guard let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: isKeyDown) else { return }
                 chunk.withUnsafeBufferPointer { buffer in
                     event.keyboardSetUnicodeString(stringLength: buffer.count, unicodeString: buffer.baseAddress)
                 }
                 event.flags = []
-                event.setIntegerValueField(.eventSourceUserData, value: Self.syntheticEventTag)
+                event.setIntegerValueField(.eventSourceUserData, value: LiveTranscriptTyper.syntheticEventTag)
                 if let targetProcessIdentifier {
                     event.postToPid(targetProcessIdentifier)
                 } else {

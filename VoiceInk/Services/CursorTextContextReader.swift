@@ -1483,11 +1483,10 @@ enum CursorTextContextReader {
             || virtualKey == 0x09
     }
 
-    @MainActor
     /// Where typed text would land: the focused app, its focused element, and the caret when readable.
     struct InsertionPoint {
         let processIdentifier: pid_t?
-        fileprivate let element: AXUIElement?
+        let element: AXUIElement?
         /// UTF-16 offset of a collapsed caret; nil when unreadable or text is selected.
         let caretLocation: Int?
 
@@ -1507,6 +1506,7 @@ enum CursorTextContextReader {
         }
     }
 
+    @MainActor
     static func focusedInsertionPoint() -> InsertionPoint {
         guard AXIsProcessTrusted(),
               let element = focusedElement(from: AXUIElementCreateSystemWide()) else {
@@ -1528,6 +1528,7 @@ enum CursorTextContextReader {
 
     /// Replaces `expected`, which must sit immediately before a collapsed caret in the focused field,
     /// with `replacement`.
+    @MainActor
     static func replaceTextBeforeCaret(_ expected: String, with replacement: String) -> TextReplacementResult {
         let expectedLength = (expected as NSString).length
         guard expectedLength > 0,
@@ -1563,7 +1564,12 @@ enum CursorTextContextReader {
         }
         let expectedAfter = before.replacingCharacters(in: target, with: replacement)
         _ = AXUIElementSetAttributeValue(element, kAXSelectedTextAttribute as CFString, replacement as CFString)
-        let after = textValue(from: element)
+        var after = textValue(from: element)
+        if after != expectedAfter {
+            // Same settle window insertion allows: some apps apply the write on their next run loop turn.
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+            after = textValue(from: element)
+        }
         if after == expectedAfter {
             let endCaret = CFRange(location: target.location + (replacement as NSString).length, length: 0)
             if !caretIs(endCaret) { _ = setSelectedTextRange(endCaret, on: element) }
@@ -1573,6 +1579,7 @@ enum CursorTextContextReader {
         return restoreCaret()
     }
 
+    @MainActor
     static func insertSelectedText(
         _ text: String,
         preparedContext: PreparedContext?

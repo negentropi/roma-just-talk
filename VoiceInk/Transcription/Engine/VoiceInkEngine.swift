@@ -20,7 +20,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private var recordingCancellation: RecordingCancellation?
     var partialTranscript: String = ""
     var currentSession: TranscriptionSession?
-    private var liveTranscriptTyper: LiveTranscriptTyper?
+    var liveTranscriptTyper: LiveTranscriptTyper?
     private var activeRecordingStartID: UUID?
     private var activePipelineTranscriptionID: UUID?
     private var canceledPipelineTranscriptions: [UUID: RecordingCancellation] = [:]
@@ -891,8 +891,9 @@ class VoiceInkEngine: NSObject, ObservableObject {
         liveTranscriptTyper = nil
     }
 
-    private func makeLiveTranscriptTyper() -> LiveTranscriptTyper {
+    func makeLiveTranscriptTyper(field: LiveTypingField = FocusedTextField()) -> LiveTranscriptTyper {
         LiveTranscriptTyper(
+            field: field,
             canStartTyping: { [weak self] in
                 guard VoiceInkLiveTypingPreference.isEnabled() else { return false }
                 // An AI rewrite of the whole text cannot replace what was typed live, so stay out of its way.

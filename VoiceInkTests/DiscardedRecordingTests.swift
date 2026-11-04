@@ -137,7 +137,7 @@ extension DiscardedRecordingTests {
     }
 }
 
-@MainActor private final class RecordingFixture {
+@MainActor final class RecordingFixture {
     let context: ModelContext
     let models: TranscriptionModelManager
     let engine: VoiceInkEngine
@@ -200,11 +200,11 @@ private extension VoiceInkEngine {
     }
 }
 
-private enum FixtureError: Error { case unusedRuntime }
+enum FixtureError: Error { case unusedRuntime }
 
 private final class DeletionCounter: @unchecked Sendable { var count = 0 }
 
-@MainActor private final class GatedTextSession: TranscriptionSession {
+@MainActor final class GatedTextSession: TranscriptionSession {
     private let text: String
     private var released: Bool
     private var gate: CheckedContinuation<Void, Never>?

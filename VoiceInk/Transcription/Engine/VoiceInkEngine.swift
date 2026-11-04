@@ -895,9 +895,11 @@ class VoiceInkEngine: NSObject, ObservableObject {
         LiveTranscriptTyper(
             field: field,
             canStartTyping: { [weak self] in
-                guard VoiceInkLiveTypingPreference.isEnabled() else { return false }
+                guard VoiceInkLiveTypingPreference.isEnabled(), let self else { return false }
+                // An expired trial pastes a notice above the transcript; live typing would skip it.
+                if case .trialExpired = self.pipeline.licenseViewModel.licenseState { return false }
                 // An AI rewrite of the whole text cannot replace what was typed live, so stay out of its way.
-                guard let enhancementService = self?.enhancementService, enhancementService.isConfigured else { return true }
+                guard let enhancementService = self.enhancementService, enhancementService.isConfigured else { return true }
                 return !enhancementService.isEnhancementEnabled && !enhancementService.hasPromptTriggerWords
             },
             cleanText: { [weak self] text in

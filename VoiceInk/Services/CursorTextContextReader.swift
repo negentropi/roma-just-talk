@@ -1489,6 +1489,7 @@ enum CursorTextContextReader {
         let element: AXUIElement?
         /// UTF-16 offset of a collapsed caret; nil when unreadable or text is selected.
         let caretLocation: Int?
+        var hasSelection = false
 
         /// The same place without a caret, for text whose caret position cannot be read back reliably.
         func withoutCaret() -> InsertionPoint {
@@ -1519,8 +1520,9 @@ enum CursorTextContextReader {
         }
         var processIdentifier = pid_t()
         let pid = AXUIElementGetPid(element, &processIdentifier) == .success ? processIdentifier : nil
-        let caret = selectedTextRange(from: element).flatMap { $0.length == 0 ? $0.location : nil }
-        return InsertionPoint(processIdentifier: pid, element: element, caretLocation: caret)
+        let range = selectedTextRange(from: element)
+        let caret = range.flatMap { $0.length == 0 ? $0.location : nil }
+        return InsertionPoint(processIdentifier: pid, element: element, caretLocation: caret, hasSelection: (range?.length ?? 0) > 0)
     }
 
     enum TextReplacementResult {

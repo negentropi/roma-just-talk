@@ -125,6 +125,16 @@ struct LiveTypingPipelineTests {
         #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
     }
 
+    @Test @MainActor func selectedTextSurvivesAnEmptyFinalTranscript() async throws {
+        let (fixture, field, restore) = try makeFixture(finalText: " \n ")
+        defer { restore() }
+        field.select("Keep this draft")
+        speak("Hello there friend", into: fixture)
+        await fixture.engine.toggleRecord()
+
+        #expect(field.text == "Keep this draft")
+    }
+
     @MainActor private func makeFixture(
         finalText: String = "",
         session: TranscriptionSession? = nil
@@ -154,6 +164,7 @@ struct LiveTypingPipelineTests {
 @MainActor private final class InMemoryTextField: LiveTypingField {
     private(set) var text = ""
     private var caret = 0
+    private var selectionLength = 0
     var focusedProcessIdentifier: pid_t = 1
     var canReceiveText = true
     let isSecureInputActive = false
@@ -161,7 +172,12 @@ struct LiveTypingPipelineTests {
     func textBeforeCursor() -> String? { (text as NSString).substring(to: caret) }
 
     func insertionPoint() -> CursorTextContextReader.InsertionPoint {
-        CursorTextContextReader.InsertionPoint(processIdentifier: focusedProcessIdentifier, element: nil, caretLocation: caret)
+        CursorTextContextReader.InsertionPoint(
+            processIdentifier: focusedProcessIdentifier,
+            element: nil,
+            caretLocation: selectionLength == 0 ? caret : nil,
+            hasSelection: selectionLength > 0
+        )
     }
 
     /// Like a real field without Accessibility trust: insertion is unsupported and keystrokes are dropped.
@@ -170,10 +186,19 @@ struct LiveTypingPipelineTests {
         return paste(inserted)
     }
 
+    /// Fills the field with `selected` and selects all of it, like a user about to dictate over it.
+    func select(_ selected: String) {
+        text = selected
+        caret = 0
+        selectionLength = (selected as NSString).length
+    }
+
     /// What the normal paste path delivers, which does not depend on live typing's checks.
+    /// Like a real text field, inserting replaces the selection.
     func paste(_ inserted: String) -> CursorTextContextReader.SelectedTextInsertionResult {
-        text = (text as NSString).replacingCharacters(in: NSRange(location: caret, length: 0), with: inserted)
+        text = (text as NSString).replacingCharacters(in: NSRange(location: caret, length: selectionLength), with: inserted)
         caret += (inserted as NSString).length
+        selectionLength = 0
         return .inserted
     }
 

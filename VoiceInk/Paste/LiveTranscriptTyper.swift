@@ -145,6 +145,12 @@ final class LiveTranscriptTyper {
     private func type(words: [String]) async {
         guard !isCancelled, !isHalted else { return }
         if typedWords.isEmpty {
+            // Typing would replace the selection before the transcript is final; if it then came out
+            // empty, the selected text would be lost. The normal paste replaces it only with a transcript.
+            guard !field.insertionPoint().hasSelection else {
+                halt("text is selected")
+                return
+            }
             textBeforeTyping = field.textBeforeCursor()
         } else if !isAtLastInsertionPoint() {
             stopUncertain("the field or caret changed during live typing")

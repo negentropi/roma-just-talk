@@ -8,6 +8,8 @@ class NotificationManager {
     private var notificationWindow: NSPanel?
     private var dismissTimer: Timer?
 
+    @MainActor static var showNotificationForTesting: ((String, VoiceInkAppNotificationKind) -> Void)?
+
     private init() {}
 
     @MainActor
@@ -18,6 +20,10 @@ class NotificationManager {
         onTap: (() -> Void)? = nil,
         actionButton: (label: String, action: () -> Void)? = nil
     ) {
+        if let showNotificationForTesting = Self.showNotificationForTesting {
+            showNotificationForTesting(title, type)
+            return
+        }
         dismissTimer?.invalidate()
         dismissTimer = nil
 

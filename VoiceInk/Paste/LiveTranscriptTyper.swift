@@ -117,7 +117,8 @@ final class LiveTranscriptTyper {
         guard !isPlacementUncertain, isAtLastInsertionPoint() else {
             return unreconciled("the field or caret changed during live typing")
         }
-        let desired = region(for: VoiceInkLiveTyping.words(finalRawText))
+        // From the raw text, as History cleans it, so single newlines survive.
+        let desired = region(for: finalRawText)
         guard desired != typedRegion else { return .insert("") }
 
         let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
@@ -139,11 +140,10 @@ final class LiveTranscriptTyper {
         return .unreconciled
     }
 
-    /// The text the field should hold for `words`: cleaned as a whole, then adapted to the text
-    /// that preceded the cursor when typing began.
-    private func region(for words: [String]) -> String {
-        guard !words.isEmpty else { return "" }
-        let cleaned = cleanText(words.joined(separator: " ")).trimmingCharacters(in: .whitespacesAndNewlines)
+    /// The text the field should hold for a raw transcript: cleaned as a whole, then adapted to the
+    /// text that preceded the cursor when typing began.
+    private func region(for rawText: String) -> String {
+        let cleaned = cleanText(rawText).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleaned.isEmpty else { return "" }
         return VoiceInkTranscriptionPasteOutputPolicy.cursorPasteTextPlan(cleaned).text(beforeCursor: textBeforeTyping)
     }
@@ -161,7 +161,7 @@ final class LiveTranscriptTyper {
             return
         }
 
-        let desired = region(for: words)
+        let desired = region(for: words.joined(separator: " "))
         let edit = VoiceInkLiveTyping.edit(from: typedRegion, to: desired)
         let before = CursorTextContextReader.focusedInsertionPoint()
         var outcome = InsertionOutcome.insertedAtCaret

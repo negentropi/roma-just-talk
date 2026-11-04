@@ -333,28 +333,38 @@ class TranscriptionPipeline {
             text: finalPastedText,
             transcriptionCompleted: transcription.transcriptionState == .completed
         )
-        if SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
+        // Reconciled even when nothing is pasteable: a final transcript that cleans to nothing must
+        // remove what was typed live, and a failed one leaves the typed words with a warning.
+        var liveRelease: LiveTranscriptTyper.ReleaseInsertion?
+        if let liveTyper, didLiveType {
+            liveRelease = transcription.transcriptionState == .completed
+                ? liveTyper.releaseInsertion(finalRawText: finalRawText ?? "")
+                : .unreconciled
+        }
+        let liveTypingUnreconciled = liveRelease == .unreconciled
+        if liveTypingUnreconciled {
+            NotificationManager.shared.showNotification(
+                title: "Live typing could not finish cleanly. Check the text field; the full transcript is in History.",
+                type: .warning
+            )
+        }
+
+        if liveRelease == nil,
+           SpecialShortcutEmptyTranscriptionFallback.consumeIfNeeded(for: transcription, modelContext: modelContext) {
             latencyTrace.event("pipeline.empty_transcription_fallback", token: traceToken)
             SoundManager.shared.play(.stop)
             await restorePromptDetectionSettingsAndDismiss()
-        } else if var textToPaste = pasteDecision.textToPaste {
+        } else if liveRelease != nil || pasteDecision.textToPaste != nil {
             let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
-            var liveTypingLostWords = false
-            if let liveTyper, didLiveType {
-                switch liveTyper.releaseInsertion(finalRawText: finalRawText ?? "") {
-                case .insert(let remainder):
-                    textToPaste = remainder
-                case .unreconciled:
-                    textToPaste = ""
-                    liveTypingLostWords = true
-                    NotificationManager.shared.showNotification(
-                        title: "Live typing could not finish cleanly. Check the text field; the full transcript is in History.",
-                        type: .warning
-                    )
-                }
-            } else {
+            var textToPaste = ""
+            switch liveRelease {
+            case .insert(let remainder):
+                textToPaste = remainder
+            case .unreconciled:
+                break
+            case nil:
                 textToPaste = await CursorPaster.preparedTextForPaste(
-                    textToPaste,
+                    pasteDecision.textToPaste ?? "",
                     preparedCursorTextContext: preparedCursorTextContext
                 )
             }
@@ -365,7 +375,8 @@ class TranscriptionPipeline {
             } else {
                 isTrialExpired = false
             }
-            let pastedText = VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
+            // The trailing space follows a delivered transcript, not live text that was only removed.
+            let pastedText = pasteDecision.textToPaste == nil ? textToPaste : VoiceInkTranscriptionPasteOutputPolicy.finalPastedText(
                 textToPaste,
                 appendTrailingSpace: VoiceInkAppendTrailingSpacePreference.isEnabled(),
                 isTrialExpired: isTrialExpired
@@ -374,7 +385,7 @@ class TranscriptionPipeline {
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
             await pasteAuthorizationPreflight.value
             // Live typing already delivered the text unless it lost words, which must not auto-send.
-            let pasteResult: CursorPaster.PasteResult = if liveTypingLostWords {
+            let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled {
                 .commandNotPosted
             } else if pastedText.isEmpty {
                 .textInserted
@@ -396,6 +407,7 @@ class TranscriptionPipeline {
             let dismissSpan = latencyTrace.begin("pipeline.dismiss_recorder", token: traceToken)
             await restorePromptDetectionSettingsAndDismiss {
                 if pasteResult.didDeliverText,
+                   pasteDecision.textToPaste != nil,
                    let autoSendKey,
                    let delayAfterPaste = VoiceInkAutoSendPolicy.delayAfterPasteNanoseconds(for: autoSendKey) {
                     Task { @MainActor in

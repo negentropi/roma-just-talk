@@ -3013,6 +3013,7 @@ public struct VoiceInkMacOSAdvancedTranscriptionSettingsPresentation: Equatable,
     public let vad: VoiceInkSettingsTogglePresentation
     public let modelPrewarm: VoiceInkSettingsTogglePresentation
     public let liveTextPreview: VoiceInkSettingsTogglePresentation
+    public let liveTyping: VoiceInkSettingsTogglePresentation
 
     public static let macOS = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation(
         sectionTitle: "Advanced",
@@ -3027,6 +3028,10 @@ public struct VoiceInkMacOSAdvancedTranscriptionSettingsPresentation: Equatable,
         liveTextPreview: VoiceInkSettingsTogglePresentation(
             title: "Show Transcript Preview",
             helpText: "Displays in-progress transcript text when the active model provides it."
+        ),
+        liveTyping: VoiceInkSettingsTogglePresentation(
+            title: "Type While Speaking",
+            helpText: "Types finished words into the focused text field while you are still speaking, with streaming models. Off while AI Enhancement can rewrite the text."
         )
     )
 }
@@ -5178,6 +5183,7 @@ public enum VoiceInkSharedPreferenceReset {
         VoiceInkPowerModeSessionPreference.clear(from: defaults)
         VoiceInkModelRuntimePreference.clear(from: defaults)
         VoiceInkRecorderPreviewPreference.clear(from: defaults)
+        defaults.removeObject(forKey: VoiceInkLiveTypingPreference.userDefaultsKey)
         VoiceInkRecordingShortcutPreference.clear(from: defaults)
         VoiceInkAudioInputPreference.clearLastUsedMicrophoneDeviceID(from: defaults)
     }

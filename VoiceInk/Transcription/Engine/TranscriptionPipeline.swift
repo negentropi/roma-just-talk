@@ -31,6 +31,7 @@ class TranscriptionPipeline {
     ///   - audioURL: The recorded audio file.
     ///   - model: The transcription model to use.
     ///   - session: An active streaming session if one was prepared, otherwise nil.
+    ///   - liveTyper: Typed committed text into the focused field during the recording; only the rest is pasted.
     ///   - onStateChange: Called when the pipeline moves to a new recording state (e.g. `.enhancing`).
     ///   - cancellation: Returns the pending cancellation, if any.
     ///   - onCancel: Called when cancellation is detected to cancel active session state.
@@ -40,6 +41,7 @@ class TranscriptionPipeline {
         audioURL: URL,
         model: any TranscriptionModel,
         session: TranscriptionSession?,
+        liveTyper: LiveTranscriptTyper?,
         latencyTraceToken: VoiceInkLatencyTrace.Token?,
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
         cancellation: () -> RecordingCancellation?,
@@ -54,6 +56,7 @@ class TranscriptionPipeline {
             token: traceToken
         )
         var finalPastedText: String?
+        var finalRawText: String?
         var promptDetectionResult: VoiceInkPromptDetectionResult?
 
         func restorePromptDetectionSettingsIfNeeded() async {
@@ -109,6 +112,10 @@ class TranscriptionPipeline {
                 token: traceToken
             )
         }
+
+        // Before the cursor-context prefetch, so it sees the cursor after the last live-typed segment.
+        let didLiveType = await liveTyper?.finish() ?? false
+        latencyTrace.event("pipeline.live_typing_finished", details: "typed=\(didLiveType)", token: traceToken)
 
         if let cancellation = cancellation() {
             await finishCanceledTranscription(cancellation)
@@ -167,6 +174,7 @@ class TranscriptionPipeline {
                     transcriptionSpan,
                     details: "result=success rawChars=\(rawText.count)"
                 )
+                finalRawText = rawText
             } catch {
                 latencyTrace.end(
                     transcriptionSpan,
@@ -206,12 +214,13 @@ class TranscriptionPipeline {
                 enhancementService.applyPromptDetectionResult(detectionResult)
             }
 
-            let enhancementRequest = textPlan.enhancementRequest(
+            // Live-typed text is already in the target app, so an enhanced rewrite could not replace it.
+            let enhancementRequest = !didLiveType ? textPlan.enhancementRequest(
                 isEnhancementEnabled: enhancementService?.isEnhancementEnabled == true,
                 isEnhancementConfigured: enhancementService?.isConfigured == true,
                 promptDetectionResult: promptDetectionResult,
                 skipConfiguration: VoiceInkPostProcessingSkipConfiguration.current()
-            )
+            ) : nil
 
             if let enhancementService,
                let enhancementRequest {
@@ -330,10 +339,25 @@ class TranscriptionPipeline {
             await restorePromptDetectionSettingsAndDismiss()
         } else if var textToPaste = pasteDecision.textToPaste {
             let pastePreparationSpan = latencyTrace.begin("pipeline.paste_prepare", token: traceToken)
-            textToPaste = await CursorPaster.preparedTextForPaste(
-                textToPaste,
-                preparedCursorTextContext: preparedCursorTextContext
-            )
+            var liveTypingLostWords = false
+            if let liveTyper, didLiveType {
+                switch liveTyper.releaseInsertion(finalRawText: finalRawText ?? "") {
+                case .insert(let remainder):
+                    textToPaste = remainder
+                case .unreconciled:
+                    textToPaste = ""
+                    liveTypingLostWords = true
+                    NotificationManager.shared.showNotification(
+                        title: "Some dictated words could not be typed. The full transcript is in History.",
+                        type: .warning
+                    )
+                }
+            } else {
+                textToPaste = await CursorPaster.preparedTextForPaste(
+                    textToPaste,
+                    preparedCursorTextContext: preparedCursorTextContext
+                )
+            }
 
             let isTrialExpired: Bool
             if case .trialExpired = licenseViewModel.licenseState {
@@ -349,11 +373,18 @@ class TranscriptionPipeline {
             latencyTrace.end(pastePreparationSpan, details: "chars=\(pastedText.count)")
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
             await pasteAuthorizationPreflight.value
-            let pasteResult = await CursorPaster.startPasteAtCursor(
-                pastedText,
-                preparedCursorTextContext: preparedCursorTextContext,
-                latencyTraceToken: traceToken
-            ).value
+            // Live typing already delivered the text unless it lost words, which must not auto-send.
+            let pasteResult: CursorPaster.PasteResult = if liveTypingLostWords {
+                .commandNotPosted
+            } else if pastedText.isEmpty {
+                .textInserted
+            } else {
+                await CursorPaster.startPasteAtCursor(
+                    pastedText,
+                    preparedCursorTextContext: preparedCursorTextContext,
+                    latencyTraceToken: traceToken
+                ).value
+            }
             latencyTrace.end(
                 pasteSpan,
                 details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"

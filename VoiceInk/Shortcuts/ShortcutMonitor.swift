@@ -359,7 +359,8 @@ final class ShortcutMonitor {
     }
 
     private func handleCGEvent(type: CGEventType, event: CGEvent) -> Bool {
-        guard let eventKind = EventKind(type) else {
+        guard let eventKind = EventKind(type),
+              event.getIntegerValueField(.eventSourceUserData) != LiveTranscriptTyper.syntheticEventTag else {
             return false
         }
 

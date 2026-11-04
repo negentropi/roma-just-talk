@@ -1484,6 +1484,61 @@ enum CursorTextContextReader {
     }
 
     @MainActor
+    enum TextReplacementResult {
+        case replaced
+        /// The field was not changed; the caret is where it was.
+        case untouched
+        /// The field changed, but not into the expected text.
+        case uncertain
+    }
+
+    /// Replaces `expected`, which must sit immediately before a collapsed caret in the focused field,
+    /// with `replacement`.
+    static func replaceTextBeforeCaret(_ expected: String, with replacement: String) -> TextReplacementResult {
+        let expectedLength = (expected as NSString).length
+        guard expectedLength > 0,
+              AXIsProcessTrusted(),
+              let element = focusedElement(from: AXUIElementCreateSystemWide()),
+              let role = role(from: element),
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role),
+              // Same exclusion as insertion: a web editor's AX value can change without its app state.
+              shouldUseDirectAccessibilityInsertion(ancestorRoles: insertionAncestorRoles(startingAt: element)),
+              let caret = selectedTextRange(from: element), caret.length == 0,
+              let before = textValue(from: element) as NSString?,
+              caret.location >= expectedLength, caret.location <= before.length else {
+            return .untouched
+        }
+        let target = NSRange(location: caret.location - expectedLength, length: expectedLength)
+        guard before.substring(with: target) == expected,
+              isAttributeSettable(kAXSelectedTextAttribute as CFString, on: element) else {
+            return .untouched
+        }
+
+        // From here the selection may have moved, so "untouched" requires the original caret back.
+        func caretIs(_ range: CFRange) -> Bool {
+            guard let current = selectedTextRange(from: element) else { return false }
+            return current.location == range.location && current.length == range.length
+        }
+        func restoreCaret() -> TextReplacementResult {
+            if !caretIs(caret) { _ = setSelectedTextRange(caret, on: element) }
+            return caretIs(caret) ? .untouched : .uncertain
+        }
+
+        guard setSelectedTextRange(CFRange(location: target.location, length: target.length), on: element) else {
+            return textValue(from: element) == before as String ? restoreCaret() : .uncertain
+        }
+        let expectedAfter = before.replacingCharacters(in: target, with: replacement)
+        _ = AXUIElementSetAttributeValue(element, kAXSelectedTextAttribute as CFString, replacement as CFString)
+        let after = textValue(from: element)
+        if after == expectedAfter {
+            let endCaret = CFRange(location: target.location + (replacement as NSString).length, length: 0)
+            if !caretIs(endCaret) { _ = setSelectedTextRange(endCaret, on: element) }
+            return caretIs(endCaret) ? .replaced : .uncertain
+        }
+        guard after == before as String else { return .uncertain }
+        return restoreCaret()
+    }
+
     static func insertSelectedText(
         _ text: String,
         preparedContext: PreparedContext?

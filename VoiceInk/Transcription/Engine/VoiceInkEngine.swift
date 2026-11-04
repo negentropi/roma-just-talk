@@ -20,6 +20,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private var recordingCancellation: RecordingCancellation?
     var partialTranscript: String = ""
     var currentSession: TranscriptionSession?
+    private var liveTranscriptTyper: LiveTranscriptTyper?
     private var activeRecordingStartID: UUID?
     private var activePipelineTranscriptionID: UUID?
     private var canceledPipelineTranscriptions: [UUID: RecordingCancellation] = [:]
@@ -162,6 +163,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                         do {
                             self.recordedFile = permanentURL
 
+                            self.cancelLiveTyping()
                             self.currentSession?.cancel()
                             self.currentSession = nil
                             self.recorder.onAudioChunk = { data in
@@ -233,6 +235,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                                 latencyTrace.event("power_mode.resolve.cancelled", details: "reason=start_aborted", token: traceToken)
                                 if self.activeRecordingStartID == startID {
                                     await self.recorder.stopRecording(latencyTraceToken: traceToken)
+                                    self.cancelLiveTyping()
                                     self.currentSession?.cancel()
                                     self.currentSession = nil
                                     self.recorder.onAudioChunk = nil
@@ -368,6 +371,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
                             self.recordedFile = nil
                             self.activeRecordingStartID = nil
                             self.stopRequestedDuringStart = false
+                            self.cancelLiveTyping()
                             self.currentSession?.cancel()
                             self.currentSession = nil
                             self.recorder.onAudioChunk = nil
@@ -424,9 +428,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
         guard ownsStartup() else { throw CancellationError() }
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
+        let liveTyper = makeLiveTranscriptTyper()
         let session = serviceRegistry.createSession(
             for: model,
-            onPartialTranscript: { [weak self] partial in
+            onPartialTranscript: { [weak self, weak liveTyper] partial in
+                // Streaming sessions report the running transcript on the main actor, only while recording.
+                MainActor.assumeIsolated { liveTyper?.update(liveTranscript: partial) }
                 Task { @MainActor in
                     self?.partialTranscript = partial
                 }
@@ -434,6 +441,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
         trackQwenRecordingSession(session, model: model)
         currentSession = session
+        liveTranscriptTyper = liveTyper
         latencyTrace.event(
             "streaming_session.created",
             details: "model=\(model.displayName)",
@@ -457,12 +465,12 @@ class VoiceInkEngine: NSObject, ObservableObject {
                 details: "result=failure error=\(String(describing: type(of: error)))"
             )
             session.cancel()
-            if currentSession === session { currentSession = nil }
+            if currentSession === session { cancelLiveTyping(); currentSession = nil }
             throw error
         }
         guard ownsStartup() else {
             session.cancel()
-            if currentSession === session { currentSession = nil }
+            if currentSession === session { cancelLiveTyping(); currentSession = nil }
             throw CancellationError()
         }
 
@@ -641,6 +649,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
 
         let session = currentSession
+        // Stays engine-owned during the pipeline so Esc can cancel queued insertions.
+        let liveTyper = liveTranscriptTyper
         let transcriptionID = transcription.id
         activePipelineTranscriptionID = transcriptionID
 
@@ -649,6 +659,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             audioURL: audioURL,
             model: model,
             session: session,
+            liveTyper: liveTyper,
             latencyTraceToken: traceToken,
             onStateChange: { [weak self] state in
                 guard let self, self.activePipelineTranscriptionID == transcriptionID else { return }
@@ -661,6 +672,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             },
             onCancel: { [weak self, session] in
                 guard let self else { return }
+                liveTyper?.cancel()
                 self.cancelPipelineSession(transcriptionID: transcriptionID, session: session)
             },
             onDismiss: { [weak self] in
@@ -678,6 +690,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             recordingCancellation = nil
         }
         canceledPipelineTranscriptions[transcriptionID] = nil
+        if liveTranscriptTyper === liveTyper { liveTranscriptTyper = nil }
 
         if didFinishActivePipeline,
            recordingState.shouldReturnToIdleWhenActivePipelineFinishes {
@@ -868,8 +881,33 @@ class VoiceInkEngine: NSObject, ObservableObject {
 
     private func cancelCurrentSession() {
         qwenStartupWarmup?.cancel()
+        cancelLiveTyping()
         currentSession?.cancel()
         currentSession = nil
+    }
+
+    private func cancelLiveTyping() {
+        liveTranscriptTyper?.cancel()
+        liveTranscriptTyper = nil
+    }
+
+    private func makeLiveTranscriptTyper() -> LiveTranscriptTyper {
+        LiveTranscriptTyper(
+            canStartTyping: { [weak self] in
+                guard VoiceInkLiveTypingPreference.isEnabled() else { return false }
+                // An AI rewrite of the whole text cannot replace what was typed live, so stay out of its way.
+                guard let enhancementService = self?.enhancementService, enhancementService.isConfigured else { return true }
+                return !enhancementService.isEnhancementEnabled && !enhancementService.hasPromptTriggerWords
+            },
+            cleanText: { [weak self] text in
+                guard let self else { return text }
+                return VoiceInkTranscriptionRunPreparation.prepareRawTextForEnhancement(
+                    text,
+                    cleanupConfiguration: VoiceInkTranscriptionCleanupConfiguration.current()
+                ) { DictionaryService.applyWordReplacements(to: $0, using: self.modelContext) }
+                    .cleanedText
+            }
+        )
     }
 
     private func finishRecorderSession() async {

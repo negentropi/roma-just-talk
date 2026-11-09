@@ -200,9 +200,7 @@ final class LiveTranscriptTyper {
                     stopUncertain("focus moved while correcting typed text")
                     return false
                 }
-                // The caret cannot confirm an equal-length correction ("there" to "their"), so wait
-                // until the field shows the corrected text before the caret.
-                guard await fieldShows(edit.insertedText, keystrokes: edit.removedSuffix.count + edit.insertedText.count) else {
+                guard await correctionLanded(edit, from: before, keystrokes: edit.removedSuffix.count + edit.insertedText.count) else {
                     stopUncertain("the corrected text did not appear in the field")
                     return false
                 }
@@ -243,14 +241,26 @@ final class LiveTranscriptTyper {
         return true
     }
 
+    /// Whether a keystroke correction has fully landed. Neither the caret nor the text alone can tell:
+    /// mid-way the caret can pass its final offset, and the old text can already end with the
+    /// inserted text ("there" to "here"). At the final caret offset, though, a partial state's text
+    /// differs from the inserted text, since an edit's removed and inserted parts differ at their
+    /// first character. So the caret is read first, then the text, and both must match.
     /// Only the inserted text is compared: editors may store other spaces as no-break spaces.
-    /// A pure deletion is confirmed by the caret check instead.
-    private func fieldShows(_ inserted: String, keystrokes: Int) async -> Bool {
-        let length = (inserted as NSString).length
-        guard length > 0 else { return true }
+    private func correctionLanded(
+        _ edit: (removedSuffix: String, insertedText: String),
+        from before: CursorTextContextReader.InsertionPoint,
+        keystrokes: Int
+    ) async -> Bool {
+        guard let start = before.caretLocation else { return false }
+        let expectedCaret = start - (edit.removedSuffix as NSString).length + (edit.insertedText as NSString).length
+        let length = (edit.insertedText as NSString).length
         for _ in 0..<(30 + keystrokes / 4) {
-            if let shown = field.textBeforeCaret(length: length),
-               VoiceInkLiveTyping.sameTypedText(shown, inserted) { return true }
+            let point = field.insertionPoint()
+            if point.continues(before.withoutCaret()), point.caretLocation == expectedCaret,
+               length == 0 || field.textBeforeCaret(length: length).map({ VoiceInkLiveTyping.sameTypedText($0, edit.insertedText) }) == true {
+                return true
+            }
             try? await Task.sleep(nanoseconds: 10_000_000)
         }
         return false

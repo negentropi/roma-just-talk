@@ -156,6 +156,22 @@ struct LiveTypingPipelineTests {
         #expect(warnings.isEmpty)
     }
 
+    @Test @MainActor func aCorrectionCountsOnlyOnceAllItsKeysLanded() async throws {
+        // "there" to "here": the old text already ends with the new word, and mid-way through the
+        // Backspaces the caret passes the offset where the correction will end.
+        let (fixture, field, restore) = try makeFixture(finalText: "Hello here you are.")
+        defer { restore() }
+        field.supportsAccessibilityEditing = false
+        field.handlesKeystrokesOneReadAtATime = true
+        speak("Hello there you", into: fixture)
+        speak("Hello here you", into: fixture)
+        speak("Hello here you are", into: fixture)
+        _ = await fixture.engine.liveTranscriptTyper?.finish()
+        field.handleAllPendingKeys()
+
+        #expect(field.text == "Hello here you")
+    }
+
     @Test @MainActor func aRevisedWordIsCorrectedAndTypingContinues() async throws {
         let (fixture, field, restore) = try makeFixture(finalText: "Hello their friend is here.")
         defer { restore() }
@@ -253,8 +269,28 @@ struct LiveTypingPipelineTests {
 
     func textBeforeCursor() -> String? { (text as NSString).substring(to: caret) }
 
+    /// Keystroke corrections queued but not yet handled by the "app". Each read of the field returns
+    /// the current state and then lets the app handle one more key, like a busy editor catching up.
+    var handlesKeystrokesOneReadAtATime = false
+    private var pendingKeys: [Character?] = []
+
+    private func handleOnePendingKey() {
+        guard !pendingKeys.isEmpty else { return }
+        if let character = pendingKeys.removeFirst() {
+            _ = paste(String(character))
+        } else {
+            let before = (text as NSString).substring(to: caret)
+            let kept = String(before.dropLast())
+            text = kept + (text as NSString).substring(from: caret)
+            caret = (kept as NSString).length
+        }
+    }
+
+    func handleAllPendingKeys() { while !pendingKeys.isEmpty { handleOnePendingKey() } }
+
     func insertionPoint() -> CursorTextContextReader.InsertionPoint {
-        CursorTextContextReader.InsertionPoint(
+        defer { handleOnePendingKey() }
+        return CursorTextContextReader.InsertionPoint(
             processIdentifier: focusedProcessIdentifier,
             element: nil,
             caretLocation: selectionLength == 0 ? caret : nil,
@@ -303,6 +339,7 @@ struct LiveTypingPipelineTests {
     }
 
     func textBeforeCaret(length: Int) -> String? {
+        defer { handleOnePendingKey() }
         guard selectionLength == 0, length <= caret else { return nil }
         return (text as NSString).substring(with: NSRange(location: caret - length, length: length))
     }
@@ -319,6 +356,10 @@ struct LiveTypingPipelineTests {
         guard canReceiveText, !userInputIsRecent, insertionPoint().continues(expected),
               let typed = textBeforeCaret(length: (deleting as NSString).length),
               VoiceInkLiveTyping.sameTypedText(typed, deleting) else { return .declined }
+        if handlesKeystrokesOneReadAtATime {
+            pendingKeys += Array(repeating: nil, count: deleting.count) + typing.map { Optional($0) }
+            return .sent
+        }
         let length = (deleting as NSString).length
         text = (text as NSString).replacingCharacters(in: NSRange(location: caret - length, length: length), with: "")
         caret -= length

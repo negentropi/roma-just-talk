@@ -8,9 +8,10 @@ import VoiceInkCore
 ///
 /// Invariant: `typedRegion`, the text this typer put into the field, ends at the caret and equals the
 /// cleaned, cursor-adapted transcript of `typedWords`. Each change types only the difference: new text
-/// is appended, and a changed tail (a dictionary replacement spanning words, a corrected word) is
-/// replaced in place. Release applies the same rule to the final transcript, so the field ends up with
-/// exactly the text History saves.
+/// is appended, and a changed tail (a word the recognizer revised, a dictionary replacement spanning
+/// words) is replaced: through Accessibility where the field allows it, otherwise by backspacing over
+/// the typed tail and typing it again. Release applies the same rule to the final transcript, so the
+/// field ends up with exactly the text History saves.
 @MainActor
 final class LiveTranscriptTyper {
     /// Marks keystrokes this class posts so the shortcut monitor does not read them as a key chord.
@@ -77,14 +78,14 @@ final class LiveTranscriptTyper {
         guard recentPasses.count == VoiceInkLiveTyping.stabilityPasses else { return }
 
         let stable = VoiceInkLiveTyping.stableWords(acrossPasses: recentPasses)
-        guard let extended = VoiceInkLiveTyping.extend(queuedWords, with: stable) else {
-            halt("the live transcript revised words already typed")
-            return
-        }
-        logger.debug("Live pass words=\(self.recentPasses.last?.count ?? 0, privacy: .public) stable=\(stable.count, privacy: .public) queued=\(extended.count, privacy: .public)")
-        guard extended != queuedWords else { return }
-        queuedWords = extended
-        let words = extended
+        // A revised typed word is corrected in the field rather than ending live typing, so the
+        // field keeps following the speech.
+        let extended = VoiceInkLiveTyping.extend(queuedWords, with: stable)
+        let next = extended ?? stable
+        logger.debug("Live pass words=\(self.recentPasses.last?.count ?? 0, privacy: .public) stable=\(stable.count, privacy: .public) queued=\(next.count, privacy: .public) revised=\(extended == nil, privacy: .public)")
+        guard next != queuedWords else { return }
+        queuedWords = next
+        let words = next
 
         let previous = pendingInsertion
         pendingInsertion = Task { @MainActor in
@@ -182,14 +183,40 @@ final class LiveTranscriptTyper {
             switch field.replaceTextBeforeCaret(edit.removedSuffix, with: edit.insertedText) {
             case .replaced:
                 break
+            case .unsupported:
+                // Web editors take only keystrokes: Backspace over the typed tail, then type the
+                // correction. Only after reading that tail back just before the caret, so nothing the
+                // user wrote is deleted.
+                guard before.caretLocation != nil,
+                      field.textBeforeCaret(length: (edit.removedSuffix as NSString).length) == edit.removedSuffix else {
+                    halt("typed text could not be read back before the caret to correct it")
+                    return false
+                }
+                guard await field.replaceByKeystrokes(
+                    deletingCharacters: edit.removedSuffix.count,
+                    typing: edit.insertedText,
+                    isCancelled: { [weak self] in self?.isCancelled ?? true }
+                ) else {
+                    stopUncertain("focus moved while correcting typed text")
+                    return false
+                }
+                // The caret cannot confirm an equal-length correction ("there" to "their"), so wait
+                // until the field itself holds the corrected text.
+                guard await fieldShows(desired) else {
+                    stopUncertain("the corrected text did not appear in the field")
+                    return false
+                }
+                outcome = .typedAsKeystrokes
             case .untouched:
-                // The field still ends with the old region; release tries again.
+                // The field no longer ends with the typed text, so it cannot be corrected safely.
                 halt("typed text could not be corrected in place")
                 return false
             case .uncertain:
                 stopUncertain("correcting typed text left unexpected text")
                 return false
             }
+            let viaKeystrokes = outcome == .typedAsKeystrokes
+            logger.debug("Live correction removed=\(edit.removedSuffix.count, privacy: .public) inserted=\(edit.insertedText.count, privacy: .public) viaKeystrokes=\(viaKeystrokes, privacy: .public)")
         } else if !edit.insertedText.isEmpty {
             outcome = await insert(edit.insertedText)
             guard outcome != .caretUnknown else {
@@ -214,6 +241,16 @@ final class LiveTranscriptTyper {
             stopUncertain("the caret did not end after the typed text")
         }
         return true
+    }
+
+    private func fieldShows(_ region: String) async -> Bool {
+        let length = (region as NSString).length
+        guard length > 0 else { return true }
+        for _ in 0..<30 {
+            if field.textBeforeCaret(length: length) == region { return true }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        return false
     }
 
     private func settledInsertionPoint(expectedCaret: Int?) async -> CursorTextContextReader.InsertionPoint {
@@ -265,6 +302,11 @@ protocol LiveTypingField {
     func insertionPoint() -> CursorTextContextReader.InsertionPoint
     func insert(_ text: String) -> CursorTextContextReader.SelectedTextInsertionResult
     func replaceTextBeforeCaret(_ expected: String, with replacement: String) -> CursorTextContextReader.TextReplacementResult
+    /// The `length` UTF-16 units just before a collapsed caret; nil when unreadable.
+    func textBeforeCaret(length: Int) -> String?
+    /// Presses Backspace `deletingCharacters` times, then types `typing`, all aimed at the field focused
+    /// now. Returns false when focus moved or the run was cancelled before it finished.
+    func replaceByKeystrokes(deletingCharacters: Int, typing: String, isCancelled: () -> Bool) async -> Bool
     func typeKeystrokes(_ text: String, isCancelled: () -> Bool) async
 }
 
@@ -287,20 +329,53 @@ struct FocusedTextField: LiveTypingField {
         CursorTextContextReader.replaceTextBeforeCaret(expected, with: replacement)
     }
 
+    func textBeforeCaret(length: Int) -> String? {
+        CursorTextContextReader.textImmediatelyBeforeCaret(length: length)
+    }
+
+    func replaceByKeystrokes(deletingCharacters: Int, typing text: String, isCancelled: () -> Bool) async -> Bool {
+        let run = KeystrokeRun()
+        guard !isCancelled(), run.isOnTarget else { return false }
+        // Back to back, right after the caller read the text back, so a click cannot land between
+        // the check and the Backspaces and redirect them into the user's own text.
+        for _ in 0..<deletingCharacters {
+            guard run.post(virtualKey: UInt16(kVK_Delete)) else { return false }
+        }
+        return await run.type(text, isCancelled: isCancelled)
+    }
+
     /// Posts the text as Unicode keystrokes. Avoids the clipboard so each insertion does not
     /// overwrite and restore the user's clipboard while they are still speaking.
     func typeKeystrokes(_ text: String, isCancelled: () -> Bool) async {
+        _ = await KeystrokeRun().type(text, isCancelled: isCancelled)
+    }
+
+    /// Keystrokes aimed at the field focused when the run began.
+    @MainActor
+    private struct KeystrokeRun {
         // A private source keeps the physically held Shift key out of the typed events.
         let source = CGEventSource(stateID: .privateState)
         let targetProcessIdentifier = CursorTextContextReader.focusedProcessIdentifierForPaste()
         let target = CursorTextContextReader.focusedInsertionPoint().withoutCaret()
-        for chunk in Self.utf16Chunks(text, maximumLength: 20) {
-            // Stop before a chunk could land in a field the user switched to; the caller then sees the move.
-            guard !isCancelled(), CursorTextContextReader.focusedInsertionPoint().continues(target) else { return }
+
+        var isOnTarget: Bool { CursorTextContextReader.focusedInsertionPoint().continues(target) }
+
+        /// Types in chunks, stopping before a chunk could land in a field the user switched to.
+        func type(_ text: String, isCancelled: () -> Bool) async -> Bool {
+            for chunk in FocusedTextField.utf16Chunks(text, maximumLength: 20) {
+                guard !isCancelled(), isOnTarget, post(virtualKey: 0, text: chunk) else { return false }
+                try? await Task.sleep(nanoseconds: 2_000_000)
+            }
+            return true
+        }
+
+        func post(virtualKey: UInt16, text: [UniChar] = []) -> Bool {
             for isKeyDown in [true, false] {
-                guard let event = CGEvent(keyboardEventSource: source, virtualKey: 0, keyDown: isKeyDown) else { return }
-                chunk.withUnsafeBufferPointer { buffer in
-                    event.keyboardSetUnicodeString(stringLength: buffer.count, unicodeString: buffer.baseAddress)
+                guard let event = CGEvent(keyboardEventSource: source, virtualKey: virtualKey, keyDown: isKeyDown) else { return false }
+                if !text.isEmpty {
+                    text.withUnsafeBufferPointer { buffer in
+                        event.keyboardSetUnicodeString(stringLength: buffer.count, unicodeString: buffer.baseAddress)
+                    }
                 }
                 event.flags = []
                 event.setIntegerValueField(.eventSourceUserData, value: LiveTranscriptTyper.syntheticEventTag)
@@ -310,12 +385,12 @@ struct FocusedTextField: LiveTypingField {
                     event.post(tap: .cghidEventTap)
                 }
             }
-            try? await Task.sleep(nanoseconds: 2_000_000)
+            return true
         }
     }
 
     /// Splits on character boundaries so a surrogate pair or emoji is never cut in half.
-    private static func utf16Chunks(_ text: String, maximumLength: Int) -> [[UniChar]] {
+    fileprivate static func utf16Chunks(_ text: String, maximumLength: Int) -> [[UniChar]] {
         var chunks: [[UniChar]] = []
         var current: [UniChar] = []
         for character in text {

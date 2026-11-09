@@ -73,7 +73,7 @@ jobs:
 
       - name: Debug unit tests
         id: unit
-        if: ${{ false }}
+        if: ${{ !cancelled() && steps.release.outcome == 'success' }}
         timeout-minutes: 25
         run: bash scripts/run-macos-ci-unit-tests.sh
 

@@ -184,19 +184,19 @@ final class LiveTranscriptTyper {
             case .replaced:
                 break
             case .unsupported:
-                // Web editors take only keystrokes: Backspace over the typed tail, then type the
-                // correction. Only after reading that tail back just before the caret, so nothing the
-                // user wrote is deleted.
-                guard before.caretLocation != nil,
-                      field.textBeforeCaret(length: (edit.removedSuffix as NSString).length) == edit.removedSuffix else {
-                    halt("typed text could not be read back before the caret to correct it")
-                    return false
-                }
-                guard await field.replaceByKeystrokes(
-                    deletingCharacters: edit.removedSuffix.count,
+                // Web editors take only keystrokes: Backspace over the typed tail, then type the correction.
+                switch await field.replaceByKeystrokes(
+                    at: before,
+                    deleting: edit.removedSuffix,
                     typing: edit.insertedText,
                     isCancelled: { [weak self] in self?.isCancelled ?? true }
-                ) else {
+                ) {
+                case .sent:
+                    break
+                case .declined:
+                    halt("typed text could not be safely corrected with keystrokes")
+                    return false
+                case .interrupted:
                     stopUncertain("focus moved while correcting typed text")
                     return false
                 }
@@ -304,10 +304,23 @@ protocol LiveTypingField {
     func replaceTextBeforeCaret(_ expected: String, with replacement: String) -> CursorTextContextReader.TextReplacementResult
     /// The `length` UTF-16 units just before a collapsed caret; nil when unreadable.
     func textBeforeCaret(length: Int) -> String?
-    /// Presses Backspace `deletingCharacters` times, then types `typing`, all aimed at the field focused
-    /// now. Returns false when focus moved or the run was cancelled before it finished.
-    func replaceByKeystrokes(deletingCharacters: Int, typing: String, isCancelled: () -> Bool) async -> Bool
+    /// Backspaces over `deleting` and types `typing`, sent only while the field is still at `expected`
+    /// (same app, element, and collapsed caret) with exactly `deleting` just before the caret.
+    func replaceByKeystrokes(
+        at expected: CursorTextContextReader.InsertionPoint,
+        deleting: String,
+        typing: String,
+        isCancelled: () -> Bool
+    ) async -> KeystrokeReplacement
     func typeKeystrokes(_ text: String, isCancelled: () -> Bool) async
+}
+
+enum KeystrokeReplacement {
+    case sent
+    /// Nothing was sent: the field moved, held other text, or the user was just clicking or typing.
+    case declined
+    /// Some keys were sent before focus moved or the run was cancelled.
+    case interrupted
 }
 
 @MainActor
@@ -333,15 +346,37 @@ struct FocusedTextField: LiveTypingField {
         CursorTextContextReader.textImmediatelyBeforeCaret(length: length)
     }
 
-    func replaceByKeystrokes(deletingCharacters: Int, typing text: String, isCancelled: () -> Bool) async -> Bool {
-        let run = KeystrokeRun()
-        guard !isCancelled(), run.isOnTarget else { return false }
-        // Back to back, right after the caller read the text back, so a click cannot land between
-        // the check and the Backspaces and redirect them into the user's own text.
-        for _ in 0..<deletingCharacters {
-            guard run.post(virtualKey: UInt16(kVK_Delete)) else { return false }
+    func replaceByKeystrokes(
+        at expected: CursorTextContextReader.InsertionPoint,
+        deleting: String,
+        typing text: String,
+        isCancelled: () -> Bool
+    ) async -> KeystrokeReplacement {
+        // A click or key press may still be queued in the app and move its caret before our Backspaces
+        // arrive, so wait until the user's own input has been quiet long enough to have been handled.
+        for _ in 0..<12 where Self.secondsSincePhysicalInput() < 0.5 {
+            try? await Task.sleep(nanoseconds: 50_000_000)
         }
-        return await run.type(text, isCancelled: isCancelled)
+        guard Self.secondsSincePhysicalInput() >= 0.5, !isCancelled(), expected.caretLocation != nil else { return .declined }
+        // Checked, then sent back to back with no suspension, so nothing of ours runs in between.
+        let run = KeystrokeRun()
+        guard CursorTextContextReader.focusedInsertionPoint().continues(expected),
+              run.target.continues(expected.withoutCaret()),
+              CursorTextContextReader.textImmediatelyBeforeCaret(length: (deleting as NSString).length) == deleting else {
+            return .declined
+        }
+        for _ in 0..<deleting.count {
+            guard run.post(virtualKey: UInt16(kVK_Delete)) else { return .interrupted }
+        }
+        return await run.type(text, isCancelled: isCancelled) ? .sent : .interrupted
+    }
+
+    /// Physical mouse clicks and key presses only; the held shortcut modifier and our own posted
+    /// keystrokes do not count.
+    private static func secondsSincePhysicalInput() -> Double {
+        [CGEventType.leftMouseDown, .rightMouseDown, .otherMouseDown, .keyDown]
+            .map { CGEventSource.secondsSinceLastEventType(.hidSystemState, eventType: $0) }
+            .min() ?? .infinity
     }
 
     /// Posts the text as Unicode keystrokes. Avoids the clipboard so each insertion does not

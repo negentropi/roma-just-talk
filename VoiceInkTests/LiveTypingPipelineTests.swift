@@ -167,6 +167,24 @@ struct LiveTypingPipelineTests {
         #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
     }
 
+    @Test @MainActor func noCorrectionRunsRightAfterTheUserClicksOrTypes() async throws {
+        let (fixture, field, restore) = try makeFixture(finalText: "Hello their friend.")
+        defer { restore() }
+        field.supportsAccessibilityEditing = false
+        var warnings: [String] = []
+        NotificationManager.showNotificationForTesting = { title, type in
+            if type == .warning { warnings.append(title) }
+        }
+        defer { NotificationManager.showNotificationForTesting = nil }
+        speak("Hello there friend", into: fixture)
+        _ = await fixture.engine.liveTranscriptTyper?.finish()
+        field.userInputIsRecent = true
+        await fixture.engine.toggleRecord()
+
+        #expect(field.text == "Hello there")
+        #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
+    }
+
     @Test @MainActor func selectedTextSurvivesAnEmptyFinalTranscript() async throws {
         let (fixture, field, restore) = try makeFixture(finalText: " \n ")
         defer { restore() }
@@ -268,14 +286,22 @@ struct LiveTypingPipelineTests {
         return (text as NSString).substring(with: NSRange(location: caret - length, length: length))
     }
 
-    func replaceByKeystrokes(deletingCharacters: Int, typing: String, isCancelled: () -> Bool) async -> Bool {
-        guard canReceiveText else { return false }
-        let before = (text as NSString).substring(to: caret)
-        let kept = String(before.dropLast(deletingCharacters))
-        text = kept + (text as NSString).substring(from: caret)
-        caret = (kept as NSString).length
+    /// True when the user just clicked or typed, so a keystroke correction must not run yet.
+    var userInputIsRecent = false
+
+    func replaceByKeystrokes(
+        at expected: CursorTextContextReader.InsertionPoint,
+        deleting: String,
+        typing: String,
+        isCancelled: () -> Bool
+    ) async -> KeystrokeReplacement {
+        guard canReceiveText, !userInputIsRecent, insertionPoint().continues(expected),
+              textBeforeCaret(length: (deleting as NSString).length) == deleting else { return .declined }
+        let length = (deleting as NSString).length
+        text = (text as NSString).replacingCharacters(in: NSRange(location: caret - length, length: length), with: "")
+        caret -= length
         _ = paste(typing)
-        return true
+        return .sent
     }
 
     /// The target app rewrites text before the caret without moving it, like autocorrect.

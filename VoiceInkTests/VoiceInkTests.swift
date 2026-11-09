@@ -14,6 +14,7 @@ import Carbon.HIToolbox
 import os
 @testable import VoiceInk
 
+extension CursorPasterHookTests {
 @Suite(.serialized)
 struct VoiceInkTests {
 
@@ -1960,4 +1961,5 @@ struct VoiceInkTests {
         }
     }
 
+}
 }

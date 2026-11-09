@@ -13,6 +13,8 @@ struct ModelSettingsView: View {
     private var prewarmModelOnWake = VoiceInkModelRuntimePreference.defaultShouldPrewarmModelOnWake
     @AppStorage(VoiceInkRecorderPreviewPreference.userDefaultsKey)
     private var showLiveTextPreview = VoiceInkRecorderPreviewPreference.defaultIsLiveTextPreviewEnabled
+    @AppStorage(VoiceInkLiveTypingPreference.userDefaultsKey)
+    private var typeWhileSpeaking = VoiceInkLiveTypingPreference.defaultIsEnabled
     @State private var promptDraftState = VoiceInkLocalWhisperPromptDraftState()
     @State private var cleanupSettingsRevision = 0
     private let advancedSettingsPresentation = VoiceInkMacOSAdvancedTranscriptionSettingsPresentation.macOS
@@ -157,6 +159,14 @@ struct ModelSettingsView: View {
                     HStack(spacing: 4) {
                         Text(advancedSettingsPresentation.modelPrewarm.title)
                         InfoTip(advancedSettingsPresentation.modelPrewarm.helpText)
+                    }
+                }
+                .toggleStyle(.switch)
+
+                Toggle(isOn: $typeWhileSpeaking) {
+                    HStack(spacing: 4) {
+                        Text(advancedSettingsPresentation.liveTyping.title)
+                        InfoTip(advancedSettingsPresentation.liveTyping.helpText)
                     }
                 }
                 .toggleStyle(.switch)

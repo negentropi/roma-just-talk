@@ -1483,6 +1483,129 @@ enum CursorTextContextReader {
             || virtualKey == 0x09
     }
 
+    /// Where typed text would land: the focused app, its focused element, and the caret when readable.
+    struct InsertionPoint {
+        let processIdentifier: pid_t?
+        let element: AXUIElement?
+        /// UTF-16 offset of a collapsed caret; nil when unreadable or text is selected.
+        let caretLocation: Int?
+        var hasSelection = false
+
+        /// The same place without a caret, for text whose caret position cannot be read back reliably.
+        func withoutCaret() -> InsertionPoint {
+            InsertionPoint(processIdentifier: processIdentifier, element: element, caretLocation: nil)
+        }
+
+        /// Whether `self`, read later, is still the same place, judged by everything `earlier` could read.
+        func continues(_ earlier: InsertionPoint) -> Bool {
+            if let pid = earlier.processIdentifier, processIdentifier != pid { return false }
+            if let element = earlier.element {
+                guard let current = self.element, CFEqual(current, element) else { return false }
+            }
+            if let caret = earlier.caretLocation, caretLocation != caret { return false }
+            return true
+        }
+    }
+
+    @MainActor
+    static func focusedInsertionPoint() -> InsertionPoint {
+        guard AXIsProcessTrusted(),
+              let element = focusedElement(from: AXUIElementCreateSystemWide()) else {
+            // Without an Accessibility focus, the frontmost app still tells a switch to another app apart.
+            return InsertionPoint(
+                processIdentifier: NSWorkspace.shared.frontmostApplication?.processIdentifier,
+                element: nil,
+                caretLocation: nil
+            )
+        }
+        var processIdentifier = pid_t()
+        let pid = AXUIElementGetPid(element, &processIdentifier) == .success ? processIdentifier : nil
+        let range = selectedTextRange(from: element)
+        let caret = range.flatMap { $0.length == 0 ? $0.location : nil }
+        return InsertionPoint(processIdentifier: pid, element: element, caretLocation: caret, hasSelection: (range?.length ?? 0) > 0)
+    }
+
+    enum TextReplacementResult {
+        case replaced
+        /// The field was not changed; the caret is where it was.
+        case untouched
+        /// The field changed, but not into the expected text.
+        case uncertain
+        /// A web editor, which Accessibility must not edit; nothing was changed.
+        case unsupported
+    }
+
+    /// The `length` UTF-16 units just before a collapsed caret in the focused field, or nil when the
+    /// caret or text cannot be read. Unlike `textBeforeCursor`, never falls back to the end of the text.
+    @MainActor
+    static func textImmediatelyBeforeCaret(length: Int) -> String? {
+        guard length > 0, AXIsProcessTrusted(),
+              let element = focusedElement(from: AXUIElementCreateSystemWide()),
+              let caret = selectedTextRange(from: element), caret.length == 0,
+              caret.location >= length else { return nil }
+        let range = CFRange(location: caret.location - length, length: length)
+        return stringForRange(range, in: element) ?? valuePrefix(range, in: element)
+    }
+
+    /// Replaces `expected`, which must sit immediately before a collapsed caret in the focused field,
+    /// with `replacement`.
+    @MainActor
+    static func replaceTextBeforeCaret(_ expected: String, with replacement: String) -> TextReplacementResult {
+        let expectedLength = (expected as NSString).length
+        guard expectedLength > 0,
+              AXIsProcessTrusted(),
+              let element = focusedElement(from: AXUIElementCreateSystemWide()),
+              let role = role(from: element),
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
+            return .untouched
+        }
+        // Same exclusion as insertion: a web editor's AX value can change without its app state.
+        guard shouldUseDirectAccessibilityInsertion(ancestorRoles: insertionAncestorRoles(startingAt: element)) else {
+            return .unsupported
+        }
+        guard isAttributeSettable(kAXSelectedTextAttribute as CFString, on: element),
+              let before = textValue(from: element) as NSString? else {
+            return .untouched
+        }
+        guard let caret = selectedTextRange(from: element), caret.length == 0,
+              caret.location >= expectedLength, caret.location <= before.length else {
+            return .untouched
+        }
+        let target = NSRange(location: caret.location - expectedLength, length: expectedLength)
+        guard before.substring(with: target) == expected else {
+            return .untouched
+        }
+
+        // From here the selection may have moved, so "untouched" requires the original caret back.
+        func caretIs(_ range: CFRange) -> Bool {
+            guard let current = selectedTextRange(from: element) else { return false }
+            return current.location == range.location && current.length == range.length
+        }
+        func restoreCaret() -> TextReplacementResult {
+            if !caretIs(caret) { _ = setSelectedTextRange(caret, on: element) }
+            return caretIs(caret) ? .untouched : .uncertain
+        }
+
+        guard setSelectedTextRange(CFRange(location: target.location, length: target.length), on: element) else {
+            return textValue(from: element) == before as String ? restoreCaret() : .uncertain
+        }
+        let expectedAfter = before.replacingCharacters(in: target, with: replacement)
+        _ = AXUIElementSetAttributeValue(element, kAXSelectedTextAttribute as CFString, replacement as CFString)
+        var after = textValue(from: element)
+        if after != expectedAfter {
+            // Same settle window insertion allows: some apps apply the write on their next run loop turn.
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.005))
+            after = textValue(from: element)
+        }
+        if after == expectedAfter {
+            let endCaret = CFRange(location: target.location + (replacement as NSString).length, length: 0)
+            if !caretIs(endCaret) { _ = setSelectedTextRange(endCaret, on: element) }
+            return caretIs(endCaret) ? .replaced : .uncertain
+        }
+        guard after == before as String else { return .uncertain }
+        return restoreCaret()
+    }
+
     @MainActor
     static func insertSelectedText(
         _ text: String,

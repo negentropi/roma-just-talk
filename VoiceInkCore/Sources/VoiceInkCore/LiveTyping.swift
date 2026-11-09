@@ -60,6 +60,12 @@ public enum VoiceInkLiveTyping {
         ".,;:!?".contains(character)
     }
 
+    /// Whether text read back from a field is the text that was typed: web editors store a typed space
+    /// as a no-break space.
+    public static func sameTypedText(_ shown: String, _ typed: String) -> Bool {
+        shown.replacingOccurrences(of: "\u{00A0}", with: " ") == typed.replacingOccurrences(of: "\u{00A0}", with: " ")
+    }
+
     /// The smallest change that turns the text already typed (ending at the caret) into `desired`:
     /// remove `removedSuffix` from just before the caret, then type `insertedText`.
     public static func edit(from typed: String, to desired: String) -> (removedSuffix: String, insertedText: String) {

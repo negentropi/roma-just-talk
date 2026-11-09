@@ -10,6 +10,10 @@ struct VoiceInkCoreCheck {
 struct VoiceInkCoreCheckRunner {
     static func main() async {
         let checks: [VoiceInkCoreCheck] = [
+            VoiceInkCoreCheck(name: "MicrophoneCheckTests.testAMutedOrVirtualInputIsReportedAsSilent", run: { MicrophoneCheckTests().testAMutedOrVirtualInputIsReportedAsSilent() }),
+            VoiceInkCoreCheck(name: "MicrophoneCheckTests.testAQuietRoomIsNotMistakenForAMissingMicrophone", run: { MicrophoneCheckTests().testAQuietRoomIsNotMistakenForAMissingMicrophone() }),
+            VoiceInkCoreCheck(name: "MicrophoneCheckTests.testAnAccidentalTapOfTheShortcutAsksNothing", run: { MicrophoneCheckTests().testAnAccidentalTapOfTheShortcutAsksNothing() }),
+            VoiceInkCoreCheck(name: "MicrophoneCheckTests.testTheMessageNamesTheMicrophone", run: { MicrophoneCheckTests().testTheMessageNamesTheMicrophone() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testProviderRepairNeverSilentlyRoutesAudioIntoOrOutOfNVIDIA", run: { NVIDIACloudModelTests().testProviderRepairNeverSilentlyRoutesAudioIntoOrOutOfNVIDIA() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testCloudEntryPointRejectsMissingKeyAndMalformedAudioBeforeNetwork", run: { await NVIDIACloudModelTests().testCloudEntryPointRejectsMissingKeyAndMalformedAudioBeforeNetwork() }),
             VoiceInkCoreCheck(name: "NVIDIACloudModelTests.testNVIDIAIsOptionalCloudAndRequiresBothKeyAndSupportedOS", run: { NVIDIACloudModelTests().testNVIDIAIsOptionalCloudAndRequiresBothKeyAndSupportedOS() }),

@@ -16,7 +16,8 @@ class NotificationManager {
         type: VoiceInkAppNotificationKind,
         duration: TimeInterval = VoiceInkAppNotificationKind.defaultDisplayDuration,
         onTap: (() -> Void)? = nil,
-        actionButton: (label: String, action: () -> Void)? = nil
+        actionButton: (label: String, action: () -> Void)? = nil,
+        menu: NotificationMenu? = nil
     ) {
         dismissTimer?.invalidate()
         dismissTimer = nil
@@ -40,7 +41,8 @@ class NotificationManager {
                 }
             },
             onTap: onTap,
-            actionButton: actionButton
+            actionButton: actionButton,
+            menu: menu
         )
         let hostingController = NSHostingController(rootView: notificationView)
         let size = hostingController.view.fittingSize

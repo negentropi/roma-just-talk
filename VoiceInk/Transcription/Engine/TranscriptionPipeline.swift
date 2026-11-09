@@ -391,6 +391,8 @@ class TranscriptionPipeline {
             rawText: transcription.text,
             enhancedText: transcription.enhancedText
         ) {
+            // Before the audio is deleted: a silent or wrong microphone otherwise looks like Roma doing nothing.
+            await MicrophoneCheckPrompt.showIfNeeded(audioURL: audioURL)
             discard(transcription, audioURL: audioURL)
             latencyTrace.finish(event: "pipeline.empty_discarded", token: traceToken)
             return

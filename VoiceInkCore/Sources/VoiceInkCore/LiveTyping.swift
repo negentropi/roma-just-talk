@@ -40,7 +40,8 @@ public enum VoiceInkLiveTyping {
 
     /// `typed` extended by the new words in `stable`, without rewriting what is already typed: typed
     /// words keep their spelling, except that the last one may gain trailing punctuation. Release
-    /// reconciles any remaining case or punctuation difference. Nil when a typed word was revised.
+    /// reconciles any remaining case or punctuation difference. Nil when a typed word was revised; the
+    /// typer then corrects the field to `stable`.
     public static func extend(_ typed: [String], with stable: [String]) -> [String]? {
         guard zip(typed, stable).allSatisfy({ key($0) == key($1) }) else { return nil }
         guard stable.count > typed.count else { return typed }

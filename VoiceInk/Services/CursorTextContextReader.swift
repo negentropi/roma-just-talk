@@ -1531,6 +1531,20 @@ enum CursorTextContextReader {
         case untouched
         /// The field changed, but not into the expected text.
         case uncertain
+        /// Accessibility cannot edit this field (web editors, unreadable text); nothing was changed.
+        case unsupported
+    }
+
+    /// The `length` UTF-16 units just before a collapsed caret in the focused field, or nil when the
+    /// caret or text cannot be read. Unlike `textBeforeCursor`, never falls back to the end of the text.
+    @MainActor
+    static func textImmediatelyBeforeCaret(length: Int) -> String? {
+        guard length > 0, AXIsProcessTrusted(),
+              let element = focusedElement(from: AXUIElementCreateSystemWide()),
+              let caret = selectedTextRange(from: element), caret.length == 0,
+              caret.location >= length else { return nil }
+        let range = CFRange(location: caret.location - length, length: length)
+        return stringForRange(range, in: element) ?? valuePrefix(range, in: element)
     }
 
     /// Replaces `expected`, which must sit immediately before a collapsed caret in the focused field,
@@ -1545,14 +1559,16 @@ enum CursorTextContextReader {
               VoiceInkCursorTextContextPolicy.isTextInputRole(role),
               // Same exclusion as insertion: a web editor's AX value can change without its app state.
               shouldUseDirectAccessibilityInsertion(ancestorRoles: insertionAncestorRoles(startingAt: element)),
-              let caret = selectedTextRange(from: element), caret.length == 0,
-              let before = textValue(from: element) as NSString?,
+              isAttributeSettable(kAXSelectedTextAttribute as CFString, on: element),
+              let before = textValue(from: element) as NSString? else {
+            return .unsupported
+        }
+        guard let caret = selectedTextRange(from: element), caret.length == 0,
               caret.location >= expectedLength, caret.location <= before.length else {
             return .untouched
         }
         let target = NSRange(location: caret.location - expectedLength, length: expectedLength)
-        guard before.substring(with: target) == expected,
-              isAttributeSettable(kAXSelectedTextAttribute as CFString, on: element) else {
+        guard before.substring(with: target) == expected else {
             return .untouched
         }
 

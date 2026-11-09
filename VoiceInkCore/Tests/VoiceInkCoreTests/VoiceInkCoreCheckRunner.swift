@@ -1213,7 +1213,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LiveTypingTests.testPunctuationEachPassAddsAtItsEndDoesNotHoldWordsBack", run: { LiveTypingTests().testPunctuationEachPassAddsAtItsEndDoesNotHoldWordsBack() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testTheWordStillBeingSpokenWaits", run: { LiveTypingTests().testTheWordStillBeingSpokenWaits() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testTypedWordsOnlyGainPunctuationAndNewWords", run: { LiveTypingTests().testTypedWordsOnlyGainPunctuationAndNewWords() }),
-            VoiceInkCoreCheck(name: "LiveTypingTests.testARevisedTypedWordStopsLiveTyping", run: { LiveTypingTests().testARevisedTypedWordStopsLiveTyping() }),
+            VoiceInkCoreCheck(name: "LiveTypingTests.testARevisedTypedWordIsReportedAsARevision", run: { LiveTypingTests().testARevisedTypedWordIsReportedAsARevision() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testNewWordsAreAppendedWithoutTouchingTypedText", run: { LiveTypingTests().testNewWordsAreAppendedWithoutTouchingTypedText() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testAReplacementSpanningTypedTextOnlyRewritesTheChangedTail", run: { LiveTypingTests().testAReplacementSpanningTypedTextOnlyRewritesTheChangedTail() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testTypingWhileSpeakingIsOnUnlessTurnedOff", run: { try LiveTypingTests().testTypingWhileSpeakingIsOnUnlessTurnedOff() }),

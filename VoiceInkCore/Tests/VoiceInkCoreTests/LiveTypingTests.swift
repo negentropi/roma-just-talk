@@ -33,7 +33,7 @@ final class LiveTypingTests: XCTestCase {
         XCTAssertEqual(extended, ["Testing", "one,", "two"])
     }
 
-    func testARevisedTypedWordStopsLiveTyping() {
+    func testARevisedTypedWordIsReportedAsARevision() {
         XCTAssertNil(VoiceInkLiveTyping.extend(["The", "weather", "was"], with: ["The", "weather", "is", "warm"]))
     }
 

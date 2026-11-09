@@ -30,6 +30,7 @@ cleanup() {
     > "$out/app-live-typing.log" 2>&1 || true
   screencapture -x "$out/final-desktop.png" >/dev/null 2>&1 &
   killall TextEdit 2>/dev/null || true
+  killall "Google Chrome" 2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -67,7 +68,10 @@ TXT
 cat > "$out/fixture-short.txt" <<'TXT'
 Please send the quarterly report to the finance team before Friday afternoon.
 TXT
-for fixture in long short; do
+cat > "$out/fixture-user.txt" <<'TXT'
+I think it's not dropped, it's just the logic of how you implement the stream text. I think it's like all aligned, all connected together, you know. It's like the way how you implement that. I don't know, probably it's too independent.
+TXT
+for fixture in long short user; do
   # Recorded once with say(1); the runner's synthesizer sometimes writes silence.
   cp "$root/.ci-proof/fixture-$fixture.wav" "$work/fixture-$fixture.wav"
   cp "$work/fixture-$fixture.wav" "$out/fixture-$fixture.wav"
@@ -161,27 +165,27 @@ runtime_write_model_receipt "$manifest" "$model_directory" "$out/model-receipt.t
 /usr/bin/log stream --level debug --style compact --predicate "subsystem == \"$bundle_id\"" > "$out/app-stream.log" 2>&1 &
 log_pid=$!
 
-# Control first so a red "on" run still has its known-bad pair in the same artifact.
-for fixture in long short; do
-for mode in off on; do
-  run="$fixture-$mode"
-  phase "probe fixture=$fixture typeWhileSpeaking=$mode"
+# Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
+runs="${RJT_PROOF_RUNS:-long:chrome:off long:chrome:on user:chrome:on short:chrome:on user:textedit:on}"
+echo "$runs" > "$out/runs.txt"
+for spec in $runs; do
+  IFS=: read -r fixture target mode <<<"$spec"
+  run="$fixture-$target-$mode"
+  phase "probe fixture=$fixture target=$target typeWhileSpeaking=$mode"
   if [ "$mode" = on ]; then value=true; else value=false; fi
   defaults write "$bundle_id" typeWhileSpeaking -bool "$value"
-  defaults read "$bundle_id" typeWhileSpeaking | tee "$out/typeWhileSpeaking-$run.txt"
   rm -f "$out/probe-$run.json"
   # Screen recording of this run; recording-start uptime (same clock as the probe's *Uptime fields) lets the fixture audio be lined up later.
   screencapture -v -x -V 240 "$out/screen-$run.mov" >/dev/null 2>&1 &
   rec_pid=$!
   python3 -c 'import time; print(time.clock_gettime(time.CLOCK_UPTIME_RAW))' > "$out/screen-$run.start-uptime.txt"
   /usr/bin/open -W -n -o "$out/probe-$run.stdout.log" --stderr "$out/probe-$run.stderr.log" "$probe_app" --args \
-    --config "$work/config.json" --fixture "$work/fixture-$fixture.wav" --mode "$mode" \
+    --config "$work/config.json" --fixture "$work/fixture-$fixture.wav" --mode "$mode" --target "$target" \
     --output "$out/probe-$run.json" --targets "$work/targets" --cases 2
   kill -INT "$rec_pid" 2>/dev/null || true
   wait "$rec_pid" 2>/dev/null || true
   cat "$out/probe-$run.stdout.log" "$out/probe-$run.stderr.log" || true
   test -s "$out/probe-$run.json" || { echo "Probe wrote no report for $run" >&2; exit 1; }
-done
 done
 
 phase "verdict"

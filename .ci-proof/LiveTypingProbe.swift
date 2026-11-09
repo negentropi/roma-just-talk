@@ -21,6 +21,7 @@ struct HistoryRow: Codable {
 
 struct LiveTypingCase: Codable {
     let role: String
+    let target: String
     let targetFile: String
     var audioStartUptime: Double?
     var audioFinishedUptime: Double?
@@ -64,10 +65,11 @@ enum LiveTypingProbe {
         guard let configPath = arguments["--config"], let fixturePath = arguments["--fixture"],
               let mode = arguments["--mode"], let outputPath = arguments["--output"],
               let targetDirectory = arguments["--targets"] else {
-            fputs("usage: LiveTypingProbe --config PATH --fixture WAV --mode on|off --output JSON --targets DIR [--cases N]\n", stderr)
+            fputs("usage: LiveTypingProbe --config PATH --fixture WAV --mode on|off --output JSON --targets DIR [--target textedit|chrome] [--cases N]\n", stderr)
             exit(2)
         }
         let caseCount = Int(arguments["--cases"] ?? "2") ?? 2
+        let target = arguments["--target"] ?? "textedit"
         let outputURL = URL(fileURLWithPath: outputPath)
         var report = LiveTypingReport(mode: mode, startedAt: Date(), accessibilityTrusted: AXIsProcessTrusted())
         defer { write(report, to: outputURL) }
@@ -101,8 +103,8 @@ enum LiveTypingProbe {
             for index in 0..<caseCount {
                 let role = index == caseCount - 1 ? "measured" : "warmup\(index + 1)"
                 let file = URL(fileURLWithPath: targetDirectory)
-                    .appendingPathComponent("rjt-live-\(mode)-\(role)-\(UUID().uuidString.prefix(8)).txt")
-                let result = runCase(role: role, file: file, fixtureURL: fixtureURL, duration: duration, device: device)
+                    .appendingPathComponent("rjt-live-\(mode)-\(role)-\(UUID().uuidString.prefix(8)).\(target == "chrome" ? "html" : "txt")")
+                let result = runCase(role: role, target: target, file: file, fixtureURL: fixtureURL, duration: duration, device: device)
                 report.cases.append(result)
                 write(report, to: outputURL)
                 log("\(role): error=\(result.error ?? "none") final=\(result.samples.last?.text ?? "<nil>")")
@@ -122,16 +124,19 @@ enum LiveTypingProbe {
 
     static func runCase(
         role: String,
+        target: String,
         file: URL,
         fixtureURL: URL,
         duration: TimeInterval,
         device: RuntimeAudioDevice
     ) -> LiveTypingCase {
-        var result = LiveTypingCase(role: role, targetFile: file.path)
+        var result = LiveTypingCase(role: role, target: target, targetFile: file.path)
         var shiftHeld = false
         do {
-            let (application, window, field) = try openTarget(file)
-            guard RuntimeAX.text(from: field) == "" else { throw ProbeError("Target field is not empty before recording") }
+            let (application, window, field) = try target == "chrome" ? openChrome(file) : openTarget(file)
+            guard (RuntimeAX.text(from: field) ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw ProbeError("Target field is not empty before recording")
+            }
             let seenTraceIDs = Set(try RuntimeLatencyLogReader.recent().traces.map(\.traceID))
             let historyBefore = try historyRows(after: -1).last?.Z_PK ?? 0
             guard RuntimeAX.focus(application: application, windowElement: window, textElement: field) else {
@@ -213,6 +218,47 @@ enum LiveTypingProbe {
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.2))
         }
         throw ProbeError("TextEdit window for \(token) did not become a focused editable field")
+    }
+
+    static let chromeBundleID = "com.google.Chrome"
+
+    /// A plain contenteditable editor in Chrome: a web editor, like chat composers, where Roma cannot
+    /// edit text through Accessibility and must use keystrokes.
+    static func openChrome(_ file: URL) throws -> (NSRunningApplication, AXUIElement, AXUIElement) {
+        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let token = file.deletingPathExtension().lastPathComponent
+        let label = "Roma live target \(token)"
+        let html = """
+        <!doctype html><meta charset="utf-8"><title>\(token)</title>
+        <style>body{margin:24px;font:26px -apple-system,sans-serif}#e{width:1150px;min-height:520px;border:1px solid #888;padding:10px;white-space:pre-wrap;outline:none}</style>
+        <div id="e" contenteditable="true" role="textbox" aria-multiline="true" aria-label="\(label)" spellcheck="false"></div>
+        <script>addEventListener('load',()=>document.getElementById('e').focus())</script>
+        """
+        try Data(html.utf8).write(to: file, options: .atomic)
+        let profile = file.deletingLastPathComponent().appendingPathComponent("chrome-profile").path
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+        process.arguments = ["--force-renderer-accessibility", "--user-data-dir=\(profile)", "--no-first-run",
+                             "--no-default-browser-check", "--disable-features=Translate", "--window-size=1300,800",
+                             "--new-window", file.absoluteString]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        try process.run()
+        let deadline = now() + 40
+        while now() < deadline {
+            if let application = NSRunningApplication.runningApplications(withBundleIdentifier: chromeBundleID).first {
+                application.activate()
+                let appElement = AXUIElementCreateApplication(application.processIdentifier)
+                AXUIElementSetAttributeValue(appElement, "AXManualAccessibility" as CFString, kCFBooleanTrue)
+                if let field = RuntimeAX.editableElement(in: appElement, identifying: label),
+                   let window = RuntimeAX.window(for: field),
+                   RuntimeAX.focus(application: application, windowElement: window, textElement: field) {
+                    return (application, window, field)
+                }
+            }
+            RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.3))
+        }
+        throw ProbeError("Chrome editor for \(token) did not become a focused editable field")
     }
 
     static func sample(_ field: AXUIElement, into result: inout LiveTypingCase, until end: Double) {

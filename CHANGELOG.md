@@ -8,6 +8,7 @@
 - Put your previous clipboard back as soon as dictated text appears in the target app, instead of 2 seconds later, so a quick Command-V pastes what you copied rather than the transcript.
 
 - Type while you speak: with a streaming model such as Parakeet, finished words now appear in the focused text field while you are still holding the shortcut, instead of all at once when you let go. Turn it off with Type While Speaking under Advanced in the AI Models settings; it stays off while AI Enhancement could rewrite the text.
+- Stop discarding dictations when another app leaves a key stuck down: releasing the shortcut now checks only keys you are physically holding.
 
 - Store new recordings as Opus instead of WAV, about 10x smaller on disk; playback, Retranscribe, and Retry keep working. Existing WAV recordings are converted once in the background after launch.
 

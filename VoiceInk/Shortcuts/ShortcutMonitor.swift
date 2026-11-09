@@ -72,8 +72,11 @@ enum KeyboardState {
         var isKeyPressed: (UInt16) -> Bool
     }
 
+    // Physical keys only. The combined session state also counts keys that other apps posted
+    // without a matching key-up; one stuck synthetic key made every special-shortcut release
+    // look like a chord and discarded the dictation.
     static let systemClient = Client { keyCode in
-        CGEventSource.keyState(.combinedSessionState, key: CGKeyCode(keyCode))
+        CGEventSource.keyState(.hidSystemState, key: CGKeyCode(keyCode))
     }
 }
 

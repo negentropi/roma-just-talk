@@ -1,6 +1,19 @@
 import SwiftUI
 import VoiceInkCore
 
+/// A pull-down of choices shown in a notification, such as the microphones to switch to.
+struct NotificationMenu {
+    struct Item: Identifiable {
+        let id: String
+        let title: String
+        let isSelected: Bool
+        let action: () -> Void
+    }
+
+    let label: String
+    let items: [Item]
+}
+
 struct AppNotificationView: View {
     let title: String
     let type: VoiceInkAppNotificationKind
@@ -8,6 +21,7 @@ struct AppNotificationView: View {
     let onClose: () -> Void
     let onTap: (() -> Void)?
     var actionButton: (label: String, action: () -> Void)? = nil
+    var menu: NotificationMenu? = nil
     
     @State private var progress: Double = 1.0
     @State private var timer: Timer?
@@ -45,6 +59,34 @@ struct AppNotificationView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 6))
                     }
                     .buttonStyle(PlainButtonStyle())
+                }
+
+                if let menu {
+                    Menu {
+                        ForEach(menu.items) { item in
+                            Button {
+                                item.action()
+                                onClose()
+                            } label: {
+                                if item.isSelected {
+                                    Label(item.title, systemImage: "checkmark")
+                                } else {
+                                    Text(item.title)
+                                }
+                            }
+                        }
+                    } label: {
+                        Text(menu.label)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(type.iconColor)
+                    }
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.visible)
+                    .fixedSize()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(type.iconColor.opacity(0.15))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
 
                 Button(action: onClose) {

@@ -4,18 +4,37 @@ import Foundation
 final class LiveTypingTests: XCTestCase {
     func testOnlyWordsEveryRecentPassAgreesOnAreTyped() {
         let passes = [
-            VoiceInkLiveTyping.words("The weather was warm and"),
-            VoiceInkLiveTyping.words("The weather was warm and bright"),
-            VoiceInkLiveTyping.words("The weather is warm and bright this"),
+            VoiceInkLiveTyping.words("The weather was warm and bright."),
+            VoiceInkLiveTyping.words("The weather is warm and bright this."),
         ]
 
-        XCTAssertEqual(VoiceInkLiveTyping.stableWords(acrossPasses: passes), ["The"])
+        XCTAssertEqual(VoiceInkLiveTyping.stableWords(acrossPasses: passes), ["The", "weather"])
     }
 
-    func testTheLastAgreedWordWaitsForItsPunctuation() {
-        let pass = VoiceInkLiveTyping.words("Send it to finance")
+    func testPunctuationEachPassAddsAtItsEndDoesNotHoldWordsBack() {
+        // Parakeet ends every pass with a period; it becomes a comma once the next word is heard.
+        let passes = [
+            VoiceInkLiveTyping.words("Testing one."),
+            VoiceInkLiveTyping.words("Testing one, two."),
+        ]
 
-        XCTAssertEqual(VoiceInkLiveTyping.stableWords(acrossPasses: [pass, pass, pass]), ["Send", "it", "to"])
+        XCTAssertEqual(VoiceInkLiveTyping.stableWords(acrossPasses: passes), ["Testing", "one"])
+    }
+
+    func testTheWordStillBeingSpokenWaits() {
+        let pass = VoiceInkLiveTyping.words("Send it to fin")
+
+        XCTAssertEqual(VoiceInkLiveTyping.stableWords(acrossPasses: [pass, pass]), ["Send", "it", "to"])
+    }
+
+    func testTypedWordsOnlyGainPunctuationAndNewWords() {
+        let extended = VoiceInkLiveTyping.extend(["Testing", "one"], with: ["testing", "one,", "two"])
+
+        XCTAssertEqual(extended, ["Testing", "one,", "two"])
+    }
+
+    func testARevisedTypedWordStopsLiveTyping() {
+        XCTAssertNil(VoiceInkLiveTyping.extend(["The", "weather", "was"], with: ["The", "weather", "is", "warm"]))
     }
 
     func testNewWordsAreAppendedWithoutTouchingTypedText() {

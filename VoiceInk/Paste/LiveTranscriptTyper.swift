@@ -72,25 +72,24 @@ final class LiveTranscriptTyper {
         }
         guard phase == .typing, !isHalted else { return }
 
-        let latest = VoiceInkLiveTyping.words(liveTranscript)
-        // A shorter transcript that agrees is fine (a commit can report only committed words);
-        // a changed word that was already queued is a revision live typing cannot follow.
-        guard zip(latest, queuedWords).allSatisfy({ $0 == $1 }) else {
-            halt("the live transcript revised words already typed")
-            return
-        }
-        recentPasses.append(latest)
+        recentPasses.append(VoiceInkLiveTyping.words(liveTranscript))
         if recentPasses.count > VoiceInkLiveTyping.stabilityPasses { recentPasses.removeFirst() }
         guard recentPasses.count == VoiceInkLiveTyping.stabilityPasses else { return }
 
         let stable = VoiceInkLiveTyping.stableWords(acrossPasses: recentPasses)
-        guard stable.count > queuedWords.count, stable.starts(with: queuedWords) else { return }
-        queuedWords = stable
+        guard let extended = VoiceInkLiveTyping.extend(queuedWords, with: stable) else {
+            halt("the live transcript revised words already typed")
+            return
+        }
+        logger.debug("Live pass words=\(self.recentPasses.last?.count ?? 0, privacy: .public) stable=\(stable.count, privacy: .public) queued=\(extended.count, privacy: .public)")
+        guard extended != queuedWords else { return }
+        queuedWords = extended
+        let words = extended
 
         let previous = pendingInsertion
         pendingInsertion = Task { @MainActor in
             await previous?.value
-            await self.type(words: stable)
+            await self.type(words: words)
         }
     }
 

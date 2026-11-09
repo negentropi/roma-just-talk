@@ -1531,7 +1531,7 @@ enum CursorTextContextReader {
         case untouched
         /// The field changed, but not into the expected text.
         case uncertain
-        /// Accessibility cannot edit this field (web editors, unreadable text); nothing was changed.
+        /// A web editor, which Accessibility must not edit; nothing was changed.
         case unsupported
     }
 
@@ -1556,12 +1556,16 @@ enum CursorTextContextReader {
               AXIsProcessTrusted(),
               let element = focusedElement(from: AXUIElementCreateSystemWide()),
               let role = role(from: element),
-              VoiceInkCursorTextContextPolicy.isTextInputRole(role),
-              // Same exclusion as insertion: a web editor's AX value can change without its app state.
-              shouldUseDirectAccessibilityInsertion(ancestorRoles: insertionAncestorRoles(startingAt: element)),
-              isAttributeSettable(kAXSelectedTextAttribute as CFString, on: element),
-              let before = textValue(from: element) as NSString? else {
+              VoiceInkCursorTextContextPolicy.isTextInputRole(role) else {
+            return .untouched
+        }
+        // Same exclusion as insertion: a web editor's AX value can change without its app state.
+        guard shouldUseDirectAccessibilityInsertion(ancestorRoles: insertionAncestorRoles(startingAt: element)) else {
             return .unsupported
+        }
+        guard isAttributeSettable(kAXSelectedTextAttribute as CFString, on: element),
+              let before = textValue(from: element) as NSString? else {
+            return .untouched
         }
         guard let caret = selectedTextRange(from: element), caret.length == 0,
               caret.location >= expectedLength, caret.location <= before.length else {

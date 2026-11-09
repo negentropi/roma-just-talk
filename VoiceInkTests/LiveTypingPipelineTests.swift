@@ -138,6 +138,24 @@ struct LiveTypingPipelineTests {
         #expect(field.text == saved)
     }
 
+    @Test @MainActor func aWebEditorStoringNoBreakSpacesStillFinishesWithoutAWarning() async throws {
+        let (fixture, field, restore) = try makeFixture(finalText: "I think it's just the logic of it.")
+        defer { restore() }
+        field.supportsAccessibilityEditing = false
+        field.storesSpacesAsNoBreakSpaces = true
+        var warnings: [String] = []
+        NotificationManager.showNotificationForTesting = { title, type in
+            if type == .warning { warnings.append(title) }
+        }
+        defer { NotificationManager.showNotificationForTesting = nil }
+        speak("I think it's you just", into: fixture)
+        await fixture.engine.toggleRecord()
+
+        let saved = try #require(try fixture.context.fetch(FetchDescriptor<Transcription>()).first?.text)
+        #expect(field.text.replacingOccurrences(of: "\u{00A0}", with: " ") == saved)
+        #expect(warnings.isEmpty)
+    }
+
     @Test @MainActor func aRevisedWordIsCorrectedAndTypingContinues() async throws {
         let (fixture, field, restore) = try makeFixture(finalText: "Hello their friend is here.")
         defer { restore() }
@@ -229,6 +247,8 @@ struct LiveTypingPipelineTests {
     var canReceiveText = true
     /// False for a web editor: Accessibility cannot edit it, only keystrokes reach it.
     var supportsAccessibilityEditing = true
+    /// Like a contenteditable editor, which stores typed spaces as no-break spaces.
+    var storesSpacesAsNoBreakSpaces = false
     let isSecureInputActive = false
 
     func textBeforeCursor() -> String? { (text as NSString).substring(to: caret) }
@@ -258,6 +278,7 @@ struct LiveTypingPipelineTests {
     /// What the normal paste path delivers, which does not depend on live typing's checks.
     /// Like a real text field, inserting replaces the selection.
     func paste(_ inserted: String) -> CursorTextContextReader.SelectedTextInsertionResult {
+        let inserted = storesSpacesAsNoBreakSpaces ? inserted.replacingOccurrences(of: " ", with: "\u{00A0}") : inserted
         text = (text as NSString).replacingCharacters(in: NSRange(location: caret, length: selectionLength), with: inserted)
         caret += (inserted as NSString).length
         selectionLength = 0
@@ -296,7 +317,8 @@ struct LiveTypingPipelineTests {
         isCancelled: () -> Bool
     ) async -> KeystrokeReplacement {
         guard canReceiveText, !userInputIsRecent, insertionPoint().continues(expected),
-              textBeforeCaret(length: (deleting as NSString).length) == deleting else { return .declined }
+              let typed = textBeforeCaret(length: (deleting as NSString).length),
+              VoiceInkLiveTyping.sameTypedText(typed, deleting) else { return .declined }
         let length = (deleting as NSString).length
         text = (text as NSString).replacingCharacters(in: NSRange(location: caret - length, length: length), with: "")
         caret -= length

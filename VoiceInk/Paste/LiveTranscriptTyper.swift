@@ -201,8 +201,8 @@ final class LiveTranscriptTyper {
                     return false
                 }
                 // The caret cannot confirm an equal-length correction ("there" to "their"), so wait
-                // until the field itself holds the corrected text.
-                guard await fieldShows(desired) else {
+                // until the field shows the corrected text before the caret.
+                guard await fieldShows(edit.insertedText, keystrokes: edit.removedSuffix.count + edit.insertedText.count) else {
                     stopUncertain("the corrected text did not appear in the field")
                     return false
                 }
@@ -243,11 +243,14 @@ final class LiveTranscriptTyper {
         return true
     }
 
-    private func fieldShows(_ region: String) async -> Bool {
-        let length = (region as NSString).length
+    /// Only the inserted text is compared: editors may store other spaces as no-break spaces.
+    /// A pure deletion is confirmed by the caret check instead.
+    private func fieldShows(_ inserted: String, keystrokes: Int) async -> Bool {
+        let length = (inserted as NSString).length
         guard length > 0 else { return true }
-        for _ in 0..<30 {
-            if field.textBeforeCaret(length: length) == region { return true }
+        for _ in 0..<(30 + keystrokes / 4) {
+            if let shown = field.textBeforeCaret(length: length),
+               VoiceInkLiveTyping.sameTypedText(shown, inserted) { return true }
             try? await Task.sleep(nanoseconds: 10_000_000)
         }
         return false
@@ -362,7 +365,8 @@ struct FocusedTextField: LiveTypingField {
         let run = KeystrokeRun()
         guard CursorTextContextReader.focusedInsertionPoint().continues(expected),
               run.target.continues(expected.withoutCaret()),
-              CursorTextContextReader.textImmediatelyBeforeCaret(length: (deleting as NSString).length) == deleting else {
+              let typed = CursorTextContextReader.textImmediatelyBeforeCaret(length: (deleting as NSString).length),
+              VoiceInkLiveTyping.sameTypedText(typed, deleting) else {
             return .declined
         }
         for _ in 0..<deleting.count {

@@ -81,7 +81,7 @@ final class LiveTranscriptTyper {
         // A revised typed word is corrected in the field rather than ending live typing, so the
         // field keeps following the speech.
         let extended = VoiceInkLiveTyping.extend(queuedWords, with: stable)
-        let next = extended ?? stable
+        let next = extended ?? VoiceInkLiveTyping.revise(queuedWords, with: stable)
         logger.debug("Live pass words=\(self.recentPasses.last?.count ?? 0, privacy: .public) stable=\(stable.count, privacy: .public) queued=\(next.count, privacy: .public) revised=\(extended == nil, privacy: .public)")
         guard next != queuedWords else { return }
         queuedWords = next
@@ -338,6 +338,8 @@ enum KeystrokeReplacement {
 
 @MainActor
 struct FocusedTextField: LiveTypingField {
+    private static let logger = Logger(subsystem: VoiceInkAppIdentity.loggingSubsystem, category: "LiveTranscriptTyper")
+
     /// Without Accessibility trust, macOS drops synthetic keystrokes silently.
     var canReceiveText: Bool { AXIsProcessTrusted() }
 
@@ -370,13 +372,18 @@ struct FocusedTextField: LiveTypingField {
         for _ in 0..<12 where Self.secondsSincePhysicalInput() < 0.5 {
             try? await Task.sleep(nanoseconds: 50_000_000)
         }
-        guard Self.secondsSincePhysicalInput() >= 0.5, !isCancelled(), expected.caretLocation != nil else { return .declined }
+        let quietSeconds = Self.secondsSincePhysicalInput()
+        guard quietSeconds >= 0.5, !isCancelled(), expected.caretLocation != nil else {
+            Self.logger.notice("Keystroke correction declined: quietSeconds=\(quietSeconds, privacy: .public) caretReadable=\(expected.caretLocation != nil, privacy: .public)")
+            return .declined
+        }
         // Checked, then sent back to back with no suspension, so nothing of ours runs in between.
         let run = KeystrokeRun()
         guard CursorTextContextReader.focusedInsertionPoint().continues(expected),
               run.target.continues(expected.withoutCaret()),
               let typed = CursorTextContextReader.textImmediatelyBeforeCaret(length: (deleting as NSString).length),
               VoiceInkLiveTyping.sameTypedText(typed, deleting) else {
+            Self.logger.notice("Keystroke correction declined: the field moved or no longer ends with the typed text")
             return .declined
         }
         for _ in 0..<deleting.count {

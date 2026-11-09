@@ -60,6 +60,13 @@ public enum VoiceInkLiveTyping {
         ".,;:!?".contains(character)
     }
 
+    /// What to type when the recognizer revised typed words: the typed words before the first revised
+    /// one keep their spelling, so the correction only rewrites from there.
+    public static func revise(_ typed: [String], with stable: [String]) -> [String] {
+        let kept = zip(typed, stable).prefix { key($0) == key($1) }.count
+        return Array(typed.prefix(kept)) + stable.dropFirst(kept)
+    }
+
     /// Whether text read back from a field is the text that was typed: web editors store a typed space
     /// as a no-break space.
     public static func sameTypedText(_ shown: String, _ typed: String) -> Bool {

@@ -37,6 +37,14 @@ final class LiveTypingTests: XCTestCase {
         XCTAssertNil(VoiceInkLiveTyping.extend(["The", "weather", "was"], with: ["The", "weather", "is", "warm"]))
     }
 
+    func testARevisionKeepsTheTypedSpellingBeforeTheRevisedWord() {
+        // Only "there" changed; "Hello," keeps its comma, so the correction starts at "there".
+        XCTAssertEqual(
+            VoiceInkLiveTyping.revise(["Hello,", "there", "friend"], with: ["hello", "their", "friend", "is"]),
+            ["Hello,", "their", "friend", "is"]
+        )
+    }
+
     func testNewWordsAreAppendedWithoutTouchingTypedText() {
         let edit = VoiceInkLiveTyping.edit(from: "Hello there.", to: "Hello there. How are")
 

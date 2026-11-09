@@ -1214,6 +1214,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "LiveTypingTests.testTheWordStillBeingSpokenWaits", run: { LiveTypingTests().testTheWordStillBeingSpokenWaits() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testTypedWordsOnlyGainPunctuationAndNewWords", run: { LiveTypingTests().testTypedWordsOnlyGainPunctuationAndNewWords() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testARevisedTypedWordIsReportedAsARevision", run: { LiveTypingTests().testARevisedTypedWordIsReportedAsARevision() }),
+            VoiceInkCoreCheck(name: "LiveTypingTests.testARevisionKeepsTheTypedSpellingBeforeTheRevisedWord", run: { LiveTypingTests().testARevisionKeepsTheTypedSpellingBeforeTheRevisedWord() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testNewWordsAreAppendedWithoutTouchingTypedText", run: { LiveTypingTests().testNewWordsAreAppendedWithoutTouchingTypedText() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testAReplacementSpanningTypedTextOnlyRewritesTheChangedTail", run: { LiveTypingTests().testAReplacementSpanningTypedTextOnlyRewritesTheChangedTail() }),
             VoiceInkCoreCheck(name: "LiveTypingTests.testTypingWhileSpeakingIsOnUnlessTurnedOff", run: { try LiveTypingTests().testTypingWhileSpeakingIsOnUnlessTurnedOff() }),

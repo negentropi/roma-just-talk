@@ -183,7 +183,7 @@ struct LiveTypingPipelineTests {
         #expect(field.text == "Hello their friend is")
     }
 
-    @Test @MainActor func textTheFieldNoLongerHoldsIsNeverBackspacedAway() async throws {
+    @Test @MainActor func aDeclinedCorrectionLeavesTheFieldAndWarns() async throws {
         let (fixture, field, restore) = try makeFixture(finalText: "Hello their friend.")
         defer { restore() }
         field.supportsAccessibilityEditing = false
@@ -201,7 +201,7 @@ struct LiveTypingPipelineTests {
         #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
     }
 
-    @Test @MainActor func noCorrectionRunsRightAfterTheUserClicksOrTypes() async throws {
+    @Test @MainActor func aCorrectionDeclinedForRecentUserInputLeavesTheFieldAndWarns() async throws {
         let (fixture, field, restore) = try makeFixture(finalText: "Hello their friend.")
         defer { restore() }
         field.supportsAccessibilityEditing = false

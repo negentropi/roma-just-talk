@@ -71,7 +71,10 @@ TXT
 cat > "$out/fixture-user.txt" <<'TXT'
 I think it's not dropped, it's just the logic of how you implement the stream text. I think it's like all aligned, all connected together, you know. It's like the way how you implement that. I don't know, probably it's too independent.
 TXT
-for fixture in long short user; do
+cat > "$out/fixture-revise.txt" <<'TXT'
+Their going to the store, I mean they're going to the store at two, no, at four. Write the right letter to the principal, not the principle. I scream for ice cream, and we'll see if the weather is whether or not.
+TXT
+for fixture in long short user revise; do
   # Recorded once with say(1); the runner's synthesizer sometimes writes silence.
   cp "$root/.ci-proof/fixture-$fixture.wav" "$work/fixture-$fixture.wav"
   cp "$work/fixture-$fixture.wav" "$out/fixture-$fixture.wav"
@@ -166,7 +169,7 @@ runtime_write_model_receipt "$manifest" "$model_directory" "$out/model-receipt.t
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-long:chrome:off long:chrome:on user:chrome:on short:chrome:on user:textedit:on}"
+runs="${RJT_PROOF_RUNS:-long:chrome:off long:chrome:on user:chrome:on revise:chrome:on short:chrome:on user:textedit:on revise:textedit:on}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
   IFS=: read -r fixture target mode <<<"$spec"
@@ -181,7 +184,7 @@ for spec in $runs; do
   python3 -c 'import time; print(time.clock_gettime(time.CLOCK_UPTIME_RAW))' > "$out/screen-$run.start-uptime.txt"
   /usr/bin/open -W -n -o "$out/probe-$run.stdout.log" --stderr "$out/probe-$run.stderr.log" "$probe_app" --args \
     --config "$work/config.json" --fixture "$work/fixture-$fixture.wav" --mode "$mode" --target "$target" \
-    --output "$out/probe-$run.json" --targets "$work/targets" --cases 2
+    --output "$out/probe-$run.json" --targets "$work/targets" --cases "$([ "$fixture" = long ] || [ "$fixture" = short ] && echo 2 || echo 4)"
   kill -INT "$rec_pid" 2>/dev/null || true
   wait "$rec_pid" 2>/dev/null || true
   cat "$out/probe-$run.stdout.log" "$out/probe-$run.stderr.log" || true

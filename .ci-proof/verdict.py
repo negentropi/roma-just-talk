@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 evidence = Path(sys.argv[1])
-MINIMUM_HOLD_MS = {'long': 8000, 'short': 3000, 'user': 8000}
+MINIMUM_HOLD_MS = {'long': 8000, 'short': 3000, 'user': 8000, 'revise': 7000}
 BUNDLE = {'textedit': 'com.apple.TextEdit', 'chrome': 'com.google.Chrome'}
 
 
@@ -31,13 +31,13 @@ def live_typed(trace):
     return None
 
 
-def assess(fixture, target, mode):
+def assess(fixture, target, mode, index=-1):
     reference = (evidence / f'fixture-{fixture}.txt').read_text()
     report = json.loads((evidence / f'probe-{fixture}-{target}-{mode}.json').read_text())
-    case = report['cases'][-1] if report.get('cases') else {}
+    case = report['cases'][index] if report.get('cases') else {}
     checks = {}
-    summary = {'fixture': fixture, 'target': target, 'mode': mode, 'fatalError': report.get('fatalError'), 'caseError': case.get('error'), 'checks': checks}
-    checks['probe ran without error'] = not report.get('fatalError') and not case.get('error') and case.get('role') == 'measured'
+    summary = {'fixture': fixture, 'target': target, 'mode': mode, 'case': index, 'fatalError': report.get('fatalError'), 'caseError': case.get('error'), 'checks': checks}
+    checks['probe ran without error'] = not report.get('fatalError') and not case.get('error') and case.get('role') is not None
     down, up = case.get('keyDownUptime'), case.get('keyUpUptime')
     samples = case.get('samples', [])
     if down is None or up is None or not samples:
@@ -96,16 +96,30 @@ def assess(fixture, target, mode):
     return summary
 
 
-results = [assess(*spec.split(':')) for spec in (evidence / 'runs.txt').read_text().split()]
+results = []
+for spec in (evidence / 'runs.txt').read_text().split():
+    fixture, target, mode = spec.split(':')
+    count = len(json.loads((evidence / f'probe-{fixture}-{target}-{mode}.json').read_text()).get('cases') or [None])
+    # The first case after launch is a cold warmup; every later case is asserted.
+    for index in range(1, max(2, count)):
+        results.append(assess(fixture, target, mode, index))
+
+# The regression only shows when the transcript revises typed text in a web editor, which depends on the
+# recognizer; require that the run actually exercised a keystroke correction rather than passing vacuously.
+stream = (evidence / 'app-stream.log').read_text(errors='replace') if (evidence / 'app-stream.log').exists() else ''
+keystroke_corrections = len(re.findall(r'Live correction .*viaKeystrokes=true', stream))
+results.append({'fixture': 'all', 'target': 'chrome', 'mode': 'on', 'case': 'n/a',
+                'keystrokeCorrections': keystroke_corrections,
+                'checks': {'at least one keystroke correction ran in Chrome': keystroke_corrections > 0}})
 passed = all(r['checks'] and all(r['checks'].values()) for r in results)
 verdict = {'passed': passed, 'results': results}
 (evidence / 'verdict.json').write_text(json.dumps(verdict, indent=2) + '\n')
 for result in results:
-    print(f"== fixture={result['fixture']} target={result['target']} typeWhileSpeaking={result['mode']}")
+    print(f"== fixture={result['fixture']} target={result['target']} typeWhileSpeaking={result['mode']} case={result['case']}")
     for name, ok in result['checks'].items():
         print(f"  {'PASS' if ok else 'FAIL'}  {name}")
     for key in ('holdMilliseconds', 'firstTextAfterKeyDownMilliseconds', 'firstTextAfterKeyUpMilliseconds',
-                'firstTextAfterAudioStartMilliseconds', 'liveTypedFromTrace', 'finalVsHistoryWER', 'finalVsSpokenScriptWER', 'lastHoldChangeBeforeAudioEndMilliseconds', 'shrinksDuringHold', 'textAtKeyUp', 'finalText', 'historyText'):
+                'firstTextAfterAudioStartMilliseconds', 'liveTypedFromTrace', 'finalVsHistoryWER', 'finalVsSpokenScriptWER', 'lastHoldChangeBeforeAudioEndMilliseconds', 'shrinksDuringHold', 'keystrokeCorrections', 'textAtKeyUp', 'finalText', 'historyText'):
         print(f"  {key}: {result.get(key)!r}")
 print('VERDICT:', 'PASS' if passed else 'FAIL')
 sys.exit(0 if passed else 1)

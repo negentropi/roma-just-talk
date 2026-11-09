@@ -149,7 +149,7 @@ struct LiveTypingPipelineTests {
         #expect(field.text == "Hello their friend is")
     }
 
-    @Test @MainActor func textTheUserTypedIsNeverBackspacedAway() async throws {
+    @Test @MainActor func textTheFieldNoLongerHoldsIsNeverBackspacedAway() async throws {
         let (fixture, field, restore) = try makeFixture(finalText: "Hello their friend.")
         defer { restore() }
         field.supportsAccessibilityEditing = false
@@ -160,10 +160,10 @@ struct LiveTypingPipelineTests {
         defer { NotificationManager.showNotificationForTesting = nil }
         speak("Hello there friend", into: fixture)
         _ = await fixture.engine.liveTranscriptTyper?.finish()
-        field.typeByHand("!")
+        field.appRewrites("there", as: "THERE")
         await fixture.engine.toggleRecord()
 
-        #expect(field.text == "Hello there!")
+        #expect(field.text == "Hello THERE")
         #expect(warnings.contains { $0.hasPrefix("Live typing could not finish cleanly") })
     }
 
@@ -263,17 +263,26 @@ struct LiveTypingPipelineTests {
         if canReceiveText { _ = paste(typed) }
     }
 
-    func deleteBackward(_ deleted: String, isCancelled: () -> Bool) async -> Bool {
+    func textBeforeCaret(length: Int) -> String? {
+        guard selectionLength == 0, length <= caret else { return nil }
+        return (text as NSString).substring(with: NSRange(location: caret - length, length: length))
+    }
+
+    func replaceByKeystrokes(deletingCharacters: Int, typing: String, isCancelled: () -> Bool) async -> Bool {
+        guard canReceiveText else { return false }
         let before = (text as NSString).substring(to: caret)
-        guard canReceiveText, selectionLength == 0, before.hasSuffix(deleted) else { return false }
-        let length = (deleted as NSString).length
-        text = (text as NSString).replacingCharacters(in: NSRange(location: caret - length, length: length), with: "")
-        caret -= length
+        let kept = String(before.dropLast(deletingCharacters))
+        text = kept + (text as NSString).substring(from: caret)
+        caret = (kept as NSString).length
+        _ = paste(typing)
         return true
     }
 
-    /// The user types at the caret, outside live typing.
-    func typeByHand(_ typed: String) { _ = paste(typed) }
+    /// The target app rewrites text before the caret without moving it, like autocorrect.
+    func appRewrites(_ old: String, as new: String) {
+        precondition((old as NSString).length == (new as NSString).length)
+        text = text.replacingOccurrences(of: old, with: new)
+    }
 }
 
 @MainActor private final class FailingSession: TranscriptionSession {

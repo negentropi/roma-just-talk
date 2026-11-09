@@ -68,7 +68,8 @@ cat > "$out/fixture-short.txt" <<'TXT'
 Please send the quarterly report to the finance team before Friday afternoon.
 TXT
 for fixture in long short; do
-  say -f "$out/fixture-$fixture.txt" -o "$work/fixture-$fixture.wav" --file-format=WAVE --data-format=LEI16@16000
+  # Recorded once with say(1); the runner's synthesizer sometimes writes silence.
+  cp "$root/.ci-proof/fixture-$fixture.wav" "$work/fixture-$fixture.wav"
   cp "$work/fixture-$fixture.wav" "$out/fixture-$fixture.wav"
   afinfo "$work/fixture-$fixture.wav" | tee "$out/fixture-$fixture-info.txt" | grep -i duration
 done

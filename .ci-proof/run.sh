@@ -165,6 +165,15 @@ fi
 echo "model ready in $((SECONDS - model_started))s from $(cat "$out/model-source.txt")"
 runtime_write_model_receipt "$manifest" "$model_directory" "$out/model-receipt.txt"
 
+phase "screen recorder"
+HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew install ffmpeg >/dev/null 2>&1 || true
+ffmpeg -hide_banner -f avfoundation -list_devices true -i "" 2>&1 | tee "$out/avfoundation-devices.txt" || true
+screen_device="$(sed -n 's/.*\[\([0-9]*\)\] Capture screen 0.*/\1/p' "$out/avfoundation-devices.txt" | head -1)"
+echo "screen device: ${screen_device:?no screen capture device}"
+# First capture on a fresh runner has come back empty; take a throwaway one.
+ffmpeg -nostdin -v error -f avfoundation -framerate 30 -i "$screen_device:none" -t 3 -y "$work/warmup.mov" || true
+ls -la "$work/warmup.mov" || true
+
 /usr/bin/log stream --level debug --style compact --predicate "subsystem == \"$bundle_id\"" > "$out/app-stream.log" 2>&1 &
 log_pid=$!
 
@@ -211,7 +220,9 @@ for spec in $runs; do
     *) defaults delete "$bundle_id" prototypeOverlayStream 2>/dev/null || true ;; esac
   rm -f "$out/probe-$run.json"
   # Screen recording of this run; recording-start uptime (same clock as the probe's *Uptime fields) lets the fixture audio be lined up later.
-  screencapture -v -x -V 240 "$out/screen-$run.mov" >/dev/null 2>&1 &
+  # Constant 30 fps: screencapture's variable-rate files mis-time sparse frames (Chrome ran ~4 s fast).
+  ffmpeg -nostdin -v error -f avfoundation -capture_cursor 1 -framerate 30 -i "$screen_device:none" -t 240 \
+    -c:v libx264 -preset ultrafast -pix_fmt yuv420p "$out/screen-$run.mov" > "$out/screen-$run.ffmpeg.log" 2>&1 &
   rec_pid=$!
   python3 -c 'import time; print(time.clock_gettime(time.CLOCK_UPTIME_RAW))' > "$out/screen-$run.start-uptime.txt"
   /usr/bin/open -W -n -o "$out/probe-$run.stdout.log" --stderr "$out/probe-$run.stderr.log" "$probe_app" --args \

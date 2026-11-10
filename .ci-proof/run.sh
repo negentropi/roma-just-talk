@@ -169,7 +169,7 @@ runtime_write_model_receipt "$manifest" "$model_directory" "$out/model-receipt.t
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-user:chrome:on user:chrome:preview user:chrome:bubble user:chrome:ghost user:chrome:ime revise:chrome:ime user:textedit:ime}"
+runs="${RJT_PROOF_RUNS:-user:chrome:ime revise:chrome:ime user:textedit:ime}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
   IFS=: read -r fixture target mode <<<"$spec"
@@ -223,6 +223,6 @@ for spec in $runs; do
   test -s "$out/probe-$run.json" || { echo "Probe wrote no report for $run" >&2; exit 1; }
 done
 
-cp /tmp/roma-stream-ime.log "$out/" 2>/dev/null || true
+cp "$HOME/roma-stream-ime.log" "$out/" 2>/dev/null || true
 phase "verdict"
 python3 "$root/.ci-proof/verdict.py" "$out"

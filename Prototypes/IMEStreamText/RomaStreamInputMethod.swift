@@ -2,7 +2,11 @@
 import Cocoa
 import InputMethodKit
 
-let log = FileHandle(forWritingAtPath: "/tmp/roma-stream-ime.log") ?? FileHandle.standardError
+let logPath = NSHomeDirectory() + "/roma-stream-ime.log"
+let log: FileHandle = {
+    if !FileManager.default.fileExists(atPath: logPath) { FileManager.default.createFile(atPath: logPath, contents: nil) }
+    return FileHandle(forWritingAtPath: logPath) ?? FileHandle.standardError
+}()
 func trace(_ message: String) {
     let line = "\(ProcessInfo.processInfo.systemUptime) \(message)\n"
     log.seekToEndOfFile(); log.write(line.data(using: .utf8)!)
@@ -10,13 +14,20 @@ func trace(_ message: String) {
 
 @objc(RomaStreamController)
 final class RomaStreamController: IMKInputController {
-    /// The controller of the field that last became active; Roma's notifications go to it.
-    static weak var active: RomaStreamController?
+    /// Every live controller, one per client connection; Roma's notifications go to the frontmost app's.
+    static let all = NSHashTable<RomaStreamController>.weakObjects()
+    static var active: RomaStreamController? {
+        let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+        let candidates = all.allObjects
+        let match = candidates.last { $0.client()?.bundleIdentifier() == front }
+        trace("route front=\(front ?? "?") controllers=\(candidates.map { $0.client()?.bundleIdentifier() ?? "nil" }) match=\(match != nil)")
+        return match ?? candidates.last
+    }
     private var markedLength = 0
 
     override func activateServer(_ sender: Any!) {
         super.activateServer(sender)
-        RomaStreamController.active = self
+        RomaStreamController.all.add(self)
         trace("activate \((sender as? IMKTextInput)?.bundleIdentifier() ?? "?")")
     }
 
@@ -35,7 +46,7 @@ final class RomaStreamController: IMKInputController {
                              selectionRange: NSRange(location: (text as NSString).length, length: 0),
                              replacementRange: NSRange(location: NSNotFound, length: 0))
         markedLength = (text as NSString).length
-        trace("marked \(markedLength): \(text)")
+        trace("marked \(markedLength) to \(client.bundleIdentifier() ?? "?") markedRange=\(client.markedRange())")
     }
 
     func commit(_ text: String) {
@@ -46,7 +57,7 @@ final class RomaStreamController: IMKInputController {
             client.insertText(text, replacementRange: NSRange(location: NSNotFound, length: 0))
         }
         markedLength = 0
-        trace("commit: \(text)")
+        trace("commit \((text as NSString).length) to \(client.bundleIdentifier() ?? "?")")
     }
 
     /// The app ends composition (click elsewhere, focus change): keep what is shown.

@@ -325,6 +325,7 @@ class TranscriptionPipeline {
         }
 
         if let cancellation = cancellation() {
+            OverlayStreamPrototype.shared.hide()
             await finishCanceledTranscription(cancellation)
             return
         }
@@ -403,6 +404,8 @@ class TranscriptionPipeline {
                     latencyTraceToken: traceToken
                 ).value
             }
+            // PROTOTYPE (proto/ime-stream-text): the pasted text replaces the overlay guess.
+            OverlayStreamPrototype.shared.hide()
             latencyTrace.end(
                 pasteSpan,
                 details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"

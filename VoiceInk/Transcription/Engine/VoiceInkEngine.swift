@@ -438,6 +438,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
                     if UserDefaults.standard.bool(forKey: "prototypeIMEStream") {
                         DistributedNotificationCenter.default().postNotificationName(
                             .init("com.negentropi.RomaStream.partial"), object: partial, userInfo: nil, deliverImmediately: true)
+                    } else if OverlayStreamPrototype.style != nil {
+                        OverlayStreamPrototype.shared.show(partial)
                     } else {
                         liveTyper?.update(liveTranscript: partial)
                     }

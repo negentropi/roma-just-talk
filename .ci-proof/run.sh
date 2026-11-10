@@ -169,7 +169,7 @@ runtime_write_model_receipt "$manifest" "$model_directory" "$out/model-receipt.t
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-user:chrome:on revise:chrome:on revise:textedit:on user:chrome:ime revise:chrome:ime revise:textedit:ime}"
+runs="${RJT_PROOF_RUNS:-user:chrome:on revise:chrome:on user:chrome:preview user:chrome:bubble user:chrome:ghost user:textedit:ghost user:chrome:ime revise:chrome:ime user:textedit:ime}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
   IFS=: read -r fixture target mode <<<"$spec"
@@ -197,6 +197,10 @@ for spec in $runs; do
   else
     defaults write "$bundle_id" prototypeIMEStream -bool false
   fi
+  # PROTOTYPE variants that leave the field alone until release: recorder preview, caret bubble, ghost text.
+  defaults write "$bundle_id" showLiveTextPreview -bool "$([ "$mode" = preview ] && echo true || echo false)"
+  case "$mode" in bubble|ghost) defaults write "$bundle_id" prototypeOverlayStream -string "$mode" ;;
+    *) defaults delete "$bundle_id" prototypeOverlayStream 2>/dev/null || true ;; esac
   rm -f "$out/probe-$run.json"
   # Screen recording of this run; recording-start uptime (same clock as the probe's *Uptime fields) lets the fixture audio be lined up later.
   screencapture -v -x -V 240 "$out/screen-$run.mov" >/dev/null 2>&1 &
@@ -204,7 +208,7 @@ for spec in $runs; do
   python3 -c 'import time; print(time.clock_gettime(time.CLOCK_UPTIME_RAW))' > "$out/screen-$run.start-uptime.txt"
   /usr/bin/open -W -n -o "$out/probe-$run.stdout.log" --stderr "$out/probe-$run.stderr.log" "$probe_app" --args \
     --config "$work/config.json" --fixture "$work/fixture-$fixture.wav" --mode "$mode" --target "$target" \
-    --output "$out/probe-$run.json" --targets "$work/targets" --cases "${RJT_PROOF_CASES:-3}"
+    --output "$out/probe-$run.json" --targets "$work/targets" --cases "${RJT_PROOF_CASES:-2}"
   kill -INT "$rec_pid" 2>/dev/null || true
   wait "$rec_pid" 2>/dev/null || true
   cat "$out/probe-$run.stdout.log" "$out/probe-$run.stderr.log" || true

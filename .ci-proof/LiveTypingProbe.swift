@@ -228,10 +228,24 @@ enum LiveTypingProbe {
         try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
         let token = file.deletingPathExtension().lastPathComponent
         let label = "Roma live target \(token)"
+        // A chat app at everyday size, so recordings show how live text feels in normal use.
         let html = """
-        <!doctype html><meta charset="utf-8"><title>\(token)</title>
-        <style>body{margin:24px;font:26px -apple-system,sans-serif}#e{width:1150px;min-height:520px;border:1px solid #888;padding:10px;white-space:pre-wrap;outline:none}</style>
-        <div id="e" contenteditable="true" role="textbox" aria-multiline="true" aria-label="\(label)" spellcheck="false"></div>
+        <!doctype html><meta charset="utf-8"><title>Team chat</title>
+        <style>
+        *{box-sizing:border-box}body{margin:0;font:15px -apple-system,sans-serif;color:#1d1c1d;display:flex;height:100vh}
+        nav{width:220px;background:#3f0e40;color:#e8dbe8;padding:16px 12px;font-size:14px}nav b{color:#fff;display:block;margin-bottom:14px;font-size:16px}
+        nav div{padding:5px 8px;border-radius:5px}nav .on{background:#1164a3;color:#fff}
+        main{flex:1;display:flex;flex-direction:column}header{padding:12px 20px;border-bottom:1px solid #ddd;font-weight:700}
+        #log{flex:1;padding:16px 20px;overflow:auto}.m{display:flex;gap:10px;margin-bottom:14px}.a{width:34px;height:34px;border-radius:6px;background:#e0b04c;flex:none}
+        .m p{margin:2px 0 0}.n{font-weight:700}.t{color:#777;font-size:12px;font-weight:400;margin-left:6px}
+        #box{margin:0 20px 20px;border:1px solid #bbb;border-radius:8px;padding:10px 12px;min-height:70px}
+        #e{outline:none;white-space:pre-wrap;min-height:44px;line-height:1.45}
+        </style>
+        <nav><b>Roma team</b><div># general</div><div class="on"># design</div><div># random</div><div>Maya</div><div>Jon</div></nav>
+        <main><header># design</header><div id="log">
+        <div class="m"><div class="a"></div><div><span class="n">Maya</span><span class="t">10:02</span><p>Did the new onboarding copy land in the build?</p></div></div>
+        <div class="m"><div class="a" style="background:#6bb38e"></div><div><span class="n">Jon</span><span class="t">10:04</span><p>Not yet, waiting on the review. Felix, any thoughts on the stream text idea?</p></div></div>
+        </div><div id="box"><div id="e" contenteditable="true" role="textbox" aria-multiline="true" aria-label="\(label)" spellcheck="false"></div></div></main>
         <script>addEventListener('load',()=>document.getElementById('e').focus())</script>
         """
         try Data(html.utf8).write(to: file, options: .atomic)

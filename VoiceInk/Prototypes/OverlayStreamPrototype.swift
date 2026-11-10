@@ -1,7 +1,7 @@
 // PROTOTYPE (proto/ime-stream-text) — throwaway, not production.
 // Shows Roma's running guess in a floating overlay instead of typing it, then hides once the
 // release paste lands. `defaults write com.negentropi.RomaJustTalk prototypeOverlayStream bubble|ghost`
-//   bubble: small dark caption just under the caret line.
+//   bubble: small dark caption just above the caret line.
 //   ghost:  grey text drawn over the field starting at the caret, sized like the field's text.
 import AppKit
 import ApplicationServices
@@ -48,8 +48,9 @@ final class OverlayStreamPrototype {
             let width: CGFloat = 420
             label.preferredMaxLayoutWidth = width - 20
             let size = label.fittingSize
-            let top = screenHeight - anchor.caret.maxY - 6
-            panel.setFrame(NSRect(x: anchor.caret.minX - 10, y: top - size.height - 12, width: width, height: size.height + 12), display: true)
+            // Just above the caret line, so it never covers what is being written or the rest of the field.
+            let bottom = screenHeight - anchor.caret.minY + 8
+            panel.setFrame(NSRect(x: anchor.caret.minX - 10, y: bottom, width: width, height: size.height + 12), display: true)
         }
         label.frame = NSRect(x: style == "ghost" ? 0 : 10, y: style == "ghost" ? 0 : 6,
                              width: panel.frame.width - (style == "ghost" ? 0 : 20), height: panel.frame.height - (style == "ghost" ? 0 : 12))

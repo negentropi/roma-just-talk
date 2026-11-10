@@ -169,7 +169,7 @@ runtime_write_model_receipt "$manifest" "$model_directory" "$out/model-receipt.t
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-user:chrome:on user:chrome:ime revise:chrome:ime user:textedit:ime}"
+runs="${RJT_PROOF_RUNS:-user:chrome:on user:chrome:preview user:chrome:bubble user:chrome:ghost user:chrome:ime revise:chrome:ime user:textedit:ime}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
   IFS=: read -r fixture target mode <<<"$spec"
@@ -190,6 +190,13 @@ for spec in $runs; do
       xcrun swiftc -swift-version 5 -O "$ime_src/RomaStreamInputMethod.swift" -o "$ime_app/Contents/MacOS/RomaStream"
       codesign --force --sign - "$ime_app"
       xcrun swiftc -swift-version 5 "$ime_src/SelectInputSource.swift" -o "$work/SelectInputSource"
+      # Stand-in for the user's one-time "add input source" in System Settings, which writes this entry;
+      # macOS no longer lets an app enable a third-party input method itself (TISEnableInputSource is a no-op).
+      entry='<dict><key>Bundle ID</key><string>com.negentropi.inputmethod.RomaStream</string><key>InputSourceKind</key><string>Keyboard Input Method</string></dict>'
+      defaults write com.apple.inputsources AppleEnabledThirdPartyInputSources -array-add "$entry"
+      defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add "$entry"
+      killall TextInputMenuAgent TextInputSwitcher 2>/dev/null || true
+      sleep 2
       "$work/SelectInputSource" "$ime_app" com.negentropi.inputmethod.RomaStream 2>&1 | tee "$out/ime-select.txt" \
         || echo "input method selection did not stick" | tee -a "$out/ime-select.txt"
       defaults read com.apple.HIToolbox AppleSelectedInputSources >> "$out/ime-select.txt" 2>&1 || true
@@ -199,6 +206,7 @@ for spec in $runs; do
   fi
   # PROTOTYPE variants that leave the field alone until release: recorder preview, caret bubble, ghost text.
   defaults write "$bundle_id" showLiveTextPreview -bool "$([ "$mode" = preview ] && echo true || echo false)"
+  defaults write "$bundle_id" RecorderType -string "$([ "$mode" = preview ] && echo mini || echo none)"
   case "$mode" in bubble|ghost) defaults write "$bundle_id" prototypeOverlayStream -string "$mode" ;;
     *) defaults delete "$bundle_id" prototypeOverlayStream 2>/dev/null || true ;; esac
   rm -f "$out/probe-$run.json"

@@ -178,11 +178,12 @@ ls -la "$work/warmup.mov" || true
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-user:chrome:ime revise:chrome:ime user:textedit:ime}"
+runs="${RJT_PROOF_RUNS:-user:chrome:ime:plain revise:chrome:ime:clickaway user:chrome:ime:cancel user:chrome:ime:silence user:chrome:ime:typing long:chrome:ime:plain user:textedit:ime:plain}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
-  IFS=: read -r fixture target mode <<<"$spec"
-  run="$fixture-$target-$mode"
+  IFS=: read -r fixture target mode scenario <<<"$spec"
+  scenario="${scenario:-plain}"
+  run="$fixture-$target-$mode-$scenario"
   phase "probe fixture=$fixture target=$target typeWhileSpeaking=$mode"
   if [ "$mode" = on ]; then value=true; else value=false; fi
   defaults write "$bundle_id" typeWhileSpeaking -bool "$value"
@@ -208,7 +209,8 @@ for spec in $runs; do
       sleep 2
       "$work/SelectInputSource" "$ime_app" com.negentropi.inputmethod.RomaStream 2>&1 | tee "$out/ime-select.txt" \
         || echo "input method selection did not stick" | tee -a "$out/ime-select.txt"
-      defaults read com.apple.HIToolbox AppleSelectedInputSources >> "$out/ime-select.txt" 2>&1 || true
+      # Roma selects Roma Stream itself for each hold; start every case from the normal keyboard.
+      "$work/SelectInputSource" "$ime_app" com.apple.keylayout.US >> "$out/ime-select.txt" 2>&1 || true
     fi
   else
     defaults write "$bundle_id" prototypeIMEStream -bool false
@@ -227,7 +229,7 @@ for spec in $runs; do
   python3 -c 'import time; print(time.clock_gettime(time.CLOCK_UPTIME_RAW))' > "$out/screen-$run.start-uptime.txt"
   /usr/bin/open -W -n -o "$out/probe-$run.stdout.log" --stderr "$out/probe-$run.stderr.log" "$probe_app" --args \
     --config "$work/config.json" --fixture "$work/fixture-$fixture.wav" --mode "$mode" --target "$target" \
-    --output "$out/probe-$run.json" --targets "$work/targets" --cases "${RJT_PROOF_CASES:-2}"
+    --output "$out/probe-$run.json" --targets "$work/targets" --cases "${RJT_PROOF_CASES:-2}" --scenario "$scenario"
   kill -INT "$rec_pid" 2>/dev/null || true
   wait "$rec_pid" 2>/dev/null || true
   cat "$out/probe-$run.stdout.log" "$out/probe-$run.stderr.log" || true
@@ -236,4 +238,4 @@ done
 
 cp "$HOME/roma-stream-ime.log" "$out/" 2>/dev/null || true
 phase "verdict"
-python3 "$root/.ci-proof/verdict.py" "$out"
+python3 "$root/.ci-proof/scenario_verdict.py" "$out"

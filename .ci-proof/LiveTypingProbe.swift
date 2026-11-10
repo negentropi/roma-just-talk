@@ -1,4 +1,5 @@
 import AppKit
+import Carbon
 import ApplicationServices
 import AVFoundation
 import Foundation
@@ -12,6 +13,7 @@ struct TextSample: Codable {
     let uptime: Double
     let text: String?
     let frontmostBundleID: String?
+    var inputSource: String? = nil
 }
 
 struct HistoryRow: Codable {
@@ -32,6 +34,11 @@ struct LiveTypingCase: Codable {
     var latencyTrace: RuntimeLatencyTrace?
     var historyRows: [HistoryRow] = []
     var error: String?
+    var scenario = "plain"
+    var actionUptime: Double?
+    var otherFieldText: String?
+    var inputSourceBefore: String?
+    var inputSourceAfter: String?
 }
 
 struct LiveTypingReport: Codable {
@@ -69,6 +76,7 @@ enum LiveTypingProbe {
             exit(2)
         }
         let caseCount = Int(arguments["--cases"] ?? "2") ?? 2
+        scenario = arguments["--scenario"] ?? "plain"
         let target = arguments["--target"] ?? "textedit"
         let outputURL = URL(fileURLWithPath: outputPath)
         var report = LiveTypingReport(mode: mode, startedAt: Date(), accessibilityTrusted: AXIsProcessTrusted())
@@ -122,6 +130,42 @@ enum LiveTypingProbe {
         }
     }
 
+    nonisolated(unsafe) static var scenario = "plain"
+
+    static func currentInputSource() -> String {
+        let source = TISCopyCurrentKeyboardInputSource().takeRetainedValue()
+        guard let raw = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else { return "?" }
+        return Unmanaged<CFString>.fromOpaque(raw).takeUnretainedValue() as String
+    }
+
+    /// The scenario's mid-dictation action, done the way a user would (real key and mouse events).
+    static func performAction(application: NSRunningApplication, into result: inout LiveTypingCase) {
+        result.actionUptime = now()
+        switch scenario {
+        case "cancel":
+            // Roma cancels on a double-tap of Escape while recording.
+            RuntimeAX.postKey(keyCode: 53, flags: .maskShift)
+            Thread.sleep(forTimeInterval: 0.15)
+            RuntimeAX.postKey(keyCode: 53, flags: .maskShift)
+        case "typing":
+            RuntimeAX.postKey(keyCode: 7, flags: .maskShift) // X
+        case "clickaway":
+            let app = AXUIElementCreateApplication(application.processIdentifier)
+            guard let other = RuntimeAX.editableElement(in: app, identifying: "Roma other field") else { log("clickaway: other field not found"); return }
+            var position = CGPoint.zero, size = CGSize.zero
+            var raw: CFTypeRef?
+            if AXUIElementCopyAttributeValue(other, kAXPositionAttribute as CFString, &raw) == .success { AXValueGetValue(raw as! AXValue, .cgPoint, &position) }
+            if AXUIElementCopyAttributeValue(other, kAXSizeAttribute as CFString, &raw) == .success { AXValueGetValue(raw as! AXValue, .cgSize, &size) }
+            let point = CGPoint(x: position.x + size.width / 2, y: position.y + size.height / 2)
+            for type in [CGEventType.leftMouseDown, .leftMouseUp] {
+                CGEvent(mouseEventSource: CGEventSource(stateID: .hidSystemState), mouseType: type, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
+            }
+        default:
+            break
+        }
+        log("action \(scenario) at \(result.actionUptime!)")
+    }
+
     static func runCase(
         role: String,
         target: String,
@@ -131,6 +175,8 @@ enum LiveTypingProbe {
         device: RuntimeAudioDevice
     ) -> LiveTypingCase {
         var result = LiveTypingCase(role: role, target: target, targetFile: file.path)
+        result.scenario = role == "measured" ? scenario : "plain"
+        result.inputSourceBefore = currentInputSource()
         var shiftHeld = false
         do {
             let (application, window, field) = try target == "chrome" ? openChrome(file) : openTarget(file)
@@ -149,20 +195,29 @@ enum LiveTypingProbe {
             result.keyDownUptime = down.postedAtSystemUptime
             sample(field, into: &result, until: down.postedAtSystemUptime + 1.0)
 
-            let playback = RuntimeAudioPlayback(fixtureURL: fixtureURL, device: device, expectedDurationSeconds: duration)
-            let audioStart = try playback.start()
-            result.audioStartUptime = audioStart
-            sample(field, into: &result, until: audioStart + duration)
-            let played = try playback.waitUntilFinished()
-            result.audioFinishedUptime = played.finishedAtSystemUptime
-            sample(field, into: &result, until: played.finishedAtSystemUptime + 0.5)
+            if result.scenario == "silence" {
+                // Shift held with nothing said.
+                sample(field, into: &result, until: now() + 4)
+            } else {
+                let playback = RuntimeAudioPlayback(fixtureURL: fixtureURL, device: device, expectedDurationSeconds: duration)
+                let audioStart = try playback.start()
+                result.audioStartUptime = audioStart
+                if result.scenario != "plain" {
+                    sample(field, into: &result, until: audioStart + duration / 2)
+                    performAction(application: application, into: &result)
+                }
+                sample(field, into: &result, until: audioStart + duration)
+                let played = try playback.waitUntilFinished()
+                result.audioFinishedUptime = played.finishedAtSystemUptime
+                sample(field, into: &result, until: played.finishedAtSystemUptime + 0.5)
+            }
 
             let up = try RuntimeShortcutInjector.postLeftShiftUp()
             shiftHeld = false
             result.keyUpUptime = up.postedAtSystemUptime
 
             // Dense sampling until the field holds stable text, then coarser while the trace settles.
-            let textDeadline = up.postedAtSystemUptime + 90
+            let textDeadline = up.postedAtSystemUptime + (result.scenario == "plain" || result.scenario == "typing" ? 90 : 12)
             var stableSince: Double?
             while now() < textDeadline {
                 let before = result.samples.count
@@ -181,11 +236,19 @@ enum LiveTypingProbe {
                     result.latencyTrace = trace
                     if trace.keyUpToInteractionSettledMilliseconds != nil { break }
                 }
+                if result.scenario == "cancel" || result.scenario == "silence", now() > traceDeadline - 75 { break
+
+                }
                 sample(field, into: &result, until: now() + 0.5)
             }
             sample(field, into: &result, until: now() + 1.5)
+            result.inputSourceAfter = currentInputSource()
+            if result.scenario == "clickaway" {
+                let app = AXUIElementCreateApplication(application.processIdentifier)
+                result.otherFieldText = RuntimeAX.editableElement(in: app, identifying: "Roma other field").flatMap { RuntimeAX.text(from: $0) }
+            }
 
-            let historyDeadline = now() + 15
+            let historyDeadline = now() + (result.scenario == "cancel" || result.scenario == "silence" ? 3 : 15)
             repeat {
                 result.historyRows = try historyRows(after: historyBefore)
                 if !result.historyRows.isEmpty { break }
@@ -242,7 +305,7 @@ enum LiveTypingProbe {
         #e{outline:none;white-space:pre-wrap;min-height:44px;line-height:1.45}
         </style>
         <nav><b>Roma team</b><div># general</div><div class="on"># design</div><div># random</div><div>Maya</div><div>Jon</div></nav>
-        <main><header># design</header><div id="log">
+        <main><header># design <input aria-label="Roma other field" placeholder="Search" style="float:right;font:13px -apple-system;padding:3px 8px;border:1px solid #ccc;border-radius:5px;width:220px"></header><div id="log">
         <div class="m"><div class="a"></div><div><span class="n">Maya</span><span class="t">10:02</span><p>Did the new onboarding copy land in the build?</p></div></div>
         <div class="m"><div class="a" style="background:#6bb38e"></div><div><span class="n">Jon</span><span class="t">10:04</span><p>Not yet, waiting on the review. Felix, any thoughts on the stream text idea?</p></div></div>
         </div><div id="box"><div id="e" contenteditable="true" role="textbox" aria-multiline="true" aria-label="\(label)" spellcheck="false"></div></div></main>
@@ -279,9 +342,10 @@ enum LiveTypingProbe {
         repeat {
             let text = RuntimeAX.text(from: field)
             let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+            let inputSource = currentInputSource()
             result.sampleReads += 1
-            if result.samples.last.map({ $0.text != text || $0.frontmostBundleID != frontmost }) ?? true {
-                result.samples.append(TextSample(uptime: now(), text: text, frontmostBundleID: frontmost))
+            if result.samples.last.map({ $0.text != text || $0.frontmostBundleID != frontmost || $0.inputSource != inputSource }) ?? true {
+                result.samples.append(TextSample(uptime: now(), text: text, frontmostBundleID: frontmost, inputSource: inputSource))
             }
             RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
         } while now() < end

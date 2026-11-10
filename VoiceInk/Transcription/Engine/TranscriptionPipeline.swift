@@ -386,17 +386,16 @@ class TranscriptionPipeline {
             let pasteSpan = latencyTrace.begin("pipeline.paste_command", token: traceToken)
             await pasteAuthorizationPreflight.value
             // Live typing already delivered the text unless it lost words, which must not auto-send.
+            // PROTOTYPE (proto/ime-stream-text): the input method commits the final text in place of its guess;
+            // without its confirmation Roma pastes as usual.
+            let imeCommitted = IMEStreamPrototype.isEnabled && !liveTypingUnreconciled && !pastedText.isEmpty
+                ? await IMEStreamPrototype.shared.commit(pastedText) : false
             let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled {
                 .commandNotPosted
             } else if pastedText.isEmpty {
                 .textInserted
-            } else if UserDefaults.standard.bool(forKey: "prototypeIMEStream") {
-                // PROTOTYPE (proto/ime-stream-text): the input method commits the final text in place of its guess.
-                {
-                    DistributedNotificationCenter.default().postNotificationName(
-                        .init("com.negentropi.RomaStream.commit"), object: pastedText, userInfo: nil, deliverImmediately: true)
-                    return CursorPaster.PasteResult.textInserted
-                }()
+            } else if imeCommitted {
+                .textInserted
             } else {
                 await CursorPaster.startPasteAtCursor(
                     pastedText,

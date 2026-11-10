@@ -429,15 +429,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
         let liveTyper = makeLiveTranscriptTyper()
+        // PROTOTYPE (proto/ime-stream-text): Roma Stream is the input source only while Shift is held.
+        IMEStreamPrototype.shared.begin()
         let session = serviceRegistry.createSession(
             for: model,
             onPartialTranscript: { [weak self, weak liveTyper] partial in
                 // Streaming sessions report the running transcript on the main actor, only while recording.
                 MainActor.assumeIsolated {
                     // PROTOTYPE (proto/ime-stream-text): hand the running guess to the Roma Stream input method.
-                    if UserDefaults.standard.bool(forKey: "prototypeIMEStream") {
-                        DistributedNotificationCenter.default().postNotificationName(
-                            .init("com.negentropi.RomaStream.partial"), object: partial, userInfo: nil, deliverImmediately: true)
+                    if IMEStreamPrototype.isEnabled {
+                        IMEStreamPrototype.shared.showGuess(partial)
                     } else if OverlayStreamPrototype.style != nil {
                         OverlayStreamPrototype.shared.show(partial)
                     } else {
@@ -701,6 +702,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
         canceledPipelineTranscriptions[transcriptionID] = nil
         if liveTranscriptTyper === liveTyper { liveTranscriptTyper = nil }
+        await IMEStreamPrototype.shared.end()
 
         if didFinishActivePipeline,
            recordingState.shouldReturnToIdleWhenActivePipelineFinishes {
@@ -899,6 +901,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func cancelLiveTyping() {
         liveTranscriptTyper?.cancel()
         liveTranscriptTyper = nil
+        Task { await IMEStreamPrototype.shared.end() }
     }
 
     func makeLiveTranscriptTyper(field: LiveTypingField? = nil) -> LiveTranscriptTyper {

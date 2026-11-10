@@ -14,25 +14,27 @@ func trace(_ message: String) {
 
 @objc(RomaStreamController)
 final class RomaStreamController: IMKInputController {
-    /// Every live controller, one per client connection; Roma's notifications go to the frontmost app's.
-    static let all = NSHashTable<RomaStreamController>.weakObjects()
-    static var active: RomaStreamController? {
-        let front = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
-        let candidates = all.allObjects
-        let match = candidates.last { $0.client()?.bundleIdentifier() == front }
-        trace("route front=\(front ?? "?") controllers=\(candidates.map { $0.client()?.bundleIdentifier() ?? "nil" }) match=\(match != nil)")
-        return match ?? candidates.last
+    /// The controller of the field focused right now; nil while focus is between fields.
+    static weak var current: RomaStreamController?
+    /// An update that arrived while no field was focused (focus flickers at Shift release).
+    static var pending: ((RomaStreamController) -> Void)?
+
+    static func deliver(_ update: @escaping (RomaStreamController) -> Void) {
+        if let current { update(current) } else { pending = update; trace("pending: no focused field") }
     }
+
     private var markedLength = 0
 
     override func activateServer(_ sender: Any!) {
         super.activateServer(sender)
-        RomaStreamController.all.add(self)
+        RomaStreamController.current = self
+        if let pending = RomaStreamController.pending { RomaStreamController.pending = nil; trace("flush pending"); pending(self) }
         trace("activate \((sender as? IMKTextInput)?.bundleIdentifier() ?? "?")")
     }
 
     override func deactivateServer(_ sender: Any!) {
         trace("deactivate")
+        if RomaStreamController.current === self { RomaStreamController.current = nil }
         super.deactivateServer(sender)
     }
 
@@ -73,9 +75,9 @@ let server = IMKServer(name: connection, bundleIdentifier: bundle.bundleIdentifi
 trace("server up \(server != nil)")
 let center = DistributedNotificationCenter.default()
 center.addObserver(forName: .init("com.negentropi.RomaStream.partial"), object: nil, queue: .main) { note in
-    MainActor.assumeIsolated { RomaStreamController.active?.showGuess(note.object as? String ?? "") }
+    MainActor.assumeIsolated { let text = note.object as? String ?? ""; RomaStreamController.deliver { $0.showGuess(text) } }
 }
 center.addObserver(forName: .init("com.negentropi.RomaStream.commit"), object: nil, queue: .main) { note in
-    MainActor.assumeIsolated { RomaStreamController.active?.commit(note.object as? String ?? "") }
+    MainActor.assumeIsolated { let text = note.object as? String ?? ""; RomaStreamController.deliver { $0.commit(text) } }
 }
 NSApplication.shared.run()

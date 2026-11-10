@@ -389,6 +389,13 @@ class TranscriptionPipeline {
                 .commandNotPosted
             } else if pastedText.isEmpty {
                 .textInserted
+            } else if UserDefaults.standard.bool(forKey: "prototypeIMEStream") {
+                // PROTOTYPE (proto/ime-stream-text): the input method commits the final text in place of its guess.
+                {
+                    DistributedNotificationCenter.default().postNotificationName(
+                        .init("com.negentropi.RomaStream.commit"), object: pastedText, userInfo: nil, deliverImmediately: true)
+                    return CursorPaster.PasteResult.textInserted
+                }()
             } else {
                 await CursorPaster.startPasteAtCursor(
                     pastedText,

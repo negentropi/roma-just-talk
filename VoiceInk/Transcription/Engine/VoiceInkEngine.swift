@@ -433,7 +433,15 @@ class VoiceInkEngine: NSObject, ObservableObject {
             for: model,
             onPartialTranscript: { [weak self, weak liveTyper] partial in
                 // Streaming sessions report the running transcript on the main actor, only while recording.
-                MainActor.assumeIsolated { liveTyper?.update(liveTranscript: partial) }
+                MainActor.assumeIsolated {
+                    // PROTOTYPE (proto/ime-stream-text): hand the running guess to the Roma Stream input method.
+                    if UserDefaults.standard.bool(forKey: "prototypeIMEStream") {
+                        DistributedNotificationCenter.default().postNotificationName(
+                            .init("com.negentropi.RomaStream.partial"), object: partial, userInfo: nil, deliverImmediately: true)
+                    } else {
+                        liveTyper?.update(liveTranscript: partial)
+                    }
+                }
                 Task { @MainActor in
                     self?.partialTranscript = partial
                 }

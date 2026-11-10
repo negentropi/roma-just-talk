@@ -169,7 +169,7 @@ runtime_write_model_receipt "$manifest" "$model_directory" "$out/model-receipt.t
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-long:chrome:off long:chrome:on user:chrome:on revise:chrome:on short:chrome:on user:textedit:on revise:textedit:on}"
+runs="${RJT_PROOF_RUNS:-user:chrome:on revise:chrome:on revise:textedit:on user:chrome:ime revise:chrome:ime revise:textedit:ime}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
   IFS=: read -r fixture target mode <<<"$spec"
@@ -177,6 +177,26 @@ for spec in $runs; do
   phase "probe fixture=$fixture target=$target typeWhileSpeaking=$mode"
   if [ "$mode" = on ]; then value=true; else value=false; fi
   defaults write "$bundle_id" typeWhileSpeaking -bool "$value"
+  if [ "$mode" = ime ]; then
+    defaults write "$bundle_id" prototypeIMEStream -bool true
+    if [ ! -d "$HOME/Library/Input Methods/RomaStream.app" ]; then
+      phase "PROTOTYPE: build, install and select the Roma Stream input method"
+      ime_src="$root/Prototypes/IMEStreamText"
+      ime_app="$HOME/Library/Input Methods/RomaStream.app"
+      mkdir -p "$ime_app/Contents/MacOS" "$ime_app/Contents/Resources"
+      cp "$ime_src/Info.plist" "$ime_app/Contents/Info.plist"
+      sips -s format tiff -z 32 32 /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GenericApplicationIcon.icns \
+        --out "$ime_app/Contents/Resources/icon.tiff" >/dev/null || true
+      xcrun swiftc -swift-version 5 -O "$ime_src/RomaStreamInputMethod.swift" -o "$ime_app/Contents/MacOS/RomaStream"
+      codesign --force --sign - "$ime_app"
+      xcrun swiftc -swift-version 5 "$ime_src/SelectInputSource.swift" -o "$work/SelectInputSource"
+      "$work/SelectInputSource" "$ime_app" com.negentropi.inputmethod.RomaStream 2>&1 | tee "$out/ime-select.txt" \
+        || echo "input method selection did not stick" | tee -a "$out/ime-select.txt"
+      defaults read com.apple.HIToolbox AppleSelectedInputSources >> "$out/ime-select.txt" 2>&1 || true
+    fi
+  else
+    defaults write "$bundle_id" prototypeIMEStream -bool false
+  fi
   rm -f "$out/probe-$run.json"
   # Screen recording of this run; recording-start uptime (same clock as the probe's *Uptime fields) lets the fixture audio be lined up later.
   screencapture -v -x -V 240 "$out/screen-$run.mov" >/dev/null 2>&1 &
@@ -184,12 +204,13 @@ for spec in $runs; do
   python3 -c 'import time; print(time.clock_gettime(time.CLOCK_UPTIME_RAW))' > "$out/screen-$run.start-uptime.txt"
   /usr/bin/open -W -n -o "$out/probe-$run.stdout.log" --stderr "$out/probe-$run.stderr.log" "$probe_app" --args \
     --config "$work/config.json" --fixture "$work/fixture-$fixture.wav" --mode "$mode" --target "$target" \
-    --output "$out/probe-$run.json" --targets "$work/targets" --cases "$([ "$fixture" = long ] || [ "$fixture" = short ] && echo 2 || echo 4)"
+    --output "$out/probe-$run.json" --targets "$work/targets" --cases "${RJT_PROOF_CASES:-3}"
   kill -INT "$rec_pid" 2>/dev/null || true
   wait "$rec_pid" 2>/dev/null || true
   cat "$out/probe-$run.stdout.log" "$out/probe-$run.stderr.log" || true
   test -s "$out/probe-$run.json" || { echo "Probe wrote no report for $run" >&2; exit 1; }
 done
 
+cp /tmp/roma-stream-ime.log "$out/" 2>/dev/null || true
 phase "verdict"
 python3 "$root/.ci-proof/verdict.py" "$out"

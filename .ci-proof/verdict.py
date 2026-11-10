@@ -77,13 +77,14 @@ def assess(fixture, target, mode, index=-1):
     # A remainder pasted on top of live-typed words would inflate the field past the saved transcript.
     checks['final field matches saved transcript (no duplicated words)'] = (
         summary['finalVsHistoryWER'] <= 0.15 and len(words(final)) <= len(words(history)) + 2)
-    if mode == 'on':
+    if mode in ('on', 'ime'):
         audio_end = case.get('audioFinishedUptime') or up
         last_change = max((s['uptime'] for s in during_hold), default=None)
         summary['lastHoldChangeBeforeAudioEndMilliseconds'] = None if last_change is None else round((audio_end - last_change) * 1000)
         summary['shrinksDuringHold'] = sum(1 for a, b in zip(held, held[1:]) if len(b['text'] or '') < len(a['text'] or ''))
         checks['field had text while Shift was still held'] = bool(during_hold)
-        checks['trace reports live typing'] = summary['liveTypedFromTrace'] is True
+        if mode == 'on':
+            checks['trace reports live typing'] = summary['liveTypedFromTrace'] is True
         # The bug the user hit: live typing stopped seconds into a long dictation.
         checks['live text kept streaming until speech ended (last change < 3.5 s before audio end)'] = (
             last_change is not None and audio_end - last_change < 3.5)
@@ -108,7 +109,8 @@ for spec in (evidence / 'runs.txt').read_text().split():
 # recognizer; require that the run actually exercised a keystroke correction rather than passing vacuously.
 stream = (evidence / 'app-stream.log').read_text(errors='replace') if (evidence / 'app-stream.log').exists() else ''
 keystroke_corrections = len(re.findall(r'Live correction .*viaKeystrokes=true', stream))
-results.append({'fixture': 'all', 'target': 'chrome', 'mode': 'on', 'case': 'n/a',
+if any(spec.endswith(':chrome:on') for spec in (evidence / 'runs.txt').read_text().split()):
+  results.append({'fixture': 'all', 'target': 'chrome', 'mode': 'on', 'case': 'n/a',
                 'keystrokeCorrections': keystroke_corrections,
                 'checks': {'at least one keystroke correction ran in Chrome': keystroke_corrections > 0}})
 passed = all(r['checks'] and all(r['checks'].values()) for r in results)

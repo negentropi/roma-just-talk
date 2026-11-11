@@ -42,6 +42,7 @@ class TranscriptionPipeline {
         model: any TranscriptionModel,
         session: TranscriptionSession?,
         liveTyper: LiveTranscriptTyper?,
+        imeHold: IMEStreamHold? = nil,
         latencyTraceToken: VoiceInkLatencyTrace.Token?,
         onStateChange: @escaping (VoiceInkRecordingState) -> Void,
         cancellation: () -> RecordingCancellation?,
@@ -387,8 +388,8 @@ class TranscriptionPipeline {
             // Live typing already delivered the text unless it lost words, which must not auto-send.
             // PROTOTYPE (proto/ime-stream-text): the input method commits the final text in place of its guess;
             // without its confirmation Roma pastes as usual.
-            let imeCommit: IMEStreamPrototype.Commit = !liveTypingUnreconciled && !pastedText.isEmpty
-                ? await IMEStreamPrototype.shared.commit(pastedText) : .unavailable
+            let imeCommit: IMEStreamHold.Commit = !liveTypingUnreconciled && !pastedText.isEmpty
+                ? await imeHold?.commit(pastedText) ?? .unavailable : .unavailable
             if imeCommit == .focusMoved {
                 NotificationManager.shared.showNotification(
                     title: "You clicked or typed while speaking, so nothing was inserted. The transcript is in History.", type: .warning)

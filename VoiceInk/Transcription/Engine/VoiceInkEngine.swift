@@ -21,6 +21,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
     var partialTranscript: String = ""
     var currentSession: TranscriptionSession?
     var liveTranscriptTyper: LiveTranscriptTyper?
+    /// PROTOTYPE (proto/ime-stream-text): the recording's Roma Stream hold, owned like the live typer.
+    var imeStreamHold: IMEStreamHold?
     private var activeRecordingStartID: UUID?
     private var activePipelineTranscriptionID: UUID?
     private var canceledPipelineTranscriptions: [UUID: RecordingCancellation] = [:]
@@ -429,16 +431,16 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
         // PROTOTYPE (proto/ime-stream-text): stream through Roma Stream when it is the input source.
-        let imeStream = IMEStreamPrototype.shared.begin()
-        let liveTyper: LiveTranscriptTyper? = imeStream ? nil : makeLiveTranscriptTyper()
+        let imeHold = IMEStreamPrototype.shared.begin()
+        let liveTyper: LiveTranscriptTyper? = imeHold == nil ? makeLiveTranscriptTyper() : nil
         let session = serviceRegistry.createSession(
             for: model,
             onPartialTranscript: { [weak self, weak liveTyper] partial in
                 // Streaming sessions report the running transcript on the main actor, only while recording.
                 MainActor.assumeIsolated {
                     // PROTOTYPE (proto/ime-stream-text): hand the running guess to the Roma Stream input method.
-                    if imeStream {
-                        IMEStreamPrototype.shared.showGuess(partial)
+                    if let imeHold {
+                        imeHold.showGuess(partial)
                     } else {
                         liveTyper?.update(liveTranscript: partial)
                     }
@@ -451,6 +453,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         trackQwenRecordingSession(session, model: model)
         currentSession = session
         liveTranscriptTyper = liveTyper
+        imeStreamHold = imeHold
         latencyTrace.event(
             "streaming_session.created",
             details: "model=\(model.displayName)",
@@ -660,6 +663,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         let session = currentSession
         // Stays engine-owned during the pipeline so Esc can cancel queued insertions.
         let liveTyper = liveTranscriptTyper
+        let imeHold = imeStreamHold
         let transcriptionID = transcription.id
         activePipelineTranscriptionID = transcriptionID
 
@@ -669,6 +673,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
             model: model,
             session: session,
             liveTyper: liveTyper,
+            imeHold: imeHold,
             latencyTraceToken: traceToken,
             onStateChange: { [weak self] state in
                 guard let self, self.activePipelineTranscriptionID == transcriptionID else { return }
@@ -700,7 +705,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
         canceledPipelineTranscriptions[transcriptionID] = nil
         if liveTranscriptTyper === liveTyper { liveTranscriptTyper = nil }
-        IMEStreamPrototype.shared.end()
+        imeHold?.end()
+        if imeStreamHold === imeHold { imeStreamHold = nil }
 
         if didFinishActivePipeline,
            recordingState.shouldReturnToIdleWhenActivePipelineFinishes {
@@ -720,7 +726,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
         logger.notice("cancelRecording called – state=\(String(describing: self.recordingState), privacy: .public)")
         // PROTOTYPE (proto/ime-stream-text): a cancelled hold leaves no guess behind.
-        IMEStreamPrototype.shared.end()
+        imeStreamHold?.end()
         let cancellationPlan = VoiceInkMacOSRecordingCancellationPolicy.plan(
             recordingState: recordingState
         )

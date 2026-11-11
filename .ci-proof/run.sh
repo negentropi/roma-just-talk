@@ -179,7 +179,7 @@ ls -la "$work/warmup.mov" || true
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-user:chrome:ime:taps user:chrome:ime:early user:chrome:ime:us user:chrome:ime:plain revise:chrome:ime:clickaway user:chrome:ime:cancel user:chrome:ime:silence user:chrome:ime:typing long:chrome:ime:plain user:textedit:ime:plain}"
+runs="${RJT_PROOF_RUNS:-user:chrome:ime:selectcancel user:chrome:ime:taps user:chrome:ime:early user:chrome:ime:us user:chrome:ime:plain revise:chrome:ime:clickaway user:chrome:ime:cancel user:chrome:ime:silence user:chrome:ime:typing long:chrome:ime:plain user:textedit:ime:plain}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
   IFS=: read -r fixture target mode scenario <<<"$spec"

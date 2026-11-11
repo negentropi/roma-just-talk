@@ -39,6 +39,12 @@ struct LiveTypingCase: Codable {
     var otherFieldText: String?
     var inputSourceBefore: String?
     var inputSourceAfter: String?
+    /// Focused field's label right after the clickaway click.
+    var focusedAfterAction: String?
+    /// Field text read right before the mid-dictation action.
+    var textAtAction: String?
+    /// Roma Stream's log lines written during this case: proves the guess went through composition.
+    var imeLog: [String] = []
 }
 
 struct LiveTypingReport: Codable {
@@ -142,7 +148,7 @@ enum LiveTypingProbe {
     static func performAction(application: NSRunningApplication, into result: inout LiveTypingCase) {
         result.actionUptime = now()
         switch scenario {
-        case "cancel":
+        case "cancel", "selectcancel":
             // Roma cancels on a double-tap of Escape while recording.
             RuntimeAX.postKey(keyCode: 53, flags: .maskShift)
             Thread.sleep(forTimeInterval: 0.15)
@@ -165,6 +171,7 @@ enum LiveTypingProbe {
             AXUIElementCopyAttributeValue(app, kAXFocusedUIElementAttribute as CFString, &focused)
             var label: CFTypeRef?
             if let focused { AXUIElementCopyAttributeValue(focused as! AXUIElement, kAXDescriptionAttribute as CFString, &label) }
+            result.focusedAfterAction = label as? String
             log("clickaway: clicked \(point); focused now: \(label as? String ?? "?")")
         default:
             break
@@ -193,6 +200,8 @@ enum LiveTypingProbe {
             log("select \(wanted) status=\(status) now=\(currentInputSource())")
         }
         result.inputSourceBefore = currentInputSource()
+        let imeLogURL = URL(fileURLWithPath: NSHomeDirectory() + "/roma-stream-ime.log")
+        let imeLogStart = (try? Data(contentsOf: imeLogURL))?.count ?? 0
         var shiftHeld = false
         do {
             let (application, window, field) = try target == "chrome" ? openChrome(file) : openTarget(file)
@@ -203,6 +212,15 @@ enum LiveTypingProbe {
             let historyBefore = try historyRows(after: -1).last?.Z_PK ?? 0
             guard RuntimeAX.focus(application: application, windowElement: window, textElement: field) else {
                 throw ProbeError("Could not focus the target field")
+            }
+            if result.scenario == "selectcancel" {
+                // Text the user selected, then a dictation they cancel: the selection must survive.
+                for keyCode: CGKeyCode in [40, 14, 14, 35] { // k e e p
+                    RuntimeAX.postKey(keyCode: keyCode, flags: [])
+                    Thread.sleep(forTimeInterval: 0.08)
+                }
+                RuntimeAX.postKey(keyCode: 0, flags: .maskCommand) // select all
+                Thread.sleep(forTimeInterval: 0.5)
             }
             if result.scenario == "taps" {
                 // Quick Shift taps, then ordinary typing, which must reach the field through Roma Stream.
@@ -252,6 +270,7 @@ enum LiveTypingProbe {
                 result.audioStartUptime = audioStart
                 if !["plain", "us", "taps"].contains(result.scenario) {
                     sample(field, into: &result, until: audioStart + duration / 2)
+                    result.textAtAction = RuntimeAX.text(from: field)
                     performAction(application: application, into: &result)
                 }
                 sample(field, into: &result, until: audioStart + duration)
@@ -284,7 +303,7 @@ enum LiveTypingProbe {
                     result.latencyTrace = trace
                     if trace.keyUpToInteractionSettledMilliseconds != nil { break }
                 }
-                if result.scenario == "cancel" || result.scenario == "silence", now() > traceDeadline - 75 { break
+                if ["cancel", "selectcancel", "silence"].contains(result.scenario), now() > traceDeadline - 75 { break
 
                 }
                 sample(field, into: &result, until: now() + 0.5)
@@ -296,7 +315,7 @@ enum LiveTypingProbe {
                 result.otherFieldText = RuntimeAX.editableElement(in: app, identifying: "Roma other field").flatMap { RuntimeAX.text(from: $0) }
             }
 
-            let historyDeadline = now() + (result.scenario == "cancel" || result.scenario == "silence" ? 3 : 15)
+            let historyDeadline = now() + (["cancel", "selectcancel", "silence"].contains(result.scenario) ? 3 : 15)
             repeat {
                 result.historyRows = try historyRows(after: historyBefore)
                 if !result.historyRows.isEmpty { break }
@@ -308,6 +327,9 @@ enum LiveTypingProbe {
         if shiftHeld {
             result.keyUpUptime = (try? RuntimeShortcutInjector.postLeftShiftUp())?.postedAtSystemUptime
         }
+        let imeLogData = (try? Data(contentsOf: imeLogURL)) ?? Data()
+        result.imeLog = String(decoding: imeLogData.dropFirst(imeLogStart), as: UTF8.self).split(separator: "\n")
+            .map { $0.split(separator: " ", maxSplits: 1).last.map(String.init) ?? "" }
         return result
     }
 

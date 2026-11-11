@@ -898,6 +898,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
     }
 
     private func cancelCurrentSession() {
+        imeStreamHold?.end()
+        imeStreamHold = nil
         qwenStartupWarmup?.cancel()
         cancelLiveTyping()
         currentSession?.cancel()

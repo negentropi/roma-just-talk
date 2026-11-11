@@ -18,7 +18,8 @@ final class RomaStreamController: IMKInputController {
     static weak var current: RomaStreamController?
     /// An update that arrived while no field was focused (focus flickers at Shift release).
     /// Expires quickly so a late field never receives it.
-    static var pending: (update: (RomaStreamController) -> Void, expires: TimeInterval)?
+    static var pending: (update: (RomaStreamController) -> Void, expires: TimeInterval, onExpire: (() -> Void)?)?
+    private static var pendingSerial = 0
     /// The field this hold's guess was shown in; the final text only ever goes there.
     static weak var guessOwner: RomaStreamController?
     static var guessShown = false
@@ -36,11 +37,26 @@ final class RomaStreamController: IMKInputController {
 
     private var markedLength = 0
 
+    /// `onExpire` runs if no field comes back before `expires`, so a waiting commit still gets an answer.
     static func deliver(until expires: TimeInterval = ProcessInfo.processInfo.systemUptime + 1.0,
+                        onExpire: (() -> Void)? = nil,
                         _ update: @escaping (RomaStreamController) -> Void) {
         if let current { update(current); return }
-        pending = (update, expires)
+        dropPending()
+        pending = (update, expires, onExpire)
+        pendingSerial += 1
+        let serial = pendingSerial
         trace("pending: no focused field")
+        DispatchQueue.main.asyncAfter(deadline: .now() + max(0, expires - ProcessInfo.processInfo.systemUptime)) {
+            MainActor.assumeIsolated { if pendingSerial == serial { dropPending() } }
+        }
+    }
+
+    static func dropPending() {
+        guard let dropped = pending else { return }
+        pending = nil
+        trace("drop pending")
+        dropped.onExpire?()
     }
 
     override func activateServer(_ sender: Any!) {
@@ -48,9 +64,13 @@ final class RomaStreamController: IMKInputController {
         RomaStreamController.current = self
         trace("activate \((sender as? IMKTextInput)?.bundleIdentifier() ?? "?")")
         if let pending = RomaStreamController.pending {
-            RomaStreamController.pending = nil
-            if ProcessInfo.processInfo.systemUptime <= pending.expires { trace("flush pending"); pending.update(self) }
-            else { trace("drop expired pending") }
+            if ProcessInfo.processInfo.systemUptime <= pending.expires {
+                RomaStreamController.pending = nil
+                trace("flush pending")
+                pending.update(self)
+            } else {
+                RomaStreamController.dropPending()
+            }
         }
     }
 
@@ -163,6 +183,9 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.partial"), object: 
             // A new hold; holds never overlap, since Roma records one at a time.
             RomaStreamController.hold = message[0]
             RomaStreamController.reset()
+            // Tells Roma this hold reached Roma Stream, even if no field shows its guess.
+            DistributedNotificationCenter.default().postNotificationName(
+                .init("com.negentropi.RomaStream.seen"), object: message[0], userInfo: nil, deliverImmediately: true)
         }
         RomaStreamController.deliver { $0.showGuess(message[1]) }
     }
@@ -172,7 +195,12 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.commit"), object: n
     let deadline = TimeInterval(message[2]) ?? 0
     MainActor.assumeIsolated {
         guard message[1] == RomaStreamController.hold else { reply(message[0], "stale"); return }
-        RomaStreamController.deliver(until: deadline) { controller in
+        if RomaStreamController.interrupted {
+            // Answer at once: the user may have clicked somewhere with no text field to come back to.
+            RomaStreamController.reset()
+            trace("commit refused: interrupted"); reply(message[0], "moved"); return
+        }
+        RomaStreamController.deliver(until: deadline, onExpire: { trace("commit refused: no field"); reply(message[0], "late") }) { controller in
             reply(message[0], controller.commit(message[3], deadline: deadline))
         }
     }
@@ -189,7 +217,7 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.clear"), object: ni
         // Report an interruption before forgetting it: Roma must not paste over the user's typing.
         let interrupted = RomaStreamController.interrupted
         RomaStreamController.reset()
-        RomaStreamController.pending = nil
+        RomaStreamController.dropPending()
         let result = interrupted ? "moved" : RomaStreamController.current?.clear() ?? "nofield"
         trace("clear: \(result)")
         if !token.isEmpty { reply(token, result) }

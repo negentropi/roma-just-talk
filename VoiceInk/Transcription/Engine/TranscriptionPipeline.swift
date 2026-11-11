@@ -396,7 +396,7 @@ class TranscriptionPipeline {
                     title: "You clicked or typed while Roma was writing, so it stopped there. The full transcript is in History.", type: .warning)
             case .uncertain:
                 NotificationManager.shared.showNotification(
-                    title: "Roma Stream didn't respond, so nothing more was inserted. The transcript is in History.", type: .warning)
+                    title: "Roma Stream didn't confirm the text. Check the field; the transcript is in History.", type: .warning)
             case .committed, .cancelled, .unavailable:
                 break
             }

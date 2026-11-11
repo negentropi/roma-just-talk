@@ -33,6 +33,12 @@ final class IMEStreamPrototype {
                 if let hold = IMEStreamPrototype.shared.activeHold, hold.id == holdID { hold.guessShown = true }
             }
         })
+        observers.append(center.addObserver(forName: .init("com.negentropi.RomaStream.seen"), object: nil, queue: .main) { note in
+            let holdID = note.object as? String
+            MainActor.assumeIsolated {
+                if let hold = IMEStreamPrototype.shared.activeHold, hold.id == holdID { hold.seen = true }
+            }
+        })
     }
 
     /// Key-down: a hold that streams through Roma Stream, or nil when another input source is
@@ -93,6 +99,8 @@ final class IMEStreamHold {
     fileprivate var guessShown = false
     /// A guess was sent; it may still be on its way to the field.
     private var guessSent = false
+    /// Roma Stream received this hold. If it never did (not running), no guess can be on screen.
+    fileprivate var seen = false
     private var ended = false
 
     fileprivate init(channel: IMEStreamPrototype) {
@@ -118,8 +126,8 @@ final class IMEStreamHold {
             IMEStreamPrototype.logger.notice("commit: no guess shown; clear reply=\(reply ?? "timeout", privacy: .public)")
             if ended { return .cancelled }
             switch reply {
-            case nil: return .uncertain
-            case "moved": return .focusMoved
+            case nil: return seen ? .uncertain : .unavailable
+            case "moved", "stale": return .focusMoved
             default: return .unavailable
             }
         }
@@ -131,9 +139,10 @@ final class IMEStreamHold {
         if ended, reply != "committed" { return .cancelled }
         switch reply {
         case "committed": return .committed
-        case "moved": return .focusMoved
+        // "stale": a newer hold replaced this hold's guess; pasting would land in its way.
+        case "moved", "stale": return .focusMoved
         case nil: return .uncertain
-        // "late", "stale", "nofield": Roma Stream inserted nothing.
+        // "late", "nofield": Roma Stream inserted nothing and took its guess down.
         default: return .unavailable
         }
     }

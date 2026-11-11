@@ -77,6 +77,11 @@ for spec in (evidence / 'runs.txt').read_text().split():
         checks['field keeps exactly the guess shown at the click'] = words(final) == words(at_click)
         checks['nothing inserted into the newly focused field'] = case.get('otherFieldText') is not None and not case['otherFieldText'].strip()
         checks['transcript kept in History'] = bool(words(history))
+        # Roma Stream must answer "moved" at once, not leave Roma to time out.
+        events = {e['name']: e['totalMilliseconds'] for e in (case.get('latencyTrace') or {}).get('events') or []}
+        ready, done = events.get('pipeline.transcribe.end'), events.get('pipeline.paste_command.end')
+        refused = None if ready is None or done is None else round(done - ready)
+        checks[f'refusal answered within 150 ms ({refused} ms)'] = refused is not None and refused <= 150
     elif scenario == 'typing':
         # Shift+X is typing a capital X, so Roma drops the dictation; the guess must not linger.
         checks['a guess was showing when X was typed'] = bool((case.get('textAtAction') or '').strip())

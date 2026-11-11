@@ -128,7 +128,9 @@ final class IMEStreamHold {
             if ended { return .cancelled }
             switch reply {
             case nil: return seen ? .uncertain : .unavailable
-            case "moved", "stale": return .focusMoved
+            case "moved": return .focusMoved
+            // Roma Stream never got this hold (it restarted): nothing of it can be on screen.
+            case "stale": return seen ? .focusMoved : .unavailable
             default: return .unavailable
             }
         }

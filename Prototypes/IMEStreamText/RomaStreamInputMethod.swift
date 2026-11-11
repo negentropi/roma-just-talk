@@ -140,6 +140,8 @@ final class RomaStreamController: IMKInputController {
         defer { RomaStreamController.reset() }
         // The user clicked, typed, or moved focus after the guess appeared: never insert anywhere.
         if RomaStreamController.interrupted || (RomaStreamController.guessShown && RomaStreamController.guessOwner !== self) {
+            // Take down a guess left in a field focus moved away from without deactivating it.
+            _ = RomaStreamController.guessOwner?.clear()
             trace("commit refused: interrupted"); return "moved"
         }
         // Past the deadline Roma no longer waits and will paste: take the guess down so the paste
@@ -204,6 +206,7 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.commit"), object: n
         guard message[1] == RomaStreamController.hold else { reply(message[0], "stale"); return }
         if RomaStreamController.interrupted {
             // Answer at once: the user may have clicked somewhere with no text field to come back to.
+            _ = RomaStreamController.guessOwner?.clear()
             RomaStreamController.reset()
             trace("commit refused: interrupted"); reply(message[0], "moved"); return
         }
@@ -223,8 +226,10 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.clear"), object: ni
         }
         // Report an interruption before forgetting it: Roma must not paste over the user's typing.
         let interrupted = RomaStreamController.interrupted
+        let owner = RomaStreamController.guessOwner
         RomaStreamController.reset()
         RomaStreamController.dropPending()
+        if owner !== RomaStreamController.current { _ = owner?.clear() }
         let result = interrupted ? "moved" : RomaStreamController.current?.clear() ?? "nofield"
         trace("clear: \(result)")
         if !token.isEmpty { reply(token, result) }

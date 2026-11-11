@@ -39,8 +39,6 @@ struct LiveTypingCase: Codable {
     var otherFieldText: String?
     var inputSourceBefore: String?
     var inputSourceAfter: String?
-    /// Input-method events logged during the short taps that precede a "taps" hold.
-    var imeEventsDuringTaps: [String]?
 }
 
 struct LiveTypingReport: Codable {
@@ -184,12 +182,15 @@ enum LiveTypingProbe {
     ) -> LiveTypingCase {
         var result = LiveTypingCase(role: role, target: target, targetFile: file.path)
         result.scenario = role == "measured" ? scenario : "plain"
-        // Every hold starts from the normal keyboard; Roma must switch to Roma Stream itself and back.
-        if let list = TISCreateInputSourceList([kTISPropertyInputSourceID as String: "com.apple.keylayout.US"] as CFDictionary, false)?
-            .takeRetainedValue() as? [TISInputSource], let us = list.first {
-            let status = TISSelectInputSource(us)
-            Thread.sleep(forTimeInterval: 0.3)
-            log("select US status=\(status) now=\(currentInputSource())")
+        // Roma Stream is the user's input source, like any input method; "us" checks the fallback
+        // for a user on another source. Selected before the field opens, as a user would have it.
+        let wanted = result.scenario == "us" ? "com.apple.keylayout.US" : "com.negentropi.inputmethod.RomaStream"
+        if currentInputSource() != wanted,
+           let list = TISCreateInputSourceList([kTISPropertyInputSourceID as String: wanted] as CFDictionary, false)?
+            .takeRetainedValue() as? [TISInputSource], let source = list.first {
+            let status = TISSelectInputSource(source)
+            Thread.sleep(forTimeInterval: 1.0)
+            log("select \(wanted) status=\(status) now=\(currentInputSource())")
         }
         result.inputSourceBefore = currentInputSource()
         var shiftHeld = false
@@ -204,39 +205,52 @@ enum LiveTypingProbe {
                 throw ProbeError("Could not focus the target field")
             }
             if result.scenario == "taps" {
-                // Quick Shift taps, which never get a guess. They used to switch to Roma Stream and
-                // straight back, and macOS dropped some of those switches back, leaving the app on it.
-                let logURL = URL(fileURLWithPath: NSHomeDirectory() + "/roma-stream-ime.log")
-                let logBefore = (try? String(contentsOf: logURL, encoding: .utf8))?.count ?? 0
+                // Quick Shift taps, then ordinary typing, which must reach the field through Roma Stream.
                 for gap in [0.12, 0.2, 0.3, 0.15, 0.25, 0.35] {
                     _ = try RuntimeShortcutInjector.postLeftShiftDown()
                     Thread.sleep(forTimeInterval: gap)
                     _ = try RuntimeShortcutInjector.postLeftShiftUp()
                     Thread.sleep(forTimeInterval: 1.0)
                 }
-                Thread.sleep(forTimeInterval: 1.5)
-                let logText = (try? String(contentsOf: logURL, encoding: .utf8)) ?? ""
-                result.imeEventsDuringTaps = String(logText.dropFirst(logBefore)).split(separator: "\n")
-                    .map { $0.split(separator: " ", maxSplits: 1).last.map(String.init) ?? "" }
-                log("taps: input-method events \(result.imeEventsDuringTaps!)")
+                for keyCode: CGKeyCode in [31, 40, 49] { // o k space
+                    RuntimeAX.postKey(keyCode: keyCode, flags: [])
+                    Thread.sleep(forTimeInterval: 0.08)
+                }
+                Thread.sleep(forTimeInterval: 1.0)
                 seenTraceIDs = Set(try RuntimeLatencyLogReader.recent().traces.map(\.traceID))
                 sample(field, into: &result, until: now() + 0.3)
             }
             sample(field, into: &result, until: now() + 0.3)
 
-            let down = try RuntimeShortcutInjector.postLeftShiftDown()
-            shiftHeld = true
-            result.keyDownUptime = down.postedAtSystemUptime
-            sample(field, into: &result, until: down.postedAtSystemUptime + 1.0)
-
-            if result.scenario == "silence" {
-                // Shift held with nothing said.
-                sample(field, into: &result, until: now() + 4)
-            } else {
+            var earlyPlayback: (RuntimeAudioPlayback, Double)?
+            if result.scenario == "early" {
+                // The user starts talking a moment before pressing Shift.
                 let playback = RuntimeAudioPlayback(fixtureURL: fixtureURL, device: device, expectedDurationSeconds: duration)
                 let audioStart = try playback.start()
                 result.audioStartUptime = audioStart
-                if result.scenario != "plain" {
+                earlyPlayback = (playback, audioStart)
+                sample(field, into: &result, until: audioStart + 1.2)
+            }
+            let down = try RuntimeShortcutInjector.postLeftShiftDown()
+            shiftHeld = true
+            result.keyDownUptime = down.postedAtSystemUptime
+            if let (playback, audioStart) = earlyPlayback {
+                sample(field, into: &result, until: audioStart + duration)
+                let played = try playback.waitUntilFinished()
+                result.audioFinishedUptime = played.finishedAtSystemUptime
+                sample(field, into: &result, until: played.finishedAtSystemUptime + 0.5)
+            } else {
+                sample(field, into: &result, until: down.postedAtSystemUptime + 1.0)
+            }
+
+            if earlyPlayback == nil, result.scenario == "silence" {
+                // Shift held with nothing said.
+                sample(field, into: &result, until: now() + 4)
+            } else if earlyPlayback == nil {
+                let playback = RuntimeAudioPlayback(fixtureURL: fixtureURL, device: device, expectedDurationSeconds: duration)
+                let audioStart = try playback.start()
+                result.audioStartUptime = audioStart
+                if !["plain", "us", "taps"].contains(result.scenario) {
                     sample(field, into: &result, until: audioStart + duration / 2)
                     performAction(application: application, into: &result)
                 }
@@ -251,7 +265,7 @@ enum LiveTypingProbe {
             result.keyUpUptime = up.postedAtSystemUptime
 
             // Dense sampling until the field holds stable text, then coarser while the trace settles.
-            let textDeadline = up.postedAtSystemUptime + (["plain", "typing", "taps"].contains(result.scenario) ? 90 : 12)
+            let textDeadline = up.postedAtSystemUptime + (["plain", "typing", "taps", "early", "us"].contains(result.scenario) ? 90 : 12)
             var stableSince: Double?
             while now() < textDeadline {
                 let before = result.samples.count

@@ -428,19 +428,17 @@ class VoiceInkEngine: NSObject, ObservableObject {
         guard ownsStartup() else { throw CancellationError() }
         let latencyTrace = VoiceInkLatencyTrace.shared
         let traceToken = latencyTraceToken
-        let liveTyper = makeLiveTranscriptTyper()
-        // PROTOTYPE (proto/ime-stream-text): Roma Stream is the input source only while Shift is held.
-        IMEStreamPrototype.shared.begin()
+        // PROTOTYPE (proto/ime-stream-text): stream through Roma Stream when it is the input source.
+        let imeStream = IMEStreamPrototype.shared.begin()
+        let liveTyper: LiveTranscriptTyper? = imeStream ? nil : makeLiveTranscriptTyper()
         let session = serviceRegistry.createSession(
             for: model,
             onPartialTranscript: { [weak self, weak liveTyper] partial in
                 // Streaming sessions report the running transcript on the main actor, only while recording.
                 MainActor.assumeIsolated {
                     // PROTOTYPE (proto/ime-stream-text): hand the running guess to the Roma Stream input method.
-                    if IMEStreamPrototype.isEnabled {
+                    if imeStream {
                         IMEStreamPrototype.shared.showGuess(partial)
-                    } else if OverlayStreamPrototype.style != nil {
-                        OverlayStreamPrototype.shared.show(partial)
                     } else {
                         liveTyper?.update(liveTranscript: partial)
                     }

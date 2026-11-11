@@ -179,19 +179,20 @@ ls -la "$work/warmup.mov" || true
 log_pid=$!
 
 # Each run: fixture:target:mode. Control (off) first so a red "on" run still has its pair in the same artifact.
-runs="${RJT_PROOF_RUNS:-user:chrome:ime:taps user:chrome:ime:plain revise:chrome:ime:clickaway user:chrome:ime:cancel user:chrome:ime:silence user:chrome:ime:typing long:chrome:ime:plain user:textedit:ime:plain}"
+runs="${RJT_PROOF_RUNS:-user:chrome:ime:taps user:chrome:ime:early user:chrome:ime:us user:chrome:ime:plain revise:chrome:ime:clickaway user:chrome:ime:cancel user:chrome:ime:silence user:chrome:ime:typing long:chrome:ime:plain user:textedit:ime:plain}"
 echo "$runs" > "$out/runs.txt"
 for spec in $runs; do
   IFS=: read -r fixture target mode scenario <<<"$spec"
   scenario="${scenario:-plain}"
   run="$fixture-$target-$mode-$scenario"
   phase "probe fixture=$fixture target=$target typeWhileSpeaking=$mode"
-  if [ "$mode" = on ]; then value=true; else value=false; fi
+  # Live typing on (the default) also for ime: it is the fallback when Roma Stream is not the input source.
+  if [ "$mode" = on ] || [ "$mode" = ime ]; then value=true; else value=false; fi
   defaults write "$bundle_id" typeWhileSpeaking -bool "$value"
   if [ "$mode" = ime ]; then
     defaults write "$bundle_id" prototypeIMEStream -bool true
     if [ ! -d "$HOME/Library/Input Methods/RomaStream.app" ]; then
-      phase "PROTOTYPE: build, install and select the Roma Stream input method"
+      phase "PROTOTYPE: build, install and select the Roma Stream input method (the user's input source from now on)"
       ime_src="$root/Prototypes/IMEStreamText"
       ime_app="$HOME/Library/Input Methods/RomaStream.app"
       mkdir -p "$ime_app/Contents/MacOS" "$ime_app/Contents/Resources"
@@ -210,17 +211,12 @@ for spec in $runs; do
       sleep 2
       "$work/SelectInputSource" "$ime_app" com.negentropi.inputmethod.RomaStream 2>&1 | tee "$out/ime-select.txt" \
         || echo "input method selection did not stick" | tee -a "$out/ime-select.txt"
-      # Roma selects Roma Stream itself for each hold; start every case from the normal keyboard.
-      "$work/SelectInputSource" "$ime_app" com.apple.keylayout.US >> "$out/ime-select.txt" 2>&1 || true
     fi
   else
     defaults write "$bundle_id" prototypeIMEStream -bool false
   fi
-  # PROTOTYPE variants that leave the field alone until release: recorder preview, caret bubble, ghost text.
-  defaults write "$bundle_id" showLiveTextPreview -bool "$([ "$mode" = preview ] && echo true || echo false)"
-  defaults write "$bundle_id" RecorderType -string "$([ "$mode" = preview ] && echo mini || echo none)"
-  case "$mode" in bubble|ghost) defaults write "$bundle_id" prototypeOverlayStream -string "$mode" ;;
-    *) defaults delete "$bundle_id" prototypeOverlayStream 2>/dev/null || true ;; esac
+  defaults write "$bundle_id" showLiveTextPreview -bool false
+  defaults write "$bundle_id" RecorderType -string none
   rm -f "$out/probe-$run.json"
   # Screen recording of this run; recording-start uptime (same clock as the probe's *Uptime fields) lets the fixture audio be lined up later.
   # Constant 30 fps: screencapture's variable-rate files mis-time sparse frames (Chrome ran ~4 s fast).

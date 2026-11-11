@@ -325,7 +325,6 @@ class TranscriptionPipeline {
         }
 
         if let cancellation = cancellation() {
-            OverlayStreamPrototype.shared.hide()
             await finishCanceledTranscription(cancellation)
             return
         }
@@ -388,7 +387,7 @@ class TranscriptionPipeline {
             // Live typing already delivered the text unless it lost words, which must not auto-send.
             // PROTOTYPE (proto/ime-stream-text): the input method commits the final text in place of its guess;
             // without its confirmation Roma pastes as usual.
-            let imeCommit: IMEStreamPrototype.Commit = IMEStreamPrototype.isEnabled && !liveTypingUnreconciled && !pastedText.isEmpty
+            let imeCommit: IMEStreamPrototype.Commit = !liveTypingUnreconciled && !pastedText.isEmpty
                 ? await IMEStreamPrototype.shared.commit(pastedText) : .unavailable
             if imeCommit == .focusMoved {
                 NotificationManager.shared.showNotification(
@@ -408,8 +407,6 @@ class TranscriptionPipeline {
                     latencyTraceToken: traceToken
                 ).value
             }
-            // PROTOTYPE (proto/ime-stream-text): the pasted text replaces the overlay guess.
-            OverlayStreamPrototype.shared.hide()
             latencyTrace.end(
                 pasteSpan,
                 details: "textDelivered=\(pasteResult.didDeliverText) result=\(String(describing: pasteResult))"

@@ -1,7 +1,9 @@
 // PROTOTYPE (proto/ime-stream-text) — throwaway, not production.
-// Drives the Roma Stream input method for one hold: select it on key-down, stream guesses as marked
-// text, commit the final text on release (confirmed by the input method), then restore the user's
-// input source. If the input method cannot confirm, Roma falls back to its normal paste.
+// Drives the Roma Stream input method for one hold: stream guesses as marked text, commit the final
+// text on release (confirmed by the input method). Roma Stream stays the user's input source, like
+// any input method; Roma never switches sources, because macOS loses quick switches made from
+// another app (the app stays on, or never turns on, the input method). When the user is on another
+// input source, Roma types live as before. Without the input method's confirmation Roma pastes.
 import Carbon
 import Foundation
 import os
@@ -13,17 +15,8 @@ final class IMEStreamPrototype {
     static let sourceID = "com.negentropi.inputmethod.RomaStream"
     private static let logger = Logger(subsystem: "com.negentropi.RomaJustTalk", category: "IMEStreamPrototype")
 
-    /// A hold is in progress; only then may a guess switch the input source.
+    /// This hold streams through Roma Stream.
     private var armed = false
-    /// Roma Stream is selected for this hold.
-    private var active = false
-    private var previousSource: TISInputSource?
-    private var selectedAt = ContinuousClock.now
-    private var pendingRestore: Task<Void, Never>?
-    /// macOS drops a switch back that follows the switch too closely, leaving the app on Roma
-    /// Stream (measured: 4 of 10 stuck at 0.1–0.3 s, 0 of 10 at 0.6 s and 1 s). Every later
-    /// switch pair then flips it the other way.
-    private static let minimumDwell = Duration.milliseconds(800)
     private var acks: [String: CheckedContinuation<String?, Never>] = [:]
     private var ackObserver: NSObjectProtocol?
 
@@ -36,39 +29,17 @@ final class IMEStreamPrototype {
         }
     }
 
-    /// Key-down. The input source is switched only once there is a guess to show, so a short
-    /// tap, which never gets one, leaves it alone.
-    func begin() {
-        guard Self.isEnabled else { return }
-        armed = true
-    }
-
-    private func select() {
-        if let pendingRestore {
-            // The previous hold's switch back has not run yet: Roma Stream is still selected.
-            pendingRestore.cancel()
-            self.pendingRestore = nil
-            active = true
-            return
-        }
-        let current = TISCopyCurrentKeyboardInputSource().takeRetainedValue()
-        guard Self.id(of: current) != Self.sourceID else { active = true; return }
-        guard let stream = Self.source() else {
-            Self.logger.error("Roma Stream is not enabled in System Settings; live text stays off")
-            armed = false
-            return
-        }
-        previousSource = current
-        selectedAt = .now
-        let status = TISSelectInputSource(stream)
-        active = status == noErr
-        Self.logger.notice("select: status=\(status, privacy: .public) previous=\(Self.id(of: current), privacy: .public)")
+    /// Key-down: whether this hold streams through Roma Stream (it is the current input source).
+    func begin() -> Bool {
+        guard Self.isEnabled else { return false }
+        let current = Self.id(of: TISCopyCurrentKeyboardInputSource().takeRetainedValue())
+        armed = current == Self.sourceID
+        Self.logger.notice("begin: source=\(current, privacy: .public) streaming=\(self.armed, privacy: .public)")
+        return armed
     }
 
     func showGuess(_ text: String) {
         guard armed, !text.isEmpty else { return }
-        if !active { select() }
-        guard active else { return }
         post("partial", text)
     }
 
@@ -78,7 +49,7 @@ final class IMEStreamPrototype {
     /// `.focusMoved` when the user clicked, typed, or moved focus while the guess showed, which, like
     /// live typing, inserts nothing; `.unavailable` means paste as usual.
     func commit(_ text: String) async -> Commit {
-        guard active else { return .unavailable }
+        guard armed else { return .unavailable }
         let reply = await request("commit", text)
         Self.logger.notice("commit: reply=\(reply ?? "timeout", privacy: .public)")
         await end()
@@ -89,24 +60,12 @@ final class IMEStreamPrototype {
         }
     }
 
-    /// Any end (empty transcript, cancel, failure): remove a leftover guess and restore the input source.
+    /// Any end (empty transcript, cancel, failure): remove a leftover guess.
     func end() async {
+        guard armed else { return }
         armed = false
-        guard active else { return }
-        active = false
         let reply = await request("clear", "")
         Self.logger.notice("end: clear reply=\(reply ?? "timeout", privacy: .public)")
-        // A new hold may have taken Roma Stream over while the clear was in flight.
-        guard !active, let previousSource else { return }
-        let wait = Self.minimumDwell - (ContinuousClock.now - selectedAt)
-        pendingRestore = Task { @MainActor in
-            if wait > .zero { try? await Task.sleep(for: wait) }
-            guard !Task.isCancelled else { return }
-            self.pendingRestore = nil
-            self.previousSource = nil
-            let status = TISSelectInputSource(previousSource)
-            Self.logger.notice("end: restore \(Self.id(of: previousSource), privacy: .public) status=\(status, privacy: .public) after \(String(describing: wait), privacy: .public) wait")
-        }
     }
 
     private func request(_ kind: String, _ text: String) async -> String? {
@@ -131,12 +90,6 @@ final class IMEStreamPrototype {
     private func post(_ kind: String, _ object: String) {
         DistributedNotificationCenter.default().postNotificationName(
             .init("com.negentropi.RomaStream.\(kind)"), object: object, userInfo: nil, deliverImmediately: true)
-    }
-
-    private static func source() -> TISInputSource? {
-        let list = TISCreateInputSourceList([kTISPropertyInputSourceID as String: sourceID] as CFDictionary, false)?
-            .takeRetainedValue() as? [TISInputSource]
-        return list?.first
     }
 
     private static func id(of source: TISInputSource) -> String {

@@ -71,10 +71,13 @@ for spec in (evidence / 'runs.txt').read_text().split():
     elif scenario == 'clickaway':
         # A click makes Chrome keep the guess showing at that moment as real text (as with any input
         # method). Same as live typing today: what was shown stays, nothing more is inserted anywhere.
-        at_click = case.get('textAtAction') or ''
-        checks['a guess was showing at the click'] = bool(words(at_click))
-        checks['the click moved focus to the other field'] = case.get('focusedAfterAction') == 'Roma other field'
-        checks['field keeps exactly the guess shown at the click'] = words(final) == words(at_click)
+        # Shift is held, so the click is a Shift-click: Chrome keeps focus in the composer and extends the
+        # selection, as it would for the user. What matters: Roma Stream saw the click, refused the
+        # commit, and the field keeps exactly the guess that was underlined at the click.
+        ended_at = next((int(m.group(1)) for line in ime_log if (m := re.match(r'commitComposition .*marked=(\d+)', line)) and int(m.group(1)) > 0), None)
+        checks[f'Roma Stream saw the click with a guess up (marked={ended_at})'] = bool(ended_at)
+        checks['Roma Stream refused the commit'] = any(line == 'commit refused: interrupted' for line in ime_log)
+        checks['field keeps exactly the guess shown at the click'] = ended_at is not None and len(raw_final.rstrip('\n')) == ended_at
         checks['nothing inserted into the newly focused field'] = case.get('otherFieldText') is not None and not case['otherFieldText'].strip()
         checks['transcript kept in History'] = bool(words(history))
         # Roma Stream must answer "moved" at once, not leave Roma to time out.

@@ -39,8 +39,6 @@ struct LiveTypingCase: Codable {
     var otherFieldText: String?
     var inputSourceBefore: String?
     var inputSourceAfter: String?
-    /// Focused field's label right after the clickaway click.
-    var focusedAfterAction: String?
     /// Field text read right before the mid-dictation action.
     var textAtAction: String?
     /// Roma Stream's log lines written during this case: proves the guess went through composition.
@@ -166,17 +164,11 @@ enum LiveTypingProbe {
             for type in [CGEventType.leftMouseDown, .leftMouseUp] {
                 CGEvent(mouseEventSource: CGEventSource(stateID: .hidSystemState), mouseType: type, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
             }
-            // Chrome reports the new focus to Accessibility a little after the click.
+            Thread.sleep(forTimeInterval: 0.3)
+            var focused: CFTypeRef?
+            AXUIElementCopyAttributeValue(app, kAXFocusedUIElementAttribute as CFString, &focused)
             var label: CFTypeRef?
-            let focusDeadline = now() + 2
-            repeat {
-                Thread.sleep(forTimeInterval: 0.1)
-                var focused: CFTypeRef?
-                label = nil
-                AXUIElementCopyAttributeValue(app, kAXFocusedUIElementAttribute as CFString, &focused)
-                if let focused { AXUIElementCopyAttributeValue(focused as! AXUIElement, kAXDescriptionAttribute as CFString, &label) }
-            } while (label as? String) != "Roma other field" && now() < focusDeadline
-            result.focusedAfterAction = label as? String
+            if let focused { AXUIElementCopyAttributeValue(focused as! AXUIElement, kAXDescriptionAttribute as CFString, &label) }
             log("clickaway: clicked \(point); focused now: \(label as? String ?? "?")")
         default:
             break

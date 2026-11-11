@@ -166,11 +166,16 @@ enum LiveTypingProbe {
             for type in [CGEventType.leftMouseDown, .leftMouseUp] {
                 CGEvent(mouseEventSource: CGEventSource(stateID: .hidSystemState), mouseType: type, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
             }
-            Thread.sleep(forTimeInterval: 0.3)
-            var focused: CFTypeRef?
-            AXUIElementCopyAttributeValue(app, kAXFocusedUIElementAttribute as CFString, &focused)
+            // Chrome reports the new focus to Accessibility a little after the click.
             var label: CFTypeRef?
-            if let focused { AXUIElementCopyAttributeValue(focused as! AXUIElement, kAXDescriptionAttribute as CFString, &label) }
+            let focusDeadline = now() + 2
+            repeat {
+                Thread.sleep(forTimeInterval: 0.1)
+                var focused: CFTypeRef?
+                label = nil
+                AXUIElementCopyAttributeValue(app, kAXFocusedUIElementAttribute as CFString, &focused)
+                if let focused { AXUIElementCopyAttributeValue(focused as! AXUIElement, kAXDescriptionAttribute as CFString, &label) }
+            } while (label as? String) != "Roma other field" && now() < focusDeadline
             result.focusedAfterAction = label as? String
             log("clickaway: clicked \(point); focused now: \(label as? String ?? "?")")
         default:

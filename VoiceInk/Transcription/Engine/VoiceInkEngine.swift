@@ -721,6 +721,8 @@ class VoiceInkEngine: NSObject, ObservableObject {
             token: traceToken
         )
         logger.notice("cancelRecording called – state=\(String(describing: self.recordingState), privacy: .public)")
+        // PROTOTYPE (proto/ime-stream-text): a cancelled hold leaves no guess behind.
+        await IMEStreamPrototype.shared.end()
         let cancellationPlan = VoiceInkMacOSRecordingCancellationPolicy.plan(
             recordingState: recordingState
         )
@@ -901,7 +903,6 @@ class VoiceInkEngine: NSObject, ObservableObject {
     private func cancelLiveTyping() {
         liveTranscriptTyper?.cancel()
         liveTranscriptTyper = nil
-        Task { await IMEStreamPrototype.shared.end() }
     }
 
     func makeLiveTranscriptTyper(field: LiveTypingField? = nil) -> LiveTranscriptTyper {

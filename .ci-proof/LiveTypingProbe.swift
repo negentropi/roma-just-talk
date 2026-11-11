@@ -176,6 +176,13 @@ enum LiveTypingProbe {
     ) -> LiveTypingCase {
         var result = LiveTypingCase(role: role, target: target, targetFile: file.path)
         result.scenario = role == "measured" ? scenario : "plain"
+        // Every hold starts from the normal keyboard; Roma must switch to Roma Stream itself and back.
+        if let list = TISCreateInputSourceList([kTISPropertyInputSourceID as String: "com.apple.keylayout.US"] as CFDictionary, false)?
+            .takeRetainedValue() as? [TISInputSource], let us = list.first {
+            let status = TISSelectInputSource(us)
+            Thread.sleep(forTimeInterval: 0.3)
+            log("select US status=\(status) now=\(currentInputSource())")
+        }
         result.inputSourceBefore = currentInputSource()
         var shiftHeld = false
         do {

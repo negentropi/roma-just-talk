@@ -19,6 +19,9 @@ final class RomaStreamController: IMKInputController {
     /// An update that arrived while no field was focused (focus flickers at Shift release).
     /// Expires quickly so a late field never receives it.
     static var pending: (update: (RomaStreamController) -> Void, expires: TimeInterval)?
+    /// The field this hold's guess was shown in; the final text only ever goes there.
+    static weak var guessOwner: RomaStreamController?
+    static var guessShown = false
 
     private var markedLength = 0
 
@@ -62,10 +65,17 @@ final class RomaStreamController: IMKInputController {
                              selectionRange: NSRange(location: (text as NSString).length, length: 0),
                              replacementRange: NSRange(location: NSNotFound, length: 0))
         markedLength = (text as NSString).length
+        RomaStreamController.guessOwner = self
+        RomaStreamController.guessShown = true
         trace("marked \(markedLength) to \(client.bundleIdentifier() ?? "?")")
     }
 
     func commit(_ text: String) -> String {
+        defer { RomaStreamController.guessShown = false; RomaStreamController.guessOwner = nil }
+        // Focus moved to another field after the guess appeared: never insert there.
+        if RomaStreamController.guessShown, RomaStreamController.guessOwner !== self {
+            trace("commit refused: focus moved"); return "moved"
+        }
         guard let client = client() else { return "nofield" }
         client.insertText(text, replacementRange: NSRange(location: NSNotFound, length: 0))
         markedLength = 0
@@ -112,6 +122,7 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.commit"), object: n
 center.addObserver(forName: .init("com.negentropi.RomaStream.clear"), object: nil, queue: .main) { note in
     let (token, _) = split(note.object)
     MainActor.assumeIsolated {
+        RomaStreamController.guessShown = false; RomaStreamController.guessOwner = nil
         if let current = RomaStreamController.current { reply(token, current.clear()) } else { RomaStreamController.pending = nil; reply(token, "nofield") }
     }
 }

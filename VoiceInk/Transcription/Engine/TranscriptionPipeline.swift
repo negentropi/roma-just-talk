@@ -388,9 +388,14 @@ class TranscriptionPipeline {
             // Live typing already delivered the text unless it lost words, which must not auto-send.
             // PROTOTYPE (proto/ime-stream-text): the input method commits the final text in place of its guess;
             // without its confirmation Roma pastes as usual.
-            let imeCommitted = IMEStreamPrototype.isEnabled && !liveTypingUnreconciled && !pastedText.isEmpty
-                ? await IMEStreamPrototype.shared.commit(pastedText) : false
-            let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled {
+            let imeCommit: IMEStreamPrototype.Commit = IMEStreamPrototype.isEnabled && !liveTypingUnreconciled && !pastedText.isEmpty
+                ? await IMEStreamPrototype.shared.commit(pastedText) : .unavailable
+            if imeCommit == .focusMoved {
+                NotificationManager.shared.showNotification(
+                    title: "Focus moved while you were speaking, so nothing was inserted. The transcript is in History.", type: .warning)
+            }
+            let imeCommitted = imeCommit != .unavailable
+            let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled || imeCommit == .focusMoved {
                 .commandNotPosted
             } else if pastedText.isEmpty {
                 .textInserted

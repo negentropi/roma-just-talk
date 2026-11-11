@@ -23,7 +23,9 @@ for spec in (evidence / 'runs.txt').read_text().split():
     final = (samples[-1]['text'] if samples else '') or ''
     history = ((case.get('historyRows') or [{}])[-1].get('ZTEXT') or '')
     during = [s for s in samples if down < s['uptime'] < up]
-    sources_during = sorted({s.get('inputSource') or '?' for s in during})
+    # Samples are stored on change, so the one in effect at key-down covers the hold too.
+    held = [s for s in samples if s['uptime'] <= down][-1:] + during
+    sources_during = sorted({s.get('inputSource') or '?' for s in held})
     checks = {
         'probe ran without error': not report.get('fatalError') and not case.get('error'),
         'input source restored after release': case.get('inputSourceAfter') == case.get('inputSourceBefore') != STREAM,
@@ -36,11 +38,13 @@ for spec in (evidence / 'runs.txt').read_text().split():
     elif scenario in ('cancel', 'silence'):
         checks['no leftover text in the field'] = not final.strip()
     elif scenario == 'clickaway':
+        # Same rule as live typing today: never insert into a field focused after the guess appeared.
         checks['no leftover guess in the field that lost focus'] = not final.strip()
-        checks['final text landed in the field focused at release'] = bool(words(history)) and words(case.get('otherFieldText')) == words(history)
+        checks['nothing inserted into the newly focused field'] = not (case.get('otherFieldText') or '').strip()
+        checks['transcript kept in History'] = bool(words(history))
     elif scenario == 'typing':
-        checks['the typed X survived'] = 'X' in final
-        checks['the transcript is in the field once'] = bool(words(history)) and ' '.join(words(final)).count(' '.join(words(history)[-4:])) == 1
+        # Shift+X is typing a capital X, so Roma drops the dictation; the guess must not linger.
+        checks['field holds only the typed X'] = final.strip() == 'X'
     ok = all(checks.values())
     passed &= ok
     results.append({'run': spec, 'checks': checks, 'final': final, 'other': case.get('otherFieldText'), 'history': history,

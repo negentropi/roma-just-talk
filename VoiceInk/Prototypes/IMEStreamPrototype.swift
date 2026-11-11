@@ -47,13 +47,21 @@ final class IMEStreamPrototype {
         post("partial", text)
     }
 
-    /// Release: true once the input method confirmed the final text replaced its guess.
-    func commit(_ text: String) async -> Bool {
-        guard active else { return false }
+    enum Commit { case committed, focusMoved, unavailable }
+
+    /// Release: `.committed` once the input method confirmed the final text replaced its guess;
+    /// `.focusMoved` when the field showing the guess lost focus, which, like live typing, never
+    /// sends the text to a newly focused field; `.unavailable` means paste as usual.
+    func commit(_ text: String) async -> Commit {
+        guard active else { return .unavailable }
         let reply = await request("commit", text)
         Self.logger.notice("commit: reply=\(reply ?? "timeout", privacy: .public)")
         await end()
-        return reply == "committed"
+        switch reply {
+        case "committed": return .committed
+        case "moved": return .focusMoved
+        default: return .unavailable
+        }
     }
 
     /// Any end (empty transcript, cancel, failure): remove a leftover guess and restore the input source.

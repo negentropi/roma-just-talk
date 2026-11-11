@@ -700,7 +700,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         }
         canceledPipelineTranscriptions[transcriptionID] = nil
         if liveTranscriptTyper === liveTyper { liveTranscriptTyper = nil }
-        await IMEStreamPrototype.shared.end()
+        IMEStreamPrototype.shared.end()
 
         if didFinishActivePipeline,
            recordingState.shouldReturnToIdleWhenActivePipelineFinishes {
@@ -720,7 +720,7 @@ class VoiceInkEngine: NSObject, ObservableObject {
         )
         logger.notice("cancelRecording called – state=\(String(describing: self.recordingState), privacy: .public)")
         // PROTOTYPE (proto/ime-stream-text): a cancelled hold leaves no guess behind.
-        await IMEStreamPrototype.shared.end()
+        IMEStreamPrototype.shared.end()
         let cancellationPlan = VoiceInkMacOSRecordingCancellationPolicy.plan(
             recordingState: recordingState
         )

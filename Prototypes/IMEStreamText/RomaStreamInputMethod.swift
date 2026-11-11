@@ -83,6 +83,10 @@ final class RomaStreamController: IMKInputController {
                              replacementRange: NSRange(location: NSNotFound, length: 0))
         markedLength = (text as NSString).length
         RomaStreamController.guessOwner = self
+        if !RomaStreamController.guessShown {
+            DistributedNotificationCenter.default().postNotificationName(
+                .init("com.negentropi.RomaStream.shown"), object: nil, userInfo: nil, deliverImmediately: true)
+        }
         RomaStreamController.guessShown = true
         trace("marked \(markedLength) to \(client.bundleIdentifier() ?? "?")")
     }
@@ -140,7 +144,10 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.clear"), object: ni
     let (token, _) = split(note.object)
     MainActor.assumeIsolated {
         RomaStreamController.reset()
-        if let current = RomaStreamController.current { reply(token, current.clear()) } else { RomaStreamController.pending = nil; reply(token, "nofield") }
+        RomaStreamController.pending = nil
+        let result = RomaStreamController.current?.clear() ?? "nofield"
+        trace("clear: \(result)")
+        if !token.isEmpty { reply(token, result) }
     }
 }
 NSApplication.shared.run()

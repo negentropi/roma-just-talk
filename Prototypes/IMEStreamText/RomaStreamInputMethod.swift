@@ -109,11 +109,17 @@ final class RomaStreamController: IMKInputController {
         trace("marked \(markedLength) to \(client.bundleIdentifier() ?? "?")")
     }
 
-    func commit(_ text: String) -> String {
+    func commit(_ text: String, deadline: TimeInterval) -> String {
         defer { RomaStreamController.reset() }
         // The user clicked, typed, or moved focus after the guess appeared: never insert anywhere.
         if RomaStreamController.interrupted || (RomaStreamController.guessShown && RomaStreamController.guessOwner !== self) {
             trace("commit refused: interrupted"); return "moved"
+        }
+        // Past the deadline Roma no longer waits and will paste: take the guess down so the paste
+        // does not land next to it, and insert nothing here.
+        guard ProcessInfo.processInfo.systemUptime <= deadline else {
+            if markedLength > 0 { clearGuess(client()) }
+            trace("commit refused: late"); return "late"
         }
         guard let client = client() else { return "nofield" }
         client.insertText(text, replacementRange: NSRange(location: NSNotFound, length: 0))
@@ -167,9 +173,7 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.commit"), object: n
     MainActor.assumeIsolated {
         guard message[1] == RomaStreamController.hold else { reply(message[0], "stale"); return }
         RomaStreamController.deliver(until: deadline) { controller in
-            // Past the deadline Roma may already be pasting: never insert the text a second time.
-            guard ProcessInfo.processInfo.systemUptime <= deadline else { trace("commit refused: late"); reply(message[0], "late"); return }
-            reply(message[0], controller.commit(message[3]))
+            reply(message[0], controller.commit(message[3], deadline: deadline))
         }
     }
 }
@@ -182,9 +186,11 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.clear"), object: ni
             if !token.isEmpty { reply(token, "stale") }
             return
         }
+        // Report an interruption before forgetting it: Roma must not paste over the user's typing.
+        let interrupted = RomaStreamController.interrupted
         RomaStreamController.reset()
         RomaStreamController.pending = nil
-        let result = RomaStreamController.current?.clear() ?? "nofield"
+        let result = interrupted ? "moved" : RomaStreamController.current?.clear() ?? "nofield"
         trace("clear: \(result)")
         if !token.isEmpty { reply(token, result) }
     }

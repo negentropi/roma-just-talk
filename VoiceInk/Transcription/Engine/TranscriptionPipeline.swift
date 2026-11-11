@@ -397,10 +397,10 @@ class TranscriptionPipeline {
             case .uncertain:
                 NotificationManager.shared.showNotification(
                     title: "Roma Stream didn't respond, so nothing more was inserted. The transcript is in History.", type: .warning)
-            case .committed, .unavailable:
+            case .committed, .cancelled, .unavailable:
                 break
             }
-            let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled || imeCommit == .focusMoved || imeCommit == .uncertain {
+            let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled || imeCommit == .focusMoved || imeCommit == .uncertain || imeCommit == .cancelled {
                 .commandNotPosted
             } else if pastedText.isEmpty || imeCommit == .committed {
                 .textInserted

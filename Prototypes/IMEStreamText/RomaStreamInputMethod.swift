@@ -66,10 +66,17 @@ final class RomaStreamController: IMKInputController {
         super.deactivateServer(sender)
     }
 
-    /// Keys go to the app untouched, except Escape while a hold's guess is up: Chrome would type it
-    /// as a character. Roma's own double-Escape cancel does not depend on this.
+    /// Keys go to the app untouched. While this field shows a guess, Escape is swallowed (Chrome would
+    /// type it as a character; Roma's own double-Escape cancel does not depend on this), and any other
+    /// key is the user typing over the guess: it goes away, the key goes through, and this hold
+    /// inserts nothing more.
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
-        event?.type == .keyDown && event?.keyCode == 53 && RomaStreamController.guessShown
+        guard let event, event.type == .keyDown, markedLength > 0 else { return false }
+        if event.keyCode == 53 { return true }
+        trace("typing over the guess: stopping this hold")
+        clearGuess(sender as? IMKTextInput)
+        RomaStreamController.interrupted = true
+        return false
     }
 
     /// The app ends composition on its own (click, Esc): our guess is not the user's text.

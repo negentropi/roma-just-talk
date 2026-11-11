@@ -74,6 +74,7 @@ for spec in (evidence / 'runs.txt').read_text().split():
         checks['transcript kept in History'] = bool(words(history))
     elif scenario == 'typing':
         # Shift+X is typing a capital X, so Roma drops the dictation; the guess must not linger.
+        checks['a guess was showing when X was typed'] = bool((case.get('textAtAction') or '').strip())
         checks['field holds only the typed X'] = final.strip() == 'X'
     ok = all(checks.values())
     passed &= ok

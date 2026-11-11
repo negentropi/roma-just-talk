@@ -303,9 +303,7 @@ enum LiveTypingProbe {
                     result.latencyTrace = trace
                     if trace.keyUpToInteractionSettledMilliseconds != nil { break }
                 }
-                if ["cancel", "selectcancel", "silence"].contains(result.scenario), now() > traceDeadline - 75 { break
-
-                }
+                if ["cancel", "selectcancel", "silence"].contains(result.scenario), now() > traceDeadline - 75 { break }
                 sample(field, into: &result, until: now() + 0.5)
             }
             sample(field, into: &result, until: now() + 1.5)

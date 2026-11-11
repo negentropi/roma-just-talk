@@ -81,7 +81,9 @@ final class IMEStreamPrototype {
 /// late cleanup can never touch a newer one.
 @MainActor
 final class IMEStreamHold {
-    enum Commit { case committed, focusMoved, unavailable }
+    /// `.uncertain`: Roma Stream did not answer, so the text may already be in the field (or a guess
+    /// may still be up); pasting could duplicate it, so Roma inserts nothing and points to History.
+    enum Commit { case committed, focusMoved, uncertain, unavailable }
 
     let id = UUID().uuidString
     private let channel: IMEStreamPrototype
@@ -110,11 +112,10 @@ final class IMEStreamHold {
         defer { end() }
         guard guessShown else {
             // Take down a guess still on its way before Roma pastes, or Chrome would keep it as text.
-            if guessSent {
-                let reply = await channel.request("clear", [id], timeout: .milliseconds(300))
-                IMEStreamPrototype.logger.notice("commit: no guess shown; clear reply=\(reply ?? "timeout", privacy: .public)")
-            }
-            return .unavailable
+            guard guessSent else { return .unavailable }
+            let reply = await channel.request("clear", [id], timeout: .milliseconds(300))
+            IMEStreamPrototype.logger.notice("commit: no guess shown; clear reply=\(reply ?? "timeout", privacy: .public)")
+            return reply == nil ? .uncertain : .unavailable
         }
         // Roma Stream refuses the commit after this deadline, which passes before Roma stops waiting:
         // once Roma falls back to pasting, a delayed commit can no longer insert the text a second time.
@@ -124,6 +125,8 @@ final class IMEStreamHold {
         switch reply {
         case "committed": return .committed
         case "moved": return .focusMoved
+        case nil: return .uncertain
+        // "late", "stale", "nofield": Roma Stream inserted nothing.
         default: return .unavailable
         }
     }

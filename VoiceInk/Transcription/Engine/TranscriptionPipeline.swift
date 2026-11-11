@@ -390,16 +390,19 @@ class TranscriptionPipeline {
             // without its confirmation Roma pastes as usual.
             let imeCommit: IMEStreamHold.Commit = !liveTypingUnreconciled && !pastedText.isEmpty
                 ? await imeHold?.commit(pastedText) ?? .unavailable : .unavailable
-            if imeCommit == .focusMoved {
+            switch imeCommit {
+            case .focusMoved:
                 NotificationManager.shared.showNotification(
-                    title: "You clicked or typed while speaking, so nothing was inserted. The transcript is in History.", type: .warning)
+                    title: "You clicked or typed while Roma was writing, so it stopped there. The full transcript is in History.", type: .warning)
+            case .uncertain:
+                NotificationManager.shared.showNotification(
+                    title: "Roma Stream didn't respond, so nothing more was inserted. The transcript is in History.", type: .warning)
+            case .committed, .unavailable:
+                break
             }
-            let imeCommitted = imeCommit != .unavailable
-            let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled || imeCommit == .focusMoved {
+            let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled || imeCommit == .focusMoved || imeCommit == .uncertain {
                 .commandNotPosted
-            } else if pastedText.isEmpty {
-                .textInserted
-            } else if imeCommitted {
+            } else if pastedText.isEmpty || imeCommit == .committed {
                 .textInserted
             } else {
                 await CursorPaster.startPasteAtCursor(

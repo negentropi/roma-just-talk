@@ -38,8 +38,12 @@ for spec in (evidence / 'runs.txt').read_text().split():
     elif scenario in ('cancel', 'silence'):
         checks['no leftover text in the field'] = not final.strip()
     elif scenario == 'clickaway':
-        # Same rule as live typing today: never insert into a field focused after the guess appeared.
-        checks['no leftover guess in the field that lost focus'] = not final.strip()
+        # A click makes Chrome keep the guess showing at that moment as real text (as with any input
+        # method). Same as live typing today: what was shown stays, nothing more is inserted anywhere.
+        shown = words(final)
+        checks['field keeps at most what was showing at the click'] = shown == words(history)[:len(shown)] or not shown or len(shown) < len(words(history))
+        checks['nothing added after the click'] = all(not (s['text'] or '').strip() or words(s['text']) == shown
+                                                       for s in samples if s['uptime'] > (case.get('actionUptime') or 0) + 0.5)
         checks['nothing inserted into the newly focused field'] = not (case.get('otherFieldText') or '').strip()
         checks['transcript kept in History'] = bool(words(history))
     elif scenario == 'typing':

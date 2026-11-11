@@ -60,10 +60,10 @@ final class RomaStreamController: IMKInputController {
         super.deactivateServer(sender)
     }
 
-    /// Keys go to the app untouched, except Escape: with an input method active, Chrome would type
-    /// it as a character. Roma's own double-Escape cancel does not depend on this.
+    /// Keys go to the app untouched, except Escape while a hold's guess is up: Chrome would type it
+    /// as a character. Roma's own double-Escape cancel does not depend on this.
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
-        event?.type == .keyDown && event?.keyCode == 53
+        event?.type == .keyDown && event?.keyCode == 53 && RomaStreamController.guessShown
     }
 
     /// The app ends composition on its own (click, Esc): our guess is not the user's text.

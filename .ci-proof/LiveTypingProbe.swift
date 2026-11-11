@@ -39,6 +39,8 @@ struct LiveTypingCase: Codable {
     var otherFieldText: String?
     var inputSourceBefore: String?
     var inputSourceAfter: String?
+    /// Input-method events logged during the short taps that precede a "taps" hold.
+    var imeEventsDuringTaps: [String]?
 }
 
 struct LiveTypingReport: Codable {
@@ -196,10 +198,29 @@ enum LiveTypingProbe {
             guard (RuntimeAX.text(from: field) ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 throw ProbeError("Target field is not empty before recording")
             }
-            let seenTraceIDs = Set(try RuntimeLatencyLogReader.recent().traces.map(\.traceID))
+            var seenTraceIDs = Set(try RuntimeLatencyLogReader.recent().traces.map(\.traceID))
             let historyBefore = try historyRows(after: -1).last?.Z_PK ?? 0
             guard RuntimeAX.focus(application: application, windowElement: window, textElement: field) else {
                 throw ProbeError("Could not focus the target field")
+            }
+            if result.scenario == "taps" {
+                // Quick Shift taps, which never get a guess. They used to switch to Roma Stream and
+                // straight back, and macOS dropped some of those switches back, leaving the app on it.
+                let logURL = URL(fileURLWithPath: NSHomeDirectory() + "/roma-stream-ime.log")
+                let logBefore = (try? String(contentsOf: logURL, encoding: .utf8))?.count ?? 0
+                for gap in [0.12, 0.2, 0.3, 0.15, 0.25, 0.35] {
+                    _ = try RuntimeShortcutInjector.postLeftShiftDown()
+                    Thread.sleep(forTimeInterval: gap)
+                    _ = try RuntimeShortcutInjector.postLeftShiftUp()
+                    Thread.sleep(forTimeInterval: 1.0)
+                }
+                Thread.sleep(forTimeInterval: 1.5)
+                let logText = (try? String(contentsOf: logURL, encoding: .utf8)) ?? ""
+                result.imeEventsDuringTaps = String(logText.dropFirst(logBefore)).split(separator: "\n")
+                    .map { $0.split(separator: " ", maxSplits: 1).last.map(String.init) ?? "" }
+                log("taps: input-method events \(result.imeEventsDuringTaps!)")
+                seenTraceIDs = Set(try RuntimeLatencyLogReader.recent().traces.map(\.traceID))
+                sample(field, into: &result, until: now() + 0.3)
             }
             sample(field, into: &result, until: now() + 0.3)
 
@@ -230,7 +251,7 @@ enum LiveTypingProbe {
             result.keyUpUptime = up.postedAtSystemUptime
 
             // Dense sampling until the field holds stable text, then coarser while the trace settles.
-            let textDeadline = up.postedAtSystemUptime + (result.scenario == "plain" || result.scenario == "typing" ? 90 : 12)
+            let textDeadline = up.postedAtSystemUptime + (["plain", "typing", "taps"].contains(result.scenario) ? 90 : 12)
             var stableSince: Double?
             while now() < textDeadline {
                 let before = result.samples.count

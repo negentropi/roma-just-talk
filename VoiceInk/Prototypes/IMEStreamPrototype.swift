@@ -13,8 +13,17 @@ final class IMEStreamPrototype {
     static let sourceID = "com.negentropi.inputmethod.RomaStream"
     private static let logger = Logger(subsystem: "com.negentropi.RomaJustTalk", category: "IMEStreamPrototype")
 
-    private var previousSource: TISInputSource?
+    /// A hold is in progress; only then may a guess switch the input source.
+    private var armed = false
+    /// Roma Stream is selected for this hold.
     private var active = false
+    private var previousSource: TISInputSource?
+    private var selectedAt = ContinuousClock.now
+    private var pendingRestore: Task<Void, Never>?
+    /// macOS drops a switch back that follows the switch too closely, leaving the app on Roma
+    /// Stream (measured: 4 of 10 stuck at 0.1–0.3 s, 0 of 10 at 0.6 s and 1 s). Every later
+    /// switch pair then flips it the other way.
+    private static let minimumDwell = Duration.milliseconds(800)
     private var acks: [String: CheckedContinuation<String?, Never>] = [:]
     private var ackObserver: NSObjectProtocol?
 
@@ -27,22 +36,38 @@ final class IMEStreamPrototype {
         }
     }
 
-    /// Key-down: switch to Roma Stream for this hold only.
+    /// Key-down. The input source is switched only once there is a guess to show, so a short
+    /// tap, which never gets one, leaves it alone.
     func begin() {
-        guard Self.isEnabled, !active else { return }
+        guard Self.isEnabled else { return }
+        armed = true
+    }
+
+    private func select() {
+        if let pendingRestore {
+            // The previous hold's switch back has not run yet: Roma Stream is still selected.
+            pendingRestore.cancel()
+            self.pendingRestore = nil
+            active = true
+            return
+        }
         let current = TISCopyCurrentKeyboardInputSource().takeRetainedValue()
         guard Self.id(of: current) != Self.sourceID else { active = true; return }
         guard let stream = Self.source() else {
             Self.logger.error("Roma Stream is not enabled in System Settings; live text stays off")
+            armed = false
             return
         }
         previousSource = current
+        selectedAt = .now
         let status = TISSelectInputSource(stream)
         active = status == noErr
-        Self.logger.notice("begin: select status=\(status, privacy: .public) previous=\(Self.id(of: current), privacy: .public)")
+        Self.logger.notice("select: status=\(status, privacy: .public) previous=\(Self.id(of: current), privacy: .public)")
     }
 
     func showGuess(_ text: String) {
+        guard armed, !text.isEmpty else { return }
+        if !active { select() }
         guard active else { return }
         post("partial", text)
     }
@@ -66,15 +91,22 @@ final class IMEStreamPrototype {
 
     /// Any end (empty transcript, cancel, failure): remove a leftover guess and restore the input source.
     func end() async {
+        armed = false
         guard active else { return }
+        active = false
         let reply = await request("clear", "")
         Self.logger.notice("end: clear reply=\(reply ?? "timeout", privacy: .public)")
-        active = false
-        if let previousSource {
+        // A new hold may have taken Roma Stream over while the clear was in flight.
+        guard !active, let previousSource else { return }
+        let wait = Self.minimumDwell - (ContinuousClock.now - selectedAt)
+        pendingRestore = Task { @MainActor in
+            if wait > .zero { try? await Task.sleep(for: wait) }
+            guard !Task.isCancelled else { return }
+            self.pendingRestore = nil
+            self.previousSource = nil
             let status = TISSelectInputSource(previousSource)
-            Self.logger.notice("end: restore \(Self.id(of: previousSource), privacy: .public) status=\(status, privacy: .public)")
+            Self.logger.notice("end: restore \(Self.id(of: previousSource), privacy: .public) status=\(status, privacy: .public) after \(String(describing: wait), privacy: .public) wait")
         }
-        previousSource = nil
     }
 
     private func request(_ kind: String, _ text: String) async -> String? {

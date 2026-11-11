@@ -30,9 +30,16 @@ for spec in (evidence / 'runs.txt').read_text().split():
         'probe ran without error': not report.get('fatalError') and not case.get('error'),
         'input source restored after release': case.get('inputSourceAfter') == case.get('inputSourceBefore') != STREAM,
     }
-    if scenario in ('plain', 'typing', 'clickaway'):
+    if scenario in ('plain', 'typing', 'clickaway', 'taps'):
         checks['Roma Stream was the input source during the hold'] = STREAM in sources_during
-    if scenario == 'plain':
+    if scenario == 'taps':
+        # Each activate must be followed by a deactivate: otherwise the app was left on Roma Stream.
+        state = None
+        for event in case.get('imeEventsDuringTaps') or []:
+            if event.startswith('activate'): state = 'on'
+            elif event.startswith('deactivate'): state = 'off'
+        checks['short taps leave the app off Roma Stream'] = state != 'on' and case.get('imeEventsDuringTaps') is not None
+    if scenario in ('plain', 'taps'):
         checks['guess visible in the field while Shift was held'] = any((s['text'] or '').strip() for s in during)
         checks['field ends with exactly the saved transcript'] = bool(words(history)) and words(final) == words(history)
     elif scenario in ('cancel', 'silence'):

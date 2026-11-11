@@ -50,8 +50,8 @@ final class IMEStreamPrototype {
     enum Commit { case committed, focusMoved, unavailable }
 
     /// Release: `.committed` once the input method confirmed the final text replaced its guess;
-    /// `.focusMoved` when the field showing the guess lost focus, which, like live typing, never
-    /// sends the text to a newly focused field; `.unavailable` means paste as usual.
+    /// `.focusMoved` when the user clicked, typed, or moved focus while the guess showed, which, like
+    /// live typing, inserts nothing; `.unavailable` means paste as usual.
     func commit(_ text: String) async -> Commit {
         guard active else { return .unavailable }
         let reply = await request("commit", text)

@@ -392,7 +392,7 @@ class TranscriptionPipeline {
                 ? await IMEStreamPrototype.shared.commit(pastedText) : .unavailable
             if imeCommit == .focusMoved {
                 NotificationManager.shared.showNotification(
-                    title: "Focus moved while you were speaking, so nothing was inserted. The transcript is in History.", type: .warning)
+                    title: "You clicked or typed while speaking, so nothing was inserted. The transcript is in History.", type: .warning)
             }
             let imeCommitted = imeCommit != .unavailable
             let pasteResult: CursorPaster.PasteResult = if liveTypingUnreconciled || imeCommit == .focusMoved {

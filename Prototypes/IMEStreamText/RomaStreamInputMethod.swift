@@ -22,6 +22,12 @@ final class RomaStreamController: IMKInputController {
     /// The field this hold's guess was shown in; the final text only ever goes there.
     static weak var guessOwner: RomaStreamController?
     static var guessShown = false
+    /// The user clicked, typed, or moved focus while a guess was showing: this hold shows and
+    /// inserts nothing more. Chrome keeps one connection for the whole page, so a click arrives as
+    /// commitComposition rather than as a deactivate.
+    static var interrupted = false
+
+    static func reset() { guessShown = false; guessOwner = nil; interrupted = false }
 
     private var markedLength = 0
 
@@ -44,22 +50,33 @@ final class RomaStreamController: IMKInputController {
 
     override func deactivateServer(_ sender: Any!) {
         // Focus left this field mid-hold: take the unfinished guess with it.
-        if markedLength > 0 { trace("deactivate: clearing guess of \(markedLength)"); clearGuess(sender as? IMKTextInput) }
+        if markedLength > 0 {
+            trace("deactivate: clearing guess of \(markedLength)")
+            clearGuess(sender as? IMKTextInput)
+            RomaStreamController.interrupted = true
+        }
         if RomaStreamController.current === self { RomaStreamController.current = nil }
         trace("deactivate")
         super.deactivateServer(sender)
     }
 
-    /// Every key goes to the app untouched; this input method only draws Roma's live guess.
-    override func handle(_ event: NSEvent!, client sender: Any!) -> Bool { false }
+    /// Keys go to the app untouched, except Escape: with an input method active, Chrome would type
+    /// it as a character. Roma's own double-Escape cancel does not depend on this.
+    override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
+        event?.type == .keyDown && event?.keyCode == 53
+    }
 
     /// The app ends composition on its own (click, Esc): our guess is not the user's text.
     override func commitComposition(_ sender: Any!) {
         trace("commitComposition (app asked), marked=\(markedLength)")
-        if markedLength > 0 { clearGuess(sender as? IMKTextInput) }
+        if markedLength > 0 {
+            clearGuess(sender as? IMKTextInput)
+            RomaStreamController.interrupted = true
+        }
     }
 
     func showGuess(_ text: String) {
+        guard !RomaStreamController.interrupted else { return }
         guard let client = client() else { trace("partial: no client"); return }
         client.setMarkedText(NSAttributedString(string: text, attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue]),
                              selectionRange: NSRange(location: (text as NSString).length, length: 0),
@@ -71,10 +88,10 @@ final class RomaStreamController: IMKInputController {
     }
 
     func commit(_ text: String) -> String {
-        defer { RomaStreamController.guessShown = false; RomaStreamController.guessOwner = nil }
-        // Focus moved to another field after the guess appeared: never insert there.
-        if RomaStreamController.guessShown, RomaStreamController.guessOwner !== self {
-            trace("commit refused: focus moved"); return "moved"
+        defer { RomaStreamController.reset() }
+        // The user clicked, typed, or moved focus after the guess appeared: never insert anywhere.
+        if RomaStreamController.interrupted || (RomaStreamController.guessShown && RomaStreamController.guessOwner !== self) {
+            trace("commit refused: interrupted"); return "moved"
         }
         guard let client = client() else { return "nofield" }
         client.insertText(text, replacementRange: NSRange(location: NSNotFound, length: 0))
@@ -122,7 +139,7 @@ center.addObserver(forName: .init("com.negentropi.RomaStream.commit"), object: n
 center.addObserver(forName: .init("com.negentropi.RomaStream.clear"), object: nil, queue: .main) { note in
     let (token, _) = split(note.object)
     MainActor.assumeIsolated {
-        RomaStreamController.guessShown = false; RomaStreamController.guessOwner = nil
+        RomaStreamController.reset()
         if let current = RomaStreamController.current { reply(token, current.clear()) } else { RomaStreamController.pending = nil; reply(token, "nofield") }
     }
 }

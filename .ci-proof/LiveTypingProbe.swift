@@ -160,6 +160,12 @@ enum LiveTypingProbe {
             for type in [CGEventType.leftMouseDown, .leftMouseUp] {
                 CGEvent(mouseEventSource: CGEventSource(stateID: .hidSystemState), mouseType: type, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
             }
+            Thread.sleep(forTimeInterval: 0.3)
+            var focused: CFTypeRef?
+            AXUIElementCopyAttributeValue(app, kAXFocusedUIElementAttribute as CFString, &focused)
+            var label: CFTypeRef?
+            if let focused { AXUIElementCopyAttributeValue(focused as! AXUIElement, kAXDescriptionAttribute as CFString, &label) }
+            log("clickaway: clicked \(point); focused now: \(label as? String ?? "?")")
         default:
             break
         }

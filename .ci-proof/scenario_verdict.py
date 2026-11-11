@@ -21,6 +21,10 @@ for spec in (evidence / 'runs.txt').read_text().split():
     samples = case.get('samples') or []
     down, up = case.get('keyDownUptime') or 0, case.get('keyUpUptime') or 0
     final = (samples[-1]['text'] if samples else '') or ''
+    # Only what this hold added counts (empty taps may paste the last transcript when that setting is on).
+    before_hold = ([s['text'] or '' for s in samples if s['uptime'] <= down] or [''])[-1]
+    if final.startswith(before_hold):
+        final = final[len(before_hold):]
     history = ((case.get('historyRows') or [{}])[-1].get('ZTEXT') or '')
     during = [s for s in samples if down < s['uptime'] < up]
     # Samples are stored on change, so the one in effect at key-down covers the hold too.

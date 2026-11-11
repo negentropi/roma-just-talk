@@ -141,6 +141,7 @@ defaults write "$bundle_id" isSoundFeedbackEnabled -bool false
 defaults write "$bundle_id" enableAnnouncements -bool false
 defaults write "$bundle_id" restoreClipboardAfterPaste -bool false
 defaults write "$bundle_id" appendTrailingSpace -bool false
+defaults write "$bundle_id" specialShortcutPasteLastTranscriptOnEmptyTap -bool false
 defaults write com.apple.TextEdit NSShowAppCentricOpenPanelInsteadOfUntitledFile -bool false
 # Large plain-text font so the screen recording is readable.
 defaults write com.apple.TextEdit NSFixedPitchFont -string Menlo-Regular

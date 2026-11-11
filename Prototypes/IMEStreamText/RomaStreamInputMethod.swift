@@ -1,5 +1,6 @@
 // PROTOTYPE — throwaway. See README.md.
 import Cocoa
+import CryptoKit
 import InputMethodKit
 
 let logPath = NSHomeDirectory() + "/roma-stream-ime.log"
@@ -36,6 +37,8 @@ final class RomaStreamController: IMKInputController {
     static func reset() { guessShown = false; guessOwner = nil; interrupted = false; declined = false }
 
     private var markedLength = 0
+    /// The guess on screen, kept only to log a fingerprint (never the text) when an app ends it.
+    private var markedText = ""
 
     /// `onExpire` runs if no field comes back before `expires`, so a waiting commit still gets an answer.
     static func deliver(until expires: TimeInterval = ProcessInfo.processInfo.systemUptime + 1.0,
@@ -101,7 +104,10 @@ final class RomaStreamController: IMKInputController {
 
     /// The app ends composition on its own (click, Esc): our guess is not the user's text.
     override func commitComposition(_ sender: Any!) {
-        trace("commitComposition (app asked), marked=\(markedLength)")
+        // Whitespace-normalized, so the probe can compare it with the field as Accessibility reads it.
+        let normalized = markedText.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        let fingerprint = SHA256.hash(data: Data(normalized.utf8)).prefix(6).map { String(format: "%02x", $0) }.joined()
+        trace("commitComposition (app asked), marked=\(markedLength) sha=\(fingerprint)")
         if markedLength > 0 {
             clearGuess(sender as? IMKTextInput)
             RomaStreamController.interrupted = true
@@ -120,6 +126,7 @@ final class RomaStreamController: IMKInputController {
                              selectionRange: NSRange(location: (text as NSString).length, length: 0),
                              replacementRange: NSRange(location: NSNotFound, length: 0))
         markedLength = (text as NSString).length
+        markedText = text
         RomaStreamController.guessOwner = self
         if !RomaStreamController.guessShown {
             DistributedNotificationCenter.default().postNotificationName(

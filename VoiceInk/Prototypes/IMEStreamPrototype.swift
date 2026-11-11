@@ -117,7 +117,8 @@ final class IMEStreamHold {
     /// `.focusMoved` when the user clicked, typed, or moved focus while the guess showed, which, like
     /// live typing, inserts nothing; `.unavailable` means paste as usual.
     func commit(_ text: String) async -> Commit {
-        guard !ended else { return .unavailable }
+        // Ended before release finished: the hold was cancelled; insert nothing.
+        guard !ended else { return .cancelled }
         defer { end() }
         guard guessShown else {
             // Take down a guess still on its way before Roma pastes, or Chrome would keep it as text.

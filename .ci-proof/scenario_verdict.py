@@ -1,4 +1,5 @@
 """PROTOTYPE verdict for the Roma Stream input method across everyday and edge-case holds."""
+import hashlib
 import json
 import re
 import sys
@@ -74,10 +75,13 @@ for spec in (evidence / 'runs.txt').read_text().split():
         # Shift is held, so the click is a Shift-click: Chrome keeps focus in the composer and extends the
         # selection, as it would for the user. What matters: Roma Stream saw the click, refused the
         # commit, and the field keeps exactly the guess that was underlined at the click.
-        ended_at = next((int(m.group(1)) for line in ime_log if (m := re.match(r'commitComposition .*marked=(\d+)', line)) and int(m.group(1)) > 0), None)
-        checks[f'Roma Stream saw the click with a guess up (marked={ended_at})'] = bool(ended_at)
+        ended = next(((int(m.group(1)), m.group(2)) for line in ime_log
+                      if (m := re.match(r'commitComposition .*marked=(\d+) sha=([0-9a-f]+)', line)) and int(m.group(1)) > 0), None)
+        checks[f'Roma Stream saw the click with a guess up ({ended})'] = ended is not None
         checks['Roma Stream refused the commit'] = any(line == 'commit refused: interrupted' for line in ime_log)
-        checks['field keeps exactly the guess shown at the click'] = ended_at is not None and len(raw_final.rstrip('\n')) == ended_at
+        kept = ' '.join(raw_final.split())
+        checks['field keeps exactly the guess shown at the click'] = (
+            ended is not None and hashlib.sha256(kept.encode()).hexdigest()[:12] == ended[1])
         checks['nothing inserted into the newly focused field'] = case.get('otherFieldText') is not None and not case['otherFieldText'].strip()
         checks['transcript kept in History'] = bool(words(history))
         # Roma Stream must answer "moved" at once, not leave Roma to time out.

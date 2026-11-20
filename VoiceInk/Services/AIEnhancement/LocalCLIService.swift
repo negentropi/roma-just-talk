@@ -58,17 +58,27 @@ final class LocalCLIService {
     enum SubscriptionProbe {
         case working
         case noSubscription
-        /// Signed in, but the test request failed: maybe offline, a usage limit, or a CLI too old for the flags.
-        case testRequestFailed
+        case managedByOrganization
+        /// No answer yet: offline, a usage limit, a slow login shell, or a CLI too old for the flags.
+        case retryLater
     }
 
     /// Whether Claude Code is signed in with a subscription and answers a real cleanup request.
     static func probeClaudeSubscription() async -> SubscriptionProbe {
-        (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
-            guard let status = Self.run(VoiceInkSubscriptionCleanupDefault.signInCheckCommand, environment: Self.shellEnvironment(), timeout: 10),
-                  VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: status.exitStatus, stdout: status.stdout)
-            else {
+        if VoiceInkSubscriptionCleanupDefault.managedSettingsPaths.contains(where: FileManager.default.fileExists(atPath:)) {
+            return .managedByOrganization
+        }
+        return (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
+            guard let status = Self.run(VoiceInkSubscriptionCleanupDefault.signInCheckCommand, environment: Self.shellEnvironment(), timeout: 10) else {
+                return .retryLater
+            }
+            switch VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: status.exitStatus, stdout: status.stdout) {
+            case .notSubscription:
                 return .noSubscription
+            case .unknown:
+                return .retryLater
+            case .subscription:
+                break
             }
             do {
                 _ = try Self.runPrompt(
@@ -79,9 +89,9 @@ final class LocalCLIService {
                 )
                 return .working
             } catch {
-                return .testRequestFailed
+                return .retryLater
             }
-        }) ?? .testRequestFailed
+        }) ?? .retryLater
     }
 
     /// The runner blocks on semaphores for up to the timeout, so keep it off Swift's cooperative pool.
@@ -187,11 +197,8 @@ final class LocalCLIService {
         }
 
         if let stdin, let writer = inputPipe?.fileHandleForWriting {
-            // A child that never reads stdin must not raise SIGPIPE in Roma when it exits.
-            _ = fcntl(writer.fileDescriptor, F_SETNOSIGPIPE, 1)
             DispatchQueue.global(qos: .utility).async {
-                try? writer.write(contentsOf: stdin)
-                try? writer.close()
+                writeAll(stdin, to: writer, until: deadline)
             }
         }
 
@@ -219,6 +226,28 @@ final class LocalCLIService {
             stdout: String(decoding: stdoutData, as: UTF8.self),
             stderr: String(decoding: stderrData, as: UTF8.self)
         )
+    }
+
+    /// Non-blocking, so a child that holds stdin open without reading can't strand this thread past the
+    /// deadline, and no SIGPIPE when the child exits first.
+    private static func writeAll(_ data: Data, to writer: FileHandle, until deadline: DispatchTime) {
+        let descriptor = writer.fileDescriptor
+        _ = fcntl(descriptor, F_SETNOSIGPIPE, 1)
+        _ = fcntl(descriptor, F_SETFL, fcntl(descriptor, F_GETFL) | O_NONBLOCK)
+        data.withUnsafeBytes { buffer in
+            var offset = 0
+            while offset < buffer.count, DispatchTime.now() < deadline {
+                let written = Darwin.write(descriptor, buffer.baseAddress! + offset, buffer.count - offset)
+                if written > 0 {
+                    offset += written
+                } else if written < 0, errno == EAGAIN || errno == EINTR {
+                    usleep(5_000)
+                } else {
+                    break
+                }
+            }
+        }
+        try? writer.close()
     }
 
     private static func preferredPATH(fallback: String?) -> String {

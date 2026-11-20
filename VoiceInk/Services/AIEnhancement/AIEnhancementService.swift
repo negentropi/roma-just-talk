@@ -130,9 +130,13 @@ class AIEnhancementService: ObservableObject {
             VoiceInkSubscriptionCleanupDefault.markChecked()
             logger.notice("Subscription cleanup not adopted reason=no-subscription")
             return
-        case .testRequestFailed:
+        case .managedByOrganization:
+            VoiceInkSubscriptionCleanupDefault.markChecked()
+            logger.notice("Subscription cleanup not adopted reason=managed-settings")
+            return
+        case .retryLater:
             VoiceInkSubscriptionCleanupDefault.recordFailedAttempt()
-            logger.notice("Subscription cleanup not adopted reason=test-request-failed")
+            logger.notice("Subscription cleanup not adopted reason=retry-later")
             return
         case .working:
             VoiceInkSubscriptionCleanupDefault.markChecked()

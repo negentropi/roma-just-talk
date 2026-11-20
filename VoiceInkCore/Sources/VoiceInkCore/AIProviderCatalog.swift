@@ -1161,28 +1161,43 @@ public enum VoiceInkSubscriptionCleanupDefault {
     public static let turnOffButtonTitle = "Turn Off"
     public static let adoptedNotificationTitle = "Cleanup is on, using your Claude subscription"
 
-    /// Shared by the sign-in check and the automatic cleanup command so both see the same credentials:
-    /// no user settings, API keys, gateways or cloud providers (any of them can bill per token), and one
-    /// retry so offline fails fast. A template the user loads by hand keeps their CLI configuration.
-    public static let claudeCommandPrefix = "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN -u ANTHROPIC_BASE_URL -u CLAUDE_CODE_USE_BEDROCK -u CLAUDE_CODE_USE_VERTEX -u CLAUDE_CODE_USE_FOUNDRY CLAUDE_CODE_MAX_RETRIES=1 claude --setting-sources \"\""
+    /// Shared by the sign-in check and the automatic cleanup command so both see the same credentials.
+    /// Only allowlisted variables and no user settings reach Claude, so nothing can switch it to an API key,
+    /// gateway, socket or cloud provider; one retry so offline fails fast. Load Template keeps the user's setup.
+    public static let claudeCommandPrefix = "env -i HOME=\"$HOME\" USER=\"$USER\" LOGNAME=\"$LOGNAME\" TMPDIR=\"$TMPDIR\" LANG=\"$LANG\" PATH=\"$PATH\" CLAUDE_CODE_MAX_RETRIES=1 claude --setting-sources \"\""
 
-    /// No tools, MCP servers or session files; the transcript arrives once, as an argument.
-    public static let claudeCleanupArguments = "-p --model sonnet --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" --tools \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence -- \"$VOICEINK_USER_PROMPT\" < /dev/null"
-    /// codex exec prints only the final message on stdout. One simple command, so zsh execs it and a timeout reaches codex itself.
-    public static let codexCleanupArguments = "--skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low -- \"$VOICEINK_FULL_PROMPT\" < /dev/null 2> /dev/null"
+    /// No tools, MCP servers or session files. The prompt arrives once, on stdin, so dictation never shows in
+    /// process listings; the system prompt here is fixed text.
+    public static let claudeCleanupArguments = "-p --model sonnet --system-prompt \"Clean up dictated text. Follow the SYSTEM_PROMPT block in the input exactly and output only the result for the USER_PROMPT block.\" --tools \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence"
+    /// `-` reads the prompt from stdin; codex exec prints only the final message on stdout.
+    public static let codexCleanupArguments = "--skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low - 2> /dev/null"
 
     public static let subscriptionCommand = claudeCommandPrefix + " " + claudeCleanupArguments
     public static let signInCheckCommand = claudeCommandPrefix + " auth status < /dev/null"
 
-    /// True only for a subscription sign-in (claude 2.1.326 `auth status` JSON on stdout);
-    /// api_key, api_key_helper and third_party bill per token.
-    public static func isSubscriptionSignIn(exitStatus: Int32, stdout: String) -> Bool {
-        guard exitStatus == 0,
-              let data = stdout.data(using: .utf8),
-              let status = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-        else { return false }
-        return status["loggedIn"] as? Bool == true &&
-            ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String)
+    /// Organization-managed Claude Code can run hooks that would receive every dictation, so it needs an explicit choice.
+    public static let managedSettingsPaths = [
+        "/Library/Application Support/ClaudeCode/managed-settings.json",
+        "/Library/Application Support/ClaudeCode/managed-settings.d"
+    ]
+
+    public enum SignIn: Equatable {
+        case subscription
+        /// Signed out, or signed in with something billed per token (api_key, api_key_helper, third_party).
+        case notSubscription
+        /// No readable status: a slow or noisy login shell. Worth asking again later.
+        case unknown
+    }
+
+    /// Reads claude 2.1.326 `auth status` JSON, tolerating login-shell banners around it.
+    public static func signIn(exitStatus: Int32, stdout: String) -> SignIn {
+        guard let start = stdout.firstIndex(of: "{"), let end = stdout.lastIndex(of: "}"), start < end,
+              let status = try? JSONSerialization.jsonObject(with: Data(stdout[start...end].utf8)) as? [String: Any],
+              let loggedIn = status["loggedIn"] as? Bool
+        else {
+            return exitStatus == 0 ? .unknown : .notSubscription
+        }
+        return loggedIn && ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String) ? .subscription : .notSubscription
     }
 
     public static func shouldCheck(_ defaults: UserDefaults = .standard) -> Bool {

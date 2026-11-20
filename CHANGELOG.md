@@ -9,7 +9,7 @@
 
 - Store new recordings as Opus instead of WAV, about 10x smaller on disk; playback, Retranscribe, and Retry keep working. Existing WAV recordings are converted once in the background after launch.
 
-- Turn on cleanup by itself when Claude Code is signed in with a subscription (not an API key) and answers a test request: your own Claude plan polishes dictated text, with no API key. A choice you already made is kept, and the notice has a Turn Off button. Automatic cleanup sends only your dictation and custom vocabulary; the new Selected Text Context switch controls whether selected text goes along. The Claude and Codex Local CLI templates start faster (Claude about 2.5 s instead of 8 s), and Codex runs without its shell tool.
+- Turn on cleanup by itself when Claude Code is signed in with a personal subscription (not organization-managed) (not an API key) and answers a test request: your own Claude plan polishes dictated text, with no API key. A choice you already made is kept, and the notice has a Turn Off button. Automatic cleanup sends only your dictation and custom vocabulary; the new Selected Text Context switch controls whether selected text goes along. The Claude and Codex Local CLI templates start faster (Claude about 2.5 s instead of 8 s), Codex runs without its shell tool, and both now receive dictation on stdin so it never appears in process listings.
 
 ## v1.95.1 - 2026-09-11
 

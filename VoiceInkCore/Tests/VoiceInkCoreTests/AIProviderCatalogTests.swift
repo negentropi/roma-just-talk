@@ -136,9 +136,12 @@ final class AIProviderCatalogTests: XCTestCase {
         let apiKey = #"{"loggedIn": true, "authMethod": "api_key", "apiKeySource": "ANTHROPIC_API_KEY"}"#
         let signedOut = #"{"loggedIn": false, "authMethod": "none"}"#
 
-        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: 0, stdout: subscription))
-        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: 0, stdout: apiKey))
-        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: 1, stdout: signedOut))
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: subscription), .subscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "Welcome back!\n" + subscription), .subscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: apiKey), .notSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 1, stdout: signedOut), .notSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 127, stdout: ""), .notSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "loading..."), .unknown)
     }
 
     func testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips() {

@@ -284,8 +284,8 @@ class AIService: ObservableObject {
         ollamaService.selectedModel = modelName
     }
 
-    func loadLocalCLITemplate(_ template: VoiceInkLocalCLITemplate) {
-        localCLIService.loadTemplate(template)
+    func loadLocalCLITemplate(_ template: VoiceInkLocalCLITemplate, command: String? = nil) {
+        localCLIService.loadTemplate(template, command: command)
         refreshLocalCLIConfigurationState()
     }
 

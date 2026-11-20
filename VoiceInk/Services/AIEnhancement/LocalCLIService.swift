@@ -38,9 +38,9 @@ final class LocalCLIService {
         timeoutSeconds = VoiceInkLocalCLIPreference.timeoutSeconds()
     }
 
-    func loadTemplate(_ template: VoiceInkLocalCLITemplate) {
+    func loadTemplate(_ template: VoiceInkLocalCLITemplate, command: String? = nil) {
         selectedTemplate = template
-        commandTemplate = template.commandTemplate
+        commandTemplate = command ?? template.commandTemplate
     }
 
     func enhance(systemPrompt: String, userPrompt: String) async throws -> String {
@@ -67,7 +67,9 @@ final class LocalCLIService {
         await Task.detached(priority: .utility) {
             var probe = SubscriptionProbe()
             for template in candidates {
-                guard let check = VoiceInkSubscriptionCleanupDefault.signInCheckCommand(for: template) else { continue }
+                guard let check = VoiceInkSubscriptionCleanupDefault.signInCheckCommand(for: template),
+                      let command = VoiceInkSubscriptionCleanupDefault.subscriptionCommand(for: template)
+                else { continue }
                 guard let status = run(check, environment: shellEnvironment(), timeout: 10),
                       VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(
                         template,
@@ -81,7 +83,7 @@ final class LocalCLIService {
                 // Catches CLIs too old for the template's flags and credentials the cleanup command can't see.
                 do {
                     _ = try runPrompt(
-                        commandTemplate: template.commandTemplate,
+                        commandTemplate: command,
                         systemPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestSystemPrompt,
                         userPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestUserPrompt,
                         timeout: VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds
@@ -104,7 +106,7 @@ final class LocalCLIService {
         environment["VOICEINK_USER_PROMPT"] = userPrompt
         environment["VOICEINK_FULL_PROMPT"] = fullPrompt
 
-        guard let result = run(commandTemplate, environment: environment, stdin: Data(fullPrompt.utf8), timeout: timeout) else {
+        guard let result = run(commandTemplate, environment: environment, stdin: Data(fullPrompt.utf8), timeout: timeout, requireCompleteOutput: true) else {
             throw VoiceInkLocalCLIExecutionError.timeout(seconds: timeout)
         }
         let stdout = VoiceInkLocalCLIPreference.cleanedOutput(result.stdout)
@@ -140,7 +142,8 @@ final class LocalCLIService {
         arguments: [String] = ["-lc"],
         environment: [String: String],
         stdin: Data? = nil,
-        timeout: TimeInterval
+        timeout: TimeInterval,
+        requireCompleteOutput: Bool = false
     ) -> ShellResult? {
         let deadline = DispatchTime.now() + timeout
         let process = Process()
@@ -209,10 +212,12 @@ final class LocalCLIService {
             return nil
         }
 
-        // A background process the shell started can hold the pipes open; keep what arrived shortly after exit.
-        _ = drained.wait(timeout: .now() + 1)
+        // A background process the shell started can hold the pipes open. Output it may still write is lost,
+        // so a rewrite counts only when complete; PATH discovery keeps what arrived (it has end markers).
+        let complete = drained.wait(timeout: .now() + 1) == .success
         outputPipe.fileHandleForReading.readabilityHandler = nil
         errorPipe.fileHandleForReading.readabilityHandler = nil
+        guard complete || !requireCompleteOutput else { return nil }
         lock.lock()
         defer { lock.unlock() }
         return ShellResult(

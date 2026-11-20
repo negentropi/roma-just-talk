@@ -1140,10 +1140,9 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
         case .pi:
             return "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         case .claude:
-            return VoiceInkSubscriptionCleanupDefault.claudeCommandPrefix + " -p --model sonnet --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" --tools \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence -- \"$VOICEINK_USER_PROMPT\" < /dev/null"
+            return "claude " + VoiceInkSubscriptionCleanupDefault.claudeCleanupArguments
         case .codex:
-            // codex exec prints only the final message on stdout. One simple command, so zsh execs it and a timeout reaches codex itself.
-            return VoiceInkSubscriptionCleanupDefault.codexCommandPrefix + " exec --skip-git-repo-check --ephemeral --ignore-user-config --sandbox read-only --disable shell_tool -c model_reasoning_effort=low -- \"$VOICEINK_FULL_PROMPT\" < /dev/null 2> /dev/null"
+            return "codex exec " + VoiceInkSubscriptionCleanupDefault.codexCleanupArguments
         case .copilot:
             return "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         }
@@ -1158,11 +1157,29 @@ public enum VoiceInkSubscriptionCleanupDefault {
     public static let adoptedTimeoutSeconds: Double = 30
     public static let turnOffButtonTitle = "Turn Off"
 
-    /// Shared by the sign-in check and the cleanup command so both see the same credentials:
-    /// no user settings (they can inject an API key), no API-key fallback, one retry so offline fails fast.
-    public static let claudeCommandPrefix = "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_MAX_RETRIES=1 claude --setting-sources \"\""
+    /// Shared by the sign-in check and the automatic cleanup command so both see the same credentials:
+    /// no user settings, API keys, gateways or cloud providers (any of them can bill per token), and one
+    /// retry so offline fails fast. A template the user loads by hand keeps their CLI configuration.
+    public static let claudeCommandPrefix = "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN -u ANTHROPIC_BASE_URL -u CLAUDE_CODE_USE_BEDROCK -u CLAUDE_CODE_USE_VERTEX -u CLAUDE_CODE_USE_FOUNDRY CLAUDE_CODE_MAX_RETRIES=1 claude --setting-sources \"\""
     /// An API key in the environment takes precedence over the saved ChatGPT login in codex exec.
     public static let codexCommandPrefix = "env -u CODEX_API_KEY -u OPENAI_API_KEY codex"
+
+    /// No tools, MCP servers or session files; the transcript arrives once, as an argument.
+    public static let claudeCleanupArguments = "-p --model sonnet --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" --tools \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence -- \"$VOICEINK_USER_PROMPT\" < /dev/null"
+    /// codex exec prints only the final message on stdout. One simple command, so zsh execs it and a timeout reaches codex itself.
+    public static let codexCleanupArguments = "--skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low -- \"$VOICEINK_FULL_PROMPT\" < /dev/null 2> /dev/null"
+
+    /// The command cleanup runs after turning itself on.
+    public static func subscriptionCommand(for template: VoiceInkLocalCLITemplate) -> String? {
+        switch template {
+        case .claude:
+            return claudeCommandPrefix + " " + claudeCleanupArguments
+        case .codex:
+            return codexCommandPrefix + " exec --ignore-user-config " + codexCleanupArguments
+        case .pi, .copilot:
+            return nil
+        }
+    }
 
     public static func signInCheckCommand(for template: VoiceInkLocalCLITemplate) -> String? {
         switch template {

@@ -136,7 +136,7 @@ class AIEnhancementService: ObservableObject {
         }
         VoiceInkSubscriptionCleanupDefault.markChecked()
 
-        aiService.loadLocalCLITemplate(template)
+        aiService.loadLocalCLITemplate(template, command: VoiceInkSubscriptionCleanupDefault.subscriptionCommand(for: template))
         aiService.updateLocalCLITimeoutSeconds(VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds)
         aiService.selectedProvider = .localCLI
         // Automatic cleanup sends only the dictation; every context source stays opt-in.

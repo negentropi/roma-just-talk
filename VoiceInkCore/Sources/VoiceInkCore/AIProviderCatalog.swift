@@ -1195,7 +1195,8 @@ public enum VoiceInkSubscriptionCleanupDefault {
 
     /// What Settings shows (read-only) for the subscription template; Roma always runs the current
     /// `cleanupArguments`, never this text, so an older saved command can't fall back to a shell.
-    public static let subscriptionCommand = "claude " + cleanupArguments.map(shellQuoted).joined(separator: " ")
+    public static let subscriptionCommand = fixedEnvironment.keys.sorted().map { "\($0)=\(fixedEnvironment[$0]!)" }.joined(separator: " ") +
+        " claude " + cleanupArguments.map(shellQuoted).joined(separator: " ")
 
     /// The Load Template > Claude command: the same flags and switches, but the user's own settings and credentials.
     public static let claudeTemplateCommand = "CLAUDE_CODE_DISABLE_ATTACHMENTS=1 CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 claude " +
@@ -1227,10 +1228,12 @@ public enum VoiceInkSubscriptionCleanupDefault {
         return !settings.isEmpty
     }
 
-    public static let organizationManagedMessage = "Claude Code is now managed by an organization, so Roma stopped sending dictation to it. To keep using it, choose Local CLI > Load Template > Claude (subscription only), or pick another cleanup provider."
-    public static let notSubscriptionMessage = "Claude Code isn't signed in with a Claude subscription, so Roma didn't send dictation to it. Sign in with claude, or pick another cleanup provider."
-    public static let unconfirmedPlanMessage = "Roma couldn't confirm a personal Claude Pro or Max plan, so automatic cleanup didn't send dictation. To use your Claude login anyway, choose Local CLI > Load Template > Claude (subscription only)."
-    public static let unknownSignInMessage = "Roma couldn't confirm Claude Code's sign-in, so it didn't send dictation. Update Claude Code or try again."
+    /// Refusals show in an 80-character notification title, so each leads with what to do.
+    public static let organizationManagedMessage = "Claude is org-managed now. Pick Claude (subscription only) to keep using it."
+    public static let notSubscriptionMessage = "Claude Code has no Claude subscription sign-in. Run claude to sign in."
+    public static let unconfirmedPlanMessage = "No personal Claude plan found. Pick Claude (subscription only) to use yours."
+    public static let shellPathUnavailableMessage = "Couldn't read your shell's PATH to find claude. Try again."
+    public static let unknownSignInMessage = "Couldn't confirm Claude Code's sign-in. Update Claude Code or try again."
 
     /// Checked before every run of the subscription template. Automatic setup needs a personal plan and no
     /// organization policy; a user who picked the template by hand accepts any Claude subscription.

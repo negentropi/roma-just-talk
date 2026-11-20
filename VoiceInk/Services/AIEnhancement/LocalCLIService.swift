@@ -51,17 +51,22 @@ final class LocalCLIService {
             throw VoiceInkLocalCLIExecutionError.commandNotConfigured
         }
 
-        // Captured together, so a template switch during the sign-in check can't relax this request's policy.
-        let commandTemplate = selectedTemplate == .claudeSubscription ? nil : commandTemplate
-        let adoptedAutomatically = UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey)
-        let timeout = timeoutSeconds
+        // Read together on the main actor, where Settings changes them, so a template switch can't pair
+        // one template's route with another's policy.
+        let request: (command: String?, adoptedAutomatically: Bool, timeout: Double) = await MainActor.run {
+            (
+                self.selectedTemplate == .claudeSubscription ? nil : self.commandTemplate,
+                UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey),
+                self.timeoutSeconds
+            )
+        }
         return try await Self.onBlockingQueue(qos: .userInitiated) {
             try Self.runPrompt(
-                commandTemplate: commandTemplate,
-                adoptedAutomatically: adoptedAutomatically,
+                commandTemplate: request.command,
+                adoptedAutomatically: request.adoptedAutomatically,
                 systemPrompt: systemPrompt,
                 userPrompt: userPrompt,
-                timeout: timeout
+                timeout: request.timeout
             )
         }
     }
@@ -77,7 +82,12 @@ final class LocalCLIService {
 
     /// Whether Claude Code is signed in with a personal subscription and answers a real cleanup request.
     static func probeClaudeSubscription() async -> SubscriptionProbe {
-        (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
+        // No Claude Code configuration at all: don't start the user's shell just to look.
+        let home = NSHomeDirectory()
+        guard ["\(home)/.claude", "\(home)/.claude.json"].contains(where: FileManager.default.fileExists(atPath:)) else {
+            return .noSubscription
+        }
+        return (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
             // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
             guard let login = Self.loginEnvironment() else {
                 return .retryLater
@@ -178,7 +188,10 @@ final class LocalCLIService {
     ) throws -> String {
         let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
         guard let commandTemplate else {
-            guard let login = loginEnvironment(), let claude = claudeLaunch(login: login) else {
+            guard let login = loginEnvironment() else {
+                throw VoiceInkLocalCLIExecutionError.executionFailed(VoiceInkSubscriptionCleanupDefault.shellPathUnavailableMessage)
+            }
+            guard let claude = claudeLaunch(login: login) else {
                 throw VoiceInkLocalCLIExecutionError.commandNotFound("claude")
             }
             // Checked every run: the sign-in or organization policy can change after the template was chosen.
@@ -386,8 +399,13 @@ final class LocalCLIService {
     /// fish), or nil if it fails or is too slow. `/usr/bin/env` prints them the same way in every shell.
     private static func discoverLoginEnvironment() -> [String: String]? {
         let loginShell = getpwuid(getuid()).flatMap { String(validatingUTF8: $0.pointee.pw_shell) } ?? "/bin/zsh"
+        // csh and tcsh reject `-ilc`; zsh still reads the system profile.
+        return discoverLoginEnvironment(shell: loginShell) ?? (loginShell == "/bin/zsh" ? nil : discoverLoginEnvironment(shell: "/bin/zsh"))
+    }
+
+    private static func discoverLoginEnvironment(shell: String) -> [String: String]? {
         guard let result = run(
-            URL(fileURLWithPath: loginShell),
+            URL(fileURLWithPath: shell),
             arguments: ["-ilc", "echo __VOICEINK_ENV_START__; /usr/bin/env; echo __VOICEINK_ENV_END__"],
             environment: ProcessInfo.processInfo.environment,
             timeout: 3

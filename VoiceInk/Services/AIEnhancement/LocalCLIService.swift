@@ -165,8 +165,10 @@ final class LocalCLIService {
         let lock = NSLock()
         var stdoutData = Data()
         var stderrData = Data()
-        let drained = DispatchGroup()
+        let stdoutDrained = DispatchGroup()
+        let stderrDrained = DispatchGroup()
         for (pipe, isStdout) in [(outputPipe, true), (errorPipe, false)] {
+            let drained = isStdout ? stdoutDrained : stderrDrained
             drained.enter()
             var reachedEOF = false
             pipe.fileHandleForReading.readabilityHandler = { handle in
@@ -214,8 +216,11 @@ final class LocalCLIService {
         }
 
         // A background process the shell started can hold the pipes open. Output it may still write is lost,
-        // so a rewrite counts only when complete; PATH discovery keeps what arrived (it has end markers).
-        let complete = drained.wait(timeout: .now() + 1) == .success
+        // so a rewrite counts only when stdout is complete; PATH discovery keeps what arrived (it has end
+        // markers). stderr is diagnostics only and never decides.
+        let grace = DispatchTime.now() + 1
+        let complete = stdoutDrained.wait(timeout: grace) == .success
+        _ = stderrDrained.wait(timeout: grace)
         outputPipe.fileHandleForReading.readabilityHandler = nil
         errorPipe.fileHandleForReading.readabilityHandler = nil
         guard complete || !requireCompleteOutput else { return nil }

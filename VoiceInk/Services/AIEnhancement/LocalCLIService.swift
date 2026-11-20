@@ -186,9 +186,18 @@ final class LocalCLIService {
             guard let login = loginEnvironment() else {
                 throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.shellPathUnavailableMessage)
             }
-            // The PATH is cached per launch; re-read it once in case claude moved since.
-            guard let claude = claudeLaunch(login: login) ?? loginEnvironment(refresh: true).flatMap(claudeLaunch(login:)) else {
-                throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.claudeNotFoundMessage)
+            // The PATH is cached per launch; re-read it once in case claude moved since. Suggest reinstalling only
+            // when a fresh read still has no claude.
+            let claude: ClaudeLaunch
+            if let cached = claudeLaunch(login: login) {
+                claude = cached
+            } else if let refreshed = refreshedLoginEnvironment() {
+                guard let found = claudeLaunch(login: refreshed) else {
+                    throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.claudeNotFoundMessage)
+                }
+                claude = found
+            } else {
+                throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.shellPathUnavailableMessage)
             }
             // Checked every run: the sign-in or organization policy can change after the template was chosen.
             if let refusal = VoiceInkSubscriptionCleanupDefault.runRefusal(
@@ -382,17 +391,26 @@ final class LocalCLIService {
         try? writer.close()
     }
 
-    private static func loginEnvironment(refresh: Bool = false) -> [String: String]? {
+    private static func loginEnvironment() -> [String: String]? {
         shellPathQueue.sync {
-            if refresh || cachedLoginEnvironment == nil {
+            if cachedLoginEnvironment == nil {
                 cachedLoginEnvironment = discoverLoginEnvironment()
             }
             return cachedLoginEnvironment
         }
     }
 
-    /// PATH and the `loginEnvironmentNames` values from the user's own interactive login shell (zsh, bash or
-    /// fish), or nil if it fails or is too slow. `/usr/bin/env` prints them the same way in every shell.
+    /// Reads the login environment again; nil if that read fails, and then the last good one stays cached.
+    private static func refreshedLoginEnvironment() -> [String: String]? {
+        shellPathQueue.sync {
+            guard let refreshed = discoverLoginEnvironment() else { return nil }
+            cachedLoginEnvironment = refreshed
+            return refreshed
+        }
+    }
+
+    /// PATH and the `loginEnvironmentNames` values from the user's interactive login shell (or zsh for shells
+    /// that reject `-ilc`), or nil if it fails or is too slow. `/usr/bin/env` prints them the same way everywhere.
     private static func discoverLoginEnvironment() -> [String: String]? {
         let loginShell = getpwuid(getuid()).flatMap { String(validatingUTF8: $0.pointee.pw_shell) } ?? "/bin/zsh"
         // Shells known to accept `-ilc` are read directly; a known shell that fails or is slow means "ask again

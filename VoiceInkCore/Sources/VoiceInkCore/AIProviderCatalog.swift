@@ -1117,6 +1117,9 @@ public struct VoiceInkMacOSLocalCLISettingsPresentation: Equatable, Sendable {
 public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendable {
     case pi
     case claude
+    /// Claude restricted to the user's subscription: what automatic cleanup uses, and how Team or
+    /// Enterprise users opt in to it by hand.
+    case claudeSubscription
     case codex
     case copilot
 
@@ -1128,6 +1131,8 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
             return "Pi"
         case .claude:
             return "Claude"
+        case .claudeSubscription:
+            return "Claude (subscription only)"
         case .codex:
             return "Codex"
         case .copilot:
@@ -1141,6 +1146,8 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
             return "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         case .claude:
             return "claude " + VoiceInkSubscriptionCleanupDefault.claudeCleanupArguments
+        case .claudeSubscription:
+            return VoiceInkSubscriptionCleanupDefault.subscriptionCommand
         case .codex:
             return "codex exec " + VoiceInkSubscriptionCleanupDefault.codexCleanupArguments
         case .copilot:
@@ -1153,7 +1160,7 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
 /// does the rewriting and no API key is needed. Only Claude: Codex runs as a full agent with tools and
 /// about 30x the input tokens, so it stays a template the user loads by hand.
 public enum VoiceInkSubscriptionCleanupDefault {
-    public static let template = VoiceInkLocalCLITemplate.claude
+    public static let template = VoiceInkLocalCLITemplate.claudeSubscription
     public static let checkedKey = "subscriptionCleanupAutoSetupChecked"
     public static let attemptsKey = "subscriptionCleanupAutoSetupAttempts"
     public static let maximumAttempts = 3
@@ -1178,29 +1185,48 @@ public enum VoiceInkSubscriptionCleanupDefault {
     public static let subscriptionCommand = claudeCommandPrefix + " " + claudeCleanupArguments
     public static let signInCheckCommand = claudeCommandPrefix + " auth status < /dev/null"
 
-    /// Organization-managed Claude Code can run hooks that would receive every dictation, so it needs an explicit choice.
-    public static let managedSettingsPaths = [
-        "/Library/Application Support/ClaudeCode/managed-settings.json",
-        "/Library/Application Support/ClaudeCode/managed-settings.d"
-    ]
+    /// Organization-managed Claude Code can run hooks that would receive every dictation, so it needs an
+    /// explicit choice. Server-managed settings reach only Team and Enterprise plans, which `signIn` excludes.
+    public static func managedSettingsPaths(userName: String = NSUserName()) -> [String] {
+        [
+            "/Library/Application Support/ClaudeCode/managed-settings.json",
+            "/Library/Application Support/ClaudeCode/managed-settings.d",
+            "/Library/Managed Preferences/com.anthropic.claudecode.plist",
+            "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist"
+        ]
+    }
 
     public enum SignIn: Equatable {
-        case subscription
-        /// Signed out, or signed in with something billed per token (api_key, api_key_helper, third_party).
+        /// A personal Pro or Max plan.
+        case personalSubscription
+        /// Team or Enterprise: the organization can push settings and hooks from its server.
+        case organizationSubscription
+        /// Not installed, signed out, or signed in with something billed per token (api_key, api_key_helper, third_party).
         case notSubscription
-        /// No readable status: a slow or noisy login shell. Worth asking again later.
+        /// No readable status: a slow, noisy or failing CLI start. Worth asking again later.
         case unknown
     }
 
-    /// Reads claude 2.1.326 `auth status` JSON, tolerating login-shell banners around it.
+    /// Reads claude 2.1.326 `auth status` JSON on stdout, tolerating text around it.
     public static func signIn(exitStatus: Int32, stdout: String) -> SignIn {
         guard let start = stdout.firstIndex(of: "{"), let end = stdout.lastIndex(of: "}"), start < end,
               let status = try? JSONSerialization.jsonObject(with: Data(stdout[start...end].utf8)) as? [String: Any],
               let loggedIn = status["loggedIn"] as? Bool
         else {
-            return exitStatus == 0 ? .unknown : .notSubscription
+            // 127: zsh found no `claude` on the user's PATH.
+            return exitStatus == 127 ? .notSubscription : .unknown
         }
-        return loggedIn && ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String) ? .subscription : .notSubscription
+        guard loggedIn, ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String) else {
+            return .notSubscription
+        }
+        switch status["subscriptionType"] as? String {
+        case "pro", "max":
+            return .personalSubscription
+        case "team", "enterprise":
+            return .organizationSubscription
+        default:
+            return .unknown
+        }
     }
 
     public static func shouldCheck(_ defaults: UserDefaults = .standard) -> Bool {

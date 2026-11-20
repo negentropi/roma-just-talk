@@ -119,7 +119,7 @@ class AIEnhancementService: ObservableObject {
         NotificationCenter.default.removeObserver(self)
     }
 
-    /// Once, while the user hasn't chosen: turns cleanup on with their signed-in Claude Code subscription.
+    /// Once, while the user hasn't chosen: turns cleanup on with their personal Claude Code subscription.
     func adoptSignedInSubscriptionIfUndecided() async {
         guard VoiceInkSubscriptionCleanupDefault.shouldCheck() else { return }
         let probe = await LocalCLIService.probeClaudeSubscription()
@@ -130,9 +130,9 @@ class AIEnhancementService: ObservableObject {
             VoiceInkSubscriptionCleanupDefault.markChecked()
             logger.notice("Subscription cleanup not adopted reason=no-subscription")
             return
-        case .managedByOrganization:
+        case .organizationManaged:
             VoiceInkSubscriptionCleanupDefault.markChecked()
-            logger.notice("Subscription cleanup not adopted reason=managed-settings")
+            logger.notice("Subscription cleanup not adopted reason=organization-managed")
             return
         case .retryLater:
             VoiceInkSubscriptionCleanupDefault.recordFailedAttempt()
@@ -142,10 +142,7 @@ class AIEnhancementService: ObservableObject {
             VoiceInkSubscriptionCleanupDefault.markChecked()
         }
 
-        aiService.loadLocalCLITemplate(
-            VoiceInkSubscriptionCleanupDefault.template,
-            command: VoiceInkSubscriptionCleanupDefault.subscriptionCommand
-        )
+        aiService.loadLocalCLITemplate(VoiceInkSubscriptionCleanupDefault.template)
         aiService.updateLocalCLITimeoutSeconds(VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds)
         aiService.selectedProvider = .localCLI
         // Automatic cleanup sends only the dictation; every context source stays opt-in.

@@ -3,7 +3,9 @@ import VoiceInkCore
 
 final class LocalCLIService {
     private static let shellPathQueue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).localcli.path")
-    private static var cachedInteractiveLoginPATH: String?
+    private static var cachedLoginEnvironment: [String: String]?
+    /// Read from the interactive login shell, where users export them, so Claude sees the same profile and proxy.
+    private static let loginEnvironmentNames = ["PATH", "CLAUDE_CONFIG_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "NODE_EXTRA_CA_CERTS"]
 
     var commandTemplate: String {
         didSet {
@@ -38,9 +40,9 @@ final class LocalCLIService {
         timeoutSeconds = VoiceInkLocalCLIPreference.timeoutSeconds()
     }
 
-    func loadTemplate(_ template: VoiceInkLocalCLITemplate, command: String? = nil) {
+    func loadTemplate(_ template: VoiceInkLocalCLITemplate) {
         selectedTemplate = template
-        commandTemplate = command ?? template.commandTemplate
+        commandTemplate = template.commandTemplate
     }
 
     func enhance(systemPrompt: String, userPrompt: String) async throws -> String {
@@ -58,30 +60,38 @@ final class LocalCLIService {
     enum SubscriptionProbe {
         case working
         case noSubscription
-        case managedByOrganization
+        /// Team, Enterprise or MDM-managed Claude: the organization's hooks could receive dictation.
+        case organizationManaged
         /// No answer yet: offline, a usage limit, a slow login shell, or a CLI too old for the flags.
         case retryLater
     }
 
     /// Whether Claude Code is signed in with a subscription and answers a real cleanup request.
     static func probeClaudeSubscription() async -> SubscriptionProbe {
-        if VoiceInkSubscriptionCleanupDefault.managedSettingsPaths.contains(where: FileManager.default.fileExists(atPath:)) {
-            return .managedByOrganization
+        if VoiceInkSubscriptionCleanupDefault.managedSettingsPaths().contains(where: FileManager.default.fileExists(atPath:)) {
+            return .organizationManaged
         }
         return (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
             // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
-            guard Self.interactiveLoginPATH() != nil else {
+            guard Self.loginEnvironment() != nil else {
                 return .retryLater
             }
-            guard let status = Self.run(VoiceInkSubscriptionCleanupDefault.signInCheckCommand, environment: Self.shellEnvironment(), timeout: 10) else {
+            guard let status = Self.run(
+                VoiceInkSubscriptionCleanupDefault.signInCheckCommand,
+                arguments: ["-c"],
+                environment: Self.shellEnvironment(),
+                timeout: 10
+            ) else {
                 return .retryLater
             }
             switch VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: status.exitStatus, stdout: status.stdout) {
             case .notSubscription:
                 return .noSubscription
+            case .organizationSubscription:
+                return .organizationManaged
             case .unknown:
                 return .retryLater
-            case .subscription:
+            case .personalSubscription:
                 break
             }
             do {
@@ -110,11 +120,26 @@ final class LocalCLIService {
     private static func runPrompt(commandTemplate: String, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
         let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
         var environment = shellEnvironment()
-        environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
-        environment["VOICEINK_USER_PROMPT"] = userPrompt
-        environment["VOICEINK_FULL_PROMPT"] = fullPrompt
+        // Only for commands that read them: environment variables show in same-user process listings
+        // and count against the argument size limit, while stdin always carries the prompt.
+        for (name, value) in [
+            ("VOICEINK_SYSTEM_PROMPT", systemPrompt),
+            ("VOICEINK_USER_PROMPT", userPrompt),
+            ("VOICEINK_FULL_PROMPT", fullPrompt)
+        ] where commandTemplate.contains(name) {
+            environment[name] = value
+        }
+        // The subscription command passes everything it needs itself; a login shell could only add a banner to stdout.
+        let arguments = commandTemplate == VoiceInkSubscriptionCleanupDefault.subscriptionCommand ? ["-c"] : ["-lc"]
 
-        guard let result = run(commandTemplate, environment: environment, stdin: Data(fullPrompt.utf8), timeout: timeout, requireCompleteOutput: true) else {
+        guard let result = run(
+            commandTemplate,
+            arguments: arguments,
+            environment: environment,
+            stdin: Data(fullPrompt.utf8),
+            timeout: timeout,
+            requireCompleteOutput: true
+        ) else {
             throw VoiceInkLocalCLIExecutionError.timeout(seconds: timeout)
         }
         let stdout = VoiceInkLocalCLIPreference.cleanedOutput(result.stdout)
@@ -133,7 +158,11 @@ final class LocalCLIService {
 
     private static func shellEnvironment() -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        environment["PATH"] = preferredPATH(fallback: environment["PATH"])
+        if let loginEnvironment = loginEnvironment() {
+            environment.merge(loginEnvironment) { _, login in login }
+        } else if environment["PATH"]?.isEmpty != false {
+            environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
+        }
         return environment
     }
 
@@ -259,22 +288,20 @@ final class LocalCLIService {
         try? writer.close()
     }
 
-    private static func preferredPATH(fallback: String?) -> String {
-        interactiveLoginPATH() ?? (fallback?.isEmpty == false ? fallback! : "/usr/bin:/bin:/usr/sbin:/sbin")
-    }
-
-    private static func interactiveLoginPATH() -> String? {
+    private static func loginEnvironment() -> [String: String]? {
         shellPathQueue.sync {
-            if cachedInteractiveLoginPATH == nil {
-                cachedInteractiveLoginPATH = discoverPATHFromInteractiveLoginShell()
+            if cachedLoginEnvironment == nil {
+                cachedLoginEnvironment = discoverLoginEnvironment()
             }
-            return cachedInteractiveLoginPATH
+            return cachedLoginEnvironment
         }
     }
 
-    private static func discoverPATHFromInteractiveLoginShell() -> String? {
+    /// PATH and the `loginEnvironmentNames` values from an interactive login shell, or nil if it fails or is too slow.
+    private static func discoverLoginEnvironment() -> [String: String]? {
+        let prints = loginEnvironmentNames.map { "print -r -- \"\($0)=${\($0)}\"" }.joined(separator: "; ")
         guard let result = run(
-            "echo __VOICEINK_PATH_START__; print -r -- $PATH; echo __VOICEINK_PATH_END__",
+            "echo __VOICEINK_ENV_START__; \(prints); echo __VOICEINK_ENV_END__",
             arguments: ["-ilc"],
             environment: ProcessInfo.processInfo.environment,
             timeout: 3
@@ -283,14 +310,21 @@ final class LocalCLIService {
         }
 
         let output = result.stdout
-        guard let startRange = output.range(of: "__VOICEINK_PATH_START__"),
-              let endRange = output.range(of: "__VOICEINK_PATH_END__", range: startRange.upperBound..<output.endIndex)
+        guard let startRange = output.range(of: "__VOICEINK_ENV_START__\n"),
+              let endRange = output.range(of: "__VOICEINK_ENV_END__", range: startRange.upperBound..<output.endIndex)
         else {
             return nil
         }
 
-        let pathSection = output[startRange.upperBound..<endRange.lowerBound]
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return pathSection.isEmpty ? nil : pathSection
+        var environment: [String: String] = [:]
+        for line in output[startRange.upperBound..<endRange.lowerBound].split(separator: "\n") {
+            guard let separator = line.firstIndex(of: "=") else { continue }
+            let name = String(line[..<separator])
+            let value = String(line[line.index(after: separator)...])
+            if loginEnvironmentNames.contains(name), !value.isEmpty {
+                environment[name] = value
+            }
+        }
+        return environment["PATH"] == nil ? nil : environment
     }
 }

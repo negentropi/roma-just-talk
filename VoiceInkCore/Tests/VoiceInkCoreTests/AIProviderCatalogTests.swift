@@ -130,17 +130,20 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
-    func testSubscriptionSignInRejectsAPIKeysAndSignedOutCLIs() {
+    func testSubscriptionSignInAdoptsOnlyPersonalPlans() {
         // Output shapes from claude 2.1.326 `auth status`.
-        let subscription = #"{"loggedIn": true, "authMethod": "claude.ai", "apiProvider": "firstParty"}"#
+        let personal = #"{"loggedIn": true, "authMethod": "claude.ai", "subscriptionType": "max"}"#
+        let team = #"{"loggedIn": true, "authMethod": "claude.ai", "subscriptionType": "team"}"#
         let apiKey = #"{"loggedIn": true, "authMethod": "api_key", "apiKeySource": "ANTHROPIC_API_KEY"}"#
         let signedOut = #"{"loggedIn": false, "authMethod": "none"}"#
 
-        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: subscription), .subscription)
-        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "Welcome back!\n" + subscription), .subscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: personal), .personalSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "Welcome back!\n" + personal), .personalSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: team), .organizationSubscription)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: apiKey), .notSubscription)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 1, stdout: signedOut), .notSubscription)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 127, stdout: ""), .notSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 1, stdout: ""), .unknown)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "loading..."), .unknown)
     }
 

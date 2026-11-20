@@ -1163,6 +1163,8 @@ public enum VoiceInkSubscriptionCleanupDefault {
     public static let template = VoiceInkLocalCLITemplate.claudeSubscription
     public static let checkedKey = "subscriptionCleanupAutoSetupChecked"
     public static let attemptsKey = "subscriptionCleanupAutoSetupAttempts"
+    /// Set while cleanup runs on the command it chose by itself; choosing a template by hand clears it.
+    public static let adoptedAutomaticallyKey = "subscriptionCleanupAdoptedAutomatically"
     public static let maximumAttempts = 3
     public static let adoptedTimeoutSeconds: Double = 30
     public static let turnOffButtonTitle = "Turn Off"
@@ -1187,14 +1189,17 @@ public enum VoiceInkSubscriptionCleanupDefault {
 
     /// Organization-managed Claude Code can run hooks that would receive every dictation, so it needs an
     /// explicit choice. Server-managed settings reach only Team and Enterprise plans, which `signIn` excludes.
-    public static func managedSettingsPaths(userName: String = NSUserName()) -> [String] {
+    public static func managedSettingsPaths(userName: String = NSUserName(), home: String = NSHomeDirectory()) -> [String] {
         [
             "/Library/Application Support/ClaudeCode/managed-settings.json",
             "/Library/Application Support/ClaudeCode/managed-settings.d",
             "/Library/Managed Preferences/com.anthropic.claudecode.plist",
-            "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist"
+            "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist",
+            "\(home)/.claude/remote-settings.json"
         ]
     }
+
+    public static let organizationManagedMessage = "Claude Code is now managed by an organization, so Roma stopped sending dictation to it. Choose a cleanup provider in Settings to continue."
 
     public enum SignIn: Equatable {
         /// A personal Pro or Max plan.

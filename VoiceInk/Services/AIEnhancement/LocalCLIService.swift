@@ -40,9 +40,10 @@ final class LocalCLIService {
         timeoutSeconds = VoiceInkLocalCLIPreference.timeoutSeconds()
     }
 
-    func loadTemplate(_ template: VoiceInkLocalCLITemplate) {
+    func loadTemplate(_ template: VoiceInkLocalCLITemplate, adoptedAutomatically: Bool = false) {
         selectedTemplate = template
         commandTemplate = template.commandTemplate
+        UserDefaults.standard.set(adoptedAutomatically, forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey)
     }
 
     func enhance(systemPrompt: String, userPrompt: String) async throws -> String {
@@ -68,7 +69,7 @@ final class LocalCLIService {
 
     /// Whether Claude Code is signed in with a subscription and answers a real cleanup request.
     static func probeClaudeSubscription() async -> SubscriptionProbe {
-        if VoiceInkSubscriptionCleanupDefault.managedSettingsPaths().contains(where: FileManager.default.fileExists(atPath:)) {
+        if managedClaudeSettingsExist() {
             return .organizationManaged
         }
         return (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
@@ -108,6 +109,10 @@ final class LocalCLIService {
         }) ?? .retryLater
     }
 
+    private static func managedClaudeSettingsExist() -> Bool {
+        VoiceInkSubscriptionCleanupDefault.managedSettingsPaths().contains(where: FileManager.default.fileExists(atPath:))
+    }
+
     /// The runner blocks on semaphores for up to the timeout, so keep it off Swift's cooperative pool.
     private static func onBlockingQueue<T>(qos: DispatchQoS.QoSClass, _ work: @escaping () throws -> T) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in
@@ -118,19 +123,25 @@ final class LocalCLIService {
     }
 
     private static func runPrompt(commandTemplate: String, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
+        let isSubscriptionCommand = commandTemplate == VoiceInkSubscriptionCleanupDefault.subscriptionCommand
+        // Organization policy can appear after automatic adoption; its hooks would receive every dictation.
+        // A user who picked the template by hand chose that.
+        if isSubscriptionCommand,
+           UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey),
+           managedClaudeSettingsExist() {
+            throw VoiceInkLocalCLIExecutionError.executionFailed(VoiceInkSubscriptionCleanupDefault.organizationManagedMessage)
+        }
         let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
         var environment = shellEnvironment()
-        // Only for commands that read them: environment variables show in same-user process listings
-        // and count against the argument size limit, while stdin always carries the prompt.
-        for (name, value) in [
-            ("VOICEINK_SYSTEM_PROMPT", systemPrompt),
-            ("VOICEINK_USER_PROMPT", userPrompt),
-            ("VOICEINK_FULL_PROMPT", fullPrompt)
-        ] where commandTemplate.contains(name) {
-            environment[name] = value
+        // Custom commands are promised these. The subscription command strips them with env -i anyway, and
+        // skipping them keeps dictation out of same-user ps listings and under the argument size limit.
+        if !isSubscriptionCommand {
+            environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
+            environment["VOICEINK_USER_PROMPT"] = userPrompt
+            environment["VOICEINK_FULL_PROMPT"] = fullPrompt
         }
         // The subscription command passes everything it needs itself; a login shell could only add a banner to stdout.
-        let arguments = commandTemplate == VoiceInkSubscriptionCleanupDefault.subscriptionCommand ? ["-c"] : ["-lc"]
+        let arguments = isSubscriptionCommand ? ["-c"] : ["-lc"]
 
         guard let result = run(
             commandTemplate,

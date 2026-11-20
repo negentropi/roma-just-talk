@@ -5,7 +5,7 @@ final class LocalCLIService {
     private static let shellPathQueue = DispatchQueue(label: "\(VoiceInkAppIdentity.loggingSubsystem).localcli.path")
     private static var cachedLoginEnvironment: [String: String]?
     /// Read from the interactive login shell, where users export them, so Claude sees the same profile and proxy.
-    private static let loginEnvironmentNames = ["PATH", "CLAUDE_CONFIG_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "NODE_EXTRA_CA_CERTS"]
+    private static let loginEnvironmentNames = ["PATH"] + VoiceInkSubscriptionCleanupDefault.passthroughEnvironmentNames
 
     var commandTemplate: String {
         didSet {
@@ -61,31 +61,23 @@ final class LocalCLIService {
     enum SubscriptionProbe {
         case working
         case noSubscription
-        /// Team, Enterprise or MDM-managed Claude: the organization's hooks could receive dictation.
+        /// Team, Enterprise or MDM/server-managed Claude: the organization's hooks could receive dictation.
         case organizationManaged
         /// No answer yet: offline, a usage limit, a slow login shell, or a CLI too old for the flags.
         case retryLater
     }
 
-    /// Whether Claude Code is signed in with a subscription and answers a real cleanup request.
+    /// Whether Claude Code is signed in with a personal subscription and answers a real cleanup request.
     static func probeClaudeSubscription() async -> SubscriptionProbe {
-        if managedClaudeSettingsExist() {
-            return .organizationManaged
-        }
-        return (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
-            // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
-            guard Self.loginEnvironment() != nil else {
-                return .retryLater
+        (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
+            guard let claude = Self.claudeLaunch() else {
+                // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
+                return Self.loginEnvironment() == nil ? .retryLater : .noSubscription
             }
-            guard let status = Self.run(
-                VoiceInkSubscriptionCleanupDefault.signInCheckCommand,
-                arguments: ["-c"],
-                environment: Self.shellEnvironment(),
-                timeout: 10
-            ) else {
-                return .retryLater
+            if claude.organizationPolicyExists {
+                return .organizationManaged
             }
-            switch VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: status.exitStatus, stdout: status.stdout) {
+            switch Self.signIn(claude) {
             case .notSubscription:
                 return .noSubscription
             case .organizationSubscription:
@@ -109,10 +101,6 @@ final class LocalCLIService {
         }) ?? .retryLater
     }
 
-    private static func managedClaudeSettingsExist() -> Bool {
-        VoiceInkSubscriptionCleanupDefault.managedSettingsPaths().contains(where: FileManager.default.fileExists(atPath:))
-    }
-
     /// The runner blocks on semaphores for up to the timeout, so keep it off Swift's cooperative pool.
     private static func onBlockingQueue<T>(qos: DispatchQoS.QoSClass, _ work: @escaping () throws -> T) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in
@@ -122,35 +110,94 @@ final class LocalCLIService {
         }
     }
 
-    private static func runPrompt(commandTemplate: String, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
-        let isSubscriptionCommand = commandTemplate == VoiceInkSubscriptionCleanupDefault.subscriptionCommand
-        // Organization policy can appear after automatic adoption; its hooks would receive every dictation.
-        // A user who picked the template by hand chose that.
-        if isSubscriptionCommand,
-           UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey),
-           managedClaudeSettingsExist() {
-            throw VoiceInkLocalCLIExecutionError.executionFailed(VoiceInkSubscriptionCleanupDefault.organizationManagedMessage)
-        }
-        let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
-        var environment = shellEnvironment()
-        // Custom commands are promised these. The subscription command strips them with env -i anyway, and
-        // skipping them keeps dictation out of same-user ps listings and under the argument size limit.
-        if !isSubscriptionCommand {
-            environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
-            environment["VOICEINK_USER_PROMPT"] = userPrompt
-            environment["VOICEINK_FULL_PROMPT"] = fullPrompt
-        }
-        // The subscription command passes everything it needs itself; a login shell could only add a banner to stdout.
-        let arguments = isSubscriptionCommand ? ["-c"] : ["-lc"]
+    /// The user's `claude`, resolved on their login PATH, with the only environment the subscription template gives it.
+    private struct ClaudeLaunch {
+        let executable: URL
+        let environment: [String: String]
 
-        guard let result = run(
-            commandTemplate,
-            arguments: arguments,
-            environment: environment,
-            stdin: Data(fullPrompt.utf8),
-            timeout: timeout,
-            requireCompleteOutput: true
+        var organizationPolicyExists: Bool {
+            let configDirectory = environment["CLAUDE_CONFIG_DIR"] ?? "\(environment["HOME"] ?? NSHomeDirectory())/.claude"
+            return VoiceInkSubscriptionCleanupDefault.managedSettingsPaths(configDirectory: configDirectory)
+                .contains(where: FileManager.default.fileExists(atPath:))
+        }
+    }
+
+    private static func claudeLaunch() -> ClaudeLaunch? {
+        guard let login = loginEnvironment(), let path = login["PATH"],
+              let directory = path.split(separator: ":").first(where: {
+                  FileManager.default.isExecutableFile(atPath: "\($0)/claude")
+              })
+        else {
+            return nil
+        }
+        let base = ProcessInfo.processInfo.environment
+        var environment = VoiceInkSubscriptionCleanupDefault.fixedEnvironment
+        for name in ["HOME", "USER", "LOGNAME", "TMPDIR", "LANG"] {
+            environment[name] = base[name]
+        }
+        environment["PATH"] = path
+        for name in VoiceInkSubscriptionCleanupDefault.passthroughEnvironmentNames {
+            environment[name] = login[name]
+        }
+        return ClaudeLaunch(executable: URL(fileURLWithPath: "\(directory)/claude"), environment: environment)
+    }
+
+    private static func signIn(_ claude: ClaudeLaunch) -> VoiceInkSubscriptionCleanupDefault.SignIn {
+        guard let status = run(
+            claude.executable,
+            arguments: VoiceInkSubscriptionCleanupDefault.authStatusArguments,
+            environment: claude.environment,
+            timeout: 10
         ) else {
+            return .unknown
+        }
+        return VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: status.exitStatus, stdout: status.stdout)
+    }
+
+    private static func runPrompt(commandTemplate: String, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
+        let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
+        let result: ShellResult?
+        if commandTemplate == VoiceInkSubscriptionCleanupDefault.subscriptionCommand {
+            guard let claude = claudeLaunch() else {
+                throw VoiceInkLocalCLIExecutionError.commandNotFound("claude")
+            }
+            // Checked every run: the sign-in or organization policy can change after the template was chosen.
+            if let refusal = VoiceInkSubscriptionCleanupDefault.runRefusal(
+                signIn: signIn(claude),
+                adoptedAutomatically: UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey),
+                organizationPolicyExists: claude.organizationPolicyExists
+            ) {
+                throw VoiceInkLocalCLIExecutionError.executionFailed(refusal)
+            }
+            result = run(
+                claude.executable,
+                arguments: VoiceInkSubscriptionCleanupDefault.cleanupArguments,
+                environment: claude.environment,
+                stdin: Data(fullPrompt.utf8),
+                timeout: timeout,
+                requireCompleteOutput: true
+            )
+        } else {
+            var environment = shellEnvironment()
+            // Custom commands are promised these; the stock Claude and Codex templates read stdin only, and
+            // leaving the variables out keeps dictation out of same-user ps listings.
+            let stdinOnlyTemplates = [VoiceInkLocalCLITemplate.claude, .codex].map(\.commandTemplate)
+            if !stdinOnlyTemplates.contains(commandTemplate) {
+                environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
+                environment["VOICEINK_USER_PROMPT"] = userPrompt
+                environment["VOICEINK_FULL_PROMPT"] = fullPrompt
+            }
+            result = run(
+                URL(fileURLWithPath: "/bin/zsh"),
+                arguments: ["-lc", commandTemplate],
+                environment: environment,
+                stdin: Data(fullPrompt.utf8),
+                timeout: timeout,
+                requireCompleteOutput: true
+            )
+        }
+
+        guard let result else {
             throw VoiceInkLocalCLIExecutionError.timeout(seconds: timeout)
         }
         let stdout = VoiceInkLocalCLIPreference.cleanedOutput(result.stdout)
@@ -183,11 +230,11 @@ final class LocalCLIService {
         let stderr: String
     }
 
-    /// Runs `zsh -lc command` under one deadline. stdin is written and output read concurrently, so a full
+    /// Runs `executable` under one deadline. stdin is written and output read concurrently, so a full
     /// pipe can't stall the child or this caller. Returns nil if it can't launch or misses the deadline.
     private static func run(
-        _ command: String,
-        arguments: [String] = ["-lc"],
+        _ executable: URL,
+        arguments: [String],
         environment: [String: String],
         stdin: Data? = nil,
         timeout: TimeInterval,
@@ -195,8 +242,8 @@ final class LocalCLIService {
     ) -> ShellResult? {
         let deadline = DispatchTime.now() + timeout
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-        process.arguments = arguments + [command]
+        process.executableURL = executable
+        process.arguments = arguments
         process.environment = environment
 
         let outputPipe = Pipe()
@@ -312,8 +359,8 @@ final class LocalCLIService {
     private static func discoverLoginEnvironment() -> [String: String]? {
         let prints = loginEnvironmentNames.map { "print -r -- \"\($0)=${\($0)}\"" }.joined(separator: "; ")
         guard let result = run(
-            "echo __VOICEINK_ENV_START__; \(prints); echo __VOICEINK_ENV_END__",
-            arguments: ["-ilc"],
+            URL(fileURLWithPath: "/bin/zsh"),
+            arguments: ["-ilc", "echo __VOICEINK_ENV_START__; \(prints); echo __VOICEINK_ENV_END__"],
             environment: ProcessInfo.processInfo.environment,
             timeout: 3
         ), result.exitStatus == 0 else {

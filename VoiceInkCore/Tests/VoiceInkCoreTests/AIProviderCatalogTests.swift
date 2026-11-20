@@ -82,7 +82,7 @@ final class AIProviderCatalogTests: XCTestCase {
     }
 
     func testLocalCLITemplatesPreserveRawValuesDisplayNamesAndCommands() {
-        XCTAssertEqual(VoiceInkLocalCLITemplate.allCases, [.pi, .claude, .codex, .copilot])
+        XCTAssertEqual(VoiceInkLocalCLITemplate.allCases, [.pi, .claude, .claudeSubscription, .codex, .copilot])
         XCTAssertEqual(VoiceInkLocalCLITemplate.pi.rawValue, "pi")
         XCTAssertEqual(VoiceInkLocalCLITemplate.claude.rawValue, "claude")
         XCTAssertEqual(VoiceInkLocalCLITemplate.codex.rawValue, "codex")

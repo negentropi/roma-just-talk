@@ -1145,11 +1145,11 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
         case .pi:
             return "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         case .claude:
-            return "claude " + VoiceInkSubscriptionCleanupDefault.claudeCleanupArguments
+            return VoiceInkSubscriptionCleanupDefault.claudeTemplateCommand
         case .claudeSubscription:
             return VoiceInkSubscriptionCleanupDefault.subscriptionCommand
         case .codex:
-            return "codex exec " + VoiceInkSubscriptionCleanupDefault.codexCleanupArguments
+            return VoiceInkSubscriptionCleanupDefault.codexTemplateCommand
         case .copilot:
             return "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         }
@@ -1170,36 +1170,57 @@ public enum VoiceInkSubscriptionCleanupDefault {
     public static let turnOffButtonTitle = "Turn Off"
     public static let adoptedNotificationTitle = "Cleanup is on, using your Claude subscription"
 
-    /// Shared by the sign-in check and the automatic cleanup command so both see the same credentials.
-    /// Only allowlisted variables and no user settings reach Claude, so nothing can switch it to an API key,
-    /// gateway, socket or cloud provider; one retry so offline fails fast. Load Template keeps the user's setup.
-    /// A custom config folder, proxy and CA settings pass through only when set (`${X:+"X=$X"}`).
-    public static let claudeCommandPrefix = "env -i HOME=\"$HOME\" USER=\"$USER\" LOGNAME=\"$LOGNAME\" TMPDIR=\"$TMPDIR\" LANG=\"$LANG\" PATH=\"$PATH\" " +
-        ["CLAUDE_CONFIG_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "NODE_EXTRA_CA_CERTS"].map { "${\($0):+\"\($0)=$\($0)\"} " }.joined() +
-        "CLAUDE_CODE_MAX_RETRIES=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude --setting-sources \"\""
+    /// Claude is launched directly, without a shell, so no shell startup file can add text to the rewrite.
+    /// Only these variables reach it (plus HOME, USER, LOGNAME, TMPDIR, LANG and PATH), so nothing can switch it
+    /// to an API key, gateway, socket, telemetry exporter or cloud provider. Load Template > Claude keeps the user's setup.
+    public static let passthroughEnvironmentNames = ["CLAUDE_CONFIG_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "NODE_EXTRA_CA_CERTS"]
+    public static let fixedEnvironment = ["CLAUDE_CODE_MAX_RETRIES": "1", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"]
 
-    /// No tools, MCP servers or session files. The prompt arrives once, on stdin, so dictation never shows in
-    /// process listings; the system prompt here is fixed text.
-    public static let claudeCleanupArguments = "-p --model sonnet --system-prompt \"Clean up dictated text. Follow the SYSTEM_PROMPT block in the input exactly and output only the result for the USER_PROMPT block.\" --tools \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence"
+    static let cleanupSystemPrompt = "Clean up dictated text. Follow the SYSTEM_PROMPT block in the input exactly and output only the result for the USER_PROMPT block."
+    /// No user settings, tools, MCP servers or session files. The prompt arrives once, on stdin, so dictation
+    /// never shows in process listings.
+    public static let cleanupArguments = [
+        "--setting-sources", "", "-p", "--model", "sonnet", "--system-prompt", cleanupSystemPrompt,
+        "--tools", "", "--strict-mcp-config", "--mcp-config", #"{"mcpServers":{}}"#,
+        "--disable-slash-commands", "--no-session-persistence"
+    ]
+    public static let authStatusArguments = ["--setting-sources", "", "auth", "status"]
+
+    /// What Settings shows for the subscription template; Roma runs `cleanupArguments` directly, not this text.
+    public static let subscriptionCommand = "claude " + cleanupArguments.map { $0.isEmpty || $0.contains(" ") || $0.contains("\"") ? "'\($0)'" : $0 }.joined(separator: " ")
+
+    /// The Load Template > Claude command: the same flags, but the user's own settings and credentials.
+    public static let claudeTemplateCommand = subscriptionCommand.replacingOccurrences(of: "claude --setting-sources '' ", with: "claude ")
     /// `-` reads the prompt from stdin; codex exec prints only the final message on stdout.
-    public static let codexCleanupArguments = "--skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low - 2> /dev/null"
+    public static let codexTemplateCommand = "codex exec --skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low - 2> /dev/null"
 
-    public static let subscriptionCommand = claudeCommandPrefix + " " + claudeCleanupArguments
-    public static let signInCheckCommand = claudeCommandPrefix + " auth status < /dev/null"
-
-    /// Organization-managed Claude Code can run hooks that would receive every dictation, so it needs an
-    /// explicit choice. Server-managed settings reach only Team and Enterprise plans, which `signIn` excludes.
-    public static func managedSettingsPaths(userName: String = NSUserName(), home: String = NSHomeDirectory()) -> [String] {
+    /// Organization-managed Claude Code can run hooks that would receive every dictation. `configDirectory` is
+    /// the effective CLAUDE_CONFIG_DIR (default ~/.claude), where server-managed settings are cached.
+    public static func managedSettingsPaths(configDirectory: String, userName: String = NSUserName()) -> [String] {
         [
             "/Library/Application Support/ClaudeCode/managed-settings.json",
             "/Library/Application Support/ClaudeCode/managed-settings.d",
             "/Library/Managed Preferences/com.anthropic.claudecode.plist",
             "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist",
-            "\(home)/.claude/remote-settings.json"
+            "\(configDirectory)/remote-settings.json"
         ]
     }
 
     public static let organizationManagedMessage = "Claude Code is now managed by an organization, so Roma stopped sending dictation to it. Choose a cleanup provider in Settings to continue."
+    public static let notSubscriptionMessage = "Claude Code isn't signed in with a Claude subscription, so Roma didn't send dictation to it. Sign in with claude, or choose another cleanup provider."
+
+    /// Checked before every run of the subscription template. Automatic setup needs a personal plan and no
+    /// organization policy; a user who picked the template by hand also accepts Team and Enterprise.
+    public static func runRefusal(signIn: SignIn, adoptedAutomatically: Bool, organizationPolicyExists: Bool) -> String? {
+        switch signIn {
+        case .personalSubscription:
+            return adoptedAutomatically && organizationPolicyExists ? organizationManagedMessage : nil
+        case .organizationSubscription:
+            return adoptedAutomatically ? organizationManagedMessage : nil
+        case .notSubscription, .unknown:
+            return notSubscriptionMessage
+        }
+    }
 
     public enum SignIn: Equatable {
         /// A personal Pro or Max plan.

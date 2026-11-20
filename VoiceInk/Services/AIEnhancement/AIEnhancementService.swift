@@ -162,7 +162,8 @@ class AIEnhancementService: ObservableObject {
                         // Only while the setup this notice describes is still the active one.
                         guard let self,
                               self.aiService.selectedProvider == .localCLI,
-                              self.aiService.localCLITemplateSelection == VoiceInkSubscriptionCleanupDefault.template
+                              self.aiService.localCLITemplateSelection == VoiceInkSubscriptionCleanupDefault.template,
+                              UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey)
                         else { return }
                         self.isEnhancementEnabled = false
                     }

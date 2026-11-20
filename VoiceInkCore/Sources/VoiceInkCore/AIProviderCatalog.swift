@@ -1113,7 +1113,7 @@ public struct VoiceInkMacOSLocalCLISettingsPresentation: Equatable, Sendable {
         commandTitle: "Command",
         loadTemplateButtonTitle: "Load Template",
         timeoutPickerTitle: "Timeout",
-        environmentHelpText: "Every command gets the full prompt on stdin. Custom commands also get VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT and VOICEINK_FULL_PROMPT; the built-in Claude and Codex templates read stdin only.",
+        environmentHelpText: "Every command gets the full prompt on stdin. Other commands also get VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT and VOICEINK_FULL_PROMPT; the built-in Claude and Codex templates read stdin only.",
         configurationRequiredHelpText: "Load a template or enter a command to enable Local CLI enhancement."
     )
 }

@@ -243,6 +243,9 @@ final class LocalCLIService {
         guard let result else {
             throw VoiceInkLocalCLIExecutionError.timeout(seconds: timeout)
         }
+        if let launchError = result.launchError {
+            throw VoiceInkLocalCLIExecutionError.executionFailed(launchError)
+        }
         let stdout = VoiceInkLocalCLIPreference.cleanedOutput(result.stdout)
         if result.exitStatus != 0 {
             let stderr = VoiceInkLocalCLIPreference.cleanedOutput(result.stderr)
@@ -273,10 +276,12 @@ final class LocalCLIService {
         let exitStatus: Int32
         let stdout: String
         let stderr: String
+        /// Set when the process never started (missing file, argument list too long…).
+        var launchError: String? = nil
     }
 
     /// Runs `executable` under one deadline. stdin is written and output read concurrently, so a full
-    /// pipe can't stall the child or this caller. Returns nil if it misses the deadline; a launch failure is exit 127.
+    /// pipe can't stall the child or this caller. Returns nil if it misses the deadline.
     private static func run(
         _ executable: URL,
         arguments: [String],
@@ -331,8 +336,12 @@ final class LocalCLIService {
         } catch {
             outputPipe.fileHandleForReading.readabilityHandler = nil
             errorPipe.fileHandleForReading.readabilityHandler = nil
-            // Reported like a missing command, not as a timeout.
-            return ShellResult(exitStatus: 127, stdout: "", stderr: "Could not start \(executable.path): \(error.localizedDescription)")
+            return ShellResult(
+                exitStatus: -1,
+                stdout: "",
+                stderr: "",
+                launchError: "Could not start \(executable.path): \(error.localizedDescription)"
+            )
         }
 
         if let stdin, let writer = inputPipe?.fileHandleForWriting {

@@ -441,7 +441,7 @@ public enum VoiceInkMacOSOnboardingPresentation {
             "Your Writing Assistant",
             "Your Vibe-Coding Assistant",
             "Works Everywhere on Mac with a click",
-            "100% offline & private"
+            "Speech recognized on your Mac"
         ]
     )
 

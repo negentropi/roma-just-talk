@@ -105,6 +105,7 @@ struct VoiceInkApp: App {
 
         let enhancementService = AIEnhancementService(aiService: aiService, modelContext: resolvedContainer.mainContext)
         _enhancementService = StateObject(wrappedValue: enhancementService)
+        Task { await enhancementService.adoptSignedInSubscriptionIfUndecided() }
 
         // 1. Create modelsDirectory URL
         let modelsDirectory = VoiceInkMacOSStorageDirectories.modelsDirectory

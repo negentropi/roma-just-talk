@@ -39,6 +39,12 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
+    @Published var useSelectedTextContext: Bool {
+        didSet {
+            VoiceInkAIEnhancementContextPreference.saveUseSelectedTextContext(useSelectedTextContext)
+        }
+    }
+
     @Published var customPrompts: [VoiceInkCustomPrompt] {
         didSet {
             VoiceInkCustomPromptStorage.savePrompts(customPrompts)
@@ -90,6 +96,7 @@ class AIEnhancementService: ObservableObject {
         self.isEnhancementEnabled = storedIsEnhancementEnabled
         self.useClipboardContext = VoiceInkAIEnhancementContextPreference.useClipboardContext()
         self.useScreenCaptureContext = VoiceInkAIEnhancementContextPreference.useScreenCaptureContext()
+        self.useSelectedTextContext = VoiceInkAIEnhancementContextPreference.useSelectedTextContext()
         let promptStoreState = VoiceInkCustomPromptPolicy.startupStoreState(
             loadedPrompts: VoiceInkCustomPromptStorage.loadPrompts(),
             selectedPromptId: VoiceInkCustomPromptStorage.loadSelectedPromptId(),
@@ -110,6 +117,59 @@ class AIEnhancementService: ObservableObject {
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+
+    /// Once, while the user hasn't chosen: turns cleanup on with their personal Claude Code subscription.
+    func adoptSignedInSubscriptionIfUndecided() async {
+        guard VoiceInkSubscriptionCleanupDefault.shouldCheck() else { return }
+        let probe = await LocalCLIService.probeClaudeSubscription()
+        // Re-check: the user may have chosen a provider while Claude was being probed.
+        guard VoiceInkSubscriptionCleanupDefault.isUndecided() else { return }
+        switch probe {
+        case .noSubscription:
+            VoiceInkSubscriptionCleanupDefault.markChecked()
+            logger.notice("Subscription cleanup not adopted reason=no-subscription")
+            return
+        case .organizationManaged:
+            VoiceInkSubscriptionCleanupDefault.markChecked()
+            logger.notice("Subscription cleanup not adopted reason=organization-managed")
+            return
+        case .retryLater:
+            VoiceInkSubscriptionCleanupDefault.recordFailedAttempt()
+            logger.notice("Subscription cleanup not adopted reason=retry-later")
+            return
+        case .working:
+            VoiceInkSubscriptionCleanupDefault.markChecked()
+        }
+
+        aiService.loadLocalCLITemplate(VoiceInkSubscriptionCleanupDefault.template, adoptedAutomatically: true)
+        aiService.updateLocalCLITimeoutSeconds(VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds)
+        aiService.selectedProvider = .localCLI
+        // Automatic cleanup sends only the dictation; every context source stays opt-in.
+        useSelectedTextContext = false
+        useClipboardContext = false
+        useScreenCaptureContext = false
+        isEnhancementEnabled = true
+        logger.notice("Subscription cleanup adopted template=claude")
+        NotificationManager.shared.showNotification(
+            title: VoiceInkSubscriptionCleanupDefault.adoptedNotificationTitle,
+            type: .success,
+            duration: 8,
+            actionButton: (
+                label: VoiceInkSubscriptionCleanupDefault.turnOffButtonTitle,
+                action: { [weak self] in
+                    Task { @MainActor in
+                        // Only while the setup this notice describes is still the active one.
+                        guard let self,
+                              self.aiService.selectedProvider == .localCLI,
+                              self.aiService.localCLITemplateSelection == VoiceInkSubscriptionCleanupDefault.template,
+                              UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey)
+                        else { return }
+                        self.isEnhancementEnabled = false
+                    }
+                }
+            )
+        )
     }
 
     @objc private func handleAPIKeyChange() {
@@ -159,10 +219,12 @@ class AIEnhancementService: ObservableObject {
     }
 
     private func selectedTextContext() async -> String? {
-        guard AXIsProcessTrusted() else {
+        guard useSelectedTextContext, AXIsProcessTrusted() else {
             return nil
         }
-        return await SelectedTextService.fetchSelectedText()
+        let selectedText = await SelectedTextService.fetchSelectedText()
+        // The switch may have been turned off while the selection was being read.
+        return useSelectedTextContext ? selectedText : nil
     }
 
     private func makeRequest(text: String) async throws -> String {

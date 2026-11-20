@@ -28,6 +28,7 @@ public enum VoiceInkUserDefaultsKey {
     public static let isAIEnhancementEnabled = "isAIEnhancementEnabled"
     public static let useClipboardContext = "useClipboardContext"
     public static let useScreenCaptureContext = "useScreenCaptureContext"
+    public static let useSelectedTextContext = "useSelectedTextContext"
     public static let customPrompts = "customPrompts"
     public static let selectedPromptId = "selectedPromptId"
     public static let powerModeUIFlag = "powerModeUIFlag"
@@ -3414,9 +3415,22 @@ public enum VoiceInkAIEnhancementContextPreference {
         defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
     }
 
+    public static let selectedTextContextTitle = "Selected Text Context"
+    public static let selectedTextContextHelp = "Send text selected in the frontmost app along with your dictation, so cleanup can use it."
+
+    /// On unless switched off; cleanup that turns itself on starts with it off.
+    public static func useSelectedTextContext(from defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.useSelectedTextContext) as? Bool ?? true
+    }
+
+    public static func saveUseSelectedTextContext(_ isEnabled: Bool, to defaults: UserDefaults = .standard) {
+        defaults.set(isEnabled, forKey: VoiceInkUserDefaultsKey.useSelectedTextContext)
+    }
+
     public static func clear(from defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.useClipboardContext)
         defaults.removeObject(forKey: VoiceInkUserDefaultsKey.useScreenCaptureContext)
+        defaults.removeObject(forKey: VoiceInkUserDefaultsKey.useSelectedTextContext)
     }
 }
 

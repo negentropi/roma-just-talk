@@ -82,7 +82,7 @@ final class AIProviderCatalogTests: XCTestCase {
     }
 
     func testLocalCLITemplatesPreserveRawValuesDisplayNamesAndCommands() {
-        XCTAssertEqual(VoiceInkLocalCLITemplate.allCases, [.pi, .claude, .codex, .copilot])
+        XCTAssertEqual(VoiceInkLocalCLITemplate.allCases, [.pi, .claude, .claudeSubscription, .codex, .copilot])
         XCTAssertEqual(VoiceInkLocalCLITemplate.pi.rawValue, "pi")
         XCTAssertEqual(VoiceInkLocalCLITemplate.claude.rawValue, "claude")
         XCTAssertEqual(VoiceInkLocalCLITemplate.codex.rawValue, "codex")
@@ -97,15 +97,96 @@ final class AIProviderCatalogTests: XCTestCase {
             VoiceInkLocalCLITemplate.pi.commandTemplate,
             "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         )
-        XCTAssertEqual(VoiceInkLocalCLITemplate.claude.commandTemplate, "claude -p \"$VOICEINK_FULL_PROMPT\"")
-        XCTAssertEqual(
-            VoiceInkLocalCLITemplate.codex.commandTemplate,
-            "TMPFILE=$(mktemp) && codex exec --skip-git-repo-check --output-last-message \"$TMPFILE\" \"$VOICEINK_FULL_PROMPT\" > /dev/null 2>&1 && cat \"$TMPFILE\" && rm \"$TMPFILE\""
-        )
         XCTAssertEqual(
             VoiceInkLocalCLITemplate.copilot.commandTemplate,
             "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         )
+    }
+
+    func testSubscriptionCleanupDefaultChecksOnceAndOnlyWhileUndecided() {
+        withIsolatedDefaults { defaults in
+            XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+            VoiceInkSubscriptionCleanupDefault.markChecked(defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+        }
+        withIsolatedDefaults { defaults in
+            VoiceInkAIEnhancementPreference.saveIsEnabled(false, to: defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+        }
+        withIsolatedDefaults { defaults in
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProvider(.gemini, to: defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+        }
+    }
+
+    func testSubscriptionCleanupDefaultGivesUpAfterRepeatedFailedTests() {
+        withIsolatedDefaults { defaults in
+            for _ in 1..<VoiceInkSubscriptionCleanupDefault.maximumAttempts {
+                VoiceInkSubscriptionCleanupDefault.recordFailedAttempt(defaults)
+                XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+            }
+            VoiceInkSubscriptionCleanupDefault.recordFailedAttempt(defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+        }
+    }
+
+    func testSubscriptionRunRefusalOnlyLetsAutomaticSetupUsePersonalUnmanagedPlans() {
+        typealias Policy = VoiceInkSubscriptionCleanupDefault
+        let rows: [(Policy.SignIn, automatic: Bool, policy: Bool, allowed: Bool)] = [
+            (.personalSubscription, true, false, true),
+            (.personalSubscription, true, true, false),
+            (.personalSubscription, false, true, true),
+            (.organizationSubscription, true, false, false),
+            (.organizationSubscription, false, false, true),
+            (.otherSubscription, true, false, false),
+            (.otherSubscription, false, false, true),
+            (.notSubscription, false, false, false),
+            (.unknown, false, false, false)
+        ]
+        for row in rows {
+            let refusal = Policy.runRefusal(signIn: row.0, adoptedAutomatically: row.automatic, organizationPolicyExists: row.policy)
+            XCTAssertEqual(refusal == nil, row.allowed, "\(row.0) automatic=\(row.automatic) policy=\(row.policy)")
+        }
+        XCTAssertNotEqual(VoiceInkLocalCLITemplate.claude.commandTemplate, VoiceInkLocalCLITemplate.claudeSubscription.commandTemplate)
+    }
+
+    func testSubscriptionRefusalsShowTheirWholeMessageInTheNotification() {
+        typealias Policy = VoiceInkSubscriptionCleanupDefault
+        for message in [
+            Policy.organizationManagedMessage, Policy.notSubscriptionMessage, Policy.unconfirmedPlanMessage,
+            Policy.unknownSignInMessage, Policy.shellPathUnavailableMessage, Policy.claudeNotFoundMessage
+        ] {
+            guard case .customError(let reason) = VoiceInkAIEnhancementError.localCLIExecutionFailure(
+                VoiceInkLocalCLIExecutionError.subscriptionRefused(message)
+            ) else {
+                XCTFail("refusal should surface as a custom error")
+                continue
+            }
+            let title = VoiceInkPostProcessingFailurePresentation.enhancementFailureNotificationTitle(reason: reason)
+            XCTAssertTrue(title.hasSuffix(message), title)
+        }
+    }
+
+    func testEmptyRemoteSettingsAreNotOrganizationPolicy() {
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(nil))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(Data("{}".utf8)))
+        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(Data(#"{"hooks": {}}"#.utf8)))
+    }
+
+    func testSubscriptionSignInAdoptsOnlyPersonalPlans() {
+        // Output shapes from claude 2.1.326 `auth status`.
+        let personal = #"{"loggedIn": true, "authMethod": "claude.ai", "subscriptionType": "max"}"#
+        let team = #"{"loggedIn": true, "authMethod": "claude.ai", "subscriptionType": "team"}"#
+        let apiKey = #"{"loggedIn": true, "authMethod": "api_key", "apiKeySource": "ANTHROPIC_API_KEY"}"#
+        let signedOut = #"{"loggedIn": false, "authMethod": "none"}"#
+
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: personal), .personalSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "Welcome back!\n" + personal), .personalSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: team), .organizationSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: apiKey), .notSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 1, stdout: signedOut), .notSubscription)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 1, stdout: ""), .unknown)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "loading..."), .unknown)
     }
 
     func testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips() {

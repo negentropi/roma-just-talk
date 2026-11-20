@@ -57,6 +57,14 @@ struct EnhancementSettingsPanel: View {
                     }
                     .toggleStyle(.switch)
 
+                    Toggle(isOn: $enhancementService.useSelectedTextContext) {
+                        HStack(spacing: 4) {
+                            Text(VoiceInkAIEnhancementContextPreference.selectedTextContextTitle)
+                            InfoTip(VoiceInkAIEnhancementContextPreference.selectedTextContextHelp)
+                        }
+                    }
+                    .toggleStyle(.switch)
+
                     Toggle(isOn: $enhancementService.useScreenCaptureContext) {
                         HStack(spacing: 4) {
                             Text(presentation.screenContextTitle)

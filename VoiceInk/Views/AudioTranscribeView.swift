@@ -278,6 +278,8 @@ struct AudioTranscribeView: View {
             isEnhancementEnabled = enhancementService.isEnhancementEnabled
             selectedPromptId = enhancementService.selectedPromptId
         }
+        // Cleanup can turn itself on at launch; the switch must never show Off while it is on.
+        .onReceive(enhancementService.$isEnhancementEnabled) { isEnhancementEnabled = $0 }
     }
 
     // MARK: - Drop Overlay

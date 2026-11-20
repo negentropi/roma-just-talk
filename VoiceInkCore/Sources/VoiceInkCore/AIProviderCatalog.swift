@@ -7,6 +7,8 @@ public enum VoiceInkLocalCLIExecutionError: Error, LocalizedError, Equatable, Se
     case nonZeroExit(status: Int, stderr: String)
     case emptyOutput
     case executionFailed(String)
+    /// Subscription cleanup declined to send; the message already says what to do and must fit a notification title.
+    case subscriptionRefused(String)
 
     public var errorDescription: String? {
         switch self {
@@ -26,6 +28,8 @@ public enum VoiceInkLocalCLIExecutionError: Error, LocalizedError, Equatable, Se
             return "Local CLI command returned empty output."
         case .executionFailed(let message):
             return "Failed to execute Local CLI command: \(message)"
+        case .subscriptionRefused(let message):
+            return message
         }
     }
 }
@@ -1109,7 +1113,7 @@ public struct VoiceInkMacOSLocalCLISettingsPresentation: Equatable, Sendable {
         commandTitle: "Command",
         loadTemplateButtonTitle: "Load Template",
         timeoutPickerTitle: "Timeout",
-        environmentHelpText: "Environment variables available: VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT, VOICEINK_FULL_PROMPT. VoiceInk also writes VOICEINK_FULL_PROMPT to stdin for every command.",
+        environmentHelpText: "Every command gets the full prompt on stdin. Other commands also get VOICEINK_SYSTEM_PROMPT, VOICEINK_USER_PROMPT and VOICEINK_FULL_PROMPT; the built-in Claude and Codex templates read stdin only.",
         configurationRequiredHelpText: "Load a template or enter a command to enable Local CLI enhancement."
     )
 }
@@ -1117,6 +1121,9 @@ public struct VoiceInkMacOSLocalCLISettingsPresentation: Equatable, Sendable {
 public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendable {
     case pi
     case claude
+    /// Claude restricted to the user's subscription: what automatic cleanup uses, and how Team or
+    /// Enterprise users opt in to it by hand.
+    case claudeSubscription
     case codex
     case copilot
 
@@ -1128,6 +1135,8 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
             return "Pi"
         case .claude:
             return "Claude"
+        case .claudeSubscription:
+            return "Claude (subscription only)"
         case .codex:
             return "Codex"
         case .copilot:
@@ -1140,13 +1149,174 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
         case .pi:
             return "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         case .claude:
-            return "claude -p \"$VOICEINK_FULL_PROMPT\""
+            return VoiceInkSubscriptionCleanupDefault.claudeTemplateCommand
+        case .claudeSubscription:
+            return VoiceInkSubscriptionCleanupDefault.subscriptionCommand
         case .codex:
-            return "TMPFILE=$(mktemp) && codex exec --skip-git-repo-check --output-last-message \"$TMPFILE\" \"$VOICEINK_FULL_PROMPT\" > /dev/null 2>&1 && cat \"$TMPFILE\" && rm \"$TMPFILE\""
+            return VoiceInkSubscriptionCleanupDefault.codexTemplateCommand
         case .copilot:
             return "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         }
     }
+}
+
+/// Cleanup turns on by itself with the user's signed-in Claude Code subscription, so their own plan
+/// does the rewriting and no API key is needed. Only Claude: Codex runs as a full agent with tools and
+/// about 30x the input tokens, so it stays a template the user loads by hand.
+public enum VoiceInkSubscriptionCleanupDefault {
+    public static let template = VoiceInkLocalCLITemplate.claudeSubscription
+    public static let checkedKey = "subscriptionCleanupAutoSetupChecked"
+    public static let attemptsKey = "subscriptionCleanupAutoSetupAttempts"
+    /// Set while cleanup runs on the command it chose by itself; choosing a template by hand clears it.
+    public static let adoptedAutomaticallyKey = "subscriptionCleanupAdoptedAutomatically"
+    public static let maximumAttempts = 3
+    public static let adoptedTimeoutSeconds: Double = 30
+    public static let turnOffButtonTitle = "Turn Off"
+    public static let adoptedNotificationTitle = "Cleanup is on, using your Claude subscription"
+
+    /// Claude is launched directly, without a shell, so no shell startup file can add text to the rewrite.
+    /// Only these variables reach it (plus HOME, USER, LOGNAME, TMPDIR, LANG and PATH), so nothing can switch it
+    /// to an API key, gateway, socket, telemetry exporter or cloud provider. Load Template > Claude keeps the user's setup.
+    public static let passthroughEnvironmentNames = ["CLAUDE_CONFIG_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "NODE_EXTRA_CA_CERTS"]
+    /// Attachments off: headless Claude would otherwise read a file named by an `@` mention in the dictation
+    /// and send its contents. Auto-memory off: no memory index from the working directory.
+    public static let fixedEnvironment = [
+        "CLAUDE_CODE_MAX_RETRIES": "1",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+        "CLAUDE_CODE_DISABLE_ATTACHMENTS": "1",
+        "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"
+    ]
+
+    static let cleanupSystemPrompt = "Clean up dictated text. Follow the SYSTEM_PROMPT block in the input exactly and output only the result for the USER_PROMPT block."
+    /// No user settings, tools, MCP servers or session files. The prompt arrives once, on stdin, so dictation
+    /// never shows in process listings.
+    public static let cleanupArguments = [
+        "--setting-sources", "", "-p", "--model", "sonnet", "--system-prompt", cleanupSystemPrompt,
+        "--tools", "", "--strict-mcp-config", "--mcp-config", #"{"mcpServers":{}}"#,
+        "--disable-slash-commands", "--no-session-persistence"
+    ]
+    public static let authStatusArguments = ["--setting-sources", "", "auth", "status", "--json"]
+
+    /// What Settings shows (read-only) for the subscription template; Roma always runs the current
+    /// `cleanupArguments`, never this text, so an older saved command can't fall back to a shell.
+    public static let subscriptionCommand = fixedEnvironment.keys.sorted().map { "\($0)=\(fixedEnvironment[$0]!)" }.joined(separator: " ") +
+        " claude " + cleanupArguments.map(shellQuoted).joined(separator: " ")
+
+    /// The Load Template > Claude command: the same flags and switches, but the user's own settings and credentials.
+    public static let claudeTemplateCommand = "CLAUDE_CODE_DISABLE_ATTACHMENTS=1 CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 claude " +
+        cleanupArguments.dropFirst(2).map(shellQuoted).joined(separator: " ")
+
+    static func shellQuoted(_ argument: String) -> String {
+        let plain = !argument.isEmpty && argument.allSatisfy { $0.isLetter || $0.isNumber || "-_./=".contains($0) }
+        return plain ? argument : "'" + argument.replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
+    /// `-` reads the prompt from stdin; codex exec prints only the final message on stdout.
+    public static let codexTemplateCommand = "codex exec --skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low - 2> /dev/null"
+
+    /// Organization-managed Claude Code can run hooks or inject instructions into every dictation. Anything
+    /// in the system ClaudeCode folder (managed settings, CLAUDE.md, rules) counts.
+    public static func managedSettingsPaths(userName: String = NSUserName()) -> [String] {
+        [
+            "/Library/Application Support/ClaudeCode",
+            "/Library/Managed Preferences/com.anthropic.claudecode.plist",
+            "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist"
+        ]
+    }
+
+    /// Server-managed settings cached in the effective CLAUDE_CONFIG_DIR (default ~/.claude). Claude writes `{}`
+    /// when the organization pushes nothing, so only a non-empty object counts.
+    public static func remoteSettingsHavePolicy(_ contents: Data?) -> Bool {
+        guard let contents, let settings = try? JSONSerialization.jsonObject(with: contents) as? [String: Any] else {
+            return false
+        }
+        return !settings.isEmpty
+    }
+
+    /// Refusals show in an 80-character notification title, so each leads with what to do.
+    public static let organizationManagedMessage = "Claude is org-managed now. Pick Claude (subscription only) to keep using it."
+    public static let notSubscriptionMessage = "Claude Code has no Claude subscription sign-in. Run claude to sign in."
+    public static let unconfirmedPlanMessage = "No personal Claude plan found. Pick Claude (subscription only) to use yours."
+    public static let claudeNotFoundMessage = "Claude Code isn't on your shell's PATH. Reinstall it or pick another provider."
+    public static let shellPathUnavailableMessage = "Couldn't read your shell's PATH to find claude. Try again."
+    public static let unknownSignInMessage = "Couldn't confirm Claude Code's sign-in. Update Claude Code or try again."
+
+    /// Checked before every run of the subscription template. Automatic setup needs a personal plan and no
+    /// organization policy; a user who picked the template by hand accepts any Claude subscription.
+    public static func runRefusal(signIn: SignIn, adoptedAutomatically: Bool, organizationPolicyExists: Bool) -> String? {
+        switch signIn {
+        case .personalSubscription:
+            return adoptedAutomatically && organizationPolicyExists ? organizationManagedMessage : nil
+        case .organizationSubscription:
+            return adoptedAutomatically ? organizationManagedMessage : nil
+        case .otherSubscription:
+            return adoptedAutomatically ? unconfirmedPlanMessage : nil
+        case .notSubscription:
+            return notSubscriptionMessage
+        case .unknown:
+            return unknownSignInMessage
+        }
+    }
+
+    public enum SignIn: Equatable {
+        /// A personal Pro or Max plan.
+        case personalSubscription
+        /// Team or Enterprise: the organization can push settings and hooks from its server.
+        case organizationSubscription
+        /// A claude.ai login whose plan Roma doesn't recognize; fine when chosen by hand, not for automatic setup.
+        case otherSubscription
+        /// Signed out, or signed in with something billed per token (api_key, api_key_helper, third_party).
+        case notSubscription
+        /// No readable status: a slow, noisy or failing CLI start. Worth asking again later.
+        case unknown
+    }
+
+    /// Reads claude 2.1.326 `auth status` JSON on stdout, tolerating text around it.
+    public static func signIn(exitStatus: Int32, stdout: String) -> SignIn {
+        guard let start = stdout.firstIndex(of: "{"), let end = stdout.lastIndex(of: "}"), start < end,
+              let status = try? JSONSerialization.jsonObject(with: Data(stdout[start...end].utf8)) as? [String: Any],
+              let loggedIn = status["loggedIn"] as? Bool
+        else {
+            return .unknown
+        }
+        guard loggedIn, ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String) else {
+            return .notSubscription
+        }
+        switch status["subscriptionType"] as? String {
+        case "pro", "max":
+            return .personalSubscription
+        case "team", "enterprise":
+            return .organizationSubscription
+        default:
+            return .otherSubscription
+        }
+    }
+
+    public static func shouldCheck(_ defaults: UserDefaults = .standard) -> Bool {
+        !defaults.bool(forKey: checkedKey) && isUndecided(defaults)
+    }
+
+    public static func markChecked(_ defaults: UserDefaults = .standard) {
+        defaults.set(true, forKey: checkedKey)
+    }
+
+    /// A failed test request may only mean offline or a usage limit, so it is retried on later launches,
+    /// up to `maximumAttempts`, before setup counts as done.
+    public static func recordFailedAttempt(_ defaults: UserDefaults = .standard) {
+        let attempts = defaults.integer(forKey: attemptsKey) + 1
+        defaults.set(attempts, forKey: attemptsKey)
+        if attempts >= maximumAttempts {
+            markChecked(defaults)
+        }
+    }
+
+    /// Undecided until the user picks a cleanup provider or switches cleanup on or off.
+    public static func isUndecided(_ defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled) == nil &&
+            defaults.object(forKey: VoiceInkUserDefaultsKey.selectedAIProvider) == nil
+    }
+
+    public static let smokeTestSystemPrompt = "Fix capitalization and punctuation. Output only the corrected text."
+    public static let smokeTestUserPrompt = "<TRANSCRIPT>\nhello world\n</TRANSCRIPT>"
 }
 
 public enum VoiceInkLocalCLIPreference {

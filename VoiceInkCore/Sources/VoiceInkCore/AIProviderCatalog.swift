@@ -7,6 +7,8 @@ public enum VoiceInkLocalCLIExecutionError: Error, LocalizedError, Equatable, Se
     case nonZeroExit(status: Int, stderr: String)
     case emptyOutput
     case executionFailed(String)
+    /// Subscription cleanup declined to send; the message already says what to do and must fit a notification title.
+    case subscriptionRefused(String)
 
     public var errorDescription: String? {
         switch self {
@@ -26,6 +28,8 @@ public enum VoiceInkLocalCLIExecutionError: Error, LocalizedError, Equatable, Se
             return "Local CLI command returned empty output."
         case .executionFailed(let message):
             return "Failed to execute Local CLI command: \(message)"
+        case .subscriptionRefused(let message):
+            return message
         }
     }
 }

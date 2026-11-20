@@ -163,6 +163,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionCleanupDefaultChecksOnceAndOnlyWhileUndecided", run: { AIProviderCatalogTests().testSubscriptionCleanupDefaultChecksOnceAndOnlyWhileUndecided() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionCleanupDefaultGivesUpAfterRepeatedFailedTests", run: { AIProviderCatalogTests().testSubscriptionCleanupDefaultGivesUpAfterRepeatedFailedTests() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionRunRefusalOnlyLetsAutomaticSetupUsePersonalUnmanagedPlans", run: { AIProviderCatalogTests().testSubscriptionRunRefusalOnlyLetsAutomaticSetupUsePersonalUnmanagedPlans() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionRefusalsShowTheirWholeMessageInTheNotification", run: { AIProviderCatalogTests().testSubscriptionRefusalsShowTheirWholeMessageInTheNotification() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testEmptyRemoteSettingsAreNotOrganizationPolicy", run: { AIProviderCatalogTests().testEmptyRemoteSettingsAreNotOrganizationPolicy() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionSignInAdoptsOnlyPersonalPlans", run: { AIProviderCatalogTests().testSubscriptionSignInAdoptsOnlyPersonalPlans() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder", run: { AIProviderCatalogTests().testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() }),

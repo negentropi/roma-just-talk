@@ -150,6 +150,23 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertNotEqual(VoiceInkLocalCLITemplate.claude.commandTemplate, VoiceInkLocalCLITemplate.claudeSubscription.commandTemplate)
     }
 
+    func testSubscriptionRefusalsShowTheirWholeMessageInTheNotification() {
+        typealias Policy = VoiceInkSubscriptionCleanupDefault
+        for message in [
+            Policy.organizationManagedMessage, Policy.notSubscriptionMessage, Policy.unconfirmedPlanMessage,
+            Policy.unknownSignInMessage, Policy.shellPathUnavailableMessage
+        ] {
+            guard case .customError(let reason) = VoiceInkAIEnhancementError.localCLIExecutionFailure(
+                VoiceInkLocalCLIExecutionError.subscriptionRefused(message)
+            ) else {
+                XCTFail("refusal should surface as a custom error")
+                continue
+            }
+            let title = VoiceInkPostProcessingFailurePresentation.enhancementFailureNotificationTitle(reason: reason)
+            XCTAssertTrue(title.hasSuffix(message), title)
+        }
+    }
+
     func testEmptyRemoteSettingsAreNotOrganizationPolicy() {
         XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(nil))
         XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(Data("{}".utf8)))

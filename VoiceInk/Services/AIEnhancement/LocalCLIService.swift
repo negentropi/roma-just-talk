@@ -184,7 +184,7 @@ final class LocalCLIService {
         let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
         guard let commandTemplate else {
             guard let login = loginEnvironment() else {
-                throw VoiceInkLocalCLIExecutionError.executionFailed(VoiceInkSubscriptionCleanupDefault.shellPathUnavailableMessage)
+                throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.shellPathUnavailableMessage)
             }
             guard let claude = claudeLaunch(login: login) else {
                 throw VoiceInkLocalCLIExecutionError.commandNotFound("claude")
@@ -195,7 +195,7 @@ final class LocalCLIService {
                 adoptedAutomatically: adoptedAutomatically,
                 organizationPolicyExists: claude.organizationPolicyExists
             ) {
-                throw VoiceInkLocalCLIExecutionError.executionFailed(refusal)
+                throw VoiceInkLocalCLIExecutionError.subscriptionRefused(refusal)
             }
             let result = run(
                 claude.executable,

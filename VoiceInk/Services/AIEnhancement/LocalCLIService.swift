@@ -51,10 +51,18 @@ final class LocalCLIService {
             throw VoiceInkLocalCLIExecutionError.commandNotConfigured
         }
 
+        // Captured together, so a template switch during the sign-in check can't relax this request's policy.
         let commandTemplate = selectedTemplate == .claudeSubscription ? nil : commandTemplate
+        let adoptedAutomatically = UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey)
         let timeout = timeoutSeconds
         return try await Self.onBlockingQueue(qos: .userInitiated) {
-            try Self.runPrompt(commandTemplate: commandTemplate, systemPrompt: systemPrompt, userPrompt: userPrompt, timeout: timeout)
+            try Self.runPrompt(
+                commandTemplate: commandTemplate,
+                adoptedAutomatically: adoptedAutomatically,
+                systemPrompt: systemPrompt,
+                userPrompt: userPrompt,
+                timeout: timeout
+            )
         }
     }
 
@@ -93,6 +101,7 @@ final class LocalCLIService {
             do {
                 _ = try Self.runPrompt(
                     commandTemplate: nil,
+                    adoptedAutomatically: true,
                     systemPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestSystemPrompt,
                     userPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestUserPrompt,
                     timeout: VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds
@@ -160,7 +169,13 @@ final class LocalCLIService {
     }
 
     /// `commandTemplate` nil runs the subscription template: the user's `claude`, launched directly with checks.
-    private static func runPrompt(commandTemplate: String?, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
+    private static func runPrompt(
+        commandTemplate: String?,
+        adoptedAutomatically: Bool,
+        systemPrompt: String,
+        userPrompt: String,
+        timeout: Double
+    ) throws -> String {
         let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
         guard let commandTemplate else {
             guard let login = loginEnvironment(), let claude = claudeLaunch(login: login) else {
@@ -169,7 +184,7 @@ final class LocalCLIService {
             // Checked every run: the sign-in or organization policy can change after the template was chosen.
             if let refusal = VoiceInkSubscriptionCleanupDefault.runRefusal(
                 signIn: signIn(claude),
-                adoptedAutomatically: UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey),
+                adoptedAutomatically: adoptedAutomatically,
                 organizationPolicyExists: claude.organizationPolicyExists
             ) {
                 throw VoiceInkLocalCLIExecutionError.executionFailed(refusal)
@@ -182,7 +197,7 @@ final class LocalCLIService {
                 timeout: timeout,
                 requireCompleteOutput: true
             )
-            return try output(of: result, timeout: timeout, command: "claude")
+            return try output(of: result, timeout: timeout, command: "claude", errorsOnStdout: true)
         }
 
         var environment = shellEnvironment()
@@ -202,18 +217,20 @@ final class LocalCLIService {
             timeout: timeout,
             requireCompleteOutput: true
         )
-        return try output(of: result, timeout: timeout, command: commandTemplate)
+        return try output(of: result, timeout: timeout, command: commandTemplate, errorsOnStdout: false)
     }
 
-    private static func output(of result: ShellResult?, timeout: Double, command: String) throws -> String {
+    /// `claude -p` prints API errors such as a usage limit on stdout, so that is the message to show.
+    private static func output(of result: ShellResult?, timeout: Double, command: String, errorsOnStdout: Bool) throws -> String {
         guard let result else {
             throw VoiceInkLocalCLIExecutionError.timeout(seconds: timeout)
         }
         let stdout = VoiceInkLocalCLIPreference.cleanedOutput(result.stdout)
         if result.exitStatus != 0 {
+            let stderr = VoiceInkLocalCLIPreference.cleanedOutput(result.stderr)
             throw VoiceInkLocalCLIPreference.commandFailureError(
                 terminationStatus: Int(result.exitStatus),
-                stderr: VoiceInkLocalCLIPreference.cleanedOutput(result.stderr),
+                stderr: (errorsOnStdout && !stdout.isEmpty) || stderr.isEmpty ? stdout : stderr,
                 commandTemplate: command
             )
         }
@@ -223,10 +240,11 @@ final class LocalCLIService {
         return stdout
     }
 
+    /// Custom commands get the app environment plus only the user's PATH, as before.
     private static func shellEnvironment() -> [String: String] {
         var environment = ProcessInfo.processInfo.environment
-        if let loginEnvironment = loginEnvironment() {
-            environment.merge(loginEnvironment) { _, login in login }
+        if let path = loginEnvironment()?["PATH"] {
+            environment["PATH"] = path
         } else if environment["PATH"]?.isEmpty != false {
             environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
         }
@@ -364,13 +382,13 @@ final class LocalCLIService {
         }
     }
 
-    /// PATH and the `loginEnvironmentNames` values from an interactive login shell, or nil if it fails or is too slow.
+    /// PATH and the `loginEnvironmentNames` values from the user's own interactive login shell (zsh, bash or
+    /// fish), or nil if it fails or is too slow. `/usr/bin/env` prints them the same way in every shell.
     private static func discoverLoginEnvironment() -> [String: String]? {
-        // `${X-}` so a .zshrc with `setopt nounset` doesn't abort on an unset name before the end marker.
-        let prints = loginEnvironmentNames.map { "print -r -- \"\($0)=${\($0)-}\"" }.joined(separator: "; ")
+        let loginShell = getpwuid(getuid()).flatMap { String(validatingUTF8: $0.pointee.pw_shell) } ?? "/bin/zsh"
         guard let result = run(
-            URL(fileURLWithPath: "/bin/zsh"),
-            arguments: ["-ilc", "echo __VOICEINK_ENV_START__; \(prints); echo __VOICEINK_ENV_END__"],
+            URL(fileURLWithPath: loginShell),
+            arguments: ["-ilc", "echo __VOICEINK_ENV_START__; /usr/bin/env; echo __VOICEINK_ENV_END__"],
             environment: ProcessInfo.processInfo.environment,
             timeout: 3
         ), result.exitStatus == 0 else {

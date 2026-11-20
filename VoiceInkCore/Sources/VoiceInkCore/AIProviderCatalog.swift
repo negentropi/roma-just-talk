@@ -1174,7 +1174,14 @@ public enum VoiceInkSubscriptionCleanupDefault {
     /// Only these variables reach it (plus HOME, USER, LOGNAME, TMPDIR, LANG and PATH), so nothing can switch it
     /// to an API key, gateway, socket, telemetry exporter or cloud provider. Load Template > Claude keeps the user's setup.
     public static let passthroughEnvironmentNames = ["CLAUDE_CONFIG_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "NODE_EXTRA_CA_CERTS"]
-    public static let fixedEnvironment = ["CLAUDE_CODE_MAX_RETRIES": "1", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"]
+    /// Attachments off: headless Claude would otherwise read a file named by an `@` mention in the dictation
+    /// and send its contents. Auto-memory off: no memory index from the working directory.
+    public static let fixedEnvironment = [
+        "CLAUDE_CODE_MAX_RETRIES": "1",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+        "CLAUDE_CODE_DISABLE_ATTACHMENTS": "1",
+        "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"
+    ]
 
     static let cleanupSystemPrompt = "Clean up dictated text. Follow the SYSTEM_PROMPT block in the input exactly and output only the result for the USER_PROMPT block."
     /// No user settings, tools, MCP servers or session files. The prompt arrives once, on stdin, so dictation
@@ -1188,10 +1195,16 @@ public enum VoiceInkSubscriptionCleanupDefault {
 
     /// What Settings shows (read-only) for the subscription template; Roma always runs the current
     /// `cleanupArguments`, never this text, so an older saved command can't fall back to a shell.
-    public static let subscriptionCommand = "claude " + cleanupArguments.map { $0.isEmpty || $0.contains(" ") || $0.contains("\"") ? "'\($0)'" : $0 }.joined(separator: " ")
+    public static let subscriptionCommand = "claude " + cleanupArguments.map(shellQuoted).joined(separator: " ")
 
-    /// The Load Template > Claude command: the same flags, but the user's own settings and credentials.
-    public static let claudeTemplateCommand = subscriptionCommand.replacingOccurrences(of: "claude --setting-sources '' ", with: "claude ")
+    /// The Load Template > Claude command: the same flags and switches, but the user's own settings and credentials.
+    public static let claudeTemplateCommand = "CLAUDE_CODE_DISABLE_ATTACHMENTS=1 CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 claude " +
+        cleanupArguments.dropFirst(2).map(shellQuoted).joined(separator: " ")
+
+    static func shellQuoted(_ argument: String) -> String {
+        let plain = !argument.isEmpty && argument.allSatisfy { $0.isLetter || $0.isNumber || "-_./=".contains($0) }
+        return plain ? argument : "'" + argument.replacingOccurrences(of: "'", with: "'\\''") + "'"
+    }
     /// `-` reads the prompt from stdin; codex exec prints only the final message on stdout.
     public static let codexTemplateCommand = "codex exec --skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low - 2> /dev/null"
 
@@ -1216,6 +1229,7 @@ public enum VoiceInkSubscriptionCleanupDefault {
 
     public static let organizationManagedMessage = "Claude Code is now managed by an organization, so Roma stopped sending dictation to it. To keep using it, choose Local CLI > Load Template > Claude (subscription only), or pick another cleanup provider."
     public static let notSubscriptionMessage = "Claude Code isn't signed in with a Claude subscription, so Roma didn't send dictation to it. Sign in with claude, or pick another cleanup provider."
+    public static let unconfirmedPlanMessage = "Roma couldn't confirm a personal Claude Pro or Max plan, so automatic cleanup didn't send dictation. To use your Claude login anyway, choose Local CLI > Load Template > Claude (subscription only)."
     public static let unknownSignInMessage = "Roma couldn't confirm Claude Code's sign-in, so it didn't send dictation. Update Claude Code or try again."
 
     /// Checked before every run of the subscription template. Automatic setup needs a personal plan and no
@@ -1224,8 +1238,10 @@ public enum VoiceInkSubscriptionCleanupDefault {
         switch signIn {
         case .personalSubscription:
             return adoptedAutomatically && organizationPolicyExists ? organizationManagedMessage : nil
-        case .organizationSubscription, .otherSubscription:
+        case .organizationSubscription:
             return adoptedAutomatically ? organizationManagedMessage : nil
+        case .otherSubscription:
+            return adoptedAutomatically ? unconfirmedPlanMessage : nil
         case .notSubscription:
             return notSubscriptionMessage
         case .unknown:

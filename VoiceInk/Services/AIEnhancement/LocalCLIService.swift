@@ -187,7 +187,7 @@ final class LocalCLIService {
                 throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.shellPathUnavailableMessage)
             }
             guard let claude = claudeLaunch(login: login) else {
-                throw VoiceInkLocalCLIExecutionError.commandNotFound("claude")
+                throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.claudeNotFoundMessage)
             }
             // Checked every run: the sign-in or organization policy can change after the template was chosen.
             if let refusal = VoiceInkSubscriptionCleanupDefault.runRefusal(

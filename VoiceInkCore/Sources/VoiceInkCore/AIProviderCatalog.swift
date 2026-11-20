@@ -1236,6 +1236,7 @@ public enum VoiceInkSubscriptionCleanupDefault {
     public static let organizationManagedMessage = "Claude is org-managed now. Pick Claude (subscription only) to keep using it."
     public static let notSubscriptionMessage = "Claude Code has no Claude subscription sign-in. Run claude to sign in."
     public static let unconfirmedPlanMessage = "No personal Claude plan found. Pick Claude (subscription only) to use yours."
+    public static let claudeNotFoundMessage = "Claude Code isn't on your shell's PATH. Reinstall it or pick another provider."
     public static let shellPathUnavailableMessage = "Couldn't read your shell's PATH to find claude. Try again."
     public static let unknownSignInMessage = "Couldn't confirm Claude Code's sign-in. Update Claude Code or try again."
 

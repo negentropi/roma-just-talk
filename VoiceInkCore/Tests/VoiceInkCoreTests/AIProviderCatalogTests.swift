@@ -154,7 +154,7 @@ final class AIProviderCatalogTests: XCTestCase {
         typealias Policy = VoiceInkSubscriptionCleanupDefault
         for message in [
             Policy.organizationManagedMessage, Policy.notSubscriptionMessage, Policy.unconfirmedPlanMessage,
-            Policy.unknownSignInMessage, Policy.shellPathUnavailableMessage
+            Policy.unknownSignInMessage, Policy.shellPathUnavailableMessage, Policy.claudeNotFoundMessage
         ] {
             guard case .customError(let reason) = VoiceInkAIEnhancementError.localCLIExecutionFailure(
                 VoiceInkLocalCLIExecutionError.subscriptionRefused(message)

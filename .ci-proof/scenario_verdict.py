@@ -61,6 +61,14 @@ for spec in (evidence / 'runs.txt').read_text().split():
         release_delay = None if landed is None else round(landed - up, 2)
         checks[f'insert adds at most 150 ms after the transcript is ready ({added} ms; release to text {release_delay} s)'] = (
             added is not None and added <= 150 and release_delay is not None)
+        # How long after a word was spoken it joined the guess (audio time; delivery to the screen is a few ms).
+        lags = sorted(int(v) for e in (case.get('latencyTrace') or {}).get('events') or []
+                      if e['name'] == 'live_guess.word_lag'
+                      for v in re.search(r'lagMs=([-0-9,]*)', e.get('details') or '').group(1).split(',') if v)
+        median = lags[len(lags) // 2] if lags else None
+        p90 = lags[int(len(lags) * 0.9)] if lags else None
+        checks[f'words join the guess within 300 ms of being spoken (median {median} ms, p90 {p90} ms, n={len(lags)})'] = (
+            median is not None and median <= 300)
     elif scenario in ('cancel', 'silence'):
         if scenario == 'cancel':
             checks['a guess was showing when Esc was pressed'] = bool((case.get('textAtAction') or '').strip())

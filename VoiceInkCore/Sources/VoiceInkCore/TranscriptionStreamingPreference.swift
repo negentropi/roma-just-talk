@@ -270,7 +270,7 @@ public struct AgreementConfig: Equatable, Sendable {
     /// Active-recording policy: starts only after key-down, then immediately consumes pre-roll.
     public static var resolveHingeStreaming: AgreementConfig {
         AgreementConfig(
-            transcribeIntervalSeconds: 0.35,
+            transcribeIntervalSeconds: 0.02,
             tokenConfirmationsNeeded: 3,
             minWordsToConfirm: 5,
             minPassConfidence: 0.15,

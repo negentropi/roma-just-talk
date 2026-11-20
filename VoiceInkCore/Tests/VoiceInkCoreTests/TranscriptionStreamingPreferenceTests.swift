@@ -358,7 +358,7 @@ final class TranscriptionStreamingPreferenceTests: XCTestCase {
         let config = AgreementConfig.resolveHingeStreaming
 
         XCTAssertEqual(defaultConfig.transcribeIntervalSeconds, 1)
-        XCTAssertEqual(config.transcribeIntervalSeconds, 0.35)
+        XCTAssertEqual(config.transcribeIntervalSeconds, 0.02)
     }
 
     func testResolveHingeCommitReusesOnlyCompleteKeyDownHypothesis() {

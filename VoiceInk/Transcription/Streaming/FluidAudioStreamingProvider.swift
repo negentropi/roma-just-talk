@@ -39,7 +39,10 @@ final class FluidAudioStreamingProvider {
     private var latestHypothesisText = ""
     private var latestHypothesisSampleCount = 0
     private let minimumAudioSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
-    private let minNewSamples = ASRConstants.minimumRequiredSamples(forSampleRate: ASRConstants.sampleRate)
+    /// A live pass runs as soon as any new speech arrived. The SDK's 0.3 s floor applies to the whole
+    /// buffer (`minimumAudioSamples`), not to the new part; gating on it held the guess ~0.3 s behind.
+    private let minNewSamples = ASRConstants.sampleRate / 20
+    private var guessWordCount = 0
 
     #if DEBUG
     private var transcribeForTesting: (([Float]) async throws -> ASRResult)?
@@ -138,6 +141,7 @@ final class FluidAudioStreamingProvider {
         trimmedSampleCount = 0
         lastTranscribedSampleCount = 0
         latestHypothesisText = ""
+        guessWordCount = 0
         latestHypothesisSampleCount = 0
         isFinalizing = false
         isDisconnected = false
@@ -467,6 +471,7 @@ final class FluidAudioStreamingProvider {
         }
         if !agreementResult.fullText.isEmpty {
             eventsContinuation?.yield(.partial(text: agreementResult.fullText))
+            traceWordLag(words: words, fullText: agreementResult.fullText)
         }
         let newHypothesisStartTime = agreementEngine.hypothesisStartTime
         if newHypothesisStartTime > 0 {
@@ -478,6 +483,22 @@ final class FluidAudioStreamingProvider {
                 trimmedSampleCount += actualTrim
             }
         }
+    }
+
+    /// Logs how long ago, in audio time, each word new to the guess finished being spoken: the lag a
+    /// speaker sees between saying a word and seeing it, minus delivery to the screen.
+    private func traceWordLag(words: [TimedWord], fullText: String) {
+        let count = fullText.split(whereSeparator: \.isWhitespace).count
+        let newCount = min(max(0, count - guessWordCount), words.count)
+        guessWordCount = count
+        guard newCount > 0 else { return }
+        let now = Double(trimmedSampleCount + audioBuffer.count) / sampleRate
+        let lags = words.suffix(newCount).map { Int((now - $0.endTime) * 1000) }
+        VoiceInkLatencyTrace.shared.event(
+            "live_guess.word_lag",
+            details: "newWords=\(newCount) words=\(count) lagMs=\(lags.map(String.init).joined(separator: \",\"))",
+            token: latencyTraceToken
+        )
     }
 
     private func finalAudioSnapshot() -> (samples: [Float], seek: Int, trimmed: Int)? {

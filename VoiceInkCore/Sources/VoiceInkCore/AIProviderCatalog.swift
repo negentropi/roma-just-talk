@@ -1194,20 +1194,27 @@ public enum VoiceInkSubscriptionCleanupDefault {
     /// `-` reads the prompt from stdin; codex exec prints only the final message on stdout.
     public static let codexTemplateCommand = "codex exec --skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low - 2> /dev/null"
 
-    /// Organization-managed Claude Code can run hooks that would receive every dictation. `configDirectory` is
-    /// the effective CLAUDE_CONFIG_DIR (default ~/.claude), where server-managed settings are cached.
-    public static func managedSettingsPaths(configDirectory: String, userName: String = NSUserName()) -> [String] {
+    /// Organization-managed Claude Code can run hooks that would receive every dictation.
+    public static func managedSettingsPaths(userName: String = NSUserName()) -> [String] {
         [
             "/Library/Application Support/ClaudeCode/managed-settings.json",
             "/Library/Application Support/ClaudeCode/managed-settings.d",
             "/Library/Managed Preferences/com.anthropic.claudecode.plist",
-            "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist",
-            "\(configDirectory)/remote-settings.json"
+            "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist"
         ]
     }
 
-    public static let organizationManagedMessage = "Claude Code is now managed by an organization, so Roma stopped sending dictation to it. Choose a cleanup provider in Settings to continue."
-    public static let notSubscriptionMessage = "Claude Code isn't signed in with a Claude subscription, so Roma didn't send dictation to it. Sign in with claude, or choose another cleanup provider."
+    /// Server-managed settings cached in the effective CLAUDE_CONFIG_DIR (default ~/.claude). Claude writes `{}`
+    /// when the organization pushes nothing, so only a non-empty object counts.
+    public static func remoteSettingsHavePolicy(_ contents: Data?) -> Bool {
+        guard let contents, let settings = try? JSONSerialization.jsonObject(with: contents) as? [String: Any] else {
+            return false
+        }
+        return !settings.isEmpty
+    }
+
+    public static let organizationManagedMessage = "Claude Code is now managed by an organization, so Roma stopped sending dictation to it. To keep using it, choose Local CLI > Load Template > Claude (subscription only), or pick another cleanup provider."
+    public static let notSubscriptionMessage = "Claude Code isn't signed in with a Claude subscription, so Roma didn't send dictation to it. Sign in with claude, or pick another cleanup provider."
 
     /// Checked before every run of the subscription template. Automatic setup needs a personal plan and no
     /// organization policy; a user who picked the template by hand also accepts Team and Enterprise.

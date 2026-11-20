@@ -130,6 +130,12 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
+    func testEmptyRemoteSettingsAreNotOrganizationPolicy() {
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(nil))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(Data("{}".utf8)))
+        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(Data(#"{"hooks": {}}"#.utf8)))
+    }
+
     func testSubscriptionSignInAdoptsOnlyPersonalPlans() {
         // Output shapes from claude 2.1.326 `auth status`.
         let personal = #"{"loggedIn": true, "authMethod": "claude.ai", "subscriptionType": "max"}"#

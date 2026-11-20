@@ -117,8 +117,10 @@ final class LocalCLIService {
 
         var organizationPolicyExists: Bool {
             let configDirectory = environment["CLAUDE_CONFIG_DIR"] ?? "\(environment["HOME"] ?? NSHomeDirectory())/.claude"
-            return VoiceInkSubscriptionCleanupDefault.managedSettingsPaths(configDirectory: configDirectory)
-                .contains(where: FileManager.default.fileExists(atPath:))
+            return VoiceInkSubscriptionCleanupDefault.managedSettingsPaths().contains(where: FileManager.default.fileExists(atPath:)) ||
+                VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(
+                    FileManager.default.contents(atPath: "\(configDirectory)/remote-settings.json")
+                )
         }
     }
 

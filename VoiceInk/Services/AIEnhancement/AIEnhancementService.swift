@@ -122,22 +122,27 @@ class AIEnhancementService: ObservableObject {
     /// Once, while the user hasn't chosen: turns cleanup on with a CLI signed in to their own subscription.
     func adoptSignedInSubscriptionIfUndecided() async {
         guard VoiceInkSubscriptionCleanupDefault.shouldCheck() else { return }
-        let (found, rejected) = await LocalCLIService.firstWorkingSubscriptionTemplate(
+        let probe = await LocalCLIService.firstWorkingSubscriptionTemplate(
             VoiceInkSubscriptionCleanupDefault.preferredTemplates
         )
         // Re-check: the user may have chosen a provider while the CLIs were being probed.
         guard VoiceInkSubscriptionCleanupDefault.isUndecided() else { return }
-        VoiceInkSubscriptionCleanupDefault.markChecked()
-        guard let template = found else {
-            logger.notice("Subscription cleanup not adopted rejected=\(rejected.joined(separator: ","), privacy: .public)")
+        guard let template = probe.template else {
+            if !probe.hadTransientFailure {
+                VoiceInkSubscriptionCleanupDefault.markChecked()
+            }
+            logger.notice("Subscription cleanup not adopted rejected=\(probe.rejected.joined(separator: ","), privacy: .public) retry=\(probe.hadTransientFailure, privacy: .public)")
             return
         }
+        VoiceInkSubscriptionCleanupDefault.markChecked()
 
         aiService.loadLocalCLITemplate(template)
         aiService.updateLocalCLITimeoutSeconds(VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds)
         aiService.selectedProvider = .localCLI
-        // Automatic cleanup sends only the dictation; selected text stays opt-in.
+        // Automatic cleanup sends only the dictation; every context source stays opt-in.
         useSelectedTextContext = false
+        useClipboardContext = false
+        useScreenCaptureContext = false
         isEnhancementEnabled = true
         logger.notice("Subscription cleanup adopted template=\(template.rawValue, privacy: .public)")
         NotificationManager.shared.showNotification(

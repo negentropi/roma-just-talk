@@ -1143,7 +1143,7 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
             return VoiceInkSubscriptionCleanupDefault.claudeCommandPrefix + " -p --model sonnet --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" --tools \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence -- \"$VOICEINK_USER_PROMPT\" < /dev/null"
         case .codex:
             // codex exec prints only the final message on stdout. One simple command, so zsh execs it and a timeout reaches codex itself.
-            return "codex exec --skip-git-repo-check --ephemeral --ignore-user-config --sandbox read-only -c model_reasoning_effort=low -- \"$VOICEINK_FULL_PROMPT\" < /dev/null 2> /dev/null"
+            return VoiceInkSubscriptionCleanupDefault.codexCommandPrefix + " exec --skip-git-repo-check --ephemeral --ignore-user-config --sandbox read-only --disable shell_tool -c model_reasoning_effort=low -- \"$VOICEINK_FULL_PROMPT\" < /dev/null 2> /dev/null"
         case .copilot:
             return "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         }
@@ -1161,13 +1161,15 @@ public enum VoiceInkSubscriptionCleanupDefault {
     /// Shared by the sign-in check and the cleanup command so both see the same credentials:
     /// no user settings (they can inject an API key), no API-key fallback, one retry so offline fails fast.
     public static let claudeCommandPrefix = "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_MAX_RETRIES=1 claude --setting-sources \"\""
+    /// An API key in the environment takes precedence over the saved ChatGPT login in codex exec.
+    public static let codexCommandPrefix = "env -u CODEX_API_KEY -u OPENAI_API_KEY codex"
 
     public static func signInCheckCommand(for template: VoiceInkLocalCLITemplate) -> String? {
         switch template {
         case .claude:
             return claudeCommandPrefix + " auth status < /dev/null"
         case .codex:
-            return "codex login status < /dev/null"
+            return codexCommandPrefix + " login status < /dev/null"
         case .pi, .copilot:
             return nil
         }
@@ -1184,6 +1186,7 @@ public enum VoiceInkSubscriptionCleanupDefault {
             return status["loggedIn"] as? Bool == true &&
                 ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String)
         case .codex:
+            // codex 0.170 prints the status on stderr; callers pass stdout and stderr together.
             return output.contains("Logged in using ChatGPT")
         case .pi, .copilot:
             return false

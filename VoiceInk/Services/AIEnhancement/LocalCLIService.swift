@@ -56,17 +56,26 @@ final class LocalCLIService {
     }
 
     /// The first preferred template whose CLI is signed in with a subscription and answers a real cleanup request.
-    static func firstWorkingSubscriptionTemplate(
-        _ candidates: [VoiceInkLocalCLITemplate]
-    ) async -> (template: VoiceInkLocalCLITemplate?, rejected: [String]) {
+    struct SubscriptionProbe {
+        var template: VoiceInkLocalCLITemplate?
+        var rejected: [String] = []
+        /// A signed-in CLI failed its test request, perhaps only because the network is down.
+        var hadTransientFailure = false
+    }
+
+    static func firstWorkingSubscriptionTemplate(_ candidates: [VoiceInkLocalCLITemplate]) async -> SubscriptionProbe {
         await Task.detached(priority: .utility) {
-            var rejected: [String] = []
+            var probe = SubscriptionProbe()
             for template in candidates {
                 guard let check = VoiceInkSubscriptionCleanupDefault.signInCheckCommand(for: template) else { continue }
                 guard let status = run(check, environment: shellEnvironment(), timeout: 10),
-                      VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(template, exitStatus: status.exitStatus, output: status.stdout)
+                      VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(
+                        template,
+                        exitStatus: status.exitStatus,
+                        output: status.stdout + status.stderr
+                      )
                 else {
-                    rejected.append("\(template.rawValue):no-subscription")
+                    probe.rejected.append("\(template.rawValue):no-subscription")
                     continue
                 }
                 // Catches CLIs too old for the template's flags and credentials the cleanup command can't see.
@@ -77,12 +86,14 @@ final class LocalCLIService {
                         userPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestUserPrompt,
                         timeout: VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds
                     )
-                    return (template, rejected)
+                    probe.template = template
+                    return probe
                 } catch {
-                    rejected.append("\(template.rawValue):smoke-test-failed")
+                    probe.rejected.append("\(template.rawValue):smoke-test-failed")
+                    probe.hadTransientFailure = true
                 }
             }
-            return (nil, rejected)
+            return probe
         }.value
     }
 
@@ -189,7 +200,10 @@ final class LocalCLIService {
 
         guard exited.wait(timeout: deadline) == .success else {
             process.terminate()
-            _ = exited.wait(timeout: .now() + 2)
+            if exited.wait(timeout: .now() + 2) == .timedOut {
+                kill(process.processIdentifier, SIGKILL)
+                _ = exited.wait(timeout: .now() + 1)
+            }
             outputPipe.fileHandleForReading.readabilityHandler = nil
             errorPipe.fileHandleForReading.readabilityHandler = nil
             return nil

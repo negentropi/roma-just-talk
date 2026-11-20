@@ -493,10 +493,10 @@ final class FluidAudioStreamingProvider {
         guessWordCount = count
         guard newCount > 0 else { return }
         let now = Double(trimmedSampleCount + audioBuffer.count) / sampleRate
-        let lags = words.suffix(newCount).map { Int((now - $0.endTime) * 1000) }
+        let lags = words.suffix(newCount).map { String(Int((now - $0.endTime) * 1000)) }.joined(separator: ",")
         VoiceInkLatencyTrace.shared.event(
             "live_guess.word_lag",
-            details: "newWords=\(newCount) words=\(count) lagMs=\(lags.map(String.init).joined(separator: \",\"))",
+            details: "newWords=\(newCount) words=\(count) lagMs=\(lags)",
             token: latencyTraceToken
         )
     }

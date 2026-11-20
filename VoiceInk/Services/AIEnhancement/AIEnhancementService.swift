@@ -159,7 +159,12 @@ class AIEnhancementService: ObservableObject {
                 label: VoiceInkSubscriptionCleanupDefault.turnOffButtonTitle,
                 action: { [weak self] in
                     Task { @MainActor in
-                        self?.isEnhancementEnabled = false
+                        // Only while the setup this notice describes is still the active one.
+                        guard let self,
+                              self.aiService.selectedProvider == .localCLI,
+                              self.aiService.localCLITemplateSelection == VoiceInkSubscriptionCleanupDefault.template
+                        else { return }
+                        self.isEnhancementEnabled = false
                     }
                 }
             )
@@ -216,7 +221,9 @@ class AIEnhancementService: ObservableObject {
         guard useSelectedTextContext, AXIsProcessTrusted() else {
             return nil
         }
-        return await SelectedTextService.fetchSelectedText()
+        let selectedText = await SelectedTextService.fetchSelectedText()
+        // The switch may have been turned off while the selection was being read.
+        return useSelectedTextContext ? selectedText : nil
     }
 
     private func makeRequest(text: String) async throws -> String {

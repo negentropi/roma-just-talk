@@ -276,7 +276,7 @@ final class LocalCLIService {
     }
 
     /// Runs `executable` under one deadline. stdin is written and output read concurrently, so a full
-    /// pipe can't stall the child or this caller. Returns nil if it can't launch or misses the deadline.
+    /// pipe can't stall the child or this caller. Returns nil if it misses the deadline; a launch failure is exit 127.
     private static func run(
         _ executable: URL,
         arguments: [String],
@@ -331,7 +331,8 @@ final class LocalCLIService {
         } catch {
             outputPipe.fileHandleForReading.readabilityHandler = nil
             errorPipe.fileHandleForReading.readabilityHandler = nil
-            return nil
+            // Reported like a missing command, not as a timeout.
+            return ShellResult(exitStatus: 127, stdout: "", stderr: "Could not start \(executable.path): \(error.localizedDescription)")
         }
 
         if let stdin, let writer = inputPipe?.fileHandleForWriting {

@@ -47,18 +47,18 @@ final class LocalCLIService {
     }
 
     func enhance(systemPrompt: String, userPrompt: String) async throws -> String {
-        guard isConfigured else {
-            throw VoiceInkLocalCLIExecutionError.commandNotConfigured
-        }
-
         // Read together on the main actor, where Settings changes them, so a template switch can't pair
         // one template's route with another's policy.
-        let request: (command: String?, adoptedAutomatically: Bool, timeout: Double) = await MainActor.run {
+        let request: (isConfigured: Bool, command: String?, adoptedAutomatically: Bool, timeout: Double) = await MainActor.run {
             (
+                self.isConfigured,
                 self.selectedTemplate == .claudeSubscription ? nil : self.commandTemplate,
                 UserDefaults.standard.bool(forKey: VoiceInkSubscriptionCleanupDefault.adoptedAutomaticallyKey),
                 self.timeoutSeconds
             )
+        }
+        guard request.isConfigured else {
+            throw VoiceInkLocalCLIExecutionError.commandNotConfigured
         }
         return try await Self.onBlockingQueue(qos: .userInitiated) {
             try Self.runPrompt(
@@ -82,12 +82,7 @@ final class LocalCLIService {
 
     /// Whether Claude Code is signed in with a personal subscription and answers a real cleanup request.
     static func probeClaudeSubscription() async -> SubscriptionProbe {
-        // No Claude Code configuration at all: don't start the user's shell just to look.
-        let home = NSHomeDirectory()
-        guard ["\(home)/.claude", "\(home)/.claude.json"].contains(where: FileManager.default.fileExists(atPath:)) else {
-            return .noSubscription
-        }
-        return (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
+        (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
             // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
             guard let login = Self.loginEnvironment() else {
                 return .retryLater
@@ -399,8 +394,10 @@ final class LocalCLIService {
     /// fish), or nil if it fails or is too slow. `/usr/bin/env` prints them the same way in every shell.
     private static func discoverLoginEnvironment() -> [String: String]? {
         let loginShell = getpwuid(getuid()).flatMap { String(validatingUTF8: $0.pointee.pw_shell) } ?? "/bin/zsh"
-        // csh and tcsh reject `-ilc`; zsh still reads the system profile.
-        return discoverLoginEnvironment(shell: loginShell) ?? (loginShell == "/bin/zsh" ? nil : discoverLoginEnvironment(shell: "/bin/zsh"))
+        // csh and tcsh reject `-ilc`, so read zsh's (it still loads the system profile). Any other shell that
+        // fails or is slow means "ask again later", not a PATH without claude.
+        let isCshFamily = ["csh", "tcsh"].contains(URL(fileURLWithPath: loginShell).lastPathComponent)
+        return discoverLoginEnvironment(shell: isCshFamily ? "/bin/zsh" : loginShell)
     }
 
     private static func discoverLoginEnvironment(shell: String) -> [String: String]? {

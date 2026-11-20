@@ -119,18 +119,26 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
-    func testSubscriptionSignInRejectsAPIKeysAndSignedOutCLIs() {
-        // Output shapes from claude 2.1.326 `auth status` and codex 0.170 `login status`.
-        let claudeSubscription = #"{"loggedIn": true, "authMethod": "claude.ai", "apiProvider": "firstParty"}"#
-        let claudeAPIKey = #"{"loggedIn": true, "authMethod": "api_key", "apiKeySource": "ANTHROPIC_API_KEY"}"#
-        let claudeSignedOut = #"{"loggedIn": false, "authMethod": "none"}"#
+    func testSubscriptionCleanupDefaultGivesUpAfterRepeatedFailedTests() {
+        withIsolatedDefaults { defaults in
+            for _ in 1..<VoiceInkSubscriptionCleanupDefault.maximumAttempts {
+                VoiceInkSubscriptionCleanupDefault.recordFailedAttempt(defaults)
+                XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+            }
+            VoiceInkSubscriptionCleanupDefault.recordFailedAttempt(defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+        }
+    }
 
-        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.claude, exitStatus: 0, output: claudeSubscription))
-        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.claude, exitStatus: 0, output: claudeAPIKey))
-        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.claude, exitStatus: 1, output: claudeSignedOut))
-        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.codex, exitStatus: 0, output: "Logged in using ChatGPT\n"))
-        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.codex, exitStatus: 0, output: "Logged in using an API key - sk-proj-***\n"))
-        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.codex, exitStatus: 1, output: "Not logged in\n"))
+    func testSubscriptionSignInRejectsAPIKeysAndSignedOutCLIs() {
+        // Output shapes from claude 2.1.326 `auth status`.
+        let subscription = #"{"loggedIn": true, "authMethod": "claude.ai", "apiProvider": "firstParty"}"#
+        let apiKey = #"{"loggedIn": true, "authMethod": "api_key", "apiKeySource": "ANTHROPIC_API_KEY"}"#
+        let signedOut = #"{"loggedIn": false, "authMethod": "none"}"#
+
+        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: 0, stdout: subscription))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: 0, stdout: apiKey))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: 1, stdout: signedOut))
     }
 
     func testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips() {

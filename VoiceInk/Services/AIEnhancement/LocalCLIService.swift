@@ -50,53 +50,47 @@ final class LocalCLIService {
 
         let commandTemplate = commandTemplate
         let timeout = timeoutSeconds
-        return try await Task.detached(priority: .userInitiated) {
+        return try await Self.onBlockingQueue(qos: .userInitiated) {
             try Self.runPrompt(commandTemplate: commandTemplate, systemPrompt: systemPrompt, userPrompt: userPrompt, timeout: timeout)
-        }.value
+        }
     }
 
-    /// The first preferred template whose CLI is signed in with a subscription and answers a real cleanup request.
-    struct SubscriptionProbe {
-        var template: VoiceInkLocalCLITemplate?
-        var rejected: [String] = []
-        /// A signed-in CLI failed its test request, perhaps only because the network is down.
-        var hadTransientFailure = false
+    enum SubscriptionProbe {
+        case working
+        case noSubscription
+        /// Signed in, but the test request failed: maybe offline, a usage limit, or a CLI too old for the flags.
+        case testRequestFailed
     }
 
-    static func firstWorkingSubscriptionTemplate(_ candidates: [VoiceInkLocalCLITemplate]) async -> SubscriptionProbe {
-        await Task.detached(priority: .utility) {
-            var probe = SubscriptionProbe()
-            for template in candidates {
-                guard let check = VoiceInkSubscriptionCleanupDefault.signInCheckCommand(for: template),
-                      let command = VoiceInkSubscriptionCleanupDefault.subscriptionCommand(for: template)
-                else { continue }
-                guard let status = run(check, environment: shellEnvironment(), timeout: 10),
-                      VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(
-                        template,
-                        exitStatus: status.exitStatus,
-                        output: status.stdout + status.stderr
-                      )
-                else {
-                    probe.rejected.append("\(template.rawValue):no-subscription")
-                    continue
-                }
-                // Catches CLIs too old for the template's flags and credentials the cleanup command can't see.
-                do {
-                    _ = try runPrompt(
-                        commandTemplate: command,
-                        systemPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestSystemPrompt,
-                        userPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestUserPrompt,
-                        timeout: VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds
-                    )
-                    probe.template = template
-                    return probe
-                } catch {
-                    probe.rejected.append("\(template.rawValue):smoke-test-failed")
-                    probe.hadTransientFailure = true
-                }
+    /// Whether Claude Code is signed in with a subscription and answers a real cleanup request.
+    static func probeClaudeSubscription() async -> SubscriptionProbe {
+        (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
+            guard let status = Self.run(VoiceInkSubscriptionCleanupDefault.signInCheckCommand, environment: Self.shellEnvironment(), timeout: 10),
+                  VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(exitStatus: status.exitStatus, stdout: status.stdout)
+            else {
+                return .noSubscription
             }
-            return probe
-        }.value
+            do {
+                _ = try Self.runPrompt(
+                    commandTemplate: VoiceInkSubscriptionCleanupDefault.subscriptionCommand,
+                    systemPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestSystemPrompt,
+                    userPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestUserPrompt,
+                    timeout: VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds
+                )
+                return .working
+            } catch {
+                return .testRequestFailed
+            }
+        }) ?? .testRequestFailed
+    }
+
+    /// The runner blocks on semaphores for up to the timeout, so keep it off Swift's cooperative pool.
+    private static func onBlockingQueue<T>(qos: DispatchQoS.QoSClass, _ work: @escaping () throws -> T) async throws -> T {
+        try await withCheckedThrowingContinuation { continuation in
+            DispatchQueue.global(qos: qos).async {
+                continuation.resume(with: Result { try work() })
+            }
+        }
     }
 
     private static func runPrompt(commandTemplate: String, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {

@@ -119,24 +119,29 @@ class AIEnhancementService: ObservableObject {
         NotificationCenter.default.removeObserver(self)
     }
 
-    /// Once, while the user hasn't chosen: turns cleanup on with a CLI signed in to their own subscription.
+    /// Once, while the user hasn't chosen: turns cleanup on with their signed-in Claude Code subscription.
     func adoptSignedInSubscriptionIfUndecided() async {
         guard VoiceInkSubscriptionCleanupDefault.shouldCheck() else { return }
-        let probe = await LocalCLIService.firstWorkingSubscriptionTemplate(
-            VoiceInkSubscriptionCleanupDefault.preferredTemplates
-        )
-        // Re-check: the user may have chosen a provider while the CLIs were being probed.
+        let probe = await LocalCLIService.probeClaudeSubscription()
+        // Re-check: the user may have chosen a provider while Claude was being probed.
         guard VoiceInkSubscriptionCleanupDefault.isUndecided() else { return }
-        guard let template = probe.template else {
-            if !probe.hadTransientFailure {
-                VoiceInkSubscriptionCleanupDefault.markChecked()
-            }
-            logger.notice("Subscription cleanup not adopted rejected=\(probe.rejected.joined(separator: ","), privacy: .public) retry=\(probe.hadTransientFailure, privacy: .public)")
+        switch probe {
+        case .noSubscription:
+            VoiceInkSubscriptionCleanupDefault.markChecked()
+            logger.notice("Subscription cleanup not adopted reason=no-subscription")
             return
+        case .testRequestFailed:
+            VoiceInkSubscriptionCleanupDefault.recordFailedAttempt()
+            logger.notice("Subscription cleanup not adopted reason=test-request-failed")
+            return
+        case .working:
+            VoiceInkSubscriptionCleanupDefault.markChecked()
         }
-        VoiceInkSubscriptionCleanupDefault.markChecked()
 
-        aiService.loadLocalCLITemplate(template, command: VoiceInkSubscriptionCleanupDefault.subscriptionCommand(for: template))
+        aiService.loadLocalCLITemplate(
+            VoiceInkSubscriptionCleanupDefault.template,
+            command: VoiceInkSubscriptionCleanupDefault.subscriptionCommand
+        )
         aiService.updateLocalCLITimeoutSeconds(VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds)
         aiService.selectedProvider = .localCLI
         // Automatic cleanup sends only the dictation; every context source stays opt-in.
@@ -144,9 +149,9 @@ class AIEnhancementService: ObservableObject {
         useClipboardContext = false
         useScreenCaptureContext = false
         isEnhancementEnabled = true
-        logger.notice("Subscription cleanup adopted template=\(template.rawValue, privacy: .public)")
+        logger.notice("Subscription cleanup adopted template=claude")
         NotificationManager.shared.showNotification(
-            title: VoiceInkSubscriptionCleanupDefault.adoptedNotificationTitle(for: template),
+            title: VoiceInkSubscriptionCleanupDefault.adoptedNotificationTitle,
             type: .success,
             duration: 8,
             actionButton: (

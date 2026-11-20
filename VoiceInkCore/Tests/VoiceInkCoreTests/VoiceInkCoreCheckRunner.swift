@@ -161,6 +161,7 @@ struct VoiceInkCoreCheckRunner {
             VoiceInkCoreCheck(name: "CustomPromptTests.testPostProcessingFinalizedTranscriptStripsReasoningTags", run: { CustomPromptTests().testPostProcessingFinalizedTranscriptStripsReasoningTags() }),
             VoiceInkCoreCheck(name: "CustomPromptTests.testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload", run: { CustomPromptTests().testPostProcessingFinalizedTranscriptStripsCodexFollowUpPayload() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionCleanupDefaultChecksOnceAndOnlyWhileUndecided", run: { AIProviderCatalogTests().testSubscriptionCleanupDefaultChecksOnceAndOnlyWhileUndecided() }),
+            VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionCleanupDefaultGivesUpAfterRepeatedFailedTests", run: { AIProviderCatalogTests().testSubscriptionCleanupDefaultGivesUpAfterRepeatedFailedTests() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testSubscriptionSignInRejectsAPIKeysAndSignedOutCLIs", run: { AIProviderCatalogTests().testSubscriptionSignInRejectsAPIKeysAndSignedOutCLIs() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder", run: { AIProviderCatalogTests().testEnhancementPromptBuilderAppendsContextSectionsInMacOSOrder() }),
             VoiceInkCoreCheck(name: "AIProviderCatalogTests.testEnhancementPromptBuilderSkipsMissingAndEmptyContextSections", run: { AIProviderCatalogTests().testEnhancementPromptBuilderSkipsMissingAndEmptyContextSections() }),

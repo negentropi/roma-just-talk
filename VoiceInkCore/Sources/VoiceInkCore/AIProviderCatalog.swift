@@ -1164,7 +1164,10 @@ public enum VoiceInkSubscriptionCleanupDefault {
     /// Shared by the sign-in check and the automatic cleanup command so both see the same credentials.
     /// Only allowlisted variables and no user settings reach Claude, so nothing can switch it to an API key,
     /// gateway, socket or cloud provider; one retry so offline fails fast. Load Template keeps the user's setup.
-    public static let claudeCommandPrefix = "env -i HOME=\"$HOME\" USER=\"$USER\" LOGNAME=\"$LOGNAME\" TMPDIR=\"$TMPDIR\" LANG=\"$LANG\" PATH=\"$PATH\" CLAUDE_CODE_MAX_RETRIES=1 claude --setting-sources \"\""
+    /// A custom config folder, proxy and CA settings pass through only when set (`${X:+"X=$X"}`).
+    public static let claudeCommandPrefix = "env -i HOME=\"$HOME\" USER=\"$USER\" LOGNAME=\"$LOGNAME\" TMPDIR=\"$TMPDIR\" LANG=\"$LANG\" PATH=\"$PATH\" " +
+        ["CLAUDE_CONFIG_DIR", "HTTPS_PROXY", "HTTP_PROXY", "NO_PROXY", "NODE_EXTRA_CA_CERTS"].map { "${\($0):+\"\($0)=$\($0)\"} " }.joined() +
+        "CLAUDE_CODE_MAX_RETRIES=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 claude --setting-sources \"\""
 
     /// No tools, MCP servers or session files. The prompt arrives once, on stdin, so dictation never shows in
     /// process listings; the system prompt here is fixed text.

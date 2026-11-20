@@ -69,6 +69,10 @@ final class LocalCLIService {
             return .managedByOrganization
         }
         return (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
+            // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
+            guard Self.interactiveLoginPATH() != nil else {
+                return .retryLater
+            }
             guard let status = Self.run(VoiceInkSubscriptionCleanupDefault.signInCheckCommand, environment: Self.shellEnvironment(), timeout: 10) else {
                 return .retryLater
             }
@@ -256,17 +260,15 @@ final class LocalCLIService {
     }
 
     private static func preferredPATH(fallback: String?) -> String {
+        interactiveLoginPATH() ?? (fallback?.isEmpty == false ? fallback! : "/usr/bin:/bin:/usr/sbin:/sbin")
+    }
+
+    private static func interactiveLoginPATH() -> String? {
         shellPathQueue.sync {
-            if let cachedInteractiveLoginPATH {
-                return cachedInteractiveLoginPATH
+            if cachedInteractiveLoginPATH == nil {
+                cachedInteractiveLoginPATH = discoverPATHFromInteractiveLoginShell()
             }
-
-            if let discovered = discoverPATHFromInteractiveLoginShell() {
-                cachedInteractiveLoginPATH = discovered
-                return discovered
-            }
-
-            return fallback?.isEmpty == false ? fallback! : "/usr/bin:/bin:/usr/sbin:/sbin"
+            return cachedInteractiveLoginPATH
         }
     }
 

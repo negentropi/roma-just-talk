@@ -1140,32 +1140,62 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
         case .pi:
             return "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         case .claude:
-            // No tools, user settings, or MCP servers: startup drops from ~8 s to ~3 s per dictation.
-            return "claude -p --model sonnet --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" --tools \"\" --setting-sources \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence -- \"$VOICEINK_USER_PROMPT\""
+            return VoiceInkSubscriptionCleanupDefault.claudeCommandPrefix + " -p --model sonnet --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" --tools \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence -- \"$VOICEINK_USER_PROMPT\" < /dev/null"
         case .codex:
-            // stdin must be closed: codex exec waits for piped stdin before answering.
-            return "TMPFILE=$(mktemp) && codex exec --skip-git-repo-check --ephemeral --ignore-user-config --sandbox read-only -c model_reasoning_effort=low --output-last-message \"$TMPFILE\" -- \"$VOICEINK_FULL_PROMPT\" < /dev/null > /dev/null 2>&1 && cat \"$TMPFILE\" && rm \"$TMPFILE\""
+            // codex exec prints only the final message on stdout. One simple command, so zsh execs it and a timeout reaches codex itself.
+            return "codex exec --skip-git-repo-check --ephemeral --ignore-user-config --sandbox read-only -c model_reasoning_effort=low -- \"$VOICEINK_FULL_PROMPT\" < /dev/null 2> /dev/null"
         case .copilot:
             return "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         }
     }
 }
 
-/// Cleanup turns on by itself with a CLI the user is already signed in to, so their own
-/// Claude or ChatGPT plan does the rewriting and no API key is needed.
+/// Cleanup turns on by itself, once, with a CLI the user is signed in to with a subscription,
+/// so their own Claude or ChatGPT plan does the rewriting and no API key is needed.
 public enum VoiceInkSubscriptionCleanupDefault {
     public static let preferredTemplates: [VoiceInkLocalCLITemplate] = [.claude, .codex]
+    public static let checkedKey = "subscriptionCleanupAutoSetupChecked"
+    public static let adoptedTimeoutSeconds: Double = 30
+    public static let turnOffButtonTitle = "Turn Off"
 
-    /// Exits 0 only when the CLI is signed in.
-    public static func signedInCheckCommand(for template: VoiceInkLocalCLITemplate) -> String? {
+    /// Shared by the sign-in check and the cleanup command so both see the same credentials:
+    /// no user settings (they can inject an API key), no API-key fallback, one retry so offline fails fast.
+    public static let claudeCommandPrefix = "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN CLAUDE_CODE_MAX_RETRIES=1 claude --setting-sources \"\""
+
+    public static func signInCheckCommand(for template: VoiceInkLocalCLITemplate) -> String? {
         switch template {
         case .claude:
-            return "claude auth status"
+            return claudeCommandPrefix + " auth status < /dev/null"
         case .codex:
-            return "codex login status"
+            return "codex login status < /dev/null"
         case .pi, .copilot:
             return nil
         }
+    }
+
+    /// True only for a subscription sign-in; API keys and third-party providers bill per token.
+    public static func isSubscriptionSignIn(_ template: VoiceInkLocalCLITemplate, exitStatus: Int32, output: String) -> Bool {
+        guard exitStatus == 0 else { return false }
+        switch template {
+        case .claude:
+            guard let data = output.data(using: .utf8),
+                  let status = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            else { return false }
+            return status["loggedIn"] as? Bool == true &&
+                ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String)
+        case .codex:
+            return output.contains("Logged in using ChatGPT")
+        case .pi, .copilot:
+            return false
+        }
+    }
+
+    public static func shouldCheck(_ defaults: UserDefaults = .standard) -> Bool {
+        !defaults.bool(forKey: checkedKey) && isUndecided(defaults)
+    }
+
+    public static func markChecked(_ defaults: UserDefaults = .standard) {
+        defaults.set(true, forKey: checkedKey)
     }
 
     /// Undecided until the user picks a cleanup provider or switches cleanup on or off.
@@ -1174,12 +1204,20 @@ public enum VoiceInkSubscriptionCleanupDefault {
             defaults.object(forKey: VoiceInkUserDefaultsKey.selectedAIProvider) == nil
     }
 
-    public static func template(signedIn: Set<VoiceInkLocalCLITemplate>) -> VoiceInkLocalCLITemplate? {
-        preferredTemplates.first(where: signedIn.contains)
+    public static let smokeTestSystemPrompt = "Fix capitalization and punctuation. Output only the corrected text."
+    public static let smokeTestUserPrompt = "<TRANSCRIPT>\nhello world\n</TRANSCRIPT>"
+
+    public static func planName(for template: VoiceInkLocalCLITemplate) -> String {
+        switch template {
+        case .codex:
+            return "ChatGPT plan"
+        default:
+            return "\(template.displayName) subscription"
+        }
     }
 
     public static func adoptedNotificationTitle(for template: VoiceInkLocalCLITemplate) -> String {
-        "Cleanup is on, using your \(template.displayName) subscription"
+        "Cleanup is on, using your \(planName(for: template))"
     }
 }
 

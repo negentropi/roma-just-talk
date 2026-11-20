@@ -103,20 +103,34 @@ final class AIProviderCatalogTests: XCTestCase {
         )
     }
 
-    func testSubscriptionCleanupDefaultOnlyAppliesUntilTheUserDecides() {
+    func testSubscriptionCleanupDefaultChecksOnceAndOnlyWhileUndecided() {
         withIsolatedDefaults { defaults in
-            XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isUndecided(defaults))
+            XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+            VoiceInkSubscriptionCleanupDefault.markChecked(defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
+        }
+        withIsolatedDefaults { defaults in
             VoiceInkAIEnhancementPreference.saveIsEnabled(false, to: defaults)
-            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isUndecided(defaults))
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
         }
         withIsolatedDefaults { defaults in
             VoiceInkAIEnhancementProviderPreference.saveSelectedProvider(.gemini, to: defaults)
-            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isUndecided(defaults))
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.shouldCheck(defaults))
         }
+    }
 
-        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.template(signedIn: [.codex, .claude]), .claude)
-        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.template(signedIn: [.codex]), .codex)
-        XCTAssertNil(VoiceInkSubscriptionCleanupDefault.template(signedIn: [.pi, .copilot]))
+    func testSubscriptionSignInRejectsAPIKeysAndSignedOutCLIs() {
+        // Output shapes from claude 2.1.326 `auth status` and codex 0.170 `login status`.
+        let claudeSubscription = #"{"loggedIn": true, "authMethod": "claude.ai", "apiProvider": "firstParty"}"#
+        let claudeAPIKey = #"{"loggedIn": true, "authMethod": "api_key", "apiKeySource": "ANTHROPIC_API_KEY"}"#
+        let claudeSignedOut = #"{"loggedIn": false, "authMethod": "none"}"#
+
+        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.claude, exitStatus: 0, output: claudeSubscription))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.claude, exitStatus: 0, output: claudeAPIKey))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.claude, exitStatus: 1, output: claudeSignedOut))
+        XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.codex, exitStatus: 0, output: "Logged in using ChatGPT\n"))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.codex, exitStatus: 0, output: "Logged in using an API key - sk-proj-***\n"))
+        XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(.codex, exitStatus: 1, output: "Not logged in\n"))
     }
 
     func testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips() {

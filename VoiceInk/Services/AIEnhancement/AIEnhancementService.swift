@@ -39,6 +39,12 @@ class AIEnhancementService: ObservableObject {
         }
     }
 
+    @Published var useSelectedTextContext: Bool {
+        didSet {
+            VoiceInkAIEnhancementContextPreference.saveUseSelectedTextContext(useSelectedTextContext)
+        }
+    }
+
     @Published var customPrompts: [VoiceInkCustomPrompt] {
         didSet {
             VoiceInkCustomPromptStorage.savePrompts(customPrompts)
@@ -90,6 +96,7 @@ class AIEnhancementService: ObservableObject {
         self.isEnhancementEnabled = storedIsEnhancementEnabled
         self.useClipboardContext = VoiceInkAIEnhancementContextPreference.useClipboardContext()
         self.useScreenCaptureContext = VoiceInkAIEnhancementContextPreference.useScreenCaptureContext()
+        self.useSelectedTextContext = VoiceInkAIEnhancementContextPreference.useSelectedTextContext()
         let promptStoreState = VoiceInkCustomPromptPolicy.startupStoreState(
             loadedPrompts: VoiceInkCustomPromptStorage.loadPrompts(),
             selectedPromptId: VoiceInkCustomPromptStorage.loadSelectedPromptId(),
@@ -112,25 +119,39 @@ class AIEnhancementService: ObservableObject {
         NotificationCenter.default.removeObserver(self)
     }
 
-    /// Turns cleanup on with the user's signed-in Claude or Codex CLI, until they decide otherwise.
+    /// Once, while the user hasn't chosen: turns cleanup on with a CLI signed in to their own subscription.
     func adoptSignedInSubscriptionIfUndecided() async {
-        guard VoiceInkSubscriptionCleanupDefault.isUndecided() else { return }
-        let signedIn = await LocalCLIService.signedInTemplates(VoiceInkSubscriptionCleanupDefault.preferredTemplates)
+        guard VoiceInkSubscriptionCleanupDefault.shouldCheck() else { return }
+        let (found, rejected) = await LocalCLIService.firstWorkingSubscriptionTemplate(
+            VoiceInkSubscriptionCleanupDefault.preferredTemplates
+        )
         // Re-check: the user may have chosen a provider while the CLIs were being probed.
-        guard VoiceInkSubscriptionCleanupDefault.isUndecided(),
-              let template = VoiceInkSubscriptionCleanupDefault.template(signedIn: signedIn)
-        else {
-            logger.notice("Subscription cleanup not adopted signedIn=\(signedIn.map(\.rawValue).sorted().joined(separator: ","), privacy: .public)")
+        guard VoiceInkSubscriptionCleanupDefault.isUndecided() else { return }
+        VoiceInkSubscriptionCleanupDefault.markChecked()
+        guard let template = found else {
+            logger.notice("Subscription cleanup not adopted rejected=\(rejected.joined(separator: ","), privacy: .public)")
             return
         }
 
         aiService.loadLocalCLITemplate(template)
+        aiService.updateLocalCLITimeoutSeconds(VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds)
         aiService.selectedProvider = .localCLI
+        // Automatic cleanup sends only the dictation; selected text stays opt-in.
+        useSelectedTextContext = false
         isEnhancementEnabled = true
         logger.notice("Subscription cleanup adopted template=\(template.rawValue, privacy: .public)")
         NotificationManager.shared.showNotification(
             title: VoiceInkSubscriptionCleanupDefault.adoptedNotificationTitle(for: template),
-            type: .success
+            type: .success,
+            duration: 8,
+            actionButton: (
+                label: VoiceInkSubscriptionCleanupDefault.turnOffButtonTitle,
+                action: { [weak self] in
+                    Task { @MainActor in
+                        self?.isEnhancementEnabled = false
+                    }
+                }
+            )
         )
     }
 
@@ -181,7 +202,7 @@ class AIEnhancementService: ObservableObject {
     }
 
     private func selectedTextContext() async -> String? {
-        guard AXIsProcessTrusted() else {
+        guard useSelectedTextContext, AXIsProcessTrusted() else {
             return nil
         }
         return await SelectedTextService.fetchSelectedText()

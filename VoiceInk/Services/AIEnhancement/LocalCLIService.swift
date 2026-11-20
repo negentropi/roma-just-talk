@@ -48,130 +48,164 @@ final class LocalCLIService {
             throw VoiceInkLocalCLIExecutionError.commandNotConfigured
         }
 
-        let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
-        return try await executeCommand(
-            commandTemplate: commandTemplate,
-            systemPrompt: systemPrompt,
-            userPrompt: userPrompt,
-            fullPrompt: fullPrompt,
-            timeout: timeoutSeconds
-        )
-    }
-
-    private func executeCommand(
-        commandTemplate: String,
-        systemPrompt: String,
-        userPrompt: String,
-        fullPrompt: String,
-        timeout: Double
-    ) async throws -> String {
-        try await withCheckedThrowingContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                let process = Process()
-                process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-                process.arguments = ["-lc", commandTemplate]
-
-                var environment = ProcessInfo.processInfo.environment
-                environment["PATH"] = Self.preferredPATH(fallback: environment["PATH"])
-                environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
-                environment["VOICEINK_USER_PROMPT"] = userPrompt
-                environment["VOICEINK_FULL_PROMPT"] = fullPrompt
-                process.environment = environment
-
-                let inputPipe = Pipe()
-                let outputPipe = Pipe()
-                let errorPipe = Pipe()
-                process.standardInput = inputPipe
-                process.standardOutput = outputPipe
-                process.standardError = errorPipe
-
-                do {
-                    try process.run()
-                } catch {
-                    continuation.resume(throwing: VoiceInkLocalCLIExecutionError.executionFailed(error.localizedDescription))
-                    return
-                }
-
-                if let inputData = fullPrompt.data(using: .utf8) {
-                    inputPipe.fileHandleForWriting.write(inputData)
-                }
-                try? inputPipe.fileHandleForWriting.close()
-
-                let semaphore = DispatchSemaphore(value: 0)
-                process.terminationHandler = { _ in
-                    semaphore.signal()
-                }
-
-                let waitResult = semaphore.wait(timeout: .now() + timeout)
-                if waitResult == .timedOut {
-                    if process.isRunning {
-                        process.terminate()
-                        _ = semaphore.wait(timeout: .now() + 2)
-                    }
-                    continuation.resume(throwing: VoiceInkLocalCLIExecutionError.timeout(seconds: timeout))
-                    return
-                }
-
-                let stdoutData = outputPipe.fileHandleForReading.readDataToEndOfFile()
-                let stderrData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-
-                let stdout = VoiceInkLocalCLIPreference.cleanedOutput(String(data: stdoutData, encoding: .utf8) ?? "")
-                let stderr = VoiceInkLocalCLIPreference.cleanedOutput(String(data: stderrData, encoding: .utf8) ?? "")
-
-                if process.terminationStatus != 0 {
-                    continuation.resume(throwing: VoiceInkLocalCLIPreference.commandFailureError(
-                        terminationStatus: Int(process.terminationStatus),
-                        stderr: stderr,
-                        commandTemplate: commandTemplate
-                    ))
-                    return
-                }
-
-                guard !stdout.isEmpty else {
-                    continuation.resume(throwing: VoiceInkLocalCLIExecutionError.emptyOutput)
-                    return
-                }
-
-                continuation.resume(returning: stdout)
-            }
-        }
-    }
-
-    /// Templates whose CLI is installed and signed in, checked with the same login-shell PATH used for cleanup.
-    static func signedInTemplates(_ candidates: [VoiceInkLocalCLITemplate]) async -> Set<VoiceInkLocalCLITemplate> {
-        await Task.detached(priority: .utility) {
-            var environment = ProcessInfo.processInfo.environment
-            environment["PATH"] = preferredPATH(fallback: environment["PATH"])
-            return Set(candidates.filter { template in
-                guard let command = VoiceInkSubscriptionCleanupDefault.signedInCheckCommand(for: template) else {
-                    return false
-                }
-                return exitsSuccessfully(command, environment: environment, timeout: 10)
-            })
+        let commandTemplate = commandTemplate
+        let timeout = timeoutSeconds
+        return try await Task.detached(priority: .userInitiated) {
+            try Self.runPrompt(commandTemplate: commandTemplate, systemPrompt: systemPrompt, userPrompt: userPrompt, timeout: timeout)
         }.value
     }
 
-    private static func exitsSuccessfully(_ command: String, environment: [String: String], timeout: TimeInterval) -> Bool {
+    /// The first preferred template whose CLI is signed in with a subscription and answers a real cleanup request.
+    static func firstWorkingSubscriptionTemplate(
+        _ candidates: [VoiceInkLocalCLITemplate]
+    ) async -> (template: VoiceInkLocalCLITemplate?, rejected: [String]) {
+        await Task.detached(priority: .utility) {
+            var rejected: [String] = []
+            for template in candidates {
+                guard let check = VoiceInkSubscriptionCleanupDefault.signInCheckCommand(for: template) else { continue }
+                guard let status = run(check, environment: shellEnvironment(), timeout: 10),
+                      VoiceInkSubscriptionCleanupDefault.isSubscriptionSignIn(template, exitStatus: status.exitStatus, output: status.stdout)
+                else {
+                    rejected.append("\(template.rawValue):no-subscription")
+                    continue
+                }
+                // Catches CLIs too old for the template's flags and credentials the cleanup command can't see.
+                do {
+                    _ = try runPrompt(
+                        commandTemplate: template.commandTemplate,
+                        systemPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestSystemPrompt,
+                        userPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestUserPrompt,
+                        timeout: VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds
+                    )
+                    return (template, rejected)
+                } catch {
+                    rejected.append("\(template.rawValue):smoke-test-failed")
+                }
+            }
+            return (nil, rejected)
+        }.value
+    }
+
+    private static func runPrompt(commandTemplate: String, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
+        let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
+        var environment = shellEnvironment()
+        environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
+        environment["VOICEINK_USER_PROMPT"] = userPrompt
+        environment["VOICEINK_FULL_PROMPT"] = fullPrompt
+
+        guard let result = run(commandTemplate, environment: environment, stdin: Data(fullPrompt.utf8), timeout: timeout) else {
+            throw VoiceInkLocalCLIExecutionError.timeout(seconds: timeout)
+        }
+        let stdout = VoiceInkLocalCLIPreference.cleanedOutput(result.stdout)
+        if result.exitStatus != 0 {
+            throw VoiceInkLocalCLIPreference.commandFailureError(
+                terminationStatus: Int(result.exitStatus),
+                stderr: VoiceInkLocalCLIPreference.cleanedOutput(result.stderr),
+                commandTemplate: commandTemplate
+            )
+        }
+        guard !stdout.isEmpty else {
+            throw VoiceInkLocalCLIExecutionError.emptyOutput
+        }
+        return stdout
+    }
+
+    private static func shellEnvironment() -> [String: String] {
+        var environment = ProcessInfo.processInfo.environment
+        environment["PATH"] = preferredPATH(fallback: environment["PATH"])
+        return environment
+    }
+
+    private struct ShellResult {
+        let exitStatus: Int32
+        let stdout: String
+        let stderr: String
+    }
+
+    /// Runs `zsh -lc command` under one deadline. stdin is written and output read concurrently, so a full
+    /// pipe can't stall the child or this caller. Returns nil if it can't launch or misses the deadline.
+    private static func run(
+        _ command: String,
+        arguments: [String] = ["-lc"],
+        environment: [String: String],
+        stdin: Data? = nil,
+        timeout: TimeInterval
+    ) -> ShellResult? {
+        let deadline = DispatchTime.now() + timeout
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-        process.arguments = ["-lc", command]
+        process.arguments = arguments + [command]
         process.environment = environment
-        process.standardInput = FileHandle.nullDevice
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
 
-        let semaphore = DispatchSemaphore(value: 0)
-        process.terminationHandler = { _ in semaphore.signal() }
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        process.standardOutput = outputPipe
+        process.standardError = errorPipe
+        let inputPipe = stdin.map { _ in Pipe() }
+        process.standardInput = inputPipe ?? FileHandle.nullDevice
+
+        let lock = NSLock()
+        var stdoutData = Data()
+        var stderrData = Data()
+        let drained = DispatchGroup()
+        for (pipe, isStdout) in [(outputPipe, true), (errorPipe, false)] {
+            drained.enter()
+            var reachedEOF = false
+            pipe.fileHandleForReading.readabilityHandler = { handle in
+                let chunk = handle.availableData
+                lock.lock()
+                defer { lock.unlock() }
+                guard !reachedEOF else { return }
+                if chunk.isEmpty {
+                    reachedEOF = true
+                    handle.readabilityHandler = nil
+                    drained.leave()
+                } else if isStdout {
+                    stdoutData.append(chunk)
+                } else {
+                    stderrData.append(chunk)
+                }
+            }
+        }
+
+        let exited = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in exited.signal() }
         do {
             try process.run()
         } catch {
-            return false
+            outputPipe.fileHandleForReading.readabilityHandler = nil
+            errorPipe.fileHandleForReading.readabilityHandler = nil
+            return nil
         }
-        guard semaphore.wait(timeout: .now() + timeout) == .success else {
+
+        if let stdin, let writer = inputPipe?.fileHandleForWriting {
+            // A child that never reads stdin must not raise SIGPIPE in Roma when it exits.
+            _ = fcntl(writer.fileDescriptor, F_SETNOSIGPIPE, 1)
+            DispatchQueue.global(qos: .utility).async {
+                try? writer.write(contentsOf: stdin)
+                try? writer.close()
+            }
+        }
+
+        guard exited.wait(timeout: deadline) == .success else {
             process.terminate()
-            return false
+            _ = exited.wait(timeout: .now() + 2)
+            outputPipe.fileHandleForReading.readabilityHandler = nil
+            errorPipe.fileHandleForReading.readabilityHandler = nil
+            return nil
         }
-        return process.terminationStatus == 0
+
+        // A background process the shell started can hold the pipes open; keep what arrived shortly after exit.
+        _ = drained.wait(timeout: .now() + 1)
+        outputPipe.fileHandleForReading.readabilityHandler = nil
+        errorPipe.fileHandleForReading.readabilityHandler = nil
+        lock.lock()
+        defer { lock.unlock() }
+        return ShellResult(
+            exitStatus: process.terminationStatus,
+            stdout: String(decoding: stdoutData, as: UTF8.self),
+            stderr: String(decoding: stderrData, as: UTF8.self)
+        )
     }
 
     private static func preferredPATH(fallback: String?) -> String {
@@ -190,55 +224,24 @@ final class LocalCLIService {
     }
 
     private static func discoverPATHFromInteractiveLoginShell() -> String? {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-        process.arguments = [
-            "-ilc",
-            "echo __VOICEINK_PATH_START__; print -r -- $PATH; echo __VOICEINK_PATH_END__"
-        ]
-
-        let stdoutPipe = Pipe()
-        let stderrPipe = Pipe()
-        process.standardOutput = stdoutPipe
-        process.standardError = stderrPipe
-
-        let semaphore = DispatchSemaphore(value: 0)
-        process.terminationHandler = { _ in semaphore.signal() }
-
-        do {
-            try process.run()
-        } catch {
-            return nil
-        }
-        let waitResult = semaphore.wait(timeout: .now() + 3)
-        if waitResult == .timedOut {
-            if process.isRunning {
-                process.terminate()
-            }
+        guard let result = run(
+            "echo __VOICEINK_PATH_START__; print -r -- $PATH; echo __VOICEINK_PATH_END__",
+            arguments: ["-ilc"],
+            environment: ProcessInfo.processInfo.environment,
+            timeout: 3
+        ), result.exitStatus == 0 else {
             return nil
         }
 
-        guard process.terminationStatus == 0 else {
-            return nil
-        }
-
-        let output = String(data: stdoutPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-        let startMarker = "__VOICEINK_PATH_START__"
-        let endMarker = "__VOICEINK_PATH_END__"
-
-        guard let startRange = output.range(of: startMarker),
-              let endRange = output.range(of: endMarker, range: startRange.upperBound..<output.endIndex)
+        let output = result.stdout
+        guard let startRange = output.range(of: "__VOICEINK_PATH_START__"),
+              let endRange = output.range(of: "__VOICEINK_PATH_END__", range: startRange.upperBound..<output.endIndex)
         else {
             return nil
         }
 
         let pathSection = output[startRange.upperBound..<endRange.lowerBound]
             .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !pathSection.isEmpty else {
-            return nil
-        }
-
-        return pathSection
+        return pathSection.isEmpty ? nil : pathSection
     }
 }

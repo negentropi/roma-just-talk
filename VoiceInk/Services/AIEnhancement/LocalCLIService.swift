@@ -186,7 +186,8 @@ final class LocalCLIService {
             guard let login = loginEnvironment() else {
                 throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.shellPathUnavailableMessage)
             }
-            guard let claude = claudeLaunch(login: login) else {
+            // The PATH is cached per launch; re-read it once in case claude moved since.
+            guard let claude = claudeLaunch(login: login) ?? loginEnvironment(refresh: true).flatMap(claudeLaunch(login:)) else {
                 throw VoiceInkLocalCLIExecutionError.subscriptionRefused(VoiceInkSubscriptionCleanupDefault.claudeNotFoundMessage)
             }
             // Checked every run: the sign-in or organization policy can change after the template was chosen.
@@ -381,9 +382,9 @@ final class LocalCLIService {
         try? writer.close()
     }
 
-    private static func loginEnvironment() -> [String: String]? {
+    private static func loginEnvironment(refresh: Bool = false) -> [String: String]? {
         shellPathQueue.sync {
-            if cachedLoginEnvironment == nil {
+            if refresh || cachedLoginEnvironment == nil {
                 cachedLoginEnvironment = discoverLoginEnvironment()
             }
             return cachedLoginEnvironment
@@ -394,10 +395,11 @@ final class LocalCLIService {
     /// fish), or nil if it fails or is too slow. `/usr/bin/env` prints them the same way in every shell.
     private static func discoverLoginEnvironment() -> [String: String]? {
         let loginShell = getpwuid(getuid()).flatMap { String(validatingUTF8: $0.pointee.pw_shell) } ?? "/bin/zsh"
-        // csh and tcsh reject `-ilc`, so read zsh's (it still loads the system profile). Any other shell that
-        // fails or is slow means "ask again later", not a PATH without claude.
-        let isCshFamily = ["csh", "tcsh"].contains(URL(fileURLWithPath: loginShell).lastPathComponent)
-        return discoverLoginEnvironment(shell: isCshFamily ? "/bin/zsh" : loginShell)
+        // Shells known to accept `-ilc` are read directly; a known shell that fails or is slow means "ask again
+        // later", not a PATH without claude. Others (csh, tcsh, pwsh, nushell…) get zsh, which still loads the
+        // system profile, as before.
+        let acceptsILC = ["zsh", "bash", "sh", "dash", "ksh", "fish"].contains(URL(fileURLWithPath: loginShell).lastPathComponent)
+        return discoverLoginEnvironment(shell: acceptsILC ? loginShell : "/bin/zsh")
     }
 
     private static func discoverLoginEnvironment(shell: String) -> [String: String]? {

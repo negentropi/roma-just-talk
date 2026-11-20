@@ -130,6 +130,26 @@ final class AIProviderCatalogTests: XCTestCase {
         }
     }
 
+    func testSubscriptionRunRefusalOnlyLetsAutomaticSetupUsePersonalUnmanagedPlans() {
+        typealias Policy = VoiceInkSubscriptionCleanupDefault
+        let rows: [(Policy.SignIn, automatic: Bool, policy: Bool, allowed: Bool)] = [
+            (.personalSubscription, true, false, true),
+            (.personalSubscription, true, true, false),
+            (.personalSubscription, false, true, true),
+            (.organizationSubscription, true, false, false),
+            (.organizationSubscription, false, false, true),
+            (.otherSubscription, true, false, false),
+            (.otherSubscription, false, false, true),
+            (.notSubscription, false, false, false),
+            (.unknown, false, false, false)
+        ]
+        for row in rows {
+            let refusal = Policy.runRefusal(signIn: row.0, adoptedAutomatically: row.automatic, organizationPolicyExists: row.policy)
+            XCTAssertEqual(refusal == nil, row.allowed, "\(row.0) automatic=\(row.automatic) policy=\(row.policy)")
+        }
+        XCTAssertNotEqual(VoiceInkLocalCLITemplate.claude.commandTemplate, VoiceInkLocalCLITemplate.claudeSubscription.commandTemplate)
+    }
+
     func testEmptyRemoteSettingsAreNotOrganizationPolicy() {
         XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(nil))
         XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.remoteSettingsHavePolicy(Data("{}".utf8)))
@@ -148,7 +168,6 @@ final class AIProviderCatalogTests: XCTestCase {
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: team), .organizationSubscription)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: apiKey), .notSubscription)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 1, stdout: signedOut), .notSubscription)
-        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 127, stdout: ""), .notSubscription)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 1, stdout: ""), .unknown)
         XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: 0, stdout: "loading..."), .unknown)
     }

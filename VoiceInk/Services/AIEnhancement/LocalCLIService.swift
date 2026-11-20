@@ -51,7 +51,7 @@ final class LocalCLIService {
             throw VoiceInkLocalCLIExecutionError.commandNotConfigured
         }
 
-        let commandTemplate = commandTemplate
+        let commandTemplate = selectedTemplate == .claudeSubscription ? nil : commandTemplate
         let timeout = timeoutSeconds
         return try await Self.onBlockingQueue(qos: .userInitiated) {
             try Self.runPrompt(commandTemplate: commandTemplate, systemPrompt: systemPrompt, userPrompt: userPrompt, timeout: timeout)
@@ -70,9 +70,12 @@ final class LocalCLIService {
     /// Whether Claude Code is signed in with a personal subscription and answers a real cleanup request.
     static func probeClaudeSubscription() async -> SubscriptionProbe {
         (try? await onBlockingQueue(qos: .utility) { () -> SubscriptionProbe in
-            guard let claude = Self.claudeLaunch() else {
-                // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
-                return Self.loginEnvironment() == nil ? .retryLater : .noSubscription
+            // Without the user's own PATH a missing `claude` proves nothing (nvm and ~/.local/bin live there).
+            guard let login = Self.loginEnvironment() else {
+                return .retryLater
+            }
+            guard let claude = Self.claudeLaunch(login: login) else {
+                return .noSubscription
             }
             if claude.organizationPolicyExists {
                 return .organizationManaged
@@ -82,14 +85,14 @@ final class LocalCLIService {
                 return .noSubscription
             case .organizationSubscription:
                 return .organizationManaged
-            case .unknown:
+            case .unknown, .otherSubscription:
                 return .retryLater
             case .personalSubscription:
                 break
             }
             do {
                 _ = try Self.runPrompt(
-                    commandTemplate: VoiceInkSubscriptionCleanupDefault.subscriptionCommand,
+                    commandTemplate: nil,
                     systemPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestSystemPrompt,
                     userPrompt: VoiceInkSubscriptionCleanupDefault.smokeTestUserPrompt,
                     timeout: VoiceInkSubscriptionCleanupDefault.adoptedTimeoutSeconds
@@ -124,8 +127,8 @@ final class LocalCLIService {
         }
     }
 
-    private static func claudeLaunch() -> ClaudeLaunch? {
-        guard let login = loginEnvironment(), let path = login["PATH"],
+    private static func claudeLaunch(login: [String: String]) -> ClaudeLaunch? {
+        guard let path = login["PATH"],
               let directory = path.split(separator: ":").first(where: {
                   FileManager.default.isExecutableFile(atPath: "\($0)/claude")
               })
@@ -156,11 +159,11 @@ final class LocalCLIService {
         return VoiceInkSubscriptionCleanupDefault.signIn(exitStatus: status.exitStatus, stdout: status.stdout)
     }
 
-    private static func runPrompt(commandTemplate: String, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
+    /// `commandTemplate` nil runs the subscription template: the user's `claude`, launched directly with checks.
+    private static func runPrompt(commandTemplate: String?, systemPrompt: String, userPrompt: String, timeout: Double) throws -> String {
         let fullPrompt = VoiceInkLocalCLIPreference.fullPrompt(systemPrompt: systemPrompt, userPrompt: userPrompt)
-        let result: ShellResult?
-        if commandTemplate == VoiceInkSubscriptionCleanupDefault.subscriptionCommand {
-            guard let claude = claudeLaunch() else {
+        guard let commandTemplate else {
+            guard let login = loginEnvironment(), let claude = claudeLaunch(login: login) else {
                 throw VoiceInkLocalCLIExecutionError.commandNotFound("claude")
             }
             // Checked every run: the sign-in or organization policy can change after the template was chosen.
@@ -171,7 +174,7 @@ final class LocalCLIService {
             ) {
                 throw VoiceInkLocalCLIExecutionError.executionFailed(refusal)
             }
-            result = run(
+            let result = run(
                 claude.executable,
                 arguments: VoiceInkSubscriptionCleanupDefault.cleanupArguments,
                 environment: claude.environment,
@@ -179,26 +182,30 @@ final class LocalCLIService {
                 timeout: timeout,
                 requireCompleteOutput: true
             )
-        } else {
-            var environment = shellEnvironment()
-            // Custom commands are promised these; the stock Claude and Codex templates read stdin only, and
-            // leaving the variables out keeps dictation out of same-user ps listings.
-            let stdinOnlyTemplates = [VoiceInkLocalCLITemplate.claude, .codex].map(\.commandTemplate)
-            if !stdinOnlyTemplates.contains(commandTemplate) {
-                environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
-                environment["VOICEINK_USER_PROMPT"] = userPrompt
-                environment["VOICEINK_FULL_PROMPT"] = fullPrompt
-            }
-            result = run(
-                URL(fileURLWithPath: "/bin/zsh"),
-                arguments: ["-lc", commandTemplate],
-                environment: environment,
-                stdin: Data(fullPrompt.utf8),
-                timeout: timeout,
-                requireCompleteOutput: true
-            )
+            return try output(of: result, timeout: timeout, command: "claude")
         }
 
+        var environment = shellEnvironment()
+        // Custom commands are promised these; the stock Claude and Codex templates read stdin only, and
+        // leaving the variables out keeps dictation out of same-user ps listings.
+        let stdinOnlyTemplates = [VoiceInkLocalCLITemplate.claude, .codex].map(\.commandTemplate)
+        if !stdinOnlyTemplates.contains(commandTemplate) {
+            environment["VOICEINK_SYSTEM_PROMPT"] = systemPrompt
+            environment["VOICEINK_USER_PROMPT"] = userPrompt
+            environment["VOICEINK_FULL_PROMPT"] = fullPrompt
+        }
+        let result = run(
+            URL(fileURLWithPath: "/bin/zsh"),
+            arguments: ["-lc", commandTemplate],
+            environment: environment,
+            stdin: Data(fullPrompt.utf8),
+            timeout: timeout,
+            requireCompleteOutput: true
+        )
+        return try output(of: result, timeout: timeout, command: commandTemplate)
+    }
+
+    private static func output(of result: ShellResult?, timeout: Double, command: String) throws -> String {
         guard let result else {
             throw VoiceInkLocalCLIExecutionError.timeout(seconds: timeout)
         }
@@ -207,7 +214,7 @@ final class LocalCLIService {
             throw VoiceInkLocalCLIPreference.commandFailureError(
                 terminationStatus: Int(result.exitStatus),
                 stderr: VoiceInkLocalCLIPreference.cleanedOutput(result.stderr),
-                commandTemplate: commandTemplate
+                commandTemplate: command
             )
         }
         guard !stdout.isEmpty else {
@@ -359,7 +366,8 @@ final class LocalCLIService {
 
     /// PATH and the `loginEnvironmentNames` values from an interactive login shell, or nil if it fails or is too slow.
     private static func discoverLoginEnvironment() -> [String: String]? {
-        let prints = loginEnvironmentNames.map { "print -r -- \"\($0)=${\($0)}\"" }.joined(separator: "; ")
+        // `${X-}` so a .zshrc with `setopt nounset` doesn't abort on an unset name before the end marker.
+        let prints = loginEnvironmentNames.map { "print -r -- \"\($0)=${\($0)-}\"" }.joined(separator: "; ")
         guard let result = run(
             URL(fileURLWithPath: "/bin/zsh"),
             arguments: ["-ilc", "echo __VOICEINK_ENV_START__; \(prints); echo __VOICEINK_ENV_END__"],

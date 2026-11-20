@@ -1184,9 +1184,10 @@ public enum VoiceInkSubscriptionCleanupDefault {
         "--tools", "", "--strict-mcp-config", "--mcp-config", #"{"mcpServers":{}}"#,
         "--disable-slash-commands", "--no-session-persistence"
     ]
-    public static let authStatusArguments = ["--setting-sources", "", "auth", "status"]
+    public static let authStatusArguments = ["--setting-sources", "", "auth", "status", "--json"]
 
-    /// What Settings shows for the subscription template; Roma runs `cleanupArguments` directly, not this text.
+    /// What Settings shows (read-only) for the subscription template; Roma always runs the current
+    /// `cleanupArguments`, never this text, so an older saved command can't fall back to a shell.
     public static let subscriptionCommand = "claude " + cleanupArguments.map { $0.isEmpty || $0.contains(" ") || $0.contains("\"") ? "'\($0)'" : $0 }.joined(separator: " ")
 
     /// The Load Template > Claude command: the same flags, but the user's own settings and credentials.
@@ -1194,11 +1195,11 @@ public enum VoiceInkSubscriptionCleanupDefault {
     /// `-` reads the prompt from stdin; codex exec prints only the final message on stdout.
     public static let codexTemplateCommand = "codex exec --skip-git-repo-check --ephemeral --sandbox read-only --disable shell_tool -c model_reasoning_effort=low - 2> /dev/null"
 
-    /// Organization-managed Claude Code can run hooks that would receive every dictation.
+    /// Organization-managed Claude Code can run hooks or inject instructions into every dictation. Anything
+    /// in the system ClaudeCode folder (managed settings, CLAUDE.md, rules) counts.
     public static func managedSettingsPaths(userName: String = NSUserName()) -> [String] {
         [
-            "/Library/Application Support/ClaudeCode/managed-settings.json",
-            "/Library/Application Support/ClaudeCode/managed-settings.d",
+            "/Library/Application Support/ClaudeCode",
             "/Library/Managed Preferences/com.anthropic.claudecode.plist",
             "/Library/Managed Preferences/\(userName)/com.anthropic.claudecode.plist"
         ]
@@ -1215,17 +1216,20 @@ public enum VoiceInkSubscriptionCleanupDefault {
 
     public static let organizationManagedMessage = "Claude Code is now managed by an organization, so Roma stopped sending dictation to it. To keep using it, choose Local CLI > Load Template > Claude (subscription only), or pick another cleanup provider."
     public static let notSubscriptionMessage = "Claude Code isn't signed in with a Claude subscription, so Roma didn't send dictation to it. Sign in with claude, or pick another cleanup provider."
+    public static let unknownSignInMessage = "Roma couldn't confirm Claude Code's sign-in, so it didn't send dictation. Update Claude Code or try again."
 
     /// Checked before every run of the subscription template. Automatic setup needs a personal plan and no
-    /// organization policy; a user who picked the template by hand also accepts Team and Enterprise.
+    /// organization policy; a user who picked the template by hand accepts any Claude subscription.
     public static func runRefusal(signIn: SignIn, adoptedAutomatically: Bool, organizationPolicyExists: Bool) -> String? {
         switch signIn {
         case .personalSubscription:
             return adoptedAutomatically && organizationPolicyExists ? organizationManagedMessage : nil
-        case .organizationSubscription:
+        case .organizationSubscription, .otherSubscription:
             return adoptedAutomatically ? organizationManagedMessage : nil
-        case .notSubscription, .unknown:
+        case .notSubscription:
             return notSubscriptionMessage
+        case .unknown:
+            return unknownSignInMessage
         }
     }
 
@@ -1234,7 +1238,9 @@ public enum VoiceInkSubscriptionCleanupDefault {
         case personalSubscription
         /// Team or Enterprise: the organization can push settings and hooks from its server.
         case organizationSubscription
-        /// Not installed, signed out, or signed in with something billed per token (api_key, api_key_helper, third_party).
+        /// A claude.ai login whose plan Roma doesn't recognize; fine when chosen by hand, not for automatic setup.
+        case otherSubscription
+        /// Signed out, or signed in with something billed per token (api_key, api_key_helper, third_party).
         case notSubscription
         /// No readable status: a slow, noisy or failing CLI start. Worth asking again later.
         case unknown
@@ -1246,8 +1252,7 @@ public enum VoiceInkSubscriptionCleanupDefault {
               let status = try? JSONSerialization.jsonObject(with: Data(stdout[start...end].utf8)) as? [String: Any],
               let loggedIn = status["loggedIn"] as? Bool
         else {
-            // 127: zsh found no `claude` on the user's PATH.
-            return exitStatus == 127 ? .notSubscription : .unknown
+            return .unknown
         }
         guard loggedIn, ["claude.ai", "oauth_token"].contains(status["authMethod"] as? String) else {
             return .notSubscription
@@ -1258,7 +1263,7 @@ public enum VoiceInkSubscriptionCleanupDefault {
         case "team", "enterprise":
             return .organizationSubscription
         default:
-            return .unknown
+            return .otherSubscription
         }
     }
 

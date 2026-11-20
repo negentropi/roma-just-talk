@@ -179,6 +179,8 @@ struct APIKeyManagementView: View {
                         }
 
                         TextEditor(text: $localCLICommandTemplate)
+                            // Shown for reference; Roma runs this template's checked command, not the text.
+                            .disabled(aiService.localCLITemplateSelection == .claudeSubscription)
                             .font(.system(.body, design: .monospaced))
                             .multilineTextAlignment(.leading)
                             .frame(minHeight: 100)

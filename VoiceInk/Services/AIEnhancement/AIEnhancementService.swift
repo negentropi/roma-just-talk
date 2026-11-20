@@ -112,6 +112,28 @@ class AIEnhancementService: ObservableObject {
         NotificationCenter.default.removeObserver(self)
     }
 
+    /// Turns cleanup on with the user's signed-in Claude or Codex CLI, until they decide otherwise.
+    func adoptSignedInSubscriptionIfUndecided() async {
+        guard VoiceInkSubscriptionCleanupDefault.isUndecided() else { return }
+        let signedIn = await LocalCLIService.signedInTemplates(VoiceInkSubscriptionCleanupDefault.preferredTemplates)
+        // Re-check: the user may have chosen a provider while the CLIs were being probed.
+        guard VoiceInkSubscriptionCleanupDefault.isUndecided(),
+              let template = VoiceInkSubscriptionCleanupDefault.template(signedIn: signedIn)
+        else {
+            logger.notice("Subscription cleanup not adopted signedIn=\(signedIn.map(\.rawValue).sorted().joined(separator: ","), privacy: .public)")
+            return
+        }
+
+        aiService.loadLocalCLITemplate(template)
+        aiService.selectedProvider = .localCLI
+        isEnhancementEnabled = true
+        logger.notice("Subscription cleanup adopted template=\(template.rawValue, privacy: .public)")
+        NotificationManager.shared.showNotification(
+            title: VoiceInkSubscriptionCleanupDefault.adoptedNotificationTitle(for: template),
+            type: .success
+        )
+    }
+
     @objc private func handleAPIKeyChange() {
         DispatchQueue.main.async {
             self.objectWillChange.send()

@@ -1140,12 +1140,46 @@ public enum VoiceInkLocalCLITemplate: String, CaseIterable, Identifiable, Sendab
         case .pi:
             return "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         case .claude:
-            return "claude -p \"$VOICEINK_FULL_PROMPT\""
+            // No tools, user settings, or MCP servers: startup drops from ~8 s to ~3 s per dictation.
+            return "claude -p --model sonnet --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" --tools \"\" --setting-sources \"\" --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --disable-slash-commands --no-session-persistence -- \"$VOICEINK_USER_PROMPT\""
         case .codex:
-            return "TMPFILE=$(mktemp) && codex exec --skip-git-repo-check --output-last-message \"$TMPFILE\" \"$VOICEINK_FULL_PROMPT\" > /dev/null 2>&1 && cat \"$TMPFILE\" && rm \"$TMPFILE\""
+            // stdin must be closed: codex exec waits for piped stdin before answering.
+            return "TMPFILE=$(mktemp) && codex exec --skip-git-repo-check --ephemeral --ignore-user-config --sandbox read-only -c model_reasoning_effort=low --output-last-message \"$TMPFILE\" -- \"$VOICEINK_FULL_PROMPT\" < /dev/null > /dev/null 2>&1 && cat \"$TMPFILE\" && rm \"$TMPFILE\""
         case .copilot:
             return "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         }
+    }
+}
+
+/// Cleanup turns on by itself with a CLI the user is already signed in to, so their own
+/// Claude or ChatGPT plan does the rewriting and no API key is needed.
+public enum VoiceInkSubscriptionCleanupDefault {
+    public static let preferredTemplates: [VoiceInkLocalCLITemplate] = [.claude, .codex]
+
+    /// Exits 0 only when the CLI is signed in.
+    public static func signedInCheckCommand(for template: VoiceInkLocalCLITemplate) -> String? {
+        switch template {
+        case .claude:
+            return "claude auth status"
+        case .codex:
+            return "codex login status"
+        case .pi, .copilot:
+            return nil
+        }
+    }
+
+    /// Undecided until the user picks a cleanup provider or switches cleanup on or off.
+    public static func isUndecided(_ defaults: UserDefaults = .standard) -> Bool {
+        defaults.object(forKey: VoiceInkUserDefaultsKey.isAIEnhancementEnabled) == nil &&
+            defaults.object(forKey: VoiceInkUserDefaultsKey.selectedAIProvider) == nil
+    }
+
+    public static func template(signedIn: Set<VoiceInkLocalCLITemplate>) -> VoiceInkLocalCLITemplate? {
+        preferredTemplates.first(where: signedIn.contains)
+    }
+
+    public static func adoptedNotificationTitle(for template: VoiceInkLocalCLITemplate) -> String {
+        "Cleanup is on, using your \(template.displayName) subscription"
     }
 }
 

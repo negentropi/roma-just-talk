@@ -137,6 +137,43 @@ final class LocalCLIService {
         }
     }
 
+    /// Templates whose CLI is installed and signed in, checked with the same login-shell PATH used for cleanup.
+    static func signedInTemplates(_ candidates: [VoiceInkLocalCLITemplate]) async -> Set<VoiceInkLocalCLITemplate> {
+        await Task.detached(priority: .utility) {
+            var environment = ProcessInfo.processInfo.environment
+            environment["PATH"] = preferredPATH(fallback: environment["PATH"])
+            return Set(candidates.filter { template in
+                guard let command = VoiceInkSubscriptionCleanupDefault.signedInCheckCommand(for: template) else {
+                    return false
+                }
+                return exitsSuccessfully(command, environment: environment, timeout: 10)
+            })
+        }.value
+    }
+
+    private static func exitsSuccessfully(_ command: String, environment: [String: String], timeout: TimeInterval) -> Bool {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        process.arguments = ["-lc", command]
+        process.environment = environment
+        process.standardInput = FileHandle.nullDevice
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+
+        let semaphore = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in semaphore.signal() }
+        do {
+            try process.run()
+        } catch {
+            return false
+        }
+        guard semaphore.wait(timeout: .now() + timeout) == .success else {
+            process.terminate()
+            return false
+        }
+        return process.terminationStatus == 0
+    }
+
     private static func preferredPATH(fallback: String?) -> String {
         shellPathQueue.sync {
             if let cachedInteractiveLoginPATH {

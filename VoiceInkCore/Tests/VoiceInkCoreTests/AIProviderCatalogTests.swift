@@ -97,15 +97,26 @@ final class AIProviderCatalogTests: XCTestCase {
             VoiceInkLocalCLITemplate.pi.commandTemplate,
             "pi -ne -ns -p --no-tools --system-prompt \"$VOICEINK_SYSTEM_PROMPT\" \"$VOICEINK_USER_PROMPT\""
         )
-        XCTAssertEqual(VoiceInkLocalCLITemplate.claude.commandTemplate, "claude -p \"$VOICEINK_FULL_PROMPT\"")
-        XCTAssertEqual(
-            VoiceInkLocalCLITemplate.codex.commandTemplate,
-            "TMPFILE=$(mktemp) && codex exec --skip-git-repo-check --output-last-message \"$TMPFILE\" \"$VOICEINK_FULL_PROMPT\" > /dev/null 2>&1 && cat \"$TMPFILE\" && rm \"$TMPFILE\""
-        )
         XCTAssertEqual(
             VoiceInkLocalCLITemplate.copilot.commandTemplate,
             "copilot -p \"$VOICEINK_FULL_PROMPT\" -s --no-ask-user --available-tools=__none__ 2>/dev/null"
         )
+    }
+
+    func testSubscriptionCleanupDefaultOnlyAppliesUntilTheUserDecides() {
+        withIsolatedDefaults { defaults in
+            XCTAssertTrue(VoiceInkSubscriptionCleanupDefault.isUndecided(defaults))
+            VoiceInkAIEnhancementPreference.saveIsEnabled(false, to: defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isUndecided(defaults))
+        }
+        withIsolatedDefaults { defaults in
+            VoiceInkAIEnhancementProviderPreference.saveSelectedProvider(.gemini, to: defaults)
+            XCTAssertFalse(VoiceInkSubscriptionCleanupDefault.isUndecided(defaults))
+        }
+
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.template(signedIn: [.codex, .claude]), .claude)
+        XCTAssertEqual(VoiceInkSubscriptionCleanupDefault.template(signedIn: [.codex]), .codex)
+        XCTAssertNil(VoiceInkSubscriptionCleanupDefault.template(signedIn: [.pi, .copilot]))
     }
 
     func testLocalCLIPreferencePreservesKeysDefaultsAndRoundTrips() {

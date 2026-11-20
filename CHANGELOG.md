@@ -9,6 +9,8 @@
 
 - Store new recordings as Opus instead of WAV, about 10x smaller on disk; playback, Retranscribe, and Retry keep working. Existing WAV recordings are converted once in the background after launch.
 
+- Turn on cleanup by default when the Claude Code or Codex CLI is installed and signed in: your own subscription polishes dictated text, with no API key. Claude is preferred, then Codex; a choice you already made is kept. Both commands start faster (Claude about 3 to 5 s instead of 8 s).
+
 ## v1.95.1 - 2026-09-11
 
 - Explain rejected NVIDIA API keys, missing access, and connection failures instead of showing an internal gRPC error.
